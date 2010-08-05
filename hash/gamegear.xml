@@ -6390,8 +6390,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+<!-- apparently the dump below was also found on a released Euro cart... waiting for verification before removing the 'Proto' part -->
 	<software name="cheesep1">
-		<description>Speedy Gonzales Cheese Catastrophe (Prototype, 19950217)</description>
+		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Prototype, 19950217)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6403,7 +6404,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
     <!-- same as feb 17 proto. was a mistake by drx? -->
 	<!--software name="cheesep2" cloneof="cheesep1">
-		<description>Speedy Gonzales Cheese Catastrophe (Prototype, 19950224)</description>
+		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Prototype, 19950224)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">

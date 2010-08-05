@@ -1,0 +1,387 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="vic1001_cart" description="Commodore VIC-1001 / VIC-20 cartridges">
+
+	<software name="worldwar">
+		<description>A World at War (PAL)</description>
+		<!-- <serial>VIC-7303</serial> -->
+		<year>198?</year>
+		<publisher>Handic</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="a world at war (handic)(198-)(vic-7303)(e).a0" size="8192" crc="89a8b4af" sha1="63a0ca93c2270d578f6bcde17bc6f5970ec30974" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ae" supported"no">
+		<description>A.E.</description>
+		<!-- <serial>VicCart-224</serial> -->
+		<year>1982</year>
+		<publisher>Br0derbund</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="a.e. (br0derbund)(1982)(viccart-224)(jue).60" size="8192" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="a.e. (br0derbund)(1982)(viccart-224)(jue).a0" size="8192" crc="05ae8278" sha1="3309bb5fe0c4fddfacfe99acbac9e8922297e7a4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advland">
+		<description>Adventure #1 - Adventureland</description>
+		<!-- <serial>VIC-1914</serial> -->
+		<!-- Enter "SYS 32592" to run cartridge. -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="4000" size="16384">
+				<rom name="adventure #1 - adventureland (commodore)(1981)(vic-1914)(jue)(sys 32592).40" size="16384" crc="47c59df4" sha1="cb29d160672d9c4383bc2549909bc6f5a059dc5d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="piratecv">
+		<description>Adventure #2 - Pirate's Cove</description>
+		<!-- <serial>VIC-1915</serial> -->
+		<!-- Enter "SYS 32592" to run cartridge. -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="4000" size="16384">
+				<rom name="adventure #2 - pirate&apos;s cove (commodore)(1981)(vic-1915)(jue)(sys 32592).40" size="16384" crc="27cfafa3" sha1="2e4accb6abb84c3a5062a98c398bee3fbf93f9e2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="mission">
+		<description>Adventure #3 - Mission Impossible</description>
+		<!-- <serial>VIC-1916</serial> -->
+		<!-- Enter "SYS 32592" to run cartridge. -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="4000" size="16384">
+				<rom name="adventure #3 - mission impossible (commodore)(1981)(vic-1916)(jue)(sys 32592).40" size="16384" crc="e385353a" sha1="03c9d4453390d37e71e345faa409eb01a1cfeff9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="voodoo">
+		<description>Adventure #4 - Voodoo Castle</description>
+		<!-- <serial>VIC-1918</serial> -->
+		<!-- Enter "SYS 32592" to run cartridge. -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="4000" size="16384">
+				<rom name="adventure #4 - voodoo castle (commodore)(1981)(vic-1918)(jue)(sys 32592).40" size="16384" crc="56ac6dbf" sha1="110395991e42ad80b6894645884e8a0380c9f424" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="thecount">
+		<description>Adventure #5 - The Count</description>
+		<!-- <serial>VIC-1917/serial> -->
+		<!-- Enter "SYS 32592" to run cartridge. -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="4000" size="16384">
+				<rom name="adventure #5 - the count (commodore)(1981)(vic-1917)(jue)(sys 32592).40" size="16384" crc="05acb7ab" sha1="81b4fca6eaf0a200948eb1d7eaf14c1dd401ad5b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="agresorn">
+		<description>Aggressor (NTSC)</description>
+		<!-- <serial>C305</serial> -->
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="aggressor (hes)(1982)(c305)(ju).a0" size="8192" crc="505ba5ea" sha1="77e480f56259459a0654751efda1417a689d83c5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="agresornp" cloneof="agresorn">
+		<description>Aggressor (PAL)</description>
+		<!-- <serial>C305</serial> -->
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="aggressor (hes)(1982)(c305)(e).a0" size="8192" crc="8610fbab" sha1="c89c75d5c543c68b429c7d7f98f68105464d3b19" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="alien">
+		<description>Alien / Super Alien (NTSC)</description>
+		<!-- <serial>VIC-1906</serial> -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="alien (aka super alien) (commodore)(1981)(vic-1906)(ju).a0" size="8192" crc="5118ab82" sha1="d303f866e1a8fea6deabe78553670ca8cc411df3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="alienblz">
+		<description>Alien Blitz</description>
+		<!-- <serial>1619</serial> -->
+		<year>1981</year>
+		<publisher>UMI</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="alien blitz (umi)(1981)(1619).a0" size="4096" crc="b53d9458" sha1="f78fece59b9ff2f281489211cadef7d459c209b2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="alienss">
+		<description>Alien Sidestep (NTSC)</description>
+		<!-- <serial></serial> -->
+		<year>1983</year>
+		<publisher>OEM</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="alien sidestep (oem)(1983)(ju).a0" size="4096" crc="2c9232d5" sha1="462e36e632e0091de18f23f6d44703e51eb553e7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="alphazoo" supported"no">
+		<description>Alphabet Zoo (NTSC)</description>
+		<!-- <serial>C326</serial> -->
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="alphabet zoo (hes)(1983)(c326)(ju).60" size="8192" crc="bef5bd96" sha1="6cf9336ad5b1f82fb639c1930fcca4edfba02df9" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="alphabet zoo (hes)(1983)(c326)(ju).a0" size="8192" crc="81424bcc" sha1="f9ea2177215b0c0d946af9b3e42705fed9e6b464" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="amazmaze">
+		<description>Amazing Maze</description>
+		<!-- <serial></serial> -->
+		<year>198?</year>
+		<publisher>Machine Language Games</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="amazing maze (machine language games)(198-)(jue).a0" size="4096" crc="e50e9e0d" sha1="b702f86e18eb51ffbe357b074ab27331b03671c7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="amazmazea" cloneof="amazmaze">
+		<description>Amazing Maze (Alt)</description>
+		<!-- <serial></serial> -->
+		<year>198?</year>
+		<publisher>Machine Language Games</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="amazing maze (machine language games)(198-)(jue) [a].a0" size="4096" crc="d77c00f7" sha1="2e248c8758aa9d9077702ea59f84bcdb36d372f3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="amidar">
+		<description>Amidar (PAL)</description>
+		<!-- <serial></serial> -->
+		<year>198?</year>
+		<publisher>F. Janke</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="amidar (f. janke)(198-)(e).a0" size="8192" crc="eebd9d68" sha1="b67ade8e5f09f68c1c31002250f0cca35940ee01" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="amok">
+		<description>Amok!</description>
+		<!-- <serial>1611</serial> -->
+		<year>1981</year>
+		<publisher>UMI</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="amok! (umi)(1981)(1611)(jue).a0" size="4096" crc="77738d0b" sha1="a354481bdc5411e07a446a8a41397e7237d9f198" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="apescape">
+		<description>Ape Escape</description>
+		<!-- <serial>SC-215</serial> -->
+		<year>1982</year>
+		<publisher>Spectravideo</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="ape escape (spectravideo)(1982)(sc-215)(jue).a0" size="8192" crc="771eff92" sha1="81a6483ec3989586c6dc4442443ccabb3f4aafe7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+     <software name="applepnc">
+		<description>Apple Panic (NTSC)</description>
+		<!-- <serial>VI-AP-C</serial> -->
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="apple panic (creative)(1982)(vi-ap-c)(ju).a0" size="8192" crc="55cdfa8d" sha1="c4e695ed97a287f2932da4b9961f43569f0fe5f0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="applepncp" cloneof="applepnc" supported"no">
+		<description>Apple Panic (PAL)</description>
+		<!-- <serial>VI-AP-C</serial> -->
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="apple panic (creative)(1982)(vi-ap-c)(e).60" size="4096" crc="d9594f49" sha1="be2101da88fba906682c8f44e4a27f740afa05b3" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="apple panic (creative)(1982)(vi-ap-c)(e).a0" size="4096" crc="503b053c" sha1="f8c0932d59d5699db883bec090c955ce00ed81af" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="aracnoid" supported"no">
+		<description>Arachnoid</description>
+		<!-- <serial>1605</serial> -->
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="arachnoid (umi)(1982)(1605).60" size="8192" crc="ad217e63" sha1="5bedc3462509987c325723d08d08745223ddaf6f" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="arachnoid (umi)(1982)(1605).a0" size="8192" crc="ec43f977" sha1="11fbeb05348d47c50f6fa2f1b52d9e3c5fde5325" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="arcadia">
+		<description>Arcadia (PAL)</description>
+		<!-- <serial></serial> -->
+		<year>198?</year>
+		<publisher>Unknown</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="arcadia (198-)(e).a0" size="8192" crc="9eac9fab" sha1="0432f1719422f385ededb98e0739bdcbccafc12c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="artilery" supported"no">
+		<description>Artillery Duel (NTSC)</description>
+		<!-- <serial>6235-A</serial> -->
+		<!-- This double ended cartridge also contains "Chuck Norris Superkicks". -->
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="artillery duel (xonox)(1983)(6235-a)(ju).60" size="8192" crc="54cc4e6e" sha1="7819711f01283a675070c1efd85ea592532fd739" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="artillery duel (xonox)(1983)(6235-a)(ju).a0" size="8192" crc="53c08b56" sha1="36cd57ae01f84da319d58903b7ac942e2a2d3f65" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="assam">
+		<description>Assam - Assembler</description>
+		<!-- <serial></serial> -->
+		<!-- Enter "SYS 700" to run cartridge. -->
+		<year>198?</year>
+		<publisher>Unknown</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="assam - assembler (198-)(jue) (sys 700).a0" size="8192" crc="122a4ad8" sha1="b3a31ba894f021f30521e22251cb2091345dee09" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="astblitz">
+		<description>Astroblitz (NTSC)</description>
+		<!-- <serial>VI-AB-C</serial> -->
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="astroblitz (creative)(1982)(vi-ab-c)(ju).a0" size="4096" crc="2a26ef6c" sha1="b34c362907c17c78120b06a589d28e8430443efb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="astblitzp" cloneof="astblitz">
+		<description>Astroblitz (PAL)</description>
+		<!-- <serial>VI-AB-C</serial> -->
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="astroblitz (creative)(1982)(vi-ab-c)(e).a0" size="4096" crc="0f6c5ed9" sha1="b8cf27b4768ef9eda8e2466f8d0471fd6905814c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="atlantis">
+		<description>Atlantis (NTSC)</description>
+		<!-- <serial>720051-1A</serial> -->
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="atlantis (imagic)(1983)(720051-1a)(ju).a0" size="4096" crc="f1ff8b52" sha1="47d5907a2b6c53a316a7a56d5b5fab6b26298bbb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="atlantisp" cloneof="atlantis">
+		<description>Atlantis (PAL)</description>
+		<!-- <serial>720051-1A</serial> -->
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="atlantis (imagic)(1983)(720051-1a)(e).a0" size="4096" crc="b81c0e71" sha1="81531534830b1431e324cdc952127682e5b13bd4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="mtntcmls">
+		<description>Attack of the Mutant Camels</description>
+		<!-- <serial>C318</serial> -->
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="attack of the mutant camels (hes)(1983)(c318)(jue).a0" size="8192" crc="d754b1ed" sha1="b5915e82f965f77b76379ea29ee9f20252313207" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="avenger">
+		<description>Avenger / VIC Avenger</description>
+		<!-- <serial>VIC-1901</serial> -->
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="avenger (aka vic avenger) (commodore)(1981)(vic-1901).a0" size="8192" crc="8a7c3a97" sha1="42b5cbbc15b537b7be7286120d36f5c4eb9b2061" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

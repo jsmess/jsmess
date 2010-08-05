@@ -3489,6 +3489,18 @@
 		</part>
 	</software>
 
+	<software name="pengadv" supported="no">
+		<!-- Alt Title: Kkum Ui Dai Ryuk ~ 꿈의대륙 -->
+		<description>Penguin Adventure (Kor)</description>
+		<year>199?</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="penguin adventure (kr).bin" size="131072" crc="445525e2" sha1="9d0c8fb5f1ff6f596aa156264db8d7c1c778b1bf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: 5501 -->
 	<software name="penguin">
 		<description>Penguin Land (Euro, USA)</description>

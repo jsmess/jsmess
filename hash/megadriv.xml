@@ -86,7 +86,6 @@
   * Payne Stewart Golf
   * Jack Nicklaus 95
   * Jack Nicklaus Power Challenge
-  * Stone Protectors
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
   
@@ -18319,6 +18318,17 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="steel talons (usa) (beta).bin" size="524288" crc="c4052f18" sha1="c3edd1f6b9f4fb16104d09c17b66feebb3785f4e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stonepro">
+		<description>Stone Protectors (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="stone protectors.bin" size="2097152" crc="fbf0d54f" sha1="6629a0299689898b1a9b54e4fd05dad1e2fd62d3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

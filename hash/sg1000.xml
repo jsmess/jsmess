@@ -14,7 +14,7 @@ The following games were available both as Golden Carts and as MyCards.
 I'm not sure from what version the dumps below come (or it they have been
 verified to contain the same data)
 
-C-05 - Champion Golf
+C-05 - Champion Golf [dumped and verified to be diff from G-1005]
 C-17 - Monaco GP
 C-26 - Star Force
 C-33 - Champion Boxing [dumped and verified to be diff from G-1033]
@@ -216,13 +216,25 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champglf">
-		<!-- Serial: G-1005 & C-05 - Alt Title: チャンピオン ゴルフ -->
+		<!-- Serial: G-1005 - Alt Title: チャンピオン ゴルフ -->
 		<description>Champion Golf (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Logitec</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="champion golf (japan).bin" size="32768" crc="868419b5" sha1="05deb000f24b7d8625c6e9332dcc91416ed3258f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champglf1" cloneof="champglf">
+		<!-- Serial: C-05 - Alt Title: チャンピオン ゴルフ -->
+		<description>Champion Golf (MyCard) (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega / Logitec</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion golf [card].bin" size="32768" crc="5a904122" sha1="f58f14581919c431ac85da72fd1a39bbe1da5e66" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -490,12 +502,24 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="gpworld">
 		<!-- Serial: G-1040 - Alt Title: GPワールド -->
-		<description>GP World (Jpn)</description>
+		<description>GP World (Jpn, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="gp world (japan).bin" size="32768" crc="191ffe0a" sha1="37aa4812d37445c9e86bc4e02f056fb50d19dc6a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gpworlda" cloneof="gpworld">
+		<!-- Serial: G-1040 - Alt Title: GPワールド -->
+		<description>GP World (Jpn, v0)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="gp world [v0].bin" size="32768" crc="942adf84" sha1="40ae9c24c61188c6f02eba1b83109c5c4d86e64b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1038,6 +1062,18 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="wboy">
+		<!-- Serial: C-69 - Alt Title: ワンダーボーイ -->
+		<description>Wonder Boy (Jpn, v1)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="wonder boy [v1].bin" size="32768" crc="e8f0344d" sha1="240600a0dda16809f49b173f731c7fdaf921466a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wboya" cloneof="wboy">
 		<!-- Serial: C-69 - Alt Title: ワンダーボーイ -->
 		<description>Wonder Boy (Jpn)</description>
 		<year>1986</year>
