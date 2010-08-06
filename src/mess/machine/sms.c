@@ -1110,6 +1110,13 @@ static int sms_verify_cart( UINT8 *magic, int size )
 	return retval;
 }
 
+#ifdef UNUSED_FUNCTION
+// For the moment we switch to a different detection routine which allows to detect 
+// in a single run Codemasters mapper, Korean mapper (including Jang Pung 3 which 
+// uses a diff signature then the one below here) and Zemina mapper (used by Wonsiin, etc.).
+// I leave these here to document alt. detection routines and in the case these functions
+// can be updated
+
 /* Check for Codemasters mapper
   0x7FE3 - 93 - sms Cosmis Spacehead
               - sms Dinobasher
@@ -1158,6 +1165,7 @@ static int detect_korean_mapper( UINT8 *rom )
 	}
 	return 0;
 }
+#endif
 
 
 static int detect_tvdraw( UINT8 *rom )
@@ -1355,18 +1363,9 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	else
 	{
 		/* If no extrainfo information is available try to find special information out on our own */
-		/* Check for special cartridge features */
+		/* Check for special cartridge features (new routine, courtesy of Omar Cornut, from MEKA)  */
 		if (size >= 0x8000)
 		{
-			if (0)
-			{
-				/* Check for special mappers */
-				if (detect_codemasters_mapper(sms_state.cartridge[index].ROM))
-					sms_state.cartridge[index].features |= CF_CODEMASTERS_MAPPER;
-
-				if (detect_korean_mapper(sms_state.cartridge[index].ROM))
-					sms_state.cartridge[index].features |= CF_KOREAN_MAPPER;
-			}
 			int c0002 = 0, c8000 = 0, cA000 = 0, cFFFF = 0, i;
 			for (i = 0; i < 0x8000; i++)
 			{
@@ -1384,9 +1383,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 				}
 			}
 			
-			printf("c002=%d, c8000=%d, cA000=%d, cFFFF=%d\n", c0002, c8000, cA000, cFFFF);
-			
-			// FIXME: Maybe automatically set "no mapper" mode for 32 KB games.
+			LOG(("Mapper test: c002 = %d, c8000 = %d, cA000 = %d, cFFFF = %d\n", c0002, c8000, cA000, cFFFF));
 			
 			// 2 is a security measure, although tests on existing ROM showed it was not needed
 			if (c0002 > cFFFF + 2 || (c0002 > 0 && cFFFF == 0))
