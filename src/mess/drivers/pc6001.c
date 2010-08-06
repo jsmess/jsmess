@@ -346,7 +346,7 @@ static VIDEO_UPDATE( pc6001m2 )
 		int xi,yi,pen,fgcol,color;
 		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
 
-		for(y=0;y<24;y++)
+		for(y=0;y<25;y++)
 		{
 			for(x=0;x<40;x++)
 			{
@@ -366,7 +366,8 @@ static VIDEO_UPDATE( pc6001m2 )
 						else
 							color = pen ? fgcol : 0;
 
-						*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
+						if ((x*8+xi) < screen->visible_area().max_x && (y*12+yi) < screen->visible_area().max_y)
+							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
 					}
 				}
 			}
