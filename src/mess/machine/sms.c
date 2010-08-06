@@ -9,12 +9,12 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define CF_CODEMASTERS_MAPPER 0x01
-#define CF_KOREAN_MAPPER      0x02
+#define CF_CODEMASTERS_MAPPER    0x01
+#define CF_KOREAN_MAPPER         0x02
 #define CF_KOREAN_ZEMINA_MAPPER  0x04
-#define CF_93C46_EEPROM       0x08
-#define CF_ONCART_RAM         0x10
-#define CF_GG_SMS_MODE        0x20
+#define CF_93C46_EEPROM          0x08
+#define CF_ONCART_RAM            0x10
+#define CF_GG_SMS_MODE           0x20
 
 #define MAX_CARTRIDGES        16
 
@@ -792,7 +792,7 @@ static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
 				memory_set_bankptr(space->machine, "bank4", sms_state.banking_cart[4]);
 				break;
 		}
-		LOG(("Zemina 2 mapper write: offset %x data %x.\n", offset, page));
+		LOG(("Zemina mapper write: offset %x data %x.\n", offset, page));
 	}
 }
 
@@ -904,7 +904,7 @@ WRITE8_HANDLER( sms_cartram_w )
 			sms_state.banking_cart[5] = sms_state.cartridge[sms_state.current_cartridge].ROM + page * 0x4000;
 			memory_set_bankptr(space->machine, "bank5", sms_state.banking_cart[5]);
 			memory_set_bankptr(space->machine, "bank6", sms_state.banking_cart[5] + 0x2000);
-			LOG(("rom 2 paged in %x codemasters.\n", page));
+			LOG(("rom 2 paged in %x (Codemasters mapper).\n", page));
 		}
 		else if (sms_state.cartridge[sms_state.current_cartridge].features & CF_ONCART_RAM)
 		{
@@ -1424,7 +1424,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		memory_nop_write(program, 0xa000, 0xa000, 0, 0);
 	}
 
-	printf("%x\n", sms_state.cartridge[index].features);
+	LOG(("Cart Features: %x\n", sms_state.cartridge[index].features));
 
 	/* Load battery backed RAM, if available */
 	image.battery_load(sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
