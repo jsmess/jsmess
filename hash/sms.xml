@@ -3489,7 +3489,7 @@
 		</part>
 	</software>
 
-	<software name="pengadv" supported="no">
+	<software name="pengadv">
 		<!-- Alt Title: Kkum Ui Dai Ryuk ~ 꿈의대륙 -->
 		<description>Penguin Adventure (Kor)</description>
 		<year>199?</year>
@@ -4749,7 +4749,7 @@
 		</part>
 	</software>
 
-	<software name="strtmast" supported="no">
+	<software name="strtmast">
 		<description>Street Master (Kor)</description>
 		<year>1992</year>
 		<publisher>Zemina</publisher>
@@ -5455,7 +5455,7 @@
 		</part>
 	</software>
 
-	<software name="wonsiin" supported="no">
+	<software name="wonsiin">
 		<description>Wonsiin (Kor)</description>
 		<year>1991</year>
 		<publisher>Zemina</publisher>
