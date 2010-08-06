@@ -17,6 +17,8 @@
            so this implementation will be used in the end.
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
+	- PC6001Mk2: crashes if you attempt to load the UI in debug mode (like putting partial keyboard
+	             emulation), dunno the reason
 
 	TODO (game specific):
 	- Arm Wrestling (PD): returns an "?OM Error" during loading, it seems to be a N66
@@ -335,7 +337,43 @@ static VIDEO_UPDATE( pc6001 )
 
 static VIDEO_UPDATE( pc6001m2 )
 {
-	pc6001_screen_draw(screen->machine,bitmap,cliprect,0);
+	int tile,attr,x,y;
+
+	attr = pc6001_video_ram[0];
+
+	if(attr == 0x0f)
+	{
+		int xi,yi,pen,fgcol,color;
+		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+
+		for(y=0;y<24;y++)
+		{
+			for(x=0;x<40;x++)
+			{
+				tile = pc6001_video_ram[(x+(y*40))+0x400];
+				attr = pc6001_video_ram[(x+(y*40)) & 0x3ff];
+
+				for(yi=0;yi<12;yi++)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+
+						fgcol = /*(attr & 2) ? 2 : */7;
+
+						if((attr & 0x0f) == 0x00) //TODO
+							color = pen ? 0 : fgcol;
+						else
+							color = pen ? fgcol : 0;
+
+						*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
+					}
+				}
+			}
+		}
+	}
+	else
+		pc6001_screen_draw(screen->machine,bitmap,cliprect,0);
 
 	return 0;
 }
@@ -529,6 +567,8 @@ static const UINT32 banksw_table_r1[0x10][4] = {
 	{ -1,			-1,				-1,				-1 },			//0x0f: <invalid setting>
 };
 
+static UINT8 bank_r0;
+
 static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
@@ -536,7 +576,9 @@ static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
-	printf("%02x BANK\n",data);
+	bank_r0 = data;
+
+//	printf("%02x BANK\n",data);
 	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[data & 0xf][0]]);
 	memory_set_bankptr(space->machine, "bank2", &ROM[banksw_table_r0[data & 0xf][1]]);
 	memory_set_bankptr(space->machine, "bank3", &ROM[banksw_table_r0[(data & 0xf0)>>4][2]]);
@@ -550,7 +592,7 @@ static WRITE8_HANDLER( pc6001m2_bank_r1_w )
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
-	printf("%02x BANK\n",data);
+//	printf("%02x BANK\n",data);
 	memory_set_bankptr(space->machine, "bank5", &ROM[banksw_table_r1[data & 0xf][0]]);
 	memory_set_bankptr(space->machine, "bank6", &ROM[banksw_table_r1[data & 0xf][1]]);
 	memory_set_bankptr(space->machine, "bank7", &ROM[banksw_table_r1[(data & 0xf0)>>4][2]]);
@@ -566,6 +608,68 @@ static WRITE8_HANDLER( work_ram5_w ) { UINT8 *ROM = memory_region(space->machine
 static WRITE8_HANDLER( work_ram6_w ) { UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+WRAM(6)] = data; }
 static WRITE8_HANDLER( work_ram7_w ) { UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+WRAM(7)] = data; }
 
+static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
+{
+	if (offset==3)
+	{
+		if(data & 1)
+			port_c_8255 |=   1<<((data>>1)&0x07);
+		else
+			port_c_8255 &= ~(1<<((data>>1)&0x07));
+
+		switch(data) {
+        	case 0x08: port_c_8255 |= 0x88; break;
+        	case 0x09: port_c_8255 &= 0xf7; break;
+        	case 0x0c: port_c_8255 |= 0x28; break;
+        	case 0x0d: port_c_8255 &= 0xf7; break;
+        	default: break;
+		}
+
+		port_c_8255 |= 0xa8;
+
+		{
+			UINT8 *ROM = memory_region(device->machine, "maincpu");
+			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
+
+			//printf("%02x\n",data);
+
+			if((data & 0x0f) == 0x05)
+				memory_set_bankptr(device->machine, "bank4", &ROM[banksw_table_r0[(bank_r0 & 0xf0)>>4][3]]);
+			if((data & 0x0f) == 0x04)
+				memory_set_bankptr(device->machine, "bank4", &gfx_data[0]); //FIXME: check this (CGROM 2)
+		}
+	}
+	i8255a_w(device,offset,data);
+}
+
+static WRITE8_HANDLER ( pc6001m2_system_latch_w )
+{
+	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+
+	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(5) }; //TODO: check me
+
+	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+
+	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
+
+	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
+	{
+		cas_switch = 1;
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	}
+	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
+	{
+		cas_switch = 0;
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//irq_vector = 0x00;
+		//cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
+	}
+
+	sys_latch = data;
+	printf("%02x\n",data);
+}
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -585,11 +689,11 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
 	//0xf2 w bank
@@ -1057,6 +1161,24 @@ static DEVICE_IMAGE_LOAD( pc6001_cass )
 	return IMAGE_INIT_PASS;
 }
 
+static const gfx_layout charlayout =
+{
+	8, 16,					/* 8 x 8 characters */
+	RGN_FRAC(1,1),					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( pc6001m2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 4)
@@ -1067,6 +1189,9 @@ static MACHINE_DRIVER_START( pc6001 )
 //  MDRV_CPU_ADD("subcpu", I8049, 7987200)
 	MDRV_MACHINE_START(pc6001)
 	MDRV_MACHINE_RESET(pc6001)
+
+	MDRV_GFXDECODE(pc6001m2)
+
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1105,6 +1230,8 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_DRIVER_END
 
+
+
 static MACHINE_DRIVER_START( pc6001m2 )
 	MDRV_IMPORT_FROM(pc6001)
 
@@ -1116,6 +1243,8 @@ static MACHINE_DRIVER_START( pc6001m2 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
 	MDRV_CPU_IO_MAP(pc6001m2_io)
+
+	MDRV_GFXDECODE(pc6001m2)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001sr )
@@ -1173,8 +1302,8 @@ ROM_START( pc6001m2 )
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x1000 )
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x4000 )
 
 	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
