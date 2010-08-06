@@ -244,23 +244,39 @@ static WRITE8_HANDLER( smc777_fbuf_w )
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
 
-static READ8_HANDLER( smc777_fdc_r )
+static void check_floppy_inserted(running_machine *machine)
+{
+	int f_num;
+	floppy_image *floppy;
+
+	/* check if a floppy is there, automatically disconnect the ready line if so (HW doesn't control the ready line) */
+	/* FIXME: floppy drive 1 doesn't work? */
+	for(f_num=0;f_num<2;f_num++)
+	{
+		floppy = flopimg_get_image(floppy_get_device(machine, f_num));
+		floppy_mon_w(floppy_get_device(machine, f_num), (floppy != NULL) ? 0 : 1);
+		floppy_drive_set_ready_state(floppy_get_device(machine, f_num), (floppy != NULL) ? 1 : 0,0);
+	}
+}
+
+static READ8_HANDLER( smc777_fdc1_r )
 {
 	running_device* dev = space->machine->device("fdc");
-	//UINT8 ret = 0;
 
-	switch(offset+0x30)
+	check_floppy_inserted(space->machine);
+
+	switch(offset)
 	{
-		case 0x30:
+		case 0x00:
 			return wd17xx_status_r(dev,offset);
-		case 0x31:
+		case 0x01:
 			return wd17xx_track_r(dev,offset);
-		case 0x32:
+		case 0x02:
 			return wd17xx_sector_r(dev,offset);
-		case 0x33:
+		case 0x03:
 			return wd17xx_data_r(dev,offset);
-		case 0x34: //irq / drq status
-			popmessage("%02x %02x\n",fdc_irq_flag,fdc_drq_flag);
+		case 0x04: //irq / drq status
+			//popmessage("%02x %02x\n",fdc_irq_flag,fdc_drq_flag);
 
 			return (fdc_irq_flag ? 0x80 : 0x00) | (fdc_drq_flag ? 0x00 : 0x40);
 	}
@@ -268,31 +284,31 @@ static READ8_HANDLER( smc777_fdc_r )
 	return 0x00;
 }
 
-static WRITE8_HANDLER( smc777_fdc_w )
+static WRITE8_HANDLER( smc777_fdc1_w )
 {
 	running_device* dev = space->machine->device("fdc");
 
-	switch(offset+0x30)
+	check_floppy_inserted(space->machine);
+
+	switch(offset)
 	{
-		case 0x30:
+		case 0x00:
 			wd17xx_command_w(dev,offset,data);
 			break;
-		case 0x31:
+		case 0x01:
 			wd17xx_track_w(dev,offset,data);
 			break;
-		case 0x32:
+		case 0x02:
 			wd17xx_sector_w(dev,offset,data);
 			break;
-		case 0x33:
+		case 0x03:
 			wd17xx_data_w(dev,offset,data);
 			break;
-		case 0x34:
-		//	wd17xx_set_drive(dev,data & 3);
-			/* TODO: understand the conditions of this */
-			floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 7));
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,0);
-		//	wd17xx_set_side(dev,(data & 0x10)>>4);
-			if(data)
+		case 0x04:
+			// ---- xxxx select floppy drive (yes, 15 of them, A to P)
+			wd17xx_set_drive(dev,data & 0x01);
+			//	wd17xx_set_side(dev,(data & 0x10)>>4);
+			if(data & 0xf0)
 			printf("%02x\n",data);
 			break;
 	}
@@ -421,9 +437,9 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x26, 0x26) AM_WRITENOP //RS232C RX / TX
 //	AM_RANGE(0x27, 0x27) AM_WRITENOP //RS232C Mode / Command / Status
 
-//	AM_RANGE(0x28, 0x2c) AM_NOP //fdc 2, MB8876 -> FD1791
+//	AM_RANGE(0x28, 0x2c) AM_READWRITE(smc777_fdc_r,smc777_fdc_w) //fdc 2, MB8876 -> FD1791
 //	AM_RANGE(0x2d, 0x2f) AM_NOP //rs-232c no. 2
-	AM_RANGE(0x30, 0x34) AM_READWRITE(smc777_fdc_r,smc777_fdc_w) //fdc 1, MB8876 -> FD1791
+	AM_RANGE(0x30, 0x34) AM_READWRITE(smc777_fdc1_r,smc777_fdc1_w) //fdc 1, MB8876 -> FD1791
 //	AM_RANGE(0x35, 0x37) AM_NOP //rs-232c no. 3
 //	AM_RANGE(0x38, 0x3b) AM_NOP //cache disk unit
 //	AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
