@@ -1926,9 +1926,11 @@ INTERRUPT_GEN( lynx_frame_int )
 
 void lynx_crc_keyword(device_image_interface &image)
 {
-    const char *info;
+    const char *info = NULL;
 
-    info = image.extrainfo();
+	if (strcmp(image.extrainfo(), ""))
+	    info = image.extrainfo();
+
     rotate = 0;
 
     if (info)

@@ -114,7 +114,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 {
 	UINT32 size;
 	int split_rom = 0, offset = 0;
-	const char *extrainfo;
+	const char *extrainfo = NULL;
 	unsigned char *ROM;
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
 
@@ -141,13 +141,11 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	{
 		image.fseek(offset, SEEK_SET);
 		image.fread( ROM, size);
-		extrainfo = image.extrainfo();
+		if (strcmp(image.extrainfo(), ""))
+			extrainfo = image.extrainfo();
 	}
 	else
-	{
 		memcpy(ROM, image.get_software_region("rom") + offset, size);
-		extrainfo = NULL;
-	}
 
 	if (extrainfo)
 	{

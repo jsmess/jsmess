@@ -646,7 +646,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 	if (image.software_entry() == NULL)
 	{
-		const char *mapinfo;
+		const char *mapinfo = NULL;
 		int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0, goodcrcinfo = 0;
 		char magic[4], extend[5];
 		int local_options = 0;
@@ -665,7 +665,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->prg_ram = 1;	// always map state->wram in bank5 (eventually, this should be enabled only for some mappers)
 
 			// check if the image is recognized by nes.hsi
-			mapinfo = image.extrainfo();
+			if (strcmp(image.extrainfo(), ""))
+				mapinfo = image.extrainfo();
 
 			// image_extrainfo() resets the file position back to start.
 			// Let's skip past the magic header once again.

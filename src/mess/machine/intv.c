@@ -398,7 +398,7 @@ static int intv_load_rom_file(device_image_interface &image)
 		int start, size;
 		int mapper, rom[5], ram, extra;
 
-		if (!image.extrainfo())
+		if (!strcmp(image.extrainfo(), ""))
 		{
 			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
 			for (i = 0; i < 0x2000; i++ )
