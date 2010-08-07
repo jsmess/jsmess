@@ -149,7 +149,6 @@ enum
 /*----------- defined in drivers/gamecom.c -----------*/
 
 extern UINT8 *gamecom_vram;
-extern UINT8 *gamecom_iram;
 
 /*----------- defined in machine/gamecom.c -----------*/
 
@@ -159,11 +158,11 @@ extern DEVICE_IMAGE_LOAD( gamecom_cart );
 
 extern WRITE8_HANDLER( gamecom_internal_w );
 extern READ8_HANDLER( gamecom_internal_r );
+extern WRITE8_HANDLER( gamecom_pio_w );
+extern READ8_HANDLER( gamecom_pio_r );
 
 extern void gamecom_handle_dma( running_device *device, int cycles );
 extern void gamecom_update_timers( running_device *device, int cycles );
-
-extern UINT8 gamecom_internal_registers[];
 
 
 /*----------- defined in video/gamecom.c -----------*/

@@ -8,11 +8,12 @@ static unsigned int base_address;
 static emu_timer *scanline_timer;
 
 static TIMER_CALLBACK( gamecom_scanline ) {
+	UINT8 * RAM = memory_region(machine, "maincpu");
 	// draw line
 	if ( scanline == 0 ) {
-		base_address = ( gamecom_internal_registers[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
+		base_address = ( RAM[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
 	}
-	if ( ~gamecom_internal_registers[SM8521_LCDC] & 0x80 ) {
+	if ( ~RAM[SM8521_LCDC] & 0x80 ) {
 		rectangle rec;
 		rec.min_x = 0;
 		rec.max_x = Y_PIXELS - 1;
@@ -24,7 +25,7 @@ static TIMER_CALLBACK( gamecom_scanline ) {
 		int	pal[4];
 		int	i;
 
-		switch( gamecom_internal_registers[SM8521_LCDC] & 0x30 ) {
+		switch( RAM[SM8521_LCDC] & 0x30 ) {
 		case 0x00:
 			pal[0] = 4;
 			pal[1] = 3;

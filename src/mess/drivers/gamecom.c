@@ -21,10 +21,12 @@ Todo:
 #include "devices/cartslot.h"
 
 UINT8 *gamecom_vram;
-UINT8 *gamecom_iram;
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x007F )  AM_BASE(&gamecom_iram) AM_READWRITE( gamecom_internal_r, gamecom_internal_w )/* CPU internal register file */
+	AM_RANGE( 0x0000, 0x0013 )  AM_RAM
+	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
+	AM_RANGE( 0x0018, 0x001F )  AM_RAM
+	AM_RANGE( 0x0020, 0x007F )  AM_READWRITE( gamecom_internal_r, gamecom_internal_w )/* CPU internal register file */
 	AM_RANGE( 0x0080, 0x03FF )  AM_RAM						/* RAM */
 	AM_RANGE( 0x0400, 0x0FFF )  AM_NOP                                              /* Nothing */
 	AM_RANGE( 0x1000, 0x1FFF )  AM_ROM                                              /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
