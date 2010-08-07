@@ -146,7 +146,6 @@ static VIDEO_START( pc6001 )
 	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x2000); //0x400? We'll see...
 }
 
-/* FIXME: colors of this aren't 100% accurate */
 static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
 {
 	int x,y,xi;
@@ -340,9 +339,7 @@ static VIDEO_UPDATE( pc6001 )
 
 static VIDEO_UPDATE( pc6001m2 )
 {
-	int tile,attr,x,y;
-
-	attr = pc6001_video_ram[0];
+	int x,y,tile,attr;
 
 	if(exgfx_mode)
 	{
@@ -353,8 +350,16 @@ static VIDEO_UPDATE( pc6001m2 )
 		{
 			for(x=0;x<40;x++)
 			{
-				tile = pc6001_video_ram[(x+(y*40))+0x400];
+				/*
+				exgfx attr format:
+				x--- ---- rom bank select
+				-xxx ---- bg color
+				---- xxxx fg color
+				Note that the exgfx banks a different gfx ROM
+				*/
+				tile = pc6001_video_ram[(x+(y*40))+0x400] + 0x200;
 				attr = pc6001_video_ram[(x+(y*40)) & 0x3ff];
+				tile+= ((attr & 0x80) << 1);
 
 				for(yi=0;yi<12;yi++)
 				{
@@ -375,7 +380,10 @@ static VIDEO_UPDATE( pc6001m2 )
 		}
 	}
 	else
+	{
+		attr = pc6001_video_ram[0];
 		pc6001_screen_draw(screen->machine,bitmap,cliprect,0);
+	}
 
 	return 0;
 }
