@@ -708,16 +708,22 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 
 	switch(vram_bank)
 	{
-		case 0x02: pc6001_video_ram = work_ram + 0x2c000; break;
-		case 0x04: pc6001_video_ram = work_ram + 0x30000; break;
-		case 0x06: pc6001_video_ram = work_ram + 0x34000; break;
-		case 0x22: pc6001_video_ram = work_ram + 0x34000; break;
-		case 0x24: pc6001_video_ram = work_ram + 0x34000; break;
-		case 0x40: pc6001_video_ram = work_ram + 0x28000; break;
-		case 0x44: pc6001_video_ram = work_ram + 0x28000; break;
-		case 0x46: pc6001_video_ram = work_ram + 0x30000; break;
-		case 0x60: pc6001_video_ram = work_ram + 0x2c000; break;
-		case 0x64: pc6001_video_ram = work_ram + 0x28000; break;
+		case 0x00: pc6001_video_ram = work_ram + 0x8000 + 0x28000; break; //4 color mode
+		case 0x02: pc6001_video_ram = work_ram + 0xc000 + 0x28000; break;
+		case 0x04: pc6001_video_ram = work_ram + 0x8000 + 0x28000; break;
+		case 0x06: pc6001_video_ram = work_ram + 0xc000 + 0x28000; break;
+		case 0x20: pc6001_video_ram = work_ram + 0xc000 + 0x28000; break; //4 color mode
+		case 0x22: pc6001_video_ram = work_ram + 0xe000 + 0x28000; break;
+		case 0x24: pc6001_video_ram = work_ram + 0xc000 + 0x28000; break;
+		case 0x26: pc6001_video_ram = work_ram + 0xe000 + 0x28000; break;
+		case 0x40: pc6001_video_ram = work_ram + 0x0000 + 0x28000; break; //4 color mode
+		case 0x42: pc6001_video_ram = work_ram + 0x8000 + 0x28000; break;
+		case 0x44: pc6001_video_ram = work_ram + 0x0000 + 0x28000; break;
+		case 0x46: pc6001_video_ram = work_ram + 0x8000 + 0x28000; break;
+		case 0x60: pc6001_video_ram = work_ram + 0x4000 + 0x28000; break; //4 color mode
+		case 0x62: pc6001_video_ram = work_ram + 0xa000 + 0x28000; break;
+		case 0x64: pc6001_video_ram = work_ram + 0x4000 + 0x28000; break;
+		case 0x66: pc6001_video_ram = work_ram + 0xa000 + 0x28000; break;
 		default:
 			printf("Unhandled vram bank %02x\n",vram_bank);
 			break;
