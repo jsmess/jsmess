@@ -18,11 +18,6 @@
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
 
-    TODO (pc6001mk2 specific)
-    - vram banking model isn't yet 100% understood;
-	- page mode 4 doesn't seem to work properly;
-	- some games needs particular parameters (with the MON command), they all won't boot;
-
 	TODO (game specific):
 	- The Outlaw (AX-10): is now broken due of the joycode stuff
 	- Portpia: hangs after a bunch of text screens
@@ -32,6 +27,7 @@
 	- Yakyukyo (MK2): waits for an irq, check which one;
 	- Forts 2 (MK2): ASCII gfxs are missing;
 	- Hydlide (MK2): crashes due of a load error;
+	- American Truck (MK2): It has various gfx bugs
 
 ==================================================================================
 
@@ -346,7 +342,51 @@ static VIDEO_UPDATE( pc6001m2 )
 {
 	int x,y,tile,attr;
 
-	if(exgfx_2bpp_mode)
+	/* note: bitmap mode have priority over everything else, check American Truck */
+	if(exgfx_bitmap_mode)
+	{
+		int count,color,i;
+
+		count = 0;
+
+		for(y=0;y<200;y++)
+		{
+			for(x=0;x<160;x+=4)
+			{
+				for(i=0;i<4;i++)
+				{
+					int pen[2];
+
+					/*
+					palette reference:
+					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
+					                    0x02, 0x06, 0x03, 0x07,
+					                    0x08, 0x0c, 0x09, 0x0d,
+					                    0x0a, 0x0e, 0x0b, 0x0f };
+
+					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
+					*/
+
+					pen[0] = pc6001_video_ram[count+0x0000] >> (6-i*2) & 3;
+					pen[1] = pc6001_video_ram[count+0x2000] >> (6-i*2) & 3;
+
+					color = 0x10;
+					color |= ((pen[0] & 1) << 2);
+					color |= ((pen[0] & 2) >> 1);
+					color |= ((pen[1] & 1) << 1);
+					color |= ((pen[1] & 2) << 2);
+
+					if (((x+i)*2+0) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen->machine->pens[color];
+					if (((x+i)*2+1) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen->machine->pens[color];
+				}
+
+				count++;
+			}
+		}
+	}
+	else if(exgfx_2bpp_mode)
 	{
 		int count,color,i;
 
@@ -387,50 +427,6 @@ static VIDEO_UPDATE( pc6001m2 )
 
 					if ((x+i) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
 						*BITMAP_ADDR16(bitmap, y, (x+i)) = screen->machine->pens[color];
-				}
-
-				count++;
-			}
-		}
-
-	}
-	else if(exgfx_bitmap_mode)
-	{
-		int count,color,i;
-
-		count = 0;
-
-		for(y=0;y<200;y++)
-		{
-			for(x=0;x<160;x+=4)
-			{
-				for(i=0;i<4;i++)
-				{
-					int pen[2];
-
-					/*
-					palette reference:
-					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
-					                    0x02, 0x06, 0x03, 0x07,
-					                    0x08, 0x0c, 0x09, 0x0d,
-					                    0x0a, 0x0e, 0x0b, 0x0f };
-
-					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
-					*/
-
-					pen[0] = pc6001_video_ram[count+0x0000] >> (6-i*2) & 3;
-					pen[1] = pc6001_video_ram[count+0x2000] >> (6-i*2) & 3;
-
-					color = 0x10;
-					color |= ((pen[0] & 1) << 2);
-					color |= ((pen[0] & 2) >> 1);
-					color |= ((pen[1] & 1) << 1);
-					color |= ((pen[1] & 2) << 2);
-
-					if (((x+i)*2+0) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen->machine->pens[color];
-					if (((x+i)*2+1) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen->machine->pens[color];
 				}
 
 				count++;
@@ -743,7 +739,7 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 			if((data & 0x0f) == 0x05)
 				memory_set_bankptr(device->machine, "bank4", &ROM[banksw_table_r0[(bank_r0 & 0xf0)>>4][3]]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(device->machine, "bank4", &gfx_data[0]); //FIXME: check this (CGROM 2)
+				memory_set_bankptr(device->machine, "bank4", &gfx_data[0x2000]); //FIXME: check this (CGROM 2)
 		}
 	}
 	i8255a_w(device,offset,data);
