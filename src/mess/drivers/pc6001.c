@@ -17,16 +17,20 @@
            so this implementation will be used in the end.
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
+
     TODO (pc6001mk2 specific)
     - vram banking model isn't yet 100% understood;
-    - extra gfx modes aren't handled yet;
+    - An additional gfx mode isn't supported yet (used by 3d Golf Simulation Super Version);
+	- page mode 4 doesn't seem to work properly;
+	- some games needs particular parameters (with the MON command), they all won't boot;
 
 	TODO (game specific):
-	- Arm Wrestling (PD): returns an "?OM Error" during loading, it seems to be a N66
-	  BASIC -> PC-6001Mk2 game actually;
 	- The Outlaw (AX-10): is now broken due of the joycode stuff
 	- Portpia: hangs after a bunch of text screens
 	- Galaxy Mission Part I / II: can't start a play
+	- Renritsuhoteishiki (PC6001mk2): has a slight bug with the kanji at the top,
+	  probably wrong kanji ROM hook-up
+	- Yakyukyo: waits for an irq, check which one;
 
 ==================================================================================
 
@@ -700,17 +704,20 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 {
 	UINT8 *work_ram = memory_region(machine, "maincpu");
 
-//	popmessage("%02x",vram_bank);
+	popmessage("%02x",vram_bank);
 
 	switch(vram_bank)
 	{
+		case 0x02: pc6001_video_ram = work_ram + 0x2c000; break;
 		case 0x04: pc6001_video_ram = work_ram + 0x30000; break;
 		case 0x06: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x22: pc6001_video_ram = work_ram + 0x34000; break;
 		case 0x24: pc6001_video_ram = work_ram + 0x34000; break;
 		case 0x40: pc6001_video_ram = work_ram + 0x28000; break;
 		case 0x44: pc6001_video_ram = work_ram + 0x28000; break;
 		case 0x46: pc6001_video_ram = work_ram + 0x30000; break;
 		case 0x60: pc6001_video_ram = work_ram + 0x2c000; break;
+		case 0x64: pc6001_video_ram = work_ram + 0x28000; break;
 		default:
 			printf("Unhandled vram bank %02x\n",vram_bank);
 			break;
@@ -786,6 +793,11 @@ static WRITE8_HANDLER( pc6001m2_col_bank_w )
 	bgcol_bank = (data & 2) >> 1;
 }
 
+static READ8_HANDLER( unk_r )
+{
+	return 0x7f; //input? used by Chrith no Ainotabidachi
+}
+
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
@@ -811,6 +823,7 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
+	AM_RANGE(0xe0, 0xe0) AM_READ(unk_r)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
 	//0xf2 w bank
