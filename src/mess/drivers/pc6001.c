@@ -127,7 +127,7 @@ static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
 static UINT32 cas_maxsize;
 /* PC6001mk2 specific */
-static UINT8 ex_vram_bank, bgcol_bank,exgfx_mode;
+static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode;
 
 //#define CAS_LENGTH 0x1655
 
@@ -341,7 +341,51 @@ static VIDEO_UPDATE( pc6001m2 )
 {
 	int x,y,tile,attr;
 
-	if(exgfx_mode)
+	if(exgfx_bitmap_mode)
+	{
+		int count,color,i;
+
+		count = 0;
+
+		for(y=0;y<200;y++)
+		{
+			for(x=0;x<160;x+=4)
+			{
+				for(i=0;i<4;i++)
+				{
+					int pen[2];
+
+					/*
+					palette reference:
+					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
+					                    0x02, 0x06, 0x03, 0x07,
+					                    0x08, 0x0c, 0x09, 0x0d,
+					                    0x0a, 0x0e, 0x0b, 0x0f };
+
+					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
+					*/
+
+					pen[0] = pc6001_video_ram[count+0x0000] >> (6-i*2) & 3;
+					pen[1] = pc6001_video_ram[count+0x2000] >> (6-i*2) & 3;
+
+					color = 0x10;
+					color |= ((pen[0] & 1) << 2);
+					color |= ((pen[0] & 2) >> 1);
+					color |= ((pen[1] & 1) << 1);
+					color |= ((pen[1] & 2) << 2);
+
+					if (((x+i)*2+0) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen->machine->pens[color];
+					if (((x+i)*2+1) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen->machine->pens[color];
+				}
+
+				count++;
+			}
+		}
+
+	}
+	else if(exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
 		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
@@ -656,23 +700,21 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 {
 	UINT8 *work_ram = memory_region(machine, "maincpu");
 
-	popmessage("%02x",vram_bank);
+//	popmessage("%02x",vram_bank);
 
 	switch(vram_bank)
 	{
 		case 0x04: pc6001_video_ram = work_ram + 0x30000; break;
 		case 0x06: pc6001_video_ram = work_ram + 0x34000; break;
 		case 0x24: pc6001_video_ram = work_ram + 0x34000; break;
-		case 0x40: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x40: pc6001_video_ram = work_ram + 0x28000; break;
 		case 0x44: pc6001_video_ram = work_ram + 0x28000; break;
 		case 0x46: pc6001_video_ram = work_ram + 0x30000; break;
-		case 0x60: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x60: pc6001_video_ram = work_ram + 0x2c000; break;
 		default:
 			printf("Unhandled vram bank %02x\n",vram_bank);
 			break;
 	}
-
-	exgfx_mode = ((vram_bank & 2) == 0);
 }
 
 static WRITE8_HANDLER ( pc6001m2_system_latch_w )
@@ -713,6 +755,28 @@ static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 
 	ex_vram_bank = data;
 	vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
+
+	exgfx_text_mode = ((data & 2) == 0);
+
+	{
+		/* Apparently bitmap mode changes the screen res to 320 x 200 */
+		if((exgfx_bitmap_mode & 8) != (data & 8))
+		{
+			rectangle visarea = space->machine->primary_screen->visible_area();
+			int y_height;
+
+			y_height = (data & 0x08) ? 200 : 240;
+
+			visarea.min_x = visarea.min_y = 0;
+			visarea.max_y = (y_height) - 1;
+			visarea.max_x = (320) - 1;
+
+			space->machine->primary_screen->configure(320, 240, visarea, space->machine->primary_screen->frame_period().attoseconds);
+		}
+	}
+	exgfx_bitmap_mode = (data & 8);
+
+	popmessage("%02x",data);
 
 //	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
 }
@@ -1322,7 +1386,7 @@ static MACHINE_DRIVER_START( pc6001m2 )
 	MDRV_MACHINE_RESET(pc6001m2)
 
 	MDRV_VIDEO_UPDATE(pc6001m2)
-	MDRV_PALETTE_LENGTH(16+32)
+	MDRV_PALETTE_LENGTH(16+16)
 	MDRV_PALETTE_INIT(pc6001m2)
 
 	/* basic machine hardware */
