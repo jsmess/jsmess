@@ -17,8 +17,9 @@
            so this implementation will be used in the end.
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
-	- PC6001Mk2: crashes if you attempt to load the UI in debug mode (like putting partial keyboard
-	             emulation), dunno the reason
+    TODO (pc6001mk2 specific)
+    - vram banking model isn't yet 100% understood;
+    - extra gfx modes aren't handled yet;
 
 	TODO (game specific):
 	- Arm Wrestling (PD): returns an "?OM Error" during loading, it seems to be a N66
@@ -645,13 +646,13 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 
 static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 {
-	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+//	UINT8 *work_ram = memory_region(space->machine, "maincpu");
 
-	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(5) }; //TODO: check me
+//	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(5) }; //TODO: check me
 
-	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+//	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
 
-	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
+//	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
 
 	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
@@ -669,7 +670,21 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 	}
 
 	sys_latch = data;
-	printf("%02x\n",data);
+//	printf("%02x B0\n",data);
+}
+
+
+static WRITE8_HANDLER( pc6001m2_vram_bank_w )
+{
+	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+
+	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
+
+	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+
+	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
+
+	printf("%02x c1\n",data);
 }
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -695,6 +710,7 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
 	//0xf2 w bank
