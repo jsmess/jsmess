@@ -20,7 +20,6 @@
 
     TODO (pc6001mk2 specific)
     - vram banking model isn't yet 100% understood;
-    - An additional gfx mode isn't supported yet (used by 3d Golf Simulation Super Version);
 	- page mode 4 doesn't seem to work properly;
 	- some games needs particular parameters (with the MON command), they all won't boot;
 
@@ -28,9 +27,11 @@
 	- The Outlaw (AX-10): is now broken due of the joycode stuff
 	- Portpia: hangs after a bunch of text screens
 	- Galaxy Mission Part I / II: can't start a play
-	- Renritsuhoteishiki (PC6001mk2): has a slight bug with the kanji at the top,
+	- Renritsuhoteishiki (MK2): has a slight bug with the kanji at the top,
 	  probably wrong kanji ROM hook-up
-	- Yakyukyo: waits for an irq, check which one;
+	- Yakyukyo (MK2): waits for an irq, check which one;
+	- Forts 2 (MK2): ASCII gfxs are missing;
+	- Hydlide (MK2): crashes due of a load error;
 
 ==================================================================================
 
@@ -131,7 +132,7 @@ static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
 static UINT32 cas_maxsize;
 /* PC6001mk2 specific */
-static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode;
+static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode,exgfx_2bpp_mode;
 
 //#define CAS_LENGTH 0x1655
 
@@ -147,7 +148,7 @@ static VIDEO_START( pc6001 )
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine, &cfg);
 	#endif
-	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x2000); //0x400? We'll see...
+	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
@@ -345,7 +346,55 @@ static VIDEO_UPDATE( pc6001m2 )
 {
 	int x,y,tile,attr;
 
-	if(exgfx_bitmap_mode)
+	if(exgfx_2bpp_mode)
+	{
+		int count,color,i;
+
+		count = 0;
+
+		for(y=0;y<200;y++)
+		{
+			for(x=0;x<320;x+=8)
+			{
+				for(i=0;i<8;i++)
+				{
+					int pen[2];
+
+					/*
+					palette reference:
+					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
+
+					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
+					*/
+
+					pen[0] = pc6001_video_ram[count+0x0000] >> (7-i) & 1;
+					pen[1] = pc6001_video_ram[count+0x2000] >> (7-i) & 1;
+
+					if(bgcol_bank & 4) //PC-6001 emulation mode
+					{
+						color = 0x08;
+						color |= (pen[0]) | (pen[1]<<1);
+						color |= (bgcol_bank & 1) << 2;
+					}
+					else //Mk-2 mode
+					{
+						color = 0x10;
+						color |= ((pen[0] & 1) << 2);
+						color |= ((pen[1] & 1) >> 0);
+						color |= ((bgcol_bank & 1) << 1);
+						color |= ((bgcol_bank & 2) << 2);
+					}
+
+					if ((x+i) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)) = screen->machine->pens[color];
+				}
+
+				count++;
+			}
+		}
+
+	}
+	else if(exgfx_bitmap_mode)
 	{
 		int count,color,i;
 
@@ -416,7 +465,7 @@ static VIDEO_UPDATE( pc6001m2 )
 						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
 
 						fgcol = (attr & 0x0f) + 0x10;
-						bgcol = ((attr & 0x70) >> 4) + 0x10 + bgcol_bank*8;
+						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((bgcol_bank & 2) << 2);
 
 						color = pen ? fgcol : bgcol;
 
@@ -704,9 +753,9 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 {
 	UINT8 *work_ram = memory_region(machine, "maincpu");
 
-	popmessage("%02x",vram_bank);
+//	popmessage("%02x",vram_bank);
 
-	switch(vram_bank)
+	switch(vram_bank & 0x66)
 	{
 		case 0x00: pc6001_video_ram = work_ram + 0x8000 + 0x28000; break; //4 color mode
 		case 0x02: pc6001_video_ram = work_ram + 0xc000 + 0x28000; break;
@@ -724,9 +773,6 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 		case 0x62: pc6001_video_ram = work_ram + 0xa000 + 0x28000; break;
 		case 0x64: pc6001_video_ram = work_ram + 0x4000 + 0x28000; break;
 		case 0x66: pc6001_video_ram = work_ram + 0xa000 + 0x28000; break;
-		default:
-			printf("Unhandled vram bank %02x\n",vram_bank);
-			break;
 	}
 }
 
@@ -771,14 +817,16 @@ static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 
 	exgfx_text_mode = ((data & 2) == 0);
 
+	exgfx_bitmap_mode = (data & 8);
+	exgfx_2bpp_mode = ((data & 6) == 0);
+
 	{
-		/* Apparently bitmap mode changes the screen res to 320 x 200 */
-		if((exgfx_bitmap_mode & 8) != (data & 8))
+		/* Apparently bitmap modes changes the screen res to 320 x 200 */
 		{
 			rectangle visarea = space->machine->primary_screen->visible_area();
 			int y_height;
 
-			y_height = (data & 0x08) ? 200 : 240;
+			y_height = (exgfx_bitmap_mode || exgfx_2bpp_mode) ? 200 : 240;
 
 			visarea.min_x = visarea.min_y = 0;
 			visarea.max_y = (y_height) - 1;
@@ -787,16 +835,15 @@ static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 			space->machine->primary_screen->configure(320, 240, visarea, space->machine->primary_screen->frame_period().attoseconds);
 		}
 	}
-	exgfx_bitmap_mode = (data & 8);
 
-	popmessage("%02x",data);
+//	popmessage("%02x",data);
 
 //	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
 }
 
 static WRITE8_HANDLER( pc6001m2_col_bank_w )
 {
-	bgcol_bank = (data & 2) >> 1;
+	bgcol_bank = (data & 7);
 }
 
 static READ8_HANDLER( unk_r )
