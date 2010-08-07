@@ -126,6 +126,8 @@ static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
 static UINT32 cas_maxsize;
+/* PC6001mk2 specific */
+static UINT8 ex_vram_bank, bgcol_bank,exgfx_mode;
 
 //#define CAS_LENGTH 0x1655
 
@@ -342,9 +344,9 @@ static VIDEO_UPDATE( pc6001m2 )
 
 	attr = pc6001_video_ram[0];
 
-	if(attr == 0x0f)
+	if(exgfx_mode)
 	{
-		int xi,yi,pen,fgcol,color;
+		int xi,yi,pen,fgcol,bgcol,color;
 		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
 
 		for(y=0;y<25;y++)
@@ -360,14 +362,12 @@ static VIDEO_UPDATE( pc6001m2 )
 					{
 						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
 
-						fgcol = /*(attr & 2) ? 2 : */7;
+						fgcol = (attr & 0x0f) + 0x10;
+						bgcol = ((attr & 0x70) >> 4) + 0x10 + bgcol_bank*8;
 
-						if((attr & 0x0f) == 0x00) //TODO
-							color = pen ? 0 : fgcol;
-						else
-							color = pen ? fgcol : 0;
+						color = pen ? fgcol : bgcol;
 
-						if ((x*8+xi) < screen->visible_area().max_x && (y*12+yi) < screen->visible_area().max_y)
+						if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
 							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
 					}
 				}
@@ -644,6 +644,29 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 	i8255a_w(device,offset,data);
 }
 
+static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
+{
+	UINT8 *work_ram = memory_region(machine, "maincpu");
+
+	popmessage("%02x",vram_bank);
+
+	switch(vram_bank)
+	{
+		case 0x04: pc6001_video_ram = work_ram + 0x30000; break;
+		case 0x06: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x24: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x40: pc6001_video_ram = work_ram + 0x34000; break;
+		case 0x44: pc6001_video_ram = work_ram + 0x28000; break;
+		case 0x46: pc6001_video_ram = work_ram + 0x30000; break;
+		case 0x60: pc6001_video_ram = work_ram + 0x34000; break;
+		default:
+			printf("Unhandled vram bank %02x\n",vram_bank);
+			break;
+	}
+
+	exgfx_mode = ((vram_bank & 2) == 0);
+}
+
 static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 {
 //	UINT8 *work_ram = memory_region(space->machine, "maincpu");
@@ -670,21 +693,25 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 	}
 
 	sys_latch = data;
-//	printf("%02x B0\n",data);
+	vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
+
+	//printf("%02x B0\n",data);
 }
 
 
 static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 {
-	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+//	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
 
-	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
+	ex_vram_bank = data;
+	vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
 
-	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+//	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+}
 
-	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
-
-	printf("%02x c1\n",data);
+static WRITE8_HANDLER( pc6001m2_col_bank_w )
+{
+	bgcol_bank = (data & 2) >> 1;
 }
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -710,6 +737,7 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
@@ -1145,12 +1173,43 @@ static const rgb_t defcolors[] =
 
 };
 
+static const rgb_t mk2_defcolors[] =
+{
+	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
+	MAKE_RGB(0xff, 0xaf, 0x00),	/* ORANGE */
+	MAKE_RGB(0x00, 0xff, 0xaf),	/* tone of GREEN */
+	MAKE_RGB(0xaf, 0xff, 0x00),	/* tone of GREEN */
+	MAKE_RGB(0xaf, 0x00, 0xff),	/* VIOLET */
+	MAKE_RGB(0xff, 0x00, 0xaf),	/* SCARLET */
+	MAKE_RGB(0x00, 0xaf, 0xff),	/* LIGHT BLUE */
+	MAKE_RGB(0xaf, 0xaf, 0xaf),	/* GRAY */
+	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
+	MAKE_RGB(0xff, 0x00, 0x00),	/* RED */
+	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
+	MAKE_RGB(0xff, 0xff, 0x00),	/* YELLOW */
+	MAKE_RGB(0x00, 0x00, 0xff),	/* BLUE */
+	MAKE_RGB(0xff, 0x00, 0xff),	/* PINK */
+	MAKE_RGB(0x00, 0xff, 0xff),	/* CYAN */
+	MAKE_RGB(0xff, 0xff, 0xff)	/* WHITE */
+};
+
 static PALETTE_INIT(pc6001)
 {
 	int i;
 
 	for(i=0;i<8+4;i++)
 		palette_set_color(machine, i+8,defcolors[i]);
+}
+
+static PALETTE_INIT(pc6001m2)
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color(machine, i+8,defcolors[i]);
+
+	for(i=0x10;i<0x20;i++)
+		palette_set_color(machine, i,mk2_defcolors[i-0x10]);
 }
 
 static const cassette_config pc6001_cassette_config =
@@ -1255,6 +1314,8 @@ static MACHINE_DRIVER_START( pc6001m2 )
 	MDRV_MACHINE_RESET(pc6001m2)
 
 	MDRV_VIDEO_UPDATE(pc6001m2)
+	MDRV_PALETTE_LENGTH(16+32)
+	MDRV_PALETTE_INIT(pc6001m2)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
