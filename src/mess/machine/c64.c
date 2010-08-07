@@ -1037,7 +1037,7 @@ static int c64_common_cart_load( device_image_interface &image )
 	const char *filetype;
 	int address = 0, new_start = 0;
 	// int lbank_end_addr = 0, hbank_end_addr = 0;
-	UINT8 *cart = memory_region(image.device().machine, "user1");
+	UINT8 *temp_cart = auto_alloc_array(image.device().machine, UINT8, size);
 
 	filetype = image.filetype();
 
@@ -1051,12 +1051,15 @@ static int c64_common_cart_load( device_image_interface &image )
 		;
 
 		if (i >= ARRAY_LENGTH(c64_cbm_cart))
+		{
+			auto_free(image.device().machine, temp_cart);
 			return IMAGE_INIT_FAIL;
-
+		}
+		
 		/* Start to parse the .crt header */
 		/* 0x16-0x17 is Hardware type */
 		image.fseek(0x16, SEEK_SET);
-		image.fread( &c64_cart_type, 2);
+		image.fread(&c64_cart_type, 2);
 		c64_cart_type = BIG_ENDIANIZE_INT16(c64_cart_type);
 		c64_mapper = c64_cart_type;
 
@@ -1094,10 +1097,10 @@ static int c64_common_cart_load( device_image_interface &image )
 
 		/* 0x18 is EXROM */
 		image.fseek(0x18, SEEK_SET);
-		image.fread( &cbm_c64_exrom, 1);
+		image.fread(&cbm_c64_exrom, 1);
 
 		/* 0x19 is GAME */
-		image.fread( &cbm_c64_game, 1);
+		image.fread(&cbm_c64_game, 1);
 
 		/* We can pass to the data: it starts from 0x40 */
 		image.fseek(0x40, SEEK_SET);
@@ -1118,25 +1121,25 @@ static int c64_common_cart_load( device_image_interface &image )
 
 			/* Start to parse the CHIP header */
 			/* First 4 bytes are the string 'CHIP' */
-			image.fread( buffer, 6);
+			image.fread(buffer, 6);
 
 			/* 0x06-0x07 is the size of the CHIP block (header + data) */
-			image.fread( &chip_size, 2);
+			image.fread(&chip_size, 2);
 			chip_size = BIG_ENDIANIZE_INT16(chip_size);
 
 			/* 0x08-0x09 chip type (ROM, RAM + no ROM, Flash ROM) */
-			image.fread( buffer + 6, 2);
+			image.fread(buffer + 6, 2);
 
 			/* 0x0a-0x0b is the bank number of the CHIP block */
-			image.fread( &chip_bank_index, 2);
+			image.fread(&chip_bank_index, 2);
 			chip_bank_index = BIG_ENDIANIZE_INT16(chip_bank_index);
 
 			/* 0x0c-0x0d is the loading address of the CHIP block */
-			image.fread( &address, 2);
+			image.fread(&address, 2);
 			address = BIG_ENDIANIZE_INT16(address);
 
 			/* 0x0e-0x0f is the data size of the CHIP block (without header) */
-			image.fread( &chip_data_size, 2);
+			image.fread(&chip_data_size, 2);
 			chip_data_size = BIG_ENDIANIZE_INT16(chip_data_size);
 
 			/* Print out the CHIP header! */
@@ -1149,22 +1152,28 @@ static int c64_common_cart_load( device_image_interface &image )
 			/* Does CHIP contain any data? */
 			c64_cbm_cart[i].chip = (UINT8*) image.image_malloc(chip_data_size);
 			if (!c64_cbm_cart[i].chip)
+			{
+				auto_free(image.device().machine, temp_cart);
 				return IMAGE_INIT_FAIL;
-
+			}
+			
 			/* Store data, address & size of the CHIP block */
 			c64_cbm_cart[i].addr = address;
 			c64_cbm_cart[i].index = chip_bank_index;
 			c64_cbm_cart[i].size = chip_data_size;
 			c64_cbm_cart[i].start = new_start;
 
-			test = image.fread( c64_cbm_cart[i].chip, chip_data_size);
+			test = image.fread(c64_cbm_cart[i].chip, chip_data_size);
 
-			memcpy(&cart[new_start], c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
+			memcpy(&temp_cart[new_start], c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 			new_start += c64_cbm_cart[i].size;
 
 			if (test != chip_data_size)
+			{
+				auto_free(image.device().machine, temp_cart);
 				return IMAGE_INIT_FAIL;
-
+			}
+			
 			/* Advance to the next CHIP block */
 			i++;
 			j += chip_size;
@@ -1187,20 +1196,26 @@ static int c64_common_cart_load( device_image_interface &image )
 		/* Does cart contain any data? */
 		c64_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!c64_cbm_cart[0].chip)
+		{
+			auto_free(image.device().machine, temp_cart);
 			return IMAGE_INIT_FAIL;
-
+		}
+		
 		/* Store data, address & size */
 		c64_cbm_cart[0].addr = address;
 		c64_cbm_cart[0].size = size;
 		c64_cbm_cart[0].start = new_start;
 
-		test = image.fread( c64_cbm_cart[0].chip, size);
+		test = image.fread(c64_cbm_cart[0].chip, size);
 
-		memcpy(&cart[new_start], c64_cbm_cart[0].chip, c64_cbm_cart[0].size);
+		memcpy(&temp_cart[new_start], c64_cbm_cart[0].chip, c64_cbm_cart[0].size);
 		new_start += c64_cbm_cart[0].size;
 
 		if (test != c64_cbm_cart[0].size)
+		{
+			auto_free(image.device().machine, temp_cart);
 			return IMAGE_INIT_FAIL;
+		}
 	}
 
 	n_banks = i;
@@ -1222,20 +1237,22 @@ static int c64_common_cart_load( device_image_interface &image )
 	switch (c64_mapper)
 	{
 	case ZAXXON:
-		memcpy(romh, cart + 0x1000, 0x2000);
+		memcpy(romh, temp_cart + 0x1000, 0x2000);
 		break;
 	default:
 		if (!c64_game && c64_exrom && (n_banks == 1))
-			memcpy(romh, cart, 0x2000);
+			memcpy(romh, temp_cart, 0x2000);
 		else
 		{
-			memcpy(roml, cart + 0 * 0x2000, 0x2000);
-			memcpy(romh, cart + 1 * 0x2000, 0x2000);
+			memcpy(roml, temp_cart + 0 * 0x2000, 0x2000);
+			memcpy(romh, temp_cart + 1 * 0x2000, 0x2000);
 		}
 	}
 
 	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
 
+	memcpy(memory_region(image.device().machine, "user1"), temp_cart, size);
+	auto_free(image.device().machine, temp_cart);
 	return IMAGE_INIT_PASS;
 }
 
