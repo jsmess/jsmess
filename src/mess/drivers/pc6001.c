@@ -27,6 +27,7 @@
 	- Hydlide (MK2): pressing down makes the player to die instantly
 	- American Truck (MK2): Screen is offset at the loading screen
 	- Castle Excellent (MK2): copyright text drawing is quite bogus.
+	- Pac-Man (MK2): gameplay is too fast
 
 ========================================================================================================================================================
 
@@ -1082,6 +1083,22 @@ static WRITE8_HANDLER( pc6001m2_timer_irqv_w )
 	timer_irq_vector = data;
 }
 
+static READ8_HANDLER( pc6001m2_bank_r0_r )
+{
+	return bank_r0;
+}
+
+static READ8_HANDLER( pc6001m2_bank_r1_r )
+{
+	return bank_r1;
+}
+
+static READ8_HANDLER( pc6001m2_bank_w0_r )
+{
+	return bank_w;
+}
+
+
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
@@ -1117,9 +1134,9 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(pc6001m2_bank_w0_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ(pc6001m2_bank_r0_r) AM_WRITE(pc6001m2_bank_r0_w)
+	AM_RANGE(0xf1, 0xf1) AM_READ(pc6001m2_bank_r1_r) AM_WRITE(pc6001m2_bank_r1_w)
+	AM_RANGE(0xf2, 0xf2) AM_READ(pc6001m2_bank_w0_r) AM_WRITE(pc6001m2_bank_w0_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
 //	AM_RANGE(0xf4
 //	AM_RANGE(0xf5
