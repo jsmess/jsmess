@@ -22,13 +22,11 @@
 	- The Outlaw (AX-10): is now broken due of the joycode stuff
 	- Portpia: hangs after a bunch of text screens
 	- Galaxy Mission Part I / II: can't start a play
-	- Renritsuhoteishiki (MK2): has a slight bug with the kanji at the top,
-	  probably wrong kanji ROM hook-up
 	- Yakyukyo (MK2): waits for an irq, check which one;
 	- Forts 2 (MK2): ASCII gfxs are missing;
 	- Hydlide (MK2): crashes due of a load error;
 	- American Truck (MK2): Screen is offset at the loading screen
-	- American Truck (MK2): joystick / keyboard question gfxs aren't right, apparently banking doesn't catch the needed change.
+	- Castle Excellent (MK2): copyright text drawing is quite bogus.
 
 ========================================================================================================================================================
 
@@ -129,8 +127,8 @@ static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
 static UINT32 cas_maxsize;
 /* PC6001mk2 specific */
-static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode,exgfx_2bpp_mode,bank_w,bank_opt;
-static UINT8 bank_r0,bank_r1;
+static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode,exgfx_2bpp_mode;
+static UINT8 bank_r0,bank_r1,gfx_bank_on,bank_w,bank_opt;
 
 //#define CAS_LENGTH 0x1655
 
@@ -788,6 +786,7 @@ static const UINT32 banksw_table_r1[0x10*4][4] = {
 static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *gfx_data = memory_region(space->machine, "gfx1");
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
@@ -798,7 +797,10 @@ static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[(data & 0xf)+(bank_opt*0x10)][0]]);
 	memory_set_bankptr(space->machine, "bank2", &ROM[banksw_table_r0[(data & 0xf)+(bank_opt*0x10)][1]]);
 	memory_set_bankptr(space->machine, "bank3", &ROM[banksw_table_r0[((data & 0xf0)>>4)+(bank_opt*0x10)][2]]);
-	memory_set_bankptr(space->machine, "bank4", &ROM[banksw_table_r0[((data & 0xf0)>>4)+(bank_opt*0x10)][3]]);
+	if(!gfx_bank_on)
+		memory_set_bankptr(space->machine, "bank4", &ROM[banksw_table_r0[((bank_r0 & 0xf0)>>4)+(bank_opt*0x10)][3]]);
+	else
+		memory_set_bankptr(space->machine, "bank4", &gfx_data[0x2000]); //FIXME: check this (CGROM 1/2?)
 }
 
 static WRITE8_HANDLER( pc6001m2_bank_r1_w )
@@ -825,6 +827,7 @@ static WRITE8_HANDLER( pc6001m2_bank_w0_w )
 static WRITE8_HANDLER( pc6001m2_opt_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *gfx_data = memory_region(space->machine, "gfx1");
 
 	/*
 	0 - TVROM / VOICE ROM
@@ -837,6 +840,10 @@ static WRITE8_HANDLER( pc6001m2_opt_bank_w )
 	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[(bank_r0 & 0xf)+(bank_opt*0x10)][0]]);
 	memory_set_bankptr(space->machine, "bank2", &ROM[banksw_table_r0[(bank_r0 & 0xf)+(bank_opt*0x10)][1]]);
 	memory_set_bankptr(space->machine, "bank3", &ROM[banksw_table_r0[((bank_r0 & 0xf0)>>4)+(bank_opt*0x10)][2]]);
+	if(!gfx_bank_on)
+		memory_set_bankptr(space->machine, "bank4", &ROM[banksw_table_r0[((bank_r0 & 0xf0)>>4)+(bank_opt*0x10)][3]]);
+	else
+		memory_set_bankptr(space->machine, "bank4", &gfx_data[0x2000]); //FIXME: check this (CGROM 1/2?)
 	memory_set_bankptr(space->machine, "bank4", &ROM[banksw_table_r0[((bank_r0 & 0xf0)>>4)+(bank_opt*0x10)][3]]);
 	memory_set_bankptr(space->machine, "bank5", &ROM[banksw_table_r1[(bank_r1 & 0xf)+(bank_opt*0x10)][0]]);
 	memory_set_bankptr(space->machine, "bank6", &ROM[banksw_table_r1[(bank_r1 & 0xf)+(bank_opt*0x10)][1]]);
@@ -880,9 +887,15 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(device->machine, "bank4", &ROM[banksw_table_r0[(bank_r0 & 0xf0)>>4][3]]);
+			{
+				gfx_bank_on = 0;
+				memory_set_bankptr(device->machine, "bank4", &ROM[banksw_table_r0[((bank_r0 & 0xf0)>>4)+(bank_opt*0x10)][3]]);
+			}
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(device->machine, "bank4", &gfx_data[0x2000]); //FIXME: check this (CGROM 2)
+			{
+				gfx_bank_on = 1;
+				memory_set_bankptr(device->machine, "bank4", &gfx_data[0x2000]); //FIXME: check this (CGROM 1/2?)
+			}
 		}
 	}
 	i8255a_w(device,offset,data);
@@ -986,9 +999,12 @@ static WRITE8_HANDLER( pc6001m2_col_bank_w )
 }
 
 /* this is a voice status flag, used by Chrith no Ainotabidachi (FIXME: identify and hook-up this voice synth chip) */
-static READ8_HANDLER( unk_r )
+static READ8_HANDLER( voice_status_r )
 {
-	return 0x7f;
+	//x--- ---- status (1) not ready
+	//-x-- ---- writes some presumably wrong data
+	//---x ---- enables voice ROM, gives small time to fire an irq there
+	return 0x00;
 }
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -1016,10 +1032,13 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_READ(unk_r)
+	/* 0xe0 / 0xe3 is clearly voice synth related */
+	AM_RANGE(0xe0, 0xe0) AM_READ(voice_status_r) //AM_WRITE(adpcm_w)
+
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(pc6001m2_bank_w0_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITENOP // Chrith writes there on the intro screens, 0xc2 then 0xc7
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1431,6 +1450,7 @@ static MACHINE_RESET(pc6001m2)
 		memory_set_bankptr(machine, "bank8", &ROM[WRAM(7)]);
 		bank_opt = 0x02; //tv rom
 		bank_w = 0x55; //write to work ram
+		gfx_bank_on = 0;
 	}
 }
 
@@ -1615,16 +1635,14 @@ static MACHINE_DRIVER_START( pc6001m2 )
 	MDRV_CPU_IO_MAP(pc6001m2_io)
 
 	MDRV_GFXDECODE(pc6001m2)
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001sr )
-	MDRV_IMPORT_FROM(pc6001)
-
-	MDRV_VIDEO_UPDATE(pc6001m2)
+	MDRV_IMPORT_FROM(pc6001m2)
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
 MACHINE_DRIVER_END
 
 /* ROM definition */
