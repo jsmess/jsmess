@@ -24,7 +24,7 @@
 	- Galaxy Mission Part I / II: can't start a play
 	- Yakyukyo (MK2): waits for an irq, check which one;
 	- Forts 2 (MK2): ASCII gfxs are missing;
-	- Hydlide (MK2): crashes due of a load error;
+	- Hydlide (MK2): pressing down makes the player to die instantly
 	- American Truck (MK2): Screen is offset at the loading screen
 	- Castle Excellent (MK2): copyright text drawing is quite bogus.
 
@@ -1351,7 +1351,7 @@ static TIMER_CALLBACK(cassette_callback)
 
 			cur_keycode = cas_data[cas_offset++];
 			popmessage("%04x %04x",cas_offset,cas_maxsize);
-			if(cas_offset >= cas_maxsize)
+			if(cas_offset > cas_maxsize)
 			{
 				cas_offset = 0;
 				cas_switch = 0;
@@ -1562,8 +1562,8 @@ static const gfx_layout kanji_layout =
 };
 
 static GFXDECODE_START( pc6001m2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout, 2, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
 
 
