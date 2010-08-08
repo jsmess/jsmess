@@ -269,7 +269,7 @@ static void draw_tile_text(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_border(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
+static void draw_border(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr,int has_mc6847)
 {
 	int x,y,color;
 
@@ -277,10 +277,12 @@ static void draw_border(running_machine *machine, bitmap_t *bitmap,const rectang
 	{
 		for(x=0;x<320;x++)
 		{
-			if((attr & 0x90) == 0x80) //2bpp
+			if(!has_mc6847) //mk2 border color is always black
+				color = 0;
+			else if((attr & 0x90) == 0x80) //2bpp
 				color = ((attr & 2)<<1) + 8;
 			else if((attr & 0x90) == 0x90) //1bpp
-				color = (attr & 2) ? 7 : 2; //FIXME: colors aren't right there either
+				color = (attr & 2) ? 7 : 2;
 			else
 				color = 0; //FIXME: other modes not yet checked
 
@@ -296,7 +298,7 @@ static void pc6001_screen_draw(running_machine *machine, bitmap_t *bitmap,const 
 
 	attr = pc6001_video_ram[0];
 
-	draw_border(machine,bitmap,cliprect,attr);
+	draw_border(machine,bitmap,cliprect,attr,has_mc6847);
 
 	if(attr & 0x80) // gfx mode
 	{
