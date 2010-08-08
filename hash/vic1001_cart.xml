@@ -14,17 +14,17 @@
 		</part>
 	</software>
 
-	<software name="ae" supported"no">
+	<software name="ae" supported="no">
 		<description>A.E.</description>
 		<!-- <serial>VicCart-224</serial> -->
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Broderbund</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
-				<rom name="a.e. (br0derbund)(1982)(viccart-224)(jue).60" size="8192" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue).60" size="8192" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
 			</dataarea>
 			<dataarea name="a000" size="8192">
-				<rom name="a.e. (br0derbund)(1982)(viccart-224)(jue).a0" size="8192" crc="05ae8278" sha1="3309bb5fe0c4fddfacfe99acbac9e8922297e7a4" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue).a0" size="8192" crc="05ae8278" sha1="3309bb5fe0c4fddfacfe99acbac9e8922297e7a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 		</part>
 	</software>
 
-    <software name="agresorn">
+    <software name="agressor">
 		<description>Aggressor (NTSC)</description>
 		<!-- <serial>C305</serial> -->
 		<year>1982</year>
@@ -106,7 +106,7 @@
 		</part>
 	</software>
 
-    <software name="agresornp" cloneof="agresorn">
+    <software name="agressorp" cloneof="agressor">
 		<description>Aggressor (PAL)</description>
 		<!-- <serial>C305</serial> -->
 		<year>1982</year>

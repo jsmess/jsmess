@@ -558,38 +558,67 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 {
 	const address_space *program = cputag_get_address_space(image.device().machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 	const char *filetype = image.filetype();
-	int address = 0;
-	int size = image.length();
-	UINT8 *ptr;
+	UINT32 address = 0;
+	UINT32 size;
+	UINT8 *ptr = memory_region(image.device().machine, M6502_TAG);
 
-	if (!mame_stricmp(filetype, "20"))
-		address = 0x2000;
-	else if (!mame_stricmp(filetype, "40"))
-		address = 0x4000;
-	else if (!mame_stricmp(filetype, "60"))
-		address = 0x6000;
-	else if (!mame_stricmp(filetype, "70"))
-		address = 0x7000;
-	else if (!mame_stricmp(filetype, "a0"))
-		address = 0xa000;
-	else if (!mame_stricmp(filetype, "b0"))
-		address = 0xb000;
-
-	ptr = memory_region(image.device().machine, M6502_TAG);
-
-	if (size == 0x4000 && address != 0x4000)
+	if (image.software_entry() == NULL)
 	{
-		image.fread( ptr + address, 0x2000);
-		image.fread( ptr + 0xa000, 0x2000);
+		size = image.length();
 
-		memory_install_rom(program, address, address + 0x1fff, 0, 0, ptr + address);
-		memory_install_rom(program, 0xa000, 0xbfff, 0, 0, ptr + 0xa000);
+		if (!mame_stricmp(filetype, "20"))
+			address = 0x2000;
+		else if (!mame_stricmp(filetype, "40"))
+			address = 0x4000;
+		else if (!mame_stricmp(filetype, "60"))
+			address = 0x6000;
+		else if (!mame_stricmp(filetype, "70"))
+			address = 0x7000;
+		else if (!mame_stricmp(filetype, "a0"))
+			address = 0xa000;
+		else if (!mame_stricmp(filetype, "b0"))
+			address = 0xb000;
+
+		// special case for a 16K image containing two 8K files glued together
+		if (size == 0x4000 && address != 0x4000)
+		{
+			image.fread(ptr + address, 0x2000);
+			image.fread(ptr + 0xa000, 0x2000);
+			
+			memory_install_rom(program, address, address + 0x1fff, 0, 0, ptr + address);
+			memory_install_rom(program, 0xa000, 0xbfff, 0, 0, ptr + 0xa000);
+		}
+		else
+		{
+			image.fread(ptr + address, size);
+			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+		}
 	}
 	else
 	{
-		image.fread( ptr + address, size);
-
-		memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+		size = image.get_software_region_length("4000");
+		if (size)
+		{
+			address = 0x4000;
+			memcpy(ptr + address, image.get_software_region("4000"), size);
+			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+		}
+		
+		size = image.get_software_region_length("6000");
+		if (size)
+		{
+			address = 0x6000;
+			memcpy(ptr + address, image.get_software_region("6000"), size);
+			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+		}
+		
+		size = image.get_software_region_length("a000");
+		if (size)
+		{
+			address = 0xa000;
+			memcpy(ptr + address, image.get_software_region("a000"), size);
+			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+		}
 	}
 
 	return IMAGE_INIT_PASS;
@@ -656,7 +685,11 @@ static MACHINE_DRIVER_START( vic20_common )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("vic1001_cart")
 	MDRV_CARTSLOT_LOAD(vic20_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list","vic1001_cart")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

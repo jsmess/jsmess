@@ -764,7 +764,7 @@ static const floppy_config bw2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(bw2),
-	NULL
+	"bw2_flop"
 };
 
 static const wd17xx_interface bw2_wd17xx_interface =
@@ -855,6 +855,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_WD179X_ADD("wd179x", bw2_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
+	MDRV_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
