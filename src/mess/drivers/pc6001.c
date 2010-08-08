@@ -1487,9 +1487,10 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static MACHINE_START(pc6001)
 {
-	/* TODO: accurate timing on these */
+	/* TODO: accurate timing on this */
 	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(160/4), NULL, 0, cassette_callback);
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1200/12), NULL, 0, cassette_callback); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
 
 	timer_hz_div = 3;
 	{
@@ -1657,10 +1658,11 @@ static GFXDECODE_START( pc6001m2 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
 
+#define PC6001_MAIN_CLOCK 7987200
 
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 2) // ~4 Mhz
+	MDRV_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MDRV_CPU_PROGRAM_MAP(pc6001_map)
 	MDRV_CPU_IO_MAP(pc6001_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
@@ -1702,7 +1704,7 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CARTSLOT_LOAD(pc6001_cass)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
+	MDRV_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
 	MDRV_SOUND_CONFIG(pc6001_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_WAVE_ADD("wave","cass")
@@ -1737,7 +1739,7 @@ static MACHINE_DRIVER_START( pc6001sr )
 MACHINE_DRIVER_END
 
 /* ROM definition */
-ROM_START( pc6001 )	/* screen = 8000-83FF */
+ROM_START( pc6001 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.60", 0x0000, 0x4000, CRC(54c03109) SHA1(c622fefda3cdc2b87a270138f24c05828b5c41d2) )
 
