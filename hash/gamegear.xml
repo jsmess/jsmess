@@ -2120,6 +2120,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="fantzoneu" cloneof="fantzone">
+		<description>Fantasy Zone Gear (USA)</description>
+		<year>1991</year>
+		<publisher>Sega / Sanritsu</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="fantasy zone (us).bin" size="131072" crc="fad007df" sha1="57563b00eeffe678b2eebeafa790015f3c164262" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fantzone1" cloneof="fantzone">
 		<description>Fantasy Zone Gear (Jpn, USA, Alt)</description>
 		<year>1991</year>
@@ -2700,7 +2711,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
-	<software name="wakevamp" cloneof="vampire">
+	<software name="wakevamp" cloneof="mstrdark">
 		<description>In the Wake of Vampire (Jpn)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
@@ -2835,6 +2846,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="robocod">
+		<description>James Pond II - Codename RoboCod (Euro)</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="james pond ii - codename robocod (eu).bin" size="524288" crc="c2f7928b" sha1="e592bce01e8148081daa2edd24fd106bd61095a6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocodu" cloneof="robocod">
 		<description>James Pond II - Codename RoboCod (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -3600,6 +3622,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="marko's magic football (europe) (en,fr,de,es).bin" size="524288" crc="22c418bf" sha1="f255d7ea194d88a1588a2bf3ff34926de17c7ff1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrdark">
+		<description>Master of Darkness (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="master of darkness (eu).bin" size="262144" crc="07d0eb42" sha1="f9eabdb7e925360f69b41f5357abcb36f893d72e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5510,6 +5543,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="roadrash">
+		<description>Road Rash (Euro)</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="road rash (eu).bin" size="524288" crc="176505d4" sha1="bf5149486c64d338e5d8e0d8397d41127e456b1b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadrashu" cloneof="roadrash">
 		<description>Road Rash (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -7824,7 +7868,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="vampire">
+	<software name="vampire" cloneof="mstrdark">
 		<description>Vampire - Master of Darkness (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>

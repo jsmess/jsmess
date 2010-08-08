@@ -1623,6 +1623,17 @@
 		</part>
 	</software>
 
+	<software name="fatetris" supported="no">
+		<description>FA Tetris (Kor)</description>
+		<year>1989</year>
+		<publisher>FA Soft</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="fa tetris (kr).bin" size="32768" crc="17ab6883" sha1="4e35c8375aba080c416d721fa885ccc232b9a171" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: G-1342, 5103 - Releases: 1987-12-27 (JPN) - Alt Title: ファミリーゲームズ - Notes: FM support -->
 	<software name="family" cloneof="parlour">
 		<description>Family Games (Jpn)</description>
