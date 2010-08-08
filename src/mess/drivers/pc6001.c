@@ -124,11 +124,15 @@ static UINT8 *pc6001_ram;
 static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
+static UINT8 timer_irq_mask;
 static UINT32 cas_offset;
 static UINT32 cas_maxsize;
+static emu_timer *timer_irq_timer;
+static UINT16 timer_hz_div;
 /* PC6001mk2 specific */
 static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode,exgfx_2bpp_mode;
 static UINT8 bank_r0,bank_r1,gfx_bank_on,bank_w,bank_opt;
+static UINT8 timer_irq_mask2, timer_irq_vector;
 
 //#define CAS_LENGTH 0x1655
 
@@ -505,6 +509,7 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	}
 
 	sys_latch = data;
+	timer_irq_mask = data & 1;
 	//printf("%02x\n",data);
 }
 
@@ -600,11 +605,13 @@ static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001_system_latch_w)
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
 ADDRESS_MAP_END
 
 /*
@@ -954,6 +961,7 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 	}
 
 	sys_latch = data;
+	timer_irq_mask = data & 1;
 	vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
 
 	//printf("%02x B0\n",data);
@@ -998,13 +1006,80 @@ static WRITE8_HANDLER( pc6001m2_col_bank_w )
 	bgcol_bank = (data & 7);
 }
 
-/* this is a voice status flag, used by Chrith no Ainotabidachi (FIXME: identify and hook-up this voice synth chip) */
-static READ8_HANDLER( voice_status_r )
+/* voice synth is a NEC uPD7752 sound chip (currently unemulated) */
+static READ8_HANDLER( upd7752_reg_r )
 {
-	//x--- ---- status (1) not ready
-	//-x-- ---- writes some presumably wrong data
-	//---x ---- enables voice ROM, gives small time to fire an irq there
-	return 0x00;
+	switch(offset & 3)
+	{
+		//[0x00]: status register
+		//x--- ---- BSY busy status (1) processing (0) stopped
+		//-x-- ---- REQ audio parameter (1) input request (0) prohibited (???)
+		//--x- ---- ~INT / EXT message data (1) Outside (0) Inside
+		//---x ---- ERR error flag
+		case 0x00: return 0x60;
+		//[0x02]: port 0xe2 latch?
+		case 0x02: return 0xff;
+		//[0x03]: port 0xe3 latch?
+		case 0x03: return 0xff;
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( upd7752_reg_w )
+{
+	switch(offset & 3)
+	{
+		// [0x00]: audio parameter transfer
+
+		// [0x02]: mode set
+		// ---- -x-- Frame periodic analysis (0) 10 ms / frame (1) 20 ms / frame
+		// ---- --xx Utterance (tempo?) speed
+		//        00 : NORMAL SPEED
+		//        01 : SLOW SPEED
+		//        10 : FAST SPEED
+		//        11 : Setting prohibited
+
+		// case 0x02:
+
+		// case 0x03: command set
+	}
+}
+
+static WRITE8_HANDLER( pc6001m2_0xf3_w )
+{
+	/*
+	x--- ---- M1 (?) wait setting
+	-x-- ---- ROM wait setting
+	--x- ---- RAM wait setting
+	---x ---- custom irq 2 address output
+	---- x--- custom irq 1 address output
+	---- -x-- timer irq mask 2 (mirror?)
+	---- --x- custom irq 2 mask
+	---- ---x custom irq 1 mask
+	*/
+	timer_irq_mask2 = data & 4;
+}
+
+static TIMER_CALLBACK(audio_callback)
+{
+	if(cas_switch == 0 && ((timer_irq_mask == 0) || (timer_irq_mask2 == 0)))
+	{
+		irq_vector = timer_irq_vector;
+		cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+	}
+}
+
+
+static WRITE8_HANDLER( pc6001m2_timer_adj_w )
+{
+	timer_hz_div = data;
+	attotime period = ATTOTIME_IN_HZ((487.5*4)/(timer_hz_div+1));
+	timer_adjust_periodic(timer_irq_timer, period,  0, period);
+}
+
+static WRITE8_HANDLER( pc6001m2_timer_irqv_w )
+{
+	timer_irq_vector = data;
 }
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -1024,21 +1099,32 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
+
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001m2_system_latch_w)
+
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
-	/* 0xe0 / 0xe3 is clearly voice synth related */
-	AM_RANGE(0xe0, 0xe0) AM_READ(voice_status_r) //AM_WRITE(adpcm_w)
+
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
+
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
 
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(pc6001m2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITENOP // Chrith writes there on the intro screens, 0xc2 then 0xc7
+	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
+//	AM_RANGE(0xf4
+//	AM_RANGE(0xf5
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1367,15 +1453,6 @@ static TIMER_CALLBACK(cassette_callback)
 	}
 }
 
-static TIMER_CALLBACK(audio_callback)
-{
-	if(cas_switch == 0)
-	{
-		irq_vector = 0x06;
-		cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
-	}
-}
-
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -1410,10 +1487,16 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static MACHINE_START(pc6001)
 {
-	/* TODO: accurate timing on these (especially for the first one) */
-	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
+	/* TODO: accurate timing on these */
 	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(160/4), NULL, 0, cassette_callback);
+
+	timer_hz_div = 3;
+	{
+		attotime period = ATTOTIME_IN_HZ((487.5*4)/(timer_hz_div+1));
+		timer_irq_timer = timer_alloc(machine, audio_callback, NULL);
+		timer_adjust_periodic(timer_irq_timer, period,  0, period);
+	}
 }
 
 static MACHINE_RESET(pc6001)
@@ -1424,6 +1507,10 @@ static MACHINE_RESET(pc6001)
 	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
 	cas_offset = 0;
+	timer_irq_mask = 1;
+	timer_irq_mask2 = 1;
+	timer_irq_vector = 0x06; // actually vector is fixed in plain PC-6001
+	timer_hz_div = 3;
 }
 
 static MACHINE_RESET(pc6001m2)
@@ -1452,6 +1539,10 @@ static MACHINE_RESET(pc6001m2)
 		bank_w = 0x55; //write to work ram
 		gfx_bank_on = 0;
 	}
+
+	timer_irq_mask = 1;
+	timer_irq_mask2 = 1;
+	timer_irq_vector = 0x06;
 }
 
 static const rgb_t defcolors[] =
@@ -1569,7 +1660,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 4)
+	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 2) // ~4 Mhz
 	MDRV_CPU_PROGRAM_MAP(pc6001_map)
 	MDRV_CPU_IO_MAP(pc6001_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
@@ -1642,7 +1733,7 @@ static MACHINE_DRIVER_START( pc6001sr )
 	MDRV_IMPORT_FROM(pc6001m2)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz)
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
 MACHINE_DRIVER_END
 
 /* ROM definition */
