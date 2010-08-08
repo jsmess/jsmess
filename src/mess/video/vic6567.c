@@ -74,6 +74,8 @@
 #include "emu.h"
 #include "video/vic6567.h"
 
+static UINT8 rdy_cycles = 0;
+
 typedef struct _vic2_state  vic2_state;
 struct _vic2_state
 {
@@ -375,7 +377,9 @@ INLINE void vic2_suspend_cpu( running_machine *machine, vic2_state *vic2 )
 	{
 		vic2->first_ba_cycle = vic2->cycles_counter;
 		if ((vic2->rdy_workaround_cb != NULL) && (vic2->rdy_workaround_cb(machine) != 7 ))
-			cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
+		{
+//			cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
+		}
 		vic2->cpu_suspended = 1;
 	}
 }
@@ -386,7 +390,9 @@ INLINE void vic2_resume_cpu( running_machine *machine, vic2_state *vic2 )
 	if (vic2->cpu_suspended == 1)
 	{
 		if ((vic2->rdy_workaround_cb != NULL))
-			cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
+		{
+//	cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
+		}
 		vic2->cpu_suspended = 0;
 	}
 }
@@ -993,7 +999,38 @@ static TIMER_CALLBACK( pal_timer_callback )
 	vic2_state *vic2 = (vic2_state *)ptr;
 	int i;
 	UINT8 mask;
+	static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	UINT8 cpu_cycles = machine->device<cpu_device>("maincpu")->total_cycles() & 0xff;
+	UINT8 vic_cycles = (vic2->cycles_counter + 1) & 0xff;
 	vic2->cycles_counter++;
+
+//	printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,rdy_cycles);
+/*
+if (input_code_pressed(machine, KEYCODE_X))
+{
+if (input_code_pressed_once(machine, KEYCODE_Q)) adjust[1]++;
+if (input_code_pressed_once(machine, KEYCODE_W)) adjust[2]++;
+if (input_code_pressed_once(machine, KEYCODE_E)) adjust[3]++;
+if (input_code_pressed_once(machine, KEYCODE_R)) adjust[4]++;
+if (input_code_pressed_once(machine, KEYCODE_T)) adjust[5]++;
+if (input_code_pressed_once(machine, KEYCODE_Y)) adjust[6]++;
+if (input_code_pressed_once(machine, KEYCODE_U)) adjust[7]++;
+if (input_code_pressed_once(machine, KEYCODE_I)) adjust[8]++;
+if (input_code_pressed_once(machine, KEYCODE_A)) adjust[1]--;
+if (input_code_pressed_once(machine, KEYCODE_S)) adjust[2]--;
+if (input_code_pressed_once(machine, KEYCODE_D)) adjust[3]--;
+if (input_code_pressed_once(machine, KEYCODE_F)) adjust[4]--;
+if (input_code_pressed_once(machine, KEYCODE_G)) adjust[5]--;
+if (input_code_pressed_once(machine, KEYCODE_H)) adjust[6]--;
+if (input_code_pressed_once(machine, KEYCODE_J)) adjust[7]--;
+if (input_code_pressed_once(machine, KEYCODE_K)) adjust[8]--;
+if (input_code_pressed_once(machine, KEYCODE_C)) adjust[0]++;
+if (input_code_pressed_once(machine, KEYCODE_V)) adjust[0]--;
+if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
+								adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
+}
+*/
 
 	switch(vic2->cycle)
 	{
@@ -1033,6 +1070,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 			vic2_suspend_cpu(machine, vic2);
 		else
 			vic2_resume_cpu(machine, vic2);
+
+		if (vic2->spr_dma_on & 0x08) rdy_cycles += (2 + adjust[1]);
 
 		vic2->cycle++;
 		break;
@@ -1078,6 +1117,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 		else
 			vic2_resume_cpu(machine, vic2);
 
+		if (vic2->spr_dma_on & 0x10) rdy_cycles += (2 + adjust[2]);
+
 		vic2->cycle++;
 		break;
 
@@ -1100,6 +1141,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 			vic2_suspend_cpu(machine, vic2);
 		else
 			vic2_resume_cpu(machine, vic2);
+
+		if (vic2->spr_dma_on & 0x20) rdy_cycles += (2 + adjust[3]);
 
 		vic2->cycle++;
 		break;
@@ -1124,6 +1167,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 		else
 			vic2_resume_cpu(machine, vic2);
 
+		if (vic2->spr_dma_on & 0x40) rdy_cycles += (2 + adjust[4]);
+
 		vic2->cycle++;
 		break;
 
@@ -1146,6 +1191,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 			vic2_suspend_cpu(machine, vic2);
 		else
 			vic2_resume_cpu(machine, vic2);
+
+		if (vic2->spr_dma_on & 0x80) rdy_cycles += (2 + adjust[5]);
 
 		vic2->cycle++;
 		break;
@@ -1187,7 +1234,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2->raster_x = 0xfffc;
 
 		if ((vic2->rdy_workaround_cb(machine) == 0 ) && (vic2->is_bad_line))
-			vic2_suspend_cpu(machine, vic2);
+			rdy_cycles += (43+adjust[0]);
 
 		vic2->cycle++;
 		break;
@@ -1202,7 +1249,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2->vc = vic2->vc_base;
 
 		if ((vic2->rdy_workaround_cb(machine) == 1 ) && (vic2->is_bad_line))
-			vic2_suspend_cpu(machine, vic2);
+			rdy_cycles += (42+adjust[0]);
 
 		vic2->cycle++;
 		break;
@@ -1222,7 +1269,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 2 ) && (vic2->is_bad_line))
-			vic2_suspend_cpu(machine, vic2);
+			rdy_cycles += (41+adjust[0]);
 
 		vic2->cycle++;
 		break;
@@ -1246,7 +1293,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 3 ) && (vic2->is_bad_line))
-			vic2_suspend_cpu(machine, vic2);
+			rdy_cycles += (40+adjust[0]);
 
 		vic2->cycle++;
 		break;
@@ -1283,7 +1330,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 4 ) && (vic2->is_bad_line))
-			vic2_suspend_cpu(machine, vic2);
+			rdy_cycles += (40+adjust[0]);
 
 		vic2->cycle++;
 		break;
@@ -1456,6 +1503,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 		else
 			vic2_resume_cpu(machine, vic2);
 
+		if (vic2->spr_dma_on & 0x01) rdy_cycles += (2 + adjust[6]);
+
 		vic2->cycle++;
 		break;
 
@@ -1511,6 +1560,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 		else
 			vic2_resume_cpu(machine, vic2);
 
+		if (vic2->spr_dma_on & 0x02) rdy_cycles += (2 + adjust[7]);
+
 		vic2->cycle++;
 		break;
 
@@ -1534,6 +1585,8 @@ static TIMER_CALLBACK( pal_timer_callback )
 		else
 			vic2_resume_cpu(machine, vic2);
 
+		if (vic2->spr_dma_on & 0x04) rdy_cycles += (2 + adjust[8]);
+
 		vic2->cycle++;
 		break;
 
@@ -1551,6 +1604,12 @@ static TIMER_CALLBACK( pal_timer_callback )
 
 		// Last cycle
 		vic2->cycle = 1;
+	}
+
+	if ((cpu_cycles == vic_cycles) && (rdy_cycles > 0))
+	{
+		device_spin_until_time (machine->firstcpu, machine->device<cpu_device>("maincpu")->cycles_to_attotime(rdy_cycles));
+		rdy_cycles = 0;
 	}
 
 	vic2->raster_x += 8;
@@ -2685,7 +2744,7 @@ static DEVICE_RESET( vic2 )
 	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
 	vic2->rasterline = 0; // VIC2_LINES - 1;
 
-	vic2->cycles_counter = 0;
+	vic2->cycles_counter = -1;
 	vic2->cycle = 63;
 
 	vic2->on = 1;
