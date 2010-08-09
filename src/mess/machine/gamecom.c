@@ -40,7 +40,6 @@ typedef struct {
 	int enabled;
 	int state_count;
 	int state_limit;
-	int counter;
 	int check_value;
 } GAMECOM_TIMER;
 
@@ -206,21 +205,21 @@ WRITE8_HANDLER( gamecom_internal_w )
 		break;
 	case SM8521_TM0D:
 		gamecom_timer[0].check_value = data;
-		break;
+		return;
 	case SM8521_TM0C:
 		gamecom_timer[0].enabled = data & 0x80;
 		gamecom_timer[0].state_limit = gamecom_timer_limit[data & 0x07];
 		gamecom_timer[0].state_count = 0;
-		gamecom_timer[0].counter = 0;
+		RAM[SM8521_TM0D] = 0;
 		break;
 	case SM8521_TM1D:
 		gamecom_timer[1].check_value = data;
-		break;
+		return;
 	case SM8521_TM1C:
 		gamecom_timer[1].enabled = data & 0x80;
 		gamecom_timer[1].state_limit = gamecom_timer_limit[data & 0x07];
 		gamecom_timer[1].state_count = 0;
-		gamecom_timer[1].counter = 0;
+		RAM[SM8521_TM1D] = 0;
 		break;
 	case SM8521_CLKT:	/* bit 6-7 */
 		if ( data & 0x80 )
@@ -334,18 +333,8 @@ WRITE8_HANDLER( gamecom_internal_w )
 
 READ8_HANDLER( gamecom_internal_r )
 {
-	/* NPW 22-Dec-2008 - Shouldn't this entire function be moved to an internal memory map of the CPU core? */
 	UINT8 * RAM = memory_region(space->machine, "maincpu");
-	offset += 0x20;
-	UINT8 data = RAM[offset];
-	switch( offset )
-	{
-	case SM8521_TM0D:	return gamecom_timer[0].counter;
-	case SM8521_TM1D:	return gamecom_timer[1].counter;
-//  case SM8521_CLKT:   /* bit 0-5 read only, 6-7 read/write */
-//          return ( RAM[offset] & 0xC0 ) | ( clock_timer_val & 0x3F );
-	}
-	return data;
+	return RAM[offset + 0x20];
 }
 
 WRITE8_HANDLER( gamecom_pio_w )
@@ -629,16 +618,17 @@ void gamecom_handle_dma( running_device *device, int cycles )
 
 void gamecom_update_timers( running_device *device, int cycles )
 {
+	UINT8 * RAM = memory_region(device->machine, "maincpu");
 	if ( gamecom_timer[0].enabled )
 	{
 		gamecom_timer[0].state_count += cycles;
 		while ( gamecom_timer[0].state_count >= gamecom_timer[0].state_limit )
 		{
 			gamecom_timer[0].state_count -= gamecom_timer[0].state_limit;
-			gamecom_timer[0].counter++;
-			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value )
+			RAM[SM8521_TM0D]++;
+			if ( RAM[SM8521_TM0D] >= gamecom_timer[0].check_value )
 			{
-				gamecom_timer[0].counter = 0;
+				RAM[SM8521_TM0D] = 0;
 				cputag_set_input_line(device->machine, "maincpu", TIM0_INT, ASSERT_LINE );
 			}
 		}
@@ -649,10 +639,10 @@ void gamecom_update_timers( running_device *device, int cycles )
 		while ( gamecom_timer[1].state_count >= gamecom_timer[1].state_limit )
 		{
 			gamecom_timer[1].state_count -= gamecom_timer[1].state_limit;
-			gamecom_timer[1].counter++;
-			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value )
+			RAM[SM8521_TM1D]++;
+			if ( RAM[SM8521_TM1D] >= gamecom_timer[1].check_value )
 			{
-				gamecom_timer[1].counter = 0;
+				RAM[SM8521_TM1D] = 0;
 				cputag_set_input_line(device->machine, "maincpu", TIM1_INT, ASSERT_LINE );
 			}
 		}
