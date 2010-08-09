@@ -21,15 +21,23 @@
 
 	TODO (game specific):
 	- (several AX* games, namely Simon, Arabian Rhapsody and others): inputs doesn't work
-	- AX6 - Demo: When AY-based speech talks, screen should be a solid green (plain PC-6001) or solid white (Mk2 version)
+	- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be a solid green (plain PC-6001) or solid white (Mk2 version),
+	              but, according to an original video reference that I've seen, that screen should actually some kind of weird garbage on it ...
+	- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the player to press either 'B' or 'C' then a number but
+	                        nothing is shown on screen, other emus behaves the same, bad dump?
 	- AX10 - The Outlaw: gameplay is now broken due of the joycode stuff
-	- Galaxy Mission Part I / II: can't start a play
-	- Portopia Renzoku Satsujin Jiken: hangs after a bunch of text screens
 	(Mk2 mode 5 games)
+	- 3D Golf Simulation Super Version: gameplay / inputs looks broken
 	- American Truck: Screen is offset at the loading screen, loading bug?
 	- Castle Excellent: copyright text drawing is quite bogus, scans text in vertical instead of horizontal?
+	- Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it with current cassette kludge, also, for Dezeni Land(s) keyboard irqs
+	                                              doesn't seem to work too well with halt opcode execution?
+	- Dezeni Land 1/4: dies after loading of main program
+	- Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
+	- Forts 1: refuses to run, bad dump?
 	- Forts 2: ASCII gfxs are missing;
-	- Hydlide: pressing down makes the player to die instantly
+	- Grobda: when "get ready" speech plays, screen should be full white but instead it's all black, same issue as AX-6 Demo?
+
 	- Pac-Man: gameplay is too fast
 	- Yakyukyo: waits for an irq, check which one;
 
@@ -972,14 +980,6 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 
 static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 {
-//	UINT8 *work_ram = memory_region(space->machine, "maincpu");
-
-//	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(5) }; //TODO: check me
-
-//	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
-
-//	printf("%08x\n",startaddr[(data >> 1) & 0x03]);
-
 	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		cas_switch = 1;
@@ -1322,8 +1322,11 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
+static UINT8 check_joy_press(running_machine *machine);
+
 static INTERRUPT_GEN( pc6001_interrupt )
 {
+	cur_keycode = check_joy_press(device->machine);
 	irq_vector = 0x16;
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
@@ -1533,15 +1536,17 @@ static TIMER_CALLBACK(keyboard_callback)
 			old_key2 = key2;
 			old_key3 = key3;
 		}
+		#if 0
 		else /* joypad polling */
 		{
 			cur_keycode = check_joy_press(space->machine);
 			if(cur_keycode)
 			{
-				irq_vector = 0x02;
+				irq_vector = 0x16;
 				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
 			}
 		}
+		#endif
 	}
 }
 
@@ -1562,8 +1567,11 @@ static MACHINE_START(pc6001)
 
 static MACHINE_RESET(pc6001)
 {
+	UINT8 *work_ram = memory_region(machine, "maincpu");
+
+	pc6001_video_ram =  work_ram + 0xc000;
+
 	port_c_8255=0;
-	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
@@ -1576,8 +1584,11 @@ static MACHINE_RESET(pc6001)
 
 static MACHINE_RESET(pc6001m2)
 {
+	UINT8 *work_ram = memory_region(machine, "maincpu");
+
+	pc6001_video_ram = work_ram + 0xc000 + 0x28000;
+
 	port_c_8255=0;
-	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
