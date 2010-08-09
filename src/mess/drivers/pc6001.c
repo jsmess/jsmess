@@ -10,8 +10,9 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
-	- joypad polling probably needs some kind of masking when you're on BASIC.
-    - make the later model to work;
+	- joypad polling actually doesn't work, the joycode stuff currently hooked up is just the
+	  keyboard arrow keys;
+    - make PC-6600 model to work;
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
            so this implementation will be used in the end.
@@ -19,15 +20,18 @@
            have any docs atm.
 
 	TODO (game specific):
-	- The Outlaw (AX-10): is now broken due of the joycode stuff
-	- Portpia: hangs after a bunch of text screens
+	- (several AX* games, namely Simon, Arabian Rhapsody and others): inputs doesn't work
+	- AX6 - Demo: When AY-based speech talks, screen should be a solid green (plain PC-6001) or solid white (Mk2 version)
+	- AX10 - The Outlaw: gameplay is now broken due of the joycode stuff
 	- Galaxy Mission Part I / II: can't start a play
-	- Yakyukyo (MK2): waits for an irq, check which one;
-	- Forts 2 (MK2): ASCII gfxs are missing;
-	- Hydlide (MK2): pressing down makes the player to die instantly
-	- American Truck (MK2): Screen is offset at the loading screen
-	- Castle Excellent (MK2): copyright text drawing is quite bogus.
-	- Pac-Man (MK2): gameplay is too fast
+	- Portopia Renzoku Satsujin Jiken: hangs after a bunch of text screens
+	(Mk2 mode 5 games)
+	- American Truck: Screen is offset at the loading screen, loading bug?
+	- Castle Excellent: copyright text drawing is quite bogus, scans text in vertical instead of horizontal?
+	- Forts 2: ASCII gfxs are missing;
+	- Hydlide: pressing down makes the player to die instantly
+	- Pac-Man: gameplay is too fast
+	- Yakyukyo: waits for an irq, check which one;
 
 ========================================================================================================================================================
 
@@ -152,12 +156,25 @@ static VIDEO_START( pc6001 )
 	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
-static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
+/* this is known as gfx mode 4 */
+static void draw_gfx_mode4(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
 {
 	int x,y,xi;
 	int fgcol,color;
-
-	fgcol = (attr & 2) ? 7 : 2;
+	int col_setting;
+	static const UINT8 pen_gattr[4][4] = {
+		{ 0, 1, 6, 2 }, //Red / Blue
+		{ 0, 6, 1, 2 }, //Blue / Red
+		{ 0, 5, 2, 2 }, //Pink / Green
+		{ 0, 2, 5, 2 }, //Green / Pink
+	};
+	static const UINT8 pen_wattr[4][4] = {
+		{ 0, 1, 6, 7 }, //Red / Blue
+		{ 0, 6, 1, 7 }, //Blue / Red
+		{ 0, 5, 2, 7 }, //Pink / Green
+		{ 0, 2, 5, 7 }, //Green / Pink
+	};
+	col_setting = input_port_read(machine,"MODE4_DSW") & 7;
 
 	for(y=0;y<192;y++)
 	{
@@ -165,11 +182,28 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const re
 		{
 			int tile = pc6001_video_ram[(x+(y*32))+0x200];
 
-			for(xi=0;xi<8;xi++)
+			if(col_setting == 0x00) //monochrome
 			{
-				color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
+				for(xi=0;xi<8;xi++)
+				{
+					fgcol = (attr & 2) ? 7 : 2;
 
-				*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = machine->pens[color];
+					color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
+
+					*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = machine->pens[color];
+				}
+			}
+			else
+			{
+				for(xi=0;xi<4;xi++)
+				{
+					fgcol = ((tile)>>(6-(xi*2)) & 3);
+
+					color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
+
+					*BITMAP_ADDR16(bitmap, (y+24), ((x*8+xi*2)+0)+32) = machine->pens[color];
+					*BITMAP_ADDR16(bitmap, (y+24), ((x*8+xi*2)+1)+32) = machine->pens[color];
+				}
 			}
 		}
 	}
@@ -309,7 +343,7 @@ static void pc6001_screen_draw(running_machine *machine, bitmap_t *bitmap,const 
 	{
 		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
-			draw_bitmap_1bpp(machine,bitmap,cliprect,attr);
+			draw_gfx_mode4(machine,bitmap,cliprect,attr);
 		}
 		else // 128x192x2 mode
 		{
@@ -1146,6 +1180,15 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pc6001 )
+	PORT_START("MODE4_DSW") //TODO: is this really a DSW? bit arrangement is also unknown if so.
+	PORT_DIPNAME( 0x07, 0x00, "Mode 4 GFX colors" )
+	PORT_DIPSETTING(    0x00, "Monochrome" )
+	PORT_DIPSETTING(    0x01, "Red/Blue" )
+	PORT_DIPSETTING(    0x02, "Blue/Red" )
+	PORT_DIPSETTING(    0x03, "Pink/Green" )
+	PORT_DIPSETTING(    0x04, "Green/Pink" )
+	//5-6-7 is presumably invalid
+
 	/* TODO: these two are unchecked */
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
