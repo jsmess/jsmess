@@ -10,8 +10,6 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
-	- joypad polling actually doesn't work, the joycode stuff currently hooked up is just the
-	  keyboard arrow keys;
     - make PC-6600 model to work;
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
@@ -20,12 +18,11 @@
            have any docs atm.
 
 	TODO (game specific):
-	- (several AX* games, namely Simon, Arabian Rhapsody and others): inputs doesn't work
+	- (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work
 	- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be a solid green (plain PC-6001) or solid white (Mk2 version),
 	              but, according to an original video reference that I've seen, that screen should actually some kind of weird garbage on it ...
 	- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the player to press either 'B' or 'C' then a number but
 	                        nothing is shown on screen, other emus behaves the same, bad dump?
-	- AX10 - The Outlaw: gameplay is now broken due of the joycode stuff
 	(Mk2 mode 5 games)
 	- 3D Golf Simulation Super Version: gameplay / inputs looks broken
 	- American Truck: Screen is offset at the loading screen, loading bug?
@@ -37,8 +34,10 @@
 	- Forts 1: refuses to run, bad dump?
 	- Forts 2: ASCII gfxs are missing;
 	- Grobda: when "get ready" speech plays, screen should be full white but instead it's all black, same issue as AX-6 Demo?
-
-	- Pac-Man: gameplay is too fast
+	- Pac-Man / Tiny Xevious 2: gameplay is too fast
+	- Salad no Kunino Tomato-Hime: can't start a play
+	- Space Harrier: inputs doesn't work properly
+	- The Black Onyx: dies because it wants to save on the tape
 	- Yakyukyo: waits for an irq, check which one;
 
 ========================================================================================================================================================
