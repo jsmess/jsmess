@@ -488,7 +488,7 @@ static VIDEO_UPDATE( pc6001m2 )
 		int xi,yi,pen,fgcol,bgcol,color;
 		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
 
-		for(y=0;y<25;y++)
+		for(y=0;y<20;y++)
 		{
 			for(x=0;x<40;x++)
 			{
@@ -525,6 +525,41 @@ static VIDEO_UPDATE( pc6001m2 )
 	{
 		attr = pc6001_video_ram[0];
 		pc6001_screen_draw(screen->machine,bitmap,cliprect,0);
+	}
+
+	return 0;
+}
+
+static VIDEO_UPDATE( pc6001sr )
+{
+	int x,y,tile,attr;
+	int xi,yi,pen,fgcol,bgcol,color;
+	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+
+	for(y=0;y<20;y++)
+	{
+		for(x=0;x<40;x++)
+		{
+			tile = pc6001_video_ram[(x+(y*40))*2+0];
+			attr = pc6001_video_ram[(x+(y*40))*2+1];
+			tile+= ((attr & 0x80) << 1);
+
+			for(yi=0;yi<12;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+
+					fgcol = (attr & 0x0f) + 0x10;
+					bgcol = ((attr & 0x70) >> 4) + 0x10 + ((bgcol_bank & 2) << 2);
+
+					color = pen ? fgcol : bgcol;
+
+					if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
+				}
+			}
+		}
 	}
 
 	return 0;
@@ -1190,7 +1225,6 @@ static WRITE8_HANDLER( pc6600_fdc_w )
 {
 }
 
-
 static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1221,6 +1255,158 @@ static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
+//	AM_RANGE(0xf4
+//	AM_RANGE(0xf5
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
+ADDRESS_MAP_END
+
+/* PC-6001 SR */
+static UINT8 sr_bank_r[8],sr_bank_w[8];
+
+#define SR_SYSROM_1(_v_) \
+	0x10000+(0x1000*_v_) \
+
+#define SR_SYSROM_2(_v_) \
+	0x20000+(0x1000*_v_) \
+
+#define SR_CGROM1(_v_) \
+	0x30000+(0x1000*_v_) \
+
+#define SR_EXROM0(_v_) \
+	0x40000+(0x1000*_v_) \
+
+#define SR_EXROM1(_v_) \
+	0x50000+(0x1000*_v_) \
+
+#define SR_EXRAM0(_v_) \
+	0x60000+(0x1000*_v_) \
+
+#define SR_WRAM0(_v_) \
+	0x70000+(0x1000*_v_) \
+
+#define SR_NULL(_v_) \
+	0x80000+(0x1000*_v_) \
+
+static READ8_HANDLER( pc6001sr_bank_rn_r )
+{
+	return sr_bank_r[offset];
+}
+
+static WRITE8_HANDLER( pc6001sr_bank_rn_w )
+{
+	const char* bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	static UINT8 bank_num;
+
+	sr_bank_r[offset] = data;
+	bank_num = data & 0x0f;
+
+	switch(data & 0xf0)
+	{
+		case 0xf0: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_SYSROM_1(bank_num)]); break;
+		case 0xe0: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_SYSROM_2(bank_num)]); break;
+		case 0xd0: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_CGROM1(bank_num)]); break;
+		case 0xc0: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_EXROM0(bank_num)]); break;
+		case 0xb0: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_EXROM1(bank_num)]); break;
+		case 0x20: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_EXRAM0(bank_num)]); break;
+		case 0x00: memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_WRAM0(bank_num)]); break;
+		default:   memory_set_bankptr(space->machine, bank_name[offset], &ROM[SR_NULL(bank_num)]); break;
+	}
+}
+
+static READ8_HANDLER( pc6001sr_bank_wn_r )
+{
+	return sr_bank_w[offset];
+}
+
+static WRITE8_HANDLER( pc6001sr_bank_wn_w )
+{
+	sr_bank_w[offset] = data;
+}
+
+#define SR_WRAM_BANK_W(_v_) \
+{ \
+	UINT8 *ROM = memory_region(space->machine, "maincpu"); \
+	static UINT8 bank_num; \
+	bank_num = sr_bank_w[_v_] & 0x0f; \
+	if((sr_bank_w[_v_] & 0xf0) != 0x20) \
+		ROM[offset+(SR_WRAM0(bank_num))] = data; \
+	else \
+		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
+} \
+
+
+static WRITE8_HANDLER( sr_work_ram0_w ) { SR_WRAM_BANK_W(0); }
+static WRITE8_HANDLER( sr_work_ram1_w ) { SR_WRAM_BANK_W(1); }
+static WRITE8_HANDLER( sr_work_ram2_w ) { SR_WRAM_BANK_W(2); }
+static WRITE8_HANDLER( sr_work_ram3_w ) { SR_WRAM_BANK_W(3); }
+static WRITE8_HANDLER( sr_work_ram4_w ) { SR_WRAM_BANK_W(4); }
+static WRITE8_HANDLER( sr_work_ram5_w ) { SR_WRAM_BANK_W(5); }
+static WRITE8_HANDLER( sr_work_ram6_w ) { SR_WRAM_BANK_W(6); }
+static WRITE8_HANDLER( sr_work_ram7_w ) { SR_WRAM_BANK_W(7); }
+
+static WRITE8_HANDLER( pc6001sr_mode_w )
+{
+	if(data & 1)
+		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
+}
+
+static WRITE8_HANDLER( pc6001sr_vram_bank_w )
+{
+	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+
+	pc6001_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
+}
+
+static ADDRESS_MAP_START(pc6001sr_map, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(sr_work_ram2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(sr_work_ram3_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(sr_work_ram4_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(sr_work_ram5_w)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(sr_work_ram6_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x67) AM_READWRITE(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)
+	AM_RANGE(0x68, 0x6f) AM_READWRITE(pc6001sr_bank_wn_r,pc6001sr_bank_wn_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
+
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+	/* these are disk related */
+//	AM_RANGE(0xb1
+//	AM_RANGE(0xb2
+//	AM_RANGE(0xb3
+
+//	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
+//	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
+//	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
+
+	AM_RANGE(0xc8, 0xc8) AM_WRITE(pc6001sr_mode_w)
+	AM_RANGE(0xc9, 0xc9) AM_WRITE(pc6001sr_vram_bank_w)
+
+	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6600_fdc_r,pc6600_fdc_w) // disk device
+
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+
+//	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
+//	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
+//	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
 //	AM_RANGE(0xf4
 //	AM_RANGE(0xf5
@@ -1675,6 +1861,49 @@ static MACHINE_RESET(pc6001m2)
 	timer_irq_vector = 0x06;
 }
 
+static MACHINE_RESET(pc6001sr)
+{
+	UINT8 *work_ram = memory_region(machine, "maincpu");
+
+	pc6001_video_ram = work_ram + 0x70000;
+
+	port_c_8255=0;
+
+	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
+	cas_switch = 0;
+	cas_offset = 0;
+
+	/* set default bankswitch */
+	{
+		UINT8 *ROM = memory_region(machine, "maincpu");
+		sr_bank_r[0] = 0xf8; memory_set_bankptr(machine, "bank1", &ROM[SR_SYSROM_1(0x08)]);
+		sr_bank_r[1] = 0xfa; memory_set_bankptr(machine, "bank2", &ROM[SR_SYSROM_1(0x0a)]);
+		sr_bank_r[2] = 0xb0; memory_set_bankptr(machine, "bank3", &ROM[SR_EXROM1(0x00)]);
+		sr_bank_r[3] = 0xc0; memory_set_bankptr(machine, "bank4", &ROM[SR_EXROM0(0x00)]);
+		sr_bank_r[4] = 0x08; memory_set_bankptr(machine, "bank5", &ROM[SR_WRAM0(0x08)]);
+		sr_bank_r[5] = 0x0a; memory_set_bankptr(machine, "bank6", &ROM[SR_WRAM0(0x0a)]);
+		sr_bank_r[6] = 0x0c; memory_set_bankptr(machine, "bank7", &ROM[SR_WRAM0(0x0c)]);
+		sr_bank_r[7] = 0x0e; memory_set_bankptr(machine, "bank8", &ROM[SR_WRAM0(0x0e)]);
+//		bank_opt = 0x02; //tv rom
+
+		/* enable default work RAM writes */
+		sr_bank_w[0] = 0x00;
+		sr_bank_w[1] = 0x02;
+		sr_bank_w[2] = 0x04;
+		sr_bank_w[3] = 0x06;
+		sr_bank_w[4] = 0x08;
+		sr_bank_w[5] = 0x0a;
+		sr_bank_w[6] = 0x0c;
+		sr_bank_w[7] = 0x0e;
+
+		gfx_bank_on = 0;
+	}
+
+	timer_irq_mask = 1;
+	timer_irq_mask2 = 1;
+	timer_irq_vector = 0x06;
+}
+
 static const rgb_t defcolors[] =
 {
 	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
@@ -1864,9 +2093,23 @@ static MACHINE_DRIVER_START( pc6600 )
 	MDRV_IMPORT_FROM(pc6001m2)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6600 Z80 CPU is actually slower than older models
+	MDRV_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
 	MDRV_CPU_IO_MAP(pc6600_io)
+	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pc6001sr )
+	MDRV_IMPORT_FROM(pc6001m2)
+
+	MDRV_MACHINE_RESET(pc6001sr)
+
+	MDRV_VIDEO_UPDATE(pc6001sr)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
+	MDRV_CPU_PROGRAM_MAP(pc6001sr_map)
+	MDRV_CPU_IO_MAP(pc6001sr_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
 MACHINE_DRIVER_END
 
@@ -1933,28 +2176,6 @@ ROM_START( pc6001m2 )
 	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
-ROM_START( pc6001sr )
-	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
-	/* If you split this into 4x 8000, the first 3 need to load to 0-7FFF (via bankswitch). The 4th part looks like gfx data */
-	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
-	ROM_LOAD( "systemrom2.64", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
-	ROM_CART_LOAD("cart",    0x48000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
-
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
-
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
-ROM_END
-
-
 ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.66", 0x10000, 0x8000, CRC(c0b01772) SHA1(9240bb6b97fe06f5f07b5d65541c4d2f8758cc2a) )
@@ -1979,15 +2200,42 @@ ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
+ROM_START( pc6001sr )
+	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
+	ROM_LOAD( "systemrom2.64", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+//  cgrom 1	                   0x30000, 0x10000
+//  exrom 0	                   0x40000, 0x10000
+//  exrom 1	                   0x50000, 0x10000
+//  exram 0	                   0x60000, 0x10000
+//  work ram 0	               0x70000, 0x10000
+//	<invalid>                  0x80000, 0x10000
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
+
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
+ROM_END
+
+/* TODO: REMOVE THIS CRAP! */
 /* There exists an alternative (incomplete?) dump, consisting of more .68 pieces, but it's been probably created for emulators:
 systemrom1.68 = 0x0-0x8000 BASICROM.68 + ??
 systemrom2.68 = 0x0-0x2000 ?? + 0x2000-0x4000 SYSROM2.68 + 0x4000-0x8000 VOICEROM.68 + 0x8000-0x10000 KANJIROM.68
 cgrom68.68 = CGROM60.68 + CGROM66.68
  */
 ROM_START( pc6600sr )	/* Variant of pc6001sr */
-	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "systemrom1.68", 0x0000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
-	ROM_LOAD( "systemrom2.68", 0x10000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "systemrom1.68", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
+	ROM_LOAD( "systemrom2.68", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
@@ -2005,6 +2253,6 @@ ROM_END
 COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    GAME_NOT_WORKING )
 COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      GAME_NOT_WORKING ) // This version is also known as the NEC Trek
 COMP( 1983, pc6001m2, pc6001,  0,     pc6001m2, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   GAME_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001m2, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", GAME_NOT_WORKING )
 COMP( 1983, pc6600,   pc6001,  0,     pc6600,   pc6001,   0,      "Nippon Electronic Company",   "PC-6600 (Japan)",       GAME_NOT_WORKING )
-COMP( 1984, pc6600sr, pc6001,  0,     pc6600,   pc6001,   0,      "Nippon Electronic Company",   "PC-6600SR (Japan)",     GAME_NOT_WORKING )
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", GAME_NOT_WORKING )
+COMP( 1984, pc6600sr, pc6001,  0,     pc6001sr, pc6001,   0,      "Nippon Electronic Company",   "PC-6600SR (Japan)",     GAME_NOT_WORKING )
