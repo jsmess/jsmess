@@ -30,6 +30,7 @@ struct datapack
 	UINT8 id;
 	UINT8 len;
 	UINT16 counter;
+	UINT8 page;
 	UINT8* data;
 };
 
@@ -287,6 +288,19 @@ void update_bank(running_machine *machine)
 	}
 }
 
+struct datapack *get_active_slot(running_machine *machine, UINT8 data)
+{
+	switch(data & 0x70)
+	{
+		case 0x60:
+			return &psion.pack1;
+		case 0x50:
+			return &psion.pack2;
+	}
+
+	return NULL;
+}
+
 void datapack_w(running_machine *machine, UINT8 data)
 {
 	//TODO
@@ -294,13 +308,15 @@ void datapack_w(running_machine *machine, UINT8 data)
 
 UINT8 datapack_r(running_machine *machine)
 {
-	if (!(psion.port6 & 0x80))
-	{
-		if (!(psion.port6 & 0x10) && psion.pack1.len > 0)
-			return psion.pack1.data[psion.pack1.counter];
-		else if (!(psion.port6 & 0x20) && psion.pack2.len > 0)
-			return psion.pack2.data[psion.pack2.counter];
-	}
+	struct datapack *pack = get_active_slot(machine, psion.port6);
+
+	if (pack != NULL && pack->len > 0 && !(psion.port6 & 0x80))
+ 	{
+		UINT32 pack_addr = pack->counter + ((pack->id & 0x04) ? 0x100 * pack->page : 0);
+
+		if (pack_addr < pack->len * 0x2000)
+			return pack->data[pack_addr];
+ 	}
 
 	return 0;
 }
@@ -319,6 +335,9 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 	case 0x08:
 		psion.tcsr_value = data;
 		break;
+	case 0x15:
+		/* read-only */
+		break;
 	case 0x16:
 		psion.port6_ddr = data;
 		break;
@@ -336,24 +355,32 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 		*/
 		if (psion.port6_ddr == 0xff)
 		{
-			if ((psion.port6 & 0x01) != (data & 0x01))
-			{
-				if (!(data & 0x10))
-					psion.pack1.counter++;
-				else if (!(data & 0x20))
-					psion.pack2.counter++;
+			struct datapack *pack = get_active_slot(space->machine, data);
 
-				if (psion.pack1.counter >= psion.pack1.len * 0x2000)
-					psion.pack1.counter -= 0x2000;
-			}
+			if (pack != NULL)
+ 			{
+				if ((psion.port6 & 0x01) != (data & 0x01))
+				{
+					pack->counter++;
 
-			if (psion.port6 & 0x02)
-			{
-				if (!(data & 0x10))
-					psion.pack1.counter = 0;
-				else if (!(data & 0x20))
-					psion.pack2.counter = 0;
-			}
+					if (pack->counter >= ((pack->id & 0x04) ? 0x100 : (pack->len * 0x2000)))
+						pack->counter = 0;
+				}
+
+				if ((psion.port6 & 0x04) && !(data & 0x04))
+				{
+					pack->page++;
+
+					if (pack->page >= (pack->len * 0x2000) / 0x100)
+						pack->page = 0;
+				}
+
+				if (psion.port6 & 0x02)
+				{
+					pack->counter = 0;
+					pack->page = 0;
+				}
+ 			}
 
 			psion.port6 = data;
 		}
@@ -581,30 +608,49 @@ INPUT_PORTS_START( psion )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D [)]") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static DEVICE_IMAGE_LOAD( psion_pack1 )
+int datapack_load(device_image_interface &image, struct datapack &pack)
 {
 	running_machine *machine = image.device().machine;
 	char opk_head[6];
+	UINT8 pack_id, pack_len;
 
 	image.fread(opk_head, 6);
-	image.fread(&psion.pack1.id, 1);
-	image.fread(&psion.pack1.len, 1);
+	image.fread(&pack_id, 1);
+	image.fread(&pack_len, 1);
 
-	if(strcmp(opk_head, "OPK") || psion.pack1.len * 0x2000 < image.length() - 6)
+	if(strcmp(opk_head, "OPK") || pack_len * 0x2000 < image.length() - 6)
 		return IMAGE_INIT_FAIL;
 
+	pack.id = pack_id;
+	pack.len = pack_len;
 	image.fseek(6, SEEK_SET);
-	psion.pack1.data = auto_alloc_array(machine, UINT8, psion.pack1.len * 0x2000);
-	memset(psion.pack1.data, 0xff, psion.pack1.len * 0x2000);
-	image.fread(psion.pack1.data, image.length() - 6);
+	pack.data = auto_alloc_array(machine, UINT8, pack.len * 0x2000);
+	memset(pack.data, 0xff, pack.len * 0x2000);
+	image.fread(pack.data, image.length() - 6);
 
 	return IMAGE_INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( psion_pack1 )
+{
+	return datapack_load(image, psion.pack1);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack1 )
 {
 	auto_free(image.device().machine, psion.pack1.data);
 	memset(&psion.pack1, 0, sizeof(psion.pack1));
+}
+
+static DEVICE_IMAGE_LOAD( psion_pack2 )
+{
+	return datapack_load(image, psion.pack2);
+}
+
+static DEVICE_IMAGE_UNLOAD( psion_pack2 )
+{
+	auto_free(image.device().machine, psion.pack2.data);
+	memset(&psion.pack2, 0, sizeof(psion.pack2));
 }
 
 static MACHINE_START(psion)
@@ -819,6 +865,13 @@ static MACHINE_DRIVER_START( psion_slot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(psion_pack1)
 	MDRV_CARTSLOT_UNLOAD(psion_pack1)
+
+	/* Datapack slot 2 */
+	MDRV_CARTSLOT_ADD("pack2")
+	MDRV_CARTSLOT_EXTENSION_LIST("opk")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(psion_pack2)
+	MDRV_CARTSLOT_UNLOAD(psion_pack2)
 MACHINE_DRIVER_END
 
 /* basic configuration for 2 lines display */
