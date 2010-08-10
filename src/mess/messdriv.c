@@ -790,10 +790,9 @@ const game_driver * const drivers[] =
 	/* NEC */
 	DRIVER( pc6001 )
 	DRIVER( pc6001a )
-	DRIVER( pc6001m2 )
-	DRIVER( pc6001sr )
+	DRIVER( pc6001mk2 )
 	DRIVER( pc6600 )
-	DRIVER( pc6600sr )
+	DRIVER( pc6001sr )
 	DRIVER( pc8001 )
 	DRIVER( pc8001mk2 )
 	DRIVER( pc8801 )

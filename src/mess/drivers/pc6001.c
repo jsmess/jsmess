@@ -2285,7 +2285,7 @@ ROM_START( pc6001a )
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
-ROM_START( pc6001m2 )
+ROM_START( pc6001mk2 )
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.62", 0x10000, 0x8000, CRC(950ac401) SHA1(fbf195ba74a3b0f80b5a756befc96c61c2094182) )
 	ROM_LOAD( "voicerom.62", 0x18000, 0x4000, CRC(49b4f917) SHA1(1a2d18f52ef19dc93da3d65f19d3abbd585628af) )
@@ -2362,33 +2362,9 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
-/* TODO: REMOVE THIS CRAP! */
-/* There exists an alternative (incomplete?) dump, consisting of more .68 pieces, but it's been probably created for emulators:
-systemrom1.68 = 0x0-0x8000 BASICROM.68 + ??
-systemrom2.68 = 0x0-0x2000 ?? + 0x2000-0x4000 SYSROM2.68 + 0x4000-0x8000 VOICEROM.68 + 0x8000-0x10000 KANJIROM.68
-cgrom68.68 = CGROM60.68 + CGROM66.68
- */
-ROM_START( pc6600sr )	/* Variant of pc6001sr */
-	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "systemrom1.68", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
-	ROM_LOAD( "systemrom2.68", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
-
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.68", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
-ROM_END
-
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY  FULLNAME          FLAGS */
 COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    GAME_NOT_WORKING )
 COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      GAME_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001m2, pc6001,  0,     pc6001m2, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   GAME_NOT_WORKING )
+COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   GAME_NOT_WORKING )
 COMP( 1983, pc6600,   pc6001,  0,     pc6600,   pc6001,   0,      "Nippon Electronic Company",   "PC-6600 (Japan)",       GAME_NOT_WORKING )
 COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", GAME_NOT_WORKING )
-COMP( 1984, pc6600sr, pc6001,  0,     pc6001sr, pc6001,   0,      "Nippon Electronic Company",   "PC-6600SR (Japan)",     GAME_NOT_WORKING )
