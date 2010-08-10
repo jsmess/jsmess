@@ -12,6 +12,7 @@
       it's not worth the effort...
     - Identify and hook-up the FDC device, apparently PC-6001 and PC-6600 doesn't even use the same thing;
     - PC-6600: mon r-0 type games doesn't seem to work at all on this version?
+    - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes the memory map to behave like the older versions)
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
            so this implementation will be used in the end.
@@ -146,6 +147,8 @@ static UINT8 ex_vram_bank, bgcol_bank,exgfx_text_mode,exgfx_bitmap_mode,exgfx_2b
 static UINT8 bank_r0,bank_r1,gfx_bank_on,bank_w,bank_opt;
 static UINT8 timer_irq_mask2, timer_irq_vector;
 static UINT32 cgrom_bank_addr;
+/* PC6001SR specific */
+static UINT8 sr_video_mode;
 
 #define IRQ_LOG (0)
 
@@ -536,28 +539,87 @@ static VIDEO_UPDATE( pc6001sr )
 	int xi,yi,pen,fgcol,bgcol,color;
 	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
 
-	for(y=0;y<20;y++)
+
+	if(sr_video_mode & 8) // text mode
 	{
-		for(x=0;x<40;x++)
+		for(y=0;y<20;y++)
 		{
-			tile = pc6001_video_ram[(x+(y*40))*2+0];
-			attr = pc6001_video_ram[(x+(y*40))*2+1];
-			tile+= ((attr & 0x80) << 1);
-
-			for(yi=0;yi<12;yi++)
+			for(x=0;x<40;x++)
 			{
-				for(xi=0;xi<8;xi++)
+				tile = pc6001_video_ram[(x+(y*40))*2+0];
+				attr = pc6001_video_ram[(x+(y*40))*2+1];
+				tile+= ((attr & 0x80) << 1);
+
+				for(yi=0;yi<12;yi++)
 				{
-					pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+					for(xi=0;xi<8;xi++)
+					{
+						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
 
-					fgcol = (attr & 0x0f) + 0x10;
-					bgcol = ((attr & 0x70) >> 4) + 0x10 + ((bgcol_bank & 2) << 2);
+						fgcol = (attr & 0x0f) + 0x10;
+						bgcol = ((attr & 0x70) >> 4) + 0x10 + ((bgcol_bank & 2) << 2);
 
-					color = pen ? fgcol : bgcol;
+						color = pen ? fgcol : bgcol;
 
-					if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
+						if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
+							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine->pens[color];
+					}
 				}
+			}
+		}
+	}
+	else //4bpp bitmap mode (TODO)
+	{
+		int count;
+
+		count = 0;
+
+		for(y=0;y<200;y+=2)
+		{
+			for(x=0;x<320;x+=4)
+			{
+				color = pc6001_video_ram[count] & 0x0f;
+
+				if ((x+0) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+0)) = screen->machine->pens[color+0x10];
+
+				color = (pc6001_video_ram[count] & 0xf0) >> 4;
+
+				if ((x+1) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+1)) = screen->machine->pens[color+0x10];
+
+				color = pc6001_video_ram[count+1] & 0x0f;
+
+				if ((x+2) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+2)) = screen->machine->pens[color+0x10];
+
+				color = (pc6001_video_ram[count+1] & 0xf0) >> 4;
+
+				if ((x+3) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+3)) = screen->machine->pens[color+0x10];
+
+				color = pc6001_video_ram[count+2] & 0x0f;
+
+				if ((x+0) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+0)) = screen->machine->pens[color+0x10];
+
+				color = (pc6001_video_ram[count+2] & 0xf0) >> 4;
+
+				if ((x+1) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+1)) = screen->machine->pens[color+0x10];
+
+				color = pc6001_video_ram[count+3] & 0x0f;
+
+				if ((x+2) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+2)) = screen->machine->pens[color+0x10];
+
+				color = (pc6001_video_ram[count+3] & 0xf0) >> 4;
+
+				if ((x+3) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+3)) = screen->machine->pens[color+0x10];
+
+
+				count+=4;
 			}
 		}
 	}
@@ -1337,7 +1399,6 @@ static WRITE8_HANDLER( pc6001sr_bank_wn_w )
 		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
 } \
 
-
 static WRITE8_HANDLER( sr_work_ram0_w ) { SR_WRAM_BANK_W(0); }
 static WRITE8_HANDLER( sr_work_ram1_w ) { SR_WRAM_BANK_W(1); }
 static WRITE8_HANDLER( sr_work_ram2_w ) { SR_WRAM_BANK_W(2); }
@@ -1349,6 +1410,8 @@ static WRITE8_HANDLER( sr_work_ram7_w ) { SR_WRAM_BANK_W(7); }
 
 static WRITE8_HANDLER( pc6001sr_mode_w )
 {
+	sr_video_mode = data;
+
 	if(data & 1)
 		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
 }
@@ -1359,6 +1422,67 @@ static WRITE8_HANDLER( pc6001sr_vram_bank_w )
 
 	pc6001_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
 }
+
+static WRITE8_HANDLER ( pc6001sr_system_latch_w )
+{
+	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
+	{
+		cas_switch = 1;
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	}
+	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
+	{
+		cas_switch = 0;
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//irq_vector = 0x00;
+		//cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
+	}
+
+	sys_latch = data;
+
+	timer_irq_mask = data & 1;
+	//vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
+
+	//printf("%02x B0\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER(necsr_ppi8255_w)
+{
+	if (offset==3)
+	{
+		if(data & 1)
+			port_c_8255 |=   1<<((data>>1)&0x07);
+		else
+			port_c_8255 &= ~(1<<((data>>1)&0x07));
+
+		switch(data) {
+        	case 0x08: port_c_8255 |= 0x88; break;
+        	case 0x09: port_c_8255 &= 0xf7; break;
+        	case 0x0c: port_c_8255 |= 0x28; break;
+        	case 0x0d: port_c_8255 &= 0xf7; break;
+        	default: break;
+		}
+
+		port_c_8255 |= 0xa8;
+
+		if(0)
+		{
+			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
+			UINT8 *ext_rom = memory_region(device->machine, "cart_img");
+
+			//printf("%02x\n",data);
+
+			if((data & 0x0f) == 0x05)
+				memory_set_bankptr(device->machine, "bank1", &ext_rom[0x2000]);
+			if((data & 0x0f) == 0x04)
+				memory_set_bankptr(device->machine, "bank1", &gfx_data[0]);
+		}
+	}
+	i8255a_w(device,offset,data);
+}
+
 
 static ADDRESS_MAP_START(pc6001sr_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1380,14 +1504,14 @@ static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necsr_ppi8255_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001sr_system_latch_w)
 	/* these are disk related */
 //	AM_RANGE(0xb1
 //	AM_RANGE(0xb2
@@ -1566,6 +1690,18 @@ static INTERRUPT_GEN( pc6001_interrupt )
 	cur_keycode = check_joy_press(device->machine);
 	if(IRQ_LOG) printf("Stick IRQ called 0x16\n");
 	irq_vector = 0x16;
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( pc6001sr_interrupt )
+{
+	static UINT8 kludge;
+
+	kludge^= 1;
+
+	cur_keycode = check_joy_press(device->machine);
+	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
+	irq_vector = (kludge) ? 0x22 : 0x16;
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -2110,7 +2246,7 @@ static MACHINE_DRIVER_START( pc6001sr )
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
 	MDRV_CPU_PROGRAM_MAP(pc6001sr_map)
 	MDRV_CPU_IO_MAP(pc6001sr_io)
-	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", pc6001sr_interrupt)
 MACHINE_DRIVER_END
 
 /* ROM definition */
