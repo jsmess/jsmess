@@ -54,7 +54,7 @@
  *************************************/
 
 static UINT8 *memcard_data;
-static UINT16 *save_ram;
+//static UINT16 *save_ram;
 
 
 /*************************************
@@ -401,7 +401,7 @@ static CUSTOM_INPUT( get_calendar_status )
  *  NVRAM (Save RAM)
  *
  *************************************/
-
+#if 0
 static NVRAM_HANDLER( neogeo )
 {
 	if (read_or_write)
@@ -424,7 +424,7 @@ static void set_save_ram_unlock( running_machine *machine, UINT8 data )
 	state->save_ram_unlocked = data;
 }
 
-#if 0
+
 static WRITE16_HANDLER( save_ram_w )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
@@ -784,7 +784,7 @@ static WRITE16_HANDLER( system_control_w )
 				   set_audio_cpu_rom_source(space, bit); /* this is a guess */
 				   break;
 		case 0x05: neogeo_set_fixed_layer_source(space->machine, bit); break;
-		case 0x06: set_save_ram_unlock(space->machine, bit); break;
+//		case 0x06: set_save_ram_unlock(space->machine, bit); break;
 		case 0x07: neogeo_set_palette_bank(space->machine, bit); break;
 
 		case 0x02: /* unknown - HC32 middle pin 1 */
@@ -1329,7 +1329,7 @@ static MACHINE_DRIVER_START( neogeo )
 
 	MDRV_MACHINE_START(neogeo)
 	MDRV_MACHINE_RESET(neogeo)
-	MDRV_NVRAM_HANDLER(neogeo)
+//	MDRV_NVRAM_HANDLER(neogeo)
 	MDRV_MEMCARD_HANDLER(neogeo)
 
 	/* video hardware */
@@ -1411,13 +1411,13 @@ ROM_END
 
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_LOAD16_WORD_SWAP( "neocd.rom",    0x00000, 0x80000, CRC(33697892) SHA1(b0f1c4fa8d4492a04431805f6537138b842b549f) )
+	ROM_LOAD16_WORD( "neocd.rom",    0x00000, 0x80000, CRC(33697892) SHA1(b0f1c4fa8d4492a04431805f6537138b842b549f) )
 
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
@@ -1426,22 +1426,22 @@ ROM_START( neocd )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "ym", ROMREGION_ERASEFF )
 
 //  NO_DELTAT_REGION
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( neocdz )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
 
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
@@ -1450,14 +1450,14 @@ ROM_START( neocdz )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "ym", ROMREGION_ERASEFF )
 
 //  NO_DELTAT_REGION
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
-
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
 CONS( 1990, aes,    0,   0,   aes,      aes,   neogeo,  "SNK", "Neo-Geo AES", 0)
 CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
 CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
