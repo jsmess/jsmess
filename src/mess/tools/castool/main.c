@@ -82,7 +82,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"rka", rka_cassette_formats               ,"Apogee"},
 	{"rkm", rkm_cassette_formats               ,"Mikrosha"},
 	{"rkp", rkp_cassette_formats               ,"Partner"},
-	{"sord5m", sordm5_cassette_formats         ,"Sord-5M"},
+	{"sordm5", sordm5_cassette_formats         ,"Sord M5"},
 	{"svi", svi_cassette_formats               ,"SVI"},
 	{"trs80l2", trs80l2_cassette_formats       ,"TRS-80 Level 2"},
 	{"tzx", tzx_cassette_formats               ,"ZX Spectrum"},
