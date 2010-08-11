@@ -1,25 +1,23 @@
 /***************************************************************************
 
-    JR-200
+    JR-200 (c) 1982 National / Panasonic
 
-    12/05/2009 Skeleton driver.
+	preliminary driver by Roberto Zandonà and Angelo Salese
 
     http://www.armchairarcade.com/neo/node/1598
 
+	TODO:
+	- Timings are basically screwed, it's too fast in idle mode, too slow
+	  when the beeper fires for a syntax error;
+	- MN1544 4-bit CPU core and ROM dump
+
 ****************************************************************************/
-
-/*
-
-    TODO:
-
-    - MN1544 4-bit CPU core and ROM dump
-
-*/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/beep.h"
 
-static UINT8 *textram;
+static UINT8 *jr200_vram,*jr200_cram;
 static UINT8 *border;
 static UINT8 io_reg[0x20] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -38,7 +36,7 @@ static const UINT8 jr200_keycodes[4][9][8] =
 	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x3a },
 	{ 0x0d, 0x0a, 0x1e, 0x31, 0x32, 0x33, 0x7a, 0x78 },
 	{ 0x63, 0x76, 0x62, 0x6e, 0x6d, 0x2c, 0x2e, 0x2f },
-	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x00, 0x00 }
+	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x03, 0x00 }
 	},
 
 	/* shifted */
@@ -81,17 +79,49 @@ static const UINT8 jr200_keycodes[4][9][8] =
 	}
 };
 
+
+static VIDEO_START( jr200 )
+{
+}
+
+static VIDEO_UPDATE( jr200 )
+{
+	int i,j;
+	const gfx_element *gfx = screen->machine->gfx[0];
+
+	bitmap_fill(bitmap, cliprect, border[0x0000] * 2 + 1);
+
+	for (i = 0; i < 0x02ff; i += 0x20)
+		for (j = 0; j < 0x20; j++)
+		{
+			UINT8 code = jr200_vram[0x000 + i + j];
+			UINT8 col = jr200_cram[0x000 + i + j];
+
+			if (col & 0x80)
+			{
+				UINT8 pixel01 = (jr200_vram[0x0000 + i + j] >> 3) & 0x07;
+				UINT8 pixel00 = (jr200_vram[0x0000 + i + j] >> 0) & 0x07;
+				UINT8 pixel11 = (jr200_cram[0x0000 + i + j] >> 3) & 0x07;
+				UINT8 pixel10 = (jr200_cram[0x0000 + i + j] >> 0) & 0x07;
+				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
+			}
+			else
+			{
+				drawgfx_opaque(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
+			}
+		}
+	return 0;
+}
+
 #if 0
 static READ8_HANDLER( test_r )
 {
 	return 0x00;
 }
 #endif
-
-static WRITE8_HANDLER( io_reg_w )
-{
-	io_reg[offset] = data;
-}
 
 static READ8_HANDLER( io_reg_r )
 {
@@ -168,24 +198,48 @@ static READ8_HANDLER( io_reg_r )
 	return value;
 }
 
+static WRITE8_HANDLER( io_reg_w )
+{
+	io_reg[offset] = data;
+
+	switch(offset)
+	{
+		/* set beeper active */
+		case 0x19:
+			beep_set_state(space->machine->device("beeper"),(data == 0x0e) ? 1 : 0);
+			break;
+		/* set beeper frequency (TODO: correct frequency algorhythm) */
+		case 0x1a:
+		case 0x1b:
+			{
+				UINT32 beep_freq;
+
+				beep_freq = ((io_reg[0x1a]<<8) | (io_reg[0x1b] & 0xff)) + 1;
+
+				beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
+			}
+			break;
+	}
+}
+
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)
     4000-7fff RAM (16k expansion)
     4000-bfff RAM (32k expansion)
-    c100-c3FF text code
-    c500-c7ff text color
-    ca00      border color
 */
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x000c) AM_RAM
-	AM_RANGE(0x000d, 0x000d) AM_RAM
-	AM_RANGE(0x000e, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&textram)
+//	AM_RANGE(0xc000, 0xc0ff) AM_RAM //PCG area (1)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr200_vram)
+//	AM_RANGE(0xc400, 0xc4ff) AM_RAM //PCG area (2)
+	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
+//	0xc800 - 0xcfff I / O area
 	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(io_reg_r, io_reg_w)
 	AM_RANGE(0xca00, 0xca00) AM_RAM AM_BASE(&border)
+//	AM_RANGE(0xd000, 0xd7ff) AM_ROM //BIOS PCG RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -292,9 +346,15 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
+static MACHINE_START(jr200)
+{
+	beep_set_frequency(machine->device("beeper"),0);
+	beep_set_state(machine->device("beeper"),0);
+}
 
 static MACHINE_RESET(jr200)
 {
+
 }
 
 static PALETTE_INIT( jr200 )
@@ -306,42 +366,6 @@ static PALETTE_INIT( jr200 )
 		palette_set_color_rgb(machine, 2 * i + 1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 		palette_set_color_rgb(machine, 2 * i + 0, pal1bit(i >> 4), pal1bit(i >> 5), pal1bit(i >> 3));
 	}
-}
-
-static VIDEO_START( jr200 )
-{
-}
-
-static VIDEO_UPDATE( jr200 )
-{
-	int i,j;
-	const gfx_element *gfx = screen->machine->gfx[0];
-
-	bitmap_fill(bitmap, cliprect, border[0x0000] * 2 + 1);
-
-	for (i = 0; i < 0x02ff; i += 0x20)
-		for (j = 0; j < 0x20; j++)
-		{
-			UINT8 code = textram[0x0100 + i + j];
-			UINT8 col = textram[0x0500 + i + j];
-
-			if (col & 0x80)
-			{
-				UINT8 pixel01 = (textram[0x0100 + i + j] >> 3) & 0x07;
-				UINT8 pixel00 = (textram[0x0100 + i + j] >> 0) & 0x07;
-				UINT8 pixel11 = (textram[0x0500 + i + j] >> 3) & 0x07;
-				UINT8 pixel10 = (textram[0x0500 + i + j] >> 0) & 0x07;
-				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
-			}
-			else
-			{
-				drawgfx_transpen(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8, 15);
-			}
-		}
-	return 0;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -362,7 +386,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( jr200_nmi )
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+//	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( jr200_irq )
@@ -375,17 +399,18 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_IO_MAP(jr200_io)
-	// MDRV_CPU_VBLANK_INT("screen", jr200_irq)
+	MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
-	MDRV_CPU_PERIODIC_INT(jr200_irq,20)
-/*
-    MDRV_CPU_ADD("mn1544", MN1544, ?)
-*/
+//	MDRV_CPU_PERIODIC_INT(jr200_irq,20)
+
+//	MDRV_CPU_ADD("mn1544", MN1544, ?)
+
+	MDRV_MACHINE_START(jr200)
 	MDRV_MACHINE_RESET(jr200)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
@@ -394,11 +419,19 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_GFXDECODE(jr200)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(jr200)
+
 	MDRV_VIDEO_START(jr200)
 	MDRV_VIDEO_UPDATE(jr200)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	// AY-8910 ?
+
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_DRIVER_END
 
-  
+
 
 /* ROM definition */
 ROM_START( jr200 )
