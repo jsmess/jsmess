@@ -7,8 +7,10 @@
     http://www.armchairarcade.com/neo/node/1598
 
 	TODO:
-	- Timings are basically screwed, it's too fast in idle mode, too slow
-	  when the beeper fires for a syntax error;
+	- Timings are basically screwed, it takes too much to load the POST but
+	  then the cursor blink is too fast
+	- keyboard MCU irq and data polling simulation should be inside a timer
+	  callback
 	- MN1544 4-bit CPU core and ROM dump
 
 ****************************************************************************/
@@ -20,6 +22,7 @@
 static UINT8 *jr200_vram,*jr200_cram;
 static UINT8 jr200_border_col;
 
+/* TODO: double check this */
 static const UINT8 jr200_keycodes[4][9][8] =
 {
 	/* unshifted */
@@ -29,7 +32,7 @@ static const UINT8 jr200_keycodes[4][9][8] =
 	{ 0x37, 0x38, 0x39, 0x09, 0x71, 0x77, 0x65, 0x72 },
 	{ 0x74, 0x79, 0x75, 0x69, 0x6f, 0x70, 0x40, 0x5b },
 	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x61, 0x73, 0x64 },
-	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x3a },
+	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x27 },
 	{ 0x0d, 0x0a, 0x1e, 0x31, 0x32, 0x33, 0x7a, 0x78 },
 	{ 0x63, 0x76, 0x62, 0x6e, 0x6d, 0x2c, 0x2e, 0x2f },
 	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x03, 0x00 }
@@ -42,7 +45,7 @@ static const UINT8 jr200_keycodes[4][9][8] =
 	{ 0x37, 0x38, 0x39, 0x09, 0x51, 0x57, 0x45, 0x52 },
 	{ 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x40, 0x7b },
 	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x41, 0x53, 0x44 },
-	{ 0x46, 0x47, 0x48, 0x4a, 0x4b, 0x4c, 0x2b, 0x2a },
+	{ 0x46, 0x47, 0x48, 0x4a, 0x4b, 0x4c, 0x3a, 0x22 },
 	{ 0x0d, 0x0a, 0x1e, 0x31, 0x32, 0x33, 0x5a, 0x58 },
 	{ 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3c, 0x3e, 0x3f },
 	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x00, 0x00 }
@@ -97,7 +100,7 @@ static VIDEO_UPDATE( jr200 )
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data; //= memory_region(screen->machine, "gfx_ram");
+					UINT8 *gfx_data;
 
 					if(attr & 0x80) //bitmap mode
 					{
@@ -105,11 +108,11 @@ static VIDEO_UPDATE( jr200 )
 							this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
 
 							tile def
-							--xx x--- up-right
-							---- -xxx up-left
+							00xx x--- up-right
+							00-- -xxx up-left
 							attr def
-							--xx x--- down-right
-							---- -xxx down-left
+							10xx x--- down-right
+							10-- -xxx down-left
 						*/
 						int step;
 
@@ -118,7 +121,7 @@ static VIDEO_UPDATE( jr200 )
 
 						pen = ((((attr & 0x3f) << 6) | (tile & 0x3f)) >> (step)) & 0x07;
 					}
-					else
+					else // tile mode
 					{
 						gfx_data = memory_region(screen->machine, attr & 0x40 ? "pcg" : "gfx_ram");
 
@@ -128,9 +131,7 @@ static VIDEO_UPDATE( jr200 )
 					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen->machine->pens[pen];
 				}
 			}
-			//drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[(col & 0x40) >> 6], code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
 		}
-			//}
 	}
 
 	return 0;
@@ -253,14 +254,34 @@ static READ8_HANDLER( jr200_system_latch_1_r )
 	return 1; // needs this to be high otherwise system refuses to boot
 }
 
+static READ8_HANDLER( jr200_tape_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( jr200_tape2_r )
+{
+	return mame_rand(space->machine);
+}
+
+
+static READ8_HANDLER( mcu_portd_r )
+{
+	/*
+	---x ---- printer status ready (ACTIVE HIGH)
+	*/
+
+	return 0x10;
+}
+
+
+static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)
     4000-7fff RAM (16k expansion)
     4000-bfff RAM (32k expansion)
 */
-
-static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -272,9 +293,11 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 //	0xc800 - 0xcfff I / O area
 	AM_RANGE(0xc801, 0xc801) AM_READ(mcu_keyb_r)
-	AM_RANGE(0xc803, 0xc803) AM_WRITENOP //used in IRQ routine (0x01 -> 0x43)
+	AM_RANGE(0xc803, 0xc803) AM_READ(mcu_portd_r) AM_WRITENOP //used in IRQ routine (0x01 -> 0x43)
+	AM_RANGE(0xc805, 0xc805) AM_WRITENOP //printer LPT port
 //	AM_RANGE(0xc806, 0xc806) //writes 0x78 there
-//	AM_RANGE(0xc807, 0xc807) //bit 6 enables tape play
+	AM_RANGE(0xc807, 0xc807) AM_READ(jr200_tape_r) //W bit 6 enables tape play
+	AM_RANGE(0xc80e, 0xc80e) AM_READ(jr200_tape2_r)
 	AM_RANGE(0xc819, 0xc819) AM_WRITE(jr200_beep_w)
 	AM_RANGE(0xc81a, 0xc81b) AM_WRITE(jr200_beep_freq_w)
 	AM_RANGE(0xc81c, 0xc81c) AM_READ(jr200_system_latch_1_r)
@@ -445,7 +468,7 @@ static INTERRUPT_GEN( jr200_irq )
 
 static MACHINE_DRIVER_START( jr200 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
+	MDRV_CPU_ADD("maincpu", M6802, 4000000) /* MN1800A, ? Mhz */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
@@ -465,7 +488,7 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 
 	MDRV_GFXDECODE(jr200)
-	MDRV_PALETTE_LENGTH(128)
+	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(jr200)
 
 	MDRV_VIDEO_START(jr200)
