@@ -18,11 +18,7 @@
 #include "sound/beep.h"
 
 static UINT8 *jr200_vram,*jr200_cram;
-static UINT8 *border;
-static UINT8 io_reg[0x20] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+static UINT8 jr200_border_col;
 
 static const UINT8 jr200_keycodes[4][9][8] =
 {
@@ -86,162 +82,58 @@ static VIDEO_START( jr200 )
 
 static VIDEO_UPDATE( jr200 )
 {
-	int i,j;
+	int x,y,xi,yi,pen;
 
-	bitmap_fill(bitmap, cliprect, border[0x0000] * 2 + 1);
+	bitmap_fill(bitmap, cliprect, jr200_border_col);
 
-	for (i = 0; i < 0x02ff; i += 0x20)
+	for (y = 0; y < 24; y++)
 	{
-		for (j = 0; j < 0x20; j++)
+		for (x = 0; x < 32; x++)
 		{
-			UINT8 code = jr200_vram[0x000 + i + j];
-			UINT8 col = jr200_cram[0x000 + i + j];
+			UINT8 tile = jr200_vram[x + y*32];
+			UINT8 attr = jr200_cram[x + y*32];
 
-			if (col & 0x80)
+			for(yi=0;yi<8;yi++)
 			{
-				UINT8 pixel01 = (jr200_vram[0x0000 + i + j] >> 3) & 0x07;
-				UINT8 pixel00 = (jr200_vram[0x0000 + i + j] >> 0) & 0x07;
-				UINT8 pixel11 = (jr200_cram[0x0000 + i + j] >> 3) & 0x07;
-				UINT8 pixel10 = (jr200_cram[0x0000 + i + j] >> 0) & 0x07;
-				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
-				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
+				for(xi=0;xi<8;xi++)
+				{
+					UINT8 *gfx_data; //= memory_region(screen->machine, "gfx_ram");
+
+					if(attr & 0x80) //bitmap mode
+					{
+						/*
+							this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
+
+							tile def
+							--xx x--- up-right
+							---- -xxx up-left
+							attr def
+							--xx x--- down-right
+							---- -xxx down-left
+						*/
+						int step;
+
+						step = ((xi & 4) ? 3 : 0);
+						step+= ((yi & 4) ? 6 : 0);
+
+						pen = ((((attr & 0x3f) << 6) | (tile & 0x3f)) >> (step)) & 0x07;
+					}
+					else
+					{
+						gfx_data = memory_region(screen->machine, attr & 0x40 ? "pcg" : "gfx_ram");
+
+						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
+					}
+
+					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen->machine->pens[pen];
+				}
 			}
-			else
-			{
-				drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[(col & 0x40) >> 6], code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
-			}
+			//drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[(col & 0x40) >> 6], code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
 		}
+			//}
 	}
 
 	return 0;
-}
-
-#if 0
-static READ8_HANDLER( test_r )
-{
-	return 0x00;
-}
-#endif
-
-static READ8_HANDLER( io_reg_r )
-{
-	UINT8 value = 0x00;
-
-	switch (offset)
-	{
-	case 0x01:
-		{
-			// hack
-			int row, col, table = 0;
-			int keydata = 0;
-			static UINT8 res;
-			static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
-
-			if (input_port_read(space->machine, "ROW9") & 0x07)
-			{
-				/* shift, upper case */
-				table = 1;
-			}
-
-			/* scan keyboard */
-			for (row = 0; row < 9; row++)
-			{
-				UINT8 data = input_port_read(space->machine, keynames[row]);
-
-				for (col = 0; col < 8; col++)
-				{
-					if (!BIT(data, col))
-					{
-						/* latch key data */
-						keydata = jr200_keycodes[table][row][col];
-					}
-				}
-			}
-
-			if(res == keydata)
-				return 0x00;
-
-			res = keydata;
-
-			return res;
-		}
-		break;
-	case 0x03:
-		//value = 0x73;
-		break;
-	case 0x07:
-		io_reg[offset] ^= 1;
-		if (io_reg[offset] & 1)
-			value = 0xe0;
-		else
-			value = 0x60;
-		break;
-	case 0x0a:
-		value = io_reg[offset] & 0xfe;
-		break;
-	case 0x0e:
-		value = 0;
-		break;
-	case 0x10:
-		value = io_reg[offset];
-		if ((value & 0x40) && (value & 1))
-		{
-			io_reg[offset] = 0;
-			value = 0;
-		}
-		break;
-	case 0x16:
-		value = 0x4e;
-		break;
-	case 0x1c:
-	{
-//		UINT8 vblank_bit = input_port_read(space->machine, "VBLANK") & 0x01;
-		value = (io_reg[offset]);
-		io_reg[offset] |= 0x01;
-		break;
-	}
-	default:
-		value = io_reg[offset];
-		break;
-	}
-
-	return value;
-}
-
-static WRITE8_HANDLER( io_reg_w )
-{
-	io_reg[offset] = data;
-
-	switch(offset)
-	{
-		case 0x03: //used in IRQ routine (0x01 -> 0x43)
-			//printf("%02x %02x\n",offset,data);
-			break;
-		case 0x06: //writes 0x78 there
-			break;
-		case 0x07: //bit 6 enables tape play
-			break;
-		/* set beeper active */
-		case 0x19:
-			beep_set_state(space->machine->device("beeper"),(data == 0x0e) ? 1 : 0);
-			break;
-		/* set beeper frequency (TODO: correct frequency algorhythm) */
-		case 0x1a:
-		case 0x1b:
-			{
-				UINT32 beep_freq;
-
-				beep_freq = ((io_reg[0x1a]<<8) | (io_reg[0x1b] & 0xff)) + 1;
-
-				beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
-			}
-			break;
-		default:
-			printf("%02x %02x\n",offset,data);
-			break;
-	}
 }
 
 static READ8_HANDLER( jr200_pcg_1_r )
@@ -292,6 +184,76 @@ static WRITE8_HANDLER( jr200_bios_char_w )
 }
 
 /*
+
+I/O Device
+
+*/
+
+static READ8_HANDLER( mcu_keyb_r )
+{
+	int row, col, table = 0;
+	int keydata = 0;
+	static UINT8 res;
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
+
+	if (input_port_read(space->machine, "ROW9") & 0x07)
+	{
+		/* shift, upper case */
+		table = 1;
+	}
+
+	/* scan keyboard */
+	for (row = 0; row < 9; row++)
+	{
+		UINT8 data = input_port_read(space->machine, keynames[row]);
+
+		for (col = 0; col < 8; col++)
+		{
+			if (!BIT(data, col))
+			{
+				/* latch key data */
+				keydata = jr200_keycodes[table][row][col];
+			}
+		}
+	}
+
+	if(res == keydata)
+		return 0x00;
+
+	res = keydata;
+
+	return res;
+}
+
+static WRITE8_HANDLER( jr200_beep_w )
+{
+	/* writing 0x0e enables the beeper, writing anything else disables it */
+	beep_set_state(space->machine->device("beeper"),((data & 0xf) == 0x0e) ? 1 : 0);
+}
+
+static WRITE8_HANDLER( jr200_beep_freq_w )
+{
+	UINT32 beep_freq;
+	static UINT8 freq_reg[2];
+
+	freq_reg[offset] = data;
+
+	beep_freq = ((freq_reg[0]<<8) | (freq_reg[1] & 0xff)) + 1;
+
+	beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
+}
+
+static WRITE8_HANDLER( jr200_border_col_w )
+{
+	jr200_border_col = data;
+}
+
+static READ8_HANDLER( jr200_system_latch_1_r )
+{
+	return 1; // needs this to be high otherwise system refuses to boot
+}
+
+/*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)
     4000-7fff RAM (16k expansion)
@@ -299,7 +261,7 @@ static WRITE8_HANDLER( jr200_bios_char_w )
 */
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 
@@ -309,21 +271,24 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
 
 //	0xc800 - 0xcfff I / O area
-	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(io_reg_r, io_reg_w)
-	AM_RANGE(0xca00, 0xca00) AM_RAM AM_BASE(&border)
+	AM_RANGE(0xc801, 0xc801) AM_READ(mcu_keyb_r)
+	AM_RANGE(0xc803, 0xc803) AM_WRITENOP //used in IRQ routine (0x01 -> 0x43)
+//	AM_RANGE(0xc806, 0xc806) //writes 0x78 there
+//	AM_RANGE(0xc807, 0xc807) //bit 6 enables tape play
+	AM_RANGE(0xc819, 0xc819) AM_WRITE(jr200_beep_w)
+	AM_RANGE(0xc81a, 0xc81b) AM_WRITE(jr200_beep_freq_w)
+	AM_RANGE(0xc81c, 0xc81c) AM_READ(jr200_system_latch_1_r)
+	AM_RANGE(0xc81d, 0xc81d) AM_READNOP //jr200_system_latch_2_r
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(jr200_border_col_w)
 
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
 	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jr200_io, ADDRESS_SPACE_IO, 8)
-ADDRESS_MAP_END
-
 /* Input ports */
 static INPUT_PORTS_START( jr200 )
-	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
@@ -427,11 +392,8 @@ static PALETTE_INIT( jr200 )
 {
 	int i;
 
-	for (i = 0; i < 64; i++)
-	{
-		palette_set_color_rgb(machine, 2 * i + 1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, 2 * i + 0, pal1bit(i >> 4), pal1bit(i >> 5), pal1bit(i >> 3));
-	}
+	for (i = 0; i < 8; i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -446,8 +408,8 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( jr200 )
-	GFXDECODE_ENTRY( "gfx_ram", 0, tiles8x8_layout, 0, 64 )
-	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx_ram", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
 
@@ -485,7 +447,6 @@ static MACHINE_DRIVER_START( jr200 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
-	MDRV_CPU_IO_MAP(jr200_io)
 	MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
 //	MDRV_CPU_PERIODIC_INT(jr200_irq,20)
