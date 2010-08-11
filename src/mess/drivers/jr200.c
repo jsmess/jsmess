@@ -87,11 +87,11 @@ static VIDEO_START( jr200 )
 static VIDEO_UPDATE( jr200 )
 {
 	int i,j;
-	const gfx_element *gfx = screen->machine->gfx[0];
 
 	bitmap_fill(bitmap, cliprect, border[0x0000] * 2 + 1);
 
 	for (i = 0; i < 0x02ff; i += 0x20)
+	{
 		for (j = 0; j < 0x20; j++)
 		{
 			UINT8 code = jr200_vram[0x000 + i + j];
@@ -110,9 +110,11 @@ static VIDEO_UPDATE( jr200 )
 			}
 			else
 			{
-				drawgfx_opaque(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
+				drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[(col & 0x40) >> 6], code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8);
 			}
 		}
+	}
+
 	return 0;
 }
 
@@ -132,7 +134,9 @@ static READ8_HANDLER( io_reg_r )
 	case 0x01:
 		{
 			// hack
-			int row, col, keydata = 0, table = 0;
+			int row, col, table = 0;
+			int keydata = 0;
+			static UINT8 res;
 			static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 			if (input_port_read(space->machine, "ROW9") & 0x07)
@@ -156,18 +160,23 @@ static READ8_HANDLER( io_reg_r )
 				}
 			}
 
-			value = keydata;
+			if(res == keydata)
+				return 0x00;
+
+			res = keydata;
+
+			return res;
 		}
 		break;
 	case 0x03:
-		value = 115;
+		//value = 0x73;
 		break;
 	case 0x07:
 		io_reg[offset] ^= 1;
 		if (io_reg[offset] & 1)
-			value = 224;
+			value = 0xe0;
 		else
-			value = 96;
+			value = 0x60;
 		break;
 	case 0x0a:
 		value = io_reg[offset] & 0xfe;
@@ -177,19 +186,22 @@ static READ8_HANDLER( io_reg_r )
 		break;
 	case 0x10:
 		value = io_reg[offset];
-		if ((value & 64) && (value & 1))
+		if ((value & 0x40) && (value & 1))
 		{
 			io_reg[offset] = 0;
 			value = 0;
 		}
 		break;
 	case 0x16:
-		value = 78;
+		value = 0x4e;
 		break;
 	case 0x1c:
-		value = io_reg[offset];
+	{
+//		UINT8 vblank_bit = input_port_read(space->machine, "VBLANK") & 0x01;
+		value = (io_reg[offset]);
 		io_reg[offset] |= 0x01;
 		break;
+	}
 	default:
 		value = io_reg[offset];
 		break;
@@ -204,6 +216,13 @@ static WRITE8_HANDLER( io_reg_w )
 
 	switch(offset)
 	{
+		case 0x03: //used in IRQ routine (0x01 -> 0x43)
+			//printf("%02x %02x\n",offset,data);
+			break;
+		case 0x06: //writes 0x78 there
+			break;
+		case 0x07: //bit 6 enables tape play
+			break;
 		/* set beeper active */
 		case 0x19:
 			beep_set_state(space->machine->device("beeper"),(data == 0x0e) ? 1 : 0);
@@ -219,7 +238,57 @@ static WRITE8_HANDLER( io_reg_w )
 				beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
 			}
 			break;
+		default:
+			printf("%02x %02x\n",offset,data);
+			break;
 	}
+}
+
+static READ8_HANDLER( jr200_pcg_1_r )
+{
+	static UINT8 *pcg = memory_region(space->machine, "pcg");
+
+	return pcg[offset+0x000];
+}
+
+static READ8_HANDLER( jr200_pcg_2_r )
+{
+	static UINT8 *pcg = memory_region(space->machine, "pcg");
+
+	return pcg[offset+0x400];
+}
+
+static WRITE8_HANDLER( jr200_pcg_1_w )
+{
+	static UINT8 *pcg = memory_region(space->machine, "pcg");
+
+	pcg[offset+0x000] = data;
+	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x000) >> 3);
+}
+
+static WRITE8_HANDLER( jr200_pcg_2_w )
+{
+	static UINT8 *pcg = memory_region(space->machine, "pcg");
+
+	pcg[offset+0x400] = data;
+	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x400) >> 3);
+}
+
+static READ8_HANDLER( jr200_bios_char_r )
+{
+	static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+
+	return gfx[offset];
+}
+
+
+static WRITE8_HANDLER( jr200_bios_char_w )
+{
+//	static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+
+	/* TODO: writing is presumably controlled by an I/O bit */
+//	gfx[offset] = data;
+//	gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
 }
 
 /*
@@ -231,15 +300,20 @@ static WRITE8_HANDLER( io_reg_w )
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
+
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-//	AM_RANGE(0xc000, 0xc0ff) AM_RAM //PCG area (1)
+
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(jr200_pcg_1_r,jr200_pcg_1_w) //PCG area (1)
 	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr200_vram)
-//	AM_RANGE(0xc400, 0xc4ff) AM_RAM //PCG area (2)
+	AM_RANGE(0xc400, 0xc4ff) AM_READWRITE(jr200_pcg_2_r,jr200_pcg_2_w) //PCG area (2)
 	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
+
 //	0xc800 - 0xcfff I / O area
 	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(io_reg_r, io_reg_w)
 	AM_RANGE(0xca00, 0xca00) AM_RAM AM_BASE(&border)
-//	AM_RANGE(0xd000, 0xd7ff) AM_ROM //BIOS PCG RAM
+
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
+	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -248,6 +322,9 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( jr200 )
+	PORT_START("VBLANK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
@@ -346,17 +423,6 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-static MACHINE_START(jr200)
-{
-	beep_set_frequency(machine->device("beeper"),0);
-	beep_set_state(machine->device("beeper"),0);
-}
-
-static MACHINE_RESET(jr200)
-{
-
-}
-
 static PALETTE_INIT( jr200 )
 {
 	int i;
@@ -380,8 +446,29 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( jr200 )
-	GFXDECODE_ENTRY( "char", 0, tiles8x8_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx_ram", 0, tiles8x8_layout, 0, 64 )
+	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
+
+
+static MACHINE_START(jr200)
+{
+	beep_set_frequency(machine->device("beeper"),0);
+	beep_set_state(machine->device("beeper"),0);
+}
+
+static MACHINE_RESET(jr200)
+{
+	static UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
+	static UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
+	int i;
+
+	for(i=0;i<0x800;i++)
+		gfx_ram[i] = gfx_rom[i];
+
+	for(i=0;i<0x800;i+=8)
+		gfx_element_mark_dirty(machine->gfx[0], i >> 3);
+}
 
 
 static INTERRUPT_GEN( jr200_nmi )
@@ -442,8 +529,12 @@ ROM_START( jr200 )
 	ROM_REGION( 0x10000, "mn1544", ROMREGION_ERASEFF )
 	ROM_LOAD( "mn1544.bin",  0x0000, 0x0400, NO_DUMP )
 
-	ROM_REGION( 0x0800, "char", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "gfx_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "char.rom", 0x0000, 0x0800, CRC(cb641624) SHA1(6fe890757ebc65bbde67227f9c7c490d8edd84f2) )
+
+	ROM_REGION( 0x0800, "gfx_ram", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( jr200u )
@@ -454,8 +545,12 @@ ROM_START( jr200u )
 	ROM_REGION( 0x10000, "mn1544", ROMREGION_ERASEFF )
 	ROM_LOAD( "mn1544.bin",  0x0000, 0x0400, NO_DUMP )
 
-	ROM_REGION( 0x0800, "char", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "gfx_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "char.rom", 0x0000, 0x0800, CRC(cb641624) SHA1(6fe890757ebc65bbde67227f9c7c490d8edd84f2) )
+
+	ROM_REGION( 0x0800, "gfx_ram", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
