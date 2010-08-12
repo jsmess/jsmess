@@ -385,6 +385,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/atarigt.o $(VIDEO)/atarigt.o \
 	$(DRIVERS)/atarisy1.o $(VIDEO)/atarisy1.o \
 	$(DRIVERS)/atarisy2.o $(VIDEO)/atarisy2.o \
+	$(DRIVERS)/atarisy4.o \
 	$(DRIVERS)/atetris.o $(VIDEO)/atetris.o \
 	$(DRIVERS)/avalnche.o $(AUDIO)/avalnche.o \
 	$(DRIVERS)/badlands.o $(VIDEO)/badlands.o \
@@ -1103,7 +1104,6 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
 
 $(MAMEOBJ)/sega.a: \
-	$(DRIVERS)/aladbl.o \
 	$(DRIVERS)/angelkds.o $(VIDEO)/angelkds.o \
 	$(DRIVERS)/bingoc.o \
 	$(DRIVERS)/blockade.o $(AUDIO)/blockade.o $(VIDEO)/blockade.o \
@@ -1112,6 +1112,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
+	$(DRIVERS)/genesisb.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
@@ -1139,7 +1140,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segamsys.o $(DRIVERS)/segae.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
-	$(DRIVERS)/ssf2md.o \
 	$(DRIVERS)/ssgbl.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
@@ -1402,7 +1402,7 @@ $(MAMEOBJ)/toaplan.a: \
 	$(DRIVERS)/slapfght.o $(MACHINE)/slapfght.o $(VIDEO)/slapfght.o \
 	$(DRIVERS)/snowbros.o $(VIDEO)/kan_pand.o $(VIDEO)/kan_panb.o \
 	$(DRIVERS)/toaplan1.o $(MACHINE)/toaplan1.o $(VIDEO)/toaplan1.o \
-	$(DRIVERS)/toaplan2.o $(AUDIO)/toaplan2.o $(VIDEO)/toaplan2.o \
+	$(DRIVERS)/toaplan2.o $(AUDIO)/toaplan2.o $(VIDEO)/toaplan2.o $(VIDEO)/gp9001.o \
 	$(DRIVERS)/twincobr.o $(MACHINE)/twincobr.o $(VIDEO)/twincobr.o \
 	$(DRIVERS)/wardner.o \
 
@@ -1496,6 +1496,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/bingor.o \
 	$(DRIVERS)/blackt96.o \
+	$(DRIVERS)/blitz.o \
 	$(DRIVERS)/buster.o \
 	$(DRIVERS)/calchase.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \

@@ -1,15 +1,16 @@
 /***************************************************************************
 
+    Pacman - 25th Anniversary Edition
     Ms.Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
 
     driver by Nicola Salmoria
 
-    Notes:
+    Notes for Ms.Pac-Man/Galaga - 20th Anniversary:
         * There are four start buttons: the first two are for Ms. Pac-Man, the other two
-          for Galaga.
+          are for Galaga.
         * To play Pac-Man instead of Ms. Pac-Man, insert coins then enter the following
           sequence: U U U D D D L R L R L. A sound will play and the ghost will change
-          from red to pink.
+          from red to pink. Then press the start button for Ms. Pac-Man.
         * To toggle the built-in speedup, insert coins then enter the following sequence:
           L R L R U U U Fire.  A sound will play if you did it correctly.  This will toggle
           the speed in both Ms Pacman & Pacman as well as provide a "Fast Shot" in Galaga
@@ -20,10 +21,22 @@
           (c) 2000 Cosmodog, Ltd.
           >
           and it listens for incoming characters.
+
+    Notes for Pacman - 25th Anniversary:
+        * Pacman 25th Anniversary is a program update which allows the player to choose the
+          game they want to play. You highlight the wanted game and then press the 1 or 2
+          player start button to start the game.
+        * There is a minor board difference that the program code can detect through the Z80
+          ports to prevent ROM swaps to upgrade Ms. Pac-Man/Galaga - 20th Anniversary Class
+          of 1981 Reunion boards.
+        * The above listed joystick manuver for the built-in speed up still works.
+        * The above listed joystick manuver to enable Pac-Man will still play a tone, but
+          the effect (if any) is unknown.
+
         * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
 
-    Note: The "correct" size of the roms are 27C020 for the program rom & 27C256 for the
-          pallete rom.  However genuine boards have been found with larger roms containing
+    Note: The "correct" size of the roms are 27C020 for the program rom and 27C256 for the
+          graphics rom.  However genuine boards have been found with larger roms containing
           the same data with the extra rom space banked out.
 
     Known issues/to-do's:
@@ -32,13 +45,6 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
-
-    Versions known to exist but not dumped: v1.0 & v1.03
-
-    Pacman 25th Anniversary is a program update giving Pacman it's own start button
-        instead of using the above mentioned "joystick maneuver"
-
-    Versions known to exist but not dumped: v2.0
 
 ***************************************************************************/
 
@@ -70,7 +76,7 @@
 
 static WRITE8_HANDLER( irqack_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 	int bit = data & 1;
 
 	cpu_interrupt_enable(state->maincpu, bit);
@@ -81,7 +87,7 @@ static WRITE8_HANDLER( irqack_w )
 
 static WRITE8_HANDLER( timer_pulse_w )
 {
-	//_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	//_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 	//printf("timer pulse %02x\n", data);
 }
 
@@ -138,7 +144,7 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 
 static void set_bankptr(running_machine *machine)
 {
-	_20pacgal_state *state = (_20pacgal_state *) machine->driver_data;
+	_20pacgal_state *state =  machine->driver_data<_20pacgal_state>();
 	if (state->game_selected == 0)
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
@@ -150,7 +156,7 @@ static void set_bankptr(running_machine *machine)
 
 static WRITE8_HANDLER( ram_bank_select_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 
 	state->game_selected = data & 1;
 	set_bankptr(space->machine);
@@ -158,7 +164,7 @@ static WRITE8_HANDLER( ram_bank_select_w )
 
 static WRITE8_HANDLER( ram_48000_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 
 	if (state->game_selected)
 	{
@@ -187,14 +193,15 @@ static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_BASE_MEMBER(_20pacgal_state, video_ram)
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
-	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", _20pacgal_wavedata_w) AM_BASE(&namco_wavedata)
+	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
 	AM_RANGE(0x4c000, 0x4dfff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_gfx_ram)
 	AM_RANGE(0x4e000, 0x4e17f) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_ram)
+	AM_RANGE(0x4e180, 0x4feff) AM_NOP
 	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_color_lookup)
 ADDRESS_MAP_END
 
@@ -208,7 +215,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
@@ -216,6 +223,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)		/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
+	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, stars_seed)	/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
@@ -274,6 +282,28 @@ static INPUT_PORTS_START( 20pacgal )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( 25pacman )
+	PORT_INCLUDE(20pacgal)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+
+
 
 /*************************************
  *
@@ -283,7 +313,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( 20pacgal )
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->eeprom = machine->device("eeprom");
@@ -295,7 +325,7 @@ static MACHINE_START( 20pacgal )
 
 static MACHINE_RESET( 20pacgal )
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 
 	state->game_selected = 0;
 }
@@ -308,7 +338,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map)
 	MDRV_CPU_IO_MAP(20pacgal_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // assert breaks the inputs in 25pacman test mode
 
 	MDRV_MACHINE_START(20pacgal)
 	MDRV_MACHINE_RESET(20pacgal)
@@ -337,9 +367,26 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+
+/*
+     Pacman - 25th Anniversary Edition
+*/
+
+ROM_START( 25pacman ) /* Revision 2.00 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
+ROM_END
+
+/*
+     Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
+*/
+
 ROM_START( 20pacgal ) /* Version 1.08 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "ms_pac-galaga_v1.08.u13", 0x00000, 0x40000, CRC(2ea16809) SHA1(27f041bdbb590917e9dcb70c21aa6b6d6c9f04fb) )
+	ROM_LOAD( "ms_pac-galaga_v1.08.u13", 0x00000, 0x40000, CRC(2ea16809) SHA1(27f041bdbb590917e9dcb70c21aa6b6d6c9f04fb) ) /* Also found labeled as "V1.08 HO" */
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
@@ -348,6 +395,14 @@ ROM_END
 ROM_START( 20pacgalr4 ) /* Version 1.04 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.04.u13", 0x00000, 0x40000, CRC(6c474d2d) SHA1(5a150fc9d2ed0e908385b9f9d532aa33cf80dba4) )
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
+ROM_END
+
+ROM_START( 20pacgalr3 ) /* Version 1.03 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "ms_pac-galaga_v1.03.u13", 0x00000, 0x40000, CRC(e13dce63) SHA1(c8943f082883c423210fc3c97323222afb00f0a2) )
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
@@ -369,14 +424,29 @@ ROM_START( 20pacgalr1 ) /* Version 1.01 */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
+ROM_START( 20pacgalr0 ) /* Version 1.00 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "ms_pac-galaga_v1.0.u13", 0x00000, 0x40000, CRC(3c92a269) SHA1(a616d912393f4e49b95231d72eec48567f46fc00) ) /* Label printed V1.0, program says v1.00 */
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
+ROM_END
+
 
 static DRIVER_INIT(20pacgal)
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
-
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
+	state->sprite_pal_base = 0x00<<2;
 }
 
+static DRIVER_INIT(25pacman)
+
+{
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
+	state->sprite_pal_base = 0x20<<2;
+}
 
 
 /*************************************
@@ -385,7 +455,11 @@ static DRIVER_INIT(20pacgal)
  *
  *************************************/
 
+GAME( 2005, 25pacman,          0, 20pacgal, 25pacman, 25pacman, ROT90, "Namco", "Pacman - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr3, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr2, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr1, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr0, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)

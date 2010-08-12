@@ -624,7 +624,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 static INTERRUPT_GEN( cps2_interrupt )
 {
-	cps_state *state = (cps_state *)device->machine->driver_data;
+	cps_state *state = device->machine->driver_data<cps_state>();
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (state->scancount >= 258)
@@ -697,7 +697,7 @@ static const eeprom_interface cps2_eeprom_interface =
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -773,7 +773,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 
 static READ16_HANDLER( cps2_qsound_volume_r )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
@@ -799,7 +799,7 @@ static READ16_HANDLER( kludge_r )
 
 static READ16_HANDLER( joy_or_paddle_r )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 
 	if (state->readpaddle != 0)
 		return (input_port_read(space->machine, "IN0"));
@@ -1193,7 +1193,7 @@ GFXDECODE_END
 
 static MACHINE_START( cps2 )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -2976,9 +2976,9 @@ ROM_END
 
 ROM_START( vampj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "vamj.03a", 0x000000, 0x80000, CRC(f55d3722) SHA1(e26bbcc47a2485914d567a6cf1cddd0f668689a1) )
-	ROM_LOAD16_WORD_SWAP( "vamj.04b", 0x080000, 0x80000, CRC(4d9c43c4) SHA1(2087090306646fed959d503ee75e24996ad95b88) ) /* incomplete updated set, all */
-	ROM_LOAD16_WORD_SWAP( "vamj.05a", 0x100000, 0x80000, CRC(6c497e92) SHA1(7c1ccdfd77fb50afe024c8402376daaeab641a24) ) /* roms should be "B" revision */
+	ROM_LOAD16_WORD_SWAP( "vamj.03a", 0x000000, 0x80000, CRC(f55d3722) SHA1(e26bbcc47a2485914d567a6cf1cddd0f668689a1) ) /* Incomplete updated set? At least rom 03 */
+	ROM_LOAD16_WORD_SWAP( "vamj.04b", 0x080000, 0x80000, CRC(4d9c43c4) SHA1(2087090306646fed959d503ee75e24996ad95b88) ) /* should be "B" revision too. Both this   */
+	ROM_LOAD16_WORD_SWAP( "vamj.05a", 0x100000, 0x80000, CRC(6c497e92) SHA1(7c1ccdfd77fb50afe024c8402376daaeab641a24) ) /* set & "vampja" below have the same date */
 	ROM_LOAD16_WORD_SWAP( "vamj.06a", 0x180000, 0x80000, CRC(f1bbecb6) SHA1(6adba89393e05f16f70b57085cabd6b4c20f53e8) )
 	ROM_LOAD16_WORD_SWAP( "vamj.07a", 0x200000, 0x80000, CRC(1067ad84) SHA1(5e4cc75cfdfd512b6230c656e7304262b5143aee) )
 	ROM_LOAD16_WORD_SWAP( "vamj.08a", 0x280000, 0x80000, CRC(4b89f41f) SHA1(bd78f33a6d448655eecf7448921d282b302fa4cb) )
@@ -5706,8 +5706,8 @@ ROM_START( sfz2h )
 	ROM_LOAD16_WORD_SWAP( "sz2h.04", 0x080000, 0x80000, CRC(ea5009fb) SHA1(9186c702994f99488d52d4dbccb3823d2b9a6dd9) )
 	ROM_LOAD16_WORD_SWAP( "sz2.05",  0x100000, 0x80000, CRC(4b442a7c) SHA1(a0d7d229cff8efb2a253ff06270258b0b4d2761e) )
 	ROM_LOAD16_WORD_SWAP( "sz2.06",  0x180000, 0x80000, CRC(5b1d49c0) SHA1(f0a0c894c9cbe2b18e7f59058665949ee0025732) )
-	ROM_LOAD16_WORD_SWAP( "sz2b.07", 0x200000, 0x80000, CRC(947e8ac6) SHA1(da82be7cba9cd557da3ee35be9194130a959d5cb) )
-	ROM_LOAD16_WORD_SWAP( "sz2b.08", 0x280000, 0x80000, CRC(92b66e01) SHA1(f09cb38aa49b22a9c98219fb2ad8a66b11fa5872) )
+	ROM_LOAD16_WORD_SWAP( "sz2h.07", 0x200000, 0x80000, CRC(947e8ac6) SHA1(da82be7cba9cd557da3ee35be9194130a959d5cb) ) /* These two are the same as the Brazil set */
+	ROM_LOAD16_WORD_SWAP( "sz2h.08", 0x280000, 0x80000, CRC(92b66e01) SHA1(f09cb38aa49b22a9c98219fb2ad8a66b11fa5872) ) /* These two are the same as the Brazil set */
 
 	ROM_REGION( 0x1400000, "gfx", 0 )
 	ROMX_LOAD( "sz2.13m",   0x0000000, 0x400000, CRC(4d1f1f22) SHA1(659fb4305bcf0cbbbbec97ede6e68a8323b13308) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -7844,7 +7844,7 @@ ROM_END
 
 static DRIVER_INIT( cps2 )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	/* Decrypt the game - see machine/cps2crpt.c */
 	DRIVER_INIT_CALL(cps2crpt);
@@ -7860,7 +7860,7 @@ static DRIVER_INIT( cps2 )
 
 static DRIVER_INIT( ssf2tb )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
@@ -7874,7 +7874,7 @@ static DRIVER_INIT( ssf2tb )
 
 static DRIVER_INIT ( pzloop2 )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
@@ -7887,19 +7887,19 @@ static DRIVER_INIT ( pzloop2 )
 
 static READ16_HANDLER( gigamn2_dummyqsound_r )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 	return state->gigamn2_dummyqsound_ram[offset];
 };
 
 static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 	state->gigamn2_dummyqsound_ram[offset] = data;
 };
 
 static DRIVER_INIT( gigamn2 )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int length = memory_region_length(machine, "maincpu");

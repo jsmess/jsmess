@@ -859,9 +859,11 @@ static ADDRESS_MAP_START( kimble_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM	/* working RAM? */
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
+#endif
 
 
 /*********** 8080 based **********/
@@ -1423,6 +1425,7 @@ static MACHINE_DRIVER_START( ssjkrpkr )
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ssjkrpkr_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("discrete")
@@ -3449,6 +3452,11 @@ static DRIVER_INIT( ssa )
 /* Just for debugging purposes */
 {
 //  UINT8 *ROM = memory_region(machine, "maincpu");
+
+//  ROM[0x073b] = 0x00;
+//  ROM[0x073c] = 0x00;
+//  ROM[0x073d] = 0x00;
+
 //  ROM[0x07af] = 0x00;
 //  ROM[0x07b0] = 0x00;
 //  ROM[0x07b1] = 0x00;
