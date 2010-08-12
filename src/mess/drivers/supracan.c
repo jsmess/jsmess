@@ -40,7 +40,6 @@ STATUS:
                                              otherwise writes 0x4f to reg 0x14 and performs additional processing
 
     Known unemulated graphical effects and issues:
-    - All: Sprites are currently very broken for an unknown reason.
     - All: Sprite sizing is still imperfect.
     - All: Sprites need to be converted to use scanline rendering for proper clipping.
     - All: Improperly-emulated 1bpp ROZ mode, used by the Super A'Can BIOS logo.
@@ -83,9 +82,9 @@ DEBUG TRICKS:
 #define DEBUG_PRIORITY          (0)
 #define DEBUG_PRIORITY_INDEX    (0) // 0-3
 
-#define VERBOSE_LEVEL   (0)
+#define VERBOSE_LEVEL   (3)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 typedef struct _acan_dma_regs_t acan_dma_regs_t;
 struct _acan_dma_regs_t
@@ -1745,7 +1744,7 @@ static WRITE16_HANDLER( supracan_video_w )
                     //acan_sprdma_regs->count <<= 1;
                 }
 
-				for(i = 0; i < acan_sprdma_regs->count; i++)
+				for(i = 0; i <= acan_sprdma_regs->count; i++)
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
