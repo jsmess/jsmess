@@ -20,6 +20,7 @@
 #include "sound/beep.h"
 
 static UINT8 *jr200_vram,*jr200_cram;
+static UINT8 *mn1271_ram;
 static UINT8 jr200_border_col;
 
 /* TODO: double check this */
@@ -249,31 +250,41 @@ static WRITE8_HANDLER( jr200_border_col_w )
 	jr200_border_col = data;
 }
 
-static READ8_HANDLER( jr200_system_latch_1_r )
+static READ8_HANDLER( mn1271_io_r )
 {
-	return 1; // needs this to be high otherwise system refuses to boot
+	if((offset+0xc800) > 0xca00)
+		return 0xff;
+
+	switch(offset+0xc800)
+	{
+		case 0xc801: return mcu_keyb_r(space,0);
+		case 0xc803: return (mn1271_ram[0x03] & 0xcf) | 0x30; //---x ---- printer status ready (ACTIVE HIGH)
+		case 0xc807: return (mn1271_ram[0x07] & 0x80) | 0x60;
+		case 0xc80a: return (mn1271_ram[0x0a] & 0xfe);
+		case 0xc80c: return (mn1271_ram[0x0c] & 0xdf) | 0x20;
+		case 0xc80e: return 0;
+		case 0xc810: return 0;
+		case 0xc816: return 0x4e;
+		case 0xc81c: return (mn1271_ram[0x1c] & 0xfe) | 1; //bit 0 needs to be high otherwise system refuses to boot
+		case 0xc81d: return (mn1271_ram[0x1d] & 0xed);
+	}
+
+	return mn1271_ram[offset];
 }
 
-static READ8_HANDLER( jr200_tape_r )
+static WRITE8_HANDLER( mn1271_io_w )
 {
-	return mame_rand(space->machine);
+	mn1271_ram[offset] = data;
+
+	switch(offset+0xc800)
+	{
+		case 0xc805: break; //LPT printer port W
+		case 0xc819: jr200_beep_w(space,0,data); break;
+		case 0xc81a:
+		case 0xc81b: jr200_beep_freq_w(space,offset-0x1a,data); break;
+		case 0xca00: jr200_border_col_w(space,0,data); break;
+	}
 }
-
-static READ8_HANDLER( jr200_tape2_r )
-{
-	return mame_rand(space->machine);
-}
-
-
-static READ8_HANDLER( mcu_portd_r )
-{
-	/*
-	---x ---- printer status ready (ACTIVE HIGH)
-	*/
-
-	return 0x10;
-}
-
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*
@@ -292,17 +303,7 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
 
 //	0xc800 - 0xcfff I / O area
-	AM_RANGE(0xc801, 0xc801) AM_READ(mcu_keyb_r)
-	AM_RANGE(0xc803, 0xc803) AM_READ(mcu_portd_r) AM_WRITENOP //used in IRQ routine (0x01 -> 0x43)
-	AM_RANGE(0xc805, 0xc805) AM_WRITENOP //printer LPT port
-//	AM_RANGE(0xc806, 0xc806) //writes 0x78 there
-	AM_RANGE(0xc807, 0xc807) AM_READ(jr200_tape_r) //W bit 6 enables tape play
-	AM_RANGE(0xc80e, 0xc80e) AM_READ(jr200_tape2_r)
-	AM_RANGE(0xc819, 0xc819) AM_WRITE(jr200_beep_w)
-	AM_RANGE(0xc81a, 0xc81b) AM_WRITE(jr200_beep_freq_w)
-	AM_RANGE(0xc81c, 0xc81c) AM_READ(jr200_system_latch_1_r)
-	AM_RANGE(0xc81d, 0xc81d) AM_READNOP //jr200_system_latch_2_r
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(jr200_border_col_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_BASE(&mn1271_ram)
 
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
 	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)
