@@ -45,7 +45,10 @@
 #define LOG_MAIN_CPU_BANKING	(1)
 #define LOG_AUDIO_CPU_BANKING	(1)
 
-
+#define NEOCD_AREA_SPR    0
+#define NEOCD_AREA_PCM    1
+#define NEOCD_AREA_AUDIO  4
+#define NEOCD_AREA_FIX    5
 
 /*************************************
  *
@@ -56,6 +59,18 @@
 static UINT8 *memcard_data;
 //static UINT16 *save_ram;
 
+// CD-ROM / DMA control registers
+struct _neocd_ctrl
+{
+	UINT8 area_sel;
+	UINT8 pcm_bank_sel;
+	UINT8 spr_bank_sel;
+	UINT32 addr_source; // target if in fill mode
+	UINT32 addr_target;
+	UINT16 fill_word;
+	UINT32 word_count;
+	UINT16 dma_mode[10];
+} neocd_ctrl;
 
 /*************************************
  *
@@ -130,9 +145,18 @@ static void update_interrupts( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
-	cputag_set_input_line(machine, "maincpu", 1, state->vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	if(strcmp((char*)machine->gamedrv->name,"aes") != 0)
+	{  // raster and vblank IRQs are swapped on the NeoCD.
+		cputag_set_input_line(machine, "maincpu", 2, state->vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, state->display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, state->irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else
+	{
+		cputag_set_input_line(machine, "maincpu", 1, state->vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, state->display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, state->irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 
@@ -447,7 +471,6 @@ static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	// AES doesn't have memcard slots?
 	return (memcard_present(field->port->machine) == -1) ? 0x07 : 0x00;
 }
 
@@ -473,6 +496,20 @@ static WRITE16_HANDLER( memcard_w )
 	}
 }
 
+/* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
+static READ16_HANDLER( neocd_memcard_r )
+{
+	return memcard_data[offset] | 0xff00;
+}
+
+
+static WRITE16_HANDLER( neocd_memcard_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		memcard_data[offset] = data;
+	}
+}
 
 static MEMCARD_HANDLER( neogeo )
 {
@@ -799,6 +836,273 @@ static WRITE16_HANDLER( system_control_w )
 }
 
 /*
+ *  CD-ROM / DMA control
+ *
+ *  DMA
+
+	FF0061	Write 0x40 means start DMA transfer
+	FF0064	Source address (in copy mode), Target address (in filll mode)
+	FF0068	Target address (in copy mode)
+	FF006C	Fill word
+	FF0070	Words count
+	FF007E	\
+	......	 | DMA programming words?	NeoGeoCD uses Sanyo Puppet LC8359 chip to
+	FF008E	/                           interface with CD, and do DMA transfers
+
+	Memory access control
+
+	FF011C	DIP SWITCH (Region code)
+	FF0105	Area Selector (5 = FIX, 0 = SPR, 4 = Z80, 1 = PCM)
+	FF01A1	Sprite bank selector
+	FF01A3	PCM bank selector
+	FF0120	Prepare sprite area for transfer
+	FF0122	Prepare PCM area for transfer
+	FF0126	Prepare Z80 area for transfer
+	FF0128	Prepare Fix area for transfer
+	FF0140	Terminate work on Spr Area	(Sprites must be decoded here)
+	FF0142	Terminate work on Pcm Area
+	FF0146	Terminate work on Z80 Area	(Z80 needs to be reset)
+	FF0148	Terminate work on Fix Area
+
+	CD-ROM:
+	0xff0102 == 0xF0 start cd transfer
+	int m=bcd(fast_r8(0x10f6c8));
+	int s=bcd(fast_r8(0x10f6c9));
+	int f=bcd(fast_r8(0x10f6ca));
+	int seccount=fast_r16(0x10f688);
+
+	inisec=((m*60)+s)*75+f;
+	inisec-=150;
+	dstaddr=0x111204; // this must come from somewhere
+
+	the value @ 0x10f688 is decremented each time a sector is read until it's 0.
+
+ *
+ */
+
+static void neocd_do_dma(const address_space* space)
+{
+	// TODO: Proper DMA timing and control
+	int count;
+//	UINT16 word;
+
+	switch(neocd_ctrl.dma_mode[0])
+	{
+	case 0xffdd:
+		for(count=0;count<neocd_ctrl.word_count;count++)
+		{
+			//word = memory_read_word(space,neocd_ctrl.addr_source);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*2),neocd_ctrl.fill_word);
+		}
+		logerror("CTRL: DMA word-fill transfer of %i bytes\n",count*2);
+		break;
+	case 0xfef5:
+		for(count=0;count<neocd_ctrl.word_count;count++)
+		{
+			//word = memory_read_word(space,neocd_ctrl.addr_source);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*4),(neocd_ctrl.addr_source+(count*4)) >> 16);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*4)+2,(neocd_ctrl.addr_source+(count*4)) & 0xffff);
+		}
+		logerror("CTRL: DMA mode 2 transfer of %i bytes\n",count*4);
+		break;
+	case 0xcffd:
+		for(count=0;count<neocd_ctrl.word_count;count++)
+		{
+			//word = memory_read_word(space,neocd_ctrl.addr_source);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*8),((neocd_ctrl.addr_source+(count*8)) >> 24) | 0xff00);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*8)+2,((neocd_ctrl.addr_source+(count*8)) >> 16) | 0xff00);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*8)+4,((neocd_ctrl.addr_source+(count*8)) >> 8) | 0xff00);
+			memory_write_word(space,neocd_ctrl.addr_source+(count*8)+6,(neocd_ctrl.addr_source+(count*8)) | 0xff00);
+		}
+		logerror("CTRL: DMA mode 3 transfer of %i bytes\n",count*8);
+		break;
+	default:
+		logerror("CTRL: Unknown DMA transfer mode %04x\n",neocd_ctrl.dma_mode[0]);
+	}
+}
+
+static READ16_HANDLER( neocd_control_r )
+{
+
+	switch(offset)
+	{
+	case 0x64/2: // source address, high word
+		return (neocd_ctrl.addr_source >> 16) & 0xffff;
+	case 0x66/2: // source address, low word
+		return neocd_ctrl.addr_source & 0xffff;
+	case 0x68/2: // target address, high word
+		return (neocd_ctrl.addr_target >> 16) & 0xffff;
+	case 0x6a/2: // target address, low word
+		return neocd_ctrl.addr_target & 0xffff;
+	case 0x6c/2: // fill word
+		return neocd_ctrl.fill_word;
+	case 0x70/2: // word count
+		return (neocd_ctrl.word_count >> 16) & 0xffff;
+	case 0x72/2:
+		return neocd_ctrl.word_count & 0xffff;
+	case 0x7e/2:  // DMA parameters
+	case 0x80/2:
+	case 0x82/2:
+	case 0x84/2:
+	case 0x86/2:
+	case 0x88/2:
+	case 0x8a/2:
+	case 0x8c/2:
+	case 0x8e/2:
+		return neocd_ctrl.dma_mode[offset-(0x7e/2)];
+		break;
+	case 0x105/2:
+		return neocd_ctrl.area_sel;
+	case 0x11c/2:
+		logerror("CTRL: Read region code.\n");
+		return 0x0600;  // we'll just force USA region for now
+	case 0x1a0/2:
+		return neocd_ctrl.spr_bank_sel;
+		break;
+	case 0x1a2/2:
+		return neocd_ctrl.pcm_bank_sel;
+		break;
+	default:
+		logerror("CTRL: Read offset %04x\n",offset);
+	}
+
+	return 0;
+}
+
+static WRITE16_HANDLER( neocd_control_w )
+{
+	switch(offset)
+	{
+	case 0x60/2: // Start DMA transfer
+		if((data & 0xff) == 0x40)
+			neocd_do_dma(space);
+		break;
+	case 0x64/2: // source address, high word
+		neocd_ctrl.addr_source = (neocd_ctrl.addr_source & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set source address to %08x\n",neocd_ctrl.addr_source);
+		break;
+	case 0x66/2: // source address, low word
+		neocd_ctrl.addr_source = (neocd_ctrl.addr_source & 0xffff0000) | data;
+		logerror("CTRL: Set source address to %08x\n",neocd_ctrl.addr_source);
+		break;
+	case 0x68/2: // target address, high word
+		neocd_ctrl.addr_target = (neocd_ctrl.addr_target & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set target address to %08x\n",neocd_ctrl.addr_target);
+		break;
+	case 0x6a/2: // target address, low word
+		neocd_ctrl.addr_target = (neocd_ctrl.addr_target & 0xffff0000) | data;
+		logerror("CTRL: Set target address to %08x\n",neocd_ctrl.addr_target);
+		break;
+	case 0x6c/2: // fill word
+		neocd_ctrl.fill_word = data;
+		logerror("CTRL: Set fill word to %04x\n",data);
+		break;
+	case 0x70/2: // word count
+		neocd_ctrl.word_count = (neocd_ctrl.word_count & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set word count to %i\n",neocd_ctrl.word_count);
+		break;
+	case 0x72/2: // word count (low word)
+		neocd_ctrl.word_count = (neocd_ctrl.word_count & 0xffff0000) | data;
+		logerror("CTRL: Set word count to %i\n",neocd_ctrl.word_count);
+		break;
+	case 0x7e/2:  // DMA parameters
+	case 0x80/2:
+	case 0x82/2:
+	case 0x84/2:
+	case 0x86/2:
+	case 0x88/2:
+	case 0x8a/2:
+	case 0x8c/2:
+	case 0x8e/2:
+		neocd_ctrl.dma_mode[offset-(0x7e/2)] = data;
+		logerror("CTRL: DMA parameter %i set to %04x\n",offset-(0x7e/2),data);
+		break;
+	case 0x104/2:
+		neocd_ctrl.area_sel = data & 0x00ff;
+		logerror("CTRL: 0xExxxxx set to area %i\n",data & 0xff);
+		break;
+	case 0x140/2:  // end sprite transfer
+		video_reset_neogeo(space->machine);
+		break;
+	case 0x142/2:  // end PCM transfer
+		break;
+	case 0x146/2:  // end Z80 transfer
+		cputag_set_input_line(space->machine,"audiocpu",INPUT_LINE_RESET,PULSE_LINE);
+		break;
+	case 0x148/2:  // end FIX transfer
+		video_reset_neogeo(space->machine);
+		break;
+	case 0x1a0/2:
+		neocd_ctrl.spr_bank_sel = data & 0xff;
+		logerror("CTRL: Sprite area set to bank %i\n",data & 0xff);
+		break;
+	case 0x1a2/2:
+		neocd_ctrl.pcm_bank_sel = data & 0xff;
+		logerror("CTRL: PCM area set to bank %i\n",data & 0xff);
+		break;
+	default:
+		logerror("CTRL: Write offset %04x, data %04x\n",offset*2,data);
+	}
+}
+
+/*
+ *  Handling NeoCD banked RAM
+ *  When the Z80 space is banked in to 0xe00000, only the low byte of each word is used
+ */
+
+static READ16_HANDLER(neocd_transfer_r)
+{
+	UINT16 ret = 0x0000;
+	UINT8* Z80 = memory_region(space->machine,"audiocpu");
+	UINT8* PCM = memory_region(space->machine,"ymsnd");
+	UINT8* FIX = memory_region(space->machine,"fixed");
+	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
+
+	switch(neocd_ctrl.area_sel)
+	{
+	case NEOCD_AREA_AUDIO:
+		ret = Z80[offset & 0xffff];
+		break;
+	case NEOCD_AREA_PCM:
+		ret = PCM[offset + (0x100000*neocd_ctrl.pcm_bank_sel)];
+		break;
+	case NEOCD_AREA_SPR:
+		ret = SPR[offset + (0x80000*neocd_ctrl.spr_bank_sel)];
+		break;
+	case NEOCD_AREA_FIX:
+		ret = FIX[offset & 0x1ffff] | 0xff00;
+		break;
+	}
+
+	return ret;
+}
+
+static WRITE16_HANDLER(neocd_transfer_w)
+{
+	UINT8* Z80 = memory_region(space->machine,"audiocpu");
+	UINT8* PCM = memory_region(space->machine,"ymsnd");
+	UINT8* FIX = memory_region(space->machine,"fixed");
+	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
+
+	switch(neocd_ctrl.area_sel)
+	{
+	case NEOCD_AREA_AUDIO:
+		Z80[offset & 0xffff] = data & 0xff;
+		break;
+	case NEOCD_AREA_PCM:
+		PCM[offset + (0x100000*neocd_ctrl.pcm_bank_sel)] = data & 0xff;
+		break;
+	case NEOCD_AREA_SPR:
+		COMBINE_DATA(SPR+(offset + (0x80000*neocd_ctrl.spr_bank_sel)));
+		break;
+	case NEOCD_AREA_FIX:
+		FIX[offset & 0x1ffff] = data & 0xff;
+		break;
+	}
+
+}
+
+/*
  * Handling selectable controller types
  */
 
@@ -896,7 +1200,7 @@ static STATE_POSTLOAD( aes_postload )
 	_set_audio_cpu_rom_source(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM));
 }
 
-static MACHINE_START( neogeo )
+static void common_machine_start(running_machine* machine)
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
@@ -910,9 +1214,6 @@ static MACHINE_START( neogeo )
 	audio_cpu_banking_init(machine);
 
 	create_interrupt_timers(machine);
-
-	/* initialize the memcard data structure */
-	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
 
 	/* start with an IRQ3 - but NOT on a reset */
 	state->irq3_pending = 1;
@@ -936,7 +1237,6 @@ static MACHINE_START( neogeo )
 	state_save_register_global(machine, state->audio_cpu_rom_source);
 	state_save_register_global(machine, state->audio_cpu_rom_source_last);
 	state_save_register_global(machine, state->save_ram_unlocked);
-	state_save_register_global_pointer(machine, memcard_data, 0x800);
 	state_save_register_global(machine, state->output_data);
 	state_save_register_global(machine, state->output_latch);
 	state_save_register_global(machine, state->el_value);
@@ -945,6 +1245,44 @@ static MACHINE_START( neogeo )
 	state_save_register_global(machine, state->recurse);
 
 	state_save_register_postload(machine, aes_postload, NULL);
+}
+
+static MACHINE_START( neogeo )
+{
+	common_machine_start(machine);
+
+	/* initialize the memcard data structure */
+	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
+	state_save_register_global_pointer(machine, memcard_data, 0x0800);
+}
+
+static MACHINE_START(neocd)
+{
+	UINT8* ROM = memory_region(machine,"mainbios");
+	UINT8* RAM = memory_region(machine,"maincpu");
+	UINT8* Z80bios = memory_region(machine,"audiobios");
+	UINT8* FIXbios = memory_region(machine,"fixedbios");
+	int x;
+
+	common_machine_start(machine);
+
+	/* initialize the memcard data structure */
+	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */
+	memcard_data = auto_alloc_array_clear(machine, UINT8, 0x2000);
+	state_save_register_global_pointer(machine, memcard_data, 0x2000);
+
+	// copy initial 68k vectors into RAM
+	memcpy(RAM,ROM,0x80);
+
+	// copy Z80 code into Z80 space (from 0x20000)
+	for(x=0;x<0x10000;x+=2)
+	{
+		Z80bios[x] = ROM[x+0x20001];
+		Z80bios[x+1] = ROM[x+0x20000];
+	}
+
+	// copy fixed tiles into FIX space (from 0x70000)
+	memcpy(FIXbios,ROM+0x70000,0x10000);
 }
 
 //static DEVICE_IMAGE_LOAD(aes_cart)
@@ -1020,6 +1358,34 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( neocd_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00007f) AM_RAMBANK(NEOGEO_BANK_VECTORS)
+	AM_RANGE(0x000080, 0x0fffff) AM_RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
+	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
+	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
+	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(aes_in0_r)
+	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP	// AES has no watchdog
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
+	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
+	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
+	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READWRITE(neogeo_unmapped_r, system_control_w)
+	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
+	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
+	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
+	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
+	AM_RANGE(0x800000, 0x803fff) AM_READWRITE(neocd_memcard_r, neocd_memcard_w)
+	AM_RANGE(0xc00000, 0xcfffff) AM_ROMBANK(NEOGEO_BANK_BIOS)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_READ(neogeo_unmapped_r) //AM_RAM_WRITE(save_ram_w) AM_BASE(&save_ram)
+	AM_RANGE(0xe00000, 0xefffff) AM_READWRITE(neocd_transfer_r,neocd_transfer_w)
+	AM_RANGE(0xf00000, 0xfeffff) AM_READ(neogeo_unmapped_r)
+	AM_RANGE(0xff0000, 0xff01ff) AM_READWRITE(neocd_control_r, neocd_control_w) // CDROM / DMA
+	AM_RANGE(0xff0200, 0xffffff) AM_READ(neogeo_unmapped_r)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -1329,8 +1695,6 @@ static MACHINE_DRIVER_START( neogeo )
 
 	MDRV_MACHINE_START(neogeo)
 	MDRV_MACHINE_RESET(neogeo)
-//	MDRV_NVRAM_HANDLER(neogeo)
-	MDRV_MEMCARD_HANDLER(neogeo)
 
 	/* video hardware */
 	MDRV_VIDEO_START(neogeo)
@@ -1358,6 +1722,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( aes )
 	MDRV_IMPORT_FROM(neogeo)
+
+	MDRV_MEMCARD_HANDLER(neogeo)
+
 	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
 //  MDRV_CARTSLOT_ADD("cart")
 //  MDRV_CARTSLOT_MANDATORY
@@ -1365,6 +1732,15 @@ static MACHINE_DRIVER_START( aes )
 //  MDRV_CARTSLOT_LOAD(aes_cart)
 
 	MDRV_SOFTWARE_LIST_ADD("cart_list","aes")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( neocd )
+	MDRV_IMPORT_FROM(neogeo)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(neocd_main_map)
+
+	MDRV_MACHINE_START(neocd)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -1411,11 +1787,11 @@ ROM_END
 
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_LOAD16_WORD( "neocd.rom",    0x00000, 0x80000, CRC(33697892) SHA1(b0f1c4fa8d4492a04431805f6537138b842b549f) )
+	ROM_LOAD16_WORD( "neocd.rom",    0x00000, 0x80000, CRC(33697892) SHA1(b0f1c4fa8d4492a04431805f6537138b842b549f) )  // not byteswapped
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "audiobios", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 
@@ -1426,9 +1802,9 @@ ROM_START( neocd )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "ymsnd", ROMREGION_ERASEFF )
 
-//  NO_DELTAT_REGION
+//    NO_DELTAT_REGION
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -1450,14 +1826,14 @@ ROM_START( neocdz )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "ymsnd", ROMREGION_ERASEFF )
 
-//  NO_DELTAT_REGION
+//    NO_DELTAT_REGION
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
 CONS( 1990, aes,    0,   0,   aes,      aes,   neogeo,  "SNK", "Neo-Geo AES", 0)
-CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
-CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
+CONS( 1994, neocd,  aes, 0,   neocd,    aes,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
+CONS( 1996, neocdz, aes, 0,   neocd,    aes,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
