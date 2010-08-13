@@ -154,7 +154,8 @@ void archimedes_reset(running_machine *machine)
 		memc_pages[i] = -1;		// indicate unmapped
 	}
 
-	ioc_regs[4] = 0x10; //set up POR (Power On Register) at start-up
+	ioc_regs[4] = 0x10; //set up POR (Power On Reset) at start-up
+	ioc_regs[8] = 0x02; //set up IL[1] On
 }
 
 void archimedes_init(running_machine *machine)
@@ -525,7 +526,22 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	};
 	#endif
 
-	if (reg >= 0x80 && reg <= 0xbc)
+	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
+	// 0x40 Border Color
+	// 0x44 - 0x4c Cursor Palette Logical Colors
+	if (reg >= 0x00 && reg <= 0x4c)
+	{
+		int r,g,b;
+
+		//TODO: 8bpp mode uses a different formula
+		//i = (val & 0x1000) >> 12; //supremacy bit
+		b = (val & 0x0f00) >> 8;
+		g = (val & 0x00f0) >> 4;
+		r = (val & 0x000f) >> 0;
+
+		palette_set_color_rgb(space->machine, reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
+	}
+	else if (reg >= 0x80 && reg <= 0xbc)
 	{
 		#ifdef DEBUG
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], val>>12);
