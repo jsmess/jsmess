@@ -471,7 +471,10 @@ static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	return (memcard_present(field->port->machine) == -1) ? 0x07 : 0x00;
+	if(strcmp((char*)field->port->machine->gamedrv->name,"aes") != 0)
+		return 0x00;  // On the Neo Geo CD, the memory card is internal and therefore always present.
+	else
+		return (memcard_present(field->port->machine) == -1) ? 0x07 : 0x00;
 }
 
 static READ16_HANDLER( memcard_r )
