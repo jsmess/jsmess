@@ -1340,6 +1340,7 @@ const game_driver * const drivers[] =
 
 	/* Robotron 1715 */
 	DRIVER (rt1715)
+	DRIVER (rt1715lc) /* (latin/cyrillic) */
 	DRIVER (rt1715w)
 
 	/* Z1013 */

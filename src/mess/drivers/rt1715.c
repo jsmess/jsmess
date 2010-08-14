@@ -1,44 +1,127 @@
 /***************************************************************************
 
-        Robotron 1715 video driver by Miodrag Milanovic
+        Robotron PC-1715
 
         10/06/2008 Preliminary driver.
 
-****************************************************************************/
 
+	Notes:
+
+	- keyboard connected to sio channel a
+	- sio channel a clock output connected to ctc trigger 0
+
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
-#include "machine/i8257.h"
-#include "video/i8275.h"
-#include "devices/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/rt1715.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/z80pio.h"
+#include "machine/z80dma.h"
 #include "devices/messram.h"
+#include "video/i8275.h"
 
-static WRITE8_HANDLER (rt1717_set_bank )
+
+/***************************************************************************
+    FLOPPY
+***************************************************************************/
+
+static WRITE8_HANDLER( rt1715_floppy_enable )
 {
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
-	memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")));
+	logerror("%s: rt1715_floppy_enable %02x\n", cpuexec_describe_context(space->machine), data);
 }
 
-/* Address maps */
-static ADDRESS_MAP_START(rt1715_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
-	AM_RANGE( 0x0800, 0xffff ) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rt1715_io , ADDRESS_SPACE_IO, 8)
-	//ADDRESS_MAP_GLOBAL_MASK(0xFF)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x28, 0x28 ) AM_WRITE( rt1717_set_bank )
-ADDRESS_MAP_END
+/***************************************************************************
+    KEYBOARD
+***************************************************************************/
 
-/* Input ports */
-static INPUT_PORTS_START( rt1715 )
-INPUT_PORTS_END
+/* si/so led */
+static READ8_HANDLER( k7658_led1_r )
+{
+	static int led1_val = 0;
+	led1_val ^= 1;
+	logerror("%s: k7658_led1_r %02x\n", cpuexec_describe_context(space->machine), led1_val);
+	return 0xff;
+}
+
+/* caps led */
+static READ8_HANDLER( k7658_led2_r )
+{
+	static int led2_val = 0;
+	led2_val ^= 1;
+	logerror("%s: k7658_led2_r %02x\n", cpuexec_describe_context(space->machine), led2_val);
+	return 0xff;
+}
+
+/* read key state */
+static READ8_HANDLER( k7658_data_r )
+{
+	UINT8 result = 0xff;
+
+	if (BIT(offset,  0)) result &= input_port_read(space->machine, "row_00");
+	if (BIT(offset,  1)) result &= input_port_read(space->machine, "row_10");
+	if (BIT(offset,  2)) result &= input_port_read(space->machine, "row_20");
+	if (BIT(offset,  3)) result &= input_port_read(space->machine, "row_30");
+	if (BIT(offset,  4)) result &= input_port_read(space->machine, "row_40");
+	if (BIT(offset,  5)) result &= input_port_read(space->machine, "row_50");
+	if (BIT(offset,  6)) result &= input_port_read(space->machine, "row_60");
+	if (BIT(offset,  7)) result &= input_port_read(space->machine, "row_70");
+	if (BIT(offset,  8)) result &= input_port_read(space->machine, "row_08");
+	if (BIT(offset,  9)) result &= input_port_read(space->machine, "row_18");
+	if (BIT(offset, 10)) result &= input_port_read(space->machine, "row_28");
+	if (BIT(offset, 11)) result &= input_port_read(space->machine, "row_38");
+	if (BIT(offset, 12)) result &= input_port_read(space->machine, "row_48");
+
+	return result;
+}
+
+/* serial output on D0 */
+static WRITE8_HANDLER( k7658_data_w )
+{
+	logerror("%s: k7658_data_w %02x\n", cpuexec_describe_context(space->machine), BIT(data, 0));
+}
+
+
+/***************************************************************************
+    MEMORY HANDLING
+***************************************************************************/
+
+static MACHINE_START( rt1715 )
+{
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0800);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
+}
+
+static MACHINE_RESET( rt1715 )
+{
+	/* on reset, enable ROM */
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "ipl"));
+}
+
+static WRITE8_HANDLER( rt1715_rom_disable )
+{
+	logerror("%s: rt1715_set_bank %02x\n", cpuexec_describe_context(space->machine), data);
+
+	/* disable ROM, enable RAM */
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+}
+
+
+/***************************************************************************
+    VIDEO EMULATION
+***************************************************************************/
+
+static VIDEO_UPDATE( rt1715 )
+{
+	VIDEO_UPDATE_CALL(generic_bitmapped);
+	return 0;
+}
+
+static I8275_DISPLAY_PIXELS( rt1715_display_pixels )
+{
+
+}
 
 /* F4 Character Displayer */
 static const gfx_layout rt1715_charlayout =
@@ -55,16 +138,181 @@ static const gfx_layout rt1715_charlayout =
 };
 
 static GFXDECODE_START( rt1715 )
-	GFXDECODE_ENTRY( "gfx", 0x0000, rt1715_charlayout, 0, 1 )
+	GFXDECODE_ENTRY("gfx", 0x0000, rt1715_charlayout, 0, 1)
+	GFXDECODE_ENTRY("gfx", 0x0800, rt1715_charlayout, 0, 1)
 GFXDECODE_END
 
-/* Machine driver */
+static const i8275_interface rt1715_i8275_intf =
+{
+	"screen",
+	8,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	rt1715_display_pixels
+};
+
+
+/***************************************************************************
+    PALETTE
+***************************************************************************/
+
+static PALETTE_INIT( rt1715 )
+{
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
+	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+}
+
+
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+static ADDRESS_MAP_START( rt1715_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
+	AM_RANGE(0x0800, 0xffff) AM_RAMBANK("bank2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rt1715_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_r, i8275_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
+	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k7658_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(k7658_data_w)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xf800) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k7658_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x8000) AM_READ(k7658_led1_r)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x8000) AM_READ(k7658_led2_r)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(k7658_data_r)
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
+
+static INPUT_PORTS_START( k7658 )
+	PORT_START("row_00")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_10")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_20")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_30")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_40")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_50")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_60")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_70")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_08")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_18")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_28")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_38")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_48")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
+
+static const z80ctc_interface rt1715_ctc_intf =
+{
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const z80sio_interface rt1715_sio_intf =
+{
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const z80pio_interface rt1715_pio_data_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const z80pio_interface rt1715_pio_control_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+/* priority unknown */
+static const z80_daisy_config rt1715_daisy_chain[] =
+{
+	{ "a71" },
+	{ "a72" },
+	{ "a30" },
+	{ "a29" },
+	{ NULL }
+};
+
 static MACHINE_DRIVER_START( rt1715 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(rt1715_mem)
 	MDRV_CPU_IO_MAP(rt1715_io)
-	MDRV_MACHINE_RESET( rt1715 )
+	MDRV_CPU_CONFIG(rt1715_daisy_chain)
+
+	MDRV_MACHINE_START(rt1715)
+	MDRV_MACHINE_RESET(rt1715)
+
+	/* keyboard */
+	MDRV_CPU_ADD("keyboard", Z80, 683000)
+	MDRV_CPU_PROGRAM_MAP(k7658_mem)
+	MDRV_CPU_IO_MAP(k7658_io)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -80,38 +328,85 @@ static MACHINE_DRIVER_START( rt1715 )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(rt1715)
 
+	MDRV_I8275_ADD("a26", rt1715_i8275_intf)
+	MDRV_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)
+	MDRV_Z80SIO_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
+
+	/* floppy */
+	MDRV_Z80PIO_ADD("a71", XTAL_10MHz/4 /* ? */, rt1715_pio_data_intf)
+	MDRV_Z80PIO_ADD("a72", XTAL_10MHz/4 /* ? */, rt1715_pio_control_intf)
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
-/* ROM definition */
+static MACHINE_DRIVER_START( rt1715w )
+	MDRV_IMPORT_FROM(rt1715)
+MACHINE_DRIVER_END
+
+
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
+
 ROM_START( rt1715 )
-	ROM_REGION(0x10800, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("s502.bin", 0x10000, 0x0800, CRC(7b6302e1) SHA1(e8f61763ff8841078a1939aa5e85a17f2af42163))
+	ROM_REGION(0x0800, "ipl", 0)
+	ROM_LOAD("s500.a25.3", 0x0000, 0x0800, NO_DUMP) // CCITT 90e7
+	ROM_LOAD("s501.a25.3", 0x0000, 0x0800, NO_DUMP) // CCITT 68da
+	ROM_LOAD("s502.a25.3", 0x0000, 0x0800, CRC(7b6302e1) SHA1(e8f61763ff8841078a1939aa5e85a17f2af42163))
 
-	ROM_REGION(0x0800, "gfx", 0)
-	ROM_LOAD("s619.bin", 0x0000, 0x0800, CRC(98647763) SHA1(93fba51ed26392ec3eff1037886576fa12443fe5))
+	ROM_REGION(0x1000, "gfx", 0)
+	ROM_LOAD("s619.a25.2", 0x0000, 0x0800, CRC(98647763) SHA1(93fba51ed26392ec3eff1037886576fa12443fe5))
+	ROM_LOAD("s602.a25.1", 0x0800, 0x0800, NO_DUMP) // CCITT fd67
 
-	// Z80 code
 	ROM_REGION(0x0800, "keyboard", 0)
 	ROM_LOAD("s600.ic8", 0x0000, 0x0800, CRC(b7070122) SHA1(687056b822086ef0eee1e9b27e5b031bdbcade61))
 
 	ROM_REGION(0x0800, "floppy", 0)
-	ROM_LOAD("r1715lr.bin", 0x0000, 0x0400, CRC(5306d57b) SHA1(a12d025717b039a8a760eb9961365402f1f501f5)) // "read rom"
-	ROM_LOAD("r1715sr.bin", 0x0400, 0x0400, CRC(319fa72c) SHA1(5f26af1e36339a934760a63e5975e9db09abeaaf)) // "write rom"
+	ROM_LOAD("068.a8.2", 0x0000, 0x0400, CRC(5306d57b) SHA1(a12d025717b039a8a760eb9961365402f1f501f5)) // "read rom"
+	ROM_LOAD("069.a8.1", 0x0400, 0x0400, CRC(319fa72c) SHA1(5f26af1e36339a934760a63e5975e9db09abeaaf)) // "write rom"
+ROM_END
+
+ROM_START( rt1715lc )
+	ROM_REGION(0x0800, "ipl", 0)
+	ROM_LOAD("s500.a25.3", 0x0000, 0x0800, NO_DUMP) // CCITT 90e7
+	ROM_LOAD("s501.a25.3", 0x0000, 0x0800, NO_DUMP) // CCITT 68da
+	ROM_LOAD("s502.a25.3", 0x0000, 0x0800, CRC(7b6302e1) SHA1(e8f61763ff8841078a1939aa5e85a17f2af42163))
+
+	ROM_REGION(0x1000, "gfx", 0)
+	ROM_LOAD("s643.a25.2", 0x0000, 0x0800, CRC(ea37f0e6) SHA1(357760974d944b9782734504b9820771e7e37645))
+	ROM_LOAD("s605.a25.1", 0x0800, 0x0800, CRC(38062024) SHA1(798f62d4adeb7098b7dcbfe6caf28302853ee97d))
+
+	ROM_REGION(0x0800, "keyboard", 0)
+	ROM_LOAD("s642.ic8", 0x0000, 0x0800, NO_DUMP) // CCITT 962e
+
+	ROM_REGION(0x0800, "floppy", 0)
+	ROM_LOAD("068.a8.2", 0x0000, 0x0400, CRC(5306d57b) SHA1(a12d025717b039a8a760eb9961365402f1f501f5)) // "read rom"
+	ROM_LOAD("069.a8.1", 0x0400, 0x0400, CRC(319fa72c) SHA1(5f26af1e36339a934760a63e5975e9db09abeaaf)) // "write rom"
 ROM_END
 
 ROM_START( rt1715w )
-	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "s550.bin", 0x10000, 0x0800, CRC(0a96c754) SHA1(4d9ad5b877353d91ba355044d2847e1d621e2b01))
-	ROM_REGION(0x0800, "gfx",0)
-	ROM_LOAD ("s619.bin", 0x0000, 0x0800, CRC(98647763) SHA1(93fba51ed26392ec3eff1037886576fa12443fe5))
+	ROM_REGION(0x0800, "ipl", 0)
+	ROM_LOAD("s550.bin", 0x0000, 0x0800, CRC(0a96c754) SHA1(4d9ad5b877353d91ba355044d2847e1d621e2b01))
+
+	// loaded from floppy on startup
+	ROM_REGION(0x1000, "gfx", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x0800, "keyboard", 0)
+	ROM_LOAD("s600.ic8", 0x0000, 0x0800, CRC(b7070122) SHA1(687056b822086ef0eee1e9b27e5b031bdbcade61))
+
+	ROM_REGION(0x0100, "prom", 0)
+	ROM_LOAD("287.bin", 0x0000, 0x0100, CRC(8508360c) SHA1(d262a8c3cf2d284c67f23b853e0d59ae5cc1d4c8)) // /CAS decoder prom, 74S287
 ROM_END
 
-/* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1986, rt1715, 0,      0,		rt1715, 	rt1715, 0,     "Robotron",	"Robotron 1715",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, rt1715w,rt1715, 0,		rt1715, 	rt1715, 0,     "Robotron",	"Robotron 1715W",	GAME_NOT_WORKING | GAME_NO_SOUND)
+/***************************************************************************
+    GAME DRIVERS
+***************************************************************************/
+
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY     FULLNAME                             FLAGS */
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, 0,    "Robotron",	"Robotron PC-1715",                  GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, 0,    "Robotron",	"Robotron PC-1715 (latin/cyrillic)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, 0,    "Robotron",	"Robotron PC-1715W",                 GAME_NOT_WORKING | GAME_NO_SOUND_HW)
