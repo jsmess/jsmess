@@ -1,13 +1,68 @@
 /***************************************************************************
 
-        Acorn Archimedes 7000/7000+
+	Acorn Archimedes 7000/7000+
 
-        30/07/2010 Skeleton driver.
+    preliminary driver by Angelo Salese,
+    based on work by Tomasz Slanina and Tom Walker
+
+
+	bp (0382827C) (second trigger)
+	do R13 = SR13
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+
+/*
+ *
+ * VIDC20 chip emulation
+ *
+ */
+
+static const char *const vidc20_regnames[] =
+{
+	"Video Palette", 					// 0
+	"Video Palette Address", 			// 1
+	"RESERVED", 						// 2
+	"LCD offset", 						// 3
+	"Border Colour",					// 4
+	"Cursor Palette Logical Colour 1", 	// 5
+	"Cursor Palette Logical Colour 2", 	// 6
+	"Cursor Palette Logical Colour 3", 	// 7
+	"Horizontal",						// 8
+	"Vertical",							// 9
+	"Stereo Image",						// A
+	"Sound",							// B
+	"External",							// C
+	"Frequency Synthesis",				// D
+	"Control",							// E
+	"Data Control"						// F
+};
+
+
+static WRITE32_HANDLER( a7000_vidc20_w )
+{
+	int reg = data >> 28;
+	int val = data & 0xffffff;
+
+	switch(reg)
+	{
+		case 4: // Border Color
+		{
+			int r,g,b;
+
+			r = (val & 0x0000ff) >> 0;
+			g = (val & 0x00ff00) >> 8;
+			b = (val & 0xff0000) >> 16;
+
+			palette_set_color_rgb(space->machine,0x100,r,g,b);
+		}
+		break;
+		default: logerror("VIDC20: %s Register write = %08x\n",vidc20_regnames[reg],val);
+	}
+}
 
 static VIDEO_START( a7000 )
 {
@@ -15,8 +70,16 @@ static VIDEO_START( a7000 )
 
 static VIDEO_UPDATE( a7000 )
 {
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
+
     return 0;
 }
+
+/*
+*
+* IOMD / ARM7500 / ARM7500FE chip emulation
+*
+*/
 
 /* TODO: some of these registers are actually ARM7500 specific */
 static const char *const iomd_regnames[] =
@@ -153,37 +216,94 @@ static const char *const iomd_regnames[] =
 
 #define IOMD_IOCR 		0x000/4
 #define IOMD_KBDDAT		0x004/4
+#define IOMD_KBDCR		0x008/4
+
+#define IOMD_IRQSTA		0x010/4
+#define IOMD_IRQRQA 	0x014/4
+#define IOMD_IRQMSKA	0x018/4
+
+#define IOMD_T0LOW		0x040/4
+#define IOMD_T0HIGH 	0x044/4
+#define IOMD_T0GO		0x048/4
+#define IOMD_T0LATCH	0x04c/4
 
 #define IOMD_ID0 		0x094/4
 #define IOMD_ID1 		0x098/4
 
-static const char *const vidc20_regnames[] =
+static UINT16 timer_in[2],timer_out[2];
+static int timer_counter[2];
+static emu_timer *IOMD_timer[2];
+static UINT8 IRQ_status_A,IRQ_mask_A;
+static UINT8 IOMD_IO_ctrl,IOMD_keyb_ctrl;
+
+static UINT16 io_id;
+
+static void fire_iomd_timer(int timer, int timer_count)
 {
-	"Video Palette", 					// 0
-	"Video Palette Address", 			// 1
-	"RESERVED", 						// 2
-	"LCD offset", 						// 3
-	"Border Colour",					// 4
-	"Cursor Palette Logical Colour 1", 	// 5
-	"Cursor Palette Logical Colour 2", 	// 6
-	"Cursor Palette Logical Colour 3", 	// 7
-	"Horizontal",						// 8
-	"Vertical",							// 9
-	"Stereo Image",						// A
-	"Sound",							// B
-	"External",							// C
-	"Frequency Synthesis",				// D
-	"Control",							// E
-	"Data Control"						// F
-};
+	int val = timer_count / 2; // correct?
+
+	if(val==0)
+		timer_adjust_oneshot(IOMD_timer[timer], attotime_never, 0);
+	else
+		timer_adjust_periodic(IOMD_timer[timer], ATTOTIME_IN_USEC(val), 0, ATTOTIME_IN_USEC(val));
+}
+
+static TIMER_CALLBACK( IOMD_timer0_callback )
+{
+	IRQ_status_A|=0x20;
+	if(IRQ_mask_A&0x20)
+	{
+		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+	}
+}
+
+static TIMER_CALLBACK( IOMD_timer1_callback )
+{
+	/*
+	PS7500_IO[IRQSTA]|=0x40;
+	if(PS7500_IO[IRQMSKA]&0x40)
+	{
+		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+	}
+	*/
+}
 
 static READ32_HANDLER( a7000_iomd_r )
 {
+	if(offset != IOMD_KBDCR)
+		logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
+
+
 	switch(offset)
 	{
-		case IOMD_ID0: return 0x000000e7; // IOMD ID low
-		case IOMD_ID1: return 0x000000d4; // IOMD ID high
-		default: 	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
+		case IOMD_IOCR:
+		{
+			static UINT8 vblank = input_port_read(space->machine, "VBLANK") & 0x80;
+
+			return IOMD_IO_ctrl | 0x34 | vblank;
+		}
+		case IOMD_KBDCR: 	return IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
+
+		/*
+		1--- ---- always high
+		-x-- ---- Timer 1
+		--x- ---- Timer 0
+		---x ---- Power On Reset
+		---- x--- Flyback
+		---- -x-- nINT1
+		---- --0- always low
+		---- ---x INT2
+		*/
+		case IOMD_IRQSTA:	return (IRQ_status_A & ~2) | 0x80;
+		case IOMD_IRQRQA:	return (IRQ_status_A & IRQ_mask_A) | 0x80;
+		case IOMD_IRQMSKA:	return (IRQ_mask_A);
+
+		case IOMD_T0LOW:	return timer_out[0] & 0xff;
+		case IOMD_T0HIGH:	return (timer_out[0] >> 8) & 0xff;
+
+		case IOMD_ID0: 		return io_id & 0xff; // IOMD ID low
+		case IOMD_ID1: 		return (io_id >> 8) & 0xff; // IOMD ID high
+//		default: 	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
 	}
 
 	return 0;
@@ -192,24 +312,47 @@ static READ32_HANDLER( a7000_iomd_r )
 static WRITE32_HANDLER( a7000_iomd_w )
 {
 	logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
-}
 
-
-static WRITE32_HANDLER( a7000_vidc20_w )
-{
-	int reg = data >> 28;
-	int val = data & 0xffffff;
-
-	switch(reg)
+	switch(offset)
 	{
-		default: logerror("VIDC20: %s Register write = %08x\n",vidc20_regnames[reg],val);
+		case IOMD_IOCR:		IOMD_IO_ctrl = data & ~0xf4; break;
+
+		case IOMD_KBDCR:
+			IOMD_keyb_ctrl = data & ~0xf4;
+			//keyboard_ctrl_write(data & 0x08);
+			break;
+
+		case IOMD_IRQRQA:	IRQ_status_A &= ~data; break;
+		case IOMD_IRQMSKA:	IRQ_mask_A = (data & ~2) | 0x80; break;
+
+		case IOMD_T0LOW: 	timer_in[0] = (timer_in[0] & 0xff00) | (data & 0xff); break;
+		case IOMD_T0HIGH: 	timer_in[0] = (timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T0GO:
+			timer_counter[0] = timer_in[0];
+			fire_iomd_timer(0,timer_counter[0]);
+			break;
+		case IOMD_T0LATCH:
+			{
+				static UINT8 readinc;
+				readinc^=1;
+				timer_out[0] = timer_counter[0];
+				if(readinc)
+				{
+					timer_counter[0]--;
+					if(timer_counter[0] < 0)
+						timer_counter[0]+= timer_in[0];
+				}
+			}
+			break;
+
+		//default: logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 	}
 }
 
 static ADDRESS_MAP_START( a7000_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x007fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0x0)
-	AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
+//	AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
+//	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
 //	I/O 03000000 - 033fffff
 	AM_RANGE(0x03000000, 0x030001ff) AM_MIRROR(0x00200000) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers
 //	AM_RANGE(0x03010000, 0x03011fff) //Super IO
@@ -220,8 +363,8 @@ static ADDRESS_MAP_START( a7000_mem, ADDRESS_SPACE_PROGRAM, 32)
 //	AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
 	AM_RANGE(0x03400000, 0x037fffff) AM_WRITE(a7000_vidc20_w)
 //	AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
-	AM_RANGE(0x10000000, 0x10ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 0 bank 0
-	AM_RANGE(0x14000000, 0x14ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 0 bank 1
+	AM_RANGE(0x10000000, 0x13ffffff) AM_RAM //SIMM 0 bank 0
+	AM_RANGE(0x14000000, 0x17ffffff) AM_RAM //SIMM 0 bank 1
 //	AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
 //	AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
 ADDRESS_MAP_END
@@ -229,11 +372,37 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
+	PORT_START("VBLANK")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
+static MACHINE_START(a7000)
+{
+	IOMD_timer[0] = timer_alloc(machine, IOMD_timer0_callback, NULL);
+	IOMD_timer[1] = timer_alloc(machine, IOMD_timer1_callback, NULL);
+
+	io_id = 0xd4e7;
+}
 
 static MACHINE_RESET(a7000)
 {
+	IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
+//	IRQ_status_A = 0x10; // set POR bit ON
+	IRQ_mask_A = 0x00;
+
+	IOMD_keyb_ctrl = 0x00;
+
+	timer_adjust_oneshot( IOMD_timer[0], attotime_never, 0);
+	timer_adjust_oneshot( IOMD_timer[1], attotime_never, 0);
+}
+
+static INTERRUPT_GEN( flyback_irq )
+{
+	IRQ_status_A|=0x08;
+	if(IRQ_mask_A&0x08)
+	{
+		generic_pulse_irq_line(device, ARM7_IRQ_LINE);
+	}
 }
 
 
@@ -242,19 +411,20 @@ static MACHINE_DRIVER_START( a7000 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )
 	MDRV_CPU_PROGRAM_MAP( a7000_mem)
+	MDRV_CPU_VBLANK_INT( "screen", flyback_irq )
 
+	MDRV_MACHINE_START( a7000 )
 	MDRV_MACHINE_RESET( a7000 )
-
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_PALETTE_LENGTH(0x200)
+//  MDRV_PALETTE_INIT(black_and_white)
 
     MDRV_VIDEO_START(a7000)
     MDRV_VIDEO_UPDATE(a7000)
