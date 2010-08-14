@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- Tomy Tutor ant Pyuuta Cartridges
@@ -80,6 +80,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
+	<software name="bombman">
+	<!-- (Japanese 001E)-->
+		<description>Bombman</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="bombman.bin" size="8192" crc="e6a7b204" sha1="e39deede7d76021e3be2cab09142af54fe97a847" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crzracer">
 	<!-- Stock No: 8302 -->
 		<description>Car-azy-racer</description>
@@ -148,6 +160,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="lmotion.bin" size="8192" crc="ede5ed83" sha1="6913d4040687485672b03891151b0db9a6bfcd2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misattck">
+	<!-- (Japanese 009E)-->
+		<description>Mission Attack</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="misattck.bin" size="8192" crc="398b2321" sha1="e15d13a34b4aa0335d00c4c6bf1afda643f80905" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,6 +256,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="trafjam.bin" size="8192" crc="81f529f9" sha1="3d2fad00cd15ee8e72a005f41fc9f96e362324d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafjama">
+	<!-- Stock No: 8103, (Japanese 010E)-->
+		<description>Trafic Jam (alt)</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="trafjama.bin" size="8192" crc="c970f2c3" sha1="086825470d349f3bbd598bbb8b8c9e13aa2458b6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
