@@ -5,7 +5,7 @@
     preliminary driver by Angelo Salese,
     based on work by Tomasz Slanina and Tom Walker
 
-
+	???
 	bp (0382827C) (second trigger)
 	do R13 = SR13
 
@@ -20,6 +20,10 @@
  * VIDC20 chip emulation
  *
  */
+
+static UINT8 vidc20_pal_index;
+static UINT16 vidc20_horz_reg[0x10],vidc20_vert_reg[0x10];
+static UINT8 vidc20_bpp_mode;
 
 static const char *const vidc20_regnames[] =
 {
@@ -41,26 +45,189 @@ static const char *const vidc20_regnames[] =
 	"Data Control"						// F
 };
 
+static const char *const vidc20_horz_regnames[] =
+{
+	"Horizontal Cycle", 				// 0x80 HCR
+	"Horizontal Sync Width", 			// 0x81 HSWR
+	"Horizontal Border Start", 			// 0x82 HBSR
+	"Horizontal Display Start",		 	// 0x83 HDSR
+	"Horizontal Display End", 			// 0x84 HDER
+	"Horizontal Border End", 			// 0x85 HBER
+	"Horizontal Cursor Start", 			// 0x86 HCSR
+	"Horizontal Interlace", 			// 0x87 HIR
+	"Horizontal Counter TEST", 			// 0x88
+	"Horizontal <UNDEFINED>", 			// 0x89
+	"Horizontal <UNDEFINED>", 			// 0x8a
+	"Horizontal <UNDEFINED>", 			// 0x8b
+	"Horizontal All TEST", 				// 0x8c
+	"Horizontal <UNDEFINED>", 			// 0x8d
+	"Horizontal <UNDEFINED>", 			// 0x8e
+	"Horizontal <UNDEFINED>" 			// 0x8f
+};
+
+#define HCR  0
+#define HSWR 1
+#define HBSR 2
+#define HDSR 3
+#define HDER 4
+#define HBER 5
+#define HCSR 6
+#define HIR  7
+
+static const char *const vidc20_vert_regnames[] =
+{
+	"Vertical Cycle", 					// 0x90 VCR
+	"Vertical Sync Width", 				// 0x91 VSWR
+	"Vertical Border Start", 			// 0x92 VBSR
+	"Vertical Display Start", 			// 0x93 VDSR
+	"Vertical Display End", 			// 0x94 VDER
+	"Vertical Border End", 				// 0x95 VBER
+	"Vertical Cursor Start", 			// 0x96 VCSR
+	"Vertical Cursor End", 				// 0x97 VCER
+	"Vertical Counter TEST", 			// 0x98
+	"Horizontal <UNDEFINED>", 			// 0x99
+	"Vertical Counter Increment TEST", 	// 0x9a
+	"Horizontal <UNDEFINED>", 			// 0x9b
+	"Vertical All TEST", 				// 0x9c
+	"Horizontal <UNDEFINED>", 			// 0x9d
+	"Horizontal <UNDEFINED>", 			// 0x9e
+	"Horizontal <UNDEFINED>" 			// 0x9f
+};
+
+#define VCR  0
+#define VSWR 1
+#define VBSR 2
+#define VDSR 3
+#define VDER 4
+#define VBER 5
+#define VCSR 6
+#define VCER 7
+
+static void vidc20_dynamic_screen_change(running_machine *machine)
+{
+	/* sanity checks - first pass */
+	/*
+	total cycles + border start/end
+	*/
+	if(vidc20_horz_reg[HCR] && vidc20_horz_reg[HBSR] && vidc20_horz_reg[HBER] &&
+	   vidc20_vert_reg[VCR] && vidc20_vert_reg[VBSR] && vidc20_vert_reg[VBER])
+	{
+		/* sanity checks - second pass */
+		/*
+		total cycles > border end > border start
+		*/
+		if((vidc20_horz_reg[HCR] > vidc20_horz_reg[HBER]) &&
+		   (vidc20_horz_reg[HBER] > vidc20_horz_reg[HBSR]) &&
+		   (vidc20_vert_reg[VCR] > vidc20_vert_reg[VBER]) &&
+		   (vidc20_vert_reg[VBER] > vidc20_vert_reg[VBSR]))
+		{
+			/* finally ready to change the resolution */
+			int hblank_period,vblank_period;
+			rectangle visarea = machine->primary_screen->visible_area();
+			hblank_period = (vidc20_horz_reg[HCR] & 0x3ffc);
+			vblank_period = (vidc20_vert_reg[VCR] & 0x3fff);
+			/* note that we use the border registers as the visible area */
+			visarea.min_x = (vidc20_horz_reg[HBSR] & 0x3ffe);
+			visarea.max_x = (vidc20_horz_reg[HBER] & 0x3ffe)-1;
+			visarea.min_y = (vidc20_vert_reg[VBSR] & 0x1fff);
+			visarea.max_y = (vidc20_vert_reg[VBER] & 0x1fff)-1;
+
+			machine->primary_screen->configure(hblank_period, vblank_period, visarea, machine->primary_screen->frame_period().attoseconds );
+			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
+			           (vidc20_horz_reg[HDER]-vidc20_horz_reg[HDSR]),(vidc20_vert_reg[VDER]-vidc20_vert_reg[VDSR]),
+			           (vidc20_horz_reg[HBER]-vidc20_horz_reg[HBSR]),(vidc20_vert_reg[VBER]-vidc20_vert_reg[VBSR]),
+			           hblank_period,vblank_period);
+		}
+	}
+}
 
 static WRITE32_HANDLER( a7000_vidc20_w )
 {
 	int reg = data >> 28;
-	int val = data & 0xffffff;
 
 	switch(reg)
 	{
+		case 0: // Video Palette
+		{
+			int r,g,b;
+
+			r = (data & 0x0000ff) >> 0;
+			g = (data & 0x00ff00) >> 8;
+			b = (data & 0xff0000) >> 16;
+
+			palette_set_color_rgb(space->machine,vidc20_pal_index & 0xff,r,g,b);
+
+			/* auto-increment & wrap-around */
+			vidc20_pal_index++;
+			vidc20_pal_index &= 0xff;
+		}
+		break;
+		case 1: // Video Palette Address
+		{
+			// according to RPCEmu, these mustn't be set
+			if (data & 0x0fffff00)
+				return;
+
+			vidc20_pal_index = data & 0xff;
+		}
+		break;
+
 		case 4: // Border Color
 		{
 			int r,g,b;
 
-			r = (val & 0x0000ff) >> 0;
-			g = (val & 0x00ff00) >> 8;
-			b = (val & 0xff0000) >> 16;
+			r = (data & 0x0000ff) >> 0;
+			g = (data & 0x00ff00) >> 8;
+			b = (data & 0xff0000) >> 16;
 
 			palette_set_color_rgb(space->machine,0x100,r,g,b);
 		}
 		break;
-		default: logerror("VIDC20: %s Register write = %08x\n",vidc20_regnames[reg],val);
+		case 5: // Cursor Palette Logical Colour n
+		case 6:
+		case 7:
+		{
+			int r,g,b;
+			int cursor_index = 0x100 + reg - 4; // 0x101,0x102 and 0x103 (plus 0x100 of above, 2bpp)
+
+			r = (data & 0x0000ff) >> 0;
+			g = (data & 0x00ff00) >> 8;
+			b = (data & 0xff0000) >> 16;
+
+			palette_set_color_rgb(space->machine,cursor_index,r,g,b);
+		}
+		break;
+		case 8: // Horizontal
+		{
+			int horz_reg;
+
+			horz_reg = (data >> 24) & 0xf;
+			vidc20_horz_reg[horz_reg] = data & 0x3fff;
+			if(horz_reg == 0 || horz_reg == 2 || horz_reg == 5)
+				vidc20_dynamic_screen_change(space->machine);
+
+			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_horz_regnames[horz_reg],val,val);
+		}
+		break;
+		case 9: // Vertical
+		{
+			int vert_reg;
+
+			vert_reg = (data >> 24) & 0xf;
+			vidc20_vert_reg[vert_reg] = data & 0x1fff;
+			if(vert_reg == 0 || vert_reg == 2 || vert_reg == 5)
+				vidc20_dynamic_screen_change(space->machine);
+
+			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_vert_regnames[vert_reg],val,val);
+
+		}
+		break;
+		case 0x0e: // Control
+		{
+			vidc20_bpp_mode = (data & 0xe0) >> 5;
+		}
+		break;
+		default: logerror("VIDC20: %s Register write = %08x\n",vidc20_regnames[reg],data & 0xfffffff);
 	}
 }
 
@@ -70,7 +237,55 @@ static VIDEO_START( a7000 )
 
 static VIDEO_UPDATE( a7000 )
 {
+	int x_size,y_size,x_start,y_start;
+	int x,y,xi;
+	UINT32 count;
+	static UINT8 *vram = memory_region(screen->machine, "vram");
+
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
+
+	count = 0;
+	x_size = (vidc20_horz_reg[HDER]-vidc20_horz_reg[HDSR]);
+	y_size = (vidc20_vert_reg[VDER]-vidc20_vert_reg[VDSR]);
+	x_start = vidc20_horz_reg[HDSR];
+	y_start = vidc20_vert_reg[VDSR];
+
+	/* check if display is enabled */
+	if(x_size <= 0 || y_size <= 0)
+		return 0;
+
+//	popmessage("%d",vidc20_bpp_mode);
+
+	switch(vidc20_bpp_mode)
+	{
+		case 0: /* 1 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x+=8)
+				{
+					for(xi=0;xi<8;xi++)
+						*BITMAP_ADDR16(bitmap, y+y_start, x+xi+x_start) = (vram[count]>>(7-xi))&1;
+
+					count++;
+				}
+			}
+		}
+		break;
+		case 3: /* 8 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x++)
+				{
+					*BITMAP_ADDR16(bitmap, y+y_start, x+x_start) = (vram[count])&0xff;
+
+					count++;
+				}
+			}
+		}
+		break;
+	}
 
     return 0;
 }
@@ -230,6 +445,12 @@ static const char *const iomd_regnames[] =
 #define IOMD_ID0 		0x094/4
 #define IOMD_ID1 		0x098/4
 
+#define IOMD_VIDCUR		0x1d0/4
+#define IOMD_VIDEND		0x1d4/4
+#define IOMD_VIDSTART	0x1d8/4
+#define IOMD_VIDINIT	0x1dc/4
+#define IOMD_VIDCR		0x1e0/4
+
 static UINT16 timer_in[2],timer_out[2];
 static int timer_counter[2];
 static emu_timer *IOMD_timer[2];
@@ -237,6 +458,8 @@ static UINT8 IRQ_status_A,IRQ_mask_A;
 static UINT8 IOMD_IO_ctrl,IOMD_keyb_ctrl;
 
 static UINT16 io_id;
+static UINT8 viddma_status;
+static UINT32 viddma_addr_start,viddma_addr_end;
 
 static void fire_iomd_timer(int timer, int timer_count)
 {
@@ -268,10 +491,28 @@ static TIMER_CALLBACK( IOMD_timer1_callback )
 	*/
 }
 
+static void viddma_transfer_start(const address_space *space)
+{
+	UINT32 src = viddma_addr_start;
+	UINT32 dst = 0;
+	UINT32 size = viddma_addr_end;
+	UINT32 dma_index;
+	UINT8 *vram = memory_region(space->machine, "vram");
+
+	/* TODO: this should actually be a qword transfer */
+	for(dma_index = 0;dma_index < size;dma_index++)
+	{
+		 vram[dst] = memory_read_byte(space, src);
+
+		 src++;
+		 dst++;
+	}
+}
+
 static READ32_HANDLER( a7000_iomd_r )
 {
-	if(offset != IOMD_KBDCR)
-		logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
+//	if(offset != IOMD_KBDCR)
+//		logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
 
 
 	switch(offset)
@@ -303,7 +544,12 @@ static READ32_HANDLER( a7000_iomd_r )
 
 		case IOMD_ID0: 		return io_id & 0xff; // IOMD ID low
 		case IOMD_ID1: 		return (io_id >> 8) & 0xff; // IOMD ID high
-//		default: 	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
+
+		case IOMD_VIDEND: 	return (viddma_addr_end & 0x00fffff8); //bits 31:24 undefined
+		case IOMD_VIDSTART: return (viddma_addr_start & 0x1ffffff8); //bits 31, 30, 29 undefined
+		case IOMD_VIDCR:	return (viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
+
+		default: 	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
 	}
 
 	return 0;
@@ -311,7 +557,7 @@ static READ32_HANDLER( a7000_iomd_r )
 
 static WRITE32_HANDLER( a7000_iomd_w )
 {
-	logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
+//	logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 
 	switch(offset)
 	{
@@ -345,22 +591,30 @@ static WRITE32_HANDLER( a7000_iomd_w )
 			}
 			break;
 
-		//default: logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
+		case IOMD_VIDEND: 	viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
+		case IOMD_VIDSTART: viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
+		case IOMD_VIDCR:
+			viddma_status = data & 0xa0; if(data & 0x20) { viddma_transfer_start(space); }
+			break;
+
+
+		default: logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 	}
 }
 
 static ADDRESS_MAP_START( a7000_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x007fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0x0)
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0x0)
 //	AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
 //	I/O 03000000 - 033fffff
-	AM_RANGE(0x03000000, 0x030001ff) AM_MIRROR(0x00200000) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers
 //	AM_RANGE(0x03010000, 0x03011fff) //Super IO
 //	AM_RANGE(0x03012000, 0x03029fff) //FDC
 //	AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //	AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //	AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
+	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers //mirrored at 0x03000000-0x1ff?
 //	AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
+
 	AM_RANGE(0x03400000, 0x037fffff) AM_WRITE(a7000_vidc20_w)
 //	AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
 	AM_RANGE(0x10000000, 0x13ffffff) AM_RAM //SIMM 0 bank 0
@@ -421,8 +675,8 @@ static MACHINE_DRIVER_START( a7000 )
     MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(1900, 1080) //max available size
+    MDRV_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
     MDRV_PALETTE_LENGTH(0x200)
 //  MDRV_PALETTE_INIT(black_and_white)
 
@@ -443,11 +697,15 @@ ROM_START(a7000)
 	ROM_LOAD( "rom2.bin", 0x100000, 0x100000, CRC(4ae4fd8b) SHA1(1b30d5905d5364dfa48bad69257b0ef8190e9bf6) )
 	ROM_LOAD( "rom3.bin", 0x200000, 0x100000, CRC(3108fb2b) SHA1(865b01583f3fb5f4ed5e9201676db327cdeb40b3) )
 	ROM_LOAD( "rom4.bin", 0x300000, 0x100000, CRC(55a51980) SHA1(a7191727edd5babf679ebbdea6585833a1fb34e6) )
+
+	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(a7000p)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "riscos-3.71.rom", 0x000000, 0x400000, CRC(211cf888) SHA1(c5fe0645e48894fb4b245abeefdc9a65d659af59))
+
+	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /***************************************************************************
