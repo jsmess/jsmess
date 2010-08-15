@@ -244,7 +244,6 @@ static VIDEO_UPDATE( a7000 )
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
-	count = 0;
 	x_size = (vidc20_horz_reg[HDER]-vidc20_horz_reg[HDSR]);
 	y_size = (vidc20_vert_reg[VDER]-vidc20_vert_reg[VDSR]);
 	x_start = vidc20_horz_reg[HDSR];
@@ -256,6 +255,8 @@ static VIDEO_UPDATE( a7000 )
 
 //	popmessage("%d",vidc20_bpp_mode);
 
+	count = 0;
+
 	switch(vidc20_bpp_mode)
 	{
 		case 0: /* 1 bpp */
@@ -265,7 +266,35 @@ static VIDEO_UPDATE( a7000 )
 				for(x=0;x<x_size;x+=8)
 				{
 					for(xi=0;xi<8;xi++)
-						*BITMAP_ADDR16(bitmap, y+y_start, x+xi+x_start) = (vram[count]>>(7-xi))&1;
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi))&1];
+
+					count++;
+				}
+			}
+		}
+		break;
+		case 1: /* 2 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x+=4)
+				{
+					for(xi=0;xi<4;xi++)
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi*2))&3];
+
+					count++;
+				}
+			}
+		}
+		break;
+		case 2: /* 4 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x+=2)
+				{
+					for(xi=0;xi<2;xi++)
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi*4))&0xf];
 
 					count++;
 				}
@@ -278,13 +307,59 @@ static VIDEO_UPDATE( a7000 )
 			{
 				for(x=0;x<x_size;x++)
 				{
-					*BITMAP_ADDR16(bitmap, y+y_start, x+x_start) = (vram[count])&0xff;
+					*BITMAP_ADDR32(bitmap, y+y_start, x+x_start) = screen->machine->pens[(vram[count])&0xff];
 
 					count++;
 				}
 			}
 		}
 		break;
+		case 4: /* 16 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x++)
+				{
+					int r,g,b,pen;
+
+					pen = ((vram[count]<<8)|(vram[count+1]))&0xffff;
+					r = (pen & 0x000f);
+					g = (pen & 0x00f0) >> 4;
+					b = (pen & 0x0f00) >> 8;
+					r = (r << 4) | (r & 0xf);
+					g = (g << 4) | (g & 0xf);
+					b = (b << 4) | (b & 0xf);
+
+					*BITMAP_ADDR32(bitmap, y+y_start, x+x_start) =  b | g << 8 | r << 16;
+
+					count+=2;
+				}
+			}
+		}
+		break;
+		case 6: /* 32 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x++)
+				{
+					int r,g,b,pen;
+
+					pen = ((vram[count]<<24)|(vram[count+1]<<16)|(vram[count+2]<<8)|(vram[count+3]<<0));
+					r = (pen & 0x0000ff);
+					g = (pen & 0x00ff00) >> 8;
+					b = (pen & 0xff0000) >> 16;
+
+					*BITMAP_ADDR32(bitmap, y+y_start, x+x_start) =  b | g << 8 | r << 16;
+
+					count+=4;
+				}
+			}
+		}
+		break;
+		default:
+			//fatalerror("VIDC20 %08x BPP mode not supported\n",vidc20_bpp_mode);
+			break;
 	}
 
     return 0;
@@ -674,7 +749,7 @@ static MACHINE_DRIVER_START( a7000 )
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(1900, 1080) //max available size
     MDRV_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
     MDRV_PALETTE_LENGTH(0x200)
