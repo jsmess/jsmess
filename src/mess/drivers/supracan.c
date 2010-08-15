@@ -132,7 +132,7 @@ public:
     emu_timer *line_on_timer;
     emu_timer *line_off_timer;
 	UINT16 *vram;
-    UINT8 bg_color;
+    UINT16 *pram;
 
     bitmap_t *sprite_final_bitmap;
     UINT8 sprite_pri[1024*1024];
@@ -370,42 +370,6 @@ static void draw_tilemap_scanline(running_machine *machine, UINT16 *scanline, UI
     scrollx |= (scrollx & 0x800) ? 0xfffff000 : 0;
     scrolly |= (scrolly & 0x800) ? 0xfffff000 : 0;
 
-    int gfx_mode = (state->tilemap_mode[layer] & 0x7000) >> 12;
-
-    int region = 1;
-    UINT16 tile_bank = 0;
-    UINT16 palette_bank = 0;
-    switch(gfx_mode)
-    {
-        case 7:
-            region = 2;
-            tile_bank = 0x1c00;
-            palette_bank = 0x00;
-            break;
-
-        case 4:
-            region = 1;
-            tile_bank = 0x800;
-            palette_bank = 0x00;
-            break;
-
-        case 2:
-            region = 1;
-            tile_bank = 0x400;
-            palette_bank = 0x00;
-            break;
-
-        case 0:
-            region = 1;
-            tile_bank = 0;
-            palette_bank = 0x00;
-            break;
-
-        default:
-            verboselog("maincpu", machine, 0, "Unsupported tilemap mode: %d\n", (state->tilemap_flags[layer] & 0x7000) >> 12);
-            break;
-    }
-
     int wrapped_x = scrollx;
     int wrapped_y = ypos + scrolly;
 
@@ -427,8 +391,17 @@ static void draw_tilemap_scanline(running_machine *machine, UINT16 *scanline, UI
         }
     }
 
-    UINT16 *src = BITMAP_ADDR16(state->tilemap_bitmap[layer], wrapped_y, 0);
-    UINT8 *srcpri = &state->tilemap_pri[layer][1024*wrapped_y];
+    int mosaic = (state->tilemap_flags[layer] & 0x001c) >> 2;
+    UINT32 mask = 0xffffffff;
+
+    if(mosaic)
+    {
+        mosaic--;
+        mask = ~(1 << mosaic);
+    }
+
+    UINT16 *src = BITMAP_ADDR16(state->tilemap_bitmap[layer], wrapped_y & mask, 0);
+    UINT8 *srcpri = &state->tilemap_pri[layer][1024*(wrapped_y & mask)];
 
     if(state->tilemap_flags[layer] & 0x20)
     {
@@ -437,8 +410,8 @@ static void draw_tilemap_scanline(running_machine *machine, UINT16 *scanline, UI
 
         for(int x = 0; x < 320; x++)
         {
-            scanline[x] = src[wrapped_x] ? src[wrapped_x] : scanline[x];
-            priline[x] = src[wrapped_x] ? srcpri[wrapped_x] : 8;
+            scanline[x] = src[wrapped_x & mask] ? src[wrapped_x & mask] : scanline[x];
+            priline[x] = src[wrapped_x & mask] ? srcpri[wrapped_x & mask] : 8;
             wrapped_x++;
             while(wrapped_x >= width*8) wrapped_x -= width*8;
         }
@@ -449,8 +422,8 @@ static void draw_tilemap_scanline(running_machine *machine, UINT16 *scanline, UI
         {
             if(wrapped_x >= 0 && wrapped_x < width*8)
             {
-                scanline[x] = src[wrapped_x] ? src[wrapped_x] : scanline[x];
-                priline[x] = src[wrapped_x] ? srcpri[wrapped_x] : 8;
+                scanline[x] = src[wrapped_x & mask] ? src[wrapped_x & mask] : scanline[x];
+                priline[x] = src[wrapped_x & mask] ? srcpri[wrapped_x & mask] : 8;
             }
             else
             {
@@ -533,9 +506,16 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
             break;
 
         default:
-            verboselog("maincpu", machine, 0, "Unsupported tilemap mode: %d\n", (state->tilemap_flags[layer] & 0x7000) >> 12);
+            verboselog("maincpu", machine, 0, "Unsupported tilemap mode: %d\n", (state->tilemap_mode[layer] & 0x7000) >> 12);
             break;
 	}
+
+    if(layer == 2)
+    {
+        region = 1;
+        tile_bank = 0x400;
+        palette_bank = 0x00;
+    }
 
     if(state->tilemap_flags[layer] & 0x20)
     {
@@ -824,22 +804,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		bool hflip = (supracan_vram[i+1] & 0x0800) ? true : false;
 		bool vflip = (supracan_vram[i+1] & 0x0400) ? true : false;
 #if !(DRAW_DEBUG_UNK_SPRITE)
-        UINT8 priority = ((supracan_vram[i+0] >> 12) & 7) + 1;
+        UINT8 priority = ((supracan_vram[i+2] >> 12) & 7) + 1;
 #endif
-		while(x > cliprect->max_x)
+		while(x > 0x200)
         {
-			x -= 0x200;
+            x -= 0x200;
         }
 
-		while(y > cliprect->max_y)
+		while(y > 0x200)
         {
-			y -= 0x200;
+            y -= 0x200;
         }
 
 		if(supracan_vram[i+3] != 0)
 		{
             int xsize = 1 << (supracan_vram[i+1] & 7);
-            int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9)+1;
+            int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9) + 1;
             //int ysize = (((supracan_vram[i+0] & 0x0600) >> 9) + 1) * (1 << ((supracan_vram[i+0] & 0x1800) >> 11));
             //if(supracan_vram[i+2] & 0x2000) ysize = xsize;
             //int ysize = ((supracan_vram[i+2] & 0x1e00) >> 9)+1;
@@ -1022,7 +1002,7 @@ static VIDEO_UPDATE( supracan )
     // crash debug: printf("K"); fflush(stdout);
     supracan_state *state = (supracan_state *)screen->machine->driver_data<supracan_state>();
 
-    bitmap_fill(bitmap, cliprect, state->bg_color);
+    bitmap_fill(bitmap, cliprect, 0);
 
     bitmap_fill(state->sprite_final_bitmap, cliprect, 0);
     memset(state->sprite_pri, 8, 1024*1024 * sizeof(UINT8));
@@ -1199,6 +1179,15 @@ static WRITE16_HANDLER( supracan_dma_w )
             break;
 	}
 }
+
+/*
+static WRITE16_HANDLER( supracan_pram_w )
+{
+    supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
+    state->pram[offset] &= ~mem_mask;
+    state->pram[offset] |= data & mem_mask;
+}
+*/
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x3fffff ) AM_ROM AM_REGION( "cart", 0 )
@@ -1432,7 +1421,6 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-
 static PALETTE_INIT( supracan )
 {
 	// Used for debugging purposes for now
@@ -1448,7 +1436,6 @@ static PALETTE_INIT( supracan )
 	}
 	//#endif
 }
-
 
 static WRITE16_HANDLER( supracan_68k_soundram_w )
 {
@@ -1564,10 +1551,23 @@ static READ16_HANDLER( supracan_video_r )
 		case 0x00/2: // Video IRQ flags
             if(!space->debugger_access)
             {
+                //verboselog("maincpu", space->machine, 0, "read video IRQ flags (%04x)\n", data);
                 cpu_set_input_line(space->machine->device("maincpu"), 7, CLEAR_LINE);
             }
 			break;
         case 0x02/2: // Current scanline
+            break;
+        case 0x08/2: // Unknown (not video flags!)
+            data = 0;
+            break;
+        case 0x100/2:
+            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_flags[0] (%04x)\n", data);
+            break;
+        case 0x106/2:
+            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_scrolly[0] (%04x)\n", data);
+            break;
+        case 0x120/2:
+            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_flags[1] (%04x)\n", data);
             break;
 		default:
             if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
@@ -1620,7 +1620,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 		state->video_regs[0] |= 0x8000;
         if(state->irq_mask & 1)
         {
-            verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n");
+            verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");
             cpu_set_input_line(machine->device("maincpu"), 7, HOLD_LINE);
         }
 		break;
@@ -1630,8 +1630,8 @@ static TIMER_CALLBACK( supracan_video_callback )
 
     if (vpos == 0)
     {
-        bitmap_fill(state->roz_final_bitmap, &machine->primary_screen->visible_area(), 0);
-        bitmap_fill(state->roz_bitmap, &machine->primary_screen->visible_area(), 0);
+        bitmap_fill(state->roz_final_bitmap, NULL, 0);
+        bitmap_fill(state->roz_bitmap, NULL, 0);
         bitmap_fill(state->tilemap_bitmap[0], NULL, 0);
         bitmap_fill(state->tilemap_bitmap[1], NULL, 0);
         bitmap_fill(state->tilemap_bitmap[2], NULL, 0);
@@ -1662,6 +1662,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 
         if(state->video_flags & 0x20)
         {
+            // Causes issues in Speedy Dragon; investigate later
             draw_tilemap(machine, state->tilemap_bitmap[2], &machine->primary_screen->visible_area(), 2);
         }
     }
@@ -1670,10 +1671,18 @@ static TIMER_CALLBACK( supracan_video_callback )
     {
         UINT16 *scandata = BITMAP_ADDR16(state->roz_final_bitmap, vpos, 0);
         UINT8 *pridata = &state->roz_final_pri[vpos*320];
-        draw_roz_bitmap_scanline(machine, state->roz_bitmap, scandata, pridata, vpos, state->roz_scrollx, state->roz_scrolly, state->roz_coeffa, state->roz_coeffb, state->roz_coeffc, state->roz_coeffd, &state->roz_cx, &state->roz_cy, state->roz_changed);
+        if(state->video_flags & 4)
+        {
+            draw_roz_bitmap_scanline(machine, state->roz_bitmap, scandata, pridata, vpos, state->roz_scrollx, state->roz_scrolly, state->roz_coeffa, state->roz_coeffb, state->roz_coeffc, state->roz_coeffd, &state->roz_cx, &state->roz_cy, state->roz_changed);
+        }
 
         for(int index = 0; index < 3; index++)
         {
+            if(index == 2)
+            {
+                // Tilemap 2 causes issues in Speedy Dragon; investigate later
+                //break;
+            }
             if(state->video_flags & (0x80 >> index) )
             {
                 scandata = BITMAP_ADDR16(state->tilemap_final_bitmap[index], vpos, 0);
@@ -1829,7 +1838,7 @@ static WRITE16_HANDLER( supracan_video_w )
         case 0x140/2: state->tilemap_flags[2] = data; verboselog("maincpu", space->machine, 0, "tilemap_flags[2] = %04x\n", data); break;
         case 0x144/2: state->tilemap_scrollx[2] = data; verboselog("maincpu", space->machine, 0, "tilemap_scrollx[2] = %04x\n", data); break;
         case 0x146/2: state->tilemap_scrolly[2] = data; verboselog("maincpu", space->machine, 0, "tilemap_scrolly[2] = %04x\n", data); break;
-        case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; verboselog("maincpu", space->machine, 0, "tilemap_base_addr[2] = %05x\n", data << 2); verboselog("maincpu", space->machine, 0, "tilemap_base_addr[2] = %05x\n", data << 1); break;
+        case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; verboselog("maincpu", space->machine, 0, "tilemap_base_addr[2] = %05x\n", data << 2); break;
         case 0x14a/2: state->tilemap_mode[2] = data; verboselog("maincpu", space->machine, 0, "tilemap_mode[2] = %04x\n", data); break;
 
 		/* ROZ */
@@ -1848,7 +1857,7 @@ static WRITE16_HANDLER( supracan_video_w )
         case 0x19a/2: state->roz_unk_base1 = data << 1; verboselog("maincpu", space->machine, 3, "roz_unk_base1 = %05x\n", data << 2); break;
         case 0x19e/2: state->roz_unk_base2 = data << 1; verboselog("maincpu", space->machine, 3, "roz_unk_base2 = %05x\n", data << 2); break;
 
-        case 0x1d0/2: state->bg_color = data & 0x00ff; verboselog("maincpu", space->machine, 3, "bg_color = %02x\n", data & 0x00ff); break;
+        //case 0x1d0/2: state->bg_color = data & 0x00ff; verboselog("maincpu", space->machine, 3, "bg_color = %04x\n", data); break;
 
 		case 0x1f0/2: //FIXME: this register is mostly not understood
 			state->irq_mask = data;//(data & 8) ? 0 : 1;
@@ -2007,6 +2016,7 @@ static MACHINE_DRIVER_START( supracan )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+    //MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MDRV_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
 
 	MDRV_PALETTE_LENGTH( 32768 )
