@@ -11,7 +11,8 @@
 		- move HD44780 implementation in a device
 
 		Note:
-		- 4 lines dysplay has an custom LCD controller derived from an HD66780
+		- 4 lines display has an custom LCD controller derived from an HD66780
+		- NVRAM works only if the machine is turned off (with OFF menu) before closing MESS
 
         16/07/2010 Skeleton driver.
 
@@ -36,13 +37,16 @@ struct datapack
 
 static struct _psion
 {
-	UINT8 kb_counter;
+	UINT16 kb_counter;
 	UINT8 enable_nmi;
 	UINT8 *sys_register;
 	UINT8 tcsr_value;
+	UINT8 stby_pwr;
 
 	/* RAM/ROM banks */
 	UINT8 *ram;
+	size_t ram_size;
+	UINT8 *paged_ram;
 	UINT8 rom_bank;
 	UINT8 ram_bank;
 	UINT8 ram_bank_count;
@@ -277,7 +281,7 @@ UINT8 kb_read(running_machine *machine)
 void update_bank(running_machine *machine)
 {
 	if (psion.ram_bank < psion.ram_bank_count && psion.ram_bank_count)
-		memory_set_bankptr(machine,"rambank", psion.ram + psion.ram_bank*0x4000);
+		memory_set_bankptr(machine,"rambank", psion.paged_ram + psion.ram_bank*0x4000);
 
 	if (psion.rom_bank_count)
 	{
@@ -397,6 +401,8 @@ READ8_HANDLER( hd63701_int_reg_r )
 	case 0x03:
 		/* datapack i/o data bus */
 		return datapack_r(space->machine);
+	case 0x14:
+		return (hd63701_internal_registers_r(space, offset)&0x7f) | (psion.stby_pwr<<7);
 	case 0x15:
 		/*
 		x--- ---- ON key active high
@@ -404,7 +410,7 @@ READ8_HANDLER( hd63701_int_reg_r )
 		---- --x- ??
 		---- ---x battery status
 		*/
-		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON");
+		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (psion.kb_counter == 0x7ff)<<1;
 	case 0x17:
 		return psion.port6;
 	case 0x08:
@@ -417,10 +423,16 @@ READ8_HANDLER( hd63701_int_reg_r )
 /* Read/Write common */
 void io_rw(const address_space* space, UINT16 offset)
 {
+	if (space->debugger_access)
+		return;
+
 	switch (offset & 0xffc0)
 	{
 	case 0xc0:
-		//Switch off
+		/* switch off, CPU goes into standby mode */
+		psion.enable_nmi = 0;
+		psion.stby_pwr = 1;
+		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
 		//Pulse enable
@@ -499,12 +511,21 @@ READ8_HANDLER( io_r )
 	return 0;
 }
 
+static INPUT_CHANGED( psion_on )
+{
+	cpu_device *cpu = field->port->machine->device<cpu_device>("maincpu");
+
+	/* reset the CPU for resume from standby */
+	if (cpu->suspended(SUSPEND_REASON_HALT))
+		cpu->reset();
+}
+
 static ADDRESS_MAP_START(psioncm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -513,7 +534,7 @@ static ADDRESS_MAP_START(psionla_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x5fff) AM_RAM
+	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -522,7 +543,7 @@ static ADDRESS_MAP_START(psionp350_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -532,7 +553,7 @@ static ADDRESS_MAP_START(psionlam_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x7fff) AM_RAM
+	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -542,7 +563,7 @@ static ADDRESS_MAP_START(psionlz_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -556,7 +577,7 @@ INPUT_PORTS_START( psion )
 		PORT_CONFSETTING( 0x01, "Low Battery" )
 
 	PORT_START("ON")
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_F10)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_F10)  PORT_CHANGED(psion_on, 0)
 
 	PORT_START("K1")
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_EQUALS)
@@ -653,6 +674,31 @@ static DEVICE_IMAGE_UNLOAD( psion_pack2 )
 	memset(&psion.pack2, 0, sizeof(psion.pack2));
 }
 
+static NVRAM_HANDLER( psion )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, psion.sys_register, 0xc0);
+		mame_fwrite(file, psion.ram, psion.ram_size);
+		if (psion.ram_bank_count)
+			mame_fwrite(file, psion.paged_ram, psion.ram_bank_count * 0x4000);
+	}
+	else
+	{
+		if (file)
+		{
+			mame_fread(file, psion.sys_register, 0xc0);
+			mame_fread(file, psion.ram, psion.ram_size);
+			if (psion.ram_bank_count)
+				mame_fread(file, psion.paged_ram, psion.ram_bank_count * 0x4000);
+
+			psion.stby_pwr = 1;
+		}
+		else
+			psion.stby_pwr = 0;
+	}
+}
+
 static MACHINE_START(psion)
 {
 	if (!strcmp(machine->gamedrv->name, "psionlam"))
@@ -682,7 +728,7 @@ static MACHINE_START(psion)
 	}
 
 	if (psion.ram_bank_count)
-		psion.ram = auto_alloc_array(machine, UINT8, psion.ram_bank_count * 0x4000);
+		psion.paged_ram = auto_alloc_array(machine, UINT8, psion.ram_bank_count * 0x4000);
 
 	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, nmi_timer);
 	timer_pulse(machine, ATTOTIME_IN_MSEC(500), NULL, 0, blink_timer);
@@ -902,6 +948,8 @@ static MACHINE_DRIVER_START( psion_2lines )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
+	MDRV_NVRAM_HANDLER(psion)
+
 	MDRV_IMPORT_FROM( psion_slot )
 MACHINE_DRIVER_END
 
@@ -932,6 +980,8 @@ static MACHINE_DRIVER_START( psion_4lines )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	MDRV_NVRAM_HANDLER(psion)
 
 	MDRV_IMPORT_FROM( psion_slot )
 MACHINE_DRIVER_END
