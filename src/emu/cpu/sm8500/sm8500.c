@@ -7,6 +7,14 @@
   this cpu, and made educated guesses on the number of cycles for each instruction.
 
   Code by Wilbert Pol
+
+
+There is some internal ram for the main cpu registers. They are offset by an index value.
+The address is (PS0 & 0xF8) + register number. It is not known what happens when PS0 >= F8.
+The assumption is that F8 to 107 is used, but it might wrap around instead.
+The registers also mirror out to main RAM, appearing at 0000 to 000F regardless of where
+they are internally.
+
 */
 
 #include "emu.h"
@@ -45,6 +53,7 @@ struct _sm8500_state
 	legacy_cpu_device *device;
 	const address_space *program;
 	UINT16 oldpc;
+	UINT8 register_ram[0x108];
 };
 
 INLINE sm8500_state *get_safe_token(running_device *device)
@@ -65,14 +74,22 @@ INLINE void sm8500_get_sp( sm8500_state *cpustate )
 	if (cpustate->SYS&0x40) cpustate->SP |= data;
 }
 
-static UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset ) {
-	if (offset < 0x10) offset+= cpustate->PS0 & 0xf8;
-	return memory_read_byte( cpustate->program, offset );
+static UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset )
+{
+	offset &= 0xffff;
+	return (offset < 0x10) ? cpustate->register_ram[offset + (cpustate->PS0 & 0xF8)]
+		: memory_read_byte( cpustate->program, offset );
 }
 
-static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data ) {
-	if (offset < 0x10) offset+= cpustate->PS0 & 0xf8;
+static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data )
+{
+	UINT8 i;
+	offset &= 0xffff;
+	if (offset < 0x10)
+		cpustate->register_ram[offset + (cpustate->PS0 & 0xF8)] = data;
+
 	memory_write_byte( cpustate->program, offset, data );
+
 	switch (offset)
 	{
 		case 0x10: cpustate->IE0 = data; break;
@@ -83,7 +100,9 @@ static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 
 		case 0x1a: cpustate->CKC = data; break;
 		case 0x1c:
 		case 0x1d: sm8500_get_sp(cpustate); break;
-		case 0x1e: cpustate->PS0 = data; break;
+		case 0x1e: cpustate->PS0 = data;
+				for (i = 0; i < 16; i++)	// refresh register contents in debugger
+					memory_write_byte(cpustate->program, i, sm85cpu_mem_readbyte(cpustate, i)); break;
 		case 0x1f: cpustate->PS1 = data; break;
 	}
 }
@@ -91,15 +110,13 @@ static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 
 
 INLINE UINT16 sm85cpu_mem_readword( sm8500_state *cpustate, UINT32 address )
 {
-	UINT16 value = (UINT16) sm85cpu_mem_readbyte( cpustate, address ) << 8;
-	value |= sm85cpu_mem_readbyte( cpustate, ( address + 1 ) & 0xffff );
-	return value;
+	return (sm85cpu_mem_readbyte( cpustate, address ) << 8) | (sm85cpu_mem_readbyte( cpustate, address+1 ));
 }
 
 INLINE void sm85cpu_mem_writeword( sm8500_state *cpustate, UINT32 address, UINT16 value )
 {
 	sm85cpu_mem_writebyte( cpustate, address, value >> 8 );
-	sm85cpu_mem_writebyte( cpustate, ( address + 1 ) & 0xffff, value & 0xff );
+	sm85cpu_mem_writebyte( cpustate, ++address, value );
 }
 
 static CPU_INIT( sm8500 )
@@ -272,7 +289,7 @@ static CPU_EXECUTE( sm8500 )
 			}
 			if (cpustate->SYS&0x40) memory_write_byte(cpustate->program,0x1c,cpustate->SP>>8);
 			memory_write_byte(cpustate->program,0x1d,cpustate->SP&0xFF);
-			memory_write_byte(cpustate->program,0x1e,cpustate->PS0);
+			sm85cpu_mem_writebyte(cpustate,0x1e,cpustate->PS0);	// need to update debugger
 			memory_write_byte(cpustate->program,0x1f,cpustate->PS1);
 		} else {
 			mycycles = 4;

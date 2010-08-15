@@ -66,9 +66,7 @@ static GAMECOM_DMA gamecom_dma;
 static GAMECOM_TIMER gamecom_timer[2];
 static gamecom_sound_t gamecom_sound;
 
-//static const int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
-
 
 static void gamecom_dma_init(running_machine *machine);
 
@@ -499,14 +497,14 @@ static void gamecom_dma_init(running_machine *machine)
 	case 0x04:
 		/* Extend RAM->VRAM */
 		gamecom_dma.source_width = 64;
-		gamecom_dma.source_bank = (UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
+		gamecom_dma.source_bank = &gamecom_vram[0x4000];
 		gamecom_dma.dest_bank = &gamecom_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
 		gamecom_dma.source_bank = &gamecom_vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		gamecom_dma.dest_width = 64;
-		gamecom_dma.dest_bank = (UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
+		gamecom_dma.dest_bank = &gamecom_vram[0x4000];
 		break;
 	}
 	gamecom_dma.source_current = gamecom_dma.source_width * gamecom_dma.source_y;
