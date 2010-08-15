@@ -550,27 +550,27 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_STR_REGISTER + ARM7_FR12:  sprintf(info->s, "FR12:%08x", ARM7REG(eR12_FIQ) ); break;
         case CPUINFO_STR_REGISTER + ARM7_FR13:  sprintf(info->s, "FR13:%08x", ARM7REG(eR13_FIQ) ); break;
         case CPUINFO_STR_REGISTER + ARM7_FR14:  sprintf(info->s, "FR14:%08x", ARM7REG(eR14_FIQ) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_FSPSR: sprintf(info->s, "FR16:%08x", ARM7REG(eSPSR_FIQ)); break;
+        case CPUINFO_STR_REGISTER + ARM7_FSPSR: sprintf(info->s, "FSPSR:%08x", ARM7REG(eSPSR_FIQ)); break;
 
         /* IRQ Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_IR13:  sprintf(info->s, "IR13:%08x", ARM7REG(eR13_IRQ) ); break;
         case CPUINFO_STR_REGISTER + ARM7_IR14:  sprintf(info->s, "IR14:%08x", ARM7REG(eR14_IRQ) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_ISPSR: sprintf(info->s, "IR16:%08x", ARM7REG(eSPSR_IRQ)); break;
+        case CPUINFO_STR_REGISTER + ARM7_ISPSR: sprintf(info->s, "ESPSR:%08x", ARM7REG(eSPSR_IRQ)); break;
 
         /* Supervisor Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_SR13:  sprintf(info->s, "SR13:%08x", ARM7REG(eR13_SVC) ); break;
         case CPUINFO_STR_REGISTER + ARM7_SR14:  sprintf(info->s, "SR14:%08x", ARM7REG(eR14_SVC) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_SSPSR: sprintf(info->s, "SR16:%08x", ARM7REG(eSPSR_SVC)); break;
+        case CPUINFO_STR_REGISTER + ARM7_SSPSR: sprintf(info->s, "SSPSR:%08x", ARM7REG(eSPSR_SVC)); break;
 
         /* Abort Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_AR13:  sprintf(info->s, "AR13:%08x", ARM7REG(eR13_ABT) ); break;
         case CPUINFO_STR_REGISTER + ARM7_AR14:  sprintf(info->s, "AR14:%08x", ARM7REG(eR14_ABT) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_ASPSR: sprintf(info->s, "AR16:%08x", ARM7REG(eSPSR_ABT)); break;
+        case CPUINFO_STR_REGISTER + ARM7_ASPSR: sprintf(info->s, "SSPSR:%08x", ARM7REG(eSPSR_ABT)); break;
 
         /* Undefined Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_UR13:  sprintf(info->s, "UR13:%08x", ARM7REG(eR13_UND) ); break;
         case CPUINFO_STR_REGISTER + ARM7_UR14:  sprintf(info->s, "UR14:%08x", ARM7REG(eR14_UND) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_USPSR: sprintf(info->s, "UR16:%08x", ARM7REG(eSPSR_UND)); break;
+        case CPUINFO_STR_REGISTER + ARM7_USPSR: sprintf(info->s, "USPSR:%08x", ARM7REG(eSPSR_UND)); break;
     }
 }
 
