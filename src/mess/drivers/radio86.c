@@ -501,11 +501,19 @@ ROM_START( mikron2 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
+ROM_START( kr03 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "kr03-dd17.rf2", 0xf800, 0x0800, CRC(AC2E24D5) SHA1(a1317a261bfd55b3b37109b14d1391308dee04de))
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("kr03-dd12.rf2", 0x0000, 0x0800, CRC(085F4259) SHA1(11c5829b072a00961ad936c26559fb63bf2dc896))
+ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 COMP( 1986, radio86,  0,       0,	radio86,	radio86, radio86,  "<unknown>", "Radio-86RK",	0)
 COMP( 1986, radio16,  radio86, 0,	radio16,	radio86, radio86,  "<unknown>", "Radio-86RK (16K RAM)",	0)
+COMP( 1986, kr03, 	  radio86, 0,	radio86,	radio86, radio86,  "Elektronika", "KR-03",	0)
 COMP( 1986, radio4k,  radio86, 0,	radio86,	radio86, radio86,  "<unknown>", "Radio-86RK (4K ROM)",	0)
 COMP( 1986, radiorom, radio86, 0,	radiorom,	radio86, radio86,  "<unknown>", "Radio-86RK (ROM-Disk)",	0)
 COMP( 1986, radioram, radio86, 0,	radioram,	radio86, radioram, "<unknown>", "Radio-86RK (ROM/RAM Disk)",	0)

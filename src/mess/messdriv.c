@@ -1317,6 +1317,7 @@ const game_driver * const drivers[] =
 	DRIVER( radioram )
 	DRIVER( spektr01 )
 	DRIVER( mikron2 )
+	DRIVER( kr03 )
 	DRIVER( apogee )
 	DRIVER( mikrosha )
 	DRIVER( partner )
