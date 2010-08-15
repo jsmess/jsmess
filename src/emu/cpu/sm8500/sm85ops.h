@@ -1276,7 +1276,11 @@ logerror( "%04X: unk%02x\n", cpustate->PC-1,op );
 	break;
 case 0x5B:	/* unk5B - 6,7,11,8,7 cycles */
 logerror( "%04X: unk%02x\n", cpustate->PC-1,op );
-	ARG_ad16;
+/* NOTE: This unknown command is used in several carts, the code below allows those carts to boot */
+	ARG_iR;
+	r1 = r2 & 7;
+	res = sm85cpu_mem_readbyte( cpustate, r1 ) + 1;
+	sm85cpu_mem_writebyte( cpustate, r1, res );
 	mycycles += 6;
 	break;
 case 0x5C:	/* DIV RRr,RRs - 47 cycles - Flags affected: -Z-V---- */
