@@ -27,6 +27,18 @@
     - tune cassette trigger level
     - accurate video timing
 
+	10 SCREEN 2,1,1:CLS
+	20 FOR X=0 TO 8
+	30 LINE(X*24,0)-(X*24+16,191),X,BF
+	40 NEXT
+
+	10 SCREEN3,1,1:COLOR,,1:CLS
+	20 X1=INT(RND(1)*256):Y1=INT(RND(1)*192):X2=INT(RND(1)*256):Y2=INT(RND(1)*192):C=INT(RND(1)*4)+1:LINE(X1,Y1)-(X2,Y2),C:GOTO 20
+	RUN
+
+
+	10 SCREEN2,1,1:CLS:FORX=0TO8:LINE(X*24,0)-(X*24+16,191),X,BF:NEXT
+
 */
 
 #include "emu.h"
@@ -87,8 +99,8 @@ static WRITE8_HANDLER( port40_w )
         2       MC6847 INT/EXT
         3       centronics strobe
         4
-        5       MC6847
-        6       MC6847
+        5       MC6847 GM1
+        6       MC6847 GM0
         7       MC6847 A/G
 
     */
@@ -98,16 +110,16 @@ static WRITE8_HANDLER( port40_w )
 	/* cassette output */
 	cassette_output(state->cassette, BIT(data, 0) ? -1.0 : +1.0);
 
-	/* internal/external character generator */
-	mc6847_intext_w(state->mc6847, BIT(data, 2));
-
 	/* cassette motor */
 	cassette_change_state(state->cassette, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* centronics strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 3));
 
-	/* alphanumerics/graphics */
+	/* MC6847 */
+	mc6847_intext_w(state->mc6847, BIT(data, 2));
+	mc6847_gm0_w(state->mc6847, BIT(data, 5));
+	mc6847_gm1_w(state->mc6847, BIT(data, 6));
 	mc6847_ag_w(state->mc6847, BIT(data, 7));
 }
 
@@ -418,7 +430,7 @@ static MACHINE_DRIVER_START( ntsc )
     MDRV_PALETTE_LENGTH(16)
 
 	MDRV_MC6847_ADD(MC6847_TAG, mc6847_intf)
-    MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+    MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC) // actually M5C6847P-1
 	MDRV_MC6847_CHAR_ROM(phc25_char_rom_r)
 
 	MDRV_VIDEO_START(ntsc)
