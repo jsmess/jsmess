@@ -90,15 +90,21 @@ static PALETTE_INIT( gamecom )
 	}
 }
 
+static INTERRUPT_GEN( gamecom_interrupt )
+{
+	cputag_set_input_line(device->machine, "maincpu", LCDC_INT, ASSERT_LINE );
+}
+
 static MACHINE_DRIVER_START( gamecom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
+	MDRV_CPU_VBLANK_INT("screen", gamecom_interrupt)
 
 	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE( 59.732155 )
-	MDRV_SCREEN_VBLANK_TIME(0)
+	MDRV_SCREEN_VBLANK_TIME(500)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( gamecom )
