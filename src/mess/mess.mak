@@ -1145,7 +1145,6 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MAME_VIDEO)/snes.o		\
 	$(MESS_MACHINE)/snescart.o	\
 	$(MESS_DRIVERS)/snes.o		\
-	$(MESS_DRIVERS)/rsptest.o	\
 	$(MESS_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/n64.o		\
 	$(MAME_VIDEO)/n64.o		\
