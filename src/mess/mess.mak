@@ -1145,6 +1145,7 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MAME_VIDEO)/snes.o		\
 	$(MESS_MACHINE)/snescart.o	\
 	$(MESS_DRIVERS)/snes.o		\
+	$(MESS_DRIVERS)/rsptest.o	\
 	$(MESS_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/n64.o		\
 	$(MAME_VIDEO)/n64.o		\
@@ -1242,6 +1243,10 @@ $(MESSOBJ)/pel.a:				\
 
 $(MESSOBJ)/philips.a:			\
 	$(MESS_DRIVERS)/cdi.o		\
+	$(MESS_MACHINE)/cdi070.o	\
+	$(MESS_MACHINE)/cdicdic.o	\
+	$(MESS_MACHINE)/cdislave.o	\
+	$(MESS_VIDEO)/mcd212.o		\
 	$(MESS_VIDEO)/p2000m.o		\
 	$(MESS_DRIVERS)/p2000t.o	\
 	$(MESS_MACHINE)/p2000t.o	\
