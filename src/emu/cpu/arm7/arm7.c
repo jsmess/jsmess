@@ -565,7 +565,7 @@ CPU_GET_INFO( arm7 )
         /* Abort Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_AR13:  sprintf(info->s, "AR13:%08x", ARM7REG(eR13_ABT) ); break;
         case CPUINFO_STR_REGISTER + ARM7_AR14:  sprintf(info->s, "AR14:%08x", ARM7REG(eR14_ABT) ); break;
-        case CPUINFO_STR_REGISTER + ARM7_ASPSR: sprintf(info->s, "SSPSR:%08x", ARM7REG(eSPSR_ABT)); break;
+        case CPUINFO_STR_REGISTER + ARM7_ASPSR: sprintf(info->s, "ASPSR:%08x", ARM7REG(eSPSR_ABT)); break;
 
         /* Undefined Mode Shadowed Registers */
         case CPUINFO_STR_REGISTER + ARM7_UR13:  sprintf(info->s, "UR13:%08x", ARM7REG(eR13_UND) ); break;
