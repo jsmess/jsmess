@@ -64,7 +64,7 @@ void archimedes_request_irq_b(running_machine *machine, int mask)
 
 	if (ioc_regs[10] & mask)
 	{
-		cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE); //TODO: was PULSE_LINE before
+		generic_pulse_irq_line(machine->device("maincpu"), ARM_IRQ_LINE);
 	}
 }
 
@@ -74,7 +74,7 @@ void archimedes_request_fiq(running_machine *machine, int mask)
 
 	if (ioc_regs[14] & mask)
 	{
-		cputag_set_input_line(machine, "maincpu", ARM_FIRQ_LINE, HOLD_LINE); //TODO: was PULSE_LINE before
+		generic_pulse_irq_line(machine->device("maincpu"), ARM_FIRQ_LINE);
 	}
 }
 
