@@ -35,6 +35,7 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
+#include "machine/i2cmem.h"
 
 static VIDEO_START( a310 )
 {
@@ -210,13 +211,23 @@ static const wd17xx_interface a310_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+#define	NVRAM_SIZE 1024
+#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+};
+
 static MACHINE_DRIVER_START( a310 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(a310_mem)
 
-	MDRV_MACHINE_RESET( a310 )
 	MDRV_MACHINE_START( a310 )
+	MDRV_MACHINE_RESET( a310 )
+
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
