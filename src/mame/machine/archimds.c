@@ -53,10 +53,13 @@ emu_timer  *vbl_timer;
 
 #define CONTROL			0
 #define IRQ_STATUS_A 	4
+#define IRQ_REQUEST_A   5
 #define IRQ_MASK_A 		6
 #define IRQ_STATUS_B	8
+#define IRQ_REQUEST_B   9
 #define IRQ_MASK_B		10
 #define FIQ_STATUS		12
+#define FIQ_REQUEST     13
 #define FIQ_MASK		14
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
@@ -367,8 +370,29 @@ READ32_HANDLER(archimedes_ioc_r)
 			case IRQ_STATUS_A:
 				return (ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
 
+			case IRQ_REQUEST_A:
+				return (ioc_regs[IRQ_STATUS_A] & ioc_regs[IRQ_MASK_A]);
+
+			case IRQ_MASK_A:
+				return (ioc_regs[IRQ_MASK_A]);
+
+			case IRQ_STATUS_B:
+				return (ioc_regs[IRQ_STATUS_B]);
+
+			case IRQ_REQUEST_B:
+				return (ioc_regs[IRQ_STATUS_B] & ioc_regs[IRQ_MASK_B]);
+
+			case IRQ_MASK_B:
+				return (ioc_regs[IRQ_MASK_B]);
+
 			case FIQ_STATUS:
 				return (ioc_regs[FIQ_STATUS] & 0x7f) | 0x80; // Force FIQ is always '1'
+
+			case FIQ_REQUEST:
+				return (ioc_regs[FIQ_STATUS] & ioc_regs[FIQ_MASK]);
+
+			case FIQ_MASK:
+				return (ioc_regs[FIQ_MASK]);
 
 			case 16:	// timer 0 read
 				return ioc_timerout[0]&0xff;
@@ -597,6 +621,9 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		b = (val & 0x0f00) >> 8;
 		g = (val & 0x00f0) >> 4;
 		r = (val & 0x000f) >> 0;
+
+		if(reg == 0x40 && val & 0xfff)
+			logerror("WARNING: border color write here!\n");
 
 		palette_set_color_rgb(space->machine, reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 	}
