@@ -24,6 +24,7 @@
 static UINT8 vidc20_pal_index;
 static UINT16 vidc20_horz_reg[0x10],vidc20_vert_reg[0x10];
 static UINT8 vidc20_bpp_mode;
+static emu_timer *flyback_timer;
 
 static const char *const vidc20_regnames[] =
 {
@@ -217,6 +218,14 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			vidc20_vert_reg[vert_reg] = data & 0x1fff;
 			if(vert_reg == 0 || vert_reg == 2 || vert_reg == 5)
 				vidc20_dynamic_screen_change(space->machine);
+
+			if(vert_reg == 4)
+			{
+				if(vidc20_vert_reg[VDER] != 0)
+					timer_adjust_oneshot(flyback_timer, space->machine->primary_screen->time_until_pos(vidc20_vert_reg[VDER]),0);
+				else
+					timer_adjust_oneshot(flyback_timer, attotime_never,0);
+			}
 
 			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_vert_regnames[vert_reg],val,val);
 
@@ -517,8 +526,14 @@ static const char *const iomd_regnames[] =
 #define IOMD_T0GO		0x048/4
 #define IOMD_T0LATCH	0x04c/4
 
+#define IOMD_T1LOW		0x050/4
+#define IOMD_T1HIGH 	0x054/4
+#define IOMD_T1GO		0x058/4
+#define IOMD_T1LATCH	0x05c/4
+
 #define IOMD_ID0 		0x094/4
 #define IOMD_ID1 		0x098/4
+#define IOMD_VERSION	0x09c/4
 
 #define IOMD_VIDCUR		0x1d0/4
 #define IOMD_VIDEND		0x1d4/4
@@ -557,13 +572,22 @@ static TIMER_CALLBACK( IOMD_timer0_callback )
 
 static TIMER_CALLBACK( IOMD_timer1_callback )
 {
-	/*
-	PS7500_IO[IRQSTA]|=0x40;
-	if(PS7500_IO[IRQMSKA]&0x40)
+	IRQ_status_A|=0x40;
+	if(IRQ_mask_A&0x40)
 	{
 		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
 	}
-	*/
+}
+
+static TIMER_CALLBACK( flyback_timer_callback )
+{
+	IRQ_status_A|=0x08;
+	if(IRQ_mask_A&0x08)
+	{
+		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+	}
+
+	timer_adjust_oneshot(flyback_timer, machine->primary_screen->time_until_pos(vidc20_vert_reg[VDER]),0);
 }
 
 static void viddma_transfer_start(const address_space *space)
@@ -594,9 +618,13 @@ static READ32_HANDLER( a7000_iomd_r )
 	{
 		case IOMD_IOCR:
 		{
-			static UINT8 vblank = input_port_read(space->machine, "VBLANK") & 0x80;
+			static UINT8 flyback;
+			int vert_pos;
 
-			return IOMD_IO_ctrl | 0x34 | vblank;
+			vert_pos = space->machine->primary_screen->vpos();
+			flyback = (vert_pos <= vidc20_vert_reg[VDSR] || vert_pos >= vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
+
+			return IOMD_IO_ctrl | 0x34 | flyback;
 		}
 		case IOMD_KBDCR: 	return IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
 
@@ -617,8 +645,12 @@ static READ32_HANDLER( a7000_iomd_r )
 		case IOMD_T0LOW:	return timer_out[0] & 0xff;
 		case IOMD_T0HIGH:	return (timer_out[0] >> 8) & 0xff;
 
+		case IOMD_T1LOW:	return timer_out[1] & 0xff;
+		case IOMD_T1HIGH:	return (timer_out[1] >> 8) & 0xff;
+
 		case IOMD_ID0: 		return io_id & 0xff; // IOMD ID low
 		case IOMD_ID1: 		return (io_id >> 8) & 0xff; // IOMD ID high
+		case IOMD_VERSION:	return 0;
 
 		case IOMD_VIDEND: 	return (viddma_addr_end & 0x00fffff8); //bits 31:24 undefined
 		case IOMD_VIDSTART: return (viddma_addr_start & 0x1ffffff8); //bits 31, 30, 29 undefined
@@ -666,6 +698,26 @@ static WRITE32_HANDLER( a7000_iomd_w )
 			}
 			break;
 
+		case IOMD_T1LOW: 	timer_in[1] = (timer_in[1] & 0xff00) | (data & 0xff); break;
+		case IOMD_T1HIGH: 	timer_in[1] = (timer_in[1] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T1GO:
+			timer_counter[1] = timer_in[1];
+			fire_iomd_timer(1,timer_counter[1]);
+			break;
+		case IOMD_T1LATCH:
+			{
+				static UINT8 readinc;
+				readinc^=1;
+				timer_out[1] = timer_counter[1];
+				if(readinc)
+				{
+					timer_counter[1]--;
+					if(timer_counter[1] < 0)
+						timer_counter[1]+= timer_in[1];
+				}
+			}
+			break;
+
 		case IOMD_VIDEND: 	viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
 		case IOMD_VIDSTART: viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
 		case IOMD_VIDCR:
@@ -701,14 +753,13 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
-	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 static MACHINE_START(a7000)
 {
 	IOMD_timer[0] = timer_alloc(machine, IOMD_timer0_callback, NULL);
 	IOMD_timer[1] = timer_alloc(machine, IOMD_timer1_callback, NULL);
+	flyback_timer = timer_alloc(machine, flyback_timer_callback, NULL);
 
 	io_id = 0xd4e7;
 }
@@ -723,24 +774,14 @@ static MACHINE_RESET(a7000)
 
 	timer_adjust_oneshot( IOMD_timer[0], attotime_never, 0);
 	timer_adjust_oneshot( IOMD_timer[1], attotime_never, 0);
+	timer_adjust_oneshot( flyback_timer, attotime_never, 0);
 }
-
-static INTERRUPT_GEN( flyback_irq )
-{
-	IRQ_status_A|=0x08;
-	if(IRQ_mask_A&0x08)
-	{
-		generic_pulse_irq_line(device, ARM7_IRQ_LINE);
-	}
-}
-
 
 static MACHINE_DRIVER_START( a7000 )
 
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )
-	MDRV_CPU_PROGRAM_MAP( a7000_mem)
-	MDRV_CPU_VBLANK_INT( "screen", flyback_irq )
+	MDRV_CPU_PROGRAM_MAP(a7000_mem)
 
 	MDRV_MACHINE_START( a7000 )
 	MDRV_MACHINE_RESET( a7000 )
