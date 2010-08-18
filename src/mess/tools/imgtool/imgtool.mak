@@ -80,7 +80,8 @@ IMGTOOL_LIB_OBJS =					\
 	$(IMGTOOL_MODULES)/thomson.o			\
 	$(IMGTOOL_MODULES)/macutil.o			\
 	$(IMGTOOL_MODULES)/cybiko.o			\
-	$(IMGTOOL_MODULES)/cybikoxt.o
+	$(IMGTOOL_MODULES)/cybikoxt.o		\
+	$(IMGTOOL_MODULES)/psion.o		\
 #	$(IMGTOOLOBJ)/tstsuite.o			\
 #	$(MESS_FORMATS)/fmsx_cas.o			\
 #	$(MESS_FORMATS)/svi_cas.o			\

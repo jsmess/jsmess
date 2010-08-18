@@ -111,5 +111,6 @@ MODULE(thom_qd_basic)
 MODULE(thom_sap_basic)
 MODULE(cybiko)
 MODULE(cybikoxt)
+MODULE(psion)
 
 #endif /* MODULES_RECURSIVE */
