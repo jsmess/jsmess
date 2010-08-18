@@ -537,6 +537,7 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_DRIVERS)/a310.o		\
 	$(MESS_DRIVERS)/a7000.o		\
 	$(MAME_MACHINE)/archimds.o	\
+	$(MAME_VIDEO)/archimds.o	\
 	$(MESS_DRIVERS)/z88.o		\
 	$(MESS_VIDEO)/z88.o			\
 	$(MESS_DRIVERS)/atom.o		\

@@ -41,45 +41,18 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
+static UINT32 ioc_timercnt[4], ioc_timerout[4];
+static UINT32 vidc_vidstart, vidc_vidend, vidc_vidinit;
+static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
+static UINT8 video_dma_on;
+UINT8 i2c_clk;
 INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
-static UINT32 ioc_timercnt[4], ioc_timerout[4];
-static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
-UINT8 i2c_clk;
+UINT8 vidc_bpp_mode;
 
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
-
-#define CONTROL			0
-#define IRQ_STATUS_A 	4
-#define IRQ_REQUEST_A   5
-#define IRQ_MASK_A 		6
-#define IRQ_STATUS_B	8
-#define IRQ_REQUEST_B   9
-#define IRQ_MASK_B		10
-#define FIQ_STATUS		12
-#define FIQ_REQUEST     13
-#define FIQ_MASK		14
-
-
-#define VIDC_HCR		0x80
-#define VIDC_HSWR		0x84
-#define VIDC_HBSR		0x88
-#define VIDC_HDSR		0x8c
-#define VIDC_HDER		0x90
-#define VIDC_HBER		0x94
-#define VIDC_HCSR		0x98
-#define VIDC_HIR		0x9c
-
-#define VIDC_VCR		0xa0
-#define VIDC_VSWR		0xa4
-#define VIDC_VBSR		0xa8
-#define VIDC_VDSR		0xac
-#define VIDC_VDER		0xb0
-#define VIDC_VBER		0xb4
-#define VIDC_VCSR		0xb8
-#define VIDC_VCER		0xbc
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
@@ -132,13 +105,24 @@ static TIMER_CALLBACK( vidc_vblank )
 
 	// set up for next vbl
 	timer_adjust_oneshot(vbl_timer, machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
+
+	/* TODO: timing of this isn't currently handled */
+	if(video_dma_on)
+	{
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		static UINT8 *vram = memory_region(machine,"vram");
+		int i;
+
+		for(i=0;i<(vidc_vidend-vidc_vidstart);i++)
+			vram[i] = (memory_read_byte(space,vidc_vidstart+i));
+	}
 }
 
 static TIMER_CALLBACK( a310_audio_tick )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	dac_signed_data_w(space->machine->device("dac"), 0x80 | (memory_read_byte(space,vidc_sndcur)));
+	dac_signed_data_w(space->machine->device("dac"), (memory_read_byte(space,vidc_sndcur)));
 
 	vidc_sndcur++;
 
@@ -710,6 +694,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		}
 
 	}
+	else if(reg == 0xe0)
+	{
+		vidc_bpp_mode = ((val & 0xc) >> 2);
+	}
 	else
 	{
 		logerror("VIDC: %x to register %x\n", val, reg);
@@ -729,6 +717,18 @@ WRITE32_HANDLER(archimedes_memc_w)
 	{
 		switch ((data >> 17) & 7)
 		{
+			case 0: /* video init */
+				vidc_vidinit = ((data>>2)&0x7fff)*16;
+				break;
+
+			case 1: /* video start */
+				vidc_vidstart = ((data>>2)&0x7fff)*16;
+				break;
+
+			case 2: /* video end */
+				vidc_vidend = ((data>>2)&0x7fff)*16;
+				break;
+
 			case 4:	/* sound start */
 				vidc_sndstart = ((data>>2)&0x7fff)*16;
 				break;
@@ -742,12 +742,14 @@ WRITE32_HANDLER(archimedes_memc_w)
 
 				logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
+				video_dma_on = ((data>>10)&1);
+
 				if ((data>>11)&1)
 				{
 					double sndhz;
 
 					/* FIXME: is the frequency correct? */
-					sndhz = (125000.0 / 2) / (double)((vidc_regs[0xc0]&0xff)+2);
+					sndhz = (250000.0) / (double)((vidc_regs[0xc0]&0xff)+2);
 
 					logerror("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 

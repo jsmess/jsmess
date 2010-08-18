@@ -37,17 +37,6 @@
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
 
-static VIDEO_START( a310 )
-{
-}
-
-static VIDEO_UPDATE( a310 )
-{
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
-
-	return 0;
-}
-
 static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
 {
 	if (state)
@@ -84,7 +73,7 @@ static MACHINE_RESET( a310 )
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
@@ -233,13 +222,13 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 0*16, 16*16 - 1)
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(a310)
-	MDRV_VIDEO_UPDATE(a310)
+	MDRV_VIDEO_START(archimds_vidc)
+	MDRV_VIDEO_UPDATE(archimds_vidc)
 
 	MDRV_SPEAKER_STANDARD_MONO("a310")
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -262,7 +251,7 @@ ROM_START(a310)
 	ROM_SYSTEM_BIOS( 2, "200", "RiscOS 2.0 (05 Oct 1988)" )
 	ROMX_LOAD( "riscos2.bin",  0x000000, 0x080000, CRC(89c4ad36) SHA1(b82a78830dac386f9b649b6d32a34f9c6910546d), ROM_BIOS(3) )
 
-	ROM_REGION( 0x00800, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT     INIT   COMPANY  FULLNAME */
