@@ -384,13 +384,18 @@ static int load_psf( running_device *cpu, unsigned char *p_n_file, int n_len )
 	return n_return;
 }
 
+DIRECT_UPDATE_HANDLER( psx_default )
+{
+	return address;
+}
+
 DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
 		running_device *cpu = machine->device("maincpu");
 
-		//cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
 
 		if( load_psxexe( cpu, exe_buffer, exe_size ) ||
 			load_cpe( cpu, exe_buffer, exe_size ) ||

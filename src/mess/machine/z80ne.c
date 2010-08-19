@@ -199,6 +199,10 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 	}
 }
 
+DIRECT_UPDATE_HANDLER( z80ne_default )
+{
+	return address;
+}
 /*
  * Handle NMI delay for single step instruction
  */
@@ -208,7 +212,7 @@ DIRECT_UPDATE_HANDLER( nmi_delay_count )
 
 	if (!nmi_delay_counter)
 	{
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));		
 		cputag_set_input_line(machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
@@ -231,7 +235,7 @@ DIRECT_UPDATE_HANDLER( reset_delay_count )
 	if (!reset_delay_counter)
 	{
 		/* remove this callback */
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 		/* and switch to RAM bank at address 0x0000 */
 		memory_set_bank( space->machine, "bank1", 0 ); /* RAM at 0x0000 (bank 1) */
 	}
@@ -282,7 +286,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 1);  /* ep548 at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 	    break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
@@ -291,7 +295,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 1);  /* ep390 at 0xF000 */
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 	    break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
@@ -300,7 +304,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 2);  /* ep1390 at 0xF000 */
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 	    break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
@@ -309,7 +313,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 3);  /* ep2390 at 0xF000 */
-		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 	    break;
 	}
 
