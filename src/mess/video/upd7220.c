@@ -984,7 +984,7 @@ static void draw_graphics_line(running_device *device, bitmap_t *bitmap, UINT32 
 
 	for (sx = 0; sx < upd7220->aw; sx++)
 	{
-		UINT16 data = memory_raw_read_word(space, addr & 0x3ffff);
+		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff);
 		upd7220->display_func(device, bitmap, y, sx << 4, addr, data);
 		if (wd) addr += 2; else addr++;
 	}
