@@ -1381,11 +1381,21 @@ MACHINE_RESET( pcjr )
 {
 	running_device *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
-	memset(st,0,sizeof(st));
 	st->u73_q2 = 0;
 	st->out1 = 0;
 	st->pc_spkrdata = 0;
 	st->pc_input = 0;
+	st->dma_channel = 0;
+	memset(st->dma_offset,0,sizeof(st->dma_offset));
+	st->ppi_portc_switch_high = 0;
+	st->ppi_speaker = 0;
+	st->ppi_keyboard_clear = 0;
+	st->ppi_keyb_clock = 0;
+	st->ppi_portb = 0;
+	st->ppi_clock_signal = 0;
+	st->ppi_data_signal = 0;
+	st->ppi_shift_register = 0;
+	st->ppi_shift_enable = 0;
 	pc_mouse_set_serial_port( machine->device("ins8250_0") );
 	pc_hdc_set_dma8237_device( st->dma8237 );
 	speaker_level_w( speaker, 0 );
