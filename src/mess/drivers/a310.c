@@ -73,7 +73,7 @@ static MACHINE_RESET( a310 )
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
@@ -223,8 +223,8 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 16*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 0*16, 16*16 - 1)
+	MDRV_SCREEN_SIZE(1280, 1024) //TODO: default screen size
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 1280 - 1, 0*16, 1024 - 1)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(archimds_vidc)
