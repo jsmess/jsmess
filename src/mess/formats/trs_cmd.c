@@ -57,7 +57,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-			ptr = memory_get_write_ptr(program, address);
+			ptr = program->get_write_ptr(address);
 			image.fread( ptr, block_length);
 			}
 			break;

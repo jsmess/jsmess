@@ -1408,7 +1408,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
     address_space *space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
 
-    addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
+    addr_ptr = (UINT8*)space->get_read_ptr(curpc);
 
     if(DEBUG_SET(DECODE_BIOS))
         if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
@@ -1753,7 +1753,7 @@ void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
     addr=((ds<<4)+si);
     OUTPUT_SEGOFS("DS:SI",ds,si);
 
-    return memory_get_read_ptr(space, addr);
+    return space->get_read_ptr(addr);
 }
 
 static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si)
@@ -1768,7 +1768,7 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
     area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
 
     OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
-    brush=(t_nimbus_brush  *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
+    brush=(t_nimbus_brush  *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
 
     logerror("Brush params\n");
     logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
@@ -1779,7 +1779,7 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
 
     OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
 
-    addr_ptr = (UINT16 *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
+    addr_ptr = (UINT16 *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
         logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
@@ -1801,7 +1801,7 @@ static void decode_dssi_f_plot_character_string(running_device *device,UINT16  d
 
     logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
 
-    char_ptr=(UINT8*)memory_get_read_ptr(space, LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
+    char_ptr=(UINT8*)space->get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
     if (plot_string_params->length==0xFFFF)
         logerror("%s",char_ptr);

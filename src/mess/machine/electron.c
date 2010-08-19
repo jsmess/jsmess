@@ -266,7 +266,7 @@ WRITE8_HANDLER( electron_ula_w )
 		electron_ula.screen_mode = ( data >> 3 ) & 0x07;
 		electron_ula.screen_base = electron_screen_base[ electron_ula.screen_mode ];
 		electron_ula.screen_size = 0x8000 - electron_ula.screen_base;
-		electron_ula.vram = (UINT8 *)memory_get_read_ptr( space, electron_ula.screen_base );
+		electron_ula.vram = (UINT8 *)space->get_read_ptr(electron_ula.screen_base );
 		logerror( "ULA: screen mode set to %d\n", electron_ula.screen_mode );
 		electron_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		cassette_change_state( cassette_device_image( space->machine ), electron_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
@@ -336,7 +336,7 @@ static void electron_reset(running_machine &machine)
 	electron_ula.screen_size = 0x8000 - 0x3000;
 	electron_ula.screen_addr = 0;
 	electron_ula.tape_running = 0;
-	electron_ula.vram = (UINT8 *)memory_get_read_ptr(cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM), electron_ula.screen_base);
+	electron_ula.vram = (UINT8 *)cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(electron_ula.screen_base);
 }
 
 MACHINE_START( electron )

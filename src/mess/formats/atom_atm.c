@@ -26,7 +26,7 @@
 
 static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = memory_get_write_ptr(cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
+	void *ptr = cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM)->get_write_ptr(addr);
 
 	image.fread( ptr, count);
 }

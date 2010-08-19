@@ -1509,7 +1509,7 @@ MACHINE_RESET( sms )
 	if (sms_state.has_fm)
 		sms_state.fm_detect = 0x01;
 
-	sms_state.mapper_ram = (UINT8*)memory_get_write_ptr(space, 0xdffc);
+	sms_state.mapper_ram = (UINT8*)space->get_write_ptr(0xdffc);
 
 	sms_state.bios_port = 0;
 

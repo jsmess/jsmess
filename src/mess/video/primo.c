@@ -23,7 +23,7 @@ static void primo_draw_scanline(running_machine *machine,bitmap_t *bitmap, int p
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, primo_scanline, 0);
 
 	/* address of current line in Primo video memory */
-	const UINT8* primo_video_ram_line = (const UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), primo_video_memory_base + 32 * primo_scanline);
+	const UINT8* primo_video_ram_line = (const UINT8*)cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(primo_video_memory_base + 32 * primo_scanline);
 
 	for (x=0; x<256; x+=8)
 	{

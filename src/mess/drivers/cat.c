@@ -317,7 +317,7 @@ static VIDEO_UPDATE( cat )
 
 static TIMER_CALLBACK( swyft_reset )
 {
-	memset(memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe2341), 0xff, 1);
+	memset(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
 }
 
 static MACHINE_START(swyft)

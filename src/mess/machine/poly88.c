@@ -293,7 +293,7 @@ SNAPSHOT_LOAD( poly88 )
 		switch(recordType) {
 			case 0 :
 					/* 00 Absolute */
-					memcpy(memory_get_read_ptr(space,address ), data + pos ,recordLen);
+					memcpy(space->get_read_ptr(address ), data + pos ,recordLen);
 					break;
 			case 1 :
 					/* 01 Comment */

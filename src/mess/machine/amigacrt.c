@@ -89,7 +89,7 @@ static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 static void amiga_ar1_nmi( running_machine *machine )
 {
 	/* get the cart's built-in ram */
-	UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000);
+	UINT16 *ar_ram = (UINT16 *)cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_write_ptr(0x9fc000);
 
 	if ( ar_ram != NULL )
 	{
@@ -261,7 +261,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 	if ( ((pc >> 16) & 0xfe ) != 0x40 )
 	{
 		/* get the cart's built-in ram */
-		UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000);
+		UINT16 *ar_ram = (UINT16 *)cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_write_ptr(0x440000);
 
 		if ( ar_ram != NULL )
 		{

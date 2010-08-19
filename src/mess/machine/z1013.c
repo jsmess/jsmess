@@ -87,7 +87,7 @@ SNAPSHOT_LOAD( z1013 )
 	if (data[12]!='C') return IMAGE_INIT_FAIL;
 	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return IMAGE_INIT_FAIL;
 
-	memcpy (memory_get_read_ptr(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
+	memcpy (cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(startaddr),
 		 data+0x20, endaddr - startaddr + 1);
 
 	cpu_set_reg(image.device().machine->device("maincpu"), Z80_PC, runaddr);

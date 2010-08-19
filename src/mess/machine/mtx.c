@@ -374,9 +374,9 @@ SNAPSHOT_LOAD( mtx )
 	{
 		/* long header */
 		addr = pick_integer_le(header, 16, 2);
-		void *ptr = memory_get_write_ptr(program, addr);
+		void *ptr = program->get_write_ptr(addr);
 		image.fread( ptr, 599);
-		ptr = memory_get_write_ptr(program, 0xc000);
+		ptr = program->get_write_ptr(0xc000);
 		image.fread( ptr, snapshot_size - 599 - 18);
 	}
 	else
@@ -384,9 +384,9 @@ SNAPSHOT_LOAD( mtx )
 		/* short header */
 		addr = pick_integer_le(header, 0, 2);
 		image.fseek(4, SEEK_SET);
-		void *ptr = memory_get_write_ptr(program, addr);
+		void *ptr = program->get_write_ptr(addr);
 		image.fread( ptr, 599);
-		ptr = memory_get_write_ptr(program, 0xc000);
+		ptr = program->get_write_ptr(0xc000);
 		image.fread( ptr, snapshot_size - 599 - 4);
 	}
 
