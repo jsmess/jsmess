@@ -37,13 +37,12 @@
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
+DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	if (state->ram_at_0000 && address == 0x66)
 	{
-		direct->raw = direct->decrypted = &state->df_on_databus;
-		direct->bytemask = 0;
+		direct.explicit_configure(0x66, 0x66, 0, &state->df_on_databus);			
 		return ~0;
 	}
 	return address;
@@ -505,7 +504,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), elwro800_direct_handler);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, *machine));
 }
 
 static const cassette_config elwro800jr_cassette_config =

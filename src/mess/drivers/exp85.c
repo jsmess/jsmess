@@ -177,7 +177,7 @@ static I8085_CONFIG( exp85_i8085_config )
 static MACHINE_START( exp85 )
 {
 	exp85_state *state = machine->driver_data<exp85_state>();
-	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");

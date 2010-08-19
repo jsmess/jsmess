@@ -145,7 +145,7 @@ static int apple1_kbd_data = 0;
 
 DRIVER_INIT( apple1 )
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	memory_install_readwrite_bank(space,0x0000, messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
 	memory_set_bankptr(machine,"bank1", messram_get_ptr(machine->device("messram")));
@@ -257,7 +257,8 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		memory_write_byte(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr, *snapptr);
+		cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM)->write_byte(addr, *snapptr);
+		
 
 	return IMAGE_INIT_PASS;
 }
@@ -520,7 +521,7 @@ READ8_HANDLER( apple1_cassette_r )
            always comes from the corresponding cassette ROM location
            in $C100-$C17F. */
 
-		return memory_read_byte(space, 0xc100 + offset);
+		return space->read_byte(0xc100 + offset);
 	}
     else
 	{
@@ -538,9 +539,9 @@ READ8_HANDLER( apple1_cassette_r )
            because it can cause tape header bits on real cassette
            images to be misread as data bits.) */
 		if (cassette_input(cassette_device_image(space->machine)) > 0.0)
-			return memory_read_byte(space, 0xc100 + (offset & ~1));
+			return space->read_byte(0xc100 + (offset & ~1));
 		else
-			return memory_read_byte(space, 0xc100 + offset);
+			return space->read_byte(0xc100 + offset);
 	}
 }
 

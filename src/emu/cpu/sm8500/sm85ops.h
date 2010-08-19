@@ -488,13 +488,17 @@
 			case 0x0F: /* NC  */ if ( ! (cpustate->PS1 & FLAG_C) ) res = 1; break; \
 			}
 
-#define PUSH8(X)	cpustate->SP--; \
-			if ( ( cpustate->SYS & 0x40 ) == 0 ) cpustate->SP &= 0xFF; \
+#define PUSH8(X)	cpustate->SP = cpustate->SP - 1; \
+			if ( ( cpustate->SYS & 0x40 ) == 0 ) { \
+				cpustate->SP = cpustate->SP & 0xFF; \
+			} \
 			sm85cpu_mem_writebyte( cpustate, cpustate->SP, X );
 
 #define POP8(X)		X = sm85cpu_mem_readbyte( cpustate, cpustate->SP ); \
-			cpustate->SP++; \
-			if ( ( cpustate->SYS & 0x40 ) == 0 ) cpustate->SP &= 0xFF;
+			cpustate->SP = cpustate->SP + 1; \
+			if ( ( cpustate->SYS & 0x40 ) == 0 ) { \
+				cpustate->SP = cpustate->SP & 0xFF; \
+			}
 
 case 0x00:	/* CLR R - 4 cycles - Flags affected: -------- */
 	ARG_R;
@@ -906,7 +910,7 @@ logerror( "%04X: unk%02x\n", cpustate->PC-1,op );
 	break;
 case 0x2E:	/* MOV PS0,#00 - 4 cycles - Flags affected: -------- */
 	ARG_R;
-	cpustate->PS0 = r1;
+	cpustate->PS0 = r1; cpustate->register_base = cpustate->internal_ram + ( r1 & 0xF8 );
         mycycles += 4;
 	break;
 case 0x2F:	/* BTST R,i - 6 cycles - Flags affected: -Z-0---- */
@@ -1276,11 +1280,7 @@ logerror( "%04X: unk%02x\n", cpustate->PC-1,op );
 	break;
 case 0x5B:	/* unk5B - 6,7,11,8,7 cycles */
 logerror( "%04X: unk%02x\n", cpustate->PC-1,op );
-/* NOTE: This unknown command is used in several carts, the code below allows those carts to boot */
-	ARG_iR;
-	r1 = r2 & 7;
-	res = sm85cpu_mem_readbyte( cpustate, r1 ) + 1;
-	sm85cpu_mem_writebyte( cpustate, r1, res );
+	ARG_ad16;
 	mycycles += 6;
 	break;
 case 0x5C:	/* DIV RRr,RRs - 47 cycles - Flags affected: -Z-V---- */

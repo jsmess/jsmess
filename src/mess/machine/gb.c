@@ -206,7 +206,7 @@ static void gb_rom8_6000( running_machine *machine, UINT8 *addr )
 
 static void gb_init(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* Initialize the memory banks */
 	gb_driver_data.MBC1Mode = 0;

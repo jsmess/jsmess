@@ -518,7 +518,7 @@ DRIVER_INIT( microtan )
 {
     UINT8 *dst = memory_region(machine, "gfx2");
     int i;
-    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {

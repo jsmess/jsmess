@@ -239,7 +239,7 @@ static WRITE8_HANDLER(devices_w)
 
 static void pk8020_set_bank(running_machine *machine,UINT8 data)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(data & 0x1F) {
 		case 0x00 :
 					{

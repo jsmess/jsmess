@@ -130,7 +130,7 @@ static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
 static UINT32 debug_dip_status;
-static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y);
+static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y);
 
 UINT64 *dc_framebuffer_ram; // '32-bit access area'
 UINT64 *dc_texture_ram; // '64-bit access area'
@@ -1123,15 +1123,15 @@ WRITE64_HANDLER( pvr_ta_w )
 				{
 					UINT32 st[6];
 
-					st[0]=memory_read_dword(space,(0x05000000+offsetra));
-					st[1]=memory_read_dword(space,(0x05000004+offsetra)); // Opaque List Pointer
-					st[2]=memory_read_dword(space,(0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
-					st[3]=memory_read_dword(space,(0x0500000c+offsetra)); // Translucent List Pointer
-					st[4]=memory_read_dword(space,(0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
+					st[0]=space->read_dword((0x05000000+offsetra));
+					st[1]=space->read_dword((0x05000004+offsetra)); // Opaque List Pointer
+					st[2]=space->read_dword((0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
+					st[3]=space->read_dword((0x0500000c+offsetra)); // Translucent List Pointer
+					st[4]=space->read_dword((0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
 
 					if (sizera == 6)
 					{
-						st[5] = memory_read_dword(space,(0x05000014+offsetra)); // Punch Through List Pointer
+						st[5] = space->read_dword((0x05000014+offsetra)); // Punch Through List Pointer
 						offsetra+=0x18;
 					}
 					else
@@ -1963,7 +1963,7 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 
 static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
 #if 0
@@ -1980,7 +1980,7 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
-	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
+	c=space->read_dword(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	bitmap_fill(bitmap,cliprect,c);
 
 
@@ -2033,7 +2033,7 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 
 */
 
-static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y)
+static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y)
 {
 	// the accumulation buffer is always 8888
 	//
@@ -2073,7 +2073,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+					space->write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2101,7 +2101,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 									((((data & 0x00f80000) >> 19)) << 10);
 					// alpha?
 
-					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+					space->write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2125,7 +2125,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+					space->write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
@@ -2152,7 +2152,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
 
-					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+					space->write_word(realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}

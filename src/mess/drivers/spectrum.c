@@ -322,13 +322,13 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	state->port_fe_data = data;
 }
 
-static DIRECT_UPDATE_HANDLER(spectrum_direct)
+DIRECT_UPDATE_HANDLER(spectrum_direct)
 {
     /* Hack for correct handling 0xffff interrupt vector */
     if (address == 0x0001)
-        if (cpu_get_reg(space->machine->device("maincpu"), STATE_GENPCBASE)==0xffff)
+        if (cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE)==0xffff)
         {
-            cpu_set_reg(space->machine->device("maincpu"), Z80_PC, 0xfff4);
+            cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xfff4);
             return 0xfff4;
         }
     return address;
@@ -622,7 +622,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT( spectrum )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (messram_get_size(machine->device("messram")))
 	{
@@ -636,9 +636,10 @@ DRIVER_INIT( spectrum )
 MACHINE_RESET( spectrum )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_set_direct_update_handler(space, spectrum_direct);
+	space->set_direct_update_handler(direct_update_delegate_create_static(spectrum_direct, *machine));
+	
 	state->port_7ffd_data = -1;
 	state->port_1ffd_data = -1;
 }

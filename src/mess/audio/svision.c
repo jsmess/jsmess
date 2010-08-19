@@ -194,7 +194,7 @@ static STREAM_UPDATE( svision_update )
 			}
 			else
 			{
-				sample = memory_read_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr);
+				sample = cputag_get_address_space(device->machine,"maincpu", ADDRESS_SPACE_PROGRAM)->read_byte(addr);
 			}
 			if (((unsigned)svision_dma.pos) & 1)
 				s = (sample & 0xf);

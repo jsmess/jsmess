@@ -165,8 +165,8 @@ Timming
 /* MAME is unnecessary */
 #define HANDLE_HALT_LINE 0
 
-#define M_RDMEM(A)		memory_read_byte_8le(cpustate->program, A)
-#define M_WRMEM(A,V)	memory_write_byte_8le(cpustate->program, A, V)
+#define M_RDMEM(A)		cpustate->program->read_byte(A)
+#define M_WRMEM(A,V)	cpustate->program->write_byte(A, V)
 #define M_RDOP(A)		memory_decrypted_read_byte(cpustate->program, A)
 #define M_RDOP_ARG(A)	memory_raw_read_byte(cpustate->program, A)
 
@@ -198,7 +198,7 @@ struct _alpha8201_state
 #endif
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 	int inst_cycles;
 };

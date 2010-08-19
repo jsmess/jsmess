@@ -159,7 +159,7 @@ static void bankswitch(running_machine *machine)
 {
 	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	running_device *messram = machine->device("messram");
 	UINT8 *rom = memory_region(machine, Z80_TAG);
 	UINT8 *ram = messram_get_ptr(messram);
@@ -753,6 +753,9 @@ static VIDEO_UPDATE( trs80m2 )
 }
 
 /* Z80-DMA Interface */
+
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dma_intf )
 {

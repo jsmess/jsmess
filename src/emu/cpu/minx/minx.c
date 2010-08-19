@@ -85,12 +85,12 @@ typedef struct {
 	UINT8	interrupt_pending;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 } minx_state;
 
-#define RD(offset)		memory_read_byte_8be( minx->program, offset )
-#define WR(offset,data)	memory_write_byte_8be( minx->program, offset, data )
+#define RD(offset)		minx->program->read_byte( offset )
+#define WR(offset,data)	minx->program->write_byte( offset, data )
 #define GET_MINX_PC		( ( minx->PC & 0x8000 ) ? ( minx->V << 15 ) | (minx->PC & 0x7FFF ) : minx->PC )
 
 INLINE minx_state *get_safe_token(running_device *device)

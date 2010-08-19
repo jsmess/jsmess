@@ -36,7 +36,7 @@ static void fds_irq(running_device *device, int scanline, int vblank, int blanke
 static void init_nes_core( running_machine *machine )
 {
 	nes_state *state = machine->driver_data<nes_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->prg_chunks == 1) ? (2 * 2) : (state->prg_chunks * 2);
 	int i;

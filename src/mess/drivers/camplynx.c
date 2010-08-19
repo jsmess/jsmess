@@ -113,7 +113,7 @@ static WRITE8_HANDLER( lynx48k_bank_w )
 static WRITE8_HANDLER( lynx128k_bank_w )
 {
 	/* get address space */
-	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Set read banks */
 	UINT8 bank = data & 0x0f;
@@ -312,7 +312,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( lynx128k )
 {
-	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_install_read_bank (mem, 0x2000, 0x3fff, 0, 0, "bank2");
 	memory_install_read_bank (mem, 0x4000, 0x5fff, 0, 0, "bank3");

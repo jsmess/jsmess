@@ -194,7 +194,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(spc1000)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank(space, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_install_read_bank(space, 0x8000, 0xffff, 0, 0, "bank3");

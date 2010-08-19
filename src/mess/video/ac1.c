@@ -29,13 +29,13 @@ VIDEO_START( ac1 )
 VIDEO_UPDATE( ac1 )
 {
 	int x,y;
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = memory_read_byte(space, AC1_VIDEO_MEMORY + x + y*64);
+			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
 			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
 		}
 	}
@@ -45,13 +45,13 @@ VIDEO_UPDATE( ac1 )
 VIDEO_UPDATE( ac1_32 )
 {
 	int x,y;
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = memory_read_byte(space, AC1_VIDEO_MEMORY + x + y*64);
+			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
 			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
 		}
 	}

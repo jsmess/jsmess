@@ -259,7 +259,7 @@ MACHINE_START( wscolor )
 
 MACHINE_RESET( wswan )
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( ws_portram, ws_portram_init, 256 );
@@ -728,7 +728,7 @@ WRITE8_HANDLER( wswan_port_w )
 				length = ws_portram[0x46] + (ws_portram[0x47] << 8);
 				for( ; length > 0; length-- )
 				{
-					memory_write_byte(space,  dst, memory_read_byte(space,  src ) );
+					space->write_byte(dst, space->read_byte(src ) );
 					src++;
 					dst++;
 				}
@@ -1485,9 +1485,9 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 		/* TODO: Output sound DMA byte */
-		wswan_port_w( space, 0x89, memory_read_byte(space,  sound_dma.source ) );
+		wswan_port_w( space, 0x89, space->read_byte(sound_dma.source ) );
 		sound_dma.size--;
 		sound_dma.source = ( sound_dma.source + 1 ) & 0x0FFFFF;
 		if ( sound_dma.size == 0 )

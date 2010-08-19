@@ -11,9 +11,9 @@
 #undef G65816_CALL_DEBUGGER
 #define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(cpustate->device, x)
 
-#define g65816_read_8(addr) 			memory_read_byte_8be(cpustate->program, addr)
-#define g65816_write_8(addr,data)		memory_write_byte_8be(cpustate->program, addr,data)
-#define g65816_read_8_immediate(A)		memory_read_byte_8be(cpustate->program, A)
+#define g65816_read_8(addr) 			cpustate->program->read_byte(addr)
+#define g65816_write_8(addr,data)		cpustate->program->write_byte(addr,data)
+#define g65816_read_8_immediate(A)		cpustate->program->read_byte(A)
 #define g65816_jumping(A)
 #define g65816_branching(A)
 
@@ -95,7 +95,7 @@ struct _g65816i_cpu_struct
 	uint irq_delay;		/* delay 1 instruction before checking irq */
 	device_irq_callback int_ack; /* Interrupt Acknowledge */
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	read8_space_func read_vector;	/* Read vector override */
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(g65816i_cpu_struct *cpustate);

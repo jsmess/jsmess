@@ -916,7 +916,7 @@ static TIMER_CALLBACK( mmc1_resync_callback )
 }
 
 
-static void mmc1_set_wram( const address_space *space, int board )
+static void mmc1_set_wram( address_space *space, int board )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = machine->driver_data<nes_state>();
@@ -988,7 +988,7 @@ static void mmc1_set_prg( running_machine *machine )
 	}
 }
 
-static void mmc1_set_prg_wram( const address_space *space, int board )
+static void mmc1_set_prg_wram( address_space *space, int board )
 {
 	mmc1_set_prg(space->machine);
 	mmc1_set_wram(space, board);
@@ -1008,7 +1008,7 @@ static void mmc1_set_chr( running_machine *machine )
 		chr8(machine, (state->mmc_reg[1] & 0x1f) >> 1, state->mmc_chr_source);
 }
 
-static void common_sxrom_write_handler( const address_space *space, offs_t offset, UINT8 data, int board )
+static void common_sxrom_write_handler( address_space *space, offs_t offset, UINT8 data, int board )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = machine->driver_data<nes_state>();
@@ -1205,7 +1205,7 @@ static WRITE8_HANDLER( fxrom_w )
 
  *************************************************************/
 
-static void mmc3_set_wram( const address_space *space )
+static void mmc3_set_wram( address_space *space )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = machine->driver_data<nes_state>();
@@ -4401,7 +4401,7 @@ static WRITE8_HANDLER( agci_50282_w )
 	LOG_MMC(("agci_50282_w, offset: %04x, data: %02x\n", offset, data));
 
 	offset += 0x8000;
-	data |= (memory_read_byte(space, offset) & 1);
+	data |= (space->read_byte(offset) & 1);
 
 	chr8(space->machine, data >> 4, CHRROM);
 	prg32(space->machine, data);
@@ -6436,7 +6436,7 @@ static WRITE8_HANDLER( sachen_74x374a_l_w )
 
  *************************************************************/
 
-static void common_s8259_write_handler( const address_space *space, offs_t offset, UINT8 data, int board )
+static void common_s8259_write_handler( address_space *space, offs_t offset, UINT8 data, int board )
 {
 	nes_state *state = space->machine->driver_data<nes_state>();
 	UINT8 bank_helper1, bank_helper2, shift, add1, add2, add3;
@@ -8589,7 +8589,7 @@ static WRITE8_HANDLER( kof96_l_w )
 	if (!state->mmc_reg[3] && offset > 0x1000)
 	{
 		state->mmc_reg[3] = 1;
-		memory_write_byte(space, 0x4017, 0x40);
+		space->write_byte(0x4017, 0x40);
 	}
 }
 

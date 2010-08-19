@@ -680,7 +680,7 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	int buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 
 	switch(buswidth)
@@ -714,7 +714,7 @@ VIDEO_START( pc_aga )
 
 VIDEO_START( pc200 )
 {
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	int buswidth;
 
 	VIDEO_START_CALL(pc_aga);

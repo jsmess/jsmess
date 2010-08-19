@@ -930,7 +930,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	UINT8 *temp_copy;
 	running_machine *machine = image.device().machine;
 	UINT8 *mem = memory_region(machine, M6502_TAG);
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (image.software_entry() == NULL)
 	{

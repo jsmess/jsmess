@@ -456,16 +456,16 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static int vic20_dma_read_color( running_machine *machine, int offset )
 {
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	return memory_read_byte(program, 0x9400 | (offset & 0x3ff));
+	return program->read_byte(0x9400 | (offset & 0x3ff));
 }
 
 static int vic20_dma_read( running_machine *machine, int offset )
 {
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	return memory_read_byte(program, MOS6560ADDR2VC20ADDR(offset));
+	return program->read_byte(MOS6560ADDR2VC20ADDR(offset));
 }
 
 static UINT8 vic20_lightx_cb( running_machine *machine )
@@ -517,7 +517,7 @@ static const mos6560_interface vic20_6561_intf =
 static MACHINE_START( vic20 )
 {
 	vic20_state *state = machine->driver_data<vic20_state>();
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->via0 = machine->device(M6522_0_TAG);
@@ -556,7 +556,7 @@ static MACHINE_START( vic20 )
 
 static DEVICE_IMAGE_LOAD( vic20_cart )
 {
-	const address_space *program = cputag_get_address_space(image.device().machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(image.device().machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 	const char *filetype = image.filetype();
 	UINT32 address = 0;
 	UINT32 size;

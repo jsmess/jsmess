@@ -163,7 +163,7 @@ WRITE8_HANDLER(kc85_disc_interface_ram_w)
 
 	logerror("interface ram w: %04x %02x\n",addr,data);
 
-	memory_write_byte(space, addr|0x0f000,data);
+	space->write_byte(addr|0x0f000,data);
 }
 
 READ8_HANDLER(kc85_disc_interface_ram_r)
@@ -175,7 +175,7 @@ READ8_HANDLER(kc85_disc_interface_ram_r)
 
 	logerror("interface ram r: %04x\n",addr);
 
-	return memory_read_byte(space, addr|0x0f000);
+	return space->read_byte(addr|0x0f000);
 }
 
 /* 4-bit latch used to reset disc interface etc */
@@ -1117,7 +1117,7 @@ bit 0: ram 4
 
 static void kc85_4_update_0x08000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	unsigned char *ram_page;
 
     if (kc85_pio_data[1] & (1<<5))
@@ -1184,7 +1184,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 /* update status of memory area 0x0000-0x03fff */
 static void kc85_4_update_0x00000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
@@ -1226,7 +1226,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 /* update status of memory area 0x4000-0x07fff */
 static void kc85_4_update_0x04000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* access ram? */
 	if (kc85_86_data & (1<<0))
@@ -1273,7 +1273,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 /* update memory address 0x0c000-0x0e000 */
 static void kc85_4_update_0x0c000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	if (kc85_86_data & (1<<7))
 	{
@@ -1312,7 +1312,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_4_update_0x0e000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	if (kc85_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
@@ -1424,7 +1424,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 /* update memory region 0x0c000-0x0e000 */
 static void kc85_3_update_0x0c000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	if (kc85_pio_data[0] & (1<<7))
 	{
@@ -1445,7 +1445,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_3_update_0x0e000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
@@ -1467,7 +1467,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 for write operations */
 static void kc85_3_update_0x00000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
@@ -1511,7 +1511,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 /* SMH_BANK(3) is used for read, SMH_BANK(8) is used for write */
 static void kc85_3_update_0x08000(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	unsigned char *ram_page;
 
     if (kc85_pio_data[0] & (1<<2))
@@ -1629,7 +1629,7 @@ static int kc85_15khz_count;
 }
 
 #if 0
-static DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
+DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
 {
 	memory_set_direct_update_handler(0,0);
 
@@ -1639,7 +1639,7 @@ static DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
 }
 
 
-static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
+DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 {
 	memory_set_direct_update_handler(0,0);
 

@@ -113,7 +113,7 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 {
 	kc85_state *state = machine->driver_data<kc85_state>();
 
-	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -409,7 +409,7 @@ static WRITE8_HANDLER( tandy200_bank_w )
 {
 	tandy200_state *state = space->machine->driver_data<tandy200_state>();
 
-	const address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -1131,7 +1131,7 @@ static MACHINE_START( kc85 )
 {
 	kc85_state *state = machine->driver_data<kc85_state>();
 
-	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->upd1990a = machine->device(UPD1990A_TAG);
@@ -1212,7 +1212,7 @@ static MACHINE_START( trsm100 )
 {
 	kc85_state *state = machine->driver_data<kc85_state>();
 
-	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->upd1990a = machine->device(UPD1990A_TAG);

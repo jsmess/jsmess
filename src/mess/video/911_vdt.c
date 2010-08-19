@@ -334,7 +334,7 @@ static int vdt911_cru_r(int offset, int unit)
 /*
     CRU interface write
 */
-static void vdt911_cru_w(const address_space *space, int offset, int data, int unit)
+static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
 {
 	offset &= 0xf;
 

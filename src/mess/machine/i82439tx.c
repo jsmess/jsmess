@@ -15,7 +15,7 @@
 typedef struct _i82439tx_state i82439tx_state;
 struct _i82439tx_state
 {
-	const address_space *space;
+	address_space *space;
 	UINT8 *rom;
 
 	UINT32 regs[8];

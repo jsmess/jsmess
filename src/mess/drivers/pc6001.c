@@ -1897,7 +1897,7 @@ static TIMER_CALLBACK(cassette_callback)
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 key1 = input_port_read(machine,"key1");
 	UINT32 key2 = input_port_read(machine,"key2");
 	UINT32 key3 = input_port_read(machine,"key3");

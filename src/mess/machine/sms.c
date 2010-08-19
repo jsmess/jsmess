@@ -97,7 +97,7 @@ struct _sms_driver_data {
 static sms_driver_data sms_state;
 
 
-static void setup_rom(const address_space *space);
+static void setup_rom(address_space *space);
 
 
 static TIMER_CALLBACK( rapid_fire_callback )
@@ -264,7 +264,7 @@ static int lphaser_sensor_is_on( running_machine *machine, const char *tag_x, co
 }
 
 
-static void sms_get_inputs( const address_space *space )
+static void sms_get_inputs( address_space *space )
 {
 	UINT8 data = 0x00;
 	UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
@@ -978,7 +978,7 @@ static void sms_machine_stop( running_machine &machine )
 }
 
 
-static void setup_rom( const address_space *space )
+static void setup_rom( address_space *space )
 {
 	running_machine *machine = space->machine;
 
@@ -1417,7 +1417,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III */
 	if ((detect_tvdraw(sms_state.cartridge[index].ROM)) && sms_state.is_region_japan)
 	{
-		const address_space *program = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *program = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &sms_tvdraw_axis_w);
 		memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &sms_tvdraw_status_r);
 		memory_install_read8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r);
@@ -1502,7 +1502,7 @@ MACHINE_START( sms )
 
 MACHINE_RESET( sms )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *smsvdp = machine->device("sms_vdp");
 
 	sms_state.ctrl_reg = 0xff;

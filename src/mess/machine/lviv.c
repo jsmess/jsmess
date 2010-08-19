@@ -46,10 +46,10 @@ static TIMER_CALLBACK( lviv_reset )
 	machine->schedule_soft_reset();
 }
 
-static DIRECT_UPDATE_HANDLER(lviv_directoverride)
+DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
-	if (input_port_read(space->machine, "RESET") & 0x01)
-		timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
+	if (input_port_read(machine, "RESET") & 0x01)
+		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
 	return address;
 }
 
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 
 WRITE8_HANDLER ( lviv_io_w )
 {
-	const address_space *cpuspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpuspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (startup_mem_map)
 	{
 		startup_mem_map = 0;
@@ -221,8 +221,8 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 
 MACHINE_RESET( lviv )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_direct_update_handler(space, lviv_directoverride);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, *machine));	
 
 	lviv_video_ram = messram_get_ptr(machine->device("messram")) + 0xc000;
 

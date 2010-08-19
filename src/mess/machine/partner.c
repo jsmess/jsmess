@@ -124,7 +124,7 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 
 static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(partner_win_mem_page) {
 		case 2 :
 				// FDD
@@ -141,7 +141,7 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 }
 static void partner_bank_switch(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	memory_install_write_bank(space, 0x0000, 0x07ff, 0, 0, "bank1");
@@ -362,6 +362,9 @@ static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);
 }
+
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
 
 I8257_INTERFACE( partner_dma )
 {

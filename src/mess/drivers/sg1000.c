@@ -798,7 +798,7 @@ static const floppy_config sf7000_floppy_config =
 
 static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
 {
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	switch (size)
 	{
@@ -838,7 +838,7 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
-	const address_space *program = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT32 size;
 	UINT8 *ptr = memory_region(image.device().machine, Z80_TAG);
 
@@ -896,7 +896,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 
 static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
 {
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* include SG-1000 mapping */
 	sg1000_map_cartridge_memory(machine, ptr, size);

@@ -30,13 +30,13 @@ VIDEO_START( kramermc )
 VIDEO_UPDATE( kramermc )
 {
 	int x,y;
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
-			int code = memory_read_byte(space, KRAMERMC_VIDEO_MEMORY + x + y*64);
+			int code = space->read_byte(KRAMERMC_VIDEO_MEMORY + x + y*64);
 			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}

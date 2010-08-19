@@ -256,7 +256,7 @@ static READ8_HANDLER( c65_read_mem )
 	if (offset <= 0x0ffff)
 		result = c64_memory[offset];
 	else
-		result = memory_read_byte(space, offset);
+		result = space->read_byte(offset);
 	return result;
 }
 
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( c65_write_mem )
 	if (offset <= 0x0ffff)
 		c64_memory[offset] = data;
 	else
-		memory_write_byte(space, offset, data);
+		space->write_byte(offset, data);
 }
 
 static struct {
@@ -303,7 +303,7 @@ static void c65_dma_port_w( running_machine *machine, int offset, int value )
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (offset & 3)
 	{

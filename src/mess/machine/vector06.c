@@ -178,7 +178,7 @@ MACHINE_START( vector06 )
 
 MACHINE_RESET( vector06 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(machine->device("maincpu"), vector06_irq_callback);
 	memory_install_read_bank (space, 0x0000, 0x7fff, 0, 0, "bank1");

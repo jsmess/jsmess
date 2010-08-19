@@ -384,13 +384,13 @@ static int load_psf( running_device *cpu, unsigned char *p_n_file, int n_len )
 	return n_return;
 }
 
-static DIRECT_UPDATE_HANDLER( psx_setopbase )
+DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
-		running_device *cpu = space->machine->device("maincpu");
+		running_device *cpu = machine->device("maincpu");
 
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 
 		if( load_psxexe( cpu, exe_buffer, exe_size ) ||
 			load_cpe( cpu, exe_buffer, exe_size ) ||
@@ -413,7 +413,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
-	const address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	exe_size = 0;
 	exe_buffer = (UINT8*)malloc( quickload_size );
@@ -428,7 +428,8 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	exe_size = quickload_size;
-	memory_set_direct_update_handler( space, psx_setopbase );
+	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, *image.device().machine));			
+
 	return IMAGE_INIT_PASS;
 }
 

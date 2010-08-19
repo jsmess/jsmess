@@ -790,11 +790,11 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 static void drq_callback(running_machine *machine, int which)
 {
     struct dma_state *dma = &i186.dma[which];
-	const address_space *memory_space   = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
-    const address_space *io_space       = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_IO);
+	address_space *memory_space   = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
+    address_space *io_space       = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_IO);
 
-    const address_space *src_space;
-    const address_space *dest_space;
+    address_space *src_space;
+    address_space *dest_space;
 
     UINT16  dma_word;
     UINT8   dma_byte;
@@ -824,14 +824,14 @@ static void drq_callback(running_machine *machine, int which)
     // Do the transfer
     if(dma->control & BYTE_WORD)
     {
-        dma_word=memory_read_word(src_space,dma->source);
-        memory_write_word(dest_space,dma->dest,dma_word);
+        dma_word=src_space->read_word(dma->source);
+        dest_space->write_word(dma->dest,dma_word);
         incdec_size=2;
     }
     else
     {
-        dma_byte=memory_read_byte(src_space,dma->source);
-        memory_write_byte(dest_space,dma->dest,dma_byte);
+        dma_byte=src_space->read_byte(dma->source);
+        dest_space->write_byte(dma->dest,dma_byte);
         incdec_size=1;
     }
 
@@ -1405,7 +1405,7 @@ static void nimbus_debug(running_machine *machine, int ref, int params, const ch
 
 static int instruction_hook(device_t &device, offs_t curpc)
 {
-    const address_space *space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
 
     addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
@@ -1746,7 +1746,7 @@ static void decode_subbios(running_device *device,offs_t pc)
     logerror("=======================================================================\n");
 }
 
-void *get_dssi_ptr(const address_space *space, UINT16   ds, UINT16 si)
+void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
 {
     int             addr;
 
@@ -1758,7 +1758,7 @@ void *get_dssi_ptr(const address_space *space, UINT16   ds, UINT16 si)
 
 static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si)
 {
-    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
     UINT16          *addr_ptr;
     t_area_params   *area_params;
@@ -1788,7 +1788,7 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
 
 static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si)
 {
-    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
     UINT8          *char_ptr;
     t_plot_string_params   *plot_string_params;
@@ -1814,7 +1814,7 @@ static void decode_dssi_f_plot_character_string(running_device *device,UINT16  d
 
 static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 si)
 {
-    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *new_colours;
     int     colour;
     new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
@@ -1828,7 +1828,7 @@ static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 
 
 static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 si)
 {
-    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
@@ -1839,7 +1839,7 @@ static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 s
 
 static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 si)
 {
-    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     int     param_no;
 
@@ -1942,7 +1942,7 @@ static const nimbus_blocks ramblocks[] =
 
 static void nimbus_bank_memory(running_machine *machine)
 {
-    const address_space *space = cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
+    address_space *space = cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
 	int     ramsize = messram_get_size(machine->device("messram"));
     int     ramblock = 0;
     int     blockno;

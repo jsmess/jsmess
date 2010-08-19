@@ -941,7 +941,7 @@ VIDEO_UPDATE( lisa )
 }
 
 
-static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
+DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 {
 	/* upper 7 bits -> segment # */
 	int segment = (address >> 17) & 0x7f;
@@ -966,10 +966,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			}
 			else
 			{	/* system ROMs */
-				direct->bytemask = 0xffffff;
-				direct->raw = direct->decrypted = lisa_rom_ptr - (address & 0xffc000);
-				direct->bytestart = (address & 0xffc000);
-				direct->byteend = (address & 0xffc000) + 0x003fff;
+				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_rom_ptr - (address & 0xffc000));
 				/*logerror("ROM (setup mode)\n");*/
 			}
 
@@ -978,7 +975,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (cpu_get_reg(space->machine->device("maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(machine->device("maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -998,10 +995,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 				/* out of segment limits : bus error */
 				logerror("illegal opbase address%lX\n", (long) address);
 			}
-			direct->bytemask = 0xffffff;
-			direct->raw = direct->decrypted = lisa_ram_ptr + mapped_address - address;
-			direct->bytestart = (address & 0xffc000);
-			direct->byteend = (address & 0xffc000) + 0x003fff;
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_ram_ptr + mapped_address - address);
 			/*logerror("RAM\n");*/
 			break;
 
@@ -1014,10 +1008,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			break;
 
 		case special_IO:
-			direct->bytemask = 0xffffff;
-			direct->raw = direct->decrypted = lisa_rom_ptr + (mapped_address & 0x003fff) - address;
-			direct->bytestart = (address & 0xffc000);
-			direct->byteend = (address & 0xffc000) + 0x003fff;
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_rom_ptr + (mapped_address & 0x003fff) - address);
 			/*logerror("ROM\n");*/
 			break;
 		}
@@ -1029,7 +1020,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	return -1;
 }
 
-static DIRECT_UPDATE_HANDLER (lisa_fdc_OPbaseoverride)
+DIRECT_UPDATE_HANDLER (lisa_fdc_OPbaseoverride)
 {
 	/* 8kb of address space -> wraparound */
 	return (address & 0x1fff);
@@ -1156,8 +1147,8 @@ MACHINE_RESET( lisa )
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "fdccpu",  ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));		
+	cputag_get_address_space(machine, "fdccpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_fdc_OPbaseoverride, *machine));		
 
 	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 

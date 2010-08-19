@@ -28,7 +28,7 @@
 
 #define TRIGGER_HSYNC	64717
 
-#define READ_MEM(x) memory_read_byte(space, x)
+#define READ_MEM(x) space->read_byte(x)
 
 /*static unsigned char *ROM; */
 
@@ -106,7 +106,7 @@ VIDEO_START( a7800 )
 
 static void maria_draw_scanline(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -340,7 +340,7 @@ INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
 	UINT8 *ROM = memory_region(device->machine, "maincpu");
-	const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	maria_scanline++;
 

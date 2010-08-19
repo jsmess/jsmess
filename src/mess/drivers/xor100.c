@@ -42,7 +42,7 @@ enum
 static void xor100_bankswitch(running_machine *machine)
 {
 	xor100_state *state = machine->driver_data<xor100_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	running_device *messram = machine->device("messram");
 	int banks = messram_get_size(messram) / 0x10000;
 

@@ -194,7 +194,7 @@ static PALETTE_INIT( vc4000 )
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image.device().machine;
-	const address_space *memspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *memspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -375,7 +375,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;
@@ -399,12 +399,12 @@ QUICKLOAD_LOAD(vc4000)
 	//if ((quick_addr + quick_length - 5) > 0x1000)
 	//  return IMAGE_INIT_FAIL;
 
-	memory_write_byte(space, 0x08be, quick_data[3]);
-	memory_write_byte(space, 0x08bf, quick_data[4]);
+	space->write_byte(0x08be, quick_data[3]);
+	space->write_byte(0x08bf, quick_data[4]);
 
 	for (i = 0; i < quick_length - 5; i++)
 	{	if ((quick_addr + i) < 0x1000)
-			memory_write_byte(space, i + quick_addr, quick_data[i+5]);
+			space->write_byte(i + quick_addr, quick_data[i+5]);
 	}
 
 	logerror("quick loading at %.4x size:%.4x\n", quick_addr, (quick_length-5));

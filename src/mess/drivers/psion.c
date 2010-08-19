@@ -421,9 +421,9 @@ READ8_HANDLER( hd63701_int_reg_r )
 }
 
 /* Read/Write common */
-void io_rw(const address_space* space, UINT16 offset)
+void io_rw(address_space* space, UINT16 offset)
 {
-	if (space->debugger_access)
+	if (space->debugger_access())
 		return;
 
 	switch (offset & 0xffc0)

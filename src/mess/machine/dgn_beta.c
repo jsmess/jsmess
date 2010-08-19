@@ -283,8 +283,8 @@ static struct PageReg	PageRegs[MaxTasks+1][MaxPage+1];	/* 16 sets of 16 page reg
 
 static void UpdateBanks(running_machine *machine, int first, int last)
 {
-	const address_space *space_0 = cputag_get_address_space(machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
-	const address_space *space_1 = cputag_get_address_space(machine, DMACPU_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *space_0 = cputag_get_address_space(machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *space_1 = cputag_get_address_space(machine, DMACPU_TAG, ADDRESS_SPACE_PROGRAM);
 	int		            Page;
 	UINT8		        *readbank;
 	write8_space_func	writebank;

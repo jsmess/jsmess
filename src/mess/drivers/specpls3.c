@@ -211,7 +211,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 void spectrum_plus3_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
 	if (state->port_7ffd_data & 8)

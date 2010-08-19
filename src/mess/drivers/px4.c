@@ -471,7 +471,7 @@ static READ8_HANDLER( px4_str_r )
 }
 
 /* helper function to map rom capsules */
-static void install_rom_capsule(const address_space *space, int size, const char *region)
+static void install_rom_capsule(address_space *space, int size, const char *region)
 {
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
@@ -501,7 +501,7 @@ static void install_rom_capsule(const address_space *space, int size, const char
 static WRITE8_HANDLER( px4_bankr_w )
 {
 	px4_state *px4 = space->machine->driver_data<px4_state>();
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);

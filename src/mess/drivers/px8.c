@@ -86,7 +86,7 @@ enum
 static void bankswitch(running_machine *machine)
 {
 	px8_state *state = machine->driver_data<px8_state>();
-	const address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
 

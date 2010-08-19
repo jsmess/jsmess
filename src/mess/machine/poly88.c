@@ -261,7 +261,7 @@ WRITE8_HANDLER(poly88_intr_w)
 
 SNAPSHOT_LOAD( poly88 )
 {
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8* data= auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;

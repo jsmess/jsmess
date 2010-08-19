@@ -140,7 +140,7 @@ ROM_END
 static QUICKLOAD_LOAD( lynx )
 {
 	running_device *cpu = image.device().machine->device("maincpu");
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image.device().machine, "maincpu");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
@@ -167,14 +167,14 @@ static QUICKLOAD_LOAD( lynx )
 	}
 
 	for (i = 0; i < length; i++)
-		memory_write_byte(space, start + i, data[i]);
+		space->write_byte(start + i, data[i]);
 
 	free(data);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
-	memory_write_byte(space, 0x1fc, start & 0xff);
-	memory_write_byte(space, 0x1fd, start >> 8);
+	space->write_byte(0x1fc, start & 0xff);
+	space->write_byte(0x1fd, start >> 8);
 
 	lynx_crc_keyword((device_image_interface&)*image.device().machine->device("quickload"));
 

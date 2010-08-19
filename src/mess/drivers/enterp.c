@@ -44,7 +44,7 @@ public:
     MEMORY / I/O
 ***************************************************************************/
 
-static void enterprise_update_memory_page(const address_space *space, offs_t page, int index)
+static void enterprise_update_memory_page(address_space *space, offs_t page, int index)
 {
 	int start = (page - 1) * 0x4000;
 	int end = (page - 1) * 0x4000 + 0x3fff;

@@ -33,7 +33,7 @@ MACHINE_START( pecom )
 MACHINE_RESET( pecom )
 {
 	UINT8 *rom = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	pecom_state *state = machine->driver_data<pecom_state>();
 
@@ -59,7 +59,7 @@ MACHINE_RESET( pecom )
 WRITE8_HANDLER( pecom_bank_w )
 {
 	running_device *cdp1869 = space->machine->device(CDP1869_TAG);
-	const address_space *space2 = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space2 = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")) + 0x0000);

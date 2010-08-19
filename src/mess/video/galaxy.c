@@ -20,7 +20,7 @@ static emu_timer *gal_video_timer = NULL;
 
 static TIMER_CALLBACK( gal_video )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int y, x;
 	if (galaxy_interrupts_enabled == TRUE)
 	{
@@ -43,7 +43,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				else
 				{
-					code = memory_read_byte(space,addr) & 0xbf;
+					code = space->read_byte(addr) & 0xbf;
 					code += (code & 0x80) >> 1;
 					code = gfx[(code & 0x7f) +(dat << 7 )] ^ 0xff;
 					first = 0;
@@ -72,7 +72,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				else
 				{
-					code = memory_read_byte(space,addr) ^ 0xff;
+					code = space->read_byte(addr) ^ 0xff;
 					first = 0;
 				}
 				y = gal_cnt / 48 - 2;
@@ -85,7 +85,7 @@ static TIMER_CALLBACK( gal_video )
 				}
 				if ((x / 8 >= 11) && (x / 8 < 44))
 				{
-					code = memory_read_byte(space, start_addr + y * 32 + (gal_cnt % 48) - 11) ^ 0xff;
+					code = space->read_byte(start_addr + y * 32 + (gal_cnt % 48) - 11) ^ 0xff;
 				}
 				else
 				{

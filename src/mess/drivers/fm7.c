@@ -79,7 +79,7 @@ static UINT8 fm77av_ym_irq;
 static UINT8 speaker_active;
 static UINT16 fm7_kanji_address;
 
-static void fm7_mmr_refresh(const address_space*);
+static void fm7_mmr_refresh(address_space*);
 
 
 static struct key_encoder
@@ -864,7 +864,7 @@ static READ8_HANDLER( fm77av_boot_mode_r )
  */
 static void fm7_update_psg(running_machine* machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if(fm7_type == SYS_FM7)
 	{
@@ -1025,7 +1025,7 @@ static READ8_HANDLER( fm7_mmr_r )
 	return 0xff;
 }
 
-static void fm7_update_bank(const address_space* space, int bank, UINT8 physical)
+static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	UINT16 size = 0xfff;
@@ -1116,7 +1116,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 	memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12));
 }
 
-static void fm7_mmr_refresh(const address_space* space)
+static void fm7_mmr_refresh(address_space* space)
 {
 	int x;
 	UINT16 window_addr;

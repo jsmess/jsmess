@@ -144,8 +144,8 @@ struct _tms32051_state
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *data;
+	address_space *program;
+	address_space *data;
 	int icount;
 };
 
@@ -173,22 +173,22 @@ INLINE void CHANGE_PC(tms32051_state *cpustate, UINT16 new_pc)
 
 INLINE UINT16 PM_READ16(tms32051_state *cpustate, UINT16 address)
 {
-	return memory_read_word_16le(cpustate->program, address << 1);
+	return cpustate->program->read_word(address << 1);
 }
 
 INLINE void PM_WRITE16(tms32051_state *cpustate, UINT16 address, UINT16 data)
 {
-	memory_write_word_16le(cpustate->program, address << 1, data);
+	cpustate->program->write_word(address << 1, data);
 }
 
 INLINE UINT16 DM_READ16(tms32051_state *cpustate, UINT16 address)
 {
-	return memory_read_word_16le(cpustate->data, address << 1);
+	return cpustate->data->read_word(address << 1);
 }
 
 INLINE void DM_WRITE16(tms32051_state *cpustate, UINT16 address, UINT16 data)
 {
-	memory_write_word_16le(cpustate->data, address << 1, data);
+	cpustate->data->write_word(address << 1, data);
 }
 
 #include "32051ops.c"

@@ -195,7 +195,7 @@ void mac_fdc_set_enable_lines(running_device *device,int enable_mask)
 static void mac_install_memory(running_machine *machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t memory_mask;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
@@ -2753,9 +2753,9 @@ static STATE_POSTLOAD( mac_state_load )
 }
 
 
-static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
+DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 {
-	mac_state *mac = space->machine->driver_data<mac_state>();
+	mac_state *mac = machine->driver_data<mac_state>();
 
 	if (mac->mac_overlay != -1)
 	{
@@ -2763,7 +2763,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
-				set_memory_overlay(space->machine, 0);		// kill the overlay
+				set_memory_overlay(machine, 0);		// kill the overlay
 				mac->mac_overlay = -1;
 			}
 		}
@@ -2771,7 +2771,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
-				set_memory_overlay(space->machine, 0);		// kill the overlay
+				set_memory_overlay(machine, 0);		// kill the overlay
 				mac->mac_overlay = -1;
 			}
 		}
@@ -2779,7 +2779,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0xa00000) && (address <= 0xafffff))
 			{
-				set_memory_overlay(space->machine, 0);		// kill the overlay
+				set_memory_overlay(machine, 0);		// kill the overlay
 				mac->mac_overlay = -1;
 			}
 		}
@@ -2787,7 +2787,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
-				set_memory_overlay(space->machine, 0);		// kill the overlay
+				set_memory_overlay(machine, 0);		// kill the overlay
 				mac->mac_overlay = -1;
 			}
 		}
@@ -2834,7 +2834,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
-		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
+		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, *machine));				
 	}
 
 	/* setup keyboard */

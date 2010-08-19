@@ -350,9 +350,9 @@ READ8_HANDLER(exidy_ff_r)
 
 Z80BIN_EXECUTE( exidy )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(space, 0xdffa) != 0xc3))
+	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
@@ -374,17 +374,17 @@ Z80BIN_EXECUTE( exidy )
 		};
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(space, 0xf01f + i, data[i]);
+			space->write_byte(0xf01f + i, data[i]);
 
 		if (!autorun)
-			memory_write_word_16le(space, 0xf028,0xc3dd);
+			space->write_word(0xf028,0xc3dd);
 
 		/* tell BASIC where program ends */
-		memory_write_byte(space, 0x1b7, (end_address >> 0) & 0xff);
-		memory_write_byte(space, 0x1b8, (end_address >> 8) & 0xff);
+		space->write_byte(0x1b7, (end_address >> 0) & 0xff);
+		space->write_byte(0x1b8, (end_address >> 8) & 0xff);
 
 		if ((execute_address != 0xc858) && autorun)
-			memory_write_word_16le(space, 0xf028, execute_address);
+			space->write_word(0xf028, execute_address);
 
 		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0xf01f);
 	}
@@ -449,7 +449,7 @@ MACHINE_START( exidy )
 
 MACHINE_RESET( exidy )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Initialize cassette interface */
 	cass_data.output.length = 0;

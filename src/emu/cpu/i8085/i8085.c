@@ -184,8 +184,8 @@ struct _i8085_state
 
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int					icount;
 };
 
@@ -374,13 +374,13 @@ INLINE UINT16 ARG16(i8085_state *cpustate)
 INLINE UINT8 RM(i8085_state *cpustate, UINT32 a)
 {
 	set_status(cpustate, 0x82); // memory read
-	return memory_read_byte_8le(cpustate->program, a);
+	return cpustate->program->read_byte(a);
 }
 
 INLINE void WM(i8085_state *cpustate, UINT32 a, UINT8 v)
 {
 	set_status(cpustate, 0x00); // memory write
-	memory_write_byte_8le(cpustate->program, a, v);
+	cpustate->program->write_byte(a, v);
 }
 
 

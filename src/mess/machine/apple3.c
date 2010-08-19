@@ -338,7 +338,7 @@ static void apple3_update_memory(running_machine *machine)
 {
 	UINT16 bank;
 	UINT8 page;
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
@@ -622,7 +622,7 @@ READ8_HANDLER( apple3_indexed_read )
 
 	addr = apple3_get_indexed_addr(space->machine,offset);
 	if (!addr)
-		result = memory_read_byte(space, offset);
+		result = space->read_byte(offset);
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
@@ -638,24 +638,21 @@ WRITE8_HANDLER( apple3_indexed_write )
 
 	addr = apple3_get_indexed_addr(space->machine,offset);
 	if (!addr)
-		memory_write_byte(space, offset, data);
+		space->write_byte(offset, data);
 	else if (addr != (UINT8 *) ~0)
 		*addr = data;
 }
 
 
 
-static DIRECT_UPDATE_HANDLER( apple3_opbase )
+DIRECT_UPDATE_HANDLER( apple3_opbase )
 {
 	UINT8 *opptr;
 
 	if ((address & 0xFF00) == 0x0000)
 	{
-		opptr = apple3_get_zpa_addr(space->machine,address);
-		direct->bytemask = ~0;
-		direct->raw = direct->decrypted = opptr - address;
-		direct->bytestart = address;
-		direct->byteend = address;
+		opptr = apple3_get_zpa_addr(machine,address);
+		direct.explicit_configure(address, address, ~0, opptr - address);
 		address = ~0;
 	}
 	return address;
@@ -727,5 +724,5 @@ DRIVER_INIT( apple3 )
 	via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), apple3_opbase);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, *machine));	
 }

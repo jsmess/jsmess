@@ -996,7 +996,7 @@ static WRITE8_HANDLER( towns_cmos_w )
 	state->towns_cmos[offset] = data;
 }
 
-void towns_update_video_banks(const address_space* space)
+void towns_update_video_banks(address_space* space)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8* ROM;

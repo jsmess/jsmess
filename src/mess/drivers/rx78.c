@@ -486,7 +486,7 @@ ROM_END
 static DRIVER_INIT( rx78 )
 {
 	UINT32 ram_size = messram_get_size(machine->device("messram"));
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if(ram_size == 0x4000)
 		memory_unmap_readwrite(prg, 0x6000, 0xafff, 0, 0);

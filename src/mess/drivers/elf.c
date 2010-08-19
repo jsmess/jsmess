@@ -275,7 +275,7 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 static MACHINE_START( elf2 )
 {
 	elf2_state *state = machine->driver_data<elf2_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->cdp1861 = machine->device(CDP1861_TAG);

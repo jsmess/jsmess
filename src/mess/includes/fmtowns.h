@@ -133,7 +133,7 @@ class towns_state : public driver_data_t
 
 };
 
-void towns_update_video_banks(const address_space*);
+void towns_update_video_banks(address_space*);
 
 INTERRUPT_GEN( towns_vsync_irq );
 VIDEO_START( towns );

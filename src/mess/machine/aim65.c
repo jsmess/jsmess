@@ -170,7 +170,7 @@ MACHINE_START( aim65 )
 {
 	running_device *via_0 = machine->device("via6522_0");
 	running_device *ram = machine->device("messram");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
 	memory_install_ram(space, 0x0000, messram_get_size(ram) - 1, 0, 0, messram_get_ptr(ram));

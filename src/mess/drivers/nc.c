@@ -339,7 +339,7 @@ static const char *nc_bankhandler_w[]={
 
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	char bank1[10];

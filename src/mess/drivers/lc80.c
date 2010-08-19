@@ -290,7 +290,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 static MACHINE_START( lc80 )
 {
 	lc80_state *state = machine->driver_data<lc80_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->z80pio2 = machine->device(Z80PIO2_TAG);

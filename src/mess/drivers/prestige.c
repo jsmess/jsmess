@@ -88,7 +88,7 @@ static READ8_HANDLER( bankswitch_r )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	const address_space *program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (offset)
 	{
@@ -182,14 +182,14 @@ static VIDEO_START( prestige )
 
 static VIDEO_UPDATE( prestige )
 {
-	const address_space *program = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 addr = 0xe000;
 
 	for (int y = 0; y < 100; y++)
 	{
 		for (int sx = 0; sx < 30; sx++)
 		{
-			UINT8 data = memory_read_byte(program, addr);
+			UINT8 data = program->read_byte(addr);
 
 			for (int x = 0; x < 8; x++)
 			{

@@ -47,7 +47,7 @@ INTERRUPT_GEN( primo_vblank_interrupt )
 
 static void primo_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 	switch (primo_port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
@@ -301,7 +301,7 @@ static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UIN
 	/* memory */
 
 	for (i=0; i<0xc000; i++)
-		memory_write_byte(cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM), i+0x4000, snapshot_data[i+38]);
+		cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte( i+0x4000, snapshot_data[i+38]);
 }
 
 SNAPSHOT_LOAD( primo )
@@ -347,7 +347,7 @@ static void primo_setup_pp (running_machine *machine,UINT8* quickload_data, UINT
 	start_addr = quickload_data[2] + quickload_data[3]*256;
 
 	for (i=4; i<quickload_size; i++)
-		memory_write_byte(cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM), start_addr+i-4, quickload_data[i]);
+		cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(start_addr+i-4, quickload_data[i]);
 
 	cpu_set_reg(machine->device("maincpu"), Z80_PC, start_addr);
 

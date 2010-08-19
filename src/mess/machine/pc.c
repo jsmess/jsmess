@@ -105,7 +105,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
 		& 0x0F0000;
 
-	result = memory_read_byte( space, page_offset + offset);
+	result = space->read_byte( page_offset + offset);
 	return result;
 }
 
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
 		& 0x0F0000;
 
-	memory_write_byte( space, page_offset + offset, data);
+	space->write_byte( page_offset + offset, data);
 }
 
 
@@ -1222,7 +1222,7 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
+	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1239,7 +1239,7 @@ DRIVER_INIT( pc200 )
 
 DRIVER_INIT( ppc512 )
 {
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
+	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1256,8 +1256,8 @@ DRIVER_INIT( ppc512 )
 }
 DRIVER_INIT( pc1512 )
 {
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	const address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
+	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1298,7 +1298,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
-	const address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 
 	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );

@@ -1365,11 +1365,11 @@ It is believed that it is used to make multiface invisible to programs */
 
 
 /* used to setup computer if a snapshot was specified */
-static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
+DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 {
 		int pc;
 
-		pc = cpu_get_pc(space->machine->device("maincpu"));
+		pc = cpu_get_pc(machine->device("maincpu"));
 
 		/* there are two places where CALL &0065 can be found
         in the multiface rom. At this address there is a RET.
@@ -1398,7 +1398,7 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		  multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
 		 /* clear op base override */
-				memory_set_direct_update_handler(space,0);
+		  //cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);				
 		}
 
 		return pc;
@@ -1490,7 +1490,7 @@ static void multiface_stop(running_machine *machine)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), amstrad_multiface_directoverride);
+		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(amstrad_multiface_directoverride, *machine));
 	}
 
 }
@@ -1654,7 +1654,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 	}
 	else  // CPC+/GX4000
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		if ( asic.enabled && ( asic.rmr2 & 0x18 ) == 0x18 )
 		{
@@ -2592,7 +2592,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* load CPCEMU style snapshots */
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *mc6845 = space->machine->device("mc6845" );
 	running_device *ay8910 = machine->device("ay");
 	int RegData;
@@ -2863,7 +2863,7 @@ BDIR BC1       |
 static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *ay8910 = machine->device("ay");
 
 	if(aleste_mode & 0x20)  // RTC selected
@@ -3227,7 +3227,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 
 static void amstrad_common_init(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	aleste_mode = 0;
 

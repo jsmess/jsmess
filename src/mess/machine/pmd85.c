@@ -39,7 +39,7 @@ static emu_timer * pmd85_cassette_timer;
 
 static void pmd851_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -82,7 +82,7 @@ static void pmd851_update_memory(running_machine *machine)
 
 static void pmd852a_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -154,7 +154,7 @@ static void pmd853_update_memory(running_machine *machine)
 
 static void alfa_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -186,7 +186,7 @@ static void alfa_update_memory(running_machine *machine)
 
 static void mato_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -210,7 +210,7 @@ static void mato_update_memory(running_machine *machine)
 
 static void c2717_update_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *mem = memory_region(machine, "maincpu");
 	if (pmd85_startup_mem_map)
@@ -848,10 +848,10 @@ static TIMER_CALLBACK( pmd_reset )
 	machine->schedule_soft_reset();
 }
 
-static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
+DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
-	if (input_port_read(space->machine, "RESET") & 0x01)
-		timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
+	if (input_port_read(machine, "RESET") & 0x01)
+		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
 	return address;
 }
 
@@ -945,5 +945,5 @@ MACHINE_RESET( pmd85 )
 
 	timer_set(machine, attotime_zero, NULL, 0, setup_machine_state);
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));					
 }

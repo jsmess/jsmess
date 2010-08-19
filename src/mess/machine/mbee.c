@@ -174,7 +174,7 @@ MACHINE_RESET( mbee )
 
 INTERRUPT_GEN( mbee_interrupt )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* once per frame, pulse the PIO B bit 7 */
 	mbee_vsync = 1;
 
@@ -184,7 +184,7 @@ INTERRUPT_GEN( mbee_interrupt )
 
 	z80pio_astb_w( mbee_z80pio, centronics_busy_r(mbee_printer));	/* signal int when not busy (L->H) */
 
-	memory_write_byte(space, 0x109, centronics_busy_r(mbee_printer));
+	space->write_byte(0x109, centronics_busy_r(mbee_printer));
 }
 
 /***********************************************************
@@ -199,25 +199,25 @@ INTERRUPT_GEN( mbee_interrupt )
 Z80BIN_EXECUTE( mbee )
 {
 	running_device *cpu = machine->device("maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_write_word_16le(space, 0xa6, execute_address);			/* fix the EXEC command */
+	space->write_word(0xa6, execute_address);			/* fix the EXEC command */
 
 	if (autorun)
 	{
-		memory_write_word_16le(space, 0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
+		space->write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
 		cpu_set_reg(cpu, STATE_GENPC, execute_address);
 	}
 	else
 	{
-		memory_write_word_16le(space, 0xa2, 0x8517);
+		space->write_word(0xa2, 0x8517);
 	}
 }
 
 QUICKLOAD_LOAD( mbee )
 {
 	running_device *cpu = image.device().machine->device("maincpu");
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image.device().machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 
@@ -235,7 +235,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 
 			if ((j < mbee_size) || (j > 0xefff))
-				memory_write_byte(space, j, data);
+				space->write_byte(j, data);
 			else
 			{
 				image.message("Not enough memory in this microbee");
@@ -245,11 +245,11 @@ QUICKLOAD_LOAD( mbee )
 
 		if (sw)
 		{
-			memory_write_word_16le(space, 0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
+			space->write_word(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
 			cpu_set_reg(cpu, STATE_GENPC, 0x801e);
 		}
 		else
-			memory_write_word_16le(space, 0xa2,0x8517);
+			space->write_word(0xa2,0x8517);
 	}
 	else if (!mame_stricmp(image.filetype(), "com"))
 	{
@@ -265,7 +265,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 
 			if ((j < mbee_size) || (j > 0xefff))
-				memory_write_byte(space, j, data);
+				space->write_byte(j, data);
 			else
 			{
 				image.message("Not enough memory in this microbee");

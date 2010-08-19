@@ -39,7 +39,7 @@ static void mpc105_update_memory(running_machine *machine)
 		/* TODO: Fix me properly! changing all cpus???? */
 		for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 		{
-			const address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
+			address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
 
 			/* first clear everything out */
 			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
@@ -70,7 +70,7 @@ static void mpc105_update_memory(running_machine *machine)
 					/* TODO: Fix me properly! changing all cpus??? */
 					for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 					{
-						const address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
+						address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
 
 						memory_install_read64_handler(space, begin, end,
 							0, 0, (read64_space_func) (FPTR)(bank + mpc105->bank_base));

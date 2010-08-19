@@ -96,7 +96,7 @@ static NVRAM_HANDLER( avigo )
 
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char bank_1[10];
 	char bank_5[10];
 
@@ -302,7 +302,7 @@ static const tc8521_interface avigo_tc8521_interface =
 static void avigo_refresh_memory(running_machine *machine)
 {
 	unsigned char *addr;
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (avigo_rom_bank_h)
 	{
@@ -396,14 +396,14 @@ static const ins8250_interface avigo_com_interface =
 };
 
 /* this is needed because this driver uses handlers in memory that gets executed */
-static DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
+DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 {
 	void *opbase_ptr;
 
 	opbase_ptr = avigo_banked_opbase[address / 0x4000];
 	if (opbase_ptr != NULL)
 	{
-		direct->raw = direct->decrypted = (UINT8*)opbase_ptr;
+		direct.explicit_configure(0x0000, 0xffff, 0xffff, (UINT8*)opbase_ptr);	
 		address = ~0;
 	}
 	return address;
@@ -440,7 +440,7 @@ static MACHINE_RESET( avigo )
 	/* clear */
 	memset(messram_get_ptr(machine->device("messram")), 0, 128*1024);
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(avigo_opbase_handler, *machine));
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);

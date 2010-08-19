@@ -406,6 +406,9 @@ static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 	i8257_hlda_w(device, state);
 }
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
 static I8257_INTERFACE( pc8001_8257_intf )
 {
 	DEVCB_LINE(hrq_w),
@@ -431,7 +434,7 @@ static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
 static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = machine->driver_data<pc8001_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	running_device *messram = machine->device("messram");
 
 	/* look up devices */

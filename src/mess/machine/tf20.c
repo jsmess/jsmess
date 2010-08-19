@@ -73,7 +73,7 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 static READ8_HANDLER( tf20_rom_disable )
 {
 	tf20_state *tf20 = get_safe_token(space->cpu->owner());
-	const address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* switch in ram */
 	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, messram_get_ptr(tf20->ram));
@@ -327,7 +327,7 @@ static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
 	running_device *cpu = device->subdevice("tf20");
-	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(cpu, tf20_irq_ack);
 
@@ -351,7 +351,7 @@ static DEVICE_START( tf20 )
 static DEVICE_RESET( tf20 )
 {
 	running_device *cpu = device->subdevice("tf20");
-	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */
 	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());

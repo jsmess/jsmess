@@ -474,12 +474,12 @@ static VIDEO_UPDATE( tandy2k )
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
 	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
-	const address_space *program = cputag_get_address_space(device->machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(device->machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
 		UINT32 videoram_addr = (state->vram_base | (va << 1)) + sx;
-		UINT8 videoram_data = memory_read_word(program, videoram_addr);
+		UINT8 videoram_data = program->read_word(videoram_addr);
 		UINT16 charram_addr = (videoram_data << 4) | sl;
 		UINT8 charram_data = state->char_ram[charram_addr] & 0xff;
 
@@ -773,7 +773,7 @@ static MACHINE_START( tandy2k )
 	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* memory banking */
-	const address_space *program = cputag_get_address_space(machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	int ram_size = messram_get_size(machine->device("messram"));
 

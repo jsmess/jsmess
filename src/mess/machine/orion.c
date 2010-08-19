@@ -279,7 +279,7 @@ static void orionz80_switch_bank(running_machine *machine)
 {
 	UINT8 bank_select;
 	UINT8 segment_select;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	bank_select = (orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = orionz80_dispatcher & 0x03;
@@ -339,7 +339,7 @@ WRITE8_HANDLER ( orionz80_dispatcher_w )
 
 MACHINE_RESET ( orionz80 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_install_write_bank(space, 0x4000, 0xefff, 0, 0, "bank2");
@@ -430,7 +430,7 @@ static WRITE8_HANDLER ( orionpro_memory_page_w );
 
 static void orionpro_bank_switch(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int page = orionpro_page & 7; // we have only 8 pages
 	int is128 = (orionpro_dispatcher & 0x80) ? 1 : 0;
 	if (is128==1)

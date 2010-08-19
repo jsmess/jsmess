@@ -35,7 +35,7 @@
 static void mc1000_bankswitch(running_machine *machine)
 {
 	mc1000_state *state = machine->driver_data<mc1000_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* MC6845 video RAM */
 	memory_set_bank(machine, "bank2", state->mc6845_bank);
@@ -320,7 +320,7 @@ static const ay8910_interface ay8910_intf =
 static MACHINE_START( mc1000 )
 {
 	mc1000_state *state = machine->driver_data<mc1000_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->mc6845 = machine->device(MC6845_TAG);
@@ -467,15 +467,15 @@ ROM_END
 
 /* Driver Initialization */
 
-static DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
+DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 {
-	mc1000_state *state = space->machine->driver_data<mc1000_state>();
+	mc1000_state *state = machine->driver_data<mc1000_state>();
 
 	if (state->rom0000)
 	{
 		if (address >= 0xc000)
 		{
-			memory_set_bank(space->machine, "bank1", 0);
+			memory_set_bank(machine, "bank1", 0);
 			state->rom0000 = 0;
 		}
 	}
@@ -485,7 +485,7 @@ static DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 
 static DRIVER_INIT( mc1000 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), mc1000_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, *machine));
 }
 
 /* System Drivers */

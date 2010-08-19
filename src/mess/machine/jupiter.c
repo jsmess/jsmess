@@ -40,41 +40,42 @@ static void jupiter_machine_stop(running_machine &machine);
 DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 {
 	UINT16 loop,tmpword;
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (address == 0x059d)
 	{
 		if (jupiter_data_type == JUPITER_ACE)
 		{
 			for (loop = 0; loop < 0x6000; loop++)
-				memory_write_byte(space, loop + 0x2000, jupiter_data[loop]);
+				space->write_byte(loop + 0x2000, jupiter_data[loop]);
 		}
 		else if (jupiter_data_type == JUPITER_TAP)
 		{
 
 			for (loop = 0; loop < jupiter_tape.dat_len; loop++)
-				memory_write_byte(space, loop + jupiter_tape.hdr_addr, jupiter_data[loop]);
+				space->write_byte(loop + jupiter_tape.hdr_addr, jupiter_data[loop]);
 
-			memory_write_byte(space, 0x3c27, 0x01);
+			space->write_byte(0x3c27, 0x01);
 
 			for (loop = 0; loop < 8; loop++)
-				memory_write_byte(space, loop + 0x3c31, jupiter_tape.hdr_vars[loop]);
-			memory_write_byte(space, 0x3c39, 0x00);
-			memory_write_byte(space, 0x3c3a, 0x00);
+				space->write_byte(loop + 0x3c31, jupiter_tape.hdr_vars[loop]);
+			space->write_byte(0x3c39, 0x00);
+			space->write_byte(0x3c3a, 0x00);
 
-			tmpword = memory_read_byte(space, 0x3c3b) + memory_read_byte(space, 0x3c3c) * 256 + jupiter_tape.hdr_len;
+			tmpword = space->read_byte(0x3c3b) + space->read_byte(0x3c3c) * 256 + jupiter_tape.hdr_len;
 
-			memory_write_byte(space, 0x3c3b, tmpword & 0xff);
-			memory_write_byte(space, 0x3c3c, (tmpword >> 8) & 0xff);
+			space->write_byte(0x3c3b, tmpword & 0xff);
+			space->write_byte(0x3c3c, (tmpword >> 8) & 0xff);
 
-			memory_write_byte(space, 0x3c45, 0x0c);	/* ? */
+			space->write_byte(0x3c45, 0x0c);	/* ? */
 
-			memory_write_byte(space, 0x3c4c, jupiter_tape.hdr_3c4c);
-			memory_write_byte(space, 0x3c4d, jupiter_tape.hdr_3c4d);
+			space->write_byte(0x3c4c, jupiter_tape.hdr_3c4c);
+			space->write_byte(0x3c4d, jupiter_tape.hdr_3c4d);
 
-			if (!memory_read_byte(space, 0x3c57) && !memory_read_byte(space, 0x3c58))
+			if (!space->read_byte(0x3c57) && !space->read_byte(0x3c58))
 			{
-				memory_write_byte(space, 0x3c57, 0x49);
-				memory_write_byte(space, 0x3c58, 0x3c);
+				space->write_byte(0x3c57, 0x49);
+				space->write_byte(0x3c58, 0x3c);
 			}
 		}
 	}
@@ -83,15 +84,16 @@ DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 
 MACHINE_START( jupiter )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 
 	if (jupiter_data)
 	{
-		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
-		memory_set_direct_update_handler(space, jupiter_opbaseoverride);
+		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);		
+		space->set_direct_update_handler(direct_update_delegate_create_static(jupiter_opbaseoverride, *machine));
+		
 	}
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, jupiter_machine_stop);

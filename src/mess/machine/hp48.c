@@ -752,7 +752,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 {
 	int i;
 	int nce2_enable = 1;
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	hp48_io_addr = 0x100000;
 

@@ -607,8 +607,9 @@ void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 	if (!ultimax)
 		c64_bankswitch(device->machine, 0);
 
-	c64_memory[0x000] = memory_read_byte(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0);
-	c64_memory[0x001] = memory_read_byte(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1);
+	c64_memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
+	c64_memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
+	
 }
 
 UINT8 c64_m6510_port_read( running_device *device, UINT8 direction )
@@ -1545,7 +1546,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 
 static void setup_c64_custom_mappers(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	switch (c64_mapper)
 	{

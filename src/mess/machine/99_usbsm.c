@@ -37,8 +37,8 @@ static int usbsm_cru_r(running_machine *machine, int offset);
 static void usbsm_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(usbsm_mem_r);
 static WRITE8_HANDLER(usbsm_mem_w);
-static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset);
-static void usbsm_mem_16_w(const address_space* space,offs_t offset, UINT16 data);
+static UINT16 usbsm_mem_16_r(address_space* space,offs_t offset);
+static void usbsm_mem_16_w(address_space* space,offs_t offset, UINT16 data);
 
 /* pointer to the SRAM area */
 static UINT16 *ti99_usbsm_RAM;
@@ -224,7 +224,7 @@ static WRITE8_HANDLER(usbsm_mem_w)
 /*
     demultiplexed read in USB-SmartMedia DSR space
 */
-static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset)
+static UINT16 usbsm_mem_16_r(address_space* space,offs_t offset)
 {
 	UINT16 reply = 0;
 	running_device *smartmedia =space->machine->device("smartmedia");
@@ -258,7 +258,7 @@ static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset)
 /*
     demultiplexed write in USB-SmartMedia DSR space
 */
-static void usbsm_mem_16_w(const address_space* space,offs_t offset, UINT16 data)
+static void usbsm_mem_16_w(address_space* space,offs_t offset, UINT16 data)
 {
 	running_device *smartmedia =space->machine->device("smartmedia");
 	if (offset < 0x800)

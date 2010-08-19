@@ -70,7 +70,7 @@
 static WRITE8_HANDLER( ls259_w )
 {
 	mm1_state *state = space->machine->driver_data<mm1_state>();
-	const address_space *program = cputag_get_address_space(space->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(space->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	int d = BIT(data, 0);
 
 	switch (offset)
@@ -448,6 +448,9 @@ static WRITE_LINE_DEVICE_HANDLER( dack3_w )
 	}
 }
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
 static I8237_INTERFACE( mm1_dma8237_intf )
 {
 	DEVCB_LINE(dma_hrq_changed),
@@ -685,7 +688,7 @@ static const floppy_config mm1_floppy_config =
 static MACHINE_START( mm1 )
 {
 	mm1_state *state = machine->driver_data<mm1_state>();
-	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* look up devices */
 	state->i8212 = machine->device(I8212_TAG);
@@ -721,7 +724,7 @@ static MACHINE_START( mm1 )
 static MACHINE_RESET( mm1 )
 {
 	mm1_state *state = machine->driver_data<mm1_state>();
-	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* reset LS259 */

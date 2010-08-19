@@ -55,7 +55,7 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
     d0 drive A */
 
 	/* get address space */
-	const address_space *mem = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (data & 0x80)
 	{
@@ -168,7 +168,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
     d0 drive A */
 
 	/* get address space */
-	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (data & 0x80)
 	{
@@ -380,7 +380,7 @@ MACHINE_START( kaypro2x )
 
 MACHINE_RESET( kaypro2x )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	kaypro2x_system_port_w(space, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
 }
@@ -424,7 +424,7 @@ QUICKLOAD_LOAD( kayproii )
 
 QUICKLOAD_LOAD( kaypro2x )
 {
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *cpu = image.device().machine->device("maincpu");
 	UINT8 *RAM = memory_region(image.device().machine, "rambank");
 	UINT16 i;

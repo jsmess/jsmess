@@ -26,8 +26,8 @@ struct _cdp1802_state
 {
 	const cdp1802_interface *intf;
 
-    const address_space *program;
-    const address_space *io;
+    address_space *program;
+    address_space *io;
 
 	devcb_resolved_write_line	out_q_func;
 	devcb_resolved_read8		in_dma_func;
@@ -75,10 +75,10 @@ INLINE cdp1802_state *get_safe_token(running_device *device)
 }
 
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
-#define RAM_R(addr)			memory_read_byte_8be(cpustate->program, addr)
-#define RAM_W(addr, data)	memory_write_byte_8be(cpustate->program, addr, data)
-#define IO_R(addr)			memory_read_byte_8be(cpustate->io, addr)
-#define IO_W(addr, data)	memory_write_byte_8be(cpustate->io, addr, data)
+#define RAM_R(addr)			cpustate->program->read_byte(addr)
+#define RAM_W(addr, data)	cpustate->program->write_byte(addr, data)
+#define IO_R(addr)			cpustate->io->read_byte(addr)
+#define IO_W(addr, data)	cpustate->io->write_byte(addr, data)
 
 #define P	cpustate->p
 #define X	cpustate->x

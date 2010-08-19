@@ -554,7 +554,7 @@ static VIDEO_UPDATE( ti68k )
 {
 	/* preliminary implementation, doesn't use the contrast value */
 	t68k_state *state = screen->machine->driver_data<t68k_state>();
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 width = screen->width();
 	UINT8 height = screen->height();
 	UINT8 x, y, b;
@@ -565,7 +565,7 @@ static VIDEO_UPDATE( ti68k )
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width / 8; x++)
 			{
-				UINT8 s_byte= memory_read_byte(space, state->lcd_base + y * (width/8) + x);
+				UINT8 s_byte= space->read_byte(state->lcd_base + y * (width/8) + x);
 				for (b = 0; b<8; b++)
 					*BITMAP_ADDR16(bitmap, y, x * 8 + (7 - b)) = (BIT(s_byte, b) > 0) ? 0 : 1;
 			}
@@ -577,7 +577,7 @@ static VIDEO_UPDATE( ti68k )
 MACHINE_START( ti68k )
 {
 	t68k_state *state = machine->driver_data<t68k_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(space->machine, "maincpu");
 	int i;
 

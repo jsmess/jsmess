@@ -219,6 +219,9 @@ static WRITE_LINE_DEVICE_HANDLER( tc_w )
     Channel 2: GDC
     Channel 3: Option slots
 */
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
 static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
 	DEVCB_LINE(dma_hrq_changed),

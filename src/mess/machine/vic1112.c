@@ -295,7 +295,7 @@ static DEVICE_START( vic1112 )
 {
 	vic1112_t *vic1112 = get_safe_token(device);
 	const vic1112_config *config = get_safe_config(device);
-	const address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	vic1112->via0 = device->subdevice(M6522_0_TAG);

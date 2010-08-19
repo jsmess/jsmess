@@ -41,7 +41,7 @@ static UINT32 *hgr_map;
 
 void apple3_write_charmem(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static const UINT32 screen_hole_map[] =
 	{
 		0x478, 0x4f8, 0x578, 0x5f8, 0x678, 0x6f8, 0x778, 0x7f8
@@ -53,12 +53,12 @@ void apple3_write_charmem(running_machine *machine)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			addr = 0x7f & memory_read_byte(space, screen_hole_map[i] + 0x400 + j + 0);
-			val = memory_read_byte(space, screen_hole_map[i] + j + 0);
+			addr = 0x7f & space->read_byte(screen_hole_map[i] + 0x400 + j + 0);
+			val = space->read_byte(screen_hole_map[i] + j + 0);
 			char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
 
-			addr = 0x7f & memory_read_byte(space, screen_hole_map[i] + 0x400 + j + 4);
-			val = memory_read_byte(space, screen_hole_map[i] + j + 4);
+			addr = 0x7f & space->read_byte(screen_hole_map[i] + 0x400 + j + 4);
+			val = space->read_byte(screen_hole_map[i] + j + 4);
 			char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
 		}
 	}

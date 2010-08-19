@@ -55,7 +55,7 @@ static TIMER_CALLBACK( handle_cassette_input )
 
 MACHINE_RESET( cgenie )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *ay8910 = machine->device("ay8910");
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
@@ -132,7 +132,7 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx = memory_region(machine, "gfx2");
 	int i;
 

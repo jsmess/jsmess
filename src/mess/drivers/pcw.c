@@ -237,7 +237,7 @@ static  READ8_HANDLER(pcw_keyboard_r)
 
 static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+1);

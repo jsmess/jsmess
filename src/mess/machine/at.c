@@ -168,7 +168,7 @@ static void at_set_keyb_int(running_machine *machine, int state)
 
 static void init_at_common(running_machine *machine, const struct kbdc8042_interface *at8042)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
 	mc146818_init(machine, MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
@@ -268,7 +268,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	result = memory_read_byte(space, page_offset + offset);
+	result = space->read_byte(page_offset + offset);
 	return result;
 }
 
@@ -278,7 +278,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	memory_write_byte(space, page_offset + offset, data);
+	space->write_byte(page_offset + offset, data);
 }
 
 

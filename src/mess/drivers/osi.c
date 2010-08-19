@@ -667,7 +667,7 @@ static MACHINE_START( osi600 )
 {
 	osi_state *state = machine->driver_data<osi_state>();
 
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);
@@ -697,7 +697,7 @@ static MACHINE_START( c1p )
 {
 	osi_state *state = machine->driver_data<osi_state>();
 
-	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

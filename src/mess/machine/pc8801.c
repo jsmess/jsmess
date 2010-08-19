@@ -311,7 +311,7 @@ static void select_extmem(char **r,char **w,UINT8 *ret_ctrl)
 
 void pc8801_update_bank(running_machine *machine)
 {
-	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char *ext_r,*ext_w;
 
 	select_extmem(&ext_r,&ext_w,NULL);

@@ -31,12 +31,12 @@ static WRITE8_HANDLER( zx_ram_w )
 
 	if (data & 0x40)
 	{
-		memory_write_byte (space, offset | 0xc000, data);
+		space->write_byte(offset | 0xc000, data);
 		RAM[offset | 0xc000] = data;
 	}
 	else
 	{
-		memory_write_byte (space, offset | 0xc000, 0);
+		space->write_byte(offset | 0xc000, 0);
 		RAM[offset | 0xc000] = 0;
 	}
 }
@@ -50,49 +50,49 @@ READ8_HANDLER( zx_ram_r )
 
 DRIVER_INIT ( zx )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, zx_ram_w);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x4000);
 }
 
-static DIRECT_UPDATE_HANDLER ( zx_setdirect )
+DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(space->machine, address, "maincpu", 0);
+		zx_ula_r(machine, address, "maincpu", 0);
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
+DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(space->machine, address, "gfx1", 0);
+		zx_ula_r(machine, address, "gfx1", 0);
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
+DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(space->machine, address, "gfx1", 1);
+		zx_ula_r(machine, address, "gfx1", 1);
 	return address;
 }
 
 MACHINE_RESET ( zx80 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), zx_setdirect);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));	
 	zx_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pow3000_setdirect);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, *machine));
 	zx_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pc8300_setdirect);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, *machine));
 	zx_tape_bit = 0x80;
 }
 

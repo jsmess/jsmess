@@ -469,7 +469,7 @@ static void akiko_start_dma( void )
 	timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
 
-static void akiko_setup_response( const address_space *space, int len, UINT8 *r1 )
+static void akiko_setup_response( address_space *space, int len, UINT8 *r1 )
 {
 	int		resp_addr = akiko.cdrom_address[1];
 	UINT8	resp_csum = 0xff;
@@ -488,7 +488,7 @@ static void akiko_setup_response( const address_space *space, int len, UINT8 *r1
 
 	for( i = 0; i < len; i++ )
 	{
-		memory_write_byte( space, resp_addr + ((akiko.cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
+		space->write_byte( resp_addr + ((akiko.cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
 	}
 
 	akiko.cdrom_cmd_resp = (akiko.cdrom_cmd_resp+len) & 0xff;
@@ -516,7 +516,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 	if ( param == 0x05 )
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		if (LOG_AKIKO_CD) logerror( "AKIKO: Completing Command %d\n", param );
 
 		resp[0] = 0x06;
@@ -538,7 +538,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 	}
 }
 
-static void akiko_update_cdrom(const address_space *space)
+static void akiko_update_cdrom(address_space *space)
 {
 	UINT8	resp[32], cmdbuf[32];
 
@@ -548,7 +548,7 @@ static void akiko_update_cdrom(const address_space *space)
 	while ( akiko.cdrom_cmd_start != akiko.cdrom_cmd_end )
 	{
 		UINT32	cmd_addr = akiko.cdrom_address[1] + 0x200 + akiko.cdrom_cmd_start;
-		int		cmd = memory_read_byte( space, cmd_addr );
+		int		cmd = space->read_byte( cmd_addr );
 
 		memset( resp, 0, sizeof( resp ) );
 		resp[0] = cmd;
@@ -590,7 +590,7 @@ static void akiko_update_cdrom(const address_space *space)
 
 			for( i = 0; i < 13; i++ )
 			{
-				cmdbuf[i] = memory_read_byte( space, cmd_addr );
+				cmdbuf[i] = space->read_byte( cmd_addr );
 				cmd_addr &= 0xffffff00;
 				cmd_addr += ( akiko.cdrom_cmd_start + i + 1 ) & 0xff;
 			}

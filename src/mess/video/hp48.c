@@ -130,13 +130,13 @@ PALETTE_INIT ( hp48 )
 	data >>= 1
 
 #define draw_quart					\
-	UINT8 data = memory_read_byte( space, addr );	\
+	UINT8 data = space->read_byte( addr );	\
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
 VIDEO_UPDATE ( hp48 )
 {
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
 	int left_margin   = HP48_IO_4(0) & 7;            /* 0..7 pixels for main bitmap */

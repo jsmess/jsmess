@@ -64,13 +64,13 @@ CPU_DISASSEMBLE( jaguardsp );
 
 #define CONDITION(x)		condition_table[(x) + ((jaguar->FLAGS & 7) << 5)]
 
-#define READBYTE(J,a)		memory_read_byte_32be((J)->program, a)
-#define READWORD(J,a)		memory_read_word_32be((J)->program, a)
-#define READLONG(J,a)		memory_read_dword_32be((J)->program, a)
+#define READBYTE(J,a)		(J)->program->read_byte(a)
+#define READWORD(J,a)		(J)->program->read_word(a)
+#define READLONG(J,a)		(J)->program->read_dword(a)
 
-#define WRITEBYTE(J,a,v)	memory_write_byte_32be((J)->program, a, v)
-#define WRITEWORD(J,a,v)	memory_write_word_32be((J)->program, a, v)
-#define WRITELONG(J,a,v)	memory_write_dword_32be((J)->program, a, v)
+#define WRITEBYTE(J,a,v)	(J)->program->write_byte(a, v)
+#define WRITEWORD(J,a,v)	(J)->program->write_word(a, v)
+#define WRITELONG(J,a,v)	(J)->program->write_dword(a, v)
 
 
 
@@ -101,7 +101,7 @@ struct _jaguar_state
 	device_irq_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 };
 
 

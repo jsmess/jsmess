@@ -723,7 +723,7 @@ static DEVICE_START( c1551 )
 	c1551->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* map TPI1 to host CPU memory space */
-	const address_space *program = cpu_get_address_space(device->machine->device(config->cpu_tag), ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(device->machine->device(config->cpu_tag), ADDRESS_SPACE_PROGRAM);
 	UINT32 start_address = c1551->address ? 0xfec0 : 0xfef0;
 
 	memory_install_readwrite8_device_handler(program, c1551->tpi1, start_address, start_address + 7, 0, 0, tpi6525_r, tpi6525_w);

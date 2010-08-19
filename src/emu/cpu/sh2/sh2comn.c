@@ -30,12 +30,12 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return memory_read_dword_32be(sh2->program, A);
+		return sh2->program->read_dword(A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return memory_read_dword_32be(sh2->program, A & AM);
+  return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
@@ -48,14 +48,14 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 
 	if (A >= 0xc0000000)
 	{
-		memory_write_dword_32be(sh2->program, A,V);
+		sh2->program->write_dword(A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	memory_write_dword_32be(sh2->program, A & AM,V);
+	sh2->program->write_dword(A & AM,V);
 }
 
 static void sh2_timer_resync(sh2_state *sh2)
@@ -185,9 +185,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst --;
 
-					dmadata = memory_read_byte_32be(sh2->program, src);
+					dmadata = sh2->program->read_byte(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_byte_32be(sh2->program, dst, dmadata);
+					sh2->program->write_byte(dst, dmadata);
 
 					if(incs == 1)
 						src ++;
@@ -207,9 +207,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 						dst -= 2;
 
 					// check: should this really be using read_word_32 / write_word_32?
-					dmadata	= memory_read_word_32be(sh2->program, src);
+					dmadata	= sh2->program->read_word(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_word_32be(sh2->program, dst, dmadata);
+					sh2->program->write_word(dst, dmadata);
 
 					if(incs == 1)
 						src += 2;
@@ -227,9 +227,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst -= 4;
 
-					dmadata	= memory_read_dword_32be(sh2->program, src);
+					dmadata	= sh2->program->read_dword(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst, dmadata);
+					sh2->program->write_dword(dst, dmadata);
 
 					if(incs == 1)
 						src += 4;
@@ -247,21 +247,21 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst -= 16;
 
-					dmadata = memory_read_dword_32be(sh2->program, src);
+					dmadata = sh2->program->read_dword(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst, dmadata);
+					sh2->program->write_dword(dst, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+4);
+					dmadata = sh2->program->read_dword(src+4);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+4, dmadata);
+					sh2->program->write_dword(dst+4, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+8);
+					dmadata = sh2->program->read_dword(src+8);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+8, dmadata);
+					sh2->program->write_dword(dst+8, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+12);
+					dmadata = sh2->program->read_dword(src+12);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+12, dmadata);
+					sh2->program->write_dword(dst+12, dmadata);
 
 					src += 16;
 					if(incd == 1)
@@ -702,6 +702,7 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
+	int i;
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
@@ -731,28 +732,47 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	sh2->internal = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, sh2->pc);
-	state_save_register_device_item(device, 0, sh2->r[15]);
 	state_save_register_device_item(device, 0, sh2->sr);
 	state_save_register_device_item(device, 0, sh2->pr);
 	state_save_register_device_item(device, 0, sh2->gbr);
 	state_save_register_device_item(device, 0, sh2->vbr);
 	state_save_register_device_item(device, 0, sh2->mach);
 	state_save_register_device_item(device, 0, sh2->macl);
-	state_save_register_device_item(device, 0, sh2->r[ 0]);
-	state_save_register_device_item(device, 0, sh2->r[ 1]);
-	state_save_register_device_item(device, 0, sh2->r[ 2]);
-	state_save_register_device_item(device, 0, sh2->r[ 3]);
-	state_save_register_device_item(device, 0, sh2->r[ 4]);
-	state_save_register_device_item(device, 0, sh2->r[ 5]);
-	state_save_register_device_item(device, 0, sh2->r[ 6]);
-	state_save_register_device_item(device, 0, sh2->r[ 7]);
-	state_save_register_device_item(device, 0, sh2->r[ 8]);
-	state_save_register_device_item(device, 0, sh2->r[ 9]);
-	state_save_register_device_item(device, 0, sh2->r[10]);
-	state_save_register_device_item(device, 0, sh2->r[11]);
-	state_save_register_device_item(device, 0, sh2->r[12]);
-	state_save_register_device_item(device, 0, sh2->r[13]);
-	state_save_register_device_item(device, 0, sh2->r[14]);
+	state_save_register_device_item_array(device, 0, sh2->r);
 	state_save_register_device_item(device, 0, sh2->ea);
+	state_save_register_device_item(device, 0, sh2->delay);
+	state_save_register_device_item(device, 0, sh2->cpu_off);
+	state_save_register_device_item(device, 0, sh2->dvsr);
+	state_save_register_device_item(device, 0, sh2->dvdnth);
+	state_save_register_device_item(device, 0, sh2->dvdntl);
+	state_save_register_device_item(device, 0, sh2->dvcr);
+	state_save_register_device_item(device, 0, sh2->pending_irq);
+	state_save_register_device_item(device, 0, sh2->test_irq);
+	state_save_register_device_item(device, 0, sh2->pending_nmi);
+	state_save_register_device_item(device, 0, sh2->irqline);
+	state_save_register_device_item(device, 0, sh2->evec);
+	state_save_register_device_item(device, 0, sh2->irqsr);
+	state_save_register_device_item(device, 0, sh2->target);
+	for (i = 0; i < 16; ++i)
+	{
+		state_save_register_device_item(device, i, sh2->irq_queue[i].irq_vector);
+		state_save_register_device_item(device, i, sh2->irq_queue[i].irq_priority);
+	}
+	state_save_register_device_item(device, 0, sh2->pcfsel);
+	state_save_register_device_item(device, 0, sh2->maxpcfsel);
+	state_save_register_device_item_array(device, 0, sh2->pcflushes);
+	state_save_register_device_item_array(device, 0, sh2->irq_line_state);
+	state_save_register_device_item_pointer(device, 0, sh2->m, 0x200/4);
+	state_save_register_device_item(device, 0, sh2->nmi_line_state);
+	state_save_register_device_item(device, 0, sh2->frc);
+	state_save_register_device_item(device, 0, sh2->ocra);
+	state_save_register_device_item(device, 0, sh2->ocrb);
+	state_save_register_device_item(device, 0, sh2->icr);
+	state_save_register_device_item(device, 0, sh2->frc_base);
+	state_save_register_device_item(device, 0, sh2->frt_input);
+	state_save_register_device_item(device, 0, sh2->internal_irq_level);
+	state_save_register_device_item(device, 0, sh2->internal_irq_vector);
+	state_save_register_device_item(device, 0, sh2->icount);
+	state_save_register_device_item_array(device, 0, sh2->dma_timer_active);
 }
 

@@ -1578,7 +1578,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 
 
 
-static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
+DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 {
 	UINT8 *opptr = NULL;
 	int slot;
@@ -1587,27 +1587,25 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 	{
 		if ((apple2gs_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 		{
-			opptr = &messram_get_ptr(space->machine->device("messram"))[address];
+			opptr = &messram_get_ptr(machine->device("messram"))[address];
 		}
 		else if ((address & 0x000F00) == 0x000000)
 		{
 			if (((address & 0xFF) >= 0x71) && ((address & 0xFF) <= 0x7F))
-				opptr = apple2gs_getslotmem(space->machine, address);
+				opptr = apple2gs_getslotmem(machine, address);
 		}
 		else
 		{
 			slot = (address & 0x000F00) / 0x100;
 
 			if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
-				opptr = apple2gs_getslotmem(space->machine, address);
+				opptr = apple2gs_getslotmem(machine, address);
 		}
 
 		if (opptr != NULL)
 		{
-			direct->bytemask = ~0;
-			direct->raw = direct->decrypted = opptr - address;
-			direct->bytestart = address;
-			direct->byteend = address;
+			direct.explicit_configure(address, address, ~0, opptr - address);
+			
 			address = ~0;
 		}
 	}
@@ -1654,7 +1652,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 
 static void apple2gs_setup_memory(running_machine *machine)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 	offs_t begin, end;
 	apple2_memmap_config cfg;
 
@@ -1691,7 +1689,8 @@ static void apple2gs_setup_memory(running_machine *machine)
 	memory_install_write8_handler(space, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
 	memory_install_read8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
 	memory_install_write8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
-	memory_set_direct_update_handler(space, apple2gs_opbase);
+	space->set_direct_update_handler(direct_update_delegate_create_static(apple2gs_opbase, *machine));
+	
 
 	/* install aux memory writes (for shadowing) */
 	memory_install_write8_handler(space, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
@@ -1715,7 +1714,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 
 static READ8_HANDLER( apple2gs_read_vector )
 {
-	return memory_read_byte(space, offset | 0xFF0000);
+	return space->read_byte(offset | 0xFF0000);
 }
 
 MACHINE_RESET( apple2gs )

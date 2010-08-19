@@ -451,7 +451,7 @@ DRIVER_INIT( plus4sid )
 
 MACHINE_RESET( c16 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	c16_state *state = machine->driver_data<c16_state>();
 
 	memset(state->keyline, 0xff, ARRAY_LENGTH(state->keyline));
@@ -508,7 +508,7 @@ static WRITE8_HANDLER( c16_sidcart_64k )
 
 static TIMER_CALLBACK( c16_sidhack_tick )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	c16_state *state = space->machine->driver_data<c16_state>();
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
@@ -528,7 +528,7 @@ static TIMER_CALLBACK( c16_sidhack_tick )
 static TIMER_CALLBACK( c16_sidcard_tick )
 {
 	c16_state *state = machine->driver_data<c16_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
 		memory_install_readwrite8_device_handler(space, state->sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r, sid6581_w);

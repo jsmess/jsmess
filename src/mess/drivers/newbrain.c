@@ -86,7 +86,7 @@ static void newbrain_eim_bankswitch(running_machine *machine)
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)
@@ -126,7 +126,7 @@ static void newbrain_a_bankswitch(running_machine *machine)
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	int bank;
 
 	if (state->paging)

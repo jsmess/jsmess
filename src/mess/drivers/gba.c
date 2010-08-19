@@ -141,7 +141,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	const address_space *space = cpu_get_address_space(machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
 	gba_state *state = machine->driver_data<gba_state>();
 
 	src = state->dma_src[ch];
@@ -194,7 +194,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 			dst &= 0xfffffffc;
 
 			// 32-bit
-			memory_write_dword(space, dst, memory_read_dword(space, src));
+			space->write_dword(dst, space->read_dword(src));
 			switch (dstadd)
 			{
 				case 0:	// increment
@@ -231,7 +231,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 			dst &= 0xfffffffe;
 
 			// 16-bit
-			memory_write_word(space, dst, memory_read_word(space, src));
+			space->write_word(dst, space->read_word(src));
 			switch (dstadd)
 			{
 				case 0:	// increment
@@ -2457,15 +2457,15 @@ MACHINE_DRIVER_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
    and some games verify that as a protection check (notably Metroid Fusion) */
-static DIRECT_UPDATE_HANDLER( gba_direct )
+DIRECT_UPDATE_HANDLER( gba_direct )
 {
 	if (address > 0x4000)
 	{
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bios")+0x4000);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "bios")+0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bios"));
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "bios"));
 	}
 
 	return address;
@@ -2473,7 +2473,7 @@ static DIRECT_UPDATE_HANDLER( gba_direct )
 
 static DRIVER_INIT(gbadv)
 {
-	memory_set_direct_update_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), gba_direct );
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, *machine));	
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

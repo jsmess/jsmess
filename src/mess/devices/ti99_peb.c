@@ -171,7 +171,7 @@ typedef struct _ti99_peb_state
 	void (*inta_callback)(running_machine *machine, int state);
 	void (*intb_callback)(running_machine *machine, int state);
 
-	const address_space *space;
+	address_space *space;
 
 } ti99_peb_state;
 

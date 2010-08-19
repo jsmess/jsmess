@@ -270,7 +270,7 @@ static CDP1802_INTERFACE( tmc600_cdp1802_config )
 static MACHINE_START( tmc600 )
 {
 	tmc600_state *state = machine->driver_data<tmc600_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

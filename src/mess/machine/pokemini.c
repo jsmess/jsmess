@@ -1442,7 +1442,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 
 static TIMER_CALLBACK( pokemini_prc_counter_callback )
 {
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	prc.count++;
 
 	/* Check for overflow */
@@ -1466,7 +1466,7 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 						UINT8 tile = pokemini_ram[ 0x360 + ( y * prc.map_size_x ) + x ];
 						int i;
 						for( i = 0; i < 8; i++ ) {
-							pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = memory_read_byte( space, prc.bg_tiles + ( tile * 8 ) + i );
+							pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space->read_byte( prc.bg_tiles + ( tile * 8 ) + i );
 						}
 					}
 				}
@@ -1497,8 +1497,8 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
 								UINT32	s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
 
-								mask = ~ ( memory_read_byte( space, s ) | ( memory_read_byte( space, s + 8 ) << 8 ) );
-								gfx = memory_read_byte( space, s + 16 ) | ( memory_read_byte( space, s + 24 ) << 8 );
+								mask = ~ ( space->read_byte( s ) | ( space->read_byte( s + 8 ) << 8 ) );
+								gfx = space->read_byte( s + 16 ) | ( space->read_byte( s + 24 ) << 8 );
 
 								/* Are the colors inverted? */
 								if ( spr_flag & 0x04 )

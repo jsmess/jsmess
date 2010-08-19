@@ -44,7 +44,7 @@
 
 
 static void Mise_A_Jour_Etat(int Adresse, int Value );
-static void Update_Sound(const address_space *space, UINT8 data);
+static void Update_Sound(address_space *space, UINT8 data);
 
 static running_device *cassette_device_image(running_machine *machine);
 
@@ -555,7 +555,7 @@ static void Init_Value_SN76477_Hector(void)
      ValMixer = 0;
 }
 
-void Update_Sound(const address_space *space, UINT8 data)
+void Update_Sound(address_space *space, UINT8 data)
 {
 	/* keep device*/
 	running_device *sn76477 = space->machine->device("sn76477");

@@ -370,7 +370,7 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 
 static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RAM_TYPE type)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (type) {
 	case PCW16_MEM_ROM:

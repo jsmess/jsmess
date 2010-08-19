@@ -162,7 +162,7 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->lmpr = data;
@@ -177,7 +177,7 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->hmpr = data;
@@ -192,7 +192,7 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->vmpr = data;

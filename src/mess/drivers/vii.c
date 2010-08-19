@@ -159,7 +159,7 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -191,7 +191,7 @@ static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle
 			bits <<= nc;
 			if(nbits < nc)
 			{
-				UINT16 b = memory_read_word_16le(space, (m++ & 0x3fffff) << 1);
+				UINT16 b = space->read_word((m++ & 0x3fffff) << 1);
 				b = (b << 8) | (b >> 8);
 				bits |= b << (nc - nbits);
 				nbits += 16;
@@ -235,7 +235,7 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 	UINT32 tilemap = regs[4];
 	UINT32 palette_map = regs[5];
 	UINT32 h, w, hn, wn;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if(!(ctrl & PAGE_ENABLE_MASK))
 	{
@@ -257,7 +257,7 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 	{
 		for(x0 = 0; x0 < wn; x0++)
 		{
-			UINT16 tile = memory_read_word_16le(space, (tilemap + x0 + wn * y0) << 1);
+			UINT16 tile = space->read_word((tilemap + x0 + wn * y0) << 1);
 			UINT16 palette = 0;
 			UINT32 xx, yy;
 
@@ -266,7 +266,7 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 				continue;
 			}
 
-			palette = memory_read_word_16le(space, (palette_map + (x0 + wn * y0) / 2) << 1);
+			palette = space->read_word((palette_map + (x0 + wn * y0) / 2) << 1);
 			if(x0 & 1)
 			{
 				palette >>= 8;
@@ -297,16 +297,16 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int depth, UINT32 base_addr)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 tile, attr;
 	INT16 x, y;
 	UINT32 h, w;
 	UINT32 bitmap_addr = 0x40 * state->video_regs[0x22];
 
-	tile = memory_read_word_16le(space, (base_addr + 0) << 1);
-	x = memory_read_word_16le(space, (base_addr + 1) << 1);
-	y = memory_read_word_16le(space, (base_addr + 2) << 1);
-	attr = memory_read_word_16le(space, (base_addr + 3) << 1);
+	tile = space->read_word((base_addr + 0) << 1);
+	x = space->read_word((base_addr + 1) << 1);
+	y = space->read_word((base_addr + 2) << 1);
+	attr = space->read_word((base_addr + 3) << 1);
 
 	if(!tile)
 	{
@@ -348,7 +348,7 @@ static void vii_blit_sprites(running_machine *machine, bitmap_t *bitmap, const r
 
 	for(n = 0; n < 256; n++)
 	{
-		//if(memory_read_word_16le(space, (0x2c00 + 4*n) << 1))
+		//if(space->read_word((0x2c00 + 4*n) << 1))
 		{
 			vii_blit_sprite(machine, bitmap, cliprect, depth, 0x2c00 + 4*n);
 		}
@@ -389,14 +389,14 @@ static VIDEO_UPDATE( vii )
 static void vii_do_dma(running_machine *machine, UINT32 len)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 src = state->video_regs[0x70];
 	UINT32 dst = state->video_regs[0x71] + 0x2c00;
 	UINT32 j;
 
 	for(j = 0; j < len; j++)
 	{
-		memory_write_word_16le(space, (dst+j) << 1, memory_read_word_16le(space, (src+j) << 1));
+		space->write_word((dst+j) << 1, space->read_word((src+j) << 1));
 	}
 
 	state->video_regs[0x72] = 0;
@@ -554,7 +554,7 @@ static void vii_do_i2c(running_machine *machine)
 static void spg_do_dma(running_machine *machine, UINT32 len)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT32 src = ((state->io_regs[0x101] & 0x3f) << 16) | state->io_regs[0x100];
 	UINT32 dst = state->io_regs[0x103] & 0x3fff;
@@ -562,7 +562,7 @@ static void spg_do_dma(running_machine *machine, UINT32 len)
 
 	for(j = 0; j < len; j++)
 	{
-		memory_write_word_16le(space, (dst+j) << 1, memory_read_word_16le(space, (src+j) << 1));
+		space->write_word((dst+j) << 1, space->read_word((src+j) << 1));
 	}
 
 	state->io_regs[0x102] = 0;

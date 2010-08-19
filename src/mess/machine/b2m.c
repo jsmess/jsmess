@@ -43,7 +43,7 @@ static READ8_HANDLER (b2m_keyboard_r )
 static void b2m_set_bank(running_machine *machine,int bank)
 {
 	UINT8 *rom;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_write_bank(space, 0x0000, 0x27ff, 0, 0, "bank1");
 	memory_install_write_bank(space, 0x2800, 0x2fff, 0, 0, "bank2");

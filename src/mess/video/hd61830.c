@@ -60,7 +60,7 @@ static const int HD61830_CYCLES[] = {
 typedef struct _hd61830_t hd61830_t;
 struct _hd61830_t
 {
-	const address_space *space;	/* memory space */
+	address_space *space;	/* memory space */
 
 	int bf;						/* busy flag */
 
@@ -169,7 +169,7 @@ READ8_DEVICE_HANDLER( hd61830_data_r )
 
 	if (LOG) logerror("HD61380 '%s' Display Data Read %02x\n", device->tag(), hd61830->dor);
 
-	hd61830->dor = memory_read_byte(hd61830->space, hd61830->cac);
+	hd61830->dor = hd61830->space->read_byte(hd61830->cac);
 
 	hd61830->cac++;
 
@@ -257,7 +257,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		break;
 
 	case HD61830_INSTRUCTION_DISPLAY_DATA_WRITE:
-		memory_write_byte(hd61830->space, hd61830->cac, data);
+		hd61830->space->write_byte(hd61830->cac, data);
 
 		if (LOG) logerror("HD61380 '%s' Display Data Write %02x -> %04x row %u col %u\n", device->tag(), data, hd61830->cac, hd61830->cac / 40, hd61830->cac % 40);
 
@@ -267,13 +267,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_CLEAR_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data_ = memory_read_byte(hd61830->space, hd61830->cac);
+		UINT8 data_ = hd61830->space->read_byte(hd61830->cac);
 
 		data_ &= ~(2 << nb);
 
 		if (LOG) logerror("HD61380 '%s' Clear Bit %u at %04x\n", device->tag(), nb + 1, hd61830->cac);
 
-		memory_write_byte(hd61830->space, hd61830->cac, data_);
+		hd61830->space->write_byte(hd61830->cac, data_);
 
 		hd61830->cac++;
 		}
@@ -282,13 +282,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_SET_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data_ = memory_read_byte(hd61830->space, hd61830->cac);
+		UINT8 data_ = hd61830->space->read_byte(hd61830->cac);
 
 		data_ |= 2 << nb;
 
 		if (LOG) logerror("HD61380 '%s' Set Bit %u at %04x\n", device->tag(), nb + 1, hd61830->cac);
 
-		memory_write_byte(hd61830->space, hd61830->cac, data_);
+		hd61830->space->write_byte(hd61830->cac, data_);
 
 		hd61830->cac++;
 		}
@@ -314,7 +314,7 @@ static void draw_scanline(running_device *device, bitmap_t *bitmap, const rectan
 
 	for (sx = 0; sx < hd61830->hn; sx++)
 	{
-		UINT8 data = memory_read_byte(hd61830->space, ra++);
+		UINT8 data = hd61830->space->read_byte(ra++);
 
 		for (x = 0; x < hd61830->hp; x++)
 		{
@@ -383,7 +383,7 @@ static void update_text(running_device *device, bitmap_t *bitmap, const rectangl
 	for(int y = 0; y < 8; y++)
 		for(int x = 0; x < hd61830->hn; x++)
 		{
-			UINT8 char_code = memory_read_byte(hd61830->space, y * hd61830->hn + x);
+			UINT8 char_code = hd61830->space->read_byte(y * hd61830->hn + x);
 
 			if (hd61830->cac == y * hd61830->hn + x)
 			{

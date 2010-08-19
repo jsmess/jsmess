@@ -571,7 +571,7 @@ static WRITE64_HANDLER( bebox_video_w )
 
 static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	const address_space *space = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 
 	memory_nop_readwrite(space, 0xC00A0000, 0xC00BFFFF, 0, 0);
 
@@ -711,7 +711,7 @@ static READ8_HANDLER( bebox_dma_read_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0x7FFF0000;
-	return memory_read_byte(space, page_offset + offset);
+	return space->read_byte(page_offset + offset);
 }
 
 
@@ -719,7 +719,7 @@ static WRITE8_HANDLER( bebox_dma_write_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0x7FFF0000;
-	memory_write_byte(space, page_offset + offset, data);
+	space->write_byte(page_offset + offset, data);
 }
 
 
@@ -945,7 +945,7 @@ static WRITE64_HANDLER( scsi53c810_w )
 static UINT32 scsi53c810_fetch(running_machine *machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = memory_read_dword_64be(cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM), dsp & 0x7FFFFFFF);
+	result = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);	
 	return BYTE_REVERSE32(result);
 }
 
@@ -1011,7 +1011,7 @@ void scsi53c810_pci_write(running_device *busdevice, running_device *device, int
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						const address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+						address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 
 						addr = (scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						memory_install_read64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_r);
@@ -1089,8 +1089,8 @@ MACHINE_START( bebox )
 
 DRIVER_INIT( bebox )
 {
-	const address_space *space_0 = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
-	const address_space *space_1 = cputag_get_address_space(machine, "ppc2", ADDRESS_SPACE_PROGRAM);
+	address_space *space_0 = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+	address_space *space_1 = cputag_get_address_space(machine, "ppc2", ADDRESS_SPACE_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 

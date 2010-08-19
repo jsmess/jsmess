@@ -353,6 +353,8 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	}
 }
 
+extern UINT8 *gce_vectorram;
+extern size_t gce_vectorram_size;
 
 DRIVER_INIT(vectrex)
 {
@@ -367,5 +369,5 @@ DRIVER_INIT(vectrex)
      * the first level of Minestorm are not evenly distributed.
      */
 
-	memset(vectorram, 0xff, vectorram_size);
+	memset(gce_vectorram, 0xff, gce_vectorram_size);
 }

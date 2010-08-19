@@ -780,7 +780,7 @@ QUICKLOAD_LOAD ( coco )
 		}
 		else
 		{
-			const address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+			address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 			/* data block - need to cap the maximum length of the block */
 			block_length = MIN(block_length, length - position);
@@ -788,7 +788,7 @@ QUICKLOAD_LOAD ( coco )
 			/* read the block into memory */
 			for (i = 0; i < block_length; i++)
 			{
-				memory_write_byte(space, block_address + i, ptr[position + i]);
+				space->write_byte(block_address + i, ptr[position + i]);
 			}
 
 			/* and advance */
@@ -2033,7 +2033,7 @@ static void setup_memory_map(running_machine *machine)
 	};
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 memsize	= sam6883_memorysize(state->sam);
 	UINT8 maptype	= sam6883_maptype(state->sam);
@@ -2373,7 +2373,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		{ 0xfe00, 0xfeff }
 	};
 
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int i, offset;
 	UINT8 *readbank;
 	UINT8 *cart_rom = memory_region(machine, "cart");

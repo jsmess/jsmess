@@ -198,7 +198,7 @@ const wd17xx_interface comx35_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static UINT8 fdc_r(const address_space *space)
+static UINT8 fdc_r(address_space *space)
 {
 	comx35_state *state = space->machine->driver_data<comx35_state>();
 	running_device *fdc = space->machine->device(WD1770_TAG);
@@ -217,7 +217,7 @@ static UINT8 fdc_r(const address_space *space)
 	return data;
 }
 
-static void fdc_w(const address_space *space, UINT8 data)
+static void fdc_w(address_space *space, UINT8 data)
 {
 	running_device *fdc = space->machine->device(WD1770_TAG);
 	/*
@@ -383,7 +383,7 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 static void set_active_bank(running_machine *machine)
 {
 	comx35_state *state = machine->driver_data<comx35_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	int bank = state->bank;
 
 	switch (state->bank)
@@ -568,14 +568,14 @@ static TIMER_CALLBACK( reset_tick )
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
-static DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
+DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 {
 	if (address >= 0x0dd0 && address <= 0x0ddf)
 	{
-		if (dos_card_active(space->machine))
+		if (dos_card_active(machine))
 		{
 			// read opcode from DOS ROM
-			direct->raw = direct->decrypted = memory_region(space->machine, "fdc");
+			direct.explicit_configure(0x0dd0, 0x0ddf, 0x000f, memory_region(machine, "fdc"));
 			return ~0;
 		}
 	}
@@ -591,11 +591,11 @@ static STATE_POSTLOAD( comx35_state_save_postload )
 MACHINE_START( comx35p )
 {
 	comx35_state *state = machine->driver_data<comx35_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* opbase handling for DOS Card */
 
-	memory_set_direct_update_handler(program, comx35_opbase_handler);
+	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, *machine));
 
 	/* BASIC ROM banking */
 

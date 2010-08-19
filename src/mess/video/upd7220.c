@@ -979,7 +979,7 @@ static void update_text(running_device *device, bitmap_t *bitmap, const rectangl
 static void draw_graphics_line(running_device *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < upd7220->aw; sx++)

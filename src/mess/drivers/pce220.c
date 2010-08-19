@@ -92,7 +92,7 @@ static WRITE8_HANDLER( rom_bank_w )
 
 static WRITE8_HANDLER( ram_bank_w )
 {
-	const address_space *space_prg = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_prg = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 bank = BIT(data,2);
 	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
 
@@ -187,7 +187,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pce220)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x0000);
 }

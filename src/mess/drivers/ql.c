@@ -530,7 +530,7 @@ static MACHINE_START( ql )
 {
 	ql_state *state = machine->driver_data<ql_state>();
 
-	const address_space *program = cputag_get_address_space(machine, M68008_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M68008_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure ROM cartridge */
 

@@ -218,25 +218,25 @@ WRITE8_HANDLER ( bbc_memorybp1_w )
 */
 
 
-static DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
+DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 {
-	UINT8 *ram = memory_region(space->machine, "maincpu");
+	UINT8 *ram = memory_region(machine, "maincpu");
 	if (vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
-		memory_set_bankptr(space->machine, "bank2", ram + 0x3000);
+		memory_set_bankptr(machine, "bank2", ram + 0x3000);
 	}
 	else
 	{
-		if (vdudriverset(space->machine))
+		if (vdudriverset(machine))
 		{
 			// if VDUDriver set then read from shadow ram
-			memory_set_bankptr(space->machine, "bank2", ram + 0xb000);
+			memory_set_bankptr(machine, "bank2", ram + 0xb000);
 		}
 		else
 		{
 			// else read from normal ram
-			memory_set_bankptr(space->machine, "bank2", ram + 0x3000);
+			memory_set_bankptr(machine, "bank2", ram + 0x3000);
 		}
 	}
 	return address;
@@ -478,21 +478,21 @@ WRITE8_HANDLER ( bbc_memorybm1_w )
 }
 
 
-static DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
+DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 {
 	if (ACCCON_X)
 	{
-		memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0xb000 );
+		memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0xb000 );
 	}
 	else
 	{
-		if (ACCCON_E && bbcm_vdudriverset(space->machine))
+		if (ACCCON_E && bbcm_vdudriverset(machine))
 		{
-			memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0xb000 );
+			memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0xb000 );
 		}
 		else
 		{
-			memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0x3000 );
+			memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0x3000 );
 		}
 	}
 
@@ -886,7 +886,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 
 
 
-static int bbc_keyboard(const address_space *space, int data)
+static int bbc_keyboard(address_space *space, int data)
 {
 	int bit;
 	int row;
@@ -945,7 +945,7 @@ static void bbcb_IC32_initialise(void)
 
 
 /* This the BBC Masters Real Time Clock and NVRam IC */
-static void MC146818_set(const address_space *space)
+static void MC146818_set(address_space *space)
 {
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",MC146818_WR,MC146818_DS,MC146818_AS,MC146818_CE);
 
@@ -979,7 +979,7 @@ static void MC146818_set(const address_space *space)
 
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	//logerror("SYSTEM write porta %d\n",data);
 
 	via_system_porta = data;
@@ -999,7 +999,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int bit, value;
 	bit = data & 0x07;
 	value = (data >> 3) & 0x01;
@@ -2139,7 +2139,7 @@ MACHINE_START( bbcbp )
 {
 	mc6850_clock = 0;
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bbcbp_direct_handler);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, *machine));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	memory_configure_bank(machine, "bank6", 0, 16, memory_region(machine, "user1") + 0x3000, 1<<14);
@@ -2165,7 +2165,7 @@ MACHINE_START( bbcm )
 {
 	mc6850_clock = 0;
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bbcm_direct_handler);
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, *machine));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
 	memory_configure_bank(machine, "bank5", 0, 16, memory_region(machine, "user1")+0x01000, 1<<14);

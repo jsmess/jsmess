@@ -91,7 +91,7 @@ static void palm_spim_exchange( running_device *device )
 
 static MACHINE_START( palm )
 {
-    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     memory_install_read_bank (space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
     memory_install_write_bank(space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));

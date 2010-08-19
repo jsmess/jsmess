@@ -139,7 +139,7 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 static void xerox820_bankswitch(running_machine *machine, int bank)
 {
 	xerox820_state *state = machine->driver_data<xerox820_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
 	if (bank)
@@ -160,7 +160,7 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 static void xerox820ii_bankswitch(running_machine *machine, int bank)
 {
 	xerox820_state *state = machine->driver_data<xerox820_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
 	if (bank)

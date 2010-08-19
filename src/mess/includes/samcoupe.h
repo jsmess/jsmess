@@ -66,7 +66,7 @@ void samcoupe_irq(running_device *device, UINT8 src);
 
 /*----------- defined in machine/samcoupe.c -----------*/
 
-void samcoupe_update_memory(const address_space *space);
+void samcoupe_update_memory(address_space *space);
 UINT8 samcoupe_mouse_r(running_machine *machine);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );

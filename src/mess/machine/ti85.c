@@ -101,7 +101,7 @@ static void update_ti85_memory (running_machine *machine)
 
 static void update_ti83p_memory (running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (ti8x_memory_page_1 & 0x40)
 	{
@@ -162,7 +162,7 @@ static void update_ti83p_memory (running_machine *machine)
 
 static void update_ti86_memory (running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (ti8x_memory_page_1 & 0x40)
 	{
@@ -194,7 +194,7 @@ static void update_ti86_memory (running_machine *machine)
 
 MACHINE_START( ti81 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -228,7 +228,7 @@ MACHINE_START( ti81 )
 
 MACHINE_START( ti82 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -269,7 +269,7 @@ MACHINE_START( ti82 )
 
 MACHINE_START( ti85 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -311,7 +311,7 @@ MACHINE_RESET( ti85 )
 
 MACHINE_START( ti83p )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -363,7 +363,7 @@ MACHINE_START( ti83p )
 
 MACHINE_START( ti86 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -882,7 +882,7 @@ static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * dat
 
 static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;
@@ -891,7 +891,7 @@ static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 
 	/* Memory dump */
 	for (i = 0; i < 0x8000; i++)
-	   memory_write_byte(space, i + 0x8000, data[i+0x94]);
+	   space->write_byte(i + 0x8000, data[i+0x94]);
 
 	ti85_keypad_mask = hdw[0x00]&0x7f;
 

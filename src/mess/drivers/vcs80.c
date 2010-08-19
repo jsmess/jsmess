@@ -240,9 +240,9 @@ ROM_END
 
 /* Driver Initialization */
 
-static DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
+DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 {
-	vcs80_state *state = space->machine->driver_data<vcs80_state>();
+	vcs80_state *state = machine->driver_data<vcs80_state>();
 
 	/* _A0 is connected to PIO PB7 */
 	z80pio_pb_w(state->z80pio, 0, (!BIT(address, 0)) << 7);
@@ -252,8 +252,8 @@ static DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 
 static DRIVER_INIT( vcs80 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), vcs80_direct_update_handler);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO), vcs80_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
 }
 
 /* System Drivers */

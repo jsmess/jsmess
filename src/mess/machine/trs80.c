@@ -263,7 +263,7 @@ WRITE8_HANDLER( trs80m4_84_w )
     d0 Select bit 0 */
 
 	/* get address space instead of io space */
-	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	trs80_mode = (trs80_mode & 0x73) | (data & 0x8c);
 
@@ -401,7 +401,7 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
         d0 Video banking exists yes/no (1=not banked) */
 
 	/* get address space instead of io space */
-	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	trs80_model4 &= 0xf7;
 	trs80_model4 |= (data << 3);
@@ -610,7 +610,7 @@ WRITE8_HANDLER( lnw80_fe_w )
     d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
-	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	trs80_mode = (trs80_mode & 0x87) | ((data & 0x0f) << 3);
 
@@ -912,7 +912,7 @@ MACHINE_RESET( trs80 )
 
 MACHINE_RESET( trs80m4 )
 {
-	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	cassette_data = 0;
 
 	memory_install_read_bank (mem, 0x0000, 0x0fff, 0, 0, "bank1");
@@ -940,7 +940,7 @@ MACHINE_RESET( trs80m4 )
 
 MACHINE_RESET( lnw80 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	cassette_data = 0;
 	trs80_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);

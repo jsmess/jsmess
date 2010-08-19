@@ -41,7 +41,7 @@
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data<atarist_state>();
 
 	if ((state->fdc_mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
@@ -50,7 +50,7 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 		{
 			if (state->fdc_mode & ATARIST_FLOPPY_MODE_WRITE)
 			{
-				UINT8 data = memory_read_byte_8be(program, state->fdc_dmabase);
+				UINT8 data = program->read_byte(state->fdc_dmabase);
 
 				wd17xx_data_w(state->wd1772, 0, data);
 			}
@@ -58,7 +58,7 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 			{
 				UINT8 data = wd17xx_data_r(state->wd1772, 0);
 
-				memory_write_byte_8be(program, state->fdc_dmabase, data);
+				program->write_byte(state->fdc_dmabase, data);
 			}
 
 			state->fdc_dmabase++;
@@ -1459,7 +1459,7 @@ static MC68901_INTERFACE( mfp_intf )
 
 static void atarist_configure_memory(running_machine *machine)
 {
-	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (messram_get_size(machine->device("messram")))
@@ -1658,7 +1658,7 @@ static MACHINE_START( megaste )
 
 static void stbook_configure_memory(running_machine *machine)
 {
-	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (messram_get_size(machine->device("messram")))

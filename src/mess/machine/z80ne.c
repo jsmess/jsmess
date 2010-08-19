@@ -202,14 +202,14 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 /*
  * Handle NMI delay for single step instruction
  */
-static DIRECT_UPDATE_HANDLER( nmi_delay_count )
+DIRECT_UPDATE_HANDLER( nmi_delay_count )
 {
 	nmi_delay_counter--;
 
 	if (!nmi_delay_counter)
 	{
-		memory_set_direct_update_handler( space, NULL );
-		cputag_set_input_line(space->machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
+		cputag_set_input_line(machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
 }
@@ -218,19 +218,20 @@ static DIRECT_UPDATE_HANDLER( nmi_delay_count )
  * Handle delayed ROM/RAM banking at RESET
  * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
  */
-static DIRECT_UPDATE_HANDLER( reset_delay_count )
+DIRECT_UPDATE_HANDLER( reset_delay_count )
 {
+	address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 	/*
      * TODO: when debugger is active, his memory access causes this callback
      *
      */
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		reset_delay_counter--;
 
 	if (!reset_delay_counter)
 	{
 		/* remove this callback */
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 		/* and switch to RAM bank at address 0x0000 */
 		memory_set_bank( space->machine, "bank1", 0 ); /* RAM at 0x0000 (bank 1) */
 	}
@@ -246,7 +247,7 @@ static void reset_lx388(running_machine *machine)
 
 static void reset_lx382_banking(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 
 	/* switch to ROM bank at address 0x0000 */
     memory_set_bank(machine, "bank1", 1);
@@ -254,12 +255,12 @@ static void reset_lx382_banking(running_machine *machine)
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	reset_delay_counter = 2;
-	memory_set_direct_update_handler(space, reset_delay_count);
+	space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));		
 }
 
 static void reset_lx390_banking(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 	reset_delay_counter = 0;
 
 	switch (input_port_read(machine, "CONFIG") & 0x07) {
@@ -272,7 +273,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		reset_delay_counter = 2;
-		memory_set_direct_update_handler(space, reset_delay_count);
+		space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));			
 	    break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -281,7 +282,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 1);  /* ep548 at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 	    break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
@@ -290,7 +291,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 1);  /* ep390 at 0xF000 */
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 	    break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
@@ -299,7 +300,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 2);  /* ep1390 at 0xF000 */
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 	    break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
@@ -308,7 +309,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
 	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
 	    memory_set_bank(machine, "bank4", 3);  /* ep2390 at 0xF000 */
-		memory_set_direct_update_handler( space, NULL );
+		//cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(NULL);
 	    break;
 	}
 
@@ -320,7 +321,7 @@ static void reset_lx390_banking(running_machine *machine)
 static MACHINE_RESET(z80ne_base)
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 
 	LOG(("In MACHINE_RESET z80ne_base\n"));
 
@@ -512,7 +513,7 @@ WRITE8_HANDLER( lx383_w )
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
     	nmi_delay_counter = 1;
-    	memory_set_direct_update_handler(cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM),nmi_delay_count);
+		cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(nmi_delay_count, *space->machine));					
 }
 
 

@@ -72,7 +72,7 @@ static WRITE8_DEVICE_HANDLER( vp595_cdp1863_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp595_install_write_handlers(running_device *device, const address_space *io, int enabled)
+void vp595_install_write_handlers(running_device *device, address_space *io, int enabled)
 {
 	vp595_t *vp595 = get_safe_token(device);
 

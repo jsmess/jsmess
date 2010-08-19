@@ -262,7 +262,7 @@ static WRITE8_HANDLER( bankswitch_w )
 {
 	/* enable RAM */
 
-	const address_space *program = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	memory_set_bank(space->machine, "bank1", VIP_BANK_RAM);
 
@@ -677,8 +677,8 @@ static MACHINE_RESET( vip )
 {
 	vip_state *state = machine->driver_data<vip_state>();
 
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
-	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
 
 	/* reset auxiliary chips */
 	state->cdp1861->reset();

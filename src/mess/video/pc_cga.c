@@ -458,8 +458,8 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	const address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
 	/* Changed video RAM size to full 32k, for cards which support the
      * Plantronics chipset.
@@ -1284,7 +1284,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
 		UINT8 buswidth = device_memory(space->machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-		const address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			switch(buswidth)

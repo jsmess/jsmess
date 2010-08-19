@@ -161,7 +161,7 @@ static void execute_hardreset(running_machine *machine, int ref, int params, con
     given address is valid for cheating
 -------------------------------------------------*/
 
-INLINE int cheat_address_is_valid(const address_space *space, offs_t address)
+INLINE int cheat_address_is_valid(address_space *space, offs_t address)
 {
 	return debug_cpu_translate(space, TRANSLATE_READ, &address) && (memory_get_write_ptr(space, address) != NULL);
 }
@@ -210,7 +210,7 @@ INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
     and swapping if necessary
 -------------------------------------------------*/
 
-INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, const address_space *space, offs_t address)
+INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space *space, offs_t address)
 {
 	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE)));
 }
@@ -554,7 +554,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, dev
     address space
 -------------------------------------------------*/
 
-int debug_command_parameter_cpu_space(running_machine *machine, const char *param, int spacenum, const address_space **result)
+int debug_command_parameter_cpu_space(running_machine *machine, const char *param, int spacenum, address_space **result)
 {
 	device_t *cpu;
 
@@ -1305,7 +1305,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 static void execute_wpset(running_machine *machine, int ref, int params, const char *param[])
 {
 	parsed_expression *condition = NULL;
-	const address_space *space;
+	address_space *space;
 	const char *action = NULL;
 	UINT64 address, length;
 	int type = 0;
@@ -1438,14 +1438,14 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(), device->debug()->watchpoint_first(spacenum)->space().name);
+				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(), device->debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
 				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != NULL; wp = wp->next())
 				{
 					buffer.printf("%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							core_i64_hex_format(memory_byte_to_address(&wp->space(), wp->address()), wp->space().addrchars),
-							core_i64_hex_format(memory_byte_to_address_end(&wp->space(), wp->address() + wp->length()) - 1, wp->space().addrchars),
+							core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
+							core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()),
 							types[wp->type() & 3]);
 					if (wp->condition() != NULL)
 						buffer.catprintf(" if %s", wp->condition());
@@ -1511,7 +1511,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 static void execute_save(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length;
-	const address_space *space;
+	address_space *space;
 	FILE *f;
 	UINT64 i;
 
@@ -1524,8 +1524,8 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 		return;
 
 	/* determine the addresses to write */
-	endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;
-	offset = memory_address_to_byte(space, offset) & space->bytemask;
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
 
 	/* open the file */
 	f = fopen(param[0], "wb");
@@ -1555,7 +1555,7 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 static void execute_dump(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length, width = 0, ascii = 1;
-	const address_space *space;
+	address_space *space;
 	FILE *f = NULL;
 	UINT64 i, j;
 
@@ -1573,16 +1573,16 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 
 	/* further validation */
 	if (width == 0)
-		width = space->dbits / 8;
-	if (width < memory_address_to_byte(space, 1))
-		width = memory_address_to_byte(space, 1);
+		width = space->data_width() / 8;
+	if (width < space->address_to_byte(1))
+		width = space->address_to_byte(1);
 	if (width != 1 && width != 2 && width != 4 && width != 8)
 	{
 		debug_console_printf(machine, "Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
-	endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;
-	offset = memory_address_to_byte(space, offset) & space->bytemask;
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
 
 	/* open the file */
 	f = fopen(param[0], "w");
@@ -1599,7 +1599,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		int outdex = 0;
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)memory_byte_to_address(space, i), space->logaddrchars));
+		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(i), space->logaddrchars()));
 
 		/* print the bytes */
 		for (j = 0; j < 16; j += width)
@@ -1653,7 +1653,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 static void execute_cheatinit(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, length = 0, real_length = 0;
-	const address_space *space;
+	address_space *space;
 	UINT32 active_cheat = 0;
 	UINT64 curaddr;
 	UINT8 i, region_count = 0;
@@ -1711,19 +1711,19 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 	if (params <= 1)
 	{
 		offset = 0;
-		length = space->bytemask + 1;
-		for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
+		length = space->bytemask() + 1;
+		for (entry = space->map()->m_entrylist.first(); entry != NULL; entry = entry->next())
 		{
-			cheat_region[region_count].offset = memory_address_to_byte(space, entry->m_addrstart) & space->bytemask;
-			cheat_region[region_count].endoffset = memory_address_to_byte(space, entry->m_addrend) & space->bytemask;
+			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
+			cheat_region[region_count].endoffset = space->address_to_byte(entry->m_addrend) & space->bytemask();
 			cheat_region[region_count].share = entry->m_share;
-			cheat_region[region_count].disabled = (entry->m_write.type == AMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].disabled = (entry->m_write.m_type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
 			if (entry->m_share != NULL)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != NULL)
-						if (strcmp(cheat_region[i].share, entry->m_share)==0)
+						if (strcmp(cheat_region[i].share, entry->m_share) == 0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
@@ -1738,8 +1738,8 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			return;
 
 		/* force region to the specified range */
-		cheat_region[region_count].offset = memory_address_to_byte(space, offset) & space->bytemask;;
-		cheat_region[region_count].endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;;
+		cheat_region[region_count].offset = space->address_to_byte(offset) & space->bytemask();
+		cheat_region[region_count].endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 		cheat_region[region_count].share = NULL;
 		cheat_region[region_count].disabled = FALSE;
 		region_count++;
@@ -1815,7 +1815,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 
 static void execute_cheatnext(running_machine *machine, int ref, int params, const char *param[])
 {
-	const address_space *space;
+	address_space *space;
 	UINT64 cheatindex;
 	UINT32 active_cheat = 0;
 	UINT8 condition;
@@ -1984,7 +1984,7 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 static void execute_cheatlist(running_machine *machine, int ref, int params, const char *param[])
 {
 	char spaceletter, sizeletter;
-	const address_space *space;
+	address_space *space;
 	device_t *cpu;
 	UINT32 active_cheat = 0;
 	UINT64 cheatindex;
@@ -2000,7 +2000,7 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 	if (params > 0)
 		f = fopen(param[0], "w");
 
-	switch (space->spacenum)
+	switch (space->spacenum())
 	{
 		default:
 		case ADDRESS_SPACE_PROGRAM:	spaceletter = 'p';	break;
@@ -2023,19 +2023,19 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
 			UINT64 value = cheat_byte_swap(&cheat, cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset)) & sizemask;
-			offs_t address = memory_byte_to_address(space, cheat.cheatmap[cheatindex].offset);
+			offs_t address = space->byte_to_address(cheat.cheatmap[cheatindex].offset);
 
 			if (params > 0)
 			{
 				active_cheat++;
-				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(value, cheat.width * 2));
+				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(value, cheat.width * 2));
 				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
+				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
 				fprintf(f, "    </script>\n");
 				fprintf(f, "  </cheat>\n\n");
 			}
 			else
-				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
+				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
 		}
 	}
 	if (params > 0)
@@ -2079,7 +2079,7 @@ static void execute_cheatundo(running_machine *machine, int ref, int params, con
 static void execute_find(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length;
-	const address_space *space;
+	address_space *space;
 	UINT64 data_to_find[256];
 	UINT8 data_size[256];
 	int cur_data_size;
@@ -2096,9 +2096,9 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		return;
 
 	/* further validation */
-	endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;
-	offset = memory_address_to_byte(space, offset) & space->bytemask;
-	cur_data_size = memory_address_to_byte(space, 1);
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
+	cur_data_size = space->address_to_byte(1);
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -2161,7 +2161,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		if (match)
 		{
 			found++;
-			debug_console_printf(machine, "Found at %s\n", core_i64_hex_format((UINT32)memory_byte_to_address(space, i), space->addrchars));
+			debug_console_printf(machine, "Found at %s\n", core_i64_hex_format((UINT32)space->byte_to_address(i), space->addrchars()));
 		}
 	}
 
@@ -2179,7 +2179,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 {
 	UINT64 offset, length, bytes = 1;
 	int minbytes, maxbytes, byteswidth;
-	const address_space *space;
+	address_space *space;
 	FILE *f = NULL;
 	int i, j;
 
@@ -2215,7 +2215,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	/* now write the data out */
 	for (i = 0; i < length; )
 	{
-		int pcbyte = memory_address_to_byte(space, offset + i) & space->bytemask;
+		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
 		char output[200+DEBUG_COMMENT_MAX_LINE_LENGTH], disasm[200];
 		const char *comment;
 		offs_t tempaddr;
@@ -2223,7 +2223,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		int numbytes = 0;
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)memory_byte_to_address(space, pcbyte), space->logaddrchars));
+		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(pcbyte), space->logaddrchars()));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2246,7 +2246,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		if (bytes)
 		{
 			int startdex = outdex;
-			numbytes = memory_address_to_byte(space, numbytes);
+			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
 				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(space, pcbyte + j, minbytes, FALSE), minbytes * 2));
 			if (outdex - startdex < byteswidth)
@@ -2373,7 +2373,7 @@ static void execute_traceflush(running_machine *machine, int ref, int params, co
 static void execute_history(running_machine *machine, int ref, int params, const char *param[])
 {
 	/* validate parameters */
-	const address_space *space;
+	address_space *space;
 	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, ADDRESS_SPACE_PROGRAM, &space))
 		return;
 
@@ -2394,7 +2394,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 		offs_t pc = debug->history_pc(-index);
 
 		/* fetch the bytes up to the maximum */
-		offs_t pcbyte = memory_address_to_byte(space, pc) & space->bytemask;
+		offs_t pcbyte = space->address_to_byte(pc) & space->bytemask();
 		UINT8 opbuf[64], argbuf[64];
 		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
@@ -2405,7 +2405,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 		char buffer[200];
 		debug->disassemble(buffer, pc, opbuf, argbuf);
 
-		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars), buffer);
+		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars()), buffer);
 	}
 }
 
@@ -2473,7 +2473,7 @@ static void execute_source(running_machine *machine, int ref, int params, const 
 
 static void execute_map(running_machine *machine, int ref, int params, const char *param[])
 {
-	const address_space *space;
+	address_space *space;
 	offs_t taddress;
 	UINT64 address;
 	int intention;
@@ -2490,14 +2490,14 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		taddress = memory_address_to_byte(space, address) & space->bytemask;
+		taddress = space->address_to_byte(address) & space->bytemask();
 		if (debug_cpu_translate(space, intention, &taddress))
 		{
-			const char *mapname = memory_get_handler_string(space, intention == TRANSLATE_WRITE_DEBUG, taddress);
-			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(memory_byte_to_address(space, taddress), space->addrchars), mapname);
+			const char *mapname = const_cast<address_space *>(space)->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
+			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(space->byte_to_address(taddress), space->addrchars()), mapname);
 		}
 		else
-			debug_console_printf(machine, "%7s: %s logical is unmapped\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars));
+			debug_console_printf(machine, "%7s: %s logical is unmapped\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()));
 	}
 }
 

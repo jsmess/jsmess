@@ -210,7 +210,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 static void abc800_bankswitch(running_machine *machine)
 {
 	abc800_state *state = machine->driver_data<abc800_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->fetch_charram)
 	{
@@ -227,7 +227,7 @@ static void abc800_bankswitch(running_machine *machine)
 static void abc802_bankswitch(running_machine *machine)
 {
 	abc802_state *state = machine->driver_data<abc802_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->lrs)
 	{
@@ -247,7 +247,7 @@ static void abc802_bankswitch(running_machine *machine)
 static void abc806_bankswitch(running_machine *machine)
 {
 	abc806_state *state = machine->driver_data<abc806_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT32 videoram_mask = messram_get_size(machine->device("messram")) - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
@@ -1357,18 +1357,18 @@ ROM_END
 
 /* Driver Initialization */
 
-static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
+DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 {
-	abc800_state *state = space->machine->driver_data<abc800_state>();
+	abc800_state *state = machine->driver_data<abc800_state>();
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
+		direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
 
 		if (!state->fetch_charram)
 		{
 			state->fetch_charram = 1;
-			abc800_bankswitch(space->machine);
+			abc800_bankswitch(machine);
 		}
 
 		return ~0;
@@ -1377,45 +1377,45 @@ static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 	if (state->fetch_charram)
 	{
 		state->fetch_charram = 0;
-		abc800_bankswitch(space->machine);
+		abc800_bankswitch(machine);
 	}
 
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
+DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 {
-	abc802_state *state = space->machine->driver_data<abc802_state>();
+	abc802_state *state = machine->driver_data<abc802_state>();
 
 	if (state->lrs)
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
+			direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
 			return ~0;
 		}
 	}
 	else
 	{
-		direct->raw = direct->decrypted = messram_get_ptr(space->machine->device("messram"));
+		direct.explicit_configure(0x0000, 0xffff, 0xffff, messram_get_ptr(machine->device("messram")));
 		return ~0;
 	}
 
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
+DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
+	abc806_state *state = machine->driver_data<abc806_state>();
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
+		direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
 
 		if (!state->fetch_charram)
 		{
 			state->fetch_charram = 1;
-			abc806_bankswitch(space->machine);
+			abc806_bankswitch(machine);
 		}
 
 		return ~0;
@@ -1424,7 +1424,7 @@ static DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 	if (state->fetch_charram)
 	{
 		state->fetch_charram = 0;
-		abc806_bankswitch(space->machine);
+		abc806_bankswitch(machine);
 	}
 
 	return address;
@@ -1432,17 +1432,17 @@ static DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 static DRIVER_INIT( abc800 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), abc800_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc800_direct_update_handler, *machine));
 }
 
 static DRIVER_INIT( abc802 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), abc802_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, *machine));
 }
 
 static DRIVER_INIT( abc806 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), abc806_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, *machine));
 }
 
 /* System Drivers */

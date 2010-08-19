@@ -81,7 +81,7 @@ static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 
 static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 {
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	int rombank = data & 0x03;
 	int ram0000 = (data >> 2) & 0x03;

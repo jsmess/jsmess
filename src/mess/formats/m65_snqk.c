@@ -217,7 +217,7 @@ static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
     UINT8 *RAM = memory_region(machine, "maincpu");
-    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     running_device *via_0 = machine->device("via6522_0");
     running_device *via_1 = machine->device("via6522_1");
     running_device *ay8910 = machine->device("ay8910.1");

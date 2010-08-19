@@ -363,7 +363,7 @@ static DRIVER_INIT( vg5k )
 
 
 	/* install expansion memory*/
-	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT16 ram_size = messram_get_size(machine->device("messram"));
 

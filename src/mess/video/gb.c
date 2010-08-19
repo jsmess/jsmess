@@ -1301,7 +1301,7 @@ void gb_video_reset( running_machine *machine, int mode )
 {
 	int	i;
 	int vram_size = 0x2000;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	emu_timer *old_timer = gb_lcd.lcd_timer;
 
 	memset( &gb_lcd, 0, sizeof(gb_lcd) );
@@ -1410,14 +1410,14 @@ void gb_video_reset( running_machine *machine, int mode )
 static void gbc_hdma(running_machine *machine, UINT16 length)
 {
 	UINT16 src, dst;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
 	while( length > 0 )
 	{
-		memory_write_byte( space, dst++, memory_read_byte( space, src++ ) );
+		space->write_byte( dst++, space->read_byte( src++ ) );
 		length--;
 	}
 	HDMA1 = src >> 8;
@@ -2173,7 +2173,7 @@ WRITE8_HANDLER ( gb_video_w )
 			UINT8 *P = gb_lcd.gb_oam->base();
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
-				*P++ = memory_read_byte (space, offset++);
+				*P++ = space->read_byte(offset++);
 		}
 		return;
 	case 0x07:						/* BGP - Background Palette */

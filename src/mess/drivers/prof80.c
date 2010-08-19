@@ -152,7 +152,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 static void prof80_bankswitch(running_machine *machine)
 {
 	prof80_state *state = machine->driver_data<prof80_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *rom = memory_region(machine, Z80_TAG);
 	int bank;

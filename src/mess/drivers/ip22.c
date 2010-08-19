@@ -1208,14 +1208,14 @@ static MACHINE_RESET( ip225015 )
 	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-static void dump_chain(const address_space *space, UINT32 ch_base)
+static void dump_chain(address_space *space, UINT32 ch_base)
 {
 
-	printf("node: %08x %08x %08x (len = %x)\n", memory_read_dword(space, ch_base), memory_read_dword(space, ch_base+4), memory_read_dword(space, ch_base+8), memory_read_dword(space, ch_base+4) & 0x3fff);
+	printf("node: %08x %08x %08x (len = %x)\n", space->read_dword(ch_base), space->read_dword(ch_base+4), space->read_dword(ch_base+8), space->read_dword(ch_base+4) & 0x3fff);
 
-	if ((memory_read_dword(space, ch_base+8) != 0) && !(memory_read_dword(space, ch_base+4) & 0x80000000))
+	if ((space->read_dword(ch_base+8) != 0) && !(space->read_dword(ch_base+4) & 0x80000000))
 	{
-		dump_chain(space, memory_read_dword(space, ch_base+8));
+		dump_chain(space, space->read_dword(ch_base+8));
 	}
 }
 
@@ -1229,7 +1229,7 @@ static UINT8 dma_buffer[4096];
 
 static void scsi_irq(running_machine *machine, int state)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (state)
 	{
@@ -1250,7 +1250,7 @@ static void scsi_irq(running_machine *machine, int state)
 				words = wd33c93_get_dma_count();
 				words /= 4;
 
-				wptr = memory_read_dword(space, nHPC_SCSI0Descriptor);
+				wptr = space->read_dword(nHPC_SCSI0Descriptor);
 				nHPC_SCSI0Descriptor += words*4;
 				dptr = 0;
 
@@ -1265,7 +1265,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 					while (words)
 					{
-						tmpword = memory_read_dword(space, wptr);
+						tmpword = space->read_dword(wptr);
 
 						if (nHPC_SCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
@@ -1301,7 +1301,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 						while (twords)
 						{
-							tmpword = memory_read_dword(space, wptr);
+							tmpword = space->read_dword(wptr);
 
 							if (nHPC_SCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 							{
@@ -1333,8 +1333,8 @@ static void scsi_irq(running_machine *machine, int state)
 				wd33c93_clear_dma();
 #if 0
 				UINT32 dptr, tmpword;
-				UINT32 bc = memory_read_dword(space, nHPC_SCSI0Descriptor + 4);
-				UINT32 rptr = memory_read_dword(space, nHPC_SCSI0Descriptor);
+				UINT32 bc = space->read_dword(nHPC_SCSI0Descriptor + 4);
+				UINT32 rptr = space->read_dword(nHPC_SCSI0Descriptor);
 				int length = bc & 0x3fff;
 				int xie = (bc & 0x20000000) ? 1 : 0;
 				int eox = (bc & 0x80000000) ? 1 : 0;
@@ -1349,7 +1349,7 @@ static void scsi_irq(running_machine *machine, int state)
 					dptr = 0;
 					while (length > 0)
 					{
-						tmpword = memory_read_dword(space, rptr);
+						tmpword = space->read_dword(rptr);
 						if (nHPC_SCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
 							dma_buffer[dptr+3] = (tmpword>>24)&0xff;
@@ -1370,7 +1370,7 @@ static void scsi_irq(running_machine *machine, int state)
 						length -= 4;
 					}
 
-					length = memory_read_dword(space, nHPC_SCSI0Descriptor+4) & 0x3fff;
+					length = space->read_dword(nHPC_SCSI0Descriptor+4) & 0x3fff;
 					wd33c93_write_data(length, dma_buffer);
 
 					// clear DMA on the controller too
@@ -1392,7 +1392,7 @@ static void scsi_irq(running_machine *machine, int state)
 				words = wd33c93_get_dma_count();
 				words /= 4;
 
-				wptr = memory_read_dword(space, nHPC_SCSI0Descriptor);
+				wptr = space->read_dword(nHPC_SCSI0Descriptor);
 				sptr = 0;
 
 //              mame_printf_info("DMA from device: %d words @ %x\n", words, wptr);
@@ -1415,7 +1415,7 @@ static void scsi_irq(running_machine *machine, int state)
 							tmpword = dma_buffer[sptr]<<24 | dma_buffer[sptr+1]<<16 | dma_buffer[sptr+2]<<8 | dma_buffer[sptr+3];
 						}
 
-						memory_write_dword(space, wptr, tmpword);
+						space->write_dword(wptr, tmpword);
 						wptr += 4;
 						sptr += 4;
 						words--;
@@ -1439,7 +1439,7 @@ static void scsi_irq(running_machine *machine, int state)
 							{
 								tmpword = dma_buffer[sptr]<<24 | dma_buffer[sptr+1]<<16 | dma_buffer[sptr+2]<<8 | dma_buffer[sptr+3];
 							}
-							memory_write_dword(space, wptr, tmpword);
+							space->write_dword(wptr, tmpword);
 
 							wptr += 4;
 							sptr += 4;

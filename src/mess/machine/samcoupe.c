@@ -22,7 +22,7 @@
     MEMORY BANKING
 ***************************************************************************/
 
-static void samcoupe_update_bank(const address_space *space, int bank_num, UINT8 *memory, int is_readonly)
+static void samcoupe_update_bank(address_space *space, int bank_num, UINT8 *memory, int is_readonly)
 {
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
@@ -42,7 +42,7 @@ static void samcoupe_update_bank(const address_space *space, int bank_num, UINT8
 }
 
 
-static void samcoupe_install_ext_mem(const address_space *space)
+static void samcoupe_install_ext_mem(address_space *space)
 {
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	UINT8 *mem;
@@ -65,7 +65,7 @@ static void samcoupe_install_ext_mem(const address_space *space)
 }
 
 
-void samcoupe_update_memory(const address_space *space)
+void samcoupe_update_memory(address_space *space)
 {
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
@@ -139,7 +139,7 @@ void samcoupe_update_memory(const address_space *space)
 
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	if (offset & 1)
@@ -242,8 +242,8 @@ MACHINE_START( samcoupe )
 
 MACHINE_RESET( samcoupe )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	/* initialize asic */

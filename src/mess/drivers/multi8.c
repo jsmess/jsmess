@@ -470,7 +470,7 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 		---- x--- memory bank status
 		---- -xxx page screen graphics in B/W mode
 	*/
-//	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+//	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 //	printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 

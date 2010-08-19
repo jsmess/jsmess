@@ -158,7 +158,7 @@ static WRITE8_DEVICE_HANDLER( vp550_sync_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp550_install_write_handlers(running_device *device, const address_space *program, int enabled)
+void vp550_install_write_handlers(running_device *device, address_space *program, int enabled)
 {
 	vp550_t *vp550 = get_safe_token(device);
 
@@ -187,7 +187,7 @@ void vp550_install_write_handlers(running_device *device, const address_space *p
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp551_install_write_handlers(running_device *device, const address_space *program, int enabled)
+void vp551_install_write_handlers(running_device *device, address_space *program, int enabled)
 {
 }
 

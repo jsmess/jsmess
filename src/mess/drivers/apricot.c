@@ -239,7 +239,7 @@ static DRIVER_INIT( apricot )
 {
 	apricot_state *apricot = machine->driver_data<apricot_state>();
 	running_device *maincpu = machine->device("maincpu");
-	const address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT32 ram_size = messram_get_size(machine->device("messram"));

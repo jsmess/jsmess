@@ -217,7 +217,7 @@ static DRIVER_INIT( aquarius )
 	/* install expansion memory if available */
 	if (messram_get_size(machine->device("messram")) > 0x1000)
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		memory_install_readwrite_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 0x1000 - 1, 0, 0, "bank1");
 		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));

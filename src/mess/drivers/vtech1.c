@@ -193,7 +193,7 @@ public:
 static SNAPSHOT_LOAD( vtech1 )
 {
 	vtech1_state *vtech1 = image.device().machine->driver_data<vtech1_state>();
-	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -225,20 +225,20 @@ static SNAPSHOT_LOAD( vtech1 )
 	switch (header[21])
 	{
 	case VZ_BASIC:		/* 0xF0 */
-		memory_write_byte(space, 0x78a4, start % 256); /* start of basic program */
-		memory_write_byte(space, 0x78a5, start / 256);
-		memory_write_byte(space, 0x78f9, end % 256); /* end of basic program */
-		memory_write_byte(space, 0x78fa, end / 256);
-		memory_write_byte(space, 0x78fb, end % 256); /* start variable table */
-		memory_write_byte(space, 0x78fc, end / 256);
-		memory_write_byte(space, 0x78fd, end % 256); /* start free mem, end variable table */
-		memory_write_byte(space, 0x78fe, end / 256);
+		space->write_byte(0x78a4, start % 256); /* start of basic program */
+		space->write_byte(0x78a5, start / 256);
+		space->write_byte(0x78f9, end % 256); /* end of basic program */
+		space->write_byte(0x78fa, end / 256);
+		space->write_byte(0x78fb, end % 256); /* start variable table */
+		space->write_byte(0x78fc, end / 256);
+		space->write_byte(0x78fd, end % 256); /* start free mem, end variable table */
+		space->write_byte(0x78fe, end / 256);
 		image.message(" %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
-		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
-		memory_write_byte(space, 0x788f, start / 256);
+		space->write_byte(0x788e, start % 256); /* usr subroutine address */
+		space->write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, start);				/* start program */
 		break;
@@ -255,7 +255,7 @@ static SNAPSHOT_LOAD( vtech1 )
 static Z80BIN_EXECUTE( vtech1 )
 {
 	running_device *cpu = machine->device("maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.
     1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
@@ -264,8 +264,8 @@ static Z80BIN_EXECUTE( vtech1 )
         7ae9 = start (load) address of a conventional basic program
         791e = custom routine to fix basic pointers */
 
-	memory_write_word_16le(space, 0x791c, end_address + 1);
-	memory_write_word_16le(space, 0x781e, execute_address);
+	space->write_word(0x791c, end_address + 1);
+	space->write_word(0x781e, execute_address);
 
 	if (start_address == 0x7ae9)
 	{
@@ -281,10 +281,10 @@ static Z80BIN_EXECUTE( vtech1 )
 		};
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(space, 0x791e + i, data[i]);
+			space->write_byte(0x791e + i, data[i]);
 
 		if (!autorun)
-			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
+			space->write_byte(0x7929, 0xb6);	/* turn off autorun */
 
 		cpu_set_reg(cpu, STATE_GENPC, 0x791e);
 	}
@@ -685,7 +685,7 @@ static VIDEO_UPDATE( vtech1 )
 static DRIVER_INIT( vtech1 )
 {
 	vtech1_state *vtech1 = machine->driver_data<vtech1_state>();
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int id;
 
 	/* find devices */
@@ -744,7 +744,7 @@ static DRIVER_INIT( vtech1 )
 
 static DRIVER_INIT( vtech1h )
 {
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 

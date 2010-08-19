@@ -36,23 +36,23 @@ static VIDEO_START( paso7 )
 #define keyb_press(_val_,_charset_) \
 	if(input_code_pressed(machine, _val_)) \
 	{ \
-		memory_write_byte(ram_space,0xfda4,0x01); \
-		memory_write_byte(ram_space,0xfce1,_charset_); \
+		ram_space->write_byte(0xfda4,0x01); \
+		ram_space->write_byte(0xfce1,_charset_); \
 	} \
 
 #define keyb_shift_press(_val_,_charset_) \
 	if(input_code_pressed(machine, _val_) && input_code_pressed(machine, KEYCODE_LSHIFT)) \
 	{ \
-		memory_write_byte(ram_space,0xfda4,0x01); \
-		memory_write_byte(ram_space,0xfce1,_charset_); \
+		ram_space->write_byte(0xfda4,0x01); \
+		ram_space->write_byte(0xfce1,_charset_); \
 	} \
 
 /* cheap kludge to use the keyboard without going nuts with the debugger ... */
 static void fake_keyboard_data(running_machine *machine)
 {
-	const address_space *ram_space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *ram_space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_write_byte(ram_space,0xfda4,0x00); //clear flag
+	ram_space->write_byte(0xfda4,0x00); //clear flag
 
 	keyb_press(KEYCODE_Z, 'z');
 	keyb_press(KEYCODE_X, 'x');
@@ -378,11 +378,11 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	if(mio_sel)
 	{
-		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		mio_sel = 0;
 		//printf("%08x\n",offset);
 		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
-		return memory_read_byte(ram_space, offset);
+		return ram_space->read_byte(offset);
 	}
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
@@ -411,9 +411,9 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	if(mio_sel)
 	{
-		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		mio_sel = 0;
-		memory_write_byte(ram_space, offset, data);
+		ram_space->write_byte(offset, data);
 		return;
 	}
 

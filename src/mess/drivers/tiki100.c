@@ -64,7 +64,7 @@ static WRITE8_HANDLER( gfxram_w )
 static void tiki100_bankswitch(running_machine *machine)
 {
 	tiki100_state *state = machine->driver_data<tiki100_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->vire)
 	{

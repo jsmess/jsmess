@@ -493,9 +493,9 @@ ROM_END
 
 /* System Drivers */
 
-static DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
+DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 {
-	mpf1_state *state = space->machine->driver_data<mpf1_state>();
+	mpf1_state *state = machine->driver_data<mpf1_state>();
 
 	if (!state->_break)
 	{
@@ -503,7 +503,7 @@ static DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 
 		if (state->m1 == 5)
 		{
-			cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 
@@ -512,7 +512,7 @@ static DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 
 static DRIVER_INIT( mpf1 )
 {
-	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), mpf1_direct_update_handler);
+	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, *machine));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

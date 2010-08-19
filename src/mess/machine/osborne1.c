@@ -220,17 +220,13 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 }
 
 
-static DIRECT_UPDATE_HANDLER( osborne1_opbase )
+DIRECT_UPDATE_HANDLER( osborne1_opbase )
 {
 	if ( ( address & 0xF000 ) == 0x2000 )
 	{
 		if ( ! osborne1.bank2_enabled )
 		{
-			direct->bytemask = 0x0fff;
-			direct->decrypted = messram_get_ptr(space->machine->device("messram")) + 0x2000;
-			direct->raw = messram_get_ptr(space->machine->device("messram")) + 0x2000;
-			direct->bytestart = 0x2000;
-			direct->byteend = 0x2fff;
+			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, messram_get_ptr(machine->device("messram")) + 0x2000);
 			return ~0;
 		}
 	}
@@ -350,7 +346,7 @@ const pia6821_interface osborne1_video_pia_config =
 
 static TIMER_CALLBACK(osborne1_video_callback)
 {
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *speaker = space->machine->device("beep");
 	running_device *pia_1 = space->machine->device("pia_1");
 	int y = machine->primary_screen->vpos();
@@ -452,7 +448,7 @@ static void osborne1_load_proc(device_image_interface &image)
 MACHINE_RESET( osborne1 )
 {
 	int drive;
-	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
 
@@ -471,7 +467,7 @@ MACHINE_RESET( osborne1 )
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 	}
 
-	memory_set_direct_update_handler( space, osborne1_opbase );
+	space->set_direct_update_handler(direct_update_delegate_create_static(osborne1_opbase, *machine));	
 }
 
 
@@ -577,7 +573,7 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 {
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = osborne1.bankswitch;
-	const address_space* space = cputag_get_address_space(device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = cputag_get_address_space(device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	osborne1_bankswitch_w( space, 0, 0 );
 	osborne1.bankswitch = old_bankswitch;

@@ -153,7 +153,7 @@ static VIDEO_UPDATE( mc10 )
 static DRIVER_INIT( mc10 )
 {
 	mc10_state *mc10 = machine->driver_data<mc10_state>();
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* initialize keyboard strobe */
 	mc10->keyboard_strobe = 0x00;

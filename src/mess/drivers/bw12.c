@@ -56,7 +56,7 @@ static void bw12_bankswitch(running_machine *machine)
 {
 	bw12_state *state = machine->driver_data<bw12_state>();
 
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	switch (state->bank)
 	{

@@ -89,7 +89,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-	const address_space *program = cputag_get_address_space(device->machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(device->machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (BIT(ma, 13))
 	{
@@ -103,7 +103,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 		{
 			UINT16 code = (state->video_ram[video_ram_addr + 1] << 8) | state->video_ram[video_ram_addr];
 			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
-			UINT16 data = memory_read_word_16le(program, char_ram_addr);
+			UINT16 data = program->read_word(char_ram_addr);
 
 			for (int x = 0; x <= 10; x++)
 			{
@@ -987,7 +987,7 @@ static MACHINE_START( victor9k )
 	state->floppy[1].image = machine->device(FLOPPY_1);
 
 	/* memory banking */
-	const address_space *program = cputag_get_address_space(machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	int ram_size = messram_get_size(machine->device("messram"));
 

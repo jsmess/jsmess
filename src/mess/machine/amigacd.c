@@ -388,14 +388,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 static void	dmac_install(running_machine *machine, offs_t base)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
 	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
 }
 
 static void	dmac_uninstall(running_machine *machine, offs_t base)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_unmap_readwrite(space, base, base + 0xFFFF, 0, 0);
 }
 

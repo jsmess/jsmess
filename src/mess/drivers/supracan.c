@@ -1153,7 +1153,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 				{
 					if(data & 0x1000)
 					{
-						memory_write_word(space, acan_dma_regs->dest[ch], memory_read_word(space, acan_dma_regs->source[ch]));
+						space->write_word(acan_dma_regs->dest[ch], space->read_word(acan_dma_regs->source[ch]));
 						acan_dma_regs->dest[ch]+=2;
 						acan_dma_regs->source[ch]+=2;
 						if(data & 0x0100)
@@ -1162,7 +1162,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 					}
 					else
 					{
-						memory_write_byte(space, acan_dma_regs->dest[ch], memory_read_byte(space, acan_dma_regs->source[ch]));
+						space->write_byte(acan_dma_regs->dest[ch], space->read_byte(acan_dma_regs->source[ch]));
 						acan_dma_regs->dest[ch]++;
 						acan_dma_regs->source[ch]++;
 					}
@@ -1219,8 +1219,8 @@ static READ8_HANDLER( supracan_6502_soundmem_r )
 
         case 0x410: // Sound IRQ enable
             data = state->sound_irq_enable_reg;
-            if(!space->debugger_access) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
-            if(!space->debugger_access)
+            if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
+            if(!space->debugger_access())
             {
                 if(state->sound_irq_enable_reg & state->sound_irq_source_reg)
                 {
@@ -1235,17 +1235,17 @@ static READ8_HANDLER( supracan_6502_soundmem_r )
         case 0x411: // Sound IRQ source
             data = state->sound_irq_source_reg;
             state->sound_irq_source_reg = 0;
-            if(!space->debugger_access) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
-            if(!space->debugger_access)
+            if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
+            if(!space->debugger_access())
             {
                 cpu_set_input_line(space->machine->device("soundcpu"), 0, CLEAR_LINE);
             }
             break;
         case 0x420:
-            if(!space->debugger_access) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
+            if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
             break;
         case 0x422:
-            if(!space->debugger_access) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
+            if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
             break;
         case 0x404:
         case 0x405:
@@ -1256,7 +1256,7 @@ static READ8_HANDLER( supracan_6502_soundmem_r )
         default:
             if(offset >= 0x300 && offset < 0x500)
             {
-                if(!space->debugger_access) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
+                if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
             }
             break;
     }
@@ -1549,7 +1549,7 @@ static READ16_HANDLER( supracan_video_r )
 	switch(offset)
 	{
 		case 0x00/2: // Video IRQ flags
-            if(!space->debugger_access)
+            if(!space->debugger_access())
             {
                 //verboselog("maincpu", space->machine, 0, "read video IRQ flags (%04x)\n", data);
                 cpu_set_input_line(space->machine->device("maincpu"), 7, CLEAR_LINE);
@@ -1561,16 +1561,16 @@ static READ16_HANDLER( supracan_video_r )
             data = 0;
             break;
         case 0x100/2:
-            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_flags[0] (%04x)\n", data);
+            if(!space->debugger_access()) verboselog("maincpu", space->machine, 0, "read tilemap_flags[0] (%04x)\n", data);
             break;
         case 0x106/2:
-            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_scrolly[0] (%04x)\n", data);
+            if(!space->debugger_access()) verboselog("maincpu", space->machine, 0, "read tilemap_scrolly[0] (%04x)\n", data);
             break;
         case 0x120/2:
-            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "read tilemap_flags[1] (%04x)\n", data);
+            if(!space->debugger_access()) verboselog("maincpu", space->machine, 0, "read tilemap_flags[1] (%04x)\n", data);
             break;
 		default:
-            if(!space->debugger_access) verboselog("maincpu", space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
+            if(!space->debugger_access()) verboselog("maincpu", space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 
@@ -1757,13 +1757,13 @@ static WRITE16_HANDLER( supracan_video_w )
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
-						memory_write_word(space, acan_sprdma_regs->dst, 0);
+						space->write_word(acan_sprdma_regs->dst, 0);
                         acan_sprdma_regs->dst+=2 * acan_sprdma_regs->dst_inc;
 						//memset(supracan_vram,0x00,0x020000);
 					}
 					else
 					{
-						memory_write_word(space, acan_sprdma_regs->dst, memory_read_word(space, acan_sprdma_regs->src));
+						space->write_word(acan_sprdma_regs->dst, space->read_word(acan_sprdma_regs->src));
                         acan_sprdma_regs->dst+=2 * acan_sprdma_regs->dst_inc;
                         acan_sprdma_regs->src+=2 * acan_sprdma_regs->src_inc;
 					}

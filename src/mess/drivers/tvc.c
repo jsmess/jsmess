@@ -17,7 +17,7 @@ static UINT8 tvc_flipflop = 0xff;
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
 				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");

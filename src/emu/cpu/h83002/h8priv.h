@@ -28,8 +28,8 @@ struct _h83xx_state
 	device_irq_callback irq_cb;
 	legacy_cpu_device *device;
 
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 
 	// onboard peripherals stuff
 	UINT8 per_regs[256];
@@ -45,7 +45,6 @@ struct _h83xx_state
 
 	int mode_8bit;
 };
-extern h83xx_state h8;
 
 INLINE h83xx_state *get_safe_token(running_device *device)
 {

@@ -34,7 +34,7 @@ struct _t11_state
     int					icount;
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *		device;
-	const address_space *program;
+	address_space *program;
 };
 
 
@@ -82,25 +82,25 @@ INLINE int ROPCODE(t11_state *cpustate)
 
 INLINE int RBYTE(t11_state *cpustate, int addr)
 {
-	return memory_read_byte_16le(cpustate->program, addr);
+	return cpustate->program->read_byte(addr);
 }
 
 
 INLINE void WBYTE(t11_state *cpustate, int addr, int data)
 {
-	memory_write_byte_16le(cpustate->program, addr, data);
+	cpustate->program->write_byte(addr, data);
 }
 
 
 INLINE int RWORD(t11_state *cpustate, int addr)
 {
-	return memory_read_word_16le(cpustate->program, addr & 0xfffe);
+	return cpustate->program->read_word(addr & 0xfffe);
 }
 
 
 INLINE void WWORD(t11_state *cpustate, int addr, int data)
 {
-	memory_write_word_16le(cpustate->program, addr & 0xfffe, data);
+	cpustate->program->write_word(addr & 0xfffe, data);
 }
 
 

@@ -149,7 +149,7 @@ static WRITE8_HANDLER( mz700_e008_w )
 
 READ8_HANDLER( mz800_bank_0_r )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in cgrom */
@@ -189,7 +189,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 WRITE8_HANDLER( mz700_bank_0_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
@@ -197,7 +197,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 
 WRITE8_HANDLER( mz800_bank_0_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
@@ -205,7 +205,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 
 READ8_HANDLER( mz800_bank_1_r )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in ram from 0x1000 to 0x1fff */
@@ -230,7 +230,7 @@ READ8_HANDLER( mz800_bank_1_r )
 
 WRITE8_HANDLER( mz700_bank_1_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -257,7 +257,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 
 WRITE8_HANDLER( mz700_bank_2_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_nop_write(spc, 0x0000, 0x0fff, 0, 0);
@@ -266,7 +266,7 @@ WRITE8_HANDLER( mz700_bank_2_w )
 
 WRITE8_HANDLER( mz700_bank_3_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -313,7 +313,7 @@ WRITE8_HANDLER( mz700_bank_3_w )
 
 WRITE8_HANDLER( mz700_bank_4_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -370,7 +370,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 WRITE8_HANDLER( mz700_bank_5_w )
 {
-	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)

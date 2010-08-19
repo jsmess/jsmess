@@ -157,7 +157,7 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT( galaxy )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_readwrite_bank( space, 0x2800, 0x2800 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 
@@ -173,7 +173,7 @@ DRIVER_INIT( galaxy )
 
 MACHINE_RESET( galaxy )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* ROM 2 enable/disable */
 	if (input_port_read(machine, "ROM2")) {
@@ -198,7 +198,7 @@ DRIVER_INIT( galaxyp )
 MACHINE_RESET( galaxyp )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
 

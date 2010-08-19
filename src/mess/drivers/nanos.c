@@ -404,7 +404,7 @@ static MACHINE_START(nanos)
 
 static MACHINE_RESET(nanos)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank3");
 	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");

@@ -265,7 +265,7 @@ static INPUT_CHANGED( clear_data )
 static void set_ram_mode(running_machine *machine)
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->ram_disable)
 	{
@@ -515,7 +515,7 @@ static CDP1802_INTERFACE( cosmicos_config )
 static MACHINE_START( cosmicos )
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->dm9368 = machine->device(DM9368_TAG);
@@ -652,9 +652,9 @@ ROM_END
 
 /* System Drivers */
 
-static DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
+DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 {
-	cosmicos_state *state = space->machine->driver_data<cosmicos_state>();
+	cosmicos_state *state = machine->driver_data<cosmicos_state>();
 
 	if (state->boot)
 	{
@@ -667,9 +667,9 @@ static DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 
 static DRIVER_INIT( cosmicos )
 {
-	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
-	memory_set_direct_update_handler(program, cosmicos_direct_update_handler);
+	program->set_direct_update_handler(direct_update_delegate_create_static(cosmicos_direct_update_handler, *machine));
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */

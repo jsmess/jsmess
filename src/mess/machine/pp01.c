@@ -85,7 +85,7 @@ static WRITE8_HANDLER (pp01_video_b_2_w)
 static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 {
 	UINT8 *mem = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;

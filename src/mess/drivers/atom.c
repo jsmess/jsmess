@@ -137,7 +137,7 @@ Hardware:   PPIA 8255
 static void bankswitch(running_machine *machine)
 {
 	atom_state *state = machine->driver_data<atom_state>();
-	const address_space *program = cputag_get_address_space(machine, SY6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, SY6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *eprom = memory_region(machine, "a000") + (state->eprom << 12);
 

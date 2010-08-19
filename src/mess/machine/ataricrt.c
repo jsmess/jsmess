@@ -325,7 +325,7 @@ static WRITE8_HANDLER( xegs_bankswitch )
 
 MACHINE_START( xegs )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *cart = memory_region(space->machine, "user1");
 	UINT8 *cpu  = memory_region(space->machine, "maincpu");
 	

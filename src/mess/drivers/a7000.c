@@ -590,7 +590,7 @@ static TIMER_CALLBACK( flyback_timer_callback )
 	timer_adjust_oneshot(flyback_timer, machine->primary_screen->time_until_pos(vidc20_vert_reg[VDER]),0);
 }
 
-static void viddma_transfer_start(const address_space *space)
+static void viddma_transfer_start(address_space *space)
 {
 	UINT32 src = viddma_addr_start;
 	UINT32 dst = 0;
@@ -601,7 +601,7 @@ static void viddma_transfer_start(const address_space *space)
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
 	{
-		 vram[dst] = memory_read_byte(space, src);
+		 vram[dst] = space->read_byte(src);
 
 		 src++;
 		 dst++;

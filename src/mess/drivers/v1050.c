@@ -148,7 +148,7 @@ void v1050_set_int(running_machine *machine, UINT8 mask, int state)
 static void v1050_bankswitch(running_machine *machine)
 {
 	v1050_state *state = machine->driver_data<v1050_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	int bank = (state->bank >> 1) & 0x03;
 
@@ -1101,7 +1101,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 static MACHINE_START( v1050 )
 {
 	v1050_state *state = machine->driver_data<v1050_state>();
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->i8214 = machine->device(UPB8214_TAG);
