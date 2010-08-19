@@ -31,8 +31,8 @@ struct _hcd62121_state
 	UINT8 temp2[0x10];
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 };
 
@@ -48,10 +48,10 @@ typedef struct _hcd62121_state hcd62121_state;
 #define _FLAG_ZH	0x10
 
 
-#define mem_readbyte(cs,A)		(memory_read_byte_8le((cs)->program,A))
-#define mem_writebyte(cs,A,V)	(memory_write_byte_8le((cs)->program,A,V))
-#define io_readbyte(cs,A)		(memory_read_byte_8le((cs)->io,A))
-#define io_writebyte(cs,A,V)	(memory_write_byte_8le((cs)->io,A,V))
+#define mem_readbyte(cs,A)		((UINT8)(cs)->program->read_byte(A))
+#define mem_writebyte(cs,A,V)	((cs)->program->write_byte(A,V))
+#define io_readbyte(cs,A)		((UINT8)(cs)->io->read_byte(A))
+#define io_writebyte(cs,A,V)	((cs)->io->write_byte(A,V))
 
 
 INLINE UINT8 read_op(hcd62121_state *cpustate)
