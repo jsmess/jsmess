@@ -546,14 +546,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc806_hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc806_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
@@ -1363,7 +1363,7 @@ DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
 
 		if (!state->fetch_charram)
 		{
@@ -1391,7 +1391,7 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
 			return ~0;
 		}
 	}
@@ -1410,7 +1410,7 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x8000, 0x7fff, memory_region(machine, Z80_TAG));
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
 
 		if (!state->fetch_charram)
 		{
@@ -1432,17 +1432,20 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 static DRIVER_INIT( abc800 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc800_direct_update_handler, *machine));
+	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc800_direct_update_handler, *machine));
 }
 
 static DRIVER_INIT( abc802 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, *machine));
+	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, *machine));
 }
 
 static DRIVER_INIT( abc806 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, *machine));
+	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, *machine));
 }
 
 /* System Drivers */
