@@ -2010,7 +2010,7 @@ static MACHINE_RESET( gba )
 	running_device *gb_b_r = machine->device("direct_b_right");
 	gba_state *state = machine->driver_data<gba_state>();
 
-	memset(state, 0, sizeof(state));
+	//memset(state, 0, sizeof(state));
 	state->SOUNDBIAS = 0x0200;
 	state->eeprom_state = EEP_IDLE;
 	state->SIOMULTI0 = 0xffff;
