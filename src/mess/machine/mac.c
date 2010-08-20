@@ -2697,7 +2697,7 @@ MACHINE_RESET(mac)
 	// clear mac state struct
 	model_save = mac->mac_model;
 	timer_save = mac->inquiry_timeout;
-	memset(mac, 0, sizeof(mac_state));
+	//memset(mac, 0, sizeof(mac_state));
 	mac->mac_model = model_save;
 	mac->inquiry_timeout = timer_save;
 
