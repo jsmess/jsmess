@@ -77,9 +77,22 @@ static int amstrad_plus_irq_cause;  // part of the interrupt vector for IM 2.  6
  * Gate Array data (CPC) -
  ****************************/
 static struct {
+	bitmap_t	*bitmap;		/* The bitmap we work on */
 	UINT8	pen_selected;		/* Pen selection */
 	UINT8	mrer;				/* Mode and ROM Enable Register */
 	UINT8	upper_bank;
+
+	/* input signals from CRTC */
+	int		vsync;
+	int		hsync;
+	int		de;
+
+	/* used for timing */
+	int		hsync_after_vsync_counter;
+	int		hsync_counter;				/* The gate array counts CRTC HSYNC pulses using an internal 6-bit counter. */
+
+	/* used for drawing the screen */
+	int		y;
 } gate_array;
 
 
@@ -150,8 +163,6 @@ static const int RamConfigurations[8 * 4] =
 
 static int prev_reg;
 
-static int amstrad_CRTC_HS = 0; /* HS = Horizontal Sync */
-static int amstrad_CRTC_VS = 0;        /* VS = Vertical Sync */
 //static int amstrad_CRTC_CR = 0;        /* CR = Cursor Enabled */
 
 /* this contains the colours in machine->pens form.*/
@@ -159,10 +170,6 @@ static int amstrad_CRTC_VS = 0;        /* VS = Vertical Sync */
 of the render colours - these may be different to the current colour palette values */
 /* colours can be changed at any time and will take effect immediatly */
 static UINT16 amstrad_GateArray_render_colours[17];
-/* The gate array counts CRTC HSYNC pulses. (It has a internal 6-bit counter). */
-static int amstrad_CRTC_HS_Counter;
-/* 2 HSYNCS after the VSYNC Counter */
-static int amstrad_CRTC_HS_After_VS_Counter;
 
 static mc6845_update_row_func draw_function;
 
@@ -1193,60 +1200,63 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
 {
-	if ( state )
+	/* TODO - Bring video up to date */
+
+	if ( ! gate_array.hsync && state )
 	{
-		amstrad_CRTC_HS_Counter++;
+		gate_array.hsync_counter++;
+		gate_array.y++;
 
-		if ( amstrad_CRTC_HS_After_VS_Counter != 0 )  // counters still operate regardless of PRI state
+		if ( gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
 		{
-			amstrad_CRTC_HS_After_VS_Counter--;
+			gate_array.hsync_after_vsync_counter--;
 
-			if (amstrad_CRTC_HS_After_VS_Counter == 0)
+			if (gate_array.hsync_after_vsync_counter == 0)
 			{
-				if (amstrad_CRTC_HS_Counter >= 32)
+				if (gate_array.hsync_counter >= 32)
 				{
 					cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 				}
-				amstrad_CRTC_HS_Counter = 0;
+				gate_array.hsync_counter = 0;
 			}
 		}
 
-		if ( amstrad_CRTC_HS_Counter >= 52 )
+		if ( gate_array.hsync_counter >= 52 )
 		{
-			amstrad_CRTC_HS_Counter = 0;
+			gate_array.hsync_counter = 0;
 			cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 		}
 	}
-	amstrad_CRTC_HS = state ? 1 : 0;
+	gate_array.hsync = state ? 1 : 0;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 {
-	if ( state )
+	if ( ! gate_array.hsync && state )
 	{
-		amstrad_CRTC_HS_Counter++;
+		gate_array.hsync_counter++;
 
-		if ( amstrad_CRTC_HS_After_VS_Counter != 0 )  // counters still operate regardless of PRI state
+		if ( gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
 		{
-			amstrad_CRTC_HS_After_VS_Counter--;
+			gate_array.hsync_after_vsync_counter--;
 
-			if (amstrad_CRTC_HS_After_VS_Counter == 0)
+			if (gate_array.hsync_after_vsync_counter == 0)
 			{
-				if (amstrad_CRTC_HS_Counter >= 32)
+				if (gate_array.hsync_counter >= 32)
 				{
 					if( asic.pri == 0 || asic.enabled == 0)
 					{
 						cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 					}
 				}
-				amstrad_CRTC_HS_Counter = 0;
+				gate_array.hsync_counter = 0;
 			}
 		}
 
-		if ( amstrad_CRTC_HS_Counter >= 52 )
+		if ( gate_array.hsync_counter >= 52 )
 		{
-			amstrad_CRTC_HS_Counter = 0;
+			gate_array.hsync_counter = 0;
 			if ( asic.pri == 0 || asic.enabled == 0 )
 			{
 				cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
@@ -1263,7 +1273,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 					logerror("PRI: triggered, scanline %d\n",asic.pri);
 					cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 					amstrad_plus_irq_cause = 0x06;  // raster interrupt vector
-					amstrad_CRTC_HS_Counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
+					gate_array.hsync_counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}
 			}
 			// CPC+/GX4000 Split screen registers  (disabled if &6801 in ASIC RAM is 0)
@@ -1279,19 +1289,32 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			amstrad_plus_handle_dma(device->machine);  // a DMA command is handled at the leading edge of HSYNC (every 64us)
 		}
 	}
-	amstrad_CRTC_HS = state ? 1 : 0;
+	gate_array.hsync = state ? 1 : 0;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 {
-	if ( ! amstrad_CRTC_VS && state )
+	/* TODO - Bring video up to date */
+
+	if ( ! gate_array.vsync && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
-		amstrad_CRTC_HS_After_VS_Counter = 2;
+		gate_array.hsync_after_vsync_counter = 2;
+
+		/* Start of new frame */
+		gate_array.y = -1;
 	}
 
-	amstrad_CRTC_VS = state ? 1 : 0;
+	gate_array.vsync = state ? 1 : 0;
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
+{
+	/* TODO - Bring video up to date */
+
+	gate_array.de = state ? 1 : 0;
 }
 
 
@@ -1300,7 +1323,7 @@ VIDEO_START( amstrad )
 	amstrad_init_lookups();
 
 	draw_function = NULL;
-	amstrad_CRTC_HS_After_VS_Counter = 2;
+	gate_array.hsync_after_vsync_counter = 2;
 }
 
 
@@ -1319,7 +1342,7 @@ const mc6845_interface amstrad_mc6845_intf =
 	NULL,						/* begin_update */
 	amstrad_update_row,			/* update_row */
 	NULL,						/* end_update */
-	DEVCB_NULL,					/* on_de_changed */
+	DEVCB_LINE(amstrad_de_changed),					/* on_de_changed */
 	DEVCB_NULL,					/* on_cur_changed */
 	DEVCB_LINE(amstrad_hsync_changed),		/* on_hsync_changed */
 	DEVCB_LINE(amstrad_vsync_changed),		/* on_vsync_changed */
@@ -2140,7 +2163,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
          then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
 		if ( gate_array.mrer & 0x10 )
 		{
-			amstrad_CRTC_HS_Counter = 0;
+			gate_array.hsync_counter = 0;
 			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 		}
 
@@ -2975,7 +2998,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
 /*  Set b0 with VSync state from the CRTC */
-	data |= amstrad_CRTC_VS;
+	data |= gate_array.vsync;
 
 	if(aleste_mode & 0x04)
 	{
@@ -3093,7 +3116,7 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 		return (amstrad_plus_asic_ram[0x2805] & 0xf8) | amstrad_plus_irq_cause;
 	}
 	cputag_set_input_line(device->machine,"maincpu", 0, CLEAR_LINE);
-	amstrad_CRTC_HS_Counter &= 0x1F;
+	gate_array.hsync_counter &= 0x1F;
 	if ( asic.enabled )
 	{
 		if(amstrad_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
@@ -3236,8 +3259,10 @@ static void amstrad_common_init(running_machine *machine)
 	aleste_mode = 0;
 
 	gate_array.mrer = 0;
+	gate_array.vsync = 0;
+	gate_array.hsync = 0;
 	amstrad_GateArray_RamConfiguration = 0;
-	amstrad_CRTC_HS_Counter = 2;
+	gate_array.hsync_counter = 2;
 
 	memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_install_read_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
@@ -3294,10 +3319,15 @@ static void amstrad_common_init(running_machine *machine)
 
 MACHINE_START( amstrad )
 {
+	screen_device *screen = downcast<screen_device *>(machine->device("screen"));
 
 	multiface_init(machine);
 	amstrad_system_type = SYSTEM_CPC;
+
+	gate_array.bitmap = auto_bitmap_alloc( machine, screen->width(), screen->height(), screen->format() );
 }
+
+
 MACHINE_RESET( amstrad )
 {
 	int i;
