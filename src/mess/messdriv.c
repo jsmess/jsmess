@@ -1216,7 +1216,7 @@ const game_driver * const drivers[] =
 
 	/* OSCOM Oy */
 //  DRIVER(osc1000b)
-	DRIVER(oscnano)
+	DRIVER(nano)
 
 	/* MIT */
 	DRIVER( tx0_64kw )  /* April 1956 MIT TX-0 (64kw RAM)      */
