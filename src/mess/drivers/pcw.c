@@ -743,7 +743,7 @@ static MACHINE_START( pcw )
 
 static MACHINE_RESET( pcw )
 {
-	UINT8* code = memory_region(machine,"bootcode");
+	UINT8* code = memory_region(machine,"printer_mcu");
 	int x;
 	/* ram paging is actually undefined at power-on */
 	pcw_bank_force = 0x00;
@@ -757,12 +757,12 @@ static MACHINE_RESET( pcw )
 	pcw_update_mem(machine, 1, pcw_banks[1]);
 	pcw_update_mem(machine, 2, pcw_banks[2]);
 	pcw_update_mem(machine, 3, pcw_banks[3]);
-	/* copy boot code into RAM - yes, it's skipping a step,
-       but there is no verified dump of the boot sequence */
+
+	/* copy boot code into RAM - yes, it's skipping a step */
 
 	memset(messram_get_ptr(machine->device("messram")),0x00,messram_get_size(machine->device("messram")));
 	for(x=0;x<256;x++)
-		messram_get_ptr(machine->device("messram"))[x+2] = code[x];
+		messram_get_ptr(machine->device("messram"))[x+2] = code[x+0x300];
 
 }
 
@@ -1056,33 +1056,57 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-/* I am loading the boot-program outside of the Z80 memory area, because it
-is banked. */
-/* 8256boot.bin is not a real ROM, it is what is loaded into RAM by the boot sequence
-   It was typed in by hand based on the disassembly found at
-   http://www.chiark.greenend.org.uk/~jacobn/cpm/pcwboot.html  */
+ROM_START(pcw8256)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)											\
+	ROM_REGION(0x400,"printer_mcu",0)  // i8041
+	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
 
-// for now all models use the same rom
-#define ROM_PCW(model)												\
-	ROM_START(model)												\
-		ROM_REGION(0x010000, "maincpu",0)							\
-		ROM_FILL(0x0000,0x10000,0x00)											\
-/*      ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))*/	\
-		ROM_REGION(256,"bootcode",0)								\
-		ROM_LOAD("8256boot.bin", 0, 256, BAD_DUMP CRC(d55925bd) SHA1(bca6a47d657557be99cb8580d4bf90968d8dde4a))	\
-	ROM_END															\
+ROM_START(pcw8512)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)											\
+	ROM_REGION(0x400,"printer_mcu",0)  // i8041
+	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
 
-ROM_PCW(pcw8256)
-ROM_PCW(pcw8512)
-ROM_PCW(pcw9256)
-ROM_PCW(pcw9512)
-ROM_PCW(pcw10)
+ROM_START(pcw9256)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)											\
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041
+	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
+
+ROM_START(pcw9512)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)											\
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041
+	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
+
+ROM_START(pcw10)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)											\
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041
+	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
+
 
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
-/*     YEAR NAME        PARENT      COMPAT  MACHINE   INPUT INIT    COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,			0,		pcw,	  pcw,	pcw,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256,	0,		pcw_512,	  pcw,	pcw,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
+/*     YEAR NAME        PARENT  COMPAT  MACHINE   INPUT INIT    COMPANY        FULLNAME */
+COMP( 1985, pcw8256,   0,		0,		pcw,	  pcw,	pcw,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
+COMP( 1985, pcw8512,   pcw8256,	0,		pcw_512,  pcw,	pcw,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
 COMP( 1987, pcw9256,   pcw8256,	0,		pcw,	  pcw,	pcw,		"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
 COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
-COMP( 1993, pcw10,	    pcw8256,	0,		pcw9512,  pcw,	pcw,	"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
+COMP( 1993, pcw10,	   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
