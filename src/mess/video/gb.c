@@ -742,18 +742,18 @@ static void sgb_update_scanline( running_machine *machine )
 				{
 					rectangle r;
 					r.min_x = SGB_XOFFSET;
-					r.max_x -= SGB_XOFFSET;
+					r.max_x = SGB_XOFFSET + 160-1;
 					r.min_y = SGB_YOFFSET;
-					r.max_y -= SGB_YOFFSET;
+					r.max_y = SGB_YOFFSET + 144 - 1;
 					bitmap_fill( bitmap, &r , 0);
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
 					rectangle r;
 					r.min_x = SGB_XOFFSET;
-					r.max_x -= SGB_XOFFSET;
+					r.max_x = SGB_XOFFSET + 160 - 1;
 					r.min_y = SGB_YOFFSET;
-					r.max_y -= SGB_YOFFSET;
+					r.max_y = SGB_YOFFSET + 144 - 1;
 					bitmap_fill( bitmap, &r , 32767);
 				} return;
 			}
@@ -773,7 +773,7 @@ static void sgb_update_scanline( running_machine *machine )
 			{
 				rectangle r;
 				r.min_x = SGB_XOFFSET;
-				r.max_x -= SGB_XOFFSET;
+				r.max_x = SGB_XOFFSET + 160 - 1;
 				r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
 				bitmap_fill( bitmap, &r , 0);
 			}
@@ -855,7 +855,7 @@ static void sgb_update_scanline( running_machine *machine )
 				{
 					rectangle r;
 					r.min_x = SGB_XOFFSET;
-					r.max_x -= SGB_XOFFSET;
+					r.max_x = SGB_XOFFSET + 160 - 1;
 					r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
 					bitmap_fill(bitmap, &r, 0);
 				}
