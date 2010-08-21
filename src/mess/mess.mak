@@ -392,6 +392,7 @@ DRVLIBS = \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/tiki.a \
 	$(MESSOBJ)/tomy.a \
+	$(MESSOBJ)/toshiba.a \
 	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
