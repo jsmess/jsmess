@@ -9,22 +9,6 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
-/* Character Memory */
-
-READ8_HANDLER( abc802_charram_r )
-{
-	abc802_state *state =  space->machine->driver_data<abc802_state>();
-
-	return state->charram[offset];
-}
-
-WRITE8_HANDLER( abc802_charram_w )
-{
-	abc802_state *state =  space->machine->driver_data<abc802_state>();
-
-	state->charram[offset] = data;
-}
-
 /* MC6845 Row Update */
 
 static MC6845_UPDATE_ROW( abc802_update_row )
@@ -168,7 +152,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( abc802_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( vs_w )
 {
 	abc802_state *driver_state = device->machine->driver_data<abc802_state>();
 
@@ -192,7 +176,8 @@ static WRITE_LINE_DEVICE_HANDLER( abc802_vsync_changed )
 
 /* MC6845 Interfaces */
 
-static const mc6845_interface abc802_mc6845_interface = {
+static const mc6845_interface crtc_intf =
+{
 	SCREEN_TAG,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -201,7 +186,7 @@ static const mc6845_interface abc802_mc6845_interface = {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(abc802_vsync_changed),
+	DEVCB_LINE(vs_w),
 	NULL
 };
 
@@ -211,22 +196,13 @@ static VIDEO_START( abc802 )
 {
 	abc802_state *state =  machine->driver_data<abc802_state>();
 
-	/* allocate memory */
-
-	state->charram = auto_alloc_array(machine, UINT8, ABC802_CHAR_RAM_SIZE);
-
 	/* find devices */
-
 	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
-
 	state->char_rom = memory_region(machine, "chargen");
 
 	/* register for state saving */
-
-	state_save_register_global_pointer(machine, state->charram, ABC802_CHAR_RAM_SIZE);
-
 	state_save_register_global(machine, state->flshclk_ctr);
 	state_save_register_global(machine, state->flshclk);
 	state_save_register_global(machine, state->mux80_40);
@@ -236,7 +212,7 @@ static VIDEO_START( abc802 )
 
 static VIDEO_UPDATE( abc802 )
 {
-	abc802_state *state =  screen->machine->driver_data<abc802_state>();
+	abc802_state *state = screen->machine->driver_data<abc802_state>();
 
 	/* expand visible area to workaround MC6845 */
 	screen->set_visible_area(0, 767, 0, 311);
@@ -250,10 +226,8 @@ static VIDEO_UPDATE( abc802 )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( abc802_video )
-	// device interface
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, abc802_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
-	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 

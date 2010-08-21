@@ -59,6 +59,10 @@ public:
 	/* sound state */
 	int pling;					/* pling */
 
+	/* serial state */
+	int z80sio_rxcb;
+	int z80sio_txcb;
+
 	/* devices */
 	running_device *z80ctc;
 	running_device *z80dart;
@@ -154,9 +158,6 @@ MACHINE_DRIVER_EXTERN(abc800m_video);
 MACHINE_DRIVER_EXTERN(abc800c_video);
 
 /*----------- defined in video/abc802.c -----------*/
-
-READ8_HANDLER( abc802_charram_r );
-WRITE8_HANDLER( abc802_charram_w );
 
 MACHINE_DRIVER_EXTERN(abc802_video);
 

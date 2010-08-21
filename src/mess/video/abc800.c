@@ -94,7 +94,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( abc800_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( vs_w )
 {
 	abc800_state *driver_state = device->machine->driver_data<abc800_state>();
 
@@ -103,7 +103,8 @@ static WRITE_LINE_DEVICE_HANDLER( abc800_vsync_changed )
 
 /* MC6845 Interfaces */
 
-static const mc6845_interface abc800m_mc6845_interface = {
+static const mc6845_interface crtc_intf =
+{
 	SCREEN_TAG,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -112,7 +113,7 @@ static const mc6845_interface abc800m_mc6845_interface = {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(abc800_vsync_changed),
+	DEVCB_LINE(vs_w),
 	NULL
 };
 
@@ -183,22 +184,6 @@ static void abc800c_hr_update(running_machine *machine, bitmap_t *bitmap, const 
 
 /* Video Start */
 
-static VIDEO_START( abc800m )
-{
-	abc800_state *state = machine->driver_data<abc800_state>();
-
-	/* find devices */
-	state->mc6845 = machine->device(MC6845_TAG);
-
-	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
-	state->fgctl_prom = memory_region(machine, "fgctl");
-
-	/* register for state saving */
-	state_save_register_global(machine, state->hrs);
-	state_save_register_global(machine, state->fgctl);
-}
-
 static VIDEO_START( abc800c )
 {
 	abc800_state *state = machine->driver_data<abc800_state>();
@@ -210,6 +195,16 @@ static VIDEO_START( abc800c )
 	/* register for state saving */
 	state_save_register_global(machine, state->hrs);
 	state_save_register_global(machine, state->fgctl);
+}
+
+static VIDEO_START( abc800m )
+{
+	VIDEO_START_CALL(abc800c);
+
+	abc800_state *state = machine->driver_data<abc800_state>();
+
+	/* find devices */
+	state->mc6845 = machine->device(MC6845_TAG);
 }
 
 /* Video Update */
@@ -258,7 +253,7 @@ static VIDEO_UPDATE( abc800c )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( abc800m_video )
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, abc800m_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

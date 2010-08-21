@@ -54,6 +54,7 @@
 
     TODO:
 
+	- replace the 2nd Z80DART with Z80SIO when it is implemented properly
     - ABC 77 keyboard
     - bit accurate Z80 SIO/2 (cassette)
     - floppy controller board
@@ -70,7 +71,6 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/serial.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
 #include "machine/z80dart.h"
 #include "machine/abcbus.h"
 #include "machine/e0516.h"
@@ -83,11 +83,6 @@
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "devices/messram.h"
-
-static running_device *cassette_device_image(running_machine *machine)
-{
-	return machine->device(CASSETTE_TAG);
-}
 
 /* Discrete Sound */
 
@@ -232,16 +227,14 @@ static void abc802_bankswitch(running_machine *machine)
 	if (state->lrs)
 	{
 		/* ROM and video RAM selected */
-		memory_install_readwrite_bank(program, 0x0000, 0x77ff, 0, 0, "bank1");
-		memory_install_readwrite8_handler(program, 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
+		memory_install_rom(program, 0x0000, 0x77ff, 0, 0, memory_region(machine, Z80_TAG));
+		memory_install_ram(program, 0x7800, 0x7fff, 0, 0, state->charram);
 	}
 	else
 	{
 		/* low RAM selected */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, messram_get_ptr(machine->device("messram")));
 	}
-
-	memory_set_bank(machine, "bank1", state->lrs);
 }
 
 static void abc806_bankswitch(running_machine *machine)
@@ -464,7 +457,7 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -491,7 +484,7 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc800_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -499,7 +492,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(abc800_state, charram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -518,7 +512,7 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -562,7 +556,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -722,42 +716,44 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
-	//running_device *z80sio = device->machine->device(Z80SIO_TAG);
+	running_device *z80sio = device->machine->device(Z80SIO_TAG);
+
+	static int z80sio_rxcb, z80sio_txcb; // FIXME
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
 	if (BIT(sb, 2))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txca_w(z80sio, state);
+		z80dart_txca_w(z80sio, state);
 		z80ctc_trg3_w(device, state);
 	}
 
 	/* connected to SIO/2 RxCB through a thingy */
 	//z80sio_rxcb = ?
-	//z80sio_rxcb_w(z80sio, z80sio_rxcb);
+	z80dart_rxcb_w(z80sio, z80sio_rxcb);
 
 	/* connected to SIO/2 TxCB through a JK divide by 2 */
-	//z80sio_txcb = !z80sio_txcb;
-	//z80sio_txcb_w(z80sio, z80sio_txcb);
+	z80sio_txcb = !z80sio_txcb;
+	z80dart_txcb_w(z80sio, z80sio_txcb);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
-	//running_device *z80sio = device->machine->device(Z80SIO_TAG);
+	running_device *z80sio = device->machine->device(Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
 	if (BIT(sb, 3))
 	{
 		/* connected to SIO/2 RxCA */
-		//z80sio_rxca_w(z80sio, state);
+		z80dart_rxca_w(z80sio, state);
 	}
 
 	if (BIT(sb, 4))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txca_w(z80sio, state);
+		z80dart_txca_w(z80sio, state);
 		z80ctc_trg3_w(device, state);
 	}
 }
@@ -773,65 +769,58 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              				/* timer disables */
+	0,              								/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),			/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),			/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)    		/* ZC/TO2 callback */
+	DEVCB_LINE(ctc_z0_w),							/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_z1_w),							/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z2_w)    						/* ZC/TO2 callback */
 };
 
 /* Z80 SIO/2 */
 
-static void sio_interrupt(running_device *device, int state)
+static READ_LINE_DEVICE_HANDLER( dfd_in_r )
 {
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
+	return cassette_input(device) > 0.0;
 }
 
-static WRITE8_DEVICE_HANDLER( sio_dtr_w )
+static WRITE_LINE_DEVICE_HANDLER( dfd_out_w )
 {
-	if (offset == 1)
-	{
-		/* cassette motor control */
-		cassette_change_state(cassette_device_image(device->machine), data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	}
+	cassette_output(device, state ? +1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
+static WRITE_LINE_DEVICE_HANDLER( motor_control_w )
 {
-	if (offset == 1)
-	{
-		/* cassette dfd out */
-	}
+	cassette_change_state(device, state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-static int sio_serial_receive( running_device *device, int channel )
+static Z80DART_INTERFACE( sio_intf )
 {
-	if (channel == 1)
-	{
-		/* cassette dfd in */
-	}
+	0, 0, 0, 0,
 
-	return -1;
-}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 
-static const z80sio_interface sio_intf =
-{
-	sio_interrupt,			/* interrupt handler */
-	sio_dtr_w,				/* DTR changed handler */
-	0,						/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	sio_serial_transmit,	/* transmit handler */
-	sio_serial_receive		/* receive handler */
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, dfd_in_r),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, dfd_out_w),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, motor_control_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
 
 /* Z80 DART */
 
 static Z80DART_INTERFACE( abc800_dart_intf )
 {
-	0,
-	0,
-	0,
+	0, 0, 0, 0,
 
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -840,6 +829,7 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -867,10 +857,9 @@ static WRITE_LINE_DEVICE_HANDLER( abc802_dart_rtsb_r )
 
 static Z80DART_INTERFACE( abc802_dart_intf )
 {
-	0,
-	0,
-	0,
+	0, 0, 0, 0,
 
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -881,6 +870,7 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc802_dart_dtrb_r),
 	DEVCB_LINE(abc802_dart_rtsb_r),
+	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
@@ -897,10 +887,9 @@ static WRITE_LINE_DEVICE_HANDLER( abc806_dart_dtrb_w )
 
 static Z80DART_INTERFACE( abc806_dart_intf )
 {
-	0,
-	0,
-	0,
+	0, 0, 0, 0,
 
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -910,6 +899,7 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc806_dart_dtrb_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -930,7 +920,7 @@ static const z80_daisy_config abc800_daisy_chain[] =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_21046_ABCBUS("abc830") },
+//	{ LUXOR_55_21046_ABCBUS("abc830") },
 	{ NULL }
 };
 
@@ -977,10 +967,6 @@ static MACHINE_START( abc802 )
 	state->abc77 = machine->device(ABC77_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
 
-	/* configure memory */
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, Z80_TAG), 0);
-
 	/* register for state saving */
 	state_save_register_global(machine, state->lrs);
 	state_save_register_global(machine, state->pling);
@@ -993,13 +979,14 @@ static MACHINE_RESET( abc802 )
 	UINT8 config = input_port_read(machine, "CONFIG");
 
 	/* memory banking */
-	memory_set_bank(machine, "bank1", 1);
+	state->lrs = 1;
+	abc802_bankswitch(machine);
 
 	/* clear screen time out (S1) */
-	z80sio_set_dcd(state->z80sio, 1, BIT(config, 0));
+	z80dart_dcdb_w(state->z80sio, BIT(config, 0));
 
 	/* unknown (S2) */
-	z80sio_set_cts(state->z80sio, 1, BIT(config, 1));
+	z80dart_ctsb_w(state->z80sio, BIT(config, 1));
 
 	/* 40/80 char (S3) */
 	z80dart_ria_w(state->z80dart, BIT(config, 2)); // 0 = 40, 1 = 80
@@ -1101,7 +1088,7 @@ static MACHINE_DRIVER_START( abc800m )
 	/* peripheral hardware */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
@@ -1109,7 +1096,7 @@ static MACHINE_DRIVER_START( abc800m )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+//	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1144,7 +1131,7 @@ static MACHINE_DRIVER_START( abc800c )
 	/* peripheral hardware */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
@@ -1152,7 +1139,7 @@ static MACHINE_DRIVER_START( abc800c )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+//	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1187,7 +1174,7 @@ static MACHINE_DRIVER_START( abc802 )
 	/* peripheral hardware */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
@@ -1195,7 +1182,7 @@ static MACHINE_DRIVER_START( abc802 )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abc802_abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+//	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1227,7 +1214,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_E0516_ADD(E0516_TAG, ABC806_X02)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
@@ -1235,7 +1222,7 @@ static MACHINE_DRIVER_START( abc806 )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+//	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1394,11 +1381,6 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
 			return ~0;
 		}
-	}
-	else
-	{
-		direct.explicit_configure(0x0000, 0xffff, 0xffff, messram_get_ptr(machine->device("messram")));
-		return ~0;
 	}
 
 	return address;

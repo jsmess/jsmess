@@ -322,7 +322,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( abc806_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( hs_w )
 {
 	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
@@ -367,7 +367,7 @@ static WRITE_LINE_DEVICE_HANDLER( abc806_hsync_changed )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( abc806_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( vs_w )
 {
 	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
@@ -376,7 +376,8 @@ static WRITE_LINE_DEVICE_HANDLER( abc806_vsync_changed )
 
 /* MC6845 Interfaces */
 
-static const mc6845_interface abc806_mc6845_interface = {
+static const mc6845_interface crtc_intf =
+{
 	SCREEN_TAG,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -384,8 +385,8 @@ static const mc6845_interface abc806_mc6845_interface = {
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(abc806_hsync_changed),
-	DEVCB_LINE(abc806_vsync_changed),
+	DEVCB_LINE(hs_w),
+	DEVCB_LINE(vs_w),
 	NULL
 };
 
@@ -429,7 +430,6 @@ static VIDEO_START(abc806)
 	int i;
 
 	/* initialize variables */
-
 	for (i = 0; i < 16; i++)
 	{
 		state->hrc[i] = 0;
@@ -441,26 +441,21 @@ static VIDEO_START(abc806)
 	state->_40 = 1;
 
 	/* find devices */
-
 	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
-
 	state->char_rom = memory_region(machine, "chargen");
 	state->rad_prom = memory_region(machine, "rad");
 	state->hru2_prom = memory_region(machine, "hru2");
 
 	/* allocate memory */
-
 	state->charram = auto_alloc_array(machine, UINT8, ABC806_CHAR_RAM_SIZE);
 	state->colorram = auto_alloc_array(machine, UINT8, ABC806_ATTR_RAM_SIZE);
 
 	/* register for state saving */
-
 	state_save_register_global_pointer(machine, state->charram, ABC806_CHAR_RAM_SIZE);
 	state_save_register_global_pointer(machine, state->colorram, ABC806_ATTR_RAM_SIZE);
 	state_save_register_global_pointer(machine, state->videoram, ABC806_VIDEO_RAM_SIZE);
-
 	state_save_register_global(machine, state->txoff);
 	state_save_register_global(machine, state->_40);
 	state_save_register_global(machine, state->flshclk_ctr);
@@ -503,10 +498,8 @@ static VIDEO_UPDATE( abc806 )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( abc806_video )
-	/* device interface */
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, abc806_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
-	/* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
