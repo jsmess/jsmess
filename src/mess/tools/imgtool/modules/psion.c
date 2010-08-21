@@ -180,7 +180,7 @@ int seek_file_name(psion_pack *pack, const char *filename)
 
 UINT8 get_free_file_id(psion_pack *pack)
 {
-	for (UINT8 file_id=0x91; file_id<=0xff; file_id++)
+	for (UINT8 file_id=0x91; file_id<0xff; file_id++)
 	{
 		int index = 0;
 
