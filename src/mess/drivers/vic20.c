@@ -274,12 +274,12 @@ static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 	if (!BIT(data, 0))
 	{
 		cassette_change_state(state->cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->cassette_timer->adjust(attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+		state->cassette_timer->enable(true);
 	}
 	else
 	{
 		cassette_change_state(state->cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->cassette_timer->reset();
+		state->cassette_timer->enable(false);
 	}
 }
 
