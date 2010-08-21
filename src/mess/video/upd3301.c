@@ -106,7 +106,7 @@ struct _upd3301_t
 	int at1;						/*  */
 	int at0;						/*  */
 	int sc;							/*  */
-	int a;							/* attributes per row */
+	int attr;						/* attributes per row */
 	int attr_blink;					/* attribute blink */
 	int attr_frame;					/* attribute blink frame counter */
 
@@ -381,11 +381,11 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 				upd3301->at1 = BIT(data, 7);
 				upd3301->at0 = BIT(data, 6);
 				upd3301->sc = BIT(data, 5);
-				upd3301->a = (data & 0x1f) + 1;
+				upd3301->attr = (data & 0x1f) + 1;
 				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", device->tag(), upd3301->at1);
 				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", device->tag(), upd3301->at0);
 				if (LOG) logerror("UPD3301 '%s' SC: %u\n", device->tag(), upd3301->sc);
-				if (LOG) logerror("UPD3301 '%s' A: %u\n", device->tag(), upd3301->a);
+				if (LOG) logerror("UPD3301 '%s' ATTR: %u\n", device->tag(), upd3301->attr);
 
 				upd3301->mode = MODE_NONE;
 				break;
@@ -556,7 +556,7 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 		upd3301->attr_fifo_pos++;
 	}
 
-	if ((upd3301->data_fifo_pos == upd3301->h) && (upd3301->attr_fifo_pos == (upd3301->a << 1)))
+	if ((upd3301->data_fifo_pos == upd3301->h) && (upd3301->attr_fifo_pos == (upd3301->attr << 1)))
 	{
 		upd3301->input_fifo = !upd3301->input_fifo;
 		upd3301->data_fifo_pos = 0;
