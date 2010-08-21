@@ -5,6 +5,66 @@ Luxor Conkort
 PCB Layout
 ----------
 
+?
+
+|-----------------------------------|
+|   LD1 SW1 LS132       CON2        |
+|                               S   |
+|   4MHz        S240    N8T97N      |
+|   S                               |
+|   7404            MC1458  4024    |
+|       S                           |
+|   74276   S                       |
+|           S   S                   |
+|   LS32    S   C140E       LS273   |
+|                                   |
+|                                   |
+|       MB8876          ROM         |
+|                                   |
+|                                   |
+|   S   LS32    LS156       TC5514  |
+|                                   |
+|                           TC5514  |
+|       Z80                         |
+|                           LS273   |
+|                                   |
+|                           LS373   |
+|       Z80PIO                      |
+|                           LS245   |
+|                                   |
+|   LS125   LS124       S   DM8131  |
+|                                   |
+|--|-----------------------------|--|
+   |------------CON1-------------|
+
+Notes:
+    All IC's shown.
+
+    ROM     - Hitachi HN462716 2Kx8 EPROM "MPT02"
+    Z80     - Sharp LH0080A Z80A CPU
+    Z80PIO  - SGS Z8420AB1 Z80A PIO
+    MB8876  - Mitsubishi MB8876 Floppy Disc Controller (FD1791 compatible)
+    TC5514  - Toshiba TC5514AP-2 1Kx4 bit Static RAM
+    DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
+    C140E   - Ferranti ?C140E "copy protection device"
+    N8T97N  - SA N8T97N ?
+    CON1    - ABC bus connector
+    CON2    - 25-pin D sub floppy connector (AMP4284)
+    SW1     - Disk drive type (SS/DS, SD/DD)
+    S1      -
+    S2      -
+    S3      -
+    S4      -
+    S5      -
+    S6      -
+    S7      -
+    S8      -
+    S9      -
+    LD1     -
+
+PCB Layout
+----------
+
 55 21046-03
 
 |-----------------------------------|
@@ -43,8 +103,8 @@ Notes:
 
     ROM     - Toshiba TMM27128D-20 16Kx8 EPROM "CNTR 1.07 6490318-07"
     TC5565  - Toshiba TC5565PL-15 8Kx8 bit Static RAM
-    Z80     - Zilog Z8400APS Z80A CPU Central Processing Unit
-    Z80DMA  - Zilog Z8410APS Z80A DMA Direct Memory Access Controller
+    Z80     - Zilog Z8400APS Z80A CPU
+    Z80DMA  - Zilog Z8410APS Z80A DMA
     SAB1793 - Siemens SAB1793-02P Floppy Disc Controller
     FDC9229 - SMC FDC9229BT Floppy Disc Interface Circuit
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator

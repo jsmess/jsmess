@@ -244,8 +244,7 @@ static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x77ff) AM_RAM AM_BASE_MEMBER(abc80_state, video_80_ram)
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(abc80_state, video_ram)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -387,7 +386,7 @@ static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 	z80pio_astb_w(state->z80pio, state->z80pio_astb);
 }
 
-static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )
+static READ8_DEVICE_HANDLER( pio_pa_r )
 {
 	/*
 
@@ -411,7 +410,7 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )
 	return (state->key_strobe << 7) | state->key_data;
 };
 
-static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
+static READ8_DEVICE_HANDLER( pio_pb_r )
 {
 	/*
 
@@ -428,15 +427,13 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
 
     */
 
-	abc80_state *state = device->machine->driver_data<abc80_state>();
-
 	/* cassette data */
-	UINT8 data = (cassette_input(state->cassette) > +1.0) ? 0x80 : 0;
+	UINT8 data = (cassette_input(device) > +1.0) << 7;
 
 	return data;
 };
 
-static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
+static WRITE8_DEVICE_HANDLER( pio_pb_w )
 {
 	/*
 
@@ -453,30 +450,38 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 
     */
 
-	abc80_state *state = device->machine->driver_data<abc80_state>();
-
 	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(device, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data */
-	cassette_output(state->cassette, BIT(data, 6) ? -1.0 : +1.0);
+	cassette_output(device, BIT(data, 6) ? -1.0 : +1.0);
 };
 
-static Z80PIO_INTERFACE( abc80_pio_intf )
+static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_HANDLER(abc80_pio_port_a_r),			/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_HANDLER(abc80_pio_port_b_r),			/* port B read callback */
-	DEVCB_HANDLER(abc80_pio_port_b_w),			/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_HANDLER(pio_pa_r),						/* port A read callback */
+	DEVCB_NULL,										/* port A write callback */
+	DEVCB_NULL,										/* portA ready active callback */
+	DEVCB_DEVICE_HANDLER(CASSETTE_TAG, pio_pb_r),	/* port B read callback */
+	DEVCB_DEVICE_HANDLER(CASSETTE_TAG, pio_pb_w),	/* port B write callback */
+	DEVCB_NULL										/* portB ready active callback */
 };
 
 static const z80_daisy_config abc80_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
 	{ NULL }
+};
+
+/* Cassette */
+
+static const cassette_config abc80_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL
 };
 
 /* ABC BUS */
@@ -494,23 +499,13 @@ static MACHINE_START( abc80 )
 	abc80_state *state = machine->driver_data<abc80_state>();
 
 	/* configure RAM expansion */
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
-	memory_set_bank(machine, "bank1", 0);
-
-	switch (messram_get_size(machine->device("messram")))
+	if (messram_get_size(machine->device("messram")) == 16*1024)
 	{
-	case 16*1024:
 		memory_unmap_readwrite(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
-		break;
-
-	case 32*1024:
-		memory_install_readwrite_bank(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank1");
-		break;
 	}
 
 	/* find devices */
 	state->z80pio = machine->device(Z80PIO_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->key_data);
@@ -537,7 +532,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	/* Z80PIO */
 	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, abc80_pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
 
 	/* Luxor Conkort 55-10828 */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
@@ -556,7 +551,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

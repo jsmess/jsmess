@@ -81,7 +81,6 @@ public:
 
 	/* devices */
 	running_device *z80pio;
-	running_device *cassette;
 };
 
 /*----------- defined in video/abc80.c -----------*/

@@ -203,14 +203,12 @@ static VIDEO_START( abc80 )
 	abc80_state *state = machine->driver_data<abc80_state>();
 
 	/* create tx_tilemap */
-
 	state->tx_tilemap = tilemap_create(machine, abc80_get_tile_info, abc80_tilemap_scan, 6, 10, 40, 24);
 
 	tilemap_set_scrolldx(state->tx_tilemap, ABC80_HDSTART, ABC80_HDSTART);
 	tilemap_set_scrolldy(state->tx_tilemap, ABC80_VDSTART, ABC80_VDSTART);
 
 	/* find memory regions */
-
 	state->char_rom = memory_region(machine, "chargen");
 	state->hsync_prom = memory_region(machine, "hsync");
 	state->vsync_prom = memory_region(machine, "vsync");
@@ -218,7 +216,6 @@ static VIDEO_START( abc80 )
 	state->attr_prom = memory_region(machine, "attr");
 
 	/* register for state saving */
-
 	state_save_register_global(machine, state->blink);
 	state_save_register_global(machine, state->char_bank);
 	state_save_register_global(machine, state->char_row);

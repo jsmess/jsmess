@@ -493,7 +493,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(abc800_state, charram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(abc802_state, charram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -916,6 +916,16 @@ static const z80_daisy_config abc800_daisy_chain[] =
 	{ NULL }
 };
 
+/* Cassette */
+
+static const cassette_config abc800_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL
+};
+
 /* ABC BUS */
 
 static ABCBUS_DAISY( abcbus_daisy )
@@ -1092,7 +1102,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
@@ -1135,7 +1145,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
@@ -1178,7 +1188,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abc802_abcbus_daisy)
@@ -1218,7 +1228,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
@@ -1263,7 +1273,7 @@ MACHINE_DRIVER_END
 */
 
 ROM_START( abc800m )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
 	ROM_LOAD( "abc m-12.1m", 0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
 	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
@@ -1283,7 +1293,7 @@ ROM_END
 #define rom_abc800c rom_abc800m
 
 ROM_START( abc802 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
 	ROM_LOAD(  "abc 02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
 	ROM_LOAD(  "abc 12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
 	ROM_LOAD(  "abc 22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
@@ -1435,5 +1445,5 @@ static DRIVER_INIT( abc806 )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY             FULLNAME        FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
