@@ -4,6 +4,18 @@
  *
  *  Skeleton: Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *  Enhanced: R. Belmont, June 2007
+ *  Angelo Salese, August 2010
+ *
+ *  TODO:
+ *  - try to understand why bios 2 was working at some point and now isn't
+ *  - fix RISC OS / Arthur booting, possible causes:
+ *  \- missing reset page size hook-up
+ *  \- some subtle memory paging fault
+ *  \- missing RAM max size
+ *  \- ARM bug?
+ *
+ *
+=======================================================================================
  *
  *      Memory map (from http://b-em.bbcmicro.com/arculator/archdocs.txt)
  *
@@ -28,6 +40,15 @@
  *  3600000 - 3FFFFFF - MEMC (write - supervisor only)
  *
  *****************************************************************************/
+/*
+	DASM of code (bios 2)
+	0x380d4e0: MEMC: control to 0x10c (page size 32 kbytes, DRAM ram refresh only during flyback)
+	0x380d4f0: VIDC: params (screen + sound frequency)
+	0x380d51c: IOC: sets control to 0xff, clear IRQA and FIQ masks, sets IRQB mask to 0x80 (keyboard receive full irq)
+	0x380d530: IOC: sets timer to 0x4e20, go command
+		0x380e0a8: work RAM physical check, max size etc.
+*/
+
 
 #include "emu.h"
 #include "machine/wd17xx.h"
@@ -36,6 +57,7 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "devices/messram.h"
 
 static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
 {
@@ -53,8 +75,25 @@ static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
 		archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
+static READ32_HANDLER( a310_psy_wram_r )
+{
+	return archimedes_memc_physmem[offset];
+}
+
+static WRITE32_HANDLER( a310_psy_wram_w )
+{
+	COMBINE_DATA(&archimedes_memc_physmem[offset]);
+}
+
+
 static DRIVER_INIT(a310)
 {
+	UINT32 ram_size = messram_get_size(machine->device("messram"));
+
+	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
+
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x02000000, 0x02000000+(ram_size-1), 0, 0, a310_psy_wram_r, a310_psy_wram_w );
+
 	archimedes_driver_init(machine);
 }
 
@@ -73,7 +112,7 @@ static MACHINE_RESET( a310 )
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+//	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
@@ -230,6 +269,10 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_VIDEO_START(archimds_vidc)
 	MDRV_VIDEO_UPDATE(archimds_vidc)
 
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("512K, 1M, 4M, 8M, 16M")
+
 	MDRV_SPEAKER_STANDARD_MONO("a310")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "a310", 1.00)
@@ -254,5 +297,5 @@ ROM_START(a310)
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT     INIT   COMPANY  FULLNAME */
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY  FULLNAME */
 COMP( 1988, a310, 0,      0,      a310,    a310,  a310,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)

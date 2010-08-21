@@ -31,12 +31,15 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "devices/messram.h"
 
 #ifdef MESS
 #include "machine/wd17xx.h"
 #endif
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
+
+#define IOC_LOG 0
 
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
@@ -355,6 +358,9 @@ static void latch_timer_cnt(int tmr)
 /* TODO: should be a 8-bit handler */
 static READ32_HANDLER( ioc_ctrl_r )
 {
+	if(IOC_LOG)
+	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+
 	switch (offset & 0x1f)
 	{
 		case CONTROL:
@@ -419,7 +425,8 @@ static READ32_HANDLER( ioc_ctrl_r )
 		case 29:
 			return (ioc_timerout[3]>>8)&0xff;
 		default:
-			logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+			if(!IOC_LOG)
+				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 			break;
 	}
 
@@ -429,6 +436,9 @@ static READ32_HANDLER( ioc_ctrl_r )
 /* TODO: should be a 8-bit handler */
 static WRITE32_HANDLER( ioc_ctrl_w )
 {
+	if(IOC_LOG)
+	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+
 	switch (offset&0x1f)
 	{
 		case 0:	// I2C bus control
@@ -531,7 +541,9 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			break;
 
 		default:
-			logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+			if(!IOC_LOG)
+				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 	}
@@ -769,10 +781,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 				visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
 				visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
 
-				//printf("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-				//	vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
-				//	visarea.max_x, visarea.max_y,
-				//	vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
+				logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+					vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
+					visarea.max_x, visarea.max_y,
+					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
 
 				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, space->machine->primary_screen->frame_period().attoseconds);
 			}
@@ -804,22 +816,27 @@ WRITE32_HANDLER(archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
+				logerror("MEMC: VIDINIT %08x\n",data);
 				vidc_vidinit = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 1: /* video start */
+				logerror("MEMC: VIDSTART %08x\n",data);
 				vidc_vidstart = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 2: /* video end */
+				logerror("MEMC: VIDEND %08x\n",data);
 				vidc_vidend = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 4:	/* sound start */
+				logerror("MEMC: VIDSNDSTART %08x\n",data);
 				vidc_sndstart = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 5: /* sound end */
+				logerror("MEMC: VIDSNDEND %08x\n",data);
 				vidc_sndend = ((data>>2)&0x7fff)*16;
 				break;
 
