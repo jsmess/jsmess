@@ -411,22 +411,20 @@ void cheat_reload(running_machine *machine)
        and MAME will load gamename.xml */
 	device_image_interface *image = NULL;
 	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
-	{
 		if (image->exists())
 		{
-			char mess_cheat_filename[9];
-			UINT32	crc = image->crc();
-			sprintf(mess_cheat_filename, "%08X", crc);
-			if (crc!=0) {
-				cheatinfo->cheatlist = cheat_list_load(machine, mess_cheat_filename);
+			UINT32 crc = image->crc();
+			if (crc != 0)
+			{
+				astring filename;
+				filename.printf("%08X", crc);
+				cheatinfo->cheatlist = cheat_list_load(machine, filename);
 				break;
 			}
 		}
-	}
+
 	if (cheatinfo->cheatlist == NULL)
-	{
 		cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
-	}
 
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
@@ -458,9 +456,7 @@ int cheat_get_global_enable(running_machine *machine)
 	cheat_private *cheatinfo = machine->cheat_data;
 
 	if (cheatinfo != NULL)
-	{
 		return !cheatinfo->disabled;
-	}
 
 	return 0;
 }
@@ -522,7 +518,7 @@ void cheat_render_text(running_machine *machine, render_container *container)
 
 		/* render any text and free it along the way */
 		for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-			if (cheatinfo->output[linenum].len() != 0)
+			if (cheatinfo->output[linenum])
 			{
 				/* output the text */
 				ui_draw_text_full(container, cheatinfo->output[linenum],
@@ -960,7 +956,7 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 		}
 
 		/* if there is a string to display, compute it */
-		if (entry->format.len() != 0)
+		if (entry->format)
 		{
 			UINT64 params[MAX_ARGUMENTS];
 			output_argument *arg;
@@ -1077,7 +1073,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 			scannode = NULL;
 			if (REMOVE_DUPLICATE_CHEATS)
 				for (scannode = cheatlist; scannode != NULL; scannode = scannode->next)
-					if (scannode->description.cmp(curcheat->description) == 0)
+					if (scannode->description == curcheat->description)
 					{
 						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description.cstr(), mame_file_full_name(cheatfile).cstr());
 						break;
@@ -1193,7 +1189,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 		mame_printf_error("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode->line);
 		return NULL;
 	}
-	cheat->description.cpy(description);
+	cheat->description = description;
 
 	/* create the symbol table */
 	cheat->symbols = symtable_alloc(NULL, machine);
@@ -1213,7 +1209,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	if (commentnode != NULL)
 	{
 		if (commentnode->value != NULL && commentnode->value[0] != 0)
-			cheat->comment.cpy(commentnode->value);
+			cheat->comment = commentnode->value;
 
 		/* only one comment is kept */
 		commentnode = xml_get_sibling(commentnode->next, "comment");
@@ -1287,14 +1283,14 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", cheat->description.cstr());
 	if (cheat->numtemp != DEFAULT_TEMP_VARIABLES)
 		mame_fprintf(cheatfile, " tempvariables=\"%d\"", cheat->numtemp);
-	if (cheat->comment.len() == 0 && cheat->parameter == NULL && scriptcount == 0)
+	if (!cheat->comment && cheat->parameter == NULL && scriptcount == 0)
 		mame_fprintf(cheatfile, " />\n");
 	else
 	{
 		mame_fprintf(cheatfile, ">\n");
 
 		/* save the comment */
-		if (cheat->comment.len() != 0)
+		if (cheat->comment)
 			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", cheat->comment.cstr());
 
 		/* output the parameter, if present */
@@ -1708,7 +1704,7 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 	astring tempstring;
 
 	/* output an action */
-	if (entry->format == NULL)
+	if (!entry->format)
 	{
 		mame_fprintf(cheatfile, "\t\t\t<action");
 		if (entry->condition != NULL)
