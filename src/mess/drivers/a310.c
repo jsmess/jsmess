@@ -41,12 +41,17 @@
  *
  *****************************************************************************/
 /*
-	DASM of code (bios 2)
+	DASM of code (bios 2 / RISC OS 2)
 	0x380d4e0: MEMC: control to 0x10c (page size 32 kbytes, DRAM ram refresh only during flyback)
 	0x380d4f0: VIDC: params (screen + sound frequency)
 	0x380d51c: IOC: sets control to 0xff, clear IRQA and FIQ masks, sets IRQB mask to 0x80 (keyboard receive full irq)
-	0x380d530: IOC: sets timer to 0x4e20, go command
+	0x380d530: IOC: sets timer 0 to 0x4e20, go command
 		0x380e0a8: work RAM physical check, max size etc.
+	0x380e1f8: IOC: Disables DRAM ram refresh, sets timer 1 to 0x7ffe, go command, then it tests the latch of this timer, enables DRAM refresh
+		0x380d00c: Set up default logical space
+		0x380d16c: Set up case by case logical space
+
+
 */
 
 

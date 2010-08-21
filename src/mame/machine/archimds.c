@@ -39,7 +39,7 @@
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
-#define IOC_LOG 0
+#define IOC_LOG 1
 
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
@@ -238,7 +238,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		page = (offset<<2) / page_sizes[memc_pagesize];
 		poffs = (offset<<2) % page_sizes[memc_pagesize];
 
-//      printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
+//		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
 
 		if (memc_pages[page] != -1)
 		{
@@ -246,7 +246,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		}
 		else
 		{
-			printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
+			//printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
 			return 0xdeadbeef;
 		}
 	}
@@ -277,11 +277,12 @@ WRITE32_HANDLER(archimedes_memc_logical_w)
 		}
 		else
 		{
-			printf("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
+			//printf("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
 		}
 	}
 }
 
+#if 0
 DIRECT_UPDATE_HANDLER( a310_setopbase )
 {
 	// if we're not in logical memory, MAME can do the right thing
@@ -305,11 +306,12 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 
 	return ~0;
 }
+#endif
 
 void archimedes_driver_init(running_machine *machine)
 {
-	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
+//	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
+//	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
 }
 
 static const char *const ioc_regnames[] =
@@ -473,7 +475,7 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 
 			break;
 
-		case 5: 	// IRQ clear A
+		case IRQ_REQUEST_A: 	// IRQ clear A
 			ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
 			// if that did it, clear the IRQ
@@ -953,6 +955,6 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	memc_pages[log] = phys + (memc*0x80);
 
-	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
+//	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
 }
 
