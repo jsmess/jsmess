@@ -53,33 +53,15 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 *      Memory maps       *
 *************************/
 
-WRITE16_HANDLER( cdic_ram_w )
-{
-	cdi_state *state = space->machine->driver_data<cdi_state>();
-	cdic_regs_t *cdic = &state->cdic_regs;
-
-	verboselog(space->machine, 0, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
-	COMBINE_DATA(&cdic->ram[offset]);
-}
-
-READ16_HANDLER( cdic_ram_r )
-{
-	cdi_state *state = space->machine->driver_data<cdi_state>();
-	cdic_regs_t *cdic = &state->cdic_regs;
-
-	verboselog(space->machine, 0, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset*2, cdic->ram[offset], mem_mask);
-	return cdic->ram[offset];
-}
-
 static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,planea)
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,planeb)
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
 #endif
-	AM_RANGE(0x00300000, 0x00303bff) AM_READWRITE(cdic_ram_r, cdic_ram_w) AM_BASE_MEMBER(cdi_state,cdic_regs.ram)
+	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdic_ram_r, cdic_ram_w)
 	//AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,cdic_regs.ram)
-	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
+	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
@@ -141,7 +123,6 @@ static MACHINE_START( cdi )
 	cdi_state *state = machine->driver_data<cdi_state>();
 
 	scc68070_register_globals(machine, &state->scc68070_regs);
-	cdic_register_globals(machine, &state->cdic_regs);
 	slave_register_globals(machine, &state->slave_regs);
 
 	state->scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
@@ -150,11 +131,7 @@ static MACHINE_START( cdi )
 	state->slave_regs.interrupt_timer = timer_alloc(machine, slave_trigger_readback_int, 0);
 	timer_adjust_oneshot(state->slave_regs.interrupt_timer, attotime_never, 0);
 
-	state->cdic_regs.interrupt_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
-	timer_adjust_oneshot(state->cdic_regs.interrupt_timer, attotime_never, 0);
-
-	state->cdic_regs.audio_sample_timer = timer_alloc(machine, audio_sample_trigger, 0);
-	timer_adjust_oneshot(state->cdic_regs.audio_sample_timer, attotime_never, 0);
+    //cdic_register_globals(&state->cdic_regs);
 }
 
 static MACHINE_RESET( cdi )
@@ -162,18 +139,11 @@ static MACHINE_RESET( cdi )
 	cdi_state *state = machine->driver_data<cdi_state>();
 	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *dst   = state->planea;
-	running_device *cdrom_dev = machine->device("cdrom");
 	memcpy(dst, src, 0x8);
 
 	scc68070_init(machine, &state->scc68070_regs);
-	cdic_init(machine, &state->cdic_regs);
+	//cdic_init(&state->cdic_regs, machine);
 	slave_init(machine, &state->slave_regs);
-
-	if( cdrom_dev )
-	{
-		state->cdic_regs.cd = mess_cd_get_cdrom_file(cdrom_dev);
-		cdda_set_cdrom(machine->device("cdda"), state->cdic_regs.cd);
-	}
 
 	machine->device("maincpu")->reset();
 
@@ -219,6 +189,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_MACHINE_RESET( cdi )
 	MDRV_MACHINE_START( cdi )
 
+    MDRV_CDICDIC_ADD( "cdic" )
 	MDRV_CDROM_ADD( "cdrom" )
 
 	/* sound hardware */

@@ -29,7 +29,6 @@ public:
     emu_timer *test_timer;
     bitmap_t* lcdbitmap;
     scc68070_regs_t scc68070_regs;
-    cdic_regs_t cdic_regs;
     slave_regs_t slave_regs;
     mcd212_regs_t mcd212_regs;
     mcd212_ab_t mcd212_ab;
@@ -39,7 +38,7 @@ public:
 
 #define VERBOSE_LEVEL   (5)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #define ENABLE_UART_PRINTING (0)
 

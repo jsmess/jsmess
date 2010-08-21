@@ -19,83 +19,143 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef _MACHINE_CDICDIC_H_
-#define _MACHINE_CDICDIC_H_
+#pragma once
+
+#ifndef __CDICDIC_H__
+#define __CDICDIC_H__
 
 #include "emu.h"
 #include "devices/chd_cd.h"
 
-#define CDIC_BUFFERED_SECTORS   2
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-typedef struct
+#define MDRV_CDICDIC_ADD(_tag) \
+    MDRV_DEVICE_ADD(_tag, MACHINE_CDICDIC, 0) \
+
+#define MDRV_CDICDIC_REPLACE(_tag) \
+    MDRV_DEVICE_REPLACE(_tag, MACHINE_CDICDIC, 0) \
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> cdicdic_device_config
+
+class cdicdic_device_config :  public device_config
 {
-    UINT16 command;             // CDIC Command Register (0x303c00)
-    UINT32 time;                // CDIC Time Register (0x303c02)
-    UINT16 file;                // CDIC File Register (0x303c06)
-    UINT32 channel;             // CDIC Channel Register (0x303c08)
-    UINT16 audio_channel;       // CDIC Audio Channel Register (0x303c0c)
+    friend class cdicdic_device;
 
-    UINT16 audio_buffer;        // CDIC Audio Buffer Register (0x303ff4)
-    UINT16 x_buffer;            // CDIC X-Buffer Register (0x303ff6)
-    UINT16 dma_control;         // CDIC DMA Control Register (0x303ff8)
-    UINT16 z_buffer;            // CDIC Z-Buffer Register (0x303ffa)
-    UINT16 interrupt_vector;    // CDIC Interrupt Vector Register (0x303ffc)
-    UINT16 data_buffer;         // CDIC Data Buffer Register (0x303ffe)
+    // construction/destruction
+    cdicdic_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-    emu_timer *interrupt_timer;
-    cdrom_file *cd;
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
 
-    emu_timer *audio_sample_timer;
-    INT32 audio_sample_freq;
-    INT32 audio_sample_size;
+    // inline configuration indexes go here (none yet)
 
-    UINT16 decode_addr;
-    UINT8 decode_delay;
-    attotime decode_period;
+protected:
+    // device_config overrides (none yet)
 
-    int xa_last[4];
-    UINT16 *ram;
-} cdic_regs_t;
+    // internal state goes here (none yet)
+};
 
-#define CDIC_SECTOR_SYNC        0
 
-#define CDIC_SECTOR_HEADER      12
 
-#define CDIC_SECTOR_MODE        15
+// ======================> cdicdic_device
 
-#define CDIC_SECTOR_FILE1       16
-#define CDIC_SECTOR_CHAN1       17
-#define CDIC_SECTOR_SUBMODE1    18
-#define CDIC_SECTOR_CODING1     19
+class cdicdic_device : public device_t
+{
+    friend class cdicdic_device_config;
 
-#define CDIC_SECTOR_FILE2       20
-#define CDIC_SECTOR_CHAN2       21
-#define CDIC_SECTOR_SUBMODE2    22
-#define CDIC_SECTOR_CODING2     23
+    // construction/destruction
+    cdicdic_device(running_machine &_machine, const cdicdic_device_config &config);
 
-#define CDIC_SECTOR_DATA        24
+public:
+    // non-static internal members
+    void sample_trigger();
+    void process_delayed_command();
+    void ram_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
+    UINT16 ram_read(const UINT32 offset, const UINT16 mem_mask);
+    void register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
+    UINT16 register_read(const UINT32 offset, const UINT16 mem_mask);
 
-#define CDIC_SECTOR_SIZE        2352
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
 
-#define CDIC_SECTOR_DATASIZE    2048
-#define CDIC_SECTOR_AUDIOSIZE   2304
-#define CDIC_SECTOR_VIDEOSIZE   2324
+    // internal callbacks
+    static TIMER_CALLBACK( audio_sample_trigger );
+    static TIMER_CALLBACK( trigger_readback_int );
 
-#define CDIC_SUBMODE_EOF        0x80
-#define CDIC_SUBMODE_RT         0x40
-#define CDIC_SUBMODE_FORM       0x20
-#define CDIC_SUBMODE_TRIG       0x10
-#define CDIC_SUBMODE_DATA       0x08
-#define CDIC_SUBMODE_AUDIO      0x04
-#define CDIC_SUBMODE_VIDEO      0x02
-#define CDIC_SUBMODE_EOR        0x01
+    // internal state
+    const cdicdic_device_config &m_config;
 
-// Member functions
-extern TIMER_CALLBACK( audio_sample_trigger );
-extern TIMER_CALLBACK( cdic_trigger_readback_int );
-extern READ16_HANDLER( cdic_r );
-extern WRITE16_HANDLER( cdic_w );
-extern void cdic_init(running_machine *machine, cdic_regs_t *cdic);
-extern void cdic_register_globals(running_machine *machine, cdic_regs_t *cdic);
+private:
+    UINT16 m_command;           // CDIC Command Register            (0x303c00)
+    UINT32 m_time;              // CDIC Time Register               (0x303c02)
+    UINT16 m_file;              // CDIC File Register               (0x303c06)
+    UINT32 m_channel;           // CDIC Channel Register            (0x303c08)
+    UINT16 m_audio_channel;     // CDIC Audio Channel Register      (0x303c0c)
 
-#endif // _MACHINE_CDICDIC_H_
+    UINT16 m_audio_buffer;      // CDIC Audio Buffer Register       (0x303ff4)
+    UINT16 m_x_buffer;          // CDIC X-Buffer Register           (0x303ff6)
+    UINT16 m_dma_control;       // CDIC DMA Control Register        (0x303ff8)
+    UINT16 m_z_buffer;          // CDIC Z-Buffer Register           (0x303ffa)
+    UINT16 m_interrupt_vector;  // CDIC Interrupt Vector Register   (0x303ffc)
+    UINT16 m_data_buffer;       // CDIC Data Buffer Register        (0x303ffe)
+
+    emu_timer *m_interrupt_timer;
+    cdrom_file *m_cd;
+
+    emu_timer *m_audio_sample_timer;
+    INT32 m_audio_sample_freq;
+    INT32 m_audio_sample_size;
+
+    UINT16 m_decode_addr;
+    UINT8 m_decode_delay;
+    attotime m_decode_period;
+
+    int m_xa_last[4];
+    UINT16 *m_ram;
+
+    void register_globals();
+    void init();
+
+    // static internal members
+    static void decode_xa_mono(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);
+    static void decode_xa_mono8(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);
+    static void decode_xa_stereo(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);
+    static void decode_xa_stereo8(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);
+
+    static const INT32 s_cdic_adpcm_filter_coef[5][2];
+
+    // non-static internal members
+    UINT32 increment_cdda_frame_bcd(UINT32 bcd);
+    UINT32 increment_cdda_sector_bcd(UINT32 bcd);
+    void decode_audio_sector(const UINT8 *xa, INT32 triggered);
+};
+
+
+// device type definition
+extern const device_type MACHINE_CDICDIC;
+
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+READ16_DEVICE_HANDLER( cdic_r );
+WRITE16_DEVICE_HANDLER( cdic_w );
+READ16_DEVICE_HANDLER( cdic_ram_r );
+WRITE16_DEVICE_HANDLER( cdic_ram_w );
+
+
+#endif // __CDICDIC_H__
