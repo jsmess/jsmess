@@ -1348,7 +1348,33 @@ ROM_END
 
 /* Driver Initialization */
 
-DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
+DIRECT_UPDATE_HANDLER( abc800c_direct_update_handler )
+{
+	abc800_state *state = machine->driver_data<abc800_state>();
+
+	if (address >= 0x7c00 && address < 0x8000)
+	{
+		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, memory_region(machine, Z80_TAG) + 0x7c00);
+
+		if (!state->fetch_charram)
+		{
+			state->fetch_charram = 1;
+			abc800_bankswitch(machine);
+		}
+
+		return ~0;
+	}
+
+	if (state->fetch_charram)
+	{
+		state->fetch_charram = 0;
+		abc800_bankswitch(machine);
+	}
+
+	return address;
+}
+
+DIRECT_UPDATE_HANDLER( abc800m_direct_update_handler )
 {
 	abc800_state *state = machine->driver_data<abc800_state>();
 
@@ -1416,10 +1442,16 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 	return address;
 }
 
-static DRIVER_INIT( abc800 )
+static DRIVER_INIT( abc800c )
 {
 	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc800_direct_update_handler, *machine));
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc800c_direct_update_handler, *machine));
+}
+
+static DRIVER_INIT( abc800m )
+{
+	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc800m_direct_update_handler, *machine));
 }
 
 static DRIVER_INIT( abc802 )
@@ -1436,8 +1468,8 @@ static DRIVER_INIT( abc806 )
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS */
+COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
