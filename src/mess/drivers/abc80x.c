@@ -176,7 +176,7 @@ static void scan_keyboard(running_machine *machine)
 			z80dart_device *z80dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 0);
-			z80dart->receive_data(Z80DART_CH_B, keycode);
+			z80dart->receive_data(CHANNEL_B, keycode);
 
 			keylatch = keycode;
 		}
@@ -188,7 +188,7 @@ static void scan_keyboard(running_machine *machine)
 			z80dart_device *z80dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 1);
-			z80dart->receive_data(Z80DART_CH_B, 0);
+			z80dart->receive_data(CHANNEL_B, 0);
 
 			keylatch = 0;
 		}
