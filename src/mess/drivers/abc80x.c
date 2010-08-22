@@ -934,12 +934,6 @@ static ABCBUS_DAISY( abcbus_daisy )
 	{ NULL }
 };
 
-static ABCBUS_DAISY( abc802_abcbus_daisy )
-{
-//  { LUXOR_55_21046_ABCBUS("abc830") }, won't boot with this enabled
-	{ NULL }
-};
-
 /* Machine Initialization */
 
 static MACHINE_START( abc800 )
@@ -1106,7 +1100,7 @@ static MACHINE_DRIVER_START( abc800m )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-//	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1149,7 +1143,7 @@ static MACHINE_DRIVER_START( abc800c )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-//	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1191,8 +1185,8 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abc802_abcbus_daisy)
-//	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1232,7 +1226,7 @@ static MACHINE_DRIVER_START( abc806 )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-//	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1360,7 +1354,7 @@ DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
 
 		if (!state->fetch_charram)
 		{
@@ -1388,7 +1382,7 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
 			return ~0;
 		}
 	}
@@ -1402,7 +1396,7 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, *direct.space().m_machine.region(Z80_TAG));
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
 
 		if (!state->fetch_charram)
 		{
@@ -1445,5 +1439,5 @@ static DRIVER_INIT( abc806 )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY             FULLNAME        FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
