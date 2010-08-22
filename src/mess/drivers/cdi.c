@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdic_ram_r, cdic_ram_w)
 	//AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,cdic_regs.ram)
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdic_r, cdic_w)
-	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
+	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
@@ -79,14 +79,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
+    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(cdislave_device::mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
+    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(cdislave_device::mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(mouse_update, 0)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(cdislave_device::mouse_update, 0)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(cdislave_device::mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DEBUG")
@@ -123,15 +123,9 @@ static MACHINE_START( cdi )
 	cdi_state *state = machine->driver_data<cdi_state>();
 
 	scc68070_register_globals(machine, &state->scc68070_regs);
-	slave_register_globals(machine, &state->slave_regs);
 
 	state->scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
 	timer_adjust_oneshot(state->scc68070_regs.timers.timer0_timer, attotime_never, 0);
-
-	state->slave_regs.interrupt_timer = timer_alloc(machine, slave_trigger_readback_int, 0);
-	timer_adjust_oneshot(state->slave_regs.interrupt_timer, attotime_never, 0);
-
-    //cdic_register_globals(&state->cdic_regs);
 }
 
 static MACHINE_RESET( cdi )
@@ -142,16 +136,11 @@ static MACHINE_RESET( cdi )
 	memcpy(dst, src, 0x8);
 
 	scc68070_init(machine, &state->scc68070_regs);
-	//cdic_init(&state->cdic_regs, machine);
-	slave_init(machine, &state->slave_regs);
 
 	machine->device("maincpu")->reset();
 
 	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
-
-	state->slave_regs.real_mouse_x = 0xffff;
-	state->slave_regs.real_mouse_y = 0xffff;
 }
 
 /*************************
@@ -191,6 +180,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 
     MDRV_CDICDIC_ADD( "cdic" )
 	MDRV_CDROM_ADD( "cdrom" )
+    MDRV_CDISLAVE_ADD( "slave" )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )

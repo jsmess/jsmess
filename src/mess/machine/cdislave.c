@@ -41,157 +41,196 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 #define verboselog(x,y,z,...)
 #endif
 
-static void slave_prepare_readback(running_machine *machine, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd);
-static void perform_mouse_update(running_machine *machine);
-static void set_mouse_position(running_machine* machine);
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-TIMER_CALLBACK( slave_trigger_readback_int )
+//-------------------------------------------------
+//  cdislave_device_config - constructor
+//-------------------------------------------------
+
+cdislave_device_config::cdislave_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "CDISLAVE", tag, owner, clock)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
 
-    verboselog(machine, 0, "Asserting IRQ2\n" );
-    cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_2, 26);
-    cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
-    timer_adjust_oneshot(slave->interrupt_timer, attotime_never, 0);
 }
 
-static void slave_prepare_readback(running_machine *machine, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *cdislave_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
-
-    slave->channel[channel].out_index = 0;
-    slave->channel[channel].out_count = count;
-    slave->channel[channel].out_buf[0] = data0;
-    slave->channel[channel].out_buf[1] = data1;
-    slave->channel[channel].out_buf[2] = data2;
-    slave->channel[channel].out_buf[3] = data3;
-    slave->channel[channel].out_cmd = cmd;
-
-    timer_adjust_oneshot(slave->interrupt_timer, delay, 0);
+    return global_alloc(cdislave_device_config(mconfig, tag, owner, clock));
 }
 
-static void perform_mouse_update(running_machine *machine)
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *cdislave_device_config::alloc_device(running_machine &machine) const
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
-    UINT16 x = input_port_read(machine, "MOUSEX");
-    UINT16 y = input_port_read(machine, "MOUSEY");
-    UINT8 buttons = input_port_read(machine, "MOUSEBTN");
+    return auto_alloc(&machine, cdislave_device(machine, *this));
+}
 
-    UINT16 old_mouse_x = slave->real_mouse_x;
-    UINT16 old_mouse_y = slave->real_mouse_y;
 
-    if(slave->real_mouse_x == 0xffff)
+//**************************************************************************
+//  MEMBER FUNCTIONS
+//**************************************************************************
+
+TIMER_CALLBACK( cdislave_device::trigger_readback_int )
+{
+    cdislave_device *slave = reinterpret_cast<cdislave_device *>(machine->device("slave"));
+    slave->readback_trigger();
+}
+
+void cdislave_device::readback_trigger()
+{
+    verboselog(&m_machine, 0, "Asserting IRQ2\n" );
+    cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_2, 26);
+    cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
+    timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+}
+
+void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
+{
+    m_channel[channel].m_out_index = 0;
+    m_channel[channel].m_out_count = count;
+    m_channel[channel].m_out_buf[0] = data0;
+    m_channel[channel].m_out_buf[1] = data1;
+    m_channel[channel].m_out_buf[2] = data2;
+    m_channel[channel].m_out_buf[3] = data3;
+    m_channel[channel].m_out_cmd = cmd;
+
+    timer_adjust_oneshot(m_interrupt_timer, delay, 0);
+}
+
+void cdislave_device::perform_mouse_update()
+{
+    UINT16 x = input_port_read(&m_machine, "MOUSEX");
+    UINT16 y = input_port_read(&m_machine, "MOUSEY");
+    UINT8 buttons = input_port_read(&m_machine, "MOUSEBTN");
+
+    UINT16 old_mouse_x = m_real_mouse_x;
+    UINT16 old_mouse_y = m_real_mouse_y;
+
+    if(m_real_mouse_x == 0xffff)
     {
         old_mouse_x = x & 0x3ff;
         old_mouse_y = y & 0x3ff;
     }
 
-    slave->real_mouse_x = x & 0x3ff;
-    slave->real_mouse_y = y & 0x3ff;
+    m_real_mouse_x = x & 0x3ff;
+    m_real_mouse_y = y & 0x3ff;
 
-    slave->fake_mouse_x += (slave->real_mouse_x - old_mouse_x);
-    slave->fake_mouse_y += (slave->real_mouse_y - old_mouse_y);
+    m_fake_mouse_x += (m_real_mouse_x - old_mouse_x);
+    m_fake_mouse_y += (m_real_mouse_y - old_mouse_y);
 
-    while(slave->fake_mouse_x > 0x3ff)
+    while(m_fake_mouse_x > 0x3ff)
     {
-        slave->fake_mouse_x += 0x400;
+        m_fake_mouse_x += 0x400;
     }
 
-    while(slave->fake_mouse_y > 0x3ff)
+    while(m_fake_mouse_y > 0x3ff)
     {
-        slave->fake_mouse_y += 0x400;
+        m_fake_mouse_y += 0x400;
     }
 
-    x = slave->fake_mouse_x;
-    y = slave->fake_mouse_y;
+    x = m_fake_mouse_x;
+    y = m_fake_mouse_y;
 
-    if(slave->polling_active)
+    if(m_polling_active)
     {
-        slave_prepare_readback(machine, attotime_zero, 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+        prepare_readback(attotime_zero, 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
     }
 }
 
-INPUT_CHANGED( mouse_update )
+INPUT_CHANGED( cdislave_device::mouse_update )
 {
-    perform_mouse_update(field->port->machine);
+    cdislave_device *slave = reinterpret_cast<cdislave_device *>(field->port->machine->device("slave"));
+    slave->perform_mouse_update();
 }
 
-READ16_HANDLER( slave_r )
+READ16_DEVICE_HANDLER( slave_r )
 {
-    cdi_state *state = space->machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
+    return downcast<cdislave_device *>(device)->register_read(offset, mem_mask);
+}
 
-    if(slave->channel[offset].out_count)
+UINT16 cdislave_device::register_read(const UINT32 offset, const UINT16 mem_mask)
+{
+    if(m_channel[offset].m_out_count)
     {
-        UINT8 ret = slave->channel[offset].out_buf[slave->channel[offset].out_index];
-        verboselog(space->machine, 0, "slave_r: Channel %d: %d, %02x\n", offset, slave->channel[offset].out_index, ret );
-        if(slave->channel[offset].out_index == 0)
+        UINT8 ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
+        verboselog(&m_machine, 0, "slave_r: Channel %d: %d, %02x\n", offset, m_channel[offset].m_out_index, ret );
+        if(m_channel[offset].m_out_index == 0)
         {
-            switch(slave->channel[offset].out_cmd)
+            switch(m_channel[offset].m_out_cmd)
             {
                 case 0xb0:
                 case 0xb1:
                 case 0xf0:
                 case 0xf3:
                 case 0xf7:
-                    verboselog(space->machine, 0, "slave_r: De-asserting IRQ2\n" );
-                    cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
+                    verboselog(&m_machine, 0, "slave_r: De-asserting IRQ2\n" );
+                    cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
                     break;
             }
         }
-        slave->channel[offset].out_index++;
-        slave->channel[offset].out_count--;
-        if(!slave->channel[offset].out_count)
+        m_channel[offset].m_out_index++;
+        m_channel[offset].m_out_count--;
+        if(!m_channel[offset].m_out_count)
         {
-            slave->channel[offset].out_index = 0;
-            slave->channel[offset].out_cmd = 0;
-            memset(slave->channel[offset].out_buf, 0, 4);
+            m_channel[offset].m_out_index = 0;
+            m_channel[offset].m_out_cmd = 0;
+            memset(m_channel[offset].m_out_buf, 0, 4);
         }
         return ret;
     }
-    verboselog(space->machine, 0, "slave_r: Channel %d: %d\n", offset, slave->channel[offset].out_index );
+    verboselog(&m_machine, 0, "slave_r: Channel %d: %d\n", offset, m_channel[offset].m_out_index );
     return 0xff;
 }
 
-static void set_mouse_position(running_machine* machine)
+void cdislave_device::set_mouse_position()
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
     UINT16 x, y;
 
-    //printf( "Set mouse position: %02x %02x %02x\n", slave->in_buf[0], slave->in_buf[1], slave->in_buf[2] );
+    //printf( "Set mouse position: %02x %02x %02x\n", m_in_buf[0], m_in_buf[1], m_in_buf[2] );
 
-    slave->fake_mouse_y = ((slave->in_buf[1] & 0x0f) << 6) | (slave->in_buf[0] & 0x3f);
-    slave->fake_mouse_x = ((slave->in_buf[1] & 0x70) << 3) | slave->in_buf[2];
+    m_fake_mouse_y = ((m_in_buf[1] & 0x0f) << 6) | (m_in_buf[0] & 0x3f);
+    m_fake_mouse_x = ((m_in_buf[1] & 0x70) << 3) | m_in_buf[2];
 
-    x = slave->fake_mouse_x;
-    y = slave->fake_mouse_y;
+    x = m_fake_mouse_x;
+    y = m_fake_mouse_y;
 
-    if(slave->polling_active)
+    if(m_polling_active)
     {
-        //slave_prepare_readback(machine, attotime_zero, 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+        //prepare_readback(attotime_zero, 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
     }
 }
 
-WRITE16_HANDLER( slave_w )
+WRITE16_DEVICE_HANDLER( slave_w )
 {
-    cdi_state *state = space->machine->driver_data<cdi_state>();
-    slave_regs_t *slave = &state->slave_regs;
+    downcast<cdislave_device *>(device)->register_write(offset, data, mem_mask);
+}
+
+void cdislave_device::register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask)
+{
+    cdi_state *state = m_machine.driver_data<cdi_state>();
 
     switch(offset)
     {
         case 0:
-            if(slave->in_index)
+            if(m_in_index)
             {
-                verboselog(space->machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, slave->in_index, data & 0x00ff );
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
-                if(slave->in_index == slave->in_count)
+                verboselog(&m_machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
+                if(m_in_index == m_in_count)
                 {
-                    switch(slave->in_buf[0])
+                    switch(m_in_buf[0])
                     {
                         case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
                         case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
@@ -201,18 +240,18 @@ WRITE16_HANDLER( slave_w )
                         case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
                         case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
                         case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: // Update Mouse Position
-                            set_mouse_position(space->machine);
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
+                            set_mouse_position();
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
                             break;
                     }
                 }
             }
             else
             {
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
                 switch(data & 0x00ff)
                 {
                     case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -223,36 +262,36 @@ WRITE16_HANDLER( slave_w )
                     case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
                     case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
                     case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff );
-                        slave->in_count = 3;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff );
+                        m_in_count = 3;
                         break;
                     default:
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
-                        slave->in_index = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+                        m_in_index = 0;
                         break;
                 }
             }
             break;
         case 1:
-            if(slave->in_index)
+            if(m_in_index)
             {
-                verboselog(space->machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, slave->in_index, data & 0x00ff );
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
-                if(slave->in_index == slave->in_count)
+                verboselog(&m_machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
+                if(m_in_index == m_in_count)
                 {
-                    switch(slave->in_buf[0])
+                    switch(m_in_buf[0])
                     {
                         case 0xf0: // Set Front Panel LCD
-                            memcpy(slave->lcd_state, slave->in_buf + 1, 16);
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
+                            memcpy(m_lcd_state, m_in_buf + 1, 16);
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
                             break;
                         default:
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
                             break;
                     }
                 }
@@ -262,142 +301,142 @@ WRITE16_HANDLER( slave_w )
                 switch(data & 0x00ff)
                 {
                     default:
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
-                        memset(slave->in_buf, 0, 17);
-                        slave->in_index = 0;
-                        slave->in_count = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+                        memset(m_in_buf, 0, 17);
+                        m_in_index = 0;
+                        m_in_count = 0;
                         break;
                 }
             }
             break;
         case 2:
-            if(slave->in_index)
+            if(m_in_index)
             {
-                verboselog(space->machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, slave->in_index, data & 0x00ff );
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
-                if(slave->in_index == slave->in_count)
+                verboselog(&m_machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
+                if(m_in_index == m_in_count)
                 {
-                    switch(slave->in_buf[0])
+                    switch(m_in_buf[0])
                     {
                         case 0xf0: // Set Front Panel LCD
-                            memset(slave->in_buf + 1, 0, 16);
-                            slave->in_count = 17;
+                            memset(m_in_buf + 1, 0, 16);
+                            m_in_count = 17;
                             break;
                         default:
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
                             break;
                     }
                 }
             }
             else
             {
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
                 switch(data & 0x00ff)
                 {
                     case 0x82: // Mute audio
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
                         dmadac_enable(&state->dmadac[0], 2, 0);
-                        slave->in_index = 0;
-                        slave->in_count = 0;
+                        m_in_index = 0;
+                        m_in_count = 0;
                         //timer_adjust_oneshot(cdic->audio_sample_timer, attotime_never, 0);
                         break;
                     case 0x83: // Unmute audio
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
                         dmadac_enable(&state->dmadac[0], 2, 1);
-                        slave->in_index = 0;
-                        slave->in_count = 0;
+                        m_in_index = 0;
+                        m_in_count = 0;
                         break;
                     case 0xf0: // Set Front Panel LCD
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
-                        slave->in_count = 17;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
+                        m_in_count = 17;
                         break;
                     default:
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
-                        memset(slave->in_buf, 0, 17);
-                        slave->in_index = 0;
-                        slave->in_count = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+                        memset(m_in_buf, 0, 17);
+                        m_in_index = 0;
+                        m_in_count = 0;
                         break;
                 }
             }
             break;
         case 3:
-            if(slave->in_index)
+            if(m_in_index)
             {
-                verboselog(space->machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, slave->in_index, data & 0x00ff );
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
-                if(slave->in_index == slave->in_count)
+                verboselog(&m_machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
+                if(m_in_index == m_in_count)
                 {
-                    switch(slave->in_buf[0])
+                    switch(m_in_buf[0])
                     {
                         case 0xb0: // Request Disc Status
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
-                            slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
+                            prepare_readback(ATTOTIME_IN_HZ(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
                             break;
                         //case 0xb1: // Request Disc Base
-                            //memset(slave->in_buf, 0, 17);
-                            //slave->in_index = 0;
-                            //slave->in_count = 0;
-                            //slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
+                            //memset(m_in_buf, 0, 17);
+                            //m_in_index = 0;
+                            //m_in_count = 0;
+                            //prepare_readback(ATTOTIME_IN_HZ(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
                             //break;
                         default:
-                            memset(slave->in_buf, 0, 17);
-                            slave->in_index = 0;
-                            slave->in_count = 0;
+                            memset(m_in_buf, 0, 17);
+                            m_in_index = 0;
+                            m_in_count = 0;
                             break;
                     }
                 }
             }
             else
             {
-                slave->in_buf[slave->in_index] = data & 0x00ff;
-                slave->in_index++;
+                m_in_buf[m_in_index] = data & 0x00ff;
+                m_in_index++;
                 switch(data & 0x00ff)
                 {
                     case 0xb0: // Request Disc Status
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
-                        slave->in_count = 4;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
+                        m_in_count = 4;
                         break;
                     case 0xb1: // Request Disc Status
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
-                        slave->in_count = 4;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
+                        m_in_count = 4;
                         break;
                     case 0xf0: // Get SLAVE revision
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Get SLAVE Revision (0xf0)\n", offset );
-                        slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
-                        slave->in_index = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Get SLAVE Revision (0xf0)\n", offset );
+                        prepare_readback(ATTOTIME_IN_HZ(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
+                        m_in_index = 0;
                         break;
                     case 0xf3: // Query Pointer Type
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Query Pointer Type (0xf3)\n", offset );
-                        slave->in_index = 0;
-                        slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0xf3, 1, 0, 0, 0xf3);
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Query Pointer Type (0xf3)\n", offset );
+                        m_in_index = 0;
+                        prepare_readback(ATTOTIME_IN_HZ(10000), 2, 2, 0xf3, 1, 0, 0, 0xf3);
                         break;
                     case 0xf6: // NTSC/PAL
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Check NTSC/PAL (0xf6)\n", offset );
-                        slave_prepare_readback(space->machine, attotime_never, 2, 2, 0xf6, 1, 0, 0, 0xf6);
-                        slave->in_index = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Check NTSC/PAL (0xf6)\n", offset );
+                        prepare_readback(attotime_never, 2, 2, 0xf6, 1, 0, 0, 0xf6);
+                        m_in_index = 0;
                         break;
                     case 0xf7: // Activate input polling
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
-                        slave->polling_active = 1;
-                        slave->in_index = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
+                        m_polling_active = 1;
+                        m_in_index = 0;
                         break;
                     case 0xfa: // Enable X-Bus interrupts
-                        verboselog(space->machine, 0, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset );
-                        slave->xbus_interrupt_enable = 1;
-                        slave->in_index = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset );
+                        m_xbus_interrupt_enable = 1;
+                        m_in_index = 0;
                         break;
                     default:
-                        verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
-                        memset(slave->in_buf, 0, 17);
-                        slave->in_index = 0;
-                        slave->in_count = 0;
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+                        memset(m_in_buf, 0, 17);
+                        m_in_index = 0;
+                        m_in_count = 0;
                         break;
                 }
             }
@@ -405,81 +444,118 @@ WRITE16_HANDLER( slave_w )
     }
 }
 
-void slave_init(running_machine *machine, slave_regs_t *slave)
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdislave_device - constructor
+//-------------------------------------------------
+
+cdislave_device::cdislave_device(running_machine &_machine, const cdislave_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
 {
-    int index = 0;
-    for(index = 0; index < 4; index++)
+    init();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cdislave_device::device_start()
+{
+    register_globals();
+
+    m_interrupt_timer = timer_alloc(&m_machine, trigger_readback_int, 0);
+    timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void cdislave_device::device_reset()
+{
+    init();
+}
+
+void cdislave_device::init()
+{
+    for(INT32 index = 0; index < 4; index++)
     {
-        slave->channel[index].out_buf[0] = 0;
-        slave->channel[index].out_buf[1] = 0;
-        slave->channel[index].out_buf[2] = 0;
-        slave->channel[index].out_buf[3] = 0;
-        slave->channel[index].out_index = 0;
-        slave->channel[index].out_count = 0;
-        slave->channel[index].out_cmd = 0;
+        m_channel[index].m_out_buf[0] = 0;
+        m_channel[index].m_out_buf[1] = 0;
+        m_channel[index].m_out_buf[2] = 0;
+        m_channel[index].m_out_buf[3] = 0;
+        m_channel[index].m_out_index = 0;
+        m_channel[index].m_out_count = 0;
+        m_channel[index].m_out_cmd = 0;
     }
 
-    memset(slave->in_buf, 0, 17);
-    slave->in_index = 0;
-    slave->in_count = 0;
+    memset(m_in_buf, 0, 17);
+    m_in_index = 0;
+    m_in_count = 0;
 
-    slave->polling_active = 0;
+    m_polling_active = 0;
 
-    slave->xbus_interrupt_enable = 0;
+    m_xbus_interrupt_enable = 0;
 
-    memset(slave->lcd_state, 0, 16);
+    memset(m_lcd_state, 0, 16);
 
-    slave->real_mouse_x = 0;
-    slave->real_mouse_y = 0;
+    m_real_mouse_x = 0xffff;
+    m_real_mouse_y = 0xffff;
 
-    slave->fake_mouse_x = 0;
-    slave->fake_mouse_y = 0;
+    m_fake_mouse_x = 0;
+    m_fake_mouse_y = 0;
 }
 
-void slave_register_globals(running_machine *machine, slave_regs_t *slave)
+void cdislave_device::register_globals()
 {
-    state_save_register_global(machine, slave->channel[0].out_buf[0]);
-    state_save_register_global(machine, slave->channel[0].out_buf[1]);
-    state_save_register_global(machine, slave->channel[0].out_buf[2]);
-    state_save_register_global(machine, slave->channel[0].out_buf[3]);
-    state_save_register_global(machine, slave->channel[0].out_index);
-    state_save_register_global(machine, slave->channel[0].out_count);
-    state_save_register_global(machine, slave->channel[0].out_cmd);
-    state_save_register_global(machine, slave->channel[1].out_buf[0]);
-    state_save_register_global(machine, slave->channel[1].out_buf[1]);
-    state_save_register_global(machine, slave->channel[1].out_buf[2]);
-    state_save_register_global(machine, slave->channel[1].out_buf[3]);
-    state_save_register_global(machine, slave->channel[1].out_index);
-    state_save_register_global(machine, slave->channel[1].out_count);
-    state_save_register_global(machine, slave->channel[1].out_cmd);
-    state_save_register_global(machine, slave->channel[2].out_buf[0]);
-    state_save_register_global(machine, slave->channel[2].out_buf[1]);
-    state_save_register_global(machine, slave->channel[2].out_buf[2]);
-    state_save_register_global(machine, slave->channel[2].out_buf[3]);
-    state_save_register_global(machine, slave->channel[2].out_index);
-    state_save_register_global(machine, slave->channel[2].out_count);
-    state_save_register_global(machine, slave->channel[2].out_cmd);
-    state_save_register_global(machine, slave->channel[3].out_buf[0]);
-    state_save_register_global(machine, slave->channel[3].out_buf[1]);
-    state_save_register_global(machine, slave->channel[3].out_buf[2]);
-    state_save_register_global(machine, slave->channel[3].out_buf[3]);
-    state_save_register_global(machine, slave->channel[3].out_index);
-    state_save_register_global(machine, slave->channel[3].out_count);
-    state_save_register_global(machine, slave->channel[3].out_cmd);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[0]);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[1]);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[2]);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[3]);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_index);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_count);
+    state_save_register_device_item(this, 0, m_channel[0].m_out_cmd);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[0]);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[1]);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[2]);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[3]);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_index);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_count);
+    state_save_register_device_item(this, 0, m_channel[1].m_out_cmd);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[0]);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[1]);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[2]);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[3]);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_index);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_count);
+    state_save_register_device_item(this, 0, m_channel[2].m_out_cmd);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[0]);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[1]);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[2]);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[3]);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_index);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_count);
+    state_save_register_device_item(this, 0, m_channel[3].m_out_cmd);
 
-    state_save_register_global_array(machine, slave->in_buf);
-    state_save_register_global(machine, slave->in_index);
-    state_save_register_global(machine, slave->in_count);
+    state_save_register_device_item_array(this, 0, m_in_buf);
+    state_save_register_device_item(this, 0, m_in_index);
+    state_save_register_device_item(this, 0, m_in_count);
 
-    state_save_register_global(machine, slave->polling_active);
+    state_save_register_device_item(this, 0, m_polling_active);
 
-    state_save_register_global(machine, slave->xbus_interrupt_enable);
+    state_save_register_device_item(this, 0, m_xbus_interrupt_enable);
 
-    state_save_register_global_array(machine, slave->lcd_state);
+    state_save_register_device_item_array(this, 0, m_lcd_state);
 
-    state_save_register_global(machine, slave->real_mouse_x);
-    state_save_register_global(machine, slave->real_mouse_y);
+    state_save_register_device_item(this, 0, m_real_mouse_x);
+    state_save_register_device_item(this, 0, m_real_mouse_y);
 
-    state_save_register_global(machine, slave->fake_mouse_x);
-    state_save_register_global(machine, slave->fake_mouse_y);
+    state_save_register_device_item(this, 0, m_fake_mouse_x);
+    state_save_register_device_item(this, 0, m_fake_mouse_y);
 }
+
+const device_type MACHINE_CDISLAVE = cdislave_device_config::static_alloc_device_config;

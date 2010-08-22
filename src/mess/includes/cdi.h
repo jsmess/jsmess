@@ -29,7 +29,6 @@ public:
     emu_timer *test_timer;
     bitmap_t* lcdbitmap;
     scc68070_regs_t scc68070_regs;
-    slave_regs_t slave_regs;
     mcd212_regs_t mcd212_regs;
     mcd212_ab_t mcd212_ab;
 };

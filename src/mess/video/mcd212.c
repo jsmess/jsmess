@@ -94,7 +94,9 @@ static void cdi220_draw_lcd(running_machine *machine, int y)
 
     for(lcd = 0; lcd < 8; lcd++)
     {
-        UINT16 data = (state->slave_regs.lcd_state[lcd*2] << 8) | state->slave_regs.lcd_state[lcd*2 + 1];
+        cdislave_device *slave = downcast<cdislave_device *>(machine->device("slave"));
+        UINT16 data = (slave->get_lcd_state()[lcd*2] << 8) |
+                       slave->get_lcd_state()[lcd*2 + 1];
         for(x = 0; x < 20; x++)
         {
             if(data & cdi220_lcd_char[y*20 + x])
