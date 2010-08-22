@@ -117,7 +117,7 @@ static READ8_HANDLER( einstein_80col_state_r )
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 	UINT8 result = 0;
 
-	result |= einstein->crtc_screen->vblank();
+	result |= einstein->crtc_screen->vblank() ? 1 : 0;
 	result |= input_port_read(space->machine, "80column_dips") & 0x06;
 
 	logerror("%s: einstein_80col_state_r %02x\n", cpuexec_describe_context(space->machine), result);
