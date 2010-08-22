@@ -93,6 +93,13 @@ DISCRETE_SOUND_END
 
 /* Keyboard HACK */
 
+enum 
+{
+	CHANNEL_A = 0,
+	CHANNEL_B
+};
+
+
 static int keylatch;
 
 static const UINT8 abc800_keycodes[7*4][8] =
