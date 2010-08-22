@@ -26,7 +26,7 @@ TODO:
 
 #define VERBOSE_LEVEL   (5)
 
-#define ENABLE_VERBOSE_LOG (1)
+// causes compile error #define ENABLE_VERBOSE_LOG (1)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
