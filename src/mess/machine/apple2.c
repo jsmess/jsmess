@@ -1063,7 +1063,7 @@ INTERRUPT_GEN( apple2_interrupt )
 	int irq_freq = 1;
 	int scanline;
 
-	profiler_mark_start(PROFILER_A2INT);
+	g_profiler.start(PROFILER_A2INT);
 
 	scanline = device->machine->primary_screen->vpos();
 
@@ -1079,7 +1079,7 @@ INTERRUPT_GEN( apple2_interrupt )
 
 	device->machine->primary_screen->update_partial(scanline);
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 
@@ -1128,9 +1128,9 @@ READ8_HANDLER ( apple2_c00x_r )
 	if(!space->debugger_access())
 	{
 		/* Read the keyboard data and strobe */
-		profiler_mark_start(PROFILER_C00X);
+		g_profiler.start(PROFILER_C00X);
 		result = AY3600_keydata_strobe_r();
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 
 	return result;
@@ -1178,7 +1178,7 @@ READ8_HANDLER ( apple2_c01x_r )
 
 	if(!space->debugger_access())
 	{
-		profiler_mark_start(PROFILER_C01X);
+		g_profiler.start(PROFILER_C01X);
 
 		LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
 		switch (offset)
@@ -1201,7 +1201,7 @@ READ8_HANDLER ( apple2_c01x_r )
 			case 0x0F:			result |= (apple2_flags & VAR_80COL)		? 0x80 : 0x00;	break;
 		}
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 
 	return result;
@@ -1216,9 +1216,9 @@ READ8_HANDLER ( apple2_c01x_r )
 WRITE8_HANDLER( apple2_c01x_w )
 {
 	/* Clear the keyboard strobe - ignore the returned results */
-	profiler_mark_start(PROFILER_C01X);
+	g_profiler.start(PROFILER_C01X);
 	AY3600_anykey_clearstrobe_r();
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

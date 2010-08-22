@@ -203,6 +203,8 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	// allocate the driver data (after devices)
 	if (m_config.m_driver_data_alloc != NULL)
 		m_driver_data = (*m_config.m_driver_data_alloc)(*this);
+	else
+		m_driver_data = auto_alloc(this, driver_data_t(*this));
 
 	// find devices
 	primary_screen = screen_first(*this);
@@ -267,6 +269,8 @@ void running_machine::start()
 	output_init(this);
 	state_init(this);
 	state_save_allow_registration(this, true);
+	state_save_register_presave(this, pre_save_static, NULL);
+	state_save_register_postload(this, post_load_static, NULL);
 	palette_init(this);
 	render_init(this);
 	ui_init(this);
@@ -338,12 +342,9 @@ void running_machine::start()
 		debugger_init(this);
 
 	// call the driver's _START callbacks
-	if (m_config.m_machine_start != NULL)
-		(*m_config.m_machine_start)(this);
-	if (m_config.m_sound_start != NULL)
-		(*m_config.m_sound_start)(this);
-	if (m_config.m_video_start != NULL)
-		(*m_config.m_video_start)(this);
+	m_driver_data->machine_start();
+	m_driver_data->sound_start();
+	m_driver_data->video_start();
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options_get_string(&m_options, OPTION_STATE);
@@ -403,7 +404,7 @@ int running_machine::run(bool firstrun)
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != SLS_NONE)
 		{
-			profiler_mark_start(PROFILER_EXTRA);
+			g_profiler.start(PROFILER_EXTRA);
 
 			// execute CPUs if not paused
 			if (!m_paused)
@@ -417,7 +418,7 @@ int running_machine::run(bool firstrun)
 			if (m_saveload_schedule != SLS_NONE)
 				handle_saveload();
 
-			profiler_mark_end();
+			g_profiler.stop();
 		}
 
 		// and out via the exit phase
@@ -713,7 +714,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 	// process only if there is a target
 	if (m_logerror_list != NULL)
 	{
-		profiler_mark_start(PROFILER_LOGERROR);
+		g_profiler.start(PROFILER_LOGERROR);
 
 		// dump to the buffer
 		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
@@ -722,7 +723,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 		for (logerror_callback_item *cb = m_logerror_list; cb != NULL; cb = cb->m_next)
 			(*cb->m_func)(*this, giant_string_buffer);
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 }
 
@@ -863,6 +864,28 @@ cancel:
 
 
 //-------------------------------------------------
+//  pre_save_static - callback to prepare for
+//  state saving
+//-------------------------------------------------
+
+STATE_PRESAVE( running_machine::pre_save_static )
+{
+	machine->m_driver_data->pre_save();
+}
+
+
+//-------------------------------------------------
+//  post_load_static - callback to update after
+//  static loading
+//-------------------------------------------------
+
+STATE_POSTLOAD( running_machine::post_load_static )
+{
+	machine->m_driver_data->post_load();
+}
+
+
+//-------------------------------------------------
 //  soft_reset - actually perform a soft-reset
 //  of the system
 //-------------------------------------------------
@@ -880,12 +903,9 @@ void running_machine::soft_reset()
 	call_notifiers(MACHINE_NOTIFY_RESET);
 
 	// run the driver's reset callbacks
-	if (m_config.m_machine_reset != NULL)
-		(*m_config.m_machine_reset)(this);
-	if (m_config.m_sound_reset != NULL)
-		(*m_config.m_sound_reset)(this);
-	if (m_config.m_video_reset != NULL)
-		(*m_config.m_video_reset)(this);
+	m_driver_data->machine_reset();
+	m_driver_data->sound_reset();
+	m_driver_data->video_reset();
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
@@ -984,6 +1004,135 @@ driver_data_t::driver_data_t(running_machine &machine)
 //-------------------------------------------------
 
 driver_data_t::~driver_data_t()
+{
+}
+
+
+//-------------------------------------------------
+//  machine_start - default implementation which
+//  calls to the legacy machine_start function
+//-------------------------------------------------
+
+void driver_data_t::machine_start()
+{
+	if (m_machine.m_config.m_machine_start != NULL)
+		(*m_machine.m_config.m_machine_start)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  machine_reset - default implementation which
+//  calls to the legacy machine_reset function
+//-------------------------------------------------
+
+void driver_data_t::machine_reset()
+{
+	if (m_machine.m_config.m_machine_reset != NULL)
+		(*m_machine.m_config.m_machine_reset)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  sound_start - default implementation which
+//  calls to the legacy sound_start function
+//-------------------------------------------------
+
+void driver_data_t::sound_start()
+{
+	if (m_machine.m_config.m_sound_start != NULL)
+		(*m_machine.m_config.m_sound_start)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  sound_reset - default implementation which
+//  calls to the legacy sound_reset function
+//-------------------------------------------------
+
+void driver_data_t::sound_reset()
+{
+	if (m_machine.m_config.m_sound_reset != NULL)
+		(*m_machine.m_config.m_sound_reset)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  palette_init - default implementation which
+//  calls to the legacy palette_init function
+//-------------------------------------------------
+
+void driver_data_t::palette_init(const UINT8 *color_prom)
+{
+	if (m_machine.m_config.m_init_palette != NULL)
+		(*m_machine.m_config.m_init_palette)(&m_machine, color_prom);
+}
+
+
+//-------------------------------------------------
+//  video_start - default implementation which
+//  calls to the legacy video_start function
+//-------------------------------------------------
+
+void driver_data_t::video_start()
+{
+	if (m_machine.m_config.m_video_start != NULL)
+		(*m_machine.m_config.m_video_start)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  video_reset - default implementation which
+//  calls to the legacy video_reset function
+//-------------------------------------------------
+
+void driver_data_t::video_reset()
+{
+	if (m_machine.m_config.m_video_reset != NULL)
+		(*m_machine.m_config.m_video_reset)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  video_update - default implementation which
+//  calls to the legacy video_update function
+//-------------------------------------------------
+
+bool driver_data_t::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	if (m_machine.m_config.m_video_update != NULL)
+		return (*m_machine.m_config.m_video_update)(&screen, &bitmap, &cliprect);
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  video_eof - default implementation which
+//  calls to the legacy video_eof function
+//-------------------------------------------------
+
+void driver_data_t::video_eof()
+{
+	if (m_machine.m_config.m_video_eof != NULL)
+		(*m_machine.m_config.m_video_eof)(&m_machine);
+}
+
+
+//-------------------------------------------------
+//  pre_save - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_data_t::pre_save()
+{
+}
+
+
+//-------------------------------------------------
+//  post_load - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_data_t::post_load()
 {
 }
 
