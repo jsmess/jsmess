@@ -97,8 +97,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vt320,  0,       0, 	vt320,	vt320,	 0, 	    "DEC",   "VT320",		GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1989?, vt330,  0,       0,  vt320,  vt320,   0,         "DEC",   "VT330",      GAME_NOT_WORKING)
-//COMP( 1989?, vt340,  0,       0,  vt320,  vt320,   0,         "DEC",   "VT340",      GAME_NOT_WORKING)
-//COMP( 1990?, vt340p,  0,      0,  vt320,  vt320,   0,         "DEC",   "VT340+",     GAME_NOT_WORKING)
+COMP( 1987, vt320,  0,       0, 	vt320,	vt320,	 0, 	    "Digital Equipment Corporation",   "VT320",		GAME_NOT_WORKING | GAME_NO_SOUND)
+//COMP( 1989?, vt330,  0,       0,  vt320,  vt320,   0,         "Digital Equipment Corporation",   "VT330",      GAME_NOT_WORKING)
+//COMP( 1989?, vt340,  0,       0,  vt320,  vt320,   0,         "Digital Equipment Corporation",   "VT340",      GAME_NOT_WORKING)
+//COMP( 1990?, vt340p,  0,      0,  vt320,  vt320,   0,         "Digital Equipment Corporation",   "VT340+",     GAME_NOT_WORKING)
 

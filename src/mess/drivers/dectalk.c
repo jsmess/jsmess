@@ -794,4 +794,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,  "DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,  "Digital Equipment Corporation",		"DECTalk DTC-01",	GAME_NOT_WORKING )

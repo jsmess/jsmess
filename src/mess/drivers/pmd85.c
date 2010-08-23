@@ -715,7 +715,7 @@ COMP( 1985, pmd852,  pmd851, 0,		pmd851,  pmd85, pmd851,   "Tesla", "PMD-85.2" ,
 COMP( 1985, pmd852a, pmd851, 0,		pmd852a, pmd85, pmd852a,  "Tesla", "PMD-85.2A" , 0)
 COMP( 1985, pmd852b, pmd851, 0,		pmd852a, pmd85, pmd852a,  "Tesla", "PMD-85.2B" , 0)
 COMP( 1988, pmd853,  pmd851, 0,		pmd853,  pmd85, pmd853,   "Tesla", "PMD-85.3" , 0)
-COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     "Didaktik", "Alfa" , 0)
+COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     "Didaktik Skalica", "Didaktik Alfa" , 0)
 COMP( 1985, mato,    pmd851, 0,		mato,    mato,  mato,     "Statny", "Mato" , 0)
 COMP( 1989, c2717,   pmd851, 0,		c2717,   pmd85, c2717,    "Zbrojovka Brno", "Consul 2717" , 0)
 COMP( 1989, c2717pmd,pmd851, 0,		c2717,   pmd85, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , GAME_NOT_WORKING)
