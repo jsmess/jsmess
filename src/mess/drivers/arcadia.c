@@ -875,7 +875,7 @@ static DRIVER_INIT( arcadia )
 CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Advision",           "Advision Home Arcade", GAME_IMPERFECT_SOUND )    /* France */
 CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia,  arcadia,      "Bandai",             "Arcadia", GAME_IMPERFECT_SOUND )                 /* Japan */
 CONS(1982, arcadia,   0,         0,        arcadia,      arcadia,  arcadia,      "Emerson",            "Arcadia 2001", GAME_IMPERFECT_SOUND )            /* U.S.A. */
-CONS(198?, tccosmos,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "Mobilar",            "Tele-Computer Cosmos", GAME_IMPERFECT_SOUND )                  /* Spain */
+CONS(198?, tccosmos,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "Mobilar?",           "Tele-Computer Cosmos", GAME_IMPERFECT_SOUND )    /* Spain? I have only found pictures of a German Cosmos ( http://www.pong-picture-page.de/catalog/product_info.php?products_id=2170 ) */
 CONS(1982, dynavisn,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Yamagiwa",           "Dynavision", GAME_IMPERFECT_SOUND )              /* Japan */
 CONS(1982, ekusera,   intmpt03,  0,        arcadia,      arcadia,  arcadia,      "P.I.C",              "Ekusera", GAME_IMPERFECT_SOUND )                 /* Japan */
 CONS(1982, hanihac,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Hanimex",            "Hanimex Home Arcade Centre", GAME_IMPERFECT_SOUND )  /* UK */
