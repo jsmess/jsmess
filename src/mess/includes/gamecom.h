@@ -154,7 +154,8 @@ extern UINT8 *gamecom_vram;
 
 extern MACHINE_RESET( gamecom );
 extern DRIVER_INIT( gamecom );
-extern DEVICE_IMAGE_LOAD( gamecom_cart );
+extern DEVICE_IMAGE_LOAD( gamecom_cart1 );
+extern DEVICE_IMAGE_LOAD( gamecom_cart2 );
 
 extern WRITE8_HANDLER( gamecom_internal_w );
 extern READ8_HANDLER( gamecom_internal_r );
