@@ -827,6 +827,8 @@ WRITE8_DEVICE_HANDLER(via_w)
 		}
 		else
 		{
+			timer_adjust_oneshot(v->t2, v_cycles_to_time(device, TIMER2_VALUE(v)), 0);
+			v->t2_active = 1;
 			v->time2 = timer_get_time(device->machine);
 		}
 		break;

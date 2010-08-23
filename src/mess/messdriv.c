@@ -1555,6 +1555,7 @@ const game_driver * const drivers[] =
 	DRIVER( et3400 )
 	DRIVER( amu880 )
 	DRIVER( interact )
+	DRIVER( jr100u )
 	DRIVER( jr200 )
 	DRIVER( jr200u )
 	DRIVER( h8 )

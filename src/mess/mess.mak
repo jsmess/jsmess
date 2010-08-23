@@ -1063,6 +1063,7 @@ $(MESSOBJ)/mattel.a:			\
 	$(MESS_VIDEO)/aquarius.o	\
 
 $(MESSOBJ)/matsushi.a:			\
+	$(MESS_DRIVERS)/jr100.o		\
 	$(MESS_DRIVERS)/jr200.o		\
 
 $(MESSOBJ)/mchester.a:			\
