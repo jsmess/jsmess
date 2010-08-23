@@ -10985,7 +10985,7 @@ static WRITE8_HANDLER( bmc_810544_w )
 	else
 		prg32(space->machine, bank);
 
-	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	chr8(space->machine, offset & 0x0f, CHRROM);
 }
