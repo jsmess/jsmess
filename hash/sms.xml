@@ -2089,6 +2089,17 @@
 		</part>
 	</software>
 
+	<software name="ghoulsd" cloneof="ghouls">
+		<description>Ghouls'n Ghosts (Demo)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ghouls'n ghosts [demo].bin" size="32768" crc="96ca6902" sha1="306658835e82fb604666eaca089b5645c12f0197" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="global">
 		<description>Global Defense (Euro, USA)</description>
 		<year>1987</year>
@@ -3221,6 +3232,17 @@
 		</part>
 	</software>
 
+	<software name="monopolyp" cloneof="monopoly">
+		<description>Monopoly (Prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="monopoly [proto].bin" size="131072" crc="7e9d87fc" sha1="68830fb46a010cf2f2d04bdc69e3759f6d42b8de" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: 4370 -->
 	<software name="montezum">
 		<description>Montezuma's Revenge Featuring Panama Joe (USA)</description>
@@ -3881,6 +3903,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="r.c. grand prix (usa, europe).bin" size="262144" crc="54316fea" sha1="94cc64f6febdb0fe4e89ecd9deeca96694e5bead" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rcgpp" cloneof="rcgp">
+		<description>R.C. Grand Prix (Prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="r.c. grand prix [proto].bin" size="262144" crc="767f11b8" sha1="0bc511d809b6e401e9855a89d0ef821b2e8df109" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5497,6 +5530,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="world cup italia '90 (europe).bin" size="131072" crc="6e1ad6fd" sha1="dfa51a4f982d0bec61532e16a679edae605d0aea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcup90d" cloneof="wcup90">
+		<description>World Cup Italia '90 (Demo)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="world cup italia '90 [demo].bin" size="131072" crc="a0cf8b15" sha1="b198ba9fdd2893a5e94ed224d032585a9f57f868" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

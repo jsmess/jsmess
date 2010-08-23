@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Compiled by K1W1
+-->
 
 <!--
   * Nearly all of the cartridges on this a800 softwarelist will also run on the Atari 400 and Atari XL/XE series computers.
@@ -54,7 +57,6 @@
     - Atari                              1983  600XL Super SALT S.00
     - Atari                                    800XL Burn-In U.01
     - Atari                                    800XL Prat UP.01
-    - Atari                                    65/130XE R.2
     - Atari                              1982  810 Disk Field Exerciser
     - Atari                              1981  810 Disk Board Compatibility Test
     - Atari                              1983  810 Disk Drive Check-out
@@ -65,13 +67,10 @@
     - Atari                              1982  Paddle Jitter Test (REV C with games)
     - Atari                                    RAM Extension Module Test Rev 1.0
     - Atari                           PR 1984  Super Pac-Man
-    - Atari                AED80013   R  1983  AtariLab Temperature Module
-    - Atari                AED80014   R  1984  AtariLab Light Module
     - Atari                RX8036     U  1984  AtariWriter (ver C)
     - Atari                RX8050     PR       1400 Telecommunicator
     - Atari                RX8061     PR 1984  Jr.Pac-Man
     - Atari                RX8067     U  1987  Final Legacy (with Graphics Menu)
-    - Atari                RX8068     PR 1984  Stargate
     - Atari                TE15644    ER 1982  400/800 SALT Diagnostic cartridge (2.05)
     - Atari France         RXF8036    ER 1982  AtariTexte
     - Atari Germany        RXG8036    ER 1982  AtariSchreiber
@@ -186,11 +185,10 @@
 
     - Spinnaker            JUK-AT     ER       Jukebox
 
-    - Stimultech                      ER 1983  Expando-Vision (2- Control Smoking/Calm Nerves)
     - Stimultech                      ER 1983  Expando-Vision (5- Athletic confidence/Golf)
     - Stimultech                      ER 1983  Expando-Vision (6- Study Habits/Memory Power)
     - Stimultech                      ER 1983  Expando-Vision (7- Career/Success Motivation)
-    - Stimultech                      ER 1983  Expando-Vision (2- Sexual Confidence)
+    - Stimultech                      ER 1983  Expando-Vision (8- Sexual Confidence)
 
     - Synapse                         ER       Synassembler
 
@@ -264,7 +262,7 @@
 
 <softwarelist name="a800" description="Atari 800 cartridges">
 
-	<software name="810diag" supported="no">
+	<software name="810diag">
 		<description>810 Diagnostic Cartridge</description>
 		<!-- <cart number>FD100006</cart number> -->
 		<year>1982</year>
@@ -276,7 +274,7 @@
 		</part>
 	</software>
 
-	<software name="3dtictac" supported="no">
+	<software name="3dtictac">
 		<description>3D Tic-Tac-Toe</description>
 		<!-- <cart number>CXL4010</cart number> -->
 		<year>1979</year>
@@ -300,7 +298,7 @@
 		</part>
 	</software>
 
-	<software name="action" supported="no">
+	<software name="action">
 		<description>Action! Programming Language</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -336,7 +334,31 @@
 		</part>
 	</software>
 
-	<software name="alienamb" supported="no">
+	<software name="alight">
+		<description>Atarilab Light Module</description>
+		<!-- <cart number>AED80014</cart number> -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atarilab light module.rom" size="16384" crc="9be1c9e4" sha1="f2dbf1ce1b49361492dafc5d09b91b1de07dc247" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<software name="atemp">
+		<description>Atarilab Temperature Module</description>
+		<!-- <cart number>AED80013</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atarilab temperature module.rom" size="16384" crc="4036e465" sha1="5119a0ac7cc7c6d27954b7522a2f40c47f136f08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienamb">
 		<description>Alien Ambush</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -348,7 +370,7 @@
 		</part>
 	</software>
 
-	<software name="alngrden" supported="no">
+	<software name="alngrden">
 		<description>Alien Garden</description>
 		<!-- <cart number>54</cart number> -->
 		<year>1982</year>
@@ -360,7 +382,7 @@
 		</part>
 	</software>
 
-	<software name="alphashd" supported="no">
+	<software name="alphashd">
 		<description>Alpha Shield</description>
 		<!-- <cart number>33022</cart number> -->
 		<year>1983</year>
@@ -384,7 +406,7 @@
 		</part>
 	</software>
 
-	<software name="animpuzl" supported="no">
+	<software name="animpuzl">
 		<description>Animated Puzzle (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -396,7 +418,7 @@
 		</part>
 	</software>
 
-	<software name="anteater" supported="no">
+	<software name="anteater">
 		<description>Ant Eater</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -408,7 +430,7 @@
 		</part>
 	</software>
 
-	<software name="asmedit" supported="no">
+	<software name="asmedit">
 		<description>Assembler Editor Computing Language</description>
 		<!-- <cart number>CXL4003</cart number> -->
 		<year>1979</year>
@@ -420,7 +442,7 @@
 		</part>
 	</software>
 
-	<software name="asteroids" supported="no">
+	<software name="asteroids">
 		<description>Asteroids</description>
 		<!-- <cart number>CXL4013</cart number> -->
 		<year>1981</year>
@@ -434,12 +456,24 @@
 
 	<software name="achase">
 		<description>Astro Chase</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>First Star Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="astro chase (first star software)(1982).rom" size="16384" crc="18752991" sha1="f508b89d2251c53d017cff6cb23b8e9880a0cc0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="achase1" cloneof="achase">
+		<description>Astro Chase (Re-Badge)</description>
 		<!-- <cart number>1190</cart number> -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a800_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="astro chase.rom" size="16384" crc="11f1c7fa" sha1="36cca84a113e3adf6759a7c71df30cbed16924f2" offset="0" />
+				<rom name="astro chase (parker brothers)(1983).rom" size="16384" crc="11f1c7fa" sha1="36cca84a113e3adf6759a7c71df30cbed16924f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -457,7 +491,7 @@
 		</part>
 	</software>
 
-	<software name="basica" supported="no">
+	<software name="basica">
 		<description>Atari BASIC Programming Language (Revision A)</description>
 		<!-- <cart number>CXL4002</cart number> -->
 		<year>1979</year>
@@ -469,7 +503,7 @@
 		</part>
 	</software>
 
-	<software name="basicb" supported="no">
+	<software name="basicb">
 		<description>Atari BASIC Programming Language (Revision B)</description>
 		<!-- <cart number>RX8002</cart number> -->
 		<year>1983</year>
@@ -481,7 +515,7 @@
 		</part>
 	</software>
 
-	<software name="basicc" supported="no">
+	<software name="basicc">
 		<description>Atari BASIC Programming Language (Revision C)</description>
 		<!-- <cart number>RX8002</cart number> -->
 		<year>1986</year>
@@ -493,7 +527,7 @@
 		</part>
 	</software>
 
-	<software name="alogo" supported="no">
+	<software name="alogo">
 		<description>Atari LOGO Computing Language</description>
 		<!-- <cart number>RX8032</cart number> -->
 		<year>1983</year>
@@ -505,7 +539,7 @@
 		</part>
 	</software>
 
-		<software name="msbasic2" supported="no">
+		<software name="msbasic2">
 		<description>Microsoft BASIC II Programming Language</description>
 		<!-- <cart number>RX8035</cart number> -->
 		<year>1982</year>
@@ -542,7 +576,7 @@
 		</part>
 	</software>
 
-	<software name="atlantis" supported="no">
+	<software name="atlantis">
 		<description>Atlantis</description>
 		<!-- <cart number>720125</cart number> -->
 		<year>1983</year>
@@ -554,7 +588,7 @@
 		</part>
 	</software>
 
-	<software name="atlantisa" cloneof="atlantis" supported="no">
+	<software name="atlantisa" cloneof="atlantis">
 		<description>Atlantis (Alt)</description>
 		<!-- <cart number>720125</cart number> -->
 		<year>1983</year>
@@ -578,7 +612,7 @@
 		</part>
 	</software>
 
-	<software name="mtntcmls" supported="no">
+	<software name="mtntcmls">
 		<description>Attack of the Mutant Camels</description>
 		<!-- <cart number>C518</cart number> -->
 		<year>1983</year>
@@ -603,7 +637,7 @@
 		</part>
 	</software>
 
-	<software name="baseball" supported="no">
+	<software name="baseball">
 		<description>Baseball</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -615,7 +649,7 @@
 		</part>
 	</software>
 
-	<software name="basxe41" supported="no">
+	<software name="basxe41">
 		<description>Basic XE Programming Language v4.1</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -627,7 +661,7 @@
 		</part>
 	</software>
 
-	<software name="basxl103" supported="no">
+	<software name="basxl103">
 		<description>Basic XL Programming Language v1.03</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -639,7 +673,7 @@
 		</part>
 	</software>
 
-	<software name="bsktball" supported="no">
+	<software name="bsktball">
 		<description>Basketball</description>
 		<!-- <cart number>CXL4004</cart number> -->
 		<year>1979</year>
@@ -651,7 +685,7 @@
 		</part>
 	</software>
 
-	<software name="bcquest" supported="no">
+	<software name="bcquest">
 		<description>BC's Quest for Tires</description>
 		<!-- <cart number>OTL-201</cart number> -->
 		<year>1983</year>
@@ -663,7 +697,7 @@
 		</part>
 	</software>
 
-	<software name="beamridr" supported="no">
+	<software name="beamridr">
 		<description>Beamrider</description>
 		<!-- <cart number>CA-009</cart number> -->
 		<year>1984</year>
@@ -675,7 +709,7 @@
 		</part>
 	</software>
 
-	<software name="bearjam" supported="no">
+	<software name="bearjam">
 		<description>BearJam</description>
 		<!-- <cart number>10031A-3</cart number> -->
 		<!-- <comment> Requires Chalkboard Inc.'s Powerpad Tablet device -->
@@ -688,7 +722,7 @@
 		</part>
 	</software>
 
-	<software name="berzerk" supported="no">
+	<software name="berzerk">
 		<description>Berzerk (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -700,7 +734,7 @@
 		</part>
 	</software>
 
-	<software name="berzerka" cloneof="berzerk" supported="no">
+	<software name="berzerka" cloneof="berzerk">
 		<description>Berzerk (Prototype, Alt)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -712,7 +746,7 @@
 		</part>
 	</software>
 
-	<software name="bigbrdfh" supported="no">
+	<software name="bigbrdfh">
 		<description>Big Bird's Funhouse</description>
 		<!-- <cart number>4L-0505</cart number> -->
 		<!-- <comment> Keybpoard overlay was supplied with cartridge -->
@@ -725,7 +759,7 @@
 		</part>
 	</software>
 
-	<software name="bigbrdsd" supported="no">
+	<software name="bigbrdsd">
 		<description>Big Bird's Special Delivery</description>
 		<!-- <cart number>4L-0109</cart number> -->
 		<year>1984</year>
@@ -737,7 +771,7 @@
 		</part>
 	</software>
 
-	<software name="blaster" supported="no">
+	<software name="blaster">
 		<description>Blaster (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -749,7 +783,7 @@
 		</part>
 	</software>
 
-	<software name="bdash" supported="no">
+	<software name="bdash">
 		<description>Boulder Dash</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -761,7 +795,7 @@
 		</part>
 	</software>
 
-	<software name="bldrbmbs" supported="no">
+	<software name="bldrbmbs">
 		<description>Boulders and Bombs</description>
 		<!-- <cart number>4L-2540</cart number> -->
 		<year>1982</year>
@@ -773,7 +807,7 @@
 		</part>
 	</software>
 
-	<software name="bntybobs" supported="no">
+	<software name="bntybobs">
 		<description>Bounty Bob Strikes Back!</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -785,7 +819,7 @@
 		</part>
 	</software>
 
-	<software name="bristles" supported="no">
+	<software name="bristles">
 		<description>Bristles</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -797,7 +831,7 @@
 		</part>
 	</software>
 
-	<software name="buckrog" supported="no">
+	<software name="buckrog">
 		<description>Buck Rogers : Planet of Zoom</description>
 		<!-- <cart number>005-03</cart number> -->
 		<year>1983</year>
@@ -809,7 +843,7 @@
 		</part>
 	</software>
 
-	<software name="cptnbebl" supported="no">
+	<software name="cptnbebl">
 		<description>Captain Beeble</description>
 		<!-- <cart number>CR1002</cart number> -->
 		<year>1983</year>
@@ -821,7 +855,7 @@
 		</part>
 	</software>
 
-	<software name="carnmass" supported="no">
+	<software name="carnmass">
 		<description>Carnival Massacre</description>
 		<!-- <cart number>THB12011</cart number> -->
 		<year>1983</year>
@@ -833,7 +867,7 @@
 		</part>
 	</software>
 
-	<software name="castlhas" supported="no">
+	<software name="castlhas">
 		<description>Castle Hassle</description>
 		<!-- <cart number>09-01123</cart number> -->
 		<year>1983</year>
@@ -845,7 +879,7 @@
 		</part>
 	</software>
 
-	<software name="cstlkeys" supported="no">
+	<software name="cstlkeys">
 		<description>Castles and Keys</description>
 		<!-- <cart number>ECPC</cart number> -->
 		<year>1983</year>
@@ -857,7 +891,7 @@
 		</part>
 	</software>
 
-	<software name="cvrnmars" supported="no">
+	<software name="cvrnmars">
 		<description>Caverns of Mars</description>
 		<!-- <cart number>RX8021</cart number> -->
 		<!-- <comment> Re-released in 1987 for the XEGS -->
@@ -870,7 +904,7 @@
 		</part>
 	</software>
 
-	<software name="centiped" supported="no">
+	<software name="centiped">
 		<description>Centipede</description>
 		<!-- <cart number>CXL4020</cart number> -->
 		<!-- <comment> Re-released in 1987 (RX8020) -->
@@ -883,7 +917,7 @@
 		</part>
 	</software>
 
-	<software name="centpedp" cloneof="centiped" supported="no">
+	<software name="centpedp" cloneof="centiped">
 		<description>Centipede (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1981</year>
@@ -895,7 +929,7 @@
 		</part>
 	</software>
 
-	<software name="chess" supported="no">
+	<software name="chess">
 		<description>Chess</description>
 		<!-- <cart number>1100</cart number> -->
 		<year>1983</year>
@@ -907,7 +941,7 @@
 		</part>
 	</software>
 
-	<software name="chicken" supported="no">
+	<software name="chicken">
 		<description>Chicken</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -919,7 +953,7 @@
 		</part>
 	</software>
 
-	<software name="chiffres" supported="no">
+	<software name="chiffres">
 		<description>Des Chiffres et des Lettres (France)</description>
 		<!-- <cart number>RXF52001</cart number> -->
 		<year>1983</year>
@@ -931,7 +965,7 @@
 		</part>
 	</software>
 
-	<software name="choplift" supported="no">
+	<software name="choplift">
 		<description>Choplifter!</description>
 		<!-- <cart number>ATCART191</cart number> -->
 		<year>1982</year>
@@ -943,7 +977,7 @@
 		</part>
 	</software>
 
-	<software name="clamjmpr" supported="no">
+	<software name="clamjmpr">
 		<description>Claim Jumper</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -955,7 +989,7 @@
 		</part>
 	</software>
 
-	<software name="cldburst" supported="no">
+	<software name="cldburst">
 		<description>Cloudburst</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -967,7 +1001,7 @@
 		</part>
 	</software>
 
-	<software name="coconots" supported="no">
+	<software name="coconots">
 		<description>CocoNotes</description>
 		<!-- <cart number>4L-9847</cart number> -->
 		<year>1984</year>
@@ -979,7 +1013,7 @@
 		</part>
 	</software>
 
-	<software name="compchss" supported="no">
+	<software name="compchss">
 		<description>Computer Chess</description>
 		<!-- <cart number>CXL4009</cart number> -->
 		<year>1979</year>
@@ -991,7 +1025,7 @@
 		</part>
 	</software>
 
-	<software name="compwar" supported="no">
+	<software name="compwar">
 		<description>Computer War</description>
 		<!-- <cart number>THA12010</cart number> -->
 		<year>1983</year>
@@ -1003,7 +1037,7 @@
 		</part>
 	</software>
 
-	<software name="congo" supported="no">
+	<software name="congo">
 		<description>Congo Bongo</description>
 		<!-- <cart number>006-03</cart number> -->
 		<year>1983</year>
@@ -1015,7 +1049,7 @@
 		</part>
 	</software>
 
-	<software name="cosmclfe" supported="no">
+	<software name="cosmclfe">
 		<description>Cosmic Life</description>
 		<!-- <cart number>COS-AT</cart number> -->
 		<year>1983</year>
@@ -1027,7 +1061,7 @@
 		</part>
 	</software>
 
-	<software name="cosmtnls" supported="no">
+	<software name="cosmtnls">
 		<description>Cosmic Tunnels (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1039,7 +1073,7 @@
 		</part>
 	</software>
 
-	<software name="crssfire" supported="no">
+	<software name="crssfire">
 		<description>CrossFire</description>
 		<!-- <cart number>ORM-001</cart number> -->
 		<year>1981</year>
@@ -1051,7 +1085,7 @@
 		</part>
 	</software>
 
-	<software name="ccastles" supported="no">
+	<software name="ccastles">
 		<description>Crystal Castles (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -1063,7 +1097,7 @@
 		</part>
 	</software>
 
-	<software name="dafuzz" supported="no">
+	<software name="dafuzz">
 		<description>Da' Fuzz</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1075,7 +1109,7 @@
 		</part>
 	</software>
 
-	<software name="dncfntsy" supported="no">
+	<software name="dncfntsy">
 		<description>Dance Fantasy</description>
 		<!-- <cart number>DCF-AT</cart number> -->
 		<year>1984</year>
@@ -1087,7 +1121,7 @@
 		</part>
 	</software>
 
-	<software name="decathln" supported="no">
+	<software name="decathln">
 		<description>Decathalon</description>
 		<!-- <cart number>CC-008</cart number> -->
 		<year>1983</year>
@@ -1099,7 +1133,7 @@
 		</part>
 	</software>
 
-	<software name="decathlna" cloneof="decathln" supported="no">
+	<software name="decathlna" cloneof="decathln">
 		<description>Decathalon (Alt)</description>
 		<!-- <cart number>CC-008</cart number> -->
 		<year>1983</year>
@@ -1111,7 +1145,7 @@
 		</part>
 	</software>
 
-	<software name="defender" supported="no">
+	<software name="defender">
 		<description>Defender</description>
 		<!-- <cart number>CXL4025</cart number> -->
 		<!-- <comment> Re-released in 1986 (RX8025) -->
@@ -1124,7 +1158,7 @@
 		</part>
 	</software>
 
-	<software name="dltadraw" supported="no">
+	<software name="dltadraw">
 		<description>Delta Drawing : Learning Program</description>
 		<!-- <cart number>DLD-AT</cart number> -->
 		<year>1983</year>
@@ -1136,7 +1170,7 @@
 		</part>
 	</software>
 
-	<software name="dlxinvdr" supported="no">
+	<software name="dlxinvdr">
 		<description>Deluxe Invaders</description>
 		<!-- <cart number>09-01101</cart number> -->
 		<year>1983</year>
@@ -1148,7 +1182,7 @@
 		</part>
 	</software>
 
-	<software name="dmnattk" supported="no">
+	<software name="dmnattk">
 		<description>Demon Attack</description>
 		<!-- <cart number>720149</cart number> -->
 		<year>1982</year>
@@ -1160,7 +1194,7 @@
 		</part>
 	</software>
 
-	<software name="destiny" supported="no">
+	<software name="destiny">
 		<description>Destiny : The Cruiser (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>198?</year>
@@ -1172,7 +1206,7 @@
 		</part>
 	</software>
 
-	<software name="diamond" supported="no">
+	<software name="diamond">
 		<description>Diamond GOS v2.0</description>
 		<!-- <cart number></cart number> -->
 		<year>1989</year>
@@ -1184,7 +1218,7 @@
 		</part>
 	</software>
 
-	<software name="diamondm" supported="no">
+	<software name="diamondm">
 		<description>Diamond Mine</description>
 		<!-- <cart number>09-01131</cart number> -->
 		<year>1983</year>
@@ -1196,7 +1230,7 @@
 		</part>
 	</software>
 
-	<software name="digdug" supported="no">
+	<software name="digdug">
 		<description>Dig Dug</description>
 		<!-- <cart number>RX8026</cart number> -->
 		<!-- <comment> Re-released in 1986 -->
@@ -1209,7 +1243,7 @@
 		</part>
 	</software>
 
-	<software name="digduga" cloneof="digdug" supported="no">
+	<software name="digduga" cloneof="digdug">
 		<description>Dig Dug (Earlier Release)</description>
 		<!-- <cart number>RX8026</cart number> -->
 		<year>1982</year>
@@ -1221,7 +1255,7 @@
 		</part>
 	</software>
 
-	<software name="digdugp" cloneof="digdug" supported="no">
+	<software name="digdugp" cloneof="digdug">
 		<description>Dig Dug (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -1233,7 +1267,7 @@
 		</part>
 	</software>
 
-	<software name="dkong" supported="no">
+	<software name="dkong">
 		<description>Donkey Kong</description>
 		<!-- <cart number>RX8031</cart number> -->
 		<!-- <comment> Re-released in 1988 for the XEGS -->
@@ -1246,7 +1280,7 @@
 		</part>
 	</software>
 
-	<software name="dkongjr" supported="no">
+	<software name="dkongjr">
 		<description>Donkey Kong Jr.</description>
 		<!-- <cart number>RX8040</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -1259,7 +1293,7 @@
 		</part>
 	</software>
 
-	<software name="droids" supported="no">
+	<software name="droids">
 		<description>Droids</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1271,7 +1305,7 @@
 		</part>
 	</software>
 
-	<software name="duckahoy" supported="no">
+	<software name="duckahoy">
 		<description>Ducks Ahoy!</description>
 		<!-- <cart number>4L-9889</cart number> -->
 		<year>1984</year>
@@ -1283,7 +1317,7 @@
 		</part>
 	</software>
 
-	<software name="etphone" supported="no">
+	<software name="etphone">
 		<description>E.T. Phone Home!</description>
 		<!-- <cart number>RX8030</cart number> -->
 		<year>1983</year>
@@ -1295,7 +1329,7 @@
 		</part>
 	</software>
 
-	<software name="eastfrnt" supported="no">
+	<software name="eastfrnt">
 		<description>Eastern Front : 1941</description>
 		<!-- <cart number>RX8039</cart number> -->
 		<!-- <comment> Re-released in 1988 for the XEGS -->
@@ -1308,7 +1342,7 @@
 		</part>
 	</software>
 
-	<software name="edusys" supported="no">
+	<software name="edusys">
 		<description>Educational System Master Cartridge</description>
 		<!-- <cart number>CXL4001</cart number> -->
 		<year>1979</year>
@@ -1320,7 +1354,7 @@
 		</part>
 	</software>
 
-	<software name="edusysd" cloneof="edusys" supported="no">
+	<software name="edusysd" cloneof="edusys">
 		<description>Educational System Master Cartridge (Re-Badge)</description>
 		<!-- <cart number>D4001</cart number> -->
 		<year>1983</year>
@@ -1332,7 +1366,7 @@
 		</part>
 	</software>
 
-	<software name="embargo" supported="no">
+	<software name="embargo">
 		<description>Embargo</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -1344,7 +1378,7 @@
 		</part>
 	</software>
 
-	<software name="mgcshaps" supported="no">
+	<software name="mgcshaps">
 		<description>Ernie's Magic Shapes</description>
 		<!-- <cart number>4L-0108</cart number> -->
 		<year>1984</year>
@@ -1356,7 +1390,7 @@
 		</part>
 	</software>
 
-	<software name="espial" supported="no">
+	<software name="espial">
 		<description>Espial</description>
 		<!-- <cart number>7-012-468</cart number> -->
 		<year>1984</year>
@@ -1368,7 +1402,7 @@
 		</part>
 	</software>
 
-	<software name="expando1" supported="no">
+	<software name="expando1">
 		<description>Expando-Vision 1 - Weight Control and Exercise</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1380,7 +1414,19 @@
 		</part>
 	</software>
 
-		<software name="expando3" supported="no">
+	<software name="expando2">
+		<description>Expando-Vision 2 - Control Smoking and Calm Nerves</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Stimultech</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="expando-vision 2 - control smoking and calm nerves.rom" size="8192" crc="eb8b49b9" sha1="662613be02f401407686c11e5653c460487cb9c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expando3">
 		<description>Expando-Vision 3 - Stress Control and Positive Thinking</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1392,7 +1438,7 @@
 		</part>
 	</software>
 
-	<software name="expando4" supported="no">
+	<software name="expando4">
 		<description>Expando-Vision 4 - Control Drinking and Responsibility</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1404,7 +1450,7 @@
 		</part>
 	</software>
 
-	<software name="express" supported="no">
+	<software name="express">
 		<description>Express! v1.12</description>
 		<!-- <cart number></cart number> -->
 		<year>1989</year>
@@ -1416,7 +1462,7 @@
 		</part>
 	</software>
 
-	<software name="facemakr" supported="no">
+	<software name="facemakr">
 		<description>FaceMaker</description>
 		<!-- <cart number>FMK-AT</cart number> -->
 		<year>1983</year>
@@ -1428,7 +1474,7 @@
 		</part>
 	</software>
 
-	<software name="fvoyage" supported="no">
+	<software name="fvoyage">
 		<description>Fantastic Voyage</description>
 		<!-- <cart number>33008</cart number> -->
 		<year>1982</year>
@@ -1440,7 +1486,7 @@
 		</part>
 	</software>
 
-	<software name="fasteddy" supported="no">
+	<software name="fasteddy">
 		<description>Fast Eddie</description>
 		<!-- <cart number>33008</cart number> -->
 		<year>1982</year>
@@ -1452,7 +1498,7 @@
 		</part>
 	</software>
 
-	<software name="flegacy" supported="no">
+	<software name="flegacy">
 		<description>Final Legacy (Text Menu Version)</description>
 		<!-- <cart number>RX8067</cart number> -->
 		<!-- <comment> Undumped cartridge with in-game Graphic Menu exists -->
@@ -1465,7 +1511,7 @@
 		</part>
 	</software>
 
-	<software name="legacy" cloneof="flegacy" supported="no">
+	<software name="legacy" cloneof="flegacy">
 		<description>The Legacy (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -1477,7 +1523,7 @@
 		</part>
 	</software>
 
-	<software name="fnlorbit" supported="no">
+	<software name="fnlorbit">
 		<description>Final Orbit</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1489,7 +1535,7 @@
 		</part>
 	</software>
 
-	<software name="firebird" supported="no">
+	<software name="firebird">
 		<description>Firebird</description>
 		<!-- <cart number></cart number> -->
 		<year>1981</year>
@@ -1501,7 +1547,7 @@
 		</part>
 	</software>
 
-	<software name="flapper" supported="no">
+	<software name="flapper">
 		<description>Flapper</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1513,7 +1559,7 @@
 		</part>
 	</software>
 
-	<software name="flipflop" supported="no">
+	<software name="flipflop">
 		<description>Flip and Flop</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1525,7 +1571,7 @@
 		</part>
 	</software>
 
-	<software name="fortapoc" supported="no">
+	<software name="fortapoc">
 		<description>Fort Apoalypse</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -1537,7 +1583,7 @@
 		</part>
 	</software>
 
-	<software name="forthntr" supported="no">
+	<software name="forthntr">
 		<description>Fortune Hunter</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -1549,7 +1595,7 @@
 		</part>
 	</software>
 
-	<software name="fracfevr" supported="no">
+	<software name="fracfevr">
 		<description>Fraction Fever</description>
 		<!-- <cart number>FRF-AT</cart number> -->
 		<year>1983</year>
@@ -1561,7 +1607,7 @@
 		</part>
 	</software>
 
-	<software name="frogger" supported="no">
+	<software name="frogger">
 		<description>Frogger</description>
 		<!-- <cart number>1110</cart number> -->
 		<year>1983</year>
@@ -1573,7 +1619,7 @@
 		</part>
 	</software>
 
-	<software name="frogger2" supported="no">
+	<software name="frogger2">
 		<description>Frogger II : Threedeep!</description>
 		<!-- <cart number>1290</cart number> -->
 		<year>1984</year>
@@ -1585,7 +1631,7 @@
 		</part>
 	</software>
 
-	<software name="funart" supported="no">
+	<software name="funart">
 		<description>Fun with Art</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1597,7 +1643,7 @@
 		</part>
 	</software>
 
-	<software name="galaxian" supported="no">
+	<software name="galaxian">
 		<description>Galaxian</description>
 		<!-- <cart number>CXL4024</cart number> -->
 		<!-- <comment> Re-released in 1986 (RX8024) -->
@@ -1610,7 +1656,7 @@
 		</part>
 	</software>
 
-	<software name="apshai" supported="no">
+	<software name="apshai">
 		<description>Gateway To Apshai</description>
 		<!-- <cart number>614R</cart number> -->
 		<year>1983</year>
@@ -1622,7 +1668,7 @@
 		</part>
 	</software>
 
-	<software name="gorf" supported="no">
+	<software name="gorf">
 		<description>Gorf</description>
 		<!-- <cart number>09-01102</cart number> -->
 		<!-- <comment> Re-released in 1983 -->
@@ -1635,7 +1681,7 @@
 		</part>
 	</software>
 
-	<software name="gridrunr" supported="no">
+	<software name="gridrunr">
 		<description>Gridrunner</description>
 		<!-- <cart number>C712</cart number> -->
 		<year>1983</year>
@@ -1647,7 +1693,7 @@
 		</part>
 	</software>
 
-	<software name="gyruss" supported="no">
+	<software name="gyruss">
 		<description>Gyruss</description>
 		<!-- <cart number>1280</cart number> -->
 		<year>1984</year>
@@ -1659,7 +1705,7 @@
 		</part>
 	</software>
 
-	<software name="hero" supported="no">
+	<software name="hero">
 		<description>H.E.R.O.</description>
 		<!-- <cart number>CZ-007</cart number> -->
 		<year>1984</year>
@@ -1671,7 +1717,7 @@
 		</part>
 	</software>
 
-	<software name="batlnband" supported="no">
+	<software name="batlnband">
 		<description>Halftime Battlin' Bands</description>
 		<!-- <cart number>4L-9848</cart number> -->
 		<year>1984</year>
@@ -1683,7 +1729,7 @@
 		</part>
 	</software>
 
-	<software name="hardhatw" supported="no">
+	<software name="hardhatw">
 		<description>Hard Hat Willy</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1695,7 +1741,7 @@
 		</part>
 	</software>
 
-	<software name="homebase" supported="no">
+	<software name="homebase">
 		<description>Homebase Electronic Banking</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -1707,7 +1753,7 @@
 		</part>
 	</software>
 
-	<software name="hypnland" supported="no">
+	<software name="hypnland">
 		<description>Hypnotic Land</description>
 		<!-- <cart number></cart number> -->
 		<year>1992</year>
@@ -1719,7 +1765,7 @@
 		</part>
 	</software>
 
-	<software name="is5000" supported="no">
+	<software name="is5000">
 		<description>INFO/soft 5000 Graphics Genlock v5.3</description>
 		<!-- <cart number></cart number> -->
 		<year>1986</year>
@@ -1731,7 +1777,7 @@
 		</part>
 	</software>
 
-	<software name="stordemo" supported="no">
+	<software name="stordemo">
 		<description>In-Store Demonstration</description>
 		<!-- <cart number>CXL4019</cart number> -->
 		<year>1979</year>
@@ -1743,7 +1789,7 @@
 		</part>
 	</software>
 
-	<software name="jamsbond" supported="no">
+	<software name="jamsbond">
 		<description>James Bond 007</description>
 		<!-- <cart number>1380</cart number> -->
 		<year>1984</year>
@@ -1755,7 +1801,7 @@
 		</part>
 	</software>
 
-	<software name="jawbrkr2" supported="no">
+	<software name="jawbrkr2">
 		<description>Jawbreaker II</description>
 		<!-- <cart number>JBL-202</cart number> -->
 		<year>1980</year>
@@ -1767,7 +1813,7 @@
 		</part>
 	</software>
 
-	<software name="jrnyplnts" supported="no">
+	<software name="jrnyplnts">
 		<description>Journey to the Planets</description>
 		<!-- <cart number>09-01124</cart number> -->
 		<year>1983</year>
@@ -1779,7 +1825,7 @@
 		</part>
 	</software>
 
-	<software name="joust" supported="no">
+	<software name="joust">
 		<description>Joust</description>
 		<!-- <cart number>RX8044</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -1792,7 +1838,7 @@
 		</part>
 	</software>
 
-	<software name="jumbojet" supported="no">
+	<software name="jumbojet">
 		<description>Jumbo Jet Pilot</description>
 		<!-- <cart number>THA12002</cart number> -->
 		<year>1982</year>
@@ -1804,7 +1850,7 @@
 		</part>
 	</software>
 
-	<software name="jmpmanjr" supported="no">
+	<software name="jmpmanjr">
 		<description>Jumpman Junior</description>
 		<!-- <cart number>594R</cart number> -->
 		<year>1983</year>
@@ -1816,7 +1862,7 @@
 		</part>
 	</software>
 
-	<software name="jnglhunt" supported="no">
+	<software name="jnglhunt">
 		<description>Jungle Hunt</description>
 		<!-- <cart number>RX8049</cart number> -->
 		<year>1983</year>
@@ -1828,7 +1874,7 @@
 		</part>
 	</software>
 
-	<software name="kantiks" supported="no">
+	<software name="kantiks">
 		<description>K-Razy Antiks</description>
 		<!-- <cart number>M8786</cart number> -->
 		<year>1982</year>
@@ -1840,7 +1886,7 @@
 		</part>
 	</software>
 
-	<software name="kritterc" supported="no">
+	<software name="kritterc">
 		<description>K-Razy Kritters</description>
 		<!-- <cart number>M8788</cart number> -->
 		<year>1982</year>
@@ -1852,7 +1898,7 @@
 		</part>
 	</software>
 
-	<software name="kritterk" cloneof="kritterc" supported="no">
+	<software name="kritterk" cloneof="kritterc">
 		<description>K-Razy Kritters (Re-Badge)</description>
 		<!-- <cart number>ATR1001/cart number> -->
 		<year>1981</year>
@@ -1864,7 +1910,7 @@
 		</part>
 	</software>
 
-	<software name="kshootc" supported="no">
+	<software name="kshootc">
 		<description>K-Razy Shout Out</description>
 		<!-- <cart number>M8784</cart number> -->
 		<year>1982</year>
@@ -1876,7 +1922,7 @@
 		</part>
 	</software>
 
-	<software name="kshootk" cloneof="kshootc" supported="no">
+	<software name="kshootk" cloneof="kshootc">
 		<description>K-Razy Shoot Out (Re-Badge)</description>
 		<!-- <cart number>ATR1000/cart number> -->
 		<year>1981</year>
@@ -1888,7 +1934,7 @@
 		</part>
 	</software>
 
-	<software name="kpatrol" supported="no">
+	<software name="kpatrol">
 		<description>K-Star Patrol</description>
 		<!-- <cart number>M8790</cart number> -->
 		<year>1982</year>
@@ -1900,7 +1946,7 @@
 		</part>
 	</software>
 
-	<software name="kaboom" supported="no">
+	<software name="kaboom">
 		<description>Kaboom!</description>
 		<!-- <cart number>CZ-002</cart number> -->
 		<year>1983</year>
@@ -1912,7 +1958,7 @@
 		</part>
 	</software>
 
-	<software name="kangaroo" supported="no">
+	<software name="kangaroo">
 		<description>Kangaroo (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -1924,7 +1970,7 @@
 		</part>
 	</software>
 
-	<software name="keystone" supported="no">
+	<software name="keystone">
 		<description>Keystone Kapers</description>
 		<!-- <cart number>CZ-006</cart number> -->
 		<year>1984</year>
@@ -1936,7 +1982,7 @@
 		</part>
 	</software>
 
-	<software name="kickback" supported="no">
+	<software name="kickback">
 		<description>Kickback</description>
 		<!-- <cart number>THB12004</cart number> -->
 		<year>1982</year>
@@ -1948,7 +1994,7 @@
 		</part>
 	</software>
 
-	<software name="kidskeys" supported="no">
+	<software name="kidskeys">
 		<description>Kids on Keys</description>
 		<!-- <cart number>KOK-AT</cart number> -->
 		<year>1983</year>
@@ -1960,7 +2006,7 @@
 		</part>
 	</software>
 
-	<software name="kindcomp" supported="no">
+	<software name="kindcomp">
 		<description>KinderComp</description>
 		<!-- <cart number>KDC-AT</cart number> -->
 		<year>1982</year>
@@ -1972,7 +2018,7 @@
 		</part>
 	</software>
 
-	<software name="kpainter" supported="no">
+	<software name="kpainter">
 		<description>Koala Painter</description>
 		<!-- <cart number>AT00315-1</cart number> -->
 		<!-- <comment> Works with Koala pad & Koala light pen devices -->
@@ -1985,7 +2031,7 @@
 		</part>
 	</software>
 
-	<software name="leeper" supported="no">
+	<software name="leeper">
 		<description>Learning with Leeper</description>
 		<!-- <cart number>LLL-201</cart number> -->
 		<year>1983</year>
@@ -1997,7 +2043,7 @@
 		</part>
 	</software>
 
-	<software name="llpaint" supported="no">
+	<software name="llpaint">
 		<description>Leo's 'Lectric Paintbrush</description>
 		<!-- <cart number>10011A-3</cart number> -->
 		<!-- <comment> Requires Chalkboard Inc.'s Powerpad Tablet device -->
@@ -2010,7 +2056,7 @@
 		</part>
 	</software>
 
-	<software name="lprfct40" supported="no">
+	<software name="lprfct40">
 		<description>Letter Perfect (40 Column Version)</description>
 		<!-- <cart number></cart number> -->
 		<year>1981</year>
@@ -2022,7 +2068,7 @@
 		</part>
 	</software>
 
-	<software name="lettrtut" supported="no">
+	<software name="lettrtut">
 		<description>Letter Tutor (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<!-- <comment> Works with the Atari CX75 light pen device -->
@@ -2035,7 +2081,7 @@
 		</part>
 	</software>
 
-	<software name="lifespan" supported="no">
+	<software name="lifespan">
 		<description>Lifespan (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2047,7 +2093,7 @@
 		</part>
 	</software>
 
-	<software name="linklogc" supported="no">
+	<software name="linklogc">
 		<description>Linking Logic</description>
 		<!-- <cart number>LNL-AT</cart number> -->
 		<year>1984</year>
@@ -2059,7 +2105,7 @@
 		</part>
 	</software>
 
-	<software name="logclvls" supported="no">
+	<software name="logclvls">
 		<description>Logic Levels</description>
 		<!-- <cart number>LLV-AT</cart number> -->
 		<year>1984</year>
@@ -2071,7 +2117,7 @@
 		</part>
 	</software>
 
-	<software name="logcmstr" supported="no">
+	<software name="logcmstr">
 		<description>LogicMaster</description>
 		<!-- <cart number>10042A-3</cart number> -->
 		<!-- <comment> Requires Chalkboard Inc.'s Powerpad Tablet device -->
@@ -2084,7 +2130,7 @@
 		</part>
 	</software>
 
-	<software name="mash" supported="no">
+	<software name="mash">
 		<description>M*A*S*H</description>
 		<!-- <cart number>ECPC</cart number> -->
 		<year>1982</year>
@@ -2096,7 +2142,7 @@
 		</part>
 	</software>
 
-	<software name="mac65101" supported="no">
+	<software name="mac65101">
 		<description>MAC-65 Macro Assembler v1.01</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -2108,7 +2154,7 @@
 		</part>
 	</software>
 
-	<software name="hockey" supported="no">
+	<software name="hockey">
 		<description>Major League Hockey</description>
 		<!-- <cart number>THB12009</cart number> -->
 		<year>1983</year>
@@ -2120,7 +2166,7 @@
 		</part>
 	</software>
 
-	<software name="mstrtype" supported="no">
+	<software name="mstrtype">
 		<description>Master Type</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2132,7 +2178,7 @@
 		</part>
 	</software>
 
-	<software name="encounter" supported="no">
+	<software name="encounter">
 		<description>Math Encounter</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -2144,7 +2190,7 @@
 		</part>
 	</software>
 
-	<software name="mileage" supported="no">
+	<software name="mileage">
 		<description>Math Mileage</description>
 		<!-- <cart number>4L-9103</cart number> -->
 		<year>1984</year>
@@ -2156,7 +2202,7 @@
 		</part>
 	</software>
 
-	<software name="mworkadd" supported="no">
+	<software name="mworkadd">
 		<description>Math Works - Addition</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -2168,7 +2214,7 @@
 		</part>
 	</software>
 
-	<software name="mworksub" supported="no">
+	<software name="mworksub">
 		<description>Math Works - Subtraction</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -2180,7 +2226,7 @@
 		</part>
 	</software>
 
-	<software name="matrhorn" supported="no">
+	<software name="matrhorn">
 		<description>Matterhorn</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -2192,7 +2238,7 @@
 		</part>
 	</software>
 
-	<software name="pacmacb2" supported="no">
+	<software name="pacmacb2">
 		<description>McDonald's Pac-Mac (Beta 2)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2204,7 +2250,7 @@
 		</part>
 	</software>
 
-	<software name="pacmacb1" cloneof="pacmacb2" supported="no">
+	<software name="pacmacb1" cloneof="pacmacb2">
 		<description>McDonald's Pac-Mac (Beta 1)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2216,7 +2262,7 @@
 		</part>
 	</software>
 
-	<software name="megmania" supported="no">
+	<software name="megmania">
 		<description>MegaMania</description>
 		<!-- <cart number>CZ-003</cart number> -->
 		<year>1983</year>
@@ -2228,7 +2274,7 @@
 		</part>
 	</software>
 
-	<software name="manor" supported="no">
+	<software name="manor">
 		<description>Memory Manor</description>
 		<!-- <cart number>MEM-AT</cart number> -->
 		<year>1984</year>
@@ -2240,7 +2286,7 @@
 		</part>
 	</software>
 
-	<software name="micfiler" supported="no">
+	<software name="micfiler">
 		<description>Microfiler</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2252,7 +2298,7 @@
 		</part>
 	</software>
 
-	<software name="micprnt8" supported="no">
+	<software name="micprnt8">
 		<description>Microprinter System 800</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2264,7 +2310,7 @@
 		</part>
 	</software>
 
-	<software name="maestro" supported="no">
+	<software name="maestro">
 		<description>MicroMaestro</description>
 		<!-- <cart number>10021A-3</cart number> -->
 		<!-- <comment> Requires Chalkboard Inc.'s Powerpad Tablet device -->
@@ -2277,7 +2323,7 @@
 		</part>
 	</software>
 
-	<software name="milliped" supported="no">
+	<software name="milliped">
 		<description>Millipede</description>
 		<!-- <cart number>RX8048</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -2290,7 +2336,7 @@
 		</part>
 	</software>
 
-	<software name="millpedp" cloneof="milliped" supported="no">
+	<software name="millpedp" cloneof="milliped">
 		<description>Millipede (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2302,7 +2348,7 @@
 		</part>
 	</software>
 
-	<software name="mine2049" supported="no">
+	<software name="mine2049">
 		<description>Miner 2049er</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2314,7 +2360,7 @@
 		</part>
 	</software>
 
-	<software name="missile" supported="no">
+	<software name="missile">
 		<description>Missile Command</description>
 		<!-- <cart number>CXL4012</cart number> -->
 		<!-- <comment> Works with Trackball controller -->
@@ -2327,7 +2373,7 @@
 		</part>
 	</software>
 
-	<software name="mogul" supported="no">
+	<software name="mogul">
 		<description>Mogul Maniac</description>
 		<!-- <cart number>ECPC</cart number> -->
 		<year>1983</year>
@@ -2339,7 +2385,7 @@
 		</part>
 	</software>
 
-	<software name="mnstrmaz" supported="no">
+	<software name="mnstrmaz">
 		<description>Monster Maze</description>
 		<!-- <cart number>56</cart number> -->
 		<year>1982</year>
@@ -2351,7 +2397,7 @@
 		</part>
 	</software>
 
-	<software name="mntezuma" supported="no">
+	<software name="mntezuma">
 		<description>Montezuma's Revenge (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -2363,7 +2409,7 @@
 		</part>
 	</software>
 
-	<software name="moonptrl" supported="no">
+	<software name="moonptrl">
 		<description>Moon Patrol</description>
 		<!-- <cart number>RX8052</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -2376,7 +2422,7 @@
 		</part>
 	</software>
 
-	<software name="mntnking" supported="no">
+	<software name="mntnking">
 		<description>Mountain King</description>
 		<!-- <cart number>4L-2541</cart number> -->
 		<year>1983</year>
@@ -2388,7 +2434,7 @@
 		</part>
 	</software>
 
-	<software name="madness" supported="no">
+	<software name="madness">
 		<description>Movie Musical Madness</description>
 		<!-- <cart number>4L-9849</cart number> -->
 		<year>1984</year>
@@ -2400,7 +2446,7 @@
 		</part>
 	</software>
 
-	<software name="docastle" supported="no">
+	<software name="docastle">
 		<description>Mr Do!'s Castle (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -2412,7 +2458,7 @@
 		</part>
 	</software>
 
-	<software name="mrcool" supported="no">
+	<software name="mrcool">
 		<description>Mr Cool</description>
 		<!-- <cart number>MCL-201</cart number> -->
 		<year>1983</year>
@@ -2424,7 +2470,7 @@
 		</part>
 	</software>
 
-	<software name="mrtnt" supported="no">
+	<software name="mrtnt">
 		<description>Mr TNT</description>
 		<!-- <cart number>C730</cart number> -->
 		<year>1983</year>
@@ -2436,7 +2482,7 @@
 		</part>
 	</software>
 
-	<software name="mspacman" supported="no">
+	<software name="mspacman">
 		<description>Ms Pac-Man</description>
 		<!-- <cart number>RX8043</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -2449,7 +2495,7 @@
 		</part>
 	</software>
 
-	<software name="fischa" supported="no">
+	<software name="fischa">
 		<description>Multi Fischa (Mexico)</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -2461,7 +2507,7 @@
 		</part>
 	</software>
 
-	<software name="composer" supported="no">
+	<software name="composer">
 		<description>Music Composer</description>
 		<!-- <cart number>CXL4007</cart number> -->
 		<year>1979</year>
@@ -2473,7 +2519,7 @@
 		</part>
 	</software>
 
-	<software name="nitestrk" supported="no">
+	<software name="nitestrk">
 		<description>Night Strike!</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2485,7 +2531,7 @@
 		</part>
 	</software>
 
-	<software name="oilswell" supported="no">
+	<software name="oilswell">
 		<description>Oil's Well</description>
 		<!-- <cart number>OWL-201</cart number> -->
 		<year>1983</year>
@@ -2497,7 +2543,7 @@
 		</part>
 	</software>
 
-	<software name="orcattk" supported="no">
+	<software name="orcattk">
 		<description>Orc Attack</description>
 		<!-- <cart number>THA12008</cart number> -->
 		<year>1983</year>
@@ -2509,7 +2555,7 @@
 		</part>
 	</software>
 
-	<software name="orchard" supported="no">
+	<software name="orchard">
 		<description>Ozzy's Orchard</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2521,7 +2567,7 @@
 		</part>
 	</software>
 
-	<software name="pacman" supported="no">
+	<software name="pacman">
 		<description>Pac-Man</description>
 		<!-- <cart number>CXL4022</cart number> -->
 		<!-- <comment> Re-released in 1987 (RX8022) -->
@@ -2534,19 +2580,19 @@
 		</part>
 	</software>
 
-	<software name="paddle" supported="no">
-		<description>Paddle Jitter Test</description>
+	<software name="paddlec">
+		<description>Paddle Jitter Test (Revision C)</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="paddle jitter test.rom" size="16384" crc="0366db59" sha1="7424663cdf6087a0fbce51bb9ba7cc8be135997d" offset="0" />
+				<rom name="paddle jitter test (rev c).rom" size="16384" crc="0366db59" sha1="7424663cdf6087a0fbce51bb9ba7cc8be135997d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pastfind" supported="no">
+	<software name="pastfind">
 		<description>Pastfinder</description>
 		<!-- <cart number>CC-104</cart number> -->
 		<year>1984</year>
@@ -2558,7 +2604,7 @@
 		</part>
 	</software>
 
-	<software name="pnutpanc" supported="no">
+	<software name="pnutpanc">
 		<description>Peanut Butter Panic</description>
 		<!-- <cart number>4L-0110</cart number> -->
 		<year>1984</year>
@@ -2570,7 +2616,7 @@
 		</part>
 	</software>
 
-	<software name="pengo" supported="no">
+	<software name="pengo">
 		<description>Pengo</description>
 		<!-- <cart number>RX8045</cart number> -->
 		<year>1983</year>
@@ -2582,7 +2628,7 @@
 		</part>
 	</software>
 
-	<software name="picnic" supported="no">
+	<software name="picnic">
 		<description>Picnic Paranoia</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2594,7 +2640,7 @@
 		</part>
 	</software>
 
-	<software name="pilot" supported="no">
+	<software name="pilot">
 		<description>Pilot Computing Language</description>
 		<!-- <cart number>CXL4018</cart number> -->
 		<year>1980</year>
@@ -2606,7 +2652,7 @@
 		</part>
 	</software>
 
-	<software name="pitfall" supported="no">
+	<software name="pitfall">
 		<description>Pitfall!</description>
 		<!-- <cart number>CZ-004</cart number> -->
 		<year>1984</year>
@@ -2618,7 +2664,7 @@
 		</part>
 	</software>
 
-	<software name="pitfall2" supported="no">
+	<software name="pitfall2">
 		<description>Pitfall! II - Lost Caverns</description>
 		<!-- <cart number>CA-011</cart number> -->
 		<year>1984</year>
@@ -2630,7 +2676,7 @@
 		</part>
 	</software>
 
-	<software name="pitstop" supported="no">
+	<software name="pitstop">
 		<description>Pitstop</description>
 		<!-- <cart number>604R</cart number> -->
 		<year>1983</year>
@@ -2642,7 +2688,7 @@
 		</part>
 	</software>
 
-	<software name="platter" supported="no">
+	<software name="platter">
 		<description>PlatterMania</description>
 		<!-- <cart number>554R</cart number> -->
 		<year>1983</year>
@@ -2654,7 +2700,7 @@
 		</part>
 	</software>
 
-	<software name="polepos" supported="no">
+	<software name="polepos">
 		<description>Pole Position</description>
 		<!-- <cart number>RX8034</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -2667,7 +2713,7 @@
 		</part>
 	</software>
 
-	<software name="pool400" supported="no">
+	<software name="pool400">
 		<description>Pool 400</description>
 		<!-- <cart number>AC1001</cart number> -->
 		<year>1982</year>
@@ -2679,7 +2725,7 @@
 		</part>
 	</software>
 
-	<software name="rackemup" cloneof="pool400" supported="no">
+	<software name="rackemup" cloneof="pool400">
 		<description>Rack 'em Up! (Re-Badged)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2691,7 +2737,7 @@
 		</part>
 	</software>
 
-	<software name="popeye" supported="no">
+	<software name="popeye">
 		<description>Popeye (US)</description>
 		<!-- <cart number>1150</cart number> -->
 		<year>1983</year>
@@ -2703,7 +2749,7 @@
 		</part>
 	</software>
 
-	<software name="popeyeu" cloneof="popeye" supported="no">
+	<software name="popeyeu" cloneof="popeye">
 		<description>Popeye (EU)</description>
 		<!-- <cart number>1150</cart number> -->
 		<year>1983</year>
@@ -2715,7 +2761,7 @@
 		</part>
 	</software>
 
-	<software name="porkys" supported="no">
+	<software name="porkys">
 		<description>Porky's</description>
 		<!-- <cart number>ECPC</cart number> -->
 		<year>1983</year>
@@ -2727,7 +2773,7 @@
 		</part>
 	</software>
 
-	<software name="powrstar" supported="no">
+	<software name="powrstar">
 		<description>Powerstar</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -2739,7 +2785,7 @@
 		</part>
 	</software>
 
-	<software name="princess" supported="no">
+	<software name="princess">
 		<description>Princess and the Frog</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2751,7 +2797,7 @@
 		</part>
 	</software>
 
-	<software name="pronto" supported="no">
+	<software name="pronto">
 		<description>Pronto : The Home Information System</description>
 		<!-- <cart number>22680</cart number> -->
 		<year>1985</year>
@@ -2763,7 +2809,7 @@
 		</part>
 	</software>
 
-	<software name="protctr2" supported="no">
+	<software name="protctr2">
 		<description>Protector II</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2775,7 +2821,7 @@
 		</part>
 	</software>
 
-	<software name="qbert" supported="no">
+	<software name="qbert">
 		<description>Q*bert</description>
 		<!-- <cart number>1120</cart number> -->
 		<year>1983</year>
@@ -2787,7 +2833,7 @@
 		</part>
 	</software>
 
-	<software name="qix" supported="no">
+	<software name="qix">
 		<description>Qix</description>
 		<!-- <cart number>CXL4027</cart number> -->
 		<year>1982</year>
@@ -2799,7 +2845,7 @@
 		</part>
 	</software>
 
-	<software name="speedway" supported="no">
+	<software name="speedway">
 		<description>Rally Speedway</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2811,7 +2857,7 @@
 		</part>
 	</software>
 
-	<software name="football" supported="no">
+	<software name="football">
 		<description>RealSports Football</description>
 		<!-- <cart number>RX8029</cart number> -->
 		<!-- <comment> Re-released in 1987) -->
@@ -2824,7 +2870,7 @@
 		</part>
 	</software>
 
-	<software name="tennis" supported="no">
+	<software name="tennis">
 		<description>RealSports Tennis</description>
 		<!-- <cart number>RX8042</cart number> -->
 		<!-- <comment> Re-released in 1987 -->
@@ -2837,7 +2883,7 @@
 		</part>
 	</software>
 
-	<software name="rivrraid" supported="no">
+	<software name="rivrraid">
 		<description>River Raid</description>
 		<!-- <cart number>CZ-001</cart number> -->
 		<year>1983</year>
@@ -2849,7 +2895,7 @@
 		</part>
 	</software>
 
-	<software name="rivrrscu" supported="no">
+	<software name="rivrrscu">
 		<description>River Rescue</description>
 		<!-- <cart number>THB12005</cart number> -->
 		<year>1983</year>
@@ -2861,7 +2907,7 @@
 		</part>
 	</software>
 
-	<software name="robo2084" supported="no">
+	<software name="robo2084">
 		<description>Robotron 2084</description>
 		<!-- <cart number>RX8033</cart number> -->
 		<year>1983</year>
@@ -2873,7 +2919,7 @@
 		</part>
 	</software>
 
-	<software name="rob2084a" cloneof="robo2084" supported="no">
+	<software name="rob2084a" cloneof="robo2084">
 		<description>Robotron 2084 (Alt)</description>
 		<!-- <cart number>RX8033</cart number> -->
 		<year>1983</year>
@@ -2885,7 +2931,7 @@
 		</part>
 	</software>
 
-	<software name="satan" supported="no">
+	<software name="satan">
 		<description>Satan's Hollow (Unreleased)</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2897,7 +2943,7 @@
 		</part>
 	</software>
 
-	<software name="seachase" supported="no">
+	<software name="seachase">
 		<description>Sea Chase</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -2909,7 +2955,7 @@
 		</part>
 	</software>
 
-	<software name="seafox" supported="no">
+	<software name="seafox">
 		<description>Sea Fox</description>
 		<!-- <cart number>ATCART193</cart number> -->
 		<year>1982</year>
@@ -2921,7 +2967,7 @@
 		</part>
 	</software>
 
-	<software name="seahorse" supported="no">
+	<software name="seahorse">
 		<description>Sea Horse Hide 'n Seek</description>
 		<!-- <cart number>4L-9890</cart number> -->
 		<year>1984</year>
@@ -2933,7 +2979,7 @@
 		</part>
 	</software>
 
-	<software name="serptine" supported="no">
+	<software name="serptine">
 		<description>Serpentine</description>
 		<!-- <cart number>ATCART190</cart number> -->
 		<year>1982</year>
@@ -2945,7 +2991,7 @@
 		</part>
 	</software>
 
-	<software name="letter" supported="no">
+	<software name="letter">
 		<description>Sesame Street Letter-Go-Round</description>
 		<!-- <cart number>4L-0365</cart number> -->
 		<!-- <comment> Keybpoard overlay was supplied with cartridge -->
@@ -2958,7 +3004,7 @@
 		</part>
 	</software>
 
-	<software name="shamus" supported="no">
+	<software name="shamus">
 		<description>Shamus</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -2970,7 +3016,7 @@
 		</part>
 	</software>
 
-	<software name="siliconw" supported="no">
+	<software name="siliconw">
 		<description>Silicon Warrior</description>
 		<!-- <cart number>664R</cart number> -->
 		<year>1983</year>
@@ -2982,7 +3028,7 @@
 		</part>
 	</software>
 
-	<software name="skywritr" supported="no">
+	<software name="skywritr">
 		<description>Sky Writer</description>
 		<!-- <cart number>RX8059</cart number> -->
 		<year>1983</year>
@@ -2994,7 +3040,7 @@
 		</part>
 	</software>
 
-	<software name="slime" supported="no">
+	<software name="slime">
 		<description>Slime</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -3006,7 +3052,7 @@
 		</part>
 	</software>
 
-	<software name="smart14" supported="no">
+	<software name="smart14">
 		<description>Smart Terminal v4.1</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3018,7 +3064,7 @@
 		</part>
 	</software>
 
-	<software name="soccer" supported="no">
+	<software name="soccer">
 		<description>Soccer</description>
 		<!-- <cart number>THB12003</cart number> -->
 		<year>1982</year>
@@ -3030,7 +3076,7 @@
 		</part>
 	</software>
 
-	<software name="invaders" supported="no">
+	<software name="invaders">
 		<description>Space Invaders</description>
 		<!-- <cart number>CXL4008</cart number> -->
 		<!-- <comment> Re-released in 1986 (RX8008) -->
@@ -3043,7 +3089,7 @@
 		</part>
 	</software>
 
-	<software name="journey" supported="no">
+	<software name="journey">
 		<description>Space Journey</description>
 		<!-- <cart number>09-01116</cart number> -->
 		<year>1983</year>
@@ -3055,7 +3101,7 @@
 		</part>
 	</software>
 
-	<software name="shuttle" supported="no">
+	<software name="shuttle">
 		<description>Space Shuttle - A Journey Into Space</description>
 		<!-- <cart number>CA-012</cart number> -->
 		<year>1983</year>
@@ -3067,7 +3113,7 @@
 		</part>
 	</software>
 
-	<software name="sprkbugs" supported="no">
+	<software name="sprkbugs">
 		<description>Spark Bugs</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3079,7 +3125,7 @@
 		</part>
 	</software>
 
-	<software name="spart419" supported="no">
+	<software name="spart419">
 		<description>Sparta DOS X v4.19</description>
 		<!-- <cart number></cart number> -->
 		<year>1989</year>
@@ -3091,7 +3137,7 @@
 		</part>
 	</software>
 
-	<software name="spart420" supported="no">
+	<software name="spart420">
 		<description>Sparta DOS X v4.20</description>
 		<!-- <cart number></cart number> -->
 		<year>1989</year>
@@ -3103,7 +3149,7 @@
 		</part>
 	</software>
 
-	<software name="spart421" supported="no">
+	<software name="spart421">
 		<description>Sparta DOS X v4.21</description>
 		<!-- <cart number></cart number> -->
 		<year>1989</year>
@@ -3115,7 +3161,7 @@
 		</part>
 	</software>
 
-	<software name="spart422" supported="no">
+	<software name="spart422">
 		<description>Sparta DOS X v4.22</description>
 		<!-- <cart number></cart number> -->
 		<year>1995</year>
@@ -3127,7 +3173,7 @@
 		</part>
 	</software>
 
-	<software name="spedwayb" supported="no">
+	<software name="spedwayb">
 		<description>Speedway Blast</description>
 		<!-- <cart number>AC1021</cart number> -->
 		<year>1982</year>
@@ -3139,7 +3185,7 @@
 		</part>
 	</software>
 
-	<software name="spidrcty" supported="no">
+	<software name="spidrcty">
 		<description>Spider City</description>
 		<!-- <cart number>33015</cart number> -->
 		<year>1983</year>
@@ -3151,7 +3197,7 @@
 		</part>
 	</software>
 
-	<software name="springer" supported="no">
+	<software name="springer">
 		<description>Springer</description>
 		<!-- <cart number>7-006-400</cart number> -->
 		<year>1983</year>
@@ -3163,7 +3209,7 @@
 		</part>
 	</software>
 
-	<software name="spyhuntr" supported="no">
+	<software name="spyhuntr">
 		<description>Spy Hunter</description>
 		<!-- <cart number>011-03</cart number> -->
 		<!-- <comment> This cartridge requires 2 joysticks to play -->
@@ -3176,7 +3222,7 @@
 		</part>
 	</software>
 
-	<software name="squishem" supported="no">
+	<software name="squishem">
 		<description>Squish 'Em!</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3188,7 +3234,7 @@
 		</part>
 	</software>
 
-	<software name="starmaze" supported="no">
+	<software name="starmaze">
 		<description>Star Maze</description>
 		<!-- <cart number>11-01222</cart number> -->
 		<year>1984</year>
@@ -3200,7 +3246,7 @@
 		</part>
 	</software>
 
-	<software name="starraid" supported="no">
+	<software name="starraid">
 		<description>Star Raiders</description>
 		<!-- <cart number>CXL4011</cart number> -->
 		<year>1979</year>
@@ -3212,7 +3258,7 @@
 		</part>
 	</software>
 
-	<software name="startrek" supported="no">
+	<software name="startrek">
 		<description>Star Trek - Strategic Operations Simulator</description>
 		<!-- <cart number>004-03</cart number> -->
 		<year>1983</year>
@@ -3224,7 +3270,7 @@
 		</part>
 	</software>
 
-	<software name="swrotj" supported="no">
+	<software name="swrotj">
 		<description>Star Wars : Return of the Jedi - Death Star Battle</description>
 		<!-- <cart number>1260</cart number> -->
 		<year>1983</year>
@@ -3236,7 +3282,7 @@
 		</part>
 	</software>
 
-	<software name="swarcade" supported="no">
+	<software name="swarcade">
 		<description>Star Wars : The Arcade Game</description>
 		<!-- <cart number>1340</cart number> -->
 		<year>1984</year>
@@ -3248,7 +3294,7 @@
 		</part>
 	</software>
 
-	<software name="stargate" supported="no">
+	<software name="stargate">
 		<description>Stargate (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -3260,7 +3306,7 @@
 		</part>
 	</software>
 
-	<software name="starion" supported="no">
+	<software name="starion">
 		<description>Starion</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3272,7 +3318,7 @@
 		</part>
 	</software>
 
-	<software name="storymac" supported="no">
+	<software name="storymac">
 		<description>Story Machine</description>
 		<!-- <cart number>SMC-AT</cart number> -->
 		<year>1983</year>
@@ -3284,7 +3330,7 @@
 		</part>
 	</software>
 
-	<software name="subcomm" supported="no">
+	<software name="subcomm">
 		<description>Submarine Commander</description>
 		<!-- <cart number>THA12001</cart number> -->
 		<year>1982</year>
@@ -3296,7 +3342,7 @@
 		</part>
 	</software>
 
-	<software name="sbrkout" supported="no">
+	<software name="sbrkout">
 		<description>Super Breakout</description>
 		<!-- <cart number>CXL4006</cart number> -->
 		<!-- <comment> Re-released in 1987 (RX8006) -->
@@ -3309,7 +3355,7 @@
 		</part>
 	</software>
 
-	<software name="sprcobra" supported="no">
+	<software name="sprcobra">
 		<description>Super Cobra</description>
 		<!-- <cart number>1140</cart number> -->
 		<year>1983</year>
@@ -3321,7 +3367,7 @@
 		</part>
 	</software>
 
-	<software name="spacman" supported="no">
+	<software name="spacman">
 		<description>Super Pac-Man (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -3333,7 +3379,7 @@
 		</part>
 	</software>
 
-	<software name="sketch" supported="no">
+	<software name="sketch">
 		<description>Super Sketch Graphics Master</description>
 		<!-- <cart number>G2300</cart number> -->
 		<!-- <comment> Requires the Personal Peripherals Inc. Super Sketch device -->
@@ -3346,7 +3392,7 @@
 		</part>
 	</software>
 
-	<software name="szaxxon" supported="no">
+	<software name="szaxxon">
 		<description>Super Zaxxon</description>
 		<!-- <cart number>012-03</cart number> -->
 		<year>1983</year>
@@ -3358,7 +3404,7 @@
 		</part>
 	</software>
 
-	<software name="suprman3" supported="no">
+	<software name="suprman3">
 		<description>Superman III (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3370,7 +3416,7 @@
 		</part>
 	</software>
 
-	<software name="survival" supported="no">
+	<software name="survival">
 		<description>Survival of the Fittest</description>
 		<!-- <cart number>ID2103</cart number> -->
 		<year>1982</year>
@@ -3382,7 +3428,7 @@
 		</part>
 	</software>
 
-	<software name="target" supported="no">
+	<software name="target">
 		<description>Target Electronic Banking</description>
 		<!-- <cart number></cart number> -->
 		<year>1986</year>
@@ -3394,7 +3440,7 @@
 		</part>
 	</software>
 
-	<software name="telelnk1" supported="no">
+	<software name="telelnk1">
 		<description>Telelink I</description>
 		<!-- <cart number>CXL4015</cart number> -->
 		<year>1981</year>
@@ -3406,7 +3452,7 @@
 		</part>
 	</software>
 
-	<software name="telelnk2" supported="no">
+	<software name="telelnk2">
 		<description>Telelink II</description>
 		<!-- <cart number>CXL4016</cart number> -->
 		<year>1982</year>
@@ -3418,7 +3464,19 @@
 		</part>
 	</software>
 
-	<software name="designer" supported="no">
+	<software name="test65">
+		<description>Test Atari 65-130XE R.2</description>
+		<!-- <cart number></cart number> -->
+		<year>1986</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="test atari 65-130xe r.2 (atari)(1986).rom" size="8192" crc="0b0b43f8" sha1="c20394f2a9c9a8bd8228dd09a33ed92abb0c685d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="designer">
 		<description>The Designer's Pencil</description>
 		<!-- <cart number>CC-102</cart number> -->
 		<year>1984</year>
@@ -3430,7 +3488,7 @@
 		</part>
 	</software>
 
-	<software name="dreadngt" supported="no">
+	<software name="dreadngt">
 		<description>The Dreadnaught Factor</description>
 		<!-- <cart number>CZ-005</cart number> -->
 		<year>1984</year>
@@ -3442,7 +3500,7 @@
 		</part>
 	</software>
 
-	<software name="starfgtr" supported="no">
+	<software name="starfgtr">
 		<description>The Last Starfighter (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -3454,7 +3512,7 @@
 		</part>
 	</software>
 
-	<software name="starftr1" cloneof="starfgtr" supported="no">
+	<software name="starftr1" cloneof="starfgtr">
 		<description>The Last Starfighter (Prototype)(Alt)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -3466,7 +3524,7 @@
 		</part>
 	</software>
 
-	<software name="phone" supported="no">
+	<software name="phone">
 		<description>The Learning Phone</description>
 		<!-- <cart number>RX8080</cart number> -->
 		<year>1985</year>
@@ -3478,7 +3536,7 @@
 		</part>
 	</software>
 
-	<software name="mwrench" supported="no">
+	<software name="mwrench">
 		<description>The Monkey Wrench</description>
 		<!-- <cart number></cart number> -->
 		<!-- <comment> This cartridge could only be used in the A800 Right Cartridge Slot -->
@@ -3491,7 +3549,7 @@
 		</part>
 	</software>
 
-	<software name="mwrench2" supported="no">
+	<software name="mwrench2">
 		<description>The Monkey Wrench II</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3503,7 +3561,7 @@
 		</part>
 	</software>
 
-	<software name="writers" supported="no">
+	<software name="writers">
 		<description>The Writer's Tool</description>
 		<!-- <cart number></cart number> -->
 		<year>1985</year>
@@ -3515,7 +3573,7 @@
 		</part>
 	</software>
 
-	<software name="timbound" supported="no">
+	<software name="timbound">
 		<description>Timebound</description>
 		<!-- <cart number>4L-0111</cart number> -->
 		<year>1984</year>
@@ -3527,7 +3585,7 @@
 		</part>
 	</software>
 
-	<software name="topper" supported="no">
+	<software name="topper">
 		<description>Topper</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -3539,7 +3597,7 @@
 		</part>
 	</software>
 
-	<software name="trackfld" supported="no">
+	<software name="trackfld">
 		<description>Track and Field</description>
 		<!-- <cart number>RX8069</cart number> -->
 		<!-- <comment> Works with Track & Field controller -->
@@ -3552,7 +3610,7 @@
 		</part>
 	</software>
 
-	<software name="turmoil" supported="no">
+	<software name="turmoil">
 		<description>Turmoil</description>
 		<!-- <cart number>33005</cart number> -->
 		<year>1982</year>
@@ -3564,7 +3622,7 @@
 		</part>
 	</software>
 
-	<software name="typo" supported="no">
+	<software name="typo">
 		<description>Typo</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -3576,7 +3634,7 @@
 		</part>
 	</software>
 
-	<software name="typoattk" supported="no">
+	<software name="typoattk">
 		<description>Typo Attack</description>
 		<!-- <cart number>RX8057</cart number> -->
 		<year>1984</year>
@@ -3588,7 +3646,7 @@
 		</part>
 	</software>
 
-	<software name="upgrabs" supported="no">
+	<software name="upgrabs">
 		<description>Up for Grabs</description>
 		<!-- <cart number>UFG-AT</cart number> -->
 		<year>1983</year>
@@ -3600,7 +3658,7 @@
 		</part>
 	</software>
 
-	<software name="upndown" supported="no">
+	<software name="upndown">
 		<description>Up 'n Down</description>
 		<!-- <cart number>009-03</cart number> -->
 		<year>1984</year>
@@ -3612,7 +3670,7 @@
 		</part>
 	</software>
 
-	<software name="videasel" supported="no">
+	<software name="videasel">
 		<description>Video Easel</description>
 		<!-- <cart number>CXL4005</cart number> -->
 		<year>1979</year>
@@ -3624,7 +3682,19 @@
 		</part>
 	</software>
 
-	<software name="webster" supported="no">
+	<software name="vpoker">
+		<description>Vegas Poker (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="vegas poker.rom" size="16384" crc="dc492963" sha1="55c6ed5c2388a8cd228bc9fd5a69fa93180ee7ea"  offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="webster">
 		<description>Webster - The Word Game</description>
 		<!-- <cart number>4L-9700</cart number> -->
 		<year>1983</year>
@@ -3636,7 +3706,7 @@
 		</part>
 	</software>
 
-	<software name="weltraum" supported="no">
+	<software name="weltraum">
 		<description>Weltraumkolonie (German)</description>
 		<!-- <cart number></cart number> -->
 		<year>1984</year>
@@ -3648,7 +3718,7 @@
 		</part>
 	</software>
 
-	<software name="whizkid" supported="no">
+	<software name="whizkid">
 		<description>Whiz Kid</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3660,7 +3730,7 @@
 		</part>
 	</software>
 
-	<software name="wow" supported="no">
+	<software name="wow">
 		<description>Wizard of Wor</description>
 		<!-- <cart number></cart number> -->
 		<year>1983</year>
@@ -3672,7 +3742,7 @@
 		</part>
 	</software>
 
-	<software name="wormwar" supported="no">
+	<software name="wormwar">
 		<description>Worm War 1</description>
 		<!-- <cart number></cart number> -->
 		<year>1982</year>
@@ -3684,7 +3754,7 @@
 		</part>
 	</software>
 
-	<software name="zaxxon" supported="no">
+	<software name="zaxxon">
 		<description>Zaxxon</description>
 		<!-- <cart number>008-03</cart number> -->
 		<year>1983</year>
@@ -3696,7 +3766,7 @@
 		</part>
 	</software>
 
-	<software name="zenji" supported="no">
+	<software name="zenji">
 		<description>Zenji</description>
 		<!-- <cart number>CZ-010</cart number> -->
 		<year>1984</year>
@@ -3708,7 +3778,7 @@
 		</part>
 	</software>
 
-	<software name="zonerngr" supported="no">
+	<software name="zonerngr">
 		<description>Zone Ranger</description>
 		<!-- <cart number>CC-101</cart number> -->
 		<year>1984</year>

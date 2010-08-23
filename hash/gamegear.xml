@@ -12,7 +12,6 @@ The following games existed according to VGRebirth
   - NFL Quarterback Club 95 (Jpn) by Acclaim
   - Robocop 3 (Jpn) by Acclaim
   - Scratch Golf (USA) by Vic Tokai
-  - Smurfs Around the World (Euro) by Infogrames
   - Sonic Drift (Euro) by Sega
   - Super Golf (USA) by Sage's Creations
   - T2 (Jpn) by Acclaim
@@ -5918,12 +5917,24 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Europe)</description>
+		<description>The Smurfs (Euro)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="smurfs, the (europe) (en,fr,de,es).bin" size="262144" crc="354e1cbd" sha1="faa80f644ece06b10b8e5ad035cbf518f80d609b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smurfstw">
+        <!-- Alt. Titles: Les Schtroumpfs Autour du Monde, Die Schlümpfe Reisen um die Welt -->
+		<description>The Smurfs Travel the World (Euro)</description>
+		<year>1995</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="smurfs travel the world, the.bin" size="262144" crc="3eb337df" sha1="33eb8c0fde81d258ceec4c74abb20c10f6953a9d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
