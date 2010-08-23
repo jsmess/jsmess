@@ -35,16 +35,6 @@ UINT16* x68k_tvram;  // Text VRAM
 UINT16* x68k_spriteram;  // sprite/background RAM
 UINT16* x68k_spritereg;  // sprite/background registers
 
-static bitmap_t* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
-static bitmap_t* x68k_gfx_big_bitmap;  // 16 colour, 1024x1024, 1 page
-static bitmap_t* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-static bitmap_t* x68k_gfx_1_bitmap_16;
-static bitmap_t* x68k_gfx_2_bitmap_16;
-static bitmap_t* x68k_gfx_3_bitmap_16;
-static bitmap_t* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-static bitmap_t* x68k_gfx_1_bitmap_256;
-static bitmap_t* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
-
 static tilemap_t* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
 static tilemap_t* x68k_bg1_8;
 static tilemap_t* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
@@ -58,7 +48,7 @@ INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
-
+/*
 static bitmap_t* x68k_get_gfx_page(int pri,int type)
 {
 	if(type == GFX16)
@@ -96,7 +86,7 @@ static bitmap_t* x68k_get_gfx_page(int pri,int type)
 
 	return NULL;  // should never reach here either.
 }
-
+*/
 static void x68k_crtc_text_copy(int src, int dest)
 {
 	// copys one raster in T-VRAM to another raster
@@ -409,6 +399,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 20:
 		if(ACCESSING_BITS_0_7)
 		{
+			x68k_sys.crtc.interlace = 0;
 			switch(data & 0x0c)
 			{
 			case 0x00:
@@ -417,9 +408,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 			case 0x08:
 			case 0x0c:  // TODO: 1024 vertical, if horizontal freq = 31kHz
 				x68k_sys.crtc.height = 512;
+				x68k_sys.crtc.interlace = 1;  // if 31kHz, 1024 lines = interlaced
 				break;
 			case 0x04:
 				x68k_sys.crtc.height = 512;
+				if(!(x68k_sys.crtc.reg[20] & 0x0010))  // if 15kHz, 512 lines = interlaced
+					x68k_sys.crtc.interlace = 1;
 				break;
 			}
 			switch(data & 0x03)
@@ -453,35 +447,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
-			rectangle rect = {0,0,0,0};
-			rect.max_x = 512;
-			rect.max_y = 512;
-			if(x68k_sys.crtc.reg[21] & 0x01)
-			{
-				bitmap_fill(x68k_gfx_0_bitmap_16,&rect,0);
-				bitmap_fill(x68k_gfx_0_bitmap_256,&rect,0);
-				bitmap_fill(x68k_gfx_0_bitmap_65536,&rect,0);
-				bitmap_fill(x68k_gfx_big_bitmap,&rect,0);
-				memset(x68k_gvram,0,0x20000);
-			}
-			if(x68k_sys.crtc.reg[21] & 0x02)
-			{
-				bitmap_fill(x68k_gfx_1_bitmap_16,&rect,0);
-				bitmap_fill(x68k_gfx_1_bitmap_256,&rect,0);
-				memset(x68k_gvram+0x10000,0,0x20000);
-			}
-			if(x68k_sys.crtc.reg[21] & 0x04)
-			{
-				bitmap_fill(x68k_gfx_2_bitmap_16,&rect,0);
-				memset(x68k_gvram+0x20000,0,0x20000);
-			}
-			if(x68k_sys.crtc.reg[21] & 0x08)
-			{
-				bitmap_fill(x68k_gfx_3_bitmap_16,&rect,0);
-				memset(x68k_gvram+0x30000,0,0x20000);
-			}
-			timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
-//          popmessage("CRTC: High-speed gfx screen clear [0x%02x]",x68k_sys.crtc.reg[21] & 0x0f);
+			memset(x68k_gvram,0,0x40000);
 		}
 		break;
 	}
@@ -530,7 +496,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 WRITE16_HANDLER( x68k_gvram_w )
 {
-	int xloc,yloc,pageoffset;
+//	int xloc,yloc,pageoffset;
 	/*
        G-VRAM usage is determined by colour depth and "real" screen size.
 
@@ -591,42 +557,6 @@ WRITE16_HANDLER( x68k_gvram_w )
 			default:
 				logerror("G-VRAM written while layer setup is undefined.\n");
 		}
-	}
-
-	pageoffset = offset & 0xfffff;
-	xloc = pageoffset % 1024;
-	yloc = pageoffset / 1024;
-	x68k_plot_pixel(x68k_gfx_big_bitmap,xloc,yloc,data & 0x000f);
-
-	pageoffset = offset & 0x3ffff;
-	xloc = pageoffset % 512;
-	yloc = pageoffset / 512;
-
-	if(offset < 0x40000)  // first page, all colour depths
-	{
-		x68k_plot_pixel(x68k_gfx_0_bitmap_65536,xloc,yloc,(x68k_gvram[offset] >> 1) + 512);
-		x68k_plot_pixel(x68k_gfx_0_bitmap_256,xloc,yloc,data & 0x00ff);
-		x68k_plot_pixel(x68k_gfx_0_bitmap_16,xloc,yloc,data & 0x000f);
-		if((x68k_sys.crtc.reg[20] & 0x0300) == 0x0300 || (x68k_sys.crtc.reg[20] & 0x0800))
-		{  // all 512k is 16-bit wide in 64k colour mode or if GVRAM is set as a buffer
-			x68k_plot_pixel(x68k_gfx_1_bitmap_256,xloc,yloc,(data & 0xff00) >> 8);
-			x68k_plot_pixel(x68k_gfx_1_bitmap_16,xloc,yloc,(data & 0x00f0) >> 4);
-			x68k_plot_pixel(x68k_gfx_2_bitmap_16,xloc,yloc,(data & 0x0f00) >> 8);
-			x68k_plot_pixel(x68k_gfx_3_bitmap_16,xloc,yloc,(data & 0xf000) >> 12);
-		}
-	}
-	if(offset >= 0x40000 && offset < 0x80000)  // second page, 16 or 256 colours
-	{
-		x68k_plot_pixel(x68k_gfx_1_bitmap_256,xloc,yloc,data & 0x00ff);
-		x68k_plot_pixel(x68k_gfx_1_bitmap_16,xloc,yloc,data & 0x000f);
-	}
-	if(offset >= 0x80000 && offset < 0xc0000)  // third page, 16 colours only
-	{
-		x68k_plot_pixel(x68k_gfx_2_bitmap_16,xloc,yloc,data & 0x000f);
-	}
-	if(offset >= 0xc0000 && offset < 0x100000)  // fourth page, 16 colours only
-	{
-		x68k_plot_pixel(x68k_gfx_3_bitmap_16,xloc,yloc,data & 0x000f);
 	}
 }
 
@@ -866,82 +796,115 @@ static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, 
 	}
 }
 
+static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 priority)
+{
+	int pixel;
+	int page;
+	UINT32 loc;  // location in GVRAM
+	UINT16 xscr,yscr;
+	UINT16 colour;
+	int shift;
+	int scanline;
+
+	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
+	{
+		if(x68k_sys.crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
+		{
+			// adjust for scroll registers
+			if(x68k_sys.video.reg[2] & 0x0010 && priority == x68k_sys.video.gfxlayer_pri[0])
+			{
+				xscr = (x68k_sys.crtc.reg[12] & 0x3ff);
+				yscr = (x68k_sys.crtc.reg[13] & 0x3ff);
+				loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x3ff) * 1024;
+				loc += xscr & 0x3ff;
+				loc &= 0xfffff;
+				for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
+				{
+					colour = x68k_gvram[loc];
+					if(colour != 0)
+						*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour] >> 1);
+					loc++;
+					loc &= 0x3ffff;
+				}
+			}
+		}
+		else  // else 512x512 "real" screen size
+		{
+			if(x68k_sys.video.reg[2] & (1 << priority))
+			{
+				page = x68k_sys.video.gfxlayer_pri[priority];
+				// adjust for scroll registers
+				switch(x68k_sys.video.reg[0] & 0x03)
+				{
+				case 0x00: // 16 colours
+					xscr = ((x68k_sys.crtc.reg[12+(page*2)])) & 0x1ff;
+					yscr = ((x68k_sys.crtc.reg[13+(page*2)])) & 0x1ff;
+					loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+					loc += xscr & 0x1ff;
+					loc &= 0x3ffff;
+					shift = 4;
+					for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
+					{
+						colour = ((x68k_gvram[loc] & (0x000f << page*shift)) >> page*shift);
+						if(colour != 0)
+							*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0x0f] >> 1);
+						loc++;
+						loc &= 0x3ffff;
+					}
+					break;
+				case 0x01: // 256 colours
+					if(page == 0 || page == 2)
+					{
+						xscr = ((x68k_sys.crtc.reg[12+(page*2)])) & 0x1ff;
+						yscr = ((x68k_sys.crtc.reg[13+(page*2)])) & 0x1ff;
+						loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+						loc += xscr & 0x1ff;
+						loc &= 0x3ffff;
+						shift = 4;
+						for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
+						{
+							colour = ((x68k_gvram[loc] & (0x00ff << page*shift)) >> page*shift);
+							if(colour != 0)
+								*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0xff] >> 1);
+							loc++;
+							loc &= 0x3ffff;
+						}
+					}
+					break;
+				case 0x03: // 65536 colours
+					xscr = ((x68k_sys.crtc.reg[12])) & 0x1ff;
+					yscr = ((x68k_sys.crtc.reg[13])) & 0x1ff;
+					loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+					loc += xscr;
+					loc &= 0x3ffff;
+					for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
+					{
+						colour = x68k_gvram[loc];
+						if(colour != 0)
+							*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (colour >> 1);
+						loc++;
+						loc &= 0x3ffff;
+					}
+					break;
+				}
+			}
+		}
+	}
+}
+
 static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 {
 	int priority;
-	rectangle rect;
-	int xscr,yscr;
-	int gpage;
+	//rectangle rect;
+	//int xscr,yscr;
+	//int gpage;
 
 	if(x68k_sys.crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
 		return;
 
 	for(priority=3;priority>=0;priority--)
 	{
-		if(x68k_sys.crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
-		{
-			// 16 colour gfx screen
-			rect.min_x=x68k_sys.crtc.hshift;
-			rect.min_y=x68k_sys.crtc.vshift;
-			rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
-			rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
-			if(x68k_sys.video.reg[2] & 0x0010 && priority == x68k_sys.video.gfxlayer_pri[0])
-			{
-				xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12]);
-				yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13]);
-				copyscrollbitmap_trans(bitmap, x68k_gfx_big_bitmap, 1, &xscr, 1, &yscr ,&cliprect,0);
-			}
-		}
-		else  // 512x512 "real" screen size
-		{
-			switch(x68k_sys.video.reg[0] & 0x03)
-			{
-			case 0x03:
-				// 65,536 colour gfx screen
-				if(x68k_sys.video.reg[2] & 0x0001 && priority == x68k_sys.video.gfxlayer_pri[0])
-				{
-					rect.min_x=x68k_sys.crtc.hshift;
-					rect.min_y=x68k_sys.crtc.vshift;
-					rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
-					rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
-					xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12] & 0x1ff);
-					yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect,0);
-				}
-				break;
-			case 0x01:
-				// 256 colour gfx screen
-				rect.min_x=x68k_sys.crtc.hshift;
-				rect.min_y=x68k_sys.crtc.vshift;
-				rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
-				rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
-				gpage = x68k_sys.video.gfxlayer_pri[priority];
-				if(x68k_sys.video.reg[2] & (1 << priority))
-				{
-					if(gpage == 0 || gpage == 2)  // so that we aren't drawing the same pages twice
-					{
-						xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12 + (gpage*2)] & 0x1ff);
-						yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13 + (gpage*2)] & 0x1ff);
-						copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX256), 1, &xscr, 1, &yscr, &cliprect,0);
-					}
-				}
-				break;
-			case 0x00:
-				// 16 colour gfx screen
-				rect.min_x=x68k_sys.crtc.hshift;
-				rect.min_y=x68k_sys.crtc.vshift;
-				rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
-				rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
-				gpage = x68k_sys.video.gfxlayer_pri[priority];
-				if(x68k_sys.video.reg[2] & (1 << priority))
-				{
-					xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12+(gpage*2)] & 0x1ff);
-					yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13+(gpage*2)] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
-				}
-				break;
-			}
-		}
+		x68k_draw_gfx_scanline(bitmap,cliprect,priority);
 	}
 }
 
@@ -1002,7 +965,10 @@ static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int pr
 
 			sx += sprite_shift;
 
-			drawgfx_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,x68k_sys.crtc.hbegin+sx,x68k_sys.crtc.vbegin+sy,0x00);
+			if(x68k_sys.crtc.interlace != 0)
+				drawgfxzoom_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,x68k_sys.crtc.hbegin+sx,x68k_sys.crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
+			else
+				drawgfx_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,x68k_sys.crtc.hbegin+sx,x68k_sys.crtc.vbegin+sy,0x00);
 		}
 	}
 }
@@ -1086,16 +1052,6 @@ static TILE_GET_INFO(x68k_get_bg1_tile_16)
 VIDEO_START( x68000 )
 {
 	int gfx_index;
-
-	x68k_text_bitmap = auto_bitmap_alloc(machine, 1024,1024,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_big_bitmap = auto_bitmap_alloc(machine, 1024,1024,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_1_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_2_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_3_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_256 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_1_bitmap_256 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_65536 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
