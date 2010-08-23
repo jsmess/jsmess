@@ -7,6 +7,21 @@
 #include "emu.h"
 #include "cbm_snqk.h"
 
+/* prg file format
+ * sfx file format
+ * sda file format
+ * 0 lsb 16bit address
+ * 2 chip data */
+
+/* p00 file format (p00 .. p63, s00 .. s63, ..)
+ * 0x0000 C64File
+ * 0x0007 0
+ * 0x0008 Name in commodore encoding?
+ * 0x0018 0 0
+ * 0x001a lsb 16bit address
+ * 0x001c data */
+
+
 static int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
 								offs_t offset, void (*cbm_sethiaddress)(running_machine *machine, UINT16 hiaddress) )
 {

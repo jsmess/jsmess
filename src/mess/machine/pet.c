@@ -8,7 +8,6 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 
-#include "includes/cbm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/ieee488.h"
@@ -847,79 +846,48 @@ INTERRUPT_GEN( pet_frame_interrupt )
 
 ***********************************************/
 
-
-static CBM_ROM pet_cbm_cart[0x20] = { {0} };
-
-
 static DEVICE_IMAGE_LOAD(pet_cart)
 {
-	int size = image.length(), test;
-	const char *filetype;
+	UINT32 size = image.length();
+	const char *filetype = image.filetype();
 	int address = 0;
 
-	filetype = image.filetype();
+	/* Assign loading address according to extension */
+	if (!mame_stricmp(filetype, "90"))
+		address = 0x9000;
+	else if (!mame_stricmp(filetype, "a0"))
+		address = 0xa000;
+	else if (!mame_stricmp(filetype, "b0"))
+		address = 0xb000;
 
-	if (!mame_stricmp(filetype, "crt"))
-	{
-	/* We temporarily remove .crt loading. Previous versions directly used
-    the same routines used to load C64 .crt file, but I seriously doubt the
-    formats are compatible. While waiting for confirmation about .crt dumps
-    for PET machines, we simply do not load .crt files */
-	}
-	else
-	{
-		/* Assign loading address according to extension */
-		if (!mame_stricmp(filetype, "a0"))
-			address = 0xa000;
+	logerror("Loading cart %s at %.4x size:%.4x\n", image.filename(), address, size);
 
-		else if (!mame_stricmp(filetype, "b0"))
-			address = 0xb000;
-
-		logerror("Loading cart %s at %.4x size:%.4x\n", image.filename(), address, size);
-
-		/* Does cart contain any data? */
-		pet_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
-		if (!pet_cbm_cart[0].chip)
-			return IMAGE_INIT_FAIL;
-
-		/* Store data, address & size */
-		pet_cbm_cart[0].addr = address;
-		pet_cbm_cart[0].size = size;
-		test = image.fread(pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
-
-		if (test != pet_cbm_cart[0].size)
-			return IMAGE_INIT_FAIL;
-	}
-
-	/* Finally load the cart */
-//  This could be needed with .crt support
-//  for (i = 0; (i < ARRAY_LENGTH(pet_cbm_cart)) && (pet_cbm_cart[i].size != 0); i++)
-//      memcpy(pet_memory + pet_cbm_cart[i].addr, pet_cbm_cart[i].chip, pet_cbm_cart[i].size);
-	memcpy(pet_memory + pet_cbm_cart[0].addr, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
+	image.fread(pet_memory + address, size);
 
 	return IMAGE_INIT_PASS;
 }
 
 MACHINE_DRIVER_START(pet_cartslot)
 	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,a0,b0")
+	MDRV_CARTSLOT_EXTENSION_LIST("90,a0,b0")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pet_cart)
 
 	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,a0,b0")
+	MDRV_CARTSLOT_EXTENSION_LIST("90,a0,b0")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pet_cart)
 MACHINE_DRIVER_END
 
+// 2010-08, FP: this is used by CBM40 & CBM80, and I actually have only found .prg files for these... does cart dumps exist?
 MACHINE_DRIVER_START(pet4_cartslot)
 	MDRV_CARTSLOT_MODIFY("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,a0")
+	MDRV_CARTSLOT_EXTENSION_LIST("a0")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pet_cart)
 
 	MDRV_CARTSLOT_MODIFY("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,a0")
+	MDRV_CARTSLOT_EXTENSION_LIST("a0")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pet_cart)
 MACHINE_DRIVER_END
