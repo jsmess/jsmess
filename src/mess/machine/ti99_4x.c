@@ -2656,7 +2656,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 	}
 	else
 	{
-		GRAM_datawrite(offset, (data>>8)&0xff);
+		GRAM_datawrite(offset, data);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
 }
