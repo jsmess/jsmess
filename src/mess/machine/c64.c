@@ -1287,7 +1287,7 @@ static DEVICE_IMAGE_LOAD( max_cart )
 {
 	int result = IMAGE_INIT_PASS;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() != NULL)
 	{
 		UINT32 size;
 
