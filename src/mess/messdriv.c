@@ -239,7 +239,7 @@ const game_driver * const drivers[] =
 	DRIVER( lnsy1392 )
 	DRIVER( vc6000 )
 	DRIVER( database )
-	DRIVER( wvmdtbse )
+	DRIVER( vmdtbase )
 	DRIVER( rwtrntcs )
 	DRIVER( telngtcs )
 	DRIVER( krvnjvtv )

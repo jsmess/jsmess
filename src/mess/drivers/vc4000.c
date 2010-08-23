@@ -349,7 +349,7 @@ ROM_START( database )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
 ROM_END
 
-ROM_START( wvmdtbse )
+ROM_START( vmdtbase )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
 ROM_END
 
@@ -430,7 +430,7 @@ CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000,      0,        "Han
 CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000,      0,        "Lansay",           "Lansay 1392",      GAME_IMPERFECT_GRAPHICS )				/* Europe */
 CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000,      0,        "Prinztronic",      "VC 6000",          GAME_IMPERFECT_GRAPHICS )					/* UK */
 CONS(1979, database, 0,         vc4000,   vc4000,    vc4000,      0,        "Voltmace",         "Voltmace Database", GAME_IMPERFECT_GRAPHICS )				/* UK */
-CONS(1979, wvmdtbse, database,  0,        vc4000,    vc4000,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )		/* UK */
+CONS(1979, vmdtbase, database,  0,        vc4000,    vc4000,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )		/* UK */
 CONS(1979, rwtrntcs, 0,         vc4000,   vc4000,    vc4000,      0,        "Rowtron",          "Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
 CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000,      0,        "Teleng",           "Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )				/* France */
