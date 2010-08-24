@@ -1354,5 +1354,5 @@ COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,      "<generic
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at386,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  at386,      "FIC", "VT-503", GAME_NOT_WORKING )
-COMP ( 199?, megapc,   ibm5170, 0,       megapc,    atvga,  at386,      "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
+COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga,  at386,      "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga,  at386,      "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
