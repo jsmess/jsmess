@@ -1015,6 +1015,8 @@ static DEVICE_IMAGE_UNLOAD( c64_cart )
 	{
 		c64_cart.bank[i].size = 0;
 		c64_cart.bank[i].addr = 0;
+		c64_cart.bank[i].index = 0;
+		c64_cart.bank[i].start = 0;
 	}
 }
 
@@ -1044,9 +1046,6 @@ static int c64_crt_load( device_image_interface &image )
 		int j;
 		unsigned short c64_cart_type;
 
-		for (i = 0; (i < C64_MAX_ROMBANK) && (c64_cart.bank[i].size != 0); i++)
-		;
-
 		if (i >= C64_MAX_ROMBANK)
 			return IMAGE_INIT_FAIL;
 		
@@ -1054,11 +1053,10 @@ static int c64_crt_load( device_image_interface &image )
 		/* 0x16-0x17 is Hardware type */
 		image.fseek(0x16, SEEK_SET);
 		image.fread(&c64_cart_type, 2);
-		c64_cart_type = BIG_ENDIANIZE_INT16(c64_cart_type);
-		c64_cart.mapper = c64_cart_type;
+		c64_cart.mapper = BIG_ENDIANIZE_INT16(c64_cart_type);
 
 		/* If it is unsupported cart type, warn the user */
-		switch (c64_cart_type)
+		switch (c64_cart.mapper)
 		{
 			case SIMONS_BASIC:	/* Type #  4 */
 			case OCEAN_1:		/* Type #  5 */
@@ -1072,7 +1070,7 @@ static int c64_crt_load( device_image_interface &image )
 			case DOMARK:		/* Type # 19 */
 			case COMAL_80:		/* Type # 21 */
 			case GENERIC_CRT:		/* Type #  0 */
-				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
+				printf("Currently supported cart type (Type %d)\n", c64_cart.mapper);
 				break;
 
 			default:
@@ -1085,7 +1083,7 @@ static int c64_crt_load( device_image_interface &image )
 			case FINAL_CART_I:	/* Type # 13 */
 			case MAGIC_FORMEL:	/* Type # 14 */
 			case SUPER_SNAP_5:	/* Type # 20 */
-				printf("Currently unsupported cart type (Type %d)\n", c64_cart_type);
+				printf("Currently unsupported cart type (Type %d)\n", c64_cart.mapper);
 				break;
 		}
 
@@ -1353,7 +1351,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 	// working: Double Dragon, Ghostbusters, Terminator 2
 	// not working: Pang, Robocop 2, Toki
 
-	UINT8 bank = data & c64_cart.n_banks;
+	UINT8 bank = data & 0x3f;
 	UINT8 *cart = memory_region(space->machine, "user1");
 
 	switch (c64_cart.bank[bank].addr)
@@ -1368,7 +1366,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 		memcpy(romh, cart + bank * 0x2000, c64_cart.bank[bank].size);
 		break;
 	default:
-		logerror("Unexpected loading address (%x) for bank %x", c64_cart.bank[bank].addr, bank);
+		logerror("Unexpected loading address (%x) for bank %x\n", c64_cart.bank[bank].addr, bank);
 		break;
 	}
 /*
