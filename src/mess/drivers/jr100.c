@@ -14,12 +14,14 @@
 #include "sound/beep.h"
 
 static UINT8 *jr100_vram;
+static UINT8 *jr100_pcg;
 static UINT8 keyboard_line;
+static bool jr100_use_pcg;
 
 static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&jr100_pcg)
 	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVREADWRITE("via", via_r, via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	
@@ -105,6 +107,10 @@ static VIDEO_UPDATE( jr100 )
 {
 	int x,y,xi,yi;
 
+	UINT8 *gfx_data = memory_region(screen->machine, "maincpu") + 0xe000;
+	if (jr100_use_pcg) {
+		gfx_data = jr100_pcg;
+	}
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
@@ -116,10 +122,7 @@ static VIDEO_UPDATE( jr100 )
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data = memory_region(screen->machine, "maincpu") + 0xe000;
-
 					UINT8 pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1);
-
 					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = attr ^ pen;
 				}
 			}
@@ -166,8 +169,9 @@ static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 {
-	
+	jr100_use_pcg = (data & 0x20) ? TRUE : FALSE;
 }
+
 static const via6522_interface jr100_via_intf =
 {
 	DEVCB_NULL,											/* in_a_func */
@@ -194,10 +198,7 @@ static const cassette_config jr100_cassette_config =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-/*	running_device *via = timer.machine->device("via");
-	int data = (cassette_input(timer.machine->device("cassette")) > +0.0) ? 1 : 0;
-	via_ca1_w(via, data);
-	via_cb1_w(via, data);*/
+
 }
 
 static MACHINE_DRIVER_START( jr100 )
