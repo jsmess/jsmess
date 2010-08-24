@@ -979,9 +979,10 @@ static void print_game_software_list(FILE *out, const game_driver *game, const m
 
 		for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 		{
-			if ( swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
+			if ( swlist->list_name[i] )
 			{
-				fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
+				fprintf(out, "\t\t<softwarelist name=\"%s\" ", swlist->list_name[i] );
+				fprintf(out, "status=\"%s\" />\n", (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible" );
 			}
 		}
 	}
@@ -1212,6 +1213,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT softwarelist EMPTY>\n"
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 #ifdef MESS
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
