@@ -804,6 +804,7 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 	int pixel;
 	int page;
 	UINT32 loc;  // location in GVRAM
+	UINT32 lineoffset;
 	UINT16 xscr,yscr;
 	UINT16 colour = 0;
 	int shift;
@@ -818,30 +819,29 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 			{
 				xscr = (x68k_sys.crtc.reg[12] & 0x3ff);
 				yscr = (x68k_sys.crtc.reg[13] & 0x3ff);
-				loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x3ff) * 1024;
-				loc += xscr & 0x3ff;
-				loc &= 0xfffff;
+				lineoffset = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x3ff) * 1024;
+				loc = xscr & 0x3ff;
 				for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 				{
-					switch(loc & 0xc0000)
+					switch(lineoffset & 0xc0000)
 					{
 					case 0x00000:
-						colour = x68k_gvram[loc & 0x3ffff] & 0x000f;
+						colour = x68k_gvram[lineoffset + (loc & 0x3ff)] & 0x000f;
 						break;
 					case 0x40000:
-						colour = (x68k_gvram[loc & 0x3ffff] & 0x00f0) >> 4;
+						colour = (x68k_gvram[(lineoffset - 0x40000) + (loc & 0x3ff)] & 0x00f0) >> 4;
 						break;
 					case 0x80000:
-						colour = (x68k_gvram[loc & 0x3ffff] & 0x0f00) >> 8;
+						colour = (x68k_gvram[(lineoffset - 0x80000) + (loc & 0x3ff)] & 0x0f00) >> 8;
 						break;
 					case 0xc0000:
-						colour = (x68k_gvram[loc & 0x3ffff] & 0xf000) >> 12;
+						colour = (x68k_gvram[(lineoffset - 0xc0000) + (loc & 0x3ff)] & 0xf000) >> 12;
 						break;
 					}
 					if(colour != 0)
 						*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour] >> 1);
 					loc++;
-					loc &= 0xfffff;
+					loc &= 0x3ff;
 				}
 			}
 		}
@@ -856,17 +856,16 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 				case 0x00: // 16 colours
 					xscr = ((x68k_sys.crtc.reg[12+(page*2)])) & 0x1ff;
 					yscr = ((x68k_sys.crtc.reg[13+(page*2)])) & 0x1ff;
-					loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
-					loc += xscr & 0x1ff;
-					loc &= 0x3ffff;
+					lineoffset = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+					loc = xscr & 0x1ff;
 					shift = 4;
 					for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 					{
-						colour = ((x68k_gvram[loc] >> page*shift) & 0x000f);
+						colour = ((x68k_gvram[lineoffset + loc] >> page*shift) & 0x000f);
 						if(colour != 0)
 							*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0x0f] >> 1);
 						loc++;
-						loc &= 0x3ffff;
+						loc &= 0x1ff;
 					}
 					break;
 				case 0x01: // 256 colours
@@ -874,33 +873,31 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 					{
 						xscr = ((x68k_sys.crtc.reg[12+(page*2)])) & 0x1ff;
 						yscr = ((x68k_sys.crtc.reg[13+(page*2)])) & 0x1ff;
-						loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
-						loc += xscr & 0x1ff;
-						loc &= 0x3ffff;
+						lineoffset = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+						loc = xscr & 0x1ff;
 						shift = 4;
 						for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 						{
-							colour = ((x68k_gvram[loc] >> page*shift) & 0x00ff);
+							colour = ((x68k_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
 								*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0xff] >> 1);
 							loc++;
-							loc &= 0x3ffff;
+							loc &= 0x1ff;
 						}
 					}
 					break;
 				case 0x03: // 65536 colours
 					xscr = ((x68k_sys.crtc.reg[12])) & 0x1ff;
 					yscr = ((x68k_sys.crtc.reg[13])) & 0x1ff;
-					loc = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
-					loc += xscr;
-					loc &= 0x3ffff;
+					lineoffset = (((scanline - x68k_sys.crtc.vbegin) + yscr) & 0x1ff) * 512;
+					loc = xscr & 0x1ff;
 					for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 					{
-						colour = x68k_gvram[loc];
+						colour = x68k_gvram[lineoffset + loc];
 						if(colour != 0)
 							*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (colour >> 1);
 						loc++;
-						loc &= 0x3ffff;
+						loc &= 0x1ff;
 					}
 					break;
 				}
