@@ -448,6 +448,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
 			memset(x68k_gvram,0,0x40000);
+			timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}
