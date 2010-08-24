@@ -285,9 +285,9 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	{
 		x68k_sys.mfp.gpio &= ~0x40;  // GPIP6
 		machine->primary_screen->update_partial(scan);
-		irq_time = machine->primary_screen->time_until_pos(scan,2);
+		irq_time = machine->primary_screen->time_until_pos(scan,x68k_sys.crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
-		end_time = machine->primary_screen->time_until_pos(scan,x68k_sys.crtc.hbegin);
+		end_time = machine->primary_screen->time_until_pos(scan,x68k_sys.crtc.hend);
 		timer_adjust_oneshot(x68k_raster_irq, irq_time, scan);
 		timer_set(machine, end_time,NULL,0,x68k_crtc_raster_end);
 		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine->primary_screen->vpos());
@@ -862,7 +862,7 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 					shift = 4;
 					for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 					{
-						colour = ((x68k_gvram[loc] & (0x000f << page*shift)) >> page*shift);
+						colour = ((x68k_gvram[loc] >> page*shift) & 0x000f);
 						if(colour != 0)
 							*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0x0f] >> 1);
 						loc++;
@@ -880,7 +880,7 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 						shift = 4;
 						for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 						{
-							colour = ((x68k_gvram[loc] & (0x00ff << page*shift)) >> page*shift);
+							colour = ((x68k_gvram[loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
 								*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour & 0xff] >> 1);
 							loc++;
