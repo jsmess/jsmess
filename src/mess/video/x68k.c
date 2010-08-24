@@ -128,6 +128,8 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 	x68k_sys.crtc.vmultiple = 1;
 	if((x68k_sys.crtc.reg[20] & 0x10) != 0 && (x68k_sys.crtc.reg[20] & 0x0c) == 0)
 		x68k_sys.crtc.vmultiple = 2;  // 31.5kHz + 256 lines = doublescan
+	if(x68k_sys.crtc.interlace != 0)
+		x68k_sys.crtc.vmultiple = 0.5f;  // 31.5kHz + 1024 lines or 15kHz + 512 lines = interlaced
 	x68k_sys.crtc.htotal = (x68k_sys.crtc.reg[0] + 1) * 8;
 	x68k_sys.crtc.vtotal = (x68k_sys.crtc.reg[4] + 1) / x68k_sys.crtc.vmultiple; // default is 567 (568 scanlines)
 	x68k_sys.crtc.hbegin = (x68k_sys.crtc.reg[2] * 8) + 1;
@@ -430,12 +432,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 				break;
 			}
 		}
-		if(ACCESSING_BITS_8_15)
+/*		if(ACCESSING_BITS_8_15)
 		{
 			x68k_sys.crtc.interlace = 0;
 			if(data & 0x0400)
 				x68k_sys.crtc.interlace = 1;
-		}
+		}*/
 		x68k_crtc_refresh_mode(space->machine);
 		break;
 	case 576:  // operation register
@@ -821,11 +823,25 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 				loc &= 0xfffff;
 				for(pixel=x68k_sys.crtc.hbegin;pixel<=x68k_sys.crtc.hend;pixel++)
 				{
-					colour = x68k_gvram[loc];
+					switch(loc & 0xc0000)
+					{
+					case 0x00000:
+						colour = x68k_gvram[loc & 0x3ffff] & 0x000f;
+						break;
+					case 0x40000:
+						colour = (x68k_gvram[loc & 0x3ffff] & 0x00f0) >> 4;
+						break;
+					case 0x80000:
+						colour = (x68k_gvram[loc & 0x3ffff] & 0x0f00) >> 8;
+						break;
+					case 0xc0000:
+						colour = (x68k_gvram[loc & 0x3ffff] & 0xf000) >> 12;
+						break;
+					}
 					if(colour != 0)
 						*BITMAP_ADDR16(bitmap,scanline,pixel) = 512 + (x68k_sys.video.gfx_pal[colour] >> 1);
 					loc++;
-					loc &= 0x3ffff;
+					loc &= 0xfffff;
 				}
 			}
 		}

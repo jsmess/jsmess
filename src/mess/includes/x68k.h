@@ -128,8 +128,8 @@ struct x68k_system
 		int hsync_end;  // Horizontal Sync End
 		int vsync_end;  // Vertical Sync End
 		int hsyncadjust;  // Horizontal Sync Adjustment
-		int hmultiple;  // Horizontal pixel multiplier
-		int vmultiple;  // Vertical scanline multiplier (x2 for doublescan modes)
+		float hmultiple;  // Horizontal pixel multiplier
+		float vmultiple;  // Vertical scanline multiplier (x2 for doublescan modes)
 		int height;
 		int width;
 		int visible_height;
