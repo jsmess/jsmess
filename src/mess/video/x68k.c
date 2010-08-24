@@ -805,7 +805,7 @@ static void x68k_draw_gfx_scanline(bitmap_t* bitmap, rectangle cliprect, UINT8 p
 	int page;
 	UINT32 loc;  // location in GVRAM
 	UINT16 xscr,yscr;
-	UINT16 colour;
+	UINT16 colour = 0;
 	int shift;
 	int scanline;
 
