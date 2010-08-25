@@ -179,6 +179,10 @@ static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 	jr100_speaker = data>>7;
 }
 
+static WRITE_LINE_DEVICE_HANDLER(jr100_via_write_cb2)
+{
+	cassette_output(device->machine->device("cassette"), state ? -1.0 : +1.0);
+}
 static const via6522_interface jr100_via_intf =
 {
 	DEVCB_NULL,											/* in_a_func */
@@ -190,10 +194,10 @@ static const via6522_interface jr100_via_intf =
 	DEVCB_HANDLER(jr100_via_write_a),					/* out_a_func */
 	DEVCB_HANDLER(jr100_via_write_b),   				/* out_b_func */
 	DEVCB_NULL,      									/* out_ca1_func */
-	DEVCB_NULL,      									/* out_cb1_func */
+	DEVCB_NULL,											/* out_cb1_func */
 	DEVCB_NULL,      									/* out_ca2_func */
-	DEVCB_NULL,      									/* out_cb2_func */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)    /* irq_func */	
+	DEVCB_LINE(jr100_via_write_cb2),      				/* out_cb2_func */
+	DEVCB_NULL    										/* irq_func */	
 };
 static const cassette_config jr100_cassette_config =
 {
