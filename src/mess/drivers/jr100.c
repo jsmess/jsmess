@@ -1,8 +1,13 @@
 /***************************************************************************
-   
+
         JR-100 National / Panasonic
 
         23/08/2010 Initial driver version
+
+        TODO:
+        - beeper doesn't work correctly when a key is pressed (should have
+          more time but it's quickly shut off), presumably there are M6802
+          timing bugs that causes this quirk.
 
 ****************************************************************************/
 
@@ -12,6 +17,7 @@
 #include "devices/cassette.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
+#include "sound/beep.h"
 #include "devices/snapquik.h"
 
 static UINT8 *jr100_ram;
@@ -21,13 +27,52 @@ static UINT8 keyboard_line;
 static bool jr100_use_pcg;
 static UINT8 jr100_speaker;
 
+static WRITE8_DEVICE_HANDLER( jr100_via_w )
+{
+	static UINT16 t1latch;
+	static UINT8 beep_en;
+
+	/* ACR: beeper masking */
+	if(offset == 0x0b)
+	{
+		//printf("BEEP %s\n",((data & 0xe0) == 0xe0) ? "ON" : "OFF");
+		beep_en = ((data & 0xe0) == 0xe0);
+
+		if(!beep_en)
+			beep_set_state(device->machine->device("beeper"),0);
+	}
+
+	/* T1L-L */
+	if(offset == 0x04)
+	{
+		t1latch = (t1latch & 0xff00) | (data & 0xff);
+		//printf("BEEP T1CL %02x\n",data);
+	}
+
+	/* T1L-H */
+	if(offset == 0x05)
+	{
+		t1latch = (t1latch & 0xff) | ((data & 0xff) << 8);
+		//printf("BEEP T1CH %02x\n",data);
+
+		/* writing here actually enables the beeper, if above masking condition is satisfied */
+		if(beep_en)
+		{
+			beep_set_state(device->machine->device("beeper"),1);
+			beep_set_frequency(device->machine->device("beeper"),894886.25 / (double)(t1latch) / 2.0);
+		}
+	}
+
+	via_w(device,offset,data);
+}
+
 static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&jr100_ram)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&jr100_pcg)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)	
-	AM_RANGE(0xc800, 0xc80f) AM_DEVREADWRITE("via", via_r, via_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM	
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)
+	AM_RANGE(0xc800, 0xc80f) AM_DEVREADWRITE("via", via_r, jr100_via_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -97,9 +142,14 @@ INPUT_PORTS_START( jr100 )
 	PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+static MACHINE_START(jr100)
+{
+	beep_set_frequency(machine->device("beeper"),0);
+	beep_set_state(machine->device("beeper"),0);
+}
 
-static MACHINE_RESET(jr100) 
-{	
+static MACHINE_RESET(jr100)
+{
 }
 
 static VIDEO_START( jr100 )
@@ -197,7 +247,7 @@ static const via6522_interface jr100_via_intf =
 	DEVCB_NULL,											/* out_cb1_func */
 	DEVCB_NULL,      									/* out_ca2_func */
 	DEVCB_LINE(jr100_via_write_cb2),      				/* out_cb2_func */
-	DEVCB_NULL    										/* irq_func */	
+	DEVCB_NULL    										/* irq_func */
 };
 static const cassette_config jr100_cassette_config =
 {
@@ -209,10 +259,10 @@ static const cassette_config jr100_cassette_config =
 
 static TIMER_DEVICE_CALLBACK( sound_tick )
 {
-	running_device *speaker = timer.machine->device("speaker");	
+	running_device *speaker = timer.machine->device("speaker");
 	speaker_level_w(speaker,jr100_speaker);
 	jr100_speaker = 0;
-	
+
 	running_device *via = timer.machine->device("via");
 	double level = cassette_input(timer.machine->device("cassette"));
 	if (level > 0.0) {
@@ -222,13 +272,13 @@ static TIMER_DEVICE_CALLBACK( sound_tick )
 		via_ca1_w(via, 1);
 		via_cb1_w(via, 1);
 	}
-	
-	
+
+
 }
 
-static UINT32 readByLittleEndian(UINT8 *buf,int pos) 
+static UINT32 readByLittleEndian(UINT8 *buf,int pos)
 {
-	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24); 
+	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
 
 static QUICKLOAD_LOAD(jr100)
@@ -258,7 +308,7 @@ static QUICKLOAD_LOAD(jr100)
 	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
 	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
 	UINT32 flag  		 = readByLittleEndian(buf,pos); pos+= 4;
-	
+
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code
 	memcpy(jr100_ram + start_address,buf + pos,code_length);
@@ -275,7 +325,7 @@ static QUICKLOAD_LOAD(jr100)
       jr100_ram[12] = ((end_address + 3) >> 8 & 0xFF);
       jr100_ram[13] = ((end_address + 3) & 0xFF);
     }
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -284,8 +334,9 @@ static MACHINE_DRIVER_START( jr100 )
     MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MDRV_CPU_PROGRAM_MAP(jr100_mem)
 
+    MDRV_MACHINE_START(jr100)
     MDRV_MACHINE_RESET(jr100)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -300,21 +351,24 @@ static MACHINE_DRIVER_START( jr100 )
 
     MDRV_VIDEO_START(jr100)
     MDRV_VIDEO_UPDATE(jr100)
-	
+
 	MDRV_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", jr100_cassette_config )	
-	
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+
+	MDRV_CASSETTE_ADD( "cassette", jr100_cassette_config )
+
 	MDRV_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
-	
+
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 0)	
+	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 0)
 MACHINE_DRIVER_END
 
 
