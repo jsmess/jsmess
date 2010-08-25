@@ -191,4 +191,4 @@ static QUICKLOAD_LOAD( lynx )
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME      FLAGS */
 CONS( 1989, lynx,   0,      0,      lynx,   lynx,   0,       "Atari",  "Lynx",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-CONS( 1991, lynx2,  lynx,   0,      lynx2,  lynx,   0,       "Atari",  "Lynx II",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+// CONS( 1991, lynx2,  lynx,   0,      lynx2,  lynx,   0,       "Atari",  "Lynx II",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

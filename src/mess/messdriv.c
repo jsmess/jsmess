@@ -47,7 +47,7 @@ const game_driver * const drivers[] =
 	DRIVER( a7800 )	 /* Atari 7800 NTSC   */
 	DRIVER( a7800p )	/* Atari 7800 PAL      */
 	DRIVER( lynx )	  /* Atari Lynx Handheld      */
-	DRIVER( lynx2 )	 /* Atari Lynx II Handheld redesigned, no additions  */
+//	DRIVER( lynx2 )	 /* Atari Lynx II Handheld redesigned, no additions  */
 	DRIVER( jaguar )	/* Atari Jaguar  */
 	DRIVER( jaguarcd )  /* Atari Jaguar CD    */
 
