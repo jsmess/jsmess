@@ -350,4 +350,4 @@ ROM_START (jupiter)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY   FULLNAME */
-COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,	"Cantab",  "Jupiter Ace" , 0)
+COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,	"Jupiter Cantab",  "Jupiter Ace" , 0 )
