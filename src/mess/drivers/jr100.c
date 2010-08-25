@@ -107,16 +107,19 @@ static VIDEO_UPDATE( jr100 )
 {
 	int x,y,xi,yi;
 
-	UINT8 *gfx_data = memory_region(screen->machine, "maincpu") + 0xe000;
-	if (jr100_use_pcg) {
-		gfx_data = jr100_pcg;
-	}
+	UINT8 *rom_pcg = memory_region(screen->machine, "maincpu") + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 tile = jr100_vram[x + y*32];
 			UINT8 attr = tile >> 7;
+			// ATTR is inverted for normal char or use PCG in case of CMODE1
+			UINT8 *gfx_data = rom_pcg;
+			if (jr100_use_pcg && attr) {
+				gfx_data = jr100_pcg;
+				attr = 0; // clear attr so bellow code stay same
+			}
 			tile &= 0x7f;
 			for(yi=0;yi<8;yi++)
 			{
