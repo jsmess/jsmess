@@ -379,7 +379,7 @@ ROM_START(hc2000)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1986, spec128,  0,	   0,		spectrum_128,	spec_plus,	0,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
-COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spec_plus,	0,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
-COMP( 1991, hc128,    spec128, 0,		spectrum_128,	spec_plus,	0,	"ICE-Felix",			"HC-128" , 0)
-COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spec_plus,	0,	"ICE-Felix",			"HC-2000" , GAME_NOT_WORKING)
+COMP( 1986, spec128,  0,	   0,		spectrum_128,	spec_plus,	0,	"Sinclair Research Ltd", "ZX Spectrum 128" , 0 )
+COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spec_plus,	0,	"Amstrad plc",           "ZX Spectrum +2" , 0 )
+COMP( 1991, hc128,    spec128, 0,		spectrum_128,	spec_plus,	0,	"ICE-Felix",			 "HC-128" , 0 )
+COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spec_plus,	0,	"ICE-Felix",			 "HC-2000" , GAME_NOT_WORKING )

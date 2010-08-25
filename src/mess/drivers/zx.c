@@ -564,9 +564,9 @@ ROM_END
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY                     FULLNAME                FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     "Sinclair Research",        "ZX-80",               0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     "Sinclair Research",        "ZX-81",               0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                     FULLNAME                FLAGS */
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     "Sinclair Research Ltd",    "ZX-80",               0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     "Sinclair Research Ltd",    "ZX-81",               0 )
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1000", 0 )
 COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1500", 0 )
 COMP( 1983, tk85,   	zx81,   0,      ts1000,     zx81,       zx,     "Microdigital",             "TK85",                0 )

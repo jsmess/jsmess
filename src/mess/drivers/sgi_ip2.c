@@ -519,4 +519,4 @@ ROM_START( sgi_ip2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     COMPANY                   FULLNAME */
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2,  sgi_ip2, "Silicon Graphics, Inc.", "IRIS 3130 (IP2)", GAME_NOT_WORKING )
+COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", GAME_NOT_WORKING )

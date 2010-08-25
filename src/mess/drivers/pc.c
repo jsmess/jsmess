@@ -3351,7 +3351,7 @@ COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy 
 
 // xt class (pc but 8086)
 COMP(  1982,	ibm5160,    ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,      ibm5150,	0,	pc200,	pc200,	pc200,	"Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc200,      ibm5150,	0,	pc200,	pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
 COMP(  1988,	pc20,       ibm5150,	0,	pc200,	pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
 COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
 COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)

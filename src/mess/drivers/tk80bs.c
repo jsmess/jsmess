@@ -356,5 +356,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, tk80bs,  	0,       0, 		tk80bs, 	tk80bs, 	 0,  	   "NEC",   "TK-80BS",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, tk80bs, 0,      0,       tk80bs,    tk80bs,  0,       "Nippon Electronic Company",   "TK-80BS",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

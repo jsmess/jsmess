@@ -1015,7 +1015,7 @@ ROM_START(zvezda)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	spectrum,	"Sinclair Research",	"ZX Spectrum" , 0)
+COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	spectrum,	"Sinclair Research Ltd",	"ZX Spectrum" , 0)
 COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"ZX Spectrum 80K" , GAME_UNOFFICIAL)
 COMP( 1995, specide,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"ZX Spectrum IDE" , GAME_UNOFFICIAL)
 COMP( 1986, inves,    spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Investronica",	"Inves Spectrum 48K+" , 0)

@@ -755,5 +755,5 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 #endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY    FULLNAME */
-COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)
-COMP( 1982, cgenienz, cgenie,	0,		cgenienz, cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000 (New Zealand)" , 0)
+COMP( 1982, cgenie,   0,        0,      cgenie,   cgenie,	0,       "EACA Computers Ltd",  "Colour Genie EG2000" , 0)
+COMP( 1982, cgenienz, cgenie,   0,      cgenienz, cgenie,	0,       "EACA Computers Ltd",  "Colour Genie EG2000 (New Zealand)" , 0)
