@@ -11,18 +11,21 @@
 #include "machine/6522via.h"
 #include "devices/cassette.h"
 #include "sound/wave.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
+#include "devices/snapquik.h"
 
+static UINT8 *jr100_ram;
 static UINT8 *jr100_vram;
 static UINT8 *jr100_pcg;
 static UINT8 keyboard_line;
 static bool jr100_use_pcg;
+static UINT8 jr100_speaker;
 
 static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&jr100_ram)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&jr100_pcg)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)	
 	AM_RANGE(0xc800, 0xc80f) AM_DEVREADWRITE("via", via_r, via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	
 ADDRESS_MAP_END
@@ -173,6 +176,7 @@ static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
 static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 {
 	jr100_use_pcg = (data & 0x20) ? TRUE : FALSE;
+	jr100_speaker = data>>7;
 }
 
 static const via6522_interface jr100_via_intf =
@@ -199,14 +203,81 @@ static const cassette_config jr100_cassette_config =
 	NULL
 };
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
+static TIMER_DEVICE_CALLBACK( sound_tick )
 {
+	running_device *speaker = timer.machine->device("speaker");	
+	speaker_level_w(speaker,jr100_speaker);
+	jr100_speaker = 0;
+	
+	running_device *via = timer.machine->device("via");
+	double level = cassette_input(timer.machine->device("cassette"));
+	if (level > 0.0) {
+		via_ca1_w(via, 0);
+		via_cb1_w(via, 0);
+	} else {
+		via_ca1_w(via, 1);
+		via_cb1_w(via, 1);
+	}
+	
+	
+}
 
+static UINT32 readByLittleEndian(UINT8 *buf,int pos) 
+{
+	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24); 
+}
+
+static QUICKLOAD_LOAD(jr100)
+{
+	int quick_length;
+	UINT8 buf[0x10000];
+	int read_;
+	quick_length = image.length();
+	if (quick_length >= 0xffff)
+		return IMAGE_INIT_FAIL;
+	read_ = image.fread(buf, quick_length);
+	if (read_ != quick_length)
+		return IMAGE_INIT_FAIL;
+
+	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47) {
+		// this is not PRG
+		return IMAGE_INIT_FAIL;
+	}
+	int pos = 4;
+	if (readByLittleEndian(buf,pos)!=1) {
+		// not version 1 of PRG file
+		return IMAGE_INIT_FAIL;
+	}
+	pos += 4;
+	UINT32 len =readByLittleEndian(buf,pos); pos+= 4;
+	pos += len; // skip name
+	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 flag  		 = readByLittleEndian(buf,pos); pos+= 4;
+	
+	UINT32 end_address = start_address + code_length - 1;
+	// copy code
+	memcpy(jr100_ram + start_address,buf + pos,code_length);
+	if (flag == 0) {
+      jr100_ram[end_address + 1] =  0xdf;
+      jr100_ram[end_address + 2] =  0xdf;
+      jr100_ram[end_address + 3] =  0xdf;
+      jr100_ram[6 ] = (end_address >> 8 & 0xFF);
+      jr100_ram[7 ] = (end_address & 0xFF);
+      jr100_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
+      jr100_ram[9 ] = ((end_address + 1) & 0xFF);
+      jr100_ram[10] = ((end_address + 2) >> 8 & 0xFF);
+      jr100_ram[11] = ((end_address + 2) & 0xFF);
+      jr100_ram[12] = ((end_address + 3) >> 8 & 0xFF);
+      jr100_ram[13] = ((end_address + 3) & 0xFF);
+    }
+	
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( jr100 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 16)
+    MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MDRV_CPU_PROGRAM_MAP(jr100_mem)
 
     MDRV_MACHINE_RESET(jr100)
@@ -231,9 +302,15 @@ static MACHINE_DRIVER_START( jr100 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", jr100_cassette_config )	
-	MDRV_TIMER_ADD_PERIODIC("cassette_timer", cassette_tick, HZ(XTAL_14_31818MHz / 16))
+	
+	MDRV_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
+	
+	/* quickload */
+	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 0)	
 MACHINE_DRIVER_END
 
 
