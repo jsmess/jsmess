@@ -7558,6 +7558,17 @@
 		</part>
 	</software>
 
+	<software name="zeldalnkc" cloneof="zeldalnk">
+		<description>The Legend of Zelda - Link's Awakening (Can)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="legend of zelda, the - link's awakening (canada).bin" size="524288" crc="4407c759" sha1="4bbd38a4548e0c7922d0a6719ac5d16791e9535b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeldalnkf" cloneof="zeldalnk">
 		<description>The Legend of Zelda - Link's Awakening (Fra)</description>
 		<year>19??</year>

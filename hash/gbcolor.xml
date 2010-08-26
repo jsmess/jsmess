@@ -3104,6 +3104,17 @@
 	</software>
 
 	<software name="doug">
+		<description>Doug's Big Game (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="doug's big game (europe).bin" size="1048576" crc="b6ffbcca" sha1="e9c207bb9b03b5762afd53c8f5295703cc1474b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dougu" cloneof="doug">
 		<description>Doug's Big Game (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
