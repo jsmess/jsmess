@@ -107,7 +107,7 @@ static MACHINE_START( a310 )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	dac_signed_data_w(machine->device("dac"), 0x80);
+	//dac_signed_data_w(machine->device("dac"), 0x80);
 }
 
 static MACHINE_RESET( a310 )
@@ -275,13 +275,34 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_RAM_DEFAULT_SIZE("2M")
 	MDRV_RAM_EXTRA_OPTIONS("512K, 1M, 4M, 8M, 16M")
 
-	MDRV_SPEAKER_STANDARD_MONO("a310")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(0, "a310", 1.00)
-
 	MDRV_WD1772_ADD("wd1772", a310_wd17xx_interface )
 
 	//MDRV_FLOPPY_4_DRIVES_ADD(a310_floppy_config)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac0", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac1", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac2", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac3", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac4", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac5", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac6", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac7", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 MACHINE_DRIVER_END
 
 ROM_START(a310)
