@@ -1562,7 +1562,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 
 	MDRV_GFXDECODE(newbrain)
 
-	MDRV_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, MSEC(12.5)) // HACK
+	MDRV_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, USEC(12500)) // HACK
 
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)

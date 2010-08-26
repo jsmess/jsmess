@@ -95,7 +95,7 @@ static MACHINE_DRIVER_START( lynx )
 	MDRV_IMPORT_FROM(lynx_cartslot)
 MACHINE_DRIVER_END
 
-
+#if 0
 static MACHINE_DRIVER_START( lynx2 )
 	MDRV_IMPORT_FROM( lynx )
 
@@ -107,7 +107,7 @@ static MACHINE_DRIVER_START( lynx2 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_DRIVER_END
-
+#endif
 
 /* these 2 dumps are saved from an running machine,
    and therefor the rom byte at 0xff09 is not readable!

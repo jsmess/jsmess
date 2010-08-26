@@ -604,10 +604,11 @@ static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
-
+#if 0
 static MACHINE_DRIVER_START( model2 )
 	MDRV_IMPORT_FROM(model1)
 MACHINE_DRIVER_END
+#endif
 
 static MACHINE_DRIVER_START( model3 )
 	MDRV_IMPORT_FROM( model1 )

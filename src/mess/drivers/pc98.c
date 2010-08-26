@@ -1110,4 +1110,4 @@ static DRIVER_INIT( pc9801 )
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY                        FULLNAME    FLAGS */
 COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   pc9801,      "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1993, pc9821,   0,       0,     pc9801,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
