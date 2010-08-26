@@ -244,12 +244,9 @@ static const wd17xx_interface a310_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-#define	NVRAM_SIZE 1024
-#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
-
 static const i2cmem_interface i2cmem_interface =
 {
-	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
 static MACHINE_DRIVER_START( a310 )
@@ -300,6 +297,8 @@ ROM_START(a310)
 	ROMX_LOAD( "riscos2.bin",  0x000000, 0x080000, CRC(89c4ad36) SHA1(b82a78830dac386f9b649b6d32a34f9c6910546d), ROM_BIOS(3) )
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY  FULLNAME */
