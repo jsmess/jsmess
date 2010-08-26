@@ -102,7 +102,7 @@ struct _fdc_hardware_type
 	write8_device_func ff40_w;
 	unsigned initial_drq : 1;
 	device_type wdtype;
-	const machine_config_token *wdmachine;
+	machine_config_constructor wdmachine;
 };
 
 
@@ -477,15 +477,14 @@ static const floppy_config coco_floppy_config =
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco) -
     get info function for the CoCo FDC
 -------------------------------------------------*/
+static MACHINE_DRIVER_START(coco_fdc)
+	MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
+	MDRV_MSM6242_ADD(DISTO_TAG)
+	MDRV_DS1315_ADD(CLOUD9_TAG)
+MACHINE_DRIVER_END
 
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 {
-	static MACHINE_DRIVER_START(coco_fdc)
-		MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
-		MDRV_MSM6242_ADD(DISTO_TAG)
-		MDRV_DS1315_ADD(CLOUD9_TAG)
-	MACHINE_DRIVER_END
-
 	static const fdc_hardware_type hwtype =
 	{
 		"CoCo FDC",
@@ -629,13 +628,12 @@ static void fdc_dragon_w(running_device *device, offs_t addr, UINT8 data)
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon) -
     get info function for the CoCo FDC
 -------------------------------------------------*/
-
+static MACHINE_DRIVER_START(dragon_fdc)
+	MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
+MACHINE_DRIVER_END
+	
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
-	static MACHINE_DRIVER_START(dragon_fdc)
-		MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
-	MACHINE_DRIVER_END
-
 	static const fdc_hardware_type hwtype =
 	{
 		"Dragon FDC",

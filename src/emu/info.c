@@ -1041,7 +1041,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	if (game->description != NULL)
 		fprintf(out, "\t\t<description>%s</description>\n", xml_normalize_string(game->description));
 
-	/* print the year only if is a number */
+	/* print the year only if is a number or another allowed character (? or +) */
 	if (game->year != NULL && strspn(game->year, "0123456789?+") == strlen(game->year))
 		fprintf(out, "\t\t<year>%s</year>\n", xml_normalize_string(game->year));
 

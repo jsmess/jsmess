@@ -353,7 +353,8 @@ public:
 	// compare a range against our range
 	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
 	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
-	bool partially_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= byteend && m_byteend >= bytestart); }
+	bool is_covered_by(offs_t bytestart, offs_t byteend) const { return (m_bytestart >= bytestart && m_byteend <= byteend); }
+	bool straddles(offs_t bytestart, offs_t byteend) const { return (m_bytestart < byteend && m_byteend > bytestart); }
 
 	// track and verify address space references to this bank
 	bool references_space(address_space &space, read_or_write readorwrite) const;
@@ -789,9 +790,9 @@ private:
 		m_live_lookup = m_table;
 		_UintType result;
 		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
-		if (sizeof(_UintType) == 2) result = m_space.read_word(offset, mask);
-		if (sizeof(_UintType) == 4) result = m_space.read_dword(offset, mask);
-		if (sizeof(_UintType) == 8) result = m_space.read_qword(offset, mask);
+		if (sizeof(_UintType) == 2) result = m_space.read_word(offset << 1, mask);
+		if (sizeof(_UintType) == 4) result = m_space.read_dword(offset << 2, mask);
+		if (sizeof(_UintType) == 8) result = m_space.read_qword(offset << 3, mask);
 		m_live_lookup = oldtable;
 		return result;
 	}
@@ -841,9 +842,9 @@ private:
 		UINT8 *oldtable = m_live_lookup;
 		m_live_lookup = m_table;
 		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
-		if (sizeof(_UintType) == 2) m_space.write_word(offset, data, mask);
-		if (sizeof(_UintType) == 4) m_space.write_dword(offset, data, mask);
-		if (sizeof(_UintType) == 8) m_space.write_qword(offset, data, mask);
+		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
+		if (sizeof(_UintType) == 4) m_space.write_dword(offset << 2, data, mask);
+		if (sizeof(_UintType) == 8) m_space.write_qword(offset << 3, data, mask);
 		m_live_lookup = oldtable;
 	}
 
@@ -2237,8 +2238,8 @@ void address_space::set_decrypted_region(offs_t addrstart, offs_t addrend, void 
 		// consider this bank if it is used for reading and matches the address space
 		if (bank->references_space(*this, ROW_READ))
 		{
-			// verify that the region fully covers the decrypted range
-			if (bank->fully_covers(bytestart, byteend))
+			// verify that the provided range fully covers this bank
+			if (bank->is_covered_by(bytestart, byteend))
 			{
 				// set the decrypted pointer for the corresponding memory bank
 				bank->set_base_decrypted(reinterpret_cast<UINT8 *>(base) + bank->bytestart() - bytestart);
@@ -2246,7 +2247,7 @@ void address_space::set_decrypted_region(offs_t addrstart, offs_t addrend, void 
 			}
 
 			// fatal error if the decrypted region straddles the bank
-			else if (bank->partially_covers(bytestart, byteend))
+			else if (bank->straddles(bytestart, byteend))
 				throw emu_fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for device '%s'", bytestart, byteend, m_device.tag());
 		}
 	}

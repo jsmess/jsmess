@@ -94,13 +94,12 @@ static WRITE8_DEVICE_HANDLER(coco_rs232_ff40_w)
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 -------------------------------------------------*/
+static MACHINE_DRIVER_START(coco_rs232)
+	MDRV_ACIA6551_ADD(UART_TAG)
+MACHINE_DRIVER_END
 
 DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 {
-	static MACHINE_DRIVER_START(coco_rs232)
-		MDRV_ACIA6551_ADD(UART_TAG)
-	MACHINE_DRIVER_END
-
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
