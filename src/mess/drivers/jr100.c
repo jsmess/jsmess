@@ -368,7 +368,7 @@ static MACHINE_DRIVER_START( jr100 )
 	MDRV_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 2)
 MACHINE_DRIVER_END
 
 
