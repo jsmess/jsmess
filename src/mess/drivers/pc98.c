@@ -636,8 +636,34 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 //  (and many more...)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports) / dma (odd ports)
+//  AM_RANGE(0x0020, 0x0020) rtc
+//  AM_RANGE(0x0022, 0x0022)
+	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
+	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
+//  AM_RANGE(0x0064, 0x0064) V-SYNC related write
+//  AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
+//  AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
+//  AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
+//  AM_RANGE(0x0070, 0x0070) crtc registers
+//  AM_RANGE(0x0072, 0x0072)
+//  AM_RANGE(0x0074, 0x0074)
+//  AM_RANGE(0x0076, 0x0076)
+//  AM_RANGE(0x0078, 0x0078)
+//  AM_RANGE(0x007a, 0x007a)
+//  AM_RANGE(0x007c, 0x007c) GRCG mode write
+//  AM_RANGE(0x007e, 0x007e) GRCG tile write
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
+	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
+//  AM_RANGE(0x00e0, 0x00ef) DMA
+	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
+	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(wram_sel_r,wram_sel_w,0xffffffff)
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READ8(pc98_mouse_r,0xffffffff)
+
+//  (and many more...)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -678,22 +704,6 @@ static MACHINE_RESET(pc9801)
 	rom_bank = 1;
 }
 
-static MACHINE_RESET(pc9821)
-{
-	UINT8 *ROM = memory_region(machine, "cpudata");
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
-
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
-
-	gate_a20 = 0;
-	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
-
-	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
-
-	wram_bank = 0;
-	rom_bank = 1;
-}
-
 /*************************************************************
  *
  * pic8259 configuration
@@ -715,15 +725,6 @@ static const struct pic8259_interface pic8259_slave_config =
 {
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
 };
-
-static VIDEO_START( pc9821 )
-{
-}
-
-static VIDEO_UPDATE( pc9821 )
-{
-	return 0;
-}
 
 static const gfx_layout charset_8x8 =
 {
@@ -989,24 +990,11 @@ static MACHINE_DRIVER_START( pc9801 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc9821 )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I486, 25000000)
-	MDRV_CPU_PROGRAM_MAP(pc9821_mem)
+	MDRV_IMPORT_FROM( pc9801 )
 
-	MDRV_MACHINE_RESET(pc9821)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-
-	MDRV_VIDEO_START(pc9821)
-	MDRV_VIDEO_UPDATE(pc9821)
+	MDRV_CPU_REPLACE("maincpu", I486, 25000000)
+	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
+	MDRV_CPU_IO_MAP(pc9821_io)
 MACHINE_DRIVER_END
 
 
@@ -1051,6 +1039,7 @@ ROM_END
 
 static DRIVER_INIT( pc9801 )
 {
+	#if 0
 	UINT8 *ROM = memory_region(machine, "cpudata");
 
 	/* patch unimplemented opcodes verr / verw */
@@ -1105,6 +1094,7 @@ static DRIVER_INIT( pc9801 )
 	/* patch ROM checksum */
 	ROM[0xf8595 & 0x3ffff] = 0x90;
 	ROM[0xf8596 & 0x3ffff] = 0x90;
+	#endif
 }
 
 
