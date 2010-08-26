@@ -1623,7 +1623,7 @@
 		</part>
 	</software>
 
-	<software name="fatetris" supported="no">
+	<software name="fatetris">
 		<description>FA Tetris (Kor)</description>
 		<year>1989</year>
 		<publisher>FA Soft</publisher>
@@ -1811,7 +1811,7 @@
 		</part>
 	</software>
 
-	<software name="fpoint" supported="no">
+	<software name="fpoint">
 		<description>Flashpoint (Kor)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
