@@ -4,8 +4,11 @@
 
     preliminary driver by Angelo Salese
 
-    memory map:
+	TODO:
+	- keyboard;
+	- floppy device;
 
+    memory map:
     0x00000-0x3ffff Work RAM
     0x40000-0x5ffff CG RAM (address bitswapped?)
     0x60000-0x67fff "Read modify write" area (related to the CG RAM)
@@ -16,15 +19,12 @@
     0x76000-0x77fff NOP (0x3b)
     0x78000-0x7ffff Phone ROM (0x3c-0x3f)
 
-    start-up vblank irq is rst $28 (0xef), this system has mixed im 0 and im 2 (!)
-
-    after some time, clear work ram [$919] to 0 ... something to do with irqs?
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
+#include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "sound/2203intf.h"
 
@@ -37,6 +37,16 @@
 static UINT8 bank_val[8],bank_addr;
 static UINT8 irq_sel,irq_vector[4];
 static UINT8 kanji_bank;
+
+#define WRAM_RESET 0
+#define IPL_RESET 1
+
+static void mz2500_reset(UINT8 type);
+static const UINT8 bank_reset_val[2][8] =
+{
+	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
+	{ 0x34, 0x35, 0x36, 0x37, 0x04, 0x05, 0x06, 0x07 }
+};
 
 /* video stuff*/
 static UINT8 text_reg[0x100], text_reg_index;
@@ -171,6 +181,15 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 
 	switch(cur_bank)
 	{
+		case 0x34:
+		case 0x35:
+		case 0x36:
+		case 0x37:
+		{
+			// IPL ROM, WRITENOP
+			//printf("%04x %02x\n",offset+bank_num*0x2000,data);
+			break;
+		}
 		case 0x39:
 		{
 			if(kanji_bank & 0x80) //kanji ROM
@@ -214,6 +233,7 @@ static READ8_HANDLER( mz2500_bank_addr_r )
 
 static WRITE8_HANDLER( mz2500_bank_addr_w )
 {
+//	printf("%02x\n",data);
 	bank_addr = data & 7;
 }
 
@@ -235,6 +255,8 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
 	bank_val[bank_addr] = data & 0x3f;
+
+	//printf("%02x %02x\n",data & 0x3f,bank_addr);
 
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
@@ -306,7 +328,7 @@ static WRITE8_HANDLER( mz2500_fdc_w )
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
 			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), 1,1);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), 1,0);
 			break;
 		case 0xdd:
 			wd17xx_set_side(dev,(data & 1));
@@ -406,8 +428,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("z80pio_0", z80pio_c_r, z80pio_c_w)
-	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE("z80pio_0", z80pio_d_r, z80pio_d_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
 //  AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
 	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
@@ -472,6 +493,13 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static void mz2500_reset(UINT8 type)
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		bank_val[i] = bank_reset_val[type][i];
+}
 
 static MACHINE_RESET(mz2500)
 {
@@ -479,25 +507,9 @@ static MACHINE_RESET(mz2500)
 	UINT8 *IPL = memory_region(machine, "ipl");
 	int i;
 
-	bank_val[0] = 0x34;
-	bank_val[1] = 0x35;
-	bank_val[2] = 0x36;
-	bank_val[3] = 0x37;
-	bank_val[4] = 0x04;
-	bank_val[5] = 0x05;
-	bank_val[6] = 0x06;
-	bank_val[7] = 0x07;
+	mz2500_reset(IPL_RESET);
 
-/*  memory_set_bankptr(machine, "bank0", &ROM[bank_val[0]*0x2000]);
-    memory_set_bankptr(machine, "bank1", &ROM[bank_val[1]*0x2000]);
-    memory_set_bankptr(machine, "bank2", &ROM[bank_val[2]*0x2000]);
-    memory_set_bankptr(machine, "bank3", &ROM[bank_val[3]*0x2000]);
-    memory_set_bankptr(machine, "bank4", &ROM[bank_val[4]*0x2000]);
-    memory_set_bankptr(machine, "bank5", &ROM[bank_val[5]*0x2000]);
-    memory_set_bankptr(machine, "bank6", &ROM[bank_val[6]*0x2000]);
-    memory_set_bankptr(machine, "bank7", &ROM[bank_val[7]*0x2000]);*/
-
-	irq_vector[0] = 0xef; /* RST 28h - vblank */
+	//irq_vector[0] = 0xef; /* RST 28h - vblank */
 
 	text_col_size = 40;
 	text_font_reg = 0;
@@ -555,20 +567,66 @@ static INTERRUPT_GEN( mz2500_vbl )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
 }
 
+static READ8_DEVICE_HANDLER( mz2500_porta_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( mz2500_portb_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( mz2500_portc_r )
+{
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( mz2500_porta_w )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( mz2500_portb_w )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
+{
+	static UINT8 reset_lines;
+
+	/* work RAM reset */
+	if((reset_lines & 0x02) == 0x00 && (data & 0x02))
+	{
+		mz2500_reset(WRAM_RESET);
+		/* correct? */
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	}
+
+	/* bit 2 is speaker */
+
+	/* IPL reset */
+	if((reset_lines & 0x08) == 0x00 && (data & 0x08))
+		mz2500_reset(IPL_RESET);
+
+	reset_lines = data;
+
+	//printf("%02x\n",data);
+}
+
+static I8255A_INTERFACE( ppi8255_intf )
+{
+	DEVCB_HANDLER(mz2500_porta_r),						/* Port A read */
+	DEVCB_HANDLER(mz2500_portb_r),						/* Port B read */
+	DEVCB_HANDLER(mz2500_portc_r),						/* Port C read */
+	DEVCB_HANDLER(mz2500_porta_w),						/* Port A write */
+	DEVCB_HANDLER(mz2500_portb_w),						/* Port B write */
+	DEVCB_HANDLER(mz2500_portc_w)						/* Port C write */
+};
+
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 {
 //  printf("%02x\n",data);
 	text_col_size = (data & 0x20) ? 80 : 40;
-}
-
-static READ8_DEVICE_HANDLER( mz2500_pio0_porta_r )
-{
-	return 0xff;
-}
-
-static READ8_DEVICE_HANDLER( mz2500_pio0_portb_r )
-{
-	return 0xff;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
@@ -579,13 +637,13 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 		test = 9; //'F'
 	else if(input_code_pressed(device->machine,KEYCODE_X))
 		test = 'C';
-	else if(input_code_pressed(device->machine,KEYCODE_C))
+	else if(input_code_pressed(device->machine,KEYCODE_1))
 		test = 0x31;
-	else if(input_code_pressed(device->machine,KEYCODE_V))
+	else if(input_code_pressed(device->machine,KEYCODE_2))
 		test = 0x32;
-	else if(input_code_pressed(device->machine,KEYCODE_B))
+	else if(input_code_pressed(device->machine,KEYCODE_3))
 		test = 0x33;
-	else if(input_code_pressed(device->machine,KEYCODE_N))
+	else if(input_code_pressed(device->machine,KEYCODE_4))
 		test = 0x34;
 	else
 		test = 0xff;
@@ -599,17 +657,6 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
 {
 	return 0xff;
 }
-
-static Z80PIO_INTERFACE( mz2500_pio0_intf )
-{
-	DEVCB_NULL, //irq handler
-	DEVCB_HANDLER( mz2500_pio0_porta_r ), //port a r
-	DEVCB_NULL, //port a w
-	DEVCB_NULL, //port a ardy
-	DEVCB_HANDLER( mz2500_pio0_portb_r ), //port b r
-	DEVCB_NULL, //port b w
-	DEVCB_NULL  //port b ardy
-};
 
 static Z80PIO_INTERFACE( mz2500_pio1_intf )
 {
@@ -658,7 +705,7 @@ static MACHINE_DRIVER_START( mz2500 )
 
     MDRV_MACHINE_RESET(mz2500)
 
-	MDRV_Z80PIO_ADD( "z80pio_0", 6000000, mz2500_pio0_intf ) // unknown clock / divider
+	MDRV_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 
 	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
