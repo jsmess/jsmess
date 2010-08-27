@@ -324,7 +324,7 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 	if(irq_sel & 0x10)
 		irq_vector[3] = data; //RP5c15
 
-	popmessage("%02x %02x %02x %02x",irq_vector[0],irq_vector[1],irq_vector[2],irq_vector[3]);
+//	popmessage("%02x %02x %02x %02x",irq_vector[0],irq_vector[1],irq_vector[2],irq_vector[3]);
 }
 
 static WRITE8_HANDLER( mz2500_fdc_w )
@@ -392,22 +392,27 @@ static READ8_HANDLER( kludge_r )
 #endif
 
 static UINT32 rom_index;
+static UINT8 hrom_index,lrom_index;
 
 static READ8_HANDLER( mz2500_rom_r )
 {
 	UINT8 *rom = memory_region(space->machine, "rom");
 	UINT8 res;
 
+	lrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+
+	rom_index = (rom_index & 0xffff00) | (lrom_index & 0xff);
+
 	res = rom[rom_index];
-	rom_index++;
 
 	return res;
 }
 
 static WRITE8_HANDLER( mz2500_rom_w )
 {
-//  printf("%02x\n",data);
-	rom_index = (data << 8) | (rom_index & 0xff00ff);
+	hrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+
+	rom_index = (data << 8) | (rom_index & 0x0000ff) | ((hrom_index & 0xff)<<16);
 	//printf("%02x\n",data);
 }
 
@@ -791,29 +796,30 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+	/* this enables HD-loader */
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
