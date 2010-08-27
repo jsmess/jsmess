@@ -35,7 +35,7 @@
 
 /* machine stuff */
 static UINT8 bank_val[8],bank_addr;
-static UINT8 irq_sel,irq_vector[4];
+static UINT8 irq_sel,irq_vector[4],irq_mask[4];
 static UINT8 kanji_bank;
 static UINT8 fdc_reverse;
 
@@ -273,12 +273,12 @@ static WRITE8_HANDLER( mz2500_kanji_bank_w )
 	kanji_bank = data;
 }
 
+/* 0xf4 - 0xf7 all returns vblank / hblank states */
 static READ8_HANDLER( mz2500_crtc_r )
 {
 	static UINT8 vblank_bit, hblank_bit;
 
-	/* TODO */
-	vblank_bit^= 1;//space->machine->primary_screen->vblank() ? 0 : 1;
+	vblank_bit = space->machine->primary_screen->vblank() ? 0 : 1;
 	hblank_bit = space->machine->primary_screen->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
@@ -304,8 +304,12 @@ static WRITE8_HANDLER( mz2500_crtc_w )
 static WRITE8_HANDLER( mz2500_irq_sel_w )
 {
 	irq_sel = data;
-	// FIXME: bit 0-3 are irq masks?
-//  printf("%02x\n",irq_sel);
+	//printf("%02x\n",irq_sel);
+	// FIXME: is activeness correct?
+	irq_mask[0] = ((data & 0x08) == 0); //CRTC
+	irq_mask[1] = ((data & 0x04) == 0); //i8253
+	irq_mask[2] = ((data & 0x02) == 0); //printer
+	irq_mask[3] = ((data & 0x01) == 0); //RP5c15
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
@@ -361,7 +365,7 @@ static const floppy_config mz2500_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };
@@ -546,11 +550,16 @@ static MACHINE_RESET(mz2500)
 	text_col_size = 40;
 	text_font_reg = 0;
 
+	/* copy IPL to its natural bank ROM/RAM position */
 	for(i=0;i<0x8000;i++)
 	{
 		//RAM[i] = IPL[i];
 		RAM[i+0x68000] = IPL[i];
 	}
+
+	/* disable IRQ */
+	for(i=0;i<4;i++)
+		irq_mask[i] = 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -596,7 +605,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( mz2500_vbl )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
+	if(irq_mask[0])
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
 }
 
 static READ8_DEVICE_HANDLER( mz2500_porta_r )
@@ -759,7 +769,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
 	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
 	MDRV_PALETTE_INIT(mz2500)
 
