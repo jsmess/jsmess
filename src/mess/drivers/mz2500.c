@@ -403,6 +403,27 @@ static WRITE8_HANDLER( mz2500_rom_w )
 	//printf("%02x\n",data);
 }
 
+/* sets first 16 color entries of the 4096 palette bank */
+static WRITE8_HANDLER( palette4096_io_w )
+{
+	static UINT8 r[16],g[16],b[16];
+	static UINT8 pal_index;
+	static UINT8 pal_entry;
+
+	pal_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	pal_entry = (pal_index & 0x1e) >> 1;
+
+	if(pal_index & 1)
+		g[pal_entry] = (data & 0x0f);
+	else
+	{
+		r[pal_entry] = (data & 0xf0) >> 4;
+		b[pal_entry] = data & 0x0f;
+	}
+
+	palette_set_color_rgb(space->machine, pal_entry+0x200,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -413,7 +434,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
 //  AM_RANGE(0xac, 0xad) AM_WRITE(emm_w)
 //  AM_RANGE(0xad, 0xad) AM_READ(emm_r)
-//  AM_RANGE(0xae, 0xae) AM_WRITE(crtc_w)
+	AM_RANGE(0xae, 0xae) AM_WRITE(palette4096_io_w)
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
