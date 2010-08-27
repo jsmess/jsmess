@@ -469,7 +469,7 @@ static INTERRUPT_GEN( jr200_irq )
 
 static MACHINE_DRIVER_START( jr200 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6802, 4000000) /* MN1800A, ? Mhz */
+	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
