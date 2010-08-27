@@ -424,6 +424,16 @@ static WRITE8_HANDLER( palette4096_io_w )
 	palette_set_color_rgb(space->machine, pal_entry+0x200,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
 }
 
+static READ8_DEVICE_HANDLER( mz2500_wd17xx_r ) 
+{
+	return wd17xx_r(device, offset) ^ 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
+{
+	wd17xx_w(device, offset, data ^ 0xff);
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -447,7 +457,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
 //  AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
-	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
 //  AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
