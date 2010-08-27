@@ -6,6 +6,7 @@
 
 	TODO:
 	- floppy device;
+	- graphics are really a bare minimum, this thing is very complex;
 	- keyboard inputs (needs something that actually works);
 
     memory map:
@@ -39,6 +40,8 @@ static UINT8 irq_sel,irq_vector[4],irq_mask[4];
 static UINT8 kanji_bank;
 static UINT8 fdc_reverse;
 static UINT8 key_mux;
+static UINT8 crtc_reg_index;
+static UINT8 crtc_reg[0x20];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -69,9 +72,9 @@ static VIDEO_UPDATE( mz2500 )
 
 	if(text_font_reg)
 	{
-		for (y=0;y<25;y++)
+		for (y=0;y<25*2;y++)
 		{
-			for (x=0;x<text_col_size;x++)
+			for (x=0;x<80/*text_col_size*/;x++)
 			{
 				int tile = vram[count+0x0000] & 0xff;
 				int attr = vram[count+0x0800];
@@ -80,10 +83,10 @@ static VIDEO_UPDATE( mz2500 )
 				//int gfx_num;
 				int color = attr & 7;
 
-				if(gfx_sel == 0x00)
-					gfx_data = memory_region(screen->machine,"pcg");
-				else
+				if(gfx_sel == 0x80 || gfx_sel == 0xc0)
 					gfx_data = memory_region(screen->machine,"kanji"); //TODO
+				else
+					gfx_data = memory_region(screen->machine,"pcg");
 
 				tile|= tile_bank << 8;
 
@@ -91,9 +94,18 @@ static VIDEO_UPDATE( mz2500 )
 				{
 					for(xi=0;xi<8;xi++)
 					{
-						UINT8 pen;
+						UINT8 pen_bit[3],pen;
 
-						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+						if(gfx_sel & 0x8)
+						{
+							pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
+							pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
+							pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
+
+							pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
+						}
+						else
+							pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
 						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = screen->machine->pens[pen];
 					}
@@ -117,10 +129,10 @@ static VIDEO_UPDATE( mz2500 )
 				//int gfx_num;
 				int color = attr & 7;
 
-				if(gfx_sel == 0x00)
-					gfx_data = memory_region(screen->machine,"pcg");
-				else
+				if(gfx_sel == 0x80 || gfx_sel == 0xc0)
 					gfx_data = memory_region(screen->machine,"kanji"); //TODO
+				else
+					gfx_data = memory_region(screen->machine,"pcg");
 
 				tile|= tile_bank << 8;
 
@@ -202,7 +214,10 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 			{
 				UINT8 *pcg_ram = memory_region(machine, "pcg");
 				pcg_ram[offset] = data;
-				gfx_element_mark_dirty(machine->gfx[3], (offset) >> 3);
+				if((offset & 0x1800) == 0x0000)
+					gfx_element_mark_dirty(machine->gfx[3], (offset) >> 3);
+				else
+					gfx_element_mark_dirty(machine->gfx[4], (offset & 0x7ff) >> 3);
 			}
 		}
 		break;
@@ -275,7 +290,7 @@ static WRITE8_HANDLER( mz2500_kanji_bank_w )
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-static READ8_HANDLER( mz2500_crtc_r )
+static READ8_HANDLER( mz2500_crtc_hvblank_r )
 {
 	static UINT8 vblank_bit, hblank_bit;
 
@@ -285,7 +300,7 @@ static READ8_HANDLER( mz2500_crtc_r )
 	return vblank_bit | hblank_bit;
 }
 
-static WRITE8_HANDLER( mz2500_crtc_w )
+static WRITE8_HANDLER( mz2500_txt_crtc_w )
 {
 	switch(offset)
 	{
@@ -447,6 +462,18 @@ static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 	wd17xx_w(device, offset, data ^ fdc_reverse);
 }
 
+static WRITE8_HANDLER( mz2500_crtc_addr_w )
+{
+	crtc_reg_index = data & 0x1f;
+}
+
+static WRITE8_HANDLER( mz2500_crtc_data_w )
+{
+	crtc_reg[crtc_reg_index & 0x1f] = data;
+
+	popmessage("%02x",crtc_reg[0x0e]);
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -462,7 +489,9 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
 //  AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
-//  AM_RANGE(0xbc, 0xbd) AM_READWRITE(crtc_r,crtc_w)
+	AM_RANGE(0xbc, 0xbc) AM_WRITE(mz2500_crtc_addr_w)
+	AM_RANGE(0xbd, 0xbd) AM_WRITE(mz2500_crtc_data_w)
+//	AM_RANGE(0xbc, 0xbf) AM_READ(mz2500_crtc_cg_r) //reads plane
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
@@ -478,7 +507,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
 //  AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
 //  AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
-	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_r) AM_WRITE(mz2500_crtc_w)
+	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_txt_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 ADDRESS_MAP_END
 
@@ -891,11 +920,35 @@ static const gfx_layout mz2500_16_layout =
 	16 * 16		/* code takes 16 times 16 bits */
 };
 
+static const gfx_layout mz2500_pcg_layout_1bpp =
+{
+	8, 8,
+	RGN_FRAC(1,4),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8
+};
+
+static const gfx_layout mz2500_pcg_layout_3bpp =
+{
+	8, 8,
+	RGN_FRAC(1,4),
+	3,
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8
+};
+
+
 static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)	// for viewer only
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)		// for viewer only
-	GFXDECODE_ENTRY("pcg", 0, mz2500_cg_layout, 0, 256)
+	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 1)
+	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 1)
 GFXDECODE_END
 
 static INTERRUPT_GEN( mz2500_vbl )
@@ -1062,7 +1115,8 @@ static MACHINE_DRIVER_START( mz2500 )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
+	//MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 640, 480, 0, 400) //TODO: fix this
 	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
 	MDRV_PALETTE_INIT(mz2500)
 
