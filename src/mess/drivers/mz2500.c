@@ -37,6 +37,7 @@
 static UINT8 bank_val[8],bank_addr;
 static UINT8 irq_sel,irq_vector[4];
 static UINT8 kanji_bank;
+static UINT8 fdc_reverse;
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -424,14 +425,14 @@ static WRITE8_HANDLER( palette4096_io_w )
 	palette_set_color_rgb(space->machine, pal_entry+0x200,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
 }
 
-static READ8_DEVICE_HANDLER( mz2500_wd17xx_r ) 
+static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
 {
-	return wd17xx_r(device, offset) ^ 0xff;
+	return wd17xx_r(device, offset) ^ fdc_reverse;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 {
-	wd17xx_w(device, offset, data ^ 0xff);
+	wd17xx_w(device, offset, data ^ fdc_reverse);
 }
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
@@ -700,6 +701,18 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 	DEVCB_NULL
 };
 
+static WRITE8_DEVICE_HANDLER( opn_porta_w )
+{
+	/*
+	---- x--- mouse select
+	---- -x-- palette bit (16/4096 colors)
+	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
+	*/
+
+	//printf("%02x\n",data);
+	fdc_reverse = data & 2 ? 0x00 : 0xff;
+}
+
 static const ym2203_interface ym2203_interface_1 =
 {
 	{
@@ -707,7 +720,7 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_INPUT_PORT("DSW0"),	// read A
 		DEVCB_INPUT_PORT("DSW1"),	// read B
-		DEVCB_NULL,					// write A
+		DEVCB_HANDLER(opn_porta_w),	// write A
 		DEVCB_NULL					// write B
 	},
 	NULL
