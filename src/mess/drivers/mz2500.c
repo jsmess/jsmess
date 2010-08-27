@@ -297,48 +297,12 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 		irq_vector[3] = data; //RP5c15
 }
 
-#if 0
-static READ8_HANDLER( mz2500_fdc_r )
-{
-	running_device* dev = space->machine->device("fdc");
-	//UINT8 ret = 0;
-
-	switch(offset+0xd8)
-	{
-		case 0xd8:
-			return wd17xx_status_r(dev,offset) & 0xff;
-		case 0xd9:
-			return wd17xx_track_r(dev,offset);
-		case 0xda:
-			return wd17xx_sector_r(dev,offset);
-		case 0xdb:
-			return wd17xx_data_r(dev,offset);
-	}
-
-	return 0xff;
-}
-#endif
-
 static WRITE8_HANDLER( mz2500_fdc_w )
 {
 	running_device* dev = space->machine->device("mb8877a");
 
 	switch(offset+0xdc)
 	{
-		#if 0
-		case 0xd8:
-			wd17xx_command_w(dev,offset,data);
-			break;
-		case 0xd9:
-			wd17xx_track_w(dev,offset,data);
-			break;
-		case 0xda:
-			wd17xx_sector_w(dev,offset,data);
-			break;
-		case 0xdb:
-			wd17xx_data_w(dev,offset,data);
-			break;
-		#endif
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
 			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -358,8 +322,6 @@ static const wd17xx_interface mz2500_mb8877a_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-#if 0
-
 static FLOPPY_OPTIONS_START( mz2500 )
 	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
@@ -368,7 +330,6 @@ static FLOPPY_OPTIONS_START( mz2500 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
-#endif
 
 static const floppy_config mz2500_floppy_config =
 {
@@ -518,10 +479,10 @@ static MACHINE_RESET(mz2500)
 	UINT8 *IPL = memory_region(machine, "ipl");
 	int i;
 
-	bank_val[0] = 0x00;
-	bank_val[1] = 0x01;
-	bank_val[2] = 0x02;
-	bank_val[3] = 0x03;
+	bank_val[0] = 0x34;
+	bank_val[1] = 0x35;
+	bank_val[2] = 0x36;
+	bank_val[3] = 0x37;
 	bank_val[4] = 0x04;
 	bank_val[5] = 0x05;
 	bank_val[6] = 0x06;
@@ -543,7 +504,7 @@ static MACHINE_RESET(mz2500)
 
 	for(i=0;i<0x8000;i++)
 	{
-		RAM[i] = IPL[i];
+		//RAM[i] = IPL[i];
 		RAM[i+0x68000] = IPL[i];
 	}
 }
@@ -677,9 +638,15 @@ static const ym2203_interface ym2203_interface_1 =
 static PALETTE_INIT( mz2500 )
 {
 	int i;
+
+	/*set up 16 colors (TODO) */
 	for(i=0;i<8;i++)
 		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
+	/* set up 256 colors (TODO) */
+
+	/* set up 4096 colors */
+	// ...
 }
 
 static MACHINE_DRIVER_START( mz2500 )
@@ -702,7 +669,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
-	MDRV_PALETTE_LENGTH(8) // TODO: it needs more than this
+	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
 	MDRV_PALETTE_INIT(mz2500)
 
 	MDRV_GFXDECODE(mz2500)
