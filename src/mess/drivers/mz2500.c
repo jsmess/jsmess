@@ -67,14 +67,17 @@ static VIDEO_UPDATE( mz2500 )
 	int x,y,count,xi,yi;
 //  gfx_element *gfx;// = screen->machine->gfx[0];
 	UINT8 *gfx_data;// = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
+	int w;
 
 	count = 0x70000;
 
+	w = (crtc_reg[0x0e] == 0x17) ? 1 : 2; //TODO
+
 	if(text_font_reg)
 	{
-		for (y=0;y<25*2;y++)
+		for (y=0;y<25;y++)
 		{
-			for (x=0;x<80/*text_col_size*/;x++)
+			for (x=0;x<40*w/*text_col_size*/;x++)
 			{
 				int tile = vram[count+0x0000] & 0xff;
 				int attr = vram[count+0x0800];
@@ -120,7 +123,7 @@ static VIDEO_UPDATE( mz2500 )
 	{
 		for (y=0;y<25;y+=2)
 		{
-			for (x=0;x<text_col_size;x++)
+			for (x=0;x<40*w;x++)
 			{
 				int tile = vram[count+0x0000] & 0xfe;
 				int attr = vram[count+0x800];
@@ -462,16 +465,67 @@ static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 	wd17xx_w(device, offset, data ^ fdc_reverse);
 }
 
+/*
+"GDE" CRTC registers
+
+0x05: clear bitmap buffer register
+
+0x08: screen res vertical start lo reg
+0x09: screen res vertical start hi reg (upper 1 bit)
+0x0a: screen res vertical end lo reg
+0x0b: screen res vertical end hi reg (upper 1 bit)
+0x0c: screen res horizontal start reg (7 bits, val x 8)
+0x0d: screen res horizontal end reg (7 bits, val x 8)
+0x0e: screen size reg
+
+*/
+
+
 static WRITE8_HANDLER( mz2500_crtc_addr_w )
 {
-	crtc_reg_index = data & 0x1f;
+	crtc_reg_index = data;
 }
 
 static WRITE8_HANDLER( mz2500_crtc_data_w )
 {
+
 	crtc_reg[crtc_reg_index & 0x1f] = data;
 
-	popmessage("%02x",crtc_reg[0x0e]);
+	if((crtc_reg_index & 0x1f) == 0x08) //accessing vs lo reg clears vs hi reg
+		crtc_reg[0x09] = 0;
+
+	if((crtc_reg_index & 0x1f) == 0x0a) //accessing ve lo reg clears ve hi reg
+		crtc_reg[0x0b] = 0;
+
+	if(crtc_reg_index & 0x80) //enable auto-inc
+		crtc_reg_index = (crtc_reg_index & 0xfc) | ((crtc_reg_index + 1) & 0x03);
+
+	{
+		static UINT16 vs,ve,hs,he;
+		rectangle visarea;
+		static UINT16 x_size;
+
+		if(crtc_reg[0x0e] == 0x15)
+			x_size = 640;
+		else if(crtc_reg[0x0e] == 0x17 || crtc_reg[0x0e] == 0x1d)
+			x_size = 320;
+		else
+			x_size = 640; // TODO
+
+		visarea.min_x = 0;
+		visarea.min_y = 0;
+		visarea.max_x = x_size - 1;
+		visarea.max_y = 200 - 1;
+
+		vs = (crtc_reg[0x08]) | ((crtc_reg[0x09]<<8) & 1);
+		ve = (crtc_reg[0x0a]) | ((crtc_reg[0x0b]<<8) & 1);
+		hs = (crtc_reg[0x0c] & 0x7f)*8;
+		he = (crtc_reg[0x0d] & 0x7f)*8;
+
+		popmessage("%d %d %d %d %02x",vs,ve,hs,he,crtc_reg[0x0e]);
+
+		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
+	}
 }
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
@@ -1116,7 +1170,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 640, 480, 0, 400) //TODO: fix this
+	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 640, 480, 0, 200) //TODO: fix this
 	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
 	MDRV_PALETTE_INIT(mz2500)
 
@@ -1127,7 +1181,7 @@ static MACHINE_DRIVER_START( mz2500 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 6000000/4) //unknown clock / divider
+	MDRV_SOUND_ADD("ym", YM2203, 6000000/2) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
