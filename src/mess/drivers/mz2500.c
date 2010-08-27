@@ -20,9 +20,6 @@
 
     after some time, clear work ram [$919] to 0 ... something to do with irqs?
 
-    currently emulation speed crawls a lot when you use the debugger,
-    comment out lines 983/984 of emu/memory.c for the time being.
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -52,8 +49,9 @@ static VIDEO_START( mz2500 )
 static VIDEO_UPDATE( mz2500 )
 {
 	UINT8 *vram = memory_region(screen->machine, "maincpu");
-	int x,y,count;
+	int x,y,count,xi,yi;
 //  gfx_element *gfx;// = screen->machine->gfx[0];
+	UINT8 *gfx_data;// = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
 	count = 0x70000;
 
@@ -64,19 +62,31 @@ static VIDEO_UPDATE( mz2500 )
 			for (x=0;x<text_col_size;x++)
 			{
 				int tile = vram[count+0x0000] & 0xff;
-				int attr = vram[count+0x800];
+				int attr = vram[count+0x0800];
 				int tile_bank = vram[count+0x1000] & 0x3f;
 				int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
-				int gfx_num;
+				//int gfx_num;
+				int color = attr & 7;
 
 				if(gfx_sel == 0x00)
-					gfx_num = 3;
+					gfx_data = memory_region(screen->machine,"pcg");
 				else
-					gfx_num = 0; //TODO
+					gfx_data = memory_region(screen->machine,"kanji"); //TODO
 
 				tile|= tile_bank << 8;
 
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,0,0,0,x*8,(y)*8);
+				for(yi=0;yi<8;yi++)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						UINT8 pen;
+
+						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = screen->machine->pens[pen];
+					}
+				}
+				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
 				count++;
 			}
@@ -92,17 +102,30 @@ static VIDEO_UPDATE( mz2500 )
 				int attr = vram[count+0x800];
 				int tile_bank = vram[count+0x1000] & 0x3f;
 				int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
-				int gfx_num;
+				//int gfx_num;
+				int color = attr & 7;
 
 				if(gfx_sel == 0x00)
-					gfx_num = 3;
+					gfx_data = memory_region(screen->machine,"pcg");
 				else
-					gfx_num = 0; //TODO
+					gfx_data = memory_region(screen->machine,"kanji"); //TODO
 
 				tile|= tile_bank << 8;
 
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,0,0,0,x*8,(y)*8);
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile+1,0,0,0,x*8,(y+1)*8);
+				for(yi=0;yi<16;yi++)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						UINT8 pen;
+
+						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = screen->machine->pens[pen];
+					}
+				}
+
+//				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
+//				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile+1,color,0,0,x*8,(y+1)*8);
 
 				count++;
 			}
@@ -651,6 +674,14 @@ static const ym2203_interface ym2203_interface_1 =
 	NULL
 };
 
+static PALETTE_INIT( mz2500 )
+{
+	int i;
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+
+}
+
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -660,8 +691,8 @@ static MACHINE_DRIVER_START( mz2500 )
 
     MDRV_MACHINE_RESET(mz2500)
 
-	MDRV_Z80PIO_ADD( "z80pio_0", 6000000/4, mz2500_pio0_intf ) // unknown clock / divider
-	MDRV_Z80PIO_ADD( "z80pio_1", 6000000/4, mz2500_pio1_intf )
+	MDRV_Z80PIO_ADD( "z80pio_0", 6000000, mz2500_pio0_intf ) // unknown clock / divider
+	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 
 	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
@@ -671,8 +702,8 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
-	MDRV_PALETTE_LENGTH(256*2)
-//  MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(8) // TODO: it needs more than this
+	MDRV_PALETTE_INIT(mz2500)
 
 	MDRV_GFXDECODE(mz2500)
 
