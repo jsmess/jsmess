@@ -124,8 +124,8 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 	count = 0x70000;
 
-	if(tv_mode != 1)
-		popmessage("%02x",tv_mode);
+//	if(tv_mode != 1)
+//	popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]);
 
 	for (y=0;y<25;y++)
 	{
@@ -230,6 +230,36 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	#endif
 }
 
+static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	static UINT32 count;
+	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 pen,pen_bit[4];
+	int x,y,xi;
+
+	count = 0x40000;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<320;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				pen_bit[0] = (vram[count+0x0000]>>(xi)) & 1 ? 1 : 0;
+				pen_bit[1] = (vram[count+0x4000]>>(xi)) & 1 ? 2 : 0;
+				pen_bit[2] = (vram[count+0x8000]>>(xi)) & 1 ? 4 : 0;
+				pen_bit[3] = (vram[count+0xc000]>>(xi)) & 1 ? 0 : 8; //FIXME: this should be swapped
+
+				pen = pen_bit[0]|pen_bit[1]|pen_bit[2]|pen_bit[3];
+
+				if(pen != 8)
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x200];
+			}
+			count++;
+		}
+	}
+}
+
 static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	static UINT32 count;
@@ -258,7 +288,10 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 static VIDEO_UPDATE( mz2500 )
 {
 	if(pal_select)
+	{
 		draw_tv_screen(screen->machine,bitmap,cliprect);
+		draw_cg16_screen(screen->machine,bitmap,cliprect);
+	}
 	else //4096 mode colors
 	{
 		// ...
@@ -649,7 +682,6 @@ static WRITE8_HANDLER( mz2500_crtc_addr_w )
 
 static WRITE8_HANDLER( mz2500_crtc_data_w )
 {
-
 	crtc_reg[crtc_reg_index & 0x1f] = data;
 
 	if((crtc_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
@@ -657,6 +689,34 @@ static WRITE8_HANDLER( mz2500_crtc_data_w )
 
 	if((crtc_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
 		crtc_reg[0x0b] = 0;
+
+	if((crtc_reg_index & 0x1f) == 0x05) //clear bitmap buffer
+	{
+		UINT32 i;
+		UINT8 *vram = memory_region(space->machine, "maincpu");
+
+		/* TODO: this isn't yet 100% accurate */
+		if(crtc_reg[0x05] & 1)
+		{
+			for(i=0;i<0x4000;i++)
+				vram[i+0x40000] = 0x00; //clear B
+		}
+		if(crtc_reg[0x05] & 2)
+		{
+			for(i=0;i<0x4000;i++)
+				vram[i+0x44000] = 0x00; //clear R
+		}
+		if(crtc_reg[0x05] & 4)
+		{
+			for(i=0;i<0x4000;i++)
+				vram[i+0x48000] = 0x00; //clear G
+		}
+		if(crtc_reg[0x05] & 8)
+		{
+			for(i=0;i<0x4000;i++)
+				vram[i+0x4c000] = 0x00; //clear I
+		}
+	}
 
 	if(crtc_reg_index & 0x80) //enable auto-inc
 		crtc_reg_index = (crtc_reg_index & 0xfc) | ((crtc_reg_index + 1) & 0x03);
@@ -701,6 +761,41 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate1_w(pit8253, 1);
 }
 
+static UINT8 joy_mode;
+
+static READ8_HANDLER( mz2500_joystick_r )
+{
+	static UINT8 res,dir_en,in_r;
+
+	res = 0xff;
+	in_r = ~input_port_read(space->machine,"JOY");
+
+	if(joy_mode & 0x40)
+	{
+		if(!(joy_mode & 0x04)) res &= ~0x20;
+		if(!(joy_mode & 0x08)) res &= ~0x10;
+		dir_en = (joy_mode & 0x20) ? 0 : 1;
+	}
+	else
+	{
+		if(!(joy_mode & 0x01)) res &= ~0x20;
+		if(!(joy_mode & 0x02)) res &= ~0x10;
+		dir_en = (joy_mode & 0x10) ? 0 : 1;
+	}
+
+	if(dir_en)
+		res &= (~((in_r) & 0x0f));
+
+	res &= (~((in_r) & 0x30));
+
+	return res;
+}
+
+static WRITE8_HANDLER( mz2500_joystick_w )
+{
+	joy_mode = data;
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -732,7 +827,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
-//  AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
+	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
@@ -1078,6 +1173,16 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static void mz2500_reset(UINT8 type)
