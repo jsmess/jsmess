@@ -104,7 +104,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
 						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
 
-						pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
+						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 					}
 					else
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
@@ -119,17 +119,14 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	}
 }
 
-static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int tv_mode)
+static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane)
 {
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
 
-	count = 0x70000;
-
-	if(tv_mode != 1)
-		popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]);
+	count = 0x70000 + (plane * 0x400);
 
 	y_step = (text_font_reg) ? 1 : 2;
 
@@ -163,12 +160,23 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
 						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
 
-						pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
+						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 					}
 					else
-						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+					{
+						if((gfx_sel & 0x30) == 0x30)
+							pen = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? color : 0; //G
+						else if((gfx_sel & 0x30) == 0x20)
+							pen = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? color : 0; //R
+						else if((gfx_sel & 0x30) == 0x10)
+							pen = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? color : 0; //B
+						else
+							pen = ((gfx_data[tile*8+yi+0x0000]>>(7-xi)) & 1) ? color : 0;
+					}
 
-					*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
+
+					if(pen)
+						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
 				}
 			}
 				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
@@ -184,7 +192,27 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	if(text_col_size)
 		draw_80x25(machine,bitmap,cliprect);
 	else
-		draw_40x25(machine,bitmap,cliprect,text_reg[0] >> 2);
+	{
+		int tv_mode;
+
+		tv_mode = text_reg[0] >> 2;
+
+		switch(tv_mode)
+		{
+//			case 0: mixed 6bpp mode
+			case 1:
+				draw_40x25(machine,bitmap,cliprect,0);
+				break;
+			case 2:
+				draw_40x25(machine,bitmap,cliprect,1);
+				break;
+			case 3:
+				draw_40x25(machine,bitmap,cliprect,0);
+				draw_40x25(machine,bitmap,cliprect,1);
+				break;
+			default: popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]); break;
+		}
+	}
 
 	#if 0
 	if(text_font_reg)
