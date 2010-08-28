@@ -27,6 +27,7 @@
 #include "machine/z80pio.h"
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
+#include "machine/pit8253.h"
 #include "sound/2203intf.h"
 
 //#include "devices/cassette.h"
@@ -528,6 +529,18 @@ static WRITE8_HANDLER( mz2500_crtc_data_w )
 	}
 }
 
+static WRITE8_HANDLER( timer_w )
+{
+	running_device *pit8253 = space->machine->device("pit");
+
+	pit8253_gate0_w(pit8253, 1);
+	pit8253_gate1_w(pit8253, 1);
+	pit8253_gate0_w(pit8253, 0);
+	pit8253_gate1_w(pit8253, 0);
+	pit8253_gate0_w(pit8253, 1);
+	pit8253_gate1_w(pit8253, 1);	
+}
+	
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -556,11 +569,11 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
-//  AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
+    AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
 //  AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
-//  AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_txt_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 ADDRESS_MAP_END
@@ -1150,6 +1163,29 @@ static PALETTE_INIT( mz2500 )
 	// ...
 }
 
+/* PIT8253 Interface */
+
+static const struct pit8253_config mz2500_pit8253_intf =
+{
+	{
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk1_w)
+		},
+		{
+			0,
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk2_w)
+		},
+		{
+			0,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -1184,6 +1220,8 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SOUND_ADD("ym", YM2203, 6000000/2) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	
+	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
 MACHINE_DRIVER_END
 
 
