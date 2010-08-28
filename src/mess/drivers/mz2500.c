@@ -57,68 +57,136 @@ static const UINT8 bank_reset_val[2][8] =
 /* video stuff*/
 static UINT8 text_reg[0x100], text_reg_index;
 static UINT8 text_col_size, text_font_reg;
+static UINT8 pal_select;
 
 static VIDEO_START( mz2500 )
 {
 }
 
-static VIDEO_UPDATE( mz2500 )
+static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *vram = memory_region(screen->machine, "maincpu");
+	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
-//  gfx_element *gfx;// = screen->machine->gfx[0];
-	UINT8 *gfx_data;// = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
-	int w;
+	UINT8 *gfx_data;
 
 	count = 0x70000;
 
-	w = (crtc_reg[0x0e] == 0x17) ? 1 : 2; //TODO
-
-	if(text_font_reg)
+	for (y=0;y<25;y++)
 	{
-		for (y=0;y<25;y++)
+		for (x=0;x<80;x++)
 		{
-			for (x=0;x<40*w/*text_col_size*/;x++)
+			int tile = vram[count+0x0000] & 0xff;
+			int attr = vram[count+0x0800];
+			int tile_bank = vram[count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
+			//int gfx_num;
+			int color = attr & 7;
+
+			if(gfx_sel == 0x80 || gfx_sel == 0xc0)
+				gfx_data = memory_region(machine,"kanji"); //TODO
+			else
+				gfx_data = memory_region(machine,"pcg");
+
+			tile|= tile_bank << 8;
+
+			for(yi=0;yi<8;yi++)
 			{
-				int tile = vram[count+0x0000] & 0xff;
-				int attr = vram[count+0x0800];
-				int tile_bank = vram[count+0x1000] & 0x3f;
-				int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
-				//int gfx_num;
-				int color = attr & 7;
-
-				if(gfx_sel == 0x80 || gfx_sel == 0xc0)
-					gfx_data = memory_region(screen->machine,"kanji"); //TODO
-				else
-					gfx_data = memory_region(screen->machine,"pcg");
-
-				tile|= tile_bank << 8;
-
-				for(yi=0;yi<8;yi++)
+				for(xi=0;xi<8;xi++)
 				{
-					for(xi=0;xi<8;xi++)
+					UINT8 pen_bit[3],pen;
+
+					if(gfx_sel & 0x8)
 					{
-						UINT8 pen_bit[3],pen;
+						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
+						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
+						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
 
-						if(gfx_sel & 0x8)
-						{
-							pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
-							pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
-							pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
-
-							pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
-						}
-						else
-							pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
-
-						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = screen->machine->pens[pen];
+						pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
 					}
+					else
+						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+					*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
 				}
+			}
 				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
-				count++;
-			}
+			count++;
 		}
+	}
+}
+
+static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int tv_mode)
+{
+	UINT8 *vram = memory_region(machine, "maincpu");
+	int x,y,count,xi,yi;
+	UINT8 *gfx_data;
+
+	count = 0x70000;
+
+	if(tv_mode != 1)
+		popmessage("%02x",tv_mode);
+
+	for (y=0;y<25;y++)
+	{
+		for (x=0;x<40;x++)
+		{
+			int tile = vram[count+0x0000] & 0xff;
+			int attr = vram[count+0x0800];
+			int tile_bank = vram[count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
+			//int gfx_num;
+			int color = attr & 7;
+
+			if(gfx_sel == 0x80 || gfx_sel == 0xc0)
+				gfx_data = memory_region(machine,"kanji"); //TODO
+			else
+				gfx_data = memory_region(machine,"pcg");
+
+			tile|= tile_bank << 8;
+
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					UINT8 pen_bit[3],pen;
+
+					if(gfx_sel & 0x8)
+					{
+						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
+						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
+						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
+
+						pen = pen_bit[0]|pen_bit[1]|pen_bit[2];
+					}
+					else
+						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+					*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
+				}
+			}
+				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
+
+			count++;
+		}
+	}
+}
+
+static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	//w = (text_col_size) ? 2 : 1; //80 : 40
+	if(text_col_size)
+		draw_80x25(machine,bitmap,cliprect);
+	else
+	{
+		//int tv_mode = (text_reg[0] & 0x0c) >> 2;
+		draw_40x25(machine,bitmap,cliprect,text_reg[0] >> 2);
+	}
+
+	#if 0
+	if(text_font_reg)
+	{
+
 	}
 	else
 	{
@@ -127,16 +195,16 @@ static VIDEO_UPDATE( mz2500 )
 			for (x=0;x<40*w;x++)
 			{
 				int tile = vram[count+0x0000] & 0xfe;
-				int attr = vram[count+0x800];
+				int attr = vram[count+0x0800];
 				int tile_bank = vram[count+0x1000] & 0x3f;
 				int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
 				//int gfx_num;
 				int color = attr & 7;
 
 				if(gfx_sel == 0x80 || gfx_sel == 0xc0)
-					gfx_data = memory_region(screen->machine,"kanji"); //TODO
+					gfx_data = memory_region(machine,"kanji"); //TODO
 				else
-					gfx_data = memory_region(screen->machine,"pcg");
+					gfx_data = memory_region(machine,"pcg");
 
 				tile|= tile_bank << 8;
 
@@ -148,7 +216,7 @@ static VIDEO_UPDATE( mz2500 )
 
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
 					}
 				}
 
@@ -159,6 +227,45 @@ static VIDEO_UPDATE( mz2500 )
 			}
 		}
 	}
+	#endif
+}
+
+static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	static UINT32 count;
+	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 pen;
+	int x,y,xi;
+
+	count = 0x40000;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<320;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				pen = (vram[count]>>(xi)) & 1 ? 0xff : 0x00;
+
+				if(pen)
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x100];
+			}
+			count++;
+		}
+	}
+}
+
+static VIDEO_UPDATE( mz2500 )
+{
+	if(pal_select)
+		draw_tv_screen(screen->machine,bitmap,cliprect);
+	else //4096 mode colors
+	{
+		// ...
+	}
+
+	if(crtc_reg[0x0e] == 0x1d)
+		draw_cg256_screen(screen->machine,bitmap,cliprect);
 
     return 0;
 }
@@ -304,13 +411,66 @@ static READ8_HANDLER( mz2500_crtc_hvblank_r )
 	return vblank_bit | hblank_bit;
 }
 
-static WRITE8_HANDLER( mz2500_txt_crtc_w )
+/*
+[0] ---x ---- line height (0) 16 (1) 20
+[0] ---- xx-- 40 column mode (0) 64 colors (1) screen 1 (2) screen 2 (3) screen 1 + screen 2
+[1] xxxx xxxx TV map offset low address value
+[2] ---- -xxx TV map offset high address value
+
+[9] ---- xxxx vertical scrolling? (val * 2)
+*/
+
+static UINT8 pal_256_param(int index, int param)
+{
+	UINT8 val;
+
+	switch(param & 3)
+	{
+		case 0: val = index & 0x80 ? 1 : 0; break;
+		case 1: val = index & 0x08 ? 1 : 0; break;
+		case 2: val = 1; break;
+		case 3: val = 0; break;
+	}
+
+	return val;
+}
+
+static WRITE8_HANDLER( mz2500_tv_crtc_w )
 {
 	switch(offset)
 	{
 		case 0: text_reg_index = data; break;
 		case 1:
 			text_reg[text_reg_index] = data;
+			if(text_reg_index == 0x0a) // set 256 color palette
+			{
+				int i,r,g,b;
+				UINT8 b_param,r_param,g_param;
+
+				b_param = (data & 0x03) >> 0;
+				r_param = (data & 0x0c) >> 2;
+				g_param = (data & 0x30) >> 4;
+
+				for(i = 0;i < 0x100;i++)
+				{
+					int bit0,bit1,bit2;
+
+					bit0 = pal_256_param(i,b_param) ? 1 : 0;
+					bit1 = i & 0x01 ? 2 : 0;
+					bit2 = i & 0x10 ? 4 : 0;
+					b = bit0|bit1|bit2;
+					bit0 = pal_256_param(i,r_param) ? 1 : 0;
+					bit1 = i & 0x02 ? 2 : 0;
+					bit2 = i & 0x20 ? 4 : 0;
+					r = bit0|bit1|bit2;
+					bit0 = pal_256_param(i,g_param) ? 1 : 0;
+					bit1 = i & 0x04 ? 2 : 0;
+					bit2 = i & 0x40 ? 4 : 0;
+					g = bit0|bit1|bit2;
+
+					palette_set_color_rgb(space->machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+				}
+			}
 			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
 			break;
 		case 2: /* CG MASK reg */ break;
@@ -492,10 +652,10 @@ static WRITE8_HANDLER( mz2500_crtc_data_w )
 
 	crtc_reg[crtc_reg_index & 0x1f] = data;
 
-	if((crtc_reg_index & 0x1f) == 0x08) //accessing vs lo reg clears vs hi reg
+	if((crtc_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
 		crtc_reg[0x09] = 0;
 
-	if((crtc_reg_index & 0x1f) == 0x0a) //accessing ve lo reg clears ve hi reg
+	if((crtc_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
 		crtc_reg[0x0b] = 0;
 
 	if(crtc_reg_index & 0x80) //enable auto-inc
@@ -523,7 +683,7 @@ static WRITE8_HANDLER( mz2500_crtc_data_w )
 		hs = (crtc_reg[0x0c] & 0x7f)*8;
 		he = (crtc_reg[0x0d] & 0x7f)*8;
 
-		popmessage("%d %d %d %d %02x",vs,ve,hs,he,crtc_reg[0x0e]);
+//		popmessage("%d %d %d %d %02x",vs,ve,hs,he,crtc_reg[0x0e]);
 
 		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
 	}
@@ -538,9 +698,9 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate0_w(pit8253, 0);
 	pit8253_gate1_w(pit8253, 0);
 	pit8253_gate0_w(pit8253, 1);
-	pit8253_gate1_w(pit8253, 1);	
+	pit8253_gate1_w(pit8253, 1);
 }
-	
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -574,7 +734,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
 //  AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
-	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_txt_crtc_w)
+	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 ADDRESS_MAP_END
 
@@ -932,13 +1092,13 @@ static MACHINE_RESET(mz2500)
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	UINT8 *IPL = memory_region(machine, "ipl");
-	int i;
+	UINT32 i;
 
 	mz2500_reset(IPL_RESET);
 
 	//irq_vector[0] = 0xef; /* RST 28h - vblank */
 
-	text_col_size = 40;
+	text_col_size = 0;
 	text_font_reg = 0;
 
 	/* copy IPL to its natural bank ROM/RAM position */
@@ -947,6 +1107,10 @@ static MACHINE_RESET(mz2500)
 		//RAM[i] = IPL[i];
 		RAM[i+0x68000] = IPL[i];
 	}
+
+	/* clear CG RAM */
+	for(i=0;i<0x20000;i++)
+		RAM[i+0x40000] = 0x00;
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
@@ -1083,7 +1247,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 {
 //  printf("%02x\n",data);
-	text_col_size = (data & 0x20) ? 80 : 40;
+	text_col_size = (data & 0x20) ? 1 : 0;
 	key_mux = data & 0x1f;
 }
 
@@ -1132,8 +1296,11 @@ static WRITE8_DEVICE_HANDLER( opn_porta_w )
 	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
 	*/
 
-	//printf("%02x\n",data);
-	fdc_reverse = data & 2 ? 0x00 : 0xff;
+//	printf("%02x\n",data);
+	fdc_reverse = (data & 2) ? 0x00 : 0xff;
+	pal_select = (data & 4) ? 1 : 0;
+	if((data & 4) == 0)
+		printf("Warning: 4096 color mode used\n");
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1220,7 +1387,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SOUND_ADD("ym", YM2203, 6000000/2) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-	
+
 	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
 MACHINE_DRIVER_END
 
