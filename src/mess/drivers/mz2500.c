@@ -6,7 +6,7 @@
 
 	TODO:
 	- floppy device;
-	- graphics are really a bare minimum, this thing is very complex;
+	- graphics are really a bare minimum, this system is very complex;
 	- keyboard inputs (needs something that actually works);
 
     memory map:
@@ -41,8 +41,8 @@ static UINT8 irq_sel,irq_vector[4],irq_mask[4];
 static UINT8 kanji_bank;
 static UINT8 fdc_reverse;
 static UINT8 key_mux;
-static UINT8 crtc_reg_index;
-static UINT8 crtc_reg[0x20];
+static UINT8 cg_reg_index;
+static UINT8 cg_reg[0x20];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -68,10 +68,13 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
+	UINT8 y_step;
 
 	count = 0x70000;
 
-	for (y=0;y<25;y++)
+	y_step = (text_font_reg) ? 1 : 2;
+
+	for (y=0;y<25;y+=y_step)
 	{
 		for (x=0;x<80;x++)
 		{
@@ -89,7 +92,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 			tile|= tile_bank << 8;
 
-			for(yi=0;yi<8;yi++)
+			for(yi=0;yi<8*y_step;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
@@ -121,13 +124,16 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
+	UINT8 y_step;
 
 	count = 0x70000;
 
-//	if(tv_mode != 1)
-//	popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]);
+	if(tv_mode != 1)
+		popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]);
 
-	for (y=0;y<25;y++)
+	y_step = (text_font_reg) ? 1 : 2;
+
+	for (y=0;y<25;y+=y_step)
 	{
 		for (x=0;x<40;x++)
 		{
@@ -145,7 +151,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 			tile|= tile_bank << 8;
 
-			for(yi=0;yi<8;yi++)
+			for(yi=0;yi<8*y_step;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
@@ -178,10 +184,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	if(text_col_size)
 		draw_80x25(machine,bitmap,cliprect);
 	else
-	{
-		//int tv_mode = (text_reg[0] & 0x0c) >> 2;
 		draw_40x25(machine,bitmap,cliprect,text_reg[0] >> 2);
-	}
 
 	#if 0
 	if(text_font_reg)
@@ -230,27 +233,29 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	#endif
 }
 
-static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size)
 {
 	static UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[4];
-	int x,y,xi;
+	int x,y,xi,pen_i;
 
 	count = 0x40000;
 
 	for(y=0;y<200;y++)
 	{
-		for(x=0;x<320;x+=8)
+		for(x=0;x<x_size;x+=8)
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				pen_bit[0] = (vram[count+0x0000]>>(xi)) & 1 ? 1 : 0;
-				pen_bit[1] = (vram[count+0x4000]>>(xi)) & 1 ? 2 : 0;
-				pen_bit[2] = (vram[count+0x8000]>>(xi)) & 1 ? 4 : 0;
-				pen_bit[3] = (vram[count+0xc000]>>(xi)) & 1 ? 0 : 8; //FIXME: this should be swapped
+				pen_bit[0] = (vram[count+0x0000 + plane*0x2000]>>(xi)) & 1 ? 1 : 0; //B
+				pen_bit[1] = (vram[count+0x4000 + plane*0x2000]>>(xi)) & 1 ? 2 : 0; //R
+				pen_bit[2] = (vram[count+0x8000 + plane*0x2000]>>(xi)) & 1 ? 4 : 0; //G
+				pen_bit[3] = (vram[count+0xc000 + plane*0x2000]>>(xi)) & 1 ? 0 : 8; //I FIXME: this should be swapped
 
-				pen = pen_bit[0]|pen_bit[1]|pen_bit[2]|pen_bit[3];
+				pen = 0;
+				for(pen_i=0;pen_i<4;pen_i++)
+					pen |= pen_bit[pen_i];
 
 				if(pen != 8)
 					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x200];
@@ -260,12 +265,13 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	}
 }
 
+/* TODO: this probably allocates CLUT to somewhere ... */
 static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	static UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
-	UINT8 pen;
-	int x,y,xi;
+	UINT8 pen,pen_bit[8];
+	int x,y,xi,pen_i;
 
 	count = 0x40000;
 
@@ -275,7 +281,18 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				pen = (vram[count]>>(xi)) & 1 ? 0xff : 0x00;
+				pen_bit[0] = (vram[count + 0x2000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x10) : 0; // B1
+				pen_bit[1] = (vram[count + 0x0000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x01) : 0; // B0
+				pen_bit[2] = (vram[count + 0x6000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x20) : 0; // R1
+				pen_bit[3] = (vram[count + 0x4000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x02) : 0; // R0
+				pen_bit[4] = (vram[count + 0xa000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x40) : 0; // G1
+				pen_bit[5] = (vram[count + 0x8000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x04) : 0; // G0
+				pen_bit[6] = (vram[count + 0xe000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x80) : 0; // I1
+				pen_bit[7] = (vram[count + 0xc000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x08) : 0; // I0
+
+				pen = 0;
+				for(pen_i=0;pen_i<8;pen_i++)
+					pen |= pen_bit[pen_i];
 
 				if(pen)
 					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x100];
@@ -287,18 +304,34 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 
 static VIDEO_UPDATE( mz2500 )
 {
+	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
+
 	if(pal_select)
-	{
 		draw_tv_screen(screen->machine,bitmap,cliprect);
-		draw_cg16_screen(screen->machine,bitmap,cliprect);
-	}
 	else //4096 mode colors
 	{
 		// ...
 	}
 
-	if(crtc_reg[0x0e] == 0x1d)
-		draw_cg256_screen(screen->machine,bitmap,cliprect);
+
+	switch(cg_reg[0x0e])
+	{
+		case 0x03: /* CG 4 color mode */ break;
+		case 0x14:
+			draw_cg16_screen(screen->machine,bitmap,cliprect,0,320);
+			draw_cg16_screen(screen->machine,bitmap,cliprect,1,320);
+			break;
+		case 0x15:
+			draw_cg16_screen(screen->machine,bitmap,cliprect,1,320);
+			draw_cg16_screen(screen->machine,bitmap,cliprect,0,320);
+			break;
+		case 0x17:
+			draw_cg16_screen(screen->machine,bitmap,cliprect,0,640);
+			break;
+		case 0x1d:
+			draw_cg256_screen(screen->machine,bitmap,cliprect);
+			break;
+	}
 
     return 0;
 }
@@ -674,76 +707,82 @@ static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 
 */
 
-
-static WRITE8_HANDLER( mz2500_crtc_addr_w )
+static READ8_HANDLER( mz2500_rplane_latch_r )
 {
-	crtc_reg_index = data;
+	if(cg_reg[0x07] & 0x10)
+	{
+		static UINT8 vblank_bit;
+
+		// ---- ---x clear flag
+		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80;
+
+		return vblank_bit;
+	}
+	else
+		return 0xff;
 }
 
-static WRITE8_HANDLER( mz2500_crtc_data_w )
+static WRITE8_HANDLER( mz2500_cg_addr_w )
 {
-	crtc_reg[crtc_reg_index & 0x1f] = data;
+	cg_reg_index = data;
+}
 
-	if((crtc_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
-		crtc_reg[0x09] = 0;
+static WRITE8_HANDLER( mz2500_cg_data_w )
+{
+	cg_reg[cg_reg_index & 0x1f] = data;
 
-	if((crtc_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
-		crtc_reg[0x0b] = 0;
+	if((cg_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
+		cg_reg[0x09] = 0;
 
-	if((crtc_reg_index & 0x1f) == 0x05) //clear bitmap buffer
+	if((cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
+		cg_reg[0x0b] = 0;
+
+	if((cg_reg_index & 0x1f) == 0x05) //clear bitmap buffer
 	{
 		UINT32 i;
 		UINT8 *vram = memory_region(space->machine, "maincpu");
 
 		/* TODO: this isn't yet 100% accurate */
-		if(crtc_reg[0x05] & 1)
+		if(cg_reg[0x05] & 1)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x40000] = 0x00; //clear B
 		}
-		if(crtc_reg[0x05] & 2)
+		if(cg_reg[0x05] & 2)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x44000] = 0x00; //clear R
 		}
-		if(crtc_reg[0x05] & 4)
+		if(cg_reg[0x05] & 4)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x48000] = 0x00; //clear G
 		}
-		if(crtc_reg[0x05] & 8)
+		if(cg_reg[0x05] & 8)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x4c000] = 0x00; //clear I
 		}
 	}
 
-	if(crtc_reg_index & 0x80) //enable auto-inc
-		crtc_reg_index = (crtc_reg_index & 0xfc) | ((crtc_reg_index + 1) & 0x03);
+	if(cg_reg_index & 0x80) //enable auto-inc
+		cg_reg_index = (cg_reg_index & 0xfc) | ((cg_reg_index + 1) & 0x03);
 
 	{
 		static UINT16 vs,ve,hs,he;
 		rectangle visarea;
-		static UINT16 x_size;
-
-		if(crtc_reg[0x0e] == 0x15)
-			x_size = 640;
-		else if(crtc_reg[0x0e] == 0x17 || crtc_reg[0x0e] == 0x1d)
-			x_size = 320;
-		else
-			x_size = 640; // TODO
 
 		visarea.min_x = 0;
 		visarea.min_y = 0;
-		visarea.max_x = x_size - 1;
+		visarea.max_x = 640 - 1;
 		visarea.max_y = 200 - 1;
 
-		vs = (crtc_reg[0x08]) | ((crtc_reg[0x09]<<8) & 1);
-		ve = (crtc_reg[0x0a]) | ((crtc_reg[0x0b]<<8) & 1);
-		hs = (crtc_reg[0x0c] & 0x7f)*8;
-		he = (crtc_reg[0x0d] & 0x7f)*8;
+		vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
+		ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
+		hs = (cg_reg[0x0c] & 0x7f)*8;
+		he = (cg_reg[0x0d] & 0x7f)*8;
 
-//		popmessage("%d %d %d %d %02x",vs,ve,hs,he,crtc_reg[0x0e]);
+//		popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
 
 		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
 	}
@@ -811,8 +850,8 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
 //  AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
-	AM_RANGE(0xbc, 0xbc) AM_WRITE(mz2500_crtc_addr_w)
-	AM_RANGE(0xbd, 0xbd) AM_WRITE(mz2500_crtc_data_w)
+	AM_RANGE(0xbc, 0xbc) AM_WRITE(mz2500_cg_addr_w)
+	AM_RANGE(0xbd, 0xbd) AM_READ(mz2500_rplane_latch_r) AM_WRITE(mz2500_cg_data_w)
 //	AM_RANGE(0xbc, 0xbf) AM_READ(mz2500_crtc_cg_r) //reads plane
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
