@@ -15,7 +15,7 @@
     memory map:
     0x00000-0x3ffff Work RAM
     0x40000-0x5ffff CG RAM (address bitswapped?)
-    0x60000-0x67fff "Read modify write" area (related to the CG RAM)
+    0x60000-0x67fff "Read modify write" area (related to the CG RAM) (0x30-0x33)
     0x68000-0x6ffff IPL ROM (0x34-0x37)
     0x70000-0x71fff TVRAM (0x38)
     0x72000-0x73fff Kanji ROM / PCG RAM (banked) (0x39)
@@ -46,6 +46,7 @@ static UINT8 fdc_reverse;
 static UINT8 key_mux;
 static UINT8 cg_reg_index;
 static UINT8 cg_reg[0x20];
+static UINT8 clut16[0x10];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -282,14 +283,14 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				pen_bit[0] = (vram[count+0x0000 + plane*0x2000]>>(xi)) & 1 ? 1 : 0; //B
 				pen_bit[1] = (vram[count+0x4000 + plane*0x2000]>>(xi)) & 1 ? 2 : 0; //R
 				pen_bit[2] = (vram[count+0x8000 + plane*0x2000]>>(xi)) & 1 ? 4 : 0; //G
-				pen_bit[3] = (vram[count+0xc000 + plane*0x2000]>>(xi)) & 1 ? 0 : 8; //I FIXME: this should be swapped
+				pen_bit[3] = (vram[count+0xc000 + plane*0x2000]>>(xi)) & 1 ? 8 : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pen != 8)
-					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x200];
+				if(pen != 0 || clut16[pen] & 0x10)
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[(clut16[pen] & 0x0f)+0x200];
 			}
 			count++;
 		}
@@ -335,7 +336,7 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 
 static VIDEO_UPDATE( mz2500 )
 {
-	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[(clut16[0] & 0xf)+0x200]); //TODO: correct?
 
 	if(pal_select)
 		draw_tv_screen(screen->machine,bitmap,cliprect);
@@ -401,8 +402,72 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 	UINT8 *ram = memory_region(machine, "maincpu");
 	UINT8 cur_bank = bank_val[bank_num];
 
+//	if(cur_bank >= 0x30 && cur_bank <= 0x33)
+//		printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",cg_reg[0],cg_reg[1],cg_reg[2],cg_reg[3],offset,data);
+
 	switch(cur_bank)
 	{
+		case 0x30:
+		case 0x31:
+		case 0x32:
+		case 0x33:
+		{
+			// READ MODIFY WRITE
+			if(cg_reg[0x0e] == 0x3)
+			{
+				// ...
+			}
+			else
+			{
+				if((cg_reg[0x05] & 0xc0) == 0x00) //replace
+				{
+					if(cg_reg[5] & 1) //B
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (cg_reg[4] & 1) ? (data & cg_reg[0] & cg_reg[6]) : 0;
+					}
+					if(cg_reg[5] & 2) //R
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (cg_reg[4] & 2) ? (data & cg_reg[1] & cg_reg[6]) : 0;
+					}
+					if(cg_reg[5] & 4) //G
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (cg_reg[4] & 4) ? (data & cg_reg[2] & cg_reg[6]) : 0;
+					}
+					if(cg_reg[5] & 8) //I
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (cg_reg[4] & 8) ? (data & cg_reg[3] & cg_reg[6]) : 0;
+					}
+				}
+				else if((cg_reg[0x05] & 0xc0) == 0x40) //pset
+				{
+					if(cg_reg[5] & 1) //B
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~data;
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (cg_reg[4] & 1) ? (data & cg_reg[0]) : 0;
+					}
+					if(cg_reg[5] & 2) //R
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~data;
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (cg_reg[4] & 2) ? (data & cg_reg[1]) : 0;
+					}
+					if(cg_reg[5] & 4) //G
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~data;
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (cg_reg[4] & 4) ? (data & cg_reg[2]) : 0;
+					}
+					if(cg_reg[5] & 8) //I
+					{
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~data;
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (cg_reg[4] & 8) ? (data & cg_reg[3]) : 0;
+					}
+				}
+			}
+			break;
+		}
 		case 0x34:
 		case 0x35:
 		case 0x36:
@@ -539,6 +604,8 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 		case 0: text_reg_index = data; break;
 		case 1:
 			text_reg[text_reg_index] = data;
+			printf("[%02x] %02x\n",text_reg_index,data);
+
 			if(text_reg_index == 0x0a) // set 256 color palette
 			{
 				int i,r,g,b;
@@ -567,6 +634,15 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 
 					palette_set_color_rgb(space->machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 				}
+
+			}
+			if(text_reg_index >= 0x80 && text_reg_index <= 0x8f) //Bitmap 16 clut registers
+			{
+				/*
+				---x ---- priority
+				---- xxxx clut number
+				*/
+				clut16[text_reg_index & 0xf] = data & 0x1f;
 			}
 			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
 			break;
@@ -770,7 +846,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 	if((cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
 		cg_reg[0x0b] = 0;
 
-	if((cg_reg_index & 0x1f) == 0x05) //clear bitmap buffer
+	if((cg_reg_index & 0x1f) == 0x05 && (cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
 		UINT8 *vram = memory_region(space->machine, "maincpu");
