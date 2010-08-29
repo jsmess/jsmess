@@ -8,9 +8,6 @@
 	- floppy device;
 	- graphics are really a bare minimum, this system is very complex;
 	- keyboard inputs (needs something that actually works);
-	- There's a z80pio bug that reads control word where it should be data
-	  word and viceversa, mostly noticeable in wrong setting of x tile graphics
-	  in Basic and the Mahjong game.
 
     memory map:
     0x00000-0x3ffff Work RAM
@@ -604,7 +601,7 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 		case 0: text_reg_index = data; break;
 		case 1:
 			text_reg[text_reg_index] = data;
-			printf("[%02x] %02x\n",text_reg_index,data);
+			//printf("[%02x] %02x\n",text_reg_index,data);
 
 			if(text_reg_index == 0x0a) // set 256 color palette
 			{
@@ -948,6 +945,7 @@ static WRITE8_HANDLER( mz2500_joystick_w )
 	joy_mode = data;
 }
 
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
@@ -977,8 +975,9 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
-	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
-	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
+//	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
+//	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
+	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
@@ -1379,10 +1378,12 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 	return input_port_read(device->machine, keynames[key_mux & 0xf]);
 }
 
+#if 0
 static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
 {
 	return pio_latchb;
 }
+#endif
 
 static Z80PIO_INTERFACE( mz2500_pio1_intf )
 {
@@ -1390,7 +1391,7 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 	DEVCB_HANDLER( mz2500_pio1_porta_r ),
 	DEVCB_HANDLER( mz2500_pio1_porta_w ),
 	DEVCB_NULL,
-	DEVCB_HANDLER( mz2500_pio1_portb_r ),
+	DEVCB_HANDLER( mz2500_pio1_porta_r ),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
