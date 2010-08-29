@@ -21,6 +21,7 @@
 
     TODO:
 
+	- fix direct update handler to make system work again
     - display interface INH
     - 2 segment display
     - single step
@@ -154,9 +155,9 @@ static WRITE8_HANDLER( display_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xff00, 0xffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x0000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_REGION(CDP1802_TAG, 0)
+	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
@@ -266,23 +267,21 @@ static void set_ram_mode(running_machine *machine)
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
 	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
 	if (state->ram_disable)
 	{
-		memory_unmap_read(program, 0xff00, 0xffff, 0, 0);
-		memory_unmap_write(program, 0xff00, 0xffff, 0, 0);
+		memory_unmap_readwrite(program, 0xff00, 0xffff, 0, 0);
 	}
 	else
 	{
 		if (state->ram_protect)
 		{
-			memory_install_read_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
-			memory_unmap_write(program, 0xff00, 0xffff, 0, 0);
+			memory_install_rom(program, 0xff00, 0xffff, 0, 0, ram);
 		}
 		else
 		{
-			memory_install_read_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
-			memory_install_write_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
+			memory_install_ram(program, 0xff00, 0xffff, 0, 0, ram);
 		}
 	}
 }
@@ -527,12 +526,6 @@ static MACHINE_START( cosmicos )
 	dm9368_rbi_w(state->dm9368, 1);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, CDP1802_TAG), 0);
-	memory_set_bank(machine, "bank1", 0);
-
-	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, CDP1802_TAG) + 0xff00, 0);
-	memory_set_bank(machine, "bank2", 0);
-
 	switch (messram_get_size(machine->device("messram")))
 	{
 	case 256:
@@ -540,16 +533,11 @@ static MACHINE_START( cosmicos )
 		break;
 
 	case 4*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 		memory_unmap_readwrite(program, 0x1000, 0xbfff, 0, 0);
-		break;
-
-	case 48*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0xbfff, 0, 0, "bank1");
 		break;
 	}
 
-	memory_install_readwrite_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
+	set_ram_mode(machine);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -641,13 +629,13 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( cosmicos )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "hex", "Hex Monitor" )
-	ROMX_LOAD( "hex.ic6",	0xc000, 0x0400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
-	ROMX_LOAD( "hex.ic7",	0xc400, 0x0400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic6",	0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic7",	0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
 	ROM_SYSTEM_BIOS( 1, "ascii", "ASCII Monitor" )
-	ROMX_LOAD( "ascii.ic6", 0xc000, 0x0400, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "ascii.ic7", 0xc400, 0x0400, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
 /* System Drivers */
@@ -659,7 +647,8 @@ DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 	if (state->boot)
 	{
 		/* force A6 and A7 high */
-		return address | 0xc0c0;
+		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, memory_region(machine, CDP1802_TAG) + 0xc0);
+		return ~0;
 	}
 
 	return address;
@@ -673,4 +662,4 @@ static DRIVER_INIT( cosmicos )
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
