@@ -516,7 +516,7 @@ static READ8_HANDLER( mz2500_crtc_hvblank_r )
 
 static UINT8 pal_256_param(int index, int param)
 {
-	UINT8 val;
+	UINT8 val = 0;
 
 	switch(param & 3)
 	{
