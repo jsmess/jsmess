@@ -26,6 +26,11 @@ static UINT8 pen_clut[8],bw_mode;
 
 static VIDEO_START( multi8 )
 {
+	keyb_press = keyb_press_flag = shift_press_flag = display_reg = 0;
+	cursor_addr = cursor_raster = 0;
+	for (bw_mode = 0; bw_mode < 8; bw_mode++) pen_clut[bw_mode]=0;
+	vram_bank = 8;
+	bw_mode = 0;	
 }
 
 static VIDEO_UPDATE( multi8 )
@@ -33,8 +38,8 @@ static VIDEO_UPDATE( multi8 )
 	int x,y,count;
 	int x_width;
 	int xi,yi;
-	static UINT8 *vram = memory_region(screen->machine, "vram");
-	static UINT8 *gfx_rom = memory_region(screen->machine, "chargen");
+	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *gfx_rom = memory_region(screen->machine, "chargen");
 
 	count = 0x0000;
 
@@ -172,8 +177,8 @@ static READ8_HANDLER( key_status_r )
 
 static READ8_HANDLER( multi8_vram_r )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
-	static UINT8 *wram = memory_region(space->machine, "wram");
+	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *wram = memory_region(space->machine, "wram");
 	UINT8 res;
 
 	if(!(vram_bank & 0x10)) //select plain work ram
@@ -190,8 +195,8 @@ static READ8_HANDLER( multi8_vram_r )
 
 static WRITE8_HANDLER( multi8_vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
-	static UINT8 *wram = memory_region(space->machine, "wram");
+	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *wram = memory_region(space->machine, "wram");
 
 	if(!(vram_bank & 0x10)) //select plain work ram
 	{
@@ -429,7 +434,7 @@ static const gfx_layout multi8_charlayout =
 };
 
 static GFXDECODE_START( multi8 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 2 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 4 )
 GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
@@ -590,7 +595,7 @@ ROM_START( multi8 )
 	ROM_REGION( 0x1000, "fdc_bios", 0 )
 	ROM_LOAD( "disk.rom",  0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "wram", ROMREGION_ERASEFF )
 ROM_END
