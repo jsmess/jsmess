@@ -1440,13 +1440,20 @@ static PALETTE_INIT( mz2500 )
 
 /* PIT8253 Interface */
 
+static WRITE_LINE_DEVICE_HANDLER( pit8253_clk1_irq )
+{
+	if(state)
+		if(irq_mask[1])
+			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
+}
+
 static const struct pit8253_config mz2500_pit8253_intf =
 {
 	{
 		{
 			31250,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk1_w)
+			DEVCB_LINE(pit8253_clk1_irq)
 		},
 		{
 			0,
