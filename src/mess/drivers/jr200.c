@@ -250,35 +250,48 @@ static WRITE8_HANDLER( jr200_border_col_w )
 	jr200_border_col = data;
 }
 
-static READ8_HANDLER( mn1271_io_r )
+emu_timer *timer_d;
+
+static TIMER_CALLBACK(timer_d_callback)
 {
-	if((offset+0xc800) > 0xca00)
-		return 0xff;
+	cpu_set_input_line(machine->firstcpu, 0, HOLD_LINE);
+}
+
+static READ8_HANDLER( mn1271_io_r )
+{	
+	UINT8 retVal = mn1271_ram[offset];
+	if((offset+0xc800) > 0xca00) 
+		retVal= 0xff;
 
 	switch(offset+0xc800)
 	{
-		case 0xc801: return mcu_keyb_r(space,0);
-		case 0xc803: return (mn1271_ram[0x03] & 0xcf) | 0x30; //---x ---- printer status ready (ACTIVE HIGH)
-		case 0xc807: return (mn1271_ram[0x07] & 0x80) | 0x60;
-		case 0xc80a: return (mn1271_ram[0x0a] & 0xfe);
-		case 0xc80c: return (mn1271_ram[0x0c] & 0xdf) | 0x20;
-		case 0xc80e: return 0;
-		case 0xc810: return 0;
-		case 0xc816: return 0x4e;
-		case 0xc81c: return (mn1271_ram[0x1c] & 0xfe) | 1; //bit 0 needs to be high otherwise system refuses to boot
-		case 0xc81d: return (mn1271_ram[0x1d] & 0xed);
+		case 0xc801: retVal= mcu_keyb_r(space,0); break;
+		case 0xc803: retVal= (mn1271_ram[0x03] & 0xcf) | 0x30;  break;//---x ---- printer status ready (ACTIVE HIGH)
+		case 0xc807: retVal= (mn1271_ram[0x07] & 0x80) | 0x60; break;
+		case 0xc80a: retVal= (mn1271_ram[0x0a] & 0xfe); break;
+		case 0xc80c: retVal= (mn1271_ram[0x0c] & 0xdf) | 0x20; break;
+		case 0xc80e: retVal= 0; break;
+		case 0xc810: retVal= 0; break;
+		case 0xc816: retVal= 0x4e; break;
+		case 0xc81c: retVal= (mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
+		case 0xc81d: retVal= (mn1271_ram[0x1d] & 0xed); break;		
 	}
-
-	return mn1271_ram[offset];
+	//logerror("mn1271_io_r [%04x] = %02x\n",offset+0xc800,retVal);
+	return retVal;
 }
 
 static WRITE8_HANDLER( mn1271_io_w )
 {
 	mn1271_ram[offset] = data;
-
 	switch(offset+0xc800)
 	{
 		case 0xc805: break; //LPT printer port W
+		case 0xc816: if (data!=0) {
+					timer_adjust_periodic(timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (mn1271_ram[0x17]*0x100 + mn1271_ram[0x18]))); 
+				} else {
+					timer_adjust_periodic(timer_d, attotime_zero, 0,  attotime_zero); 
+				}
+				break;
 		case 0xc819: jr200_beep_w(space,0,data); break;
 		case 0xc81a:
 		case 0xc81b: jr200_beep_freq_w(space,offset-0x1a,data); break;
@@ -436,11 +449,11 @@ static GFXDECODE_START( jr200 )
 	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-
 static MACHINE_START(jr200)
 {
 	beep_set_frequency(machine->device("beeper"),0);
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_state(machine->device("beeper"),0);	
+	timer_d = timer_alloc(machine, timer_d_callback, NULL);
 }
 
 static MACHINE_RESET(jr200)
@@ -448,6 +461,7 @@ static MACHINE_RESET(jr200)
 	static UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
 	static UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
 	int i;
+	memset(mn1271_ram,0,0x800);
 
 	for(i=0;i<0x800;i++)
 		gfx_ram[i] = gfx_rom[i];
@@ -457,23 +471,10 @@ static MACHINE_RESET(jr200)
 }
 
 
-static INTERRUPT_GEN( jr200_nmi )
-{
-//	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static INTERRUPT_GEN( jr200_irq )
-{
-	cpu_set_input_line(device, 0, HOLD_LINE);
-}
-
 static MACHINE_DRIVER_START( jr200 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
-	MDRV_CPU_VBLANK_INT("screen", jr200_irq)
-	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
-//	MDRV_CPU_PERIODIC_INT(jr200_irq,20)
 
 //	MDRV_CPU_ADD("mn1544", MN1544, ?)
 
