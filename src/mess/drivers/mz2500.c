@@ -200,7 +200,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 		tv_mode = text_reg[0] >> 2;
 
-		switch(tv_mode)
+		switch(tv_mode & 3)
 		{
 //			case 0: mixed 6bpp mode
 			case 1:
@@ -213,7 +213,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 				draw_40x25(machine,bitmap,cliprect,0);
 				draw_40x25(machine,bitmap,cliprect,1);
 				break;
-			default: popmessage("%02x %02x %02x",tv_mode,text_reg[1],text_reg[2]); break;
+			default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
 	}
 
@@ -804,11 +804,15 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 	{
 		static UINT16 vs,ve,hs,he;
 		rectangle visarea;
+		static int x_size,y_size;
+
+		x_size = ((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03) ? 640 : 320;
+		y_size = ((cg_reg[0x0e] & 0x1f) == 0x03) ? 400 : 200;
 
 		visarea.min_x = 0;
 		visarea.min_y = 0;
-		visarea.max_x = 640 - 1;
-		visarea.max_y = 200 - 1;
+		visarea.max_x = x_size - 1;
+		visarea.max_y = y_size - 1;
 
 		vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
 		ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
@@ -1400,7 +1404,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 640, 480, 0, 200) //TODO: fix this
+	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 320, 480, 0, 200) //TODO: fix this
 	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
 	MDRV_PALETTE_INIT(mz2500)
 
