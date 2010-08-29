@@ -579,11 +579,13 @@ static WRITE8_HANDLER( mz2500_irq_sel_w )
 {
 	irq_sel = data;
 	//printf("%02x\n",irq_sel);
-	// FIXME: is activeness correct?
-	irq_mask[0] = ((data & 0x08) == 0); //CRTC
-	irq_mask[1] = ((data & 0x04) == 0); //i8253
-	irq_mask[2] = ((data & 0x02) == 0); //printer
-	irq_mask[3] = ((data & 0x01) == 0); //RP5c15
+	// activeness is trusted, see Tower of Druaga
+	irq_mask[0] = (data & 0x08); //CRTC
+	irq_mask[1] = (data & 0x04); //i8253
+	irq_mask[2] = (data & 0x02); //printer
+	irq_mask[3] = (data & 0x01); //RP5c15
+
+	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
@@ -628,7 +630,7 @@ static const wd17xx_interface mz2500_mb8877a_interface =
 static FLOPPY_OPTIONS_START( mz2500 )
 	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
-		TRACKS([40])
+		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
@@ -641,7 +643,7 @@ static const floppy_config mz2500_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD_40,
+	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };
