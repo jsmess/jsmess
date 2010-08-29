@@ -44,6 +44,7 @@ static UINT8 key_mux;
 static UINT8 cg_reg_index;
 static UINT8 cg_reg[0x20];
 static UINT8 clut16[0x10];
+static UINT16 clut256[0x100];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -323,8 +324,8 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pen)
-					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen+0x100];
+				if(pen != 0 || clut256[pen] & 0x100)
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[(clut256[pen] & 0xff)+0x100];
 			}
 			count++;
 		}
@@ -640,6 +641,15 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 				---- xxxx clut number
 				*/
 				clut16[text_reg_index & 0xf] = data & 0x1f;
+
+				{
+					int i;
+
+					for(i=0;i<0x10;i++)
+					{
+						clut256[(text_reg_index & 0xf) | (i << 4)] = (((data & 0x1f) << 4) | i);
+					}
+				}
 			}
 			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
 			break;
@@ -1442,9 +1452,8 @@ static PALETTE_INIT( mz2500 )
 
 static WRITE_LINE_DEVICE_HANDLER( pit8253_clk1_irq )
 {
-	if(state)
-		if(irq_mask[1])
-			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
+	if(irq_mask[1])
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
 }
 
 static const struct pit8253_config mz2500_pit8253_intf =
