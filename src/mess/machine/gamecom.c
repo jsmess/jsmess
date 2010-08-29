@@ -68,8 +68,6 @@ static gamecom_sound_t gamecom_sound;
 
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-static void gamecom_dma_init(running_machine *machine);
-
 static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 * RAM = memory_region(machine, "maincpu");
@@ -87,8 +85,6 @@ MACHINE_RESET( gamecom )
 	memory_set_bankptr( machine, "bank4", rom );
 
 	cartridge = NULL;
-	/* disable DMA and timer */
-	gamecom_dma.enabled = 0;
 }
 
 static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
@@ -136,7 +132,7 @@ static void handle_stylus_press( running_machine *machine, UINT8 column )
 	}
 	else
 	{
-		RAM[SM8521_P0] = 0xfe | (RAM[SM8521_CLKT]&1);
+		RAM[SM8521_P0] = 0xFF;
 		RAM[SM8521_P1] = ( RAM[SM8521_P1] & 0xFC ) | 3;
 	}
 }
@@ -277,42 +273,8 @@ WRITE8_HANDLER( gamecom_internal_w )
 		break;
 
 	/* Video hardware and DMA */
-	case SM8521_LCDC:
-//      logerror( "%X: Setting LCDC to %X\n", activecpu_get_pc(), data );
-		break;
-	case SM8521_LCH:
-		break;
-	case SM8521_LCV:
-		break;
-	case SM8521_DMC:
-		gamecom_dma.overwrite_mode = data & 0x01;
-		gamecom_dma.transfer_mode = data & 0x06;
-		gamecom_dma.decrement_x = data & 0x08;
-		gamecom_dma.decrement_y = data & 0x10;
-		gamecom_dma.enabled = data & 0x80;
-		if ( gamecom_dma.enabled )
-		{
-			gamecom_dma_init(space->machine);
-		}
-		break;
-	case SM8521_DMX1:
-		break;
-	case SM8521_DMY1:
-		break;
-	case SM8521_DMDX:
-		break;
-	case SM8521_DMDY:
-		break;
-	case SM8521_DMX2:
-		break;
-	case SM8521_DMY2:
-		break;
-	case SM8521_DMPL:
-		break;
 	case SM8521_DMBR:
 		data &= 0x7f;
-		break;
-	case SM8521_DMVP:
 		break;
 	case SM8521_TM0D:
 		gamecom_timer[0].check_value = data;
@@ -445,9 +407,22 @@ WRITE8_HANDLER( gamecom_internal_w )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-static void gamecom_dma_init(running_machine *machine)
+/* For now the increment/decrement-x and increment/decrement-y parts are NOT supported.
+   Their usage is also not explained properly in the manuals. Guess we'll have to wait
+   for them to show up in some rom images...
+ */
+void gamecom_handle_dma( running_device *device, int cycles )
 {
-	UINT8 * RAM = memory_region(machine, "maincpu");
+	UINT8 * RAM = memory_region(device->machine, "maincpu");
+	UINT8 data = RAM[SM8521_DMC];
+	gamecom_dma.overwrite_mode = data & 0x01;
+	gamecom_dma.transfer_mode = data & 0x06;
+	gamecom_dma.decrement_x = data & 0x08;
+	gamecom_dma.decrement_y = data & 0x10;
+	gamecom_dma.enabled = data & 0x80;
+	if ( !gamecom_dma.enabled ) return;
+
+
 	if ( gamecom_dma.decrement_x || gamecom_dma.decrement_y )
 	{
 		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
@@ -486,7 +461,7 @@ static void gamecom_dma_init(running_machine *machine)
 		gamecom_dma.source_mask = 0x3FFF;
 		if ( RAM[SM8521_DMBR] < 16 )
 		{
-			gamecom_dma.source_bank = memory_region(machine, "kernel") + (RAM[SM8521_DMBR] << 14);
+			gamecom_dma.source_bank = memory_region(device->machine, "kernel") + (RAM[SM8521_DMBR] << 14);
 		}
 		else
 		{
@@ -515,20 +490,9 @@ static void gamecom_dma_init(running_machine *machine)
 	gamecom_dma.source_line = gamecom_dma.source_current;
 	gamecom_dma.dest_line = gamecom_dma.dest_current;
 	gamecom_dma.state_count = 0;
-}
 
-/* For now the increment/decrement-x and increment/decrement-y parts are NOT supported.
-   Their usage is also not explained properly in the manuals. Guess we'll have to wait
-   for them to show up in some rom images...
- */
-void gamecom_handle_dma( running_device *device, int cycles )
-{
 	unsigned y_count, x_count;
-	/* If not enabled, ignore */
-	if ( ! gamecom_dma.enabled )
-	{
-		return;
-	}
+
 	for( y_count = 0; y_count <= gamecom_dma.width_y; y_count++ )
 	{
 		for( x_count = 0; x_count <= gamecom_dma.width_x; x_count++ )
