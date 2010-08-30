@@ -17,6 +17,7 @@ Skeleton drivers:
 - Cromemco C-10
 - CZK-80
 - Robotron K8915
+- Schleicher MES
 
 
 
