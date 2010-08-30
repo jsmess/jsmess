@@ -35,7 +35,7 @@
 	- The Black Onyx: hangs at the title screen, background should also animate;
 	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
 	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
-	- Ys 3: crashes if you try to load it with different DSW settings
+	- Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
 
     memory map:
     0x00000-0x3ffff Work RAM
@@ -177,7 +177,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
-							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 					}
 				}
 			}
@@ -261,14 +261,14 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
 							{
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+0) = machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+1) = machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+0) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+1) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 							}
 						}
 						else
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 						}
 					}
 				}
@@ -440,17 +440,10 @@ static VIDEO_UPDATE( mz2500 )
 
 	//popmessage("%02x",cg_mask);
 
-	if(pal_select)
-	{
-		draw_cg_screen(screen->machine,bitmap,cliprect,0);
-		draw_tv_screen(screen->machine,bitmap,cliprect);
-		draw_cg_screen(screen->machine,bitmap,cliprect,1);
+	draw_cg_screen(screen->machine,bitmap,cliprect,0);
+	draw_tv_screen(screen->machine,bitmap,cliprect);
+	draw_cg_screen(screen->machine,bitmap,cliprect,1);
 	//	popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
-	}
-	else //4096 mode colors
-	{
-		draw_tv_screen(screen->machine,bitmap,cliprect);
-	}
 
     return 0;
 }
@@ -858,7 +851,7 @@ static WRITE8_HANDLER( mz2500_fdc_w )
 	{
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), 1,0);
 			break;
 		case 0xdd:
@@ -1628,8 +1621,6 @@ static WRITE8_DEVICE_HANDLER( opn_porta_w )
 //	printf("%02x\n",data);
 	fdc_reverse = (data & 2) ? 0x00 : 0xff;
 	pal_select = (data & 4) ? 1 : 0;
-	if((data & 4) == 0)
-		printf("Warning: 4096 color mode used\n");
 }
 
 static const ym2203_interface ym2203_interface_1 =
