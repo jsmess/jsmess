@@ -240,8 +240,13 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
+	UINT32 wa_reg;
+	UINT8 s_x;
 
-	count = 0x40000 + (plane * 0x2000);
+	count = (cg_reg[0x10]) | ((cg_reg[0x11] & 0x3f) << 8);
+	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & 0x3f) << 8);
+	/* TODO: layer 2 scrolling */
+	s_x = (cg_reg[0x0f] & 0xf);
 
 	for(y=0;y<200;y++)
 	{
@@ -249,19 +254,22 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				pen_bit[0] = (vram[count+0x0000]>>(xi)) & 1 ? 1 : 0; //B
-				pen_bit[1] = (vram[count+0x4000]>>(xi)) & 1 ? 2 : 0; //R
-				pen_bit[2] = (vram[count+0x8000]>>(xi)) & 1 ? 4 : 0; //G
-				pen_bit[3] = (vram[count+0xc000]>>(xi)) & 1 ? 8 : 0; //I
+				pen_bit[0] = (vram[count+0x40000+(plane * 0x2000)]>>(xi)) & 1 ? 1 : 0; //B
+				pen_bit[1] = (vram[count+0x44000+(plane * 0x2000)]>>(xi)) & 1 ? 2 : 0; //R
+				pen_bit[2] = (vram[count+0x48000+(plane * 0x2000)]>>(xi)) & 1 ? 4 : 0; //G
+				pen_bit[3] = (vram[count+0x4c000+(plane * 0x2000)]>>(xi)) & 1 ? 8 : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
 				if(pen != 0 || clut16[pen] & 0x10)
-					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+					*BITMAP_ADDR16(bitmap, y, x+xi+s_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
 			}
 			count++;
+			count&=0x3fff;
+			if(count > wa_reg)
+				count = 0;
 		}
 	}
 }
@@ -333,6 +341,7 @@ static VIDEO_UPDATE( mz2500 )
 		draw_tv_screen(screen->machine,bitmap,cliprect);
 		draw_cg_screen(screen->machine,bitmap,cliprect);
 		//draw_tv_screen(screen->machine,bitmap,cliprect);
+		popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
 	}
 	else //4096 mode colors
 	{
@@ -880,7 +889,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		hs = (cg_reg[0x0c] & 0x7f)*8;
 		he = (cg_reg[0x0d] & 0x7f)*8;
 
-//		popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+		popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
 
 		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
 	}
@@ -1282,7 +1291,11 @@ static READ8_DEVICE_HANDLER( mz2500_porta_r )
 
 static READ8_DEVICE_HANDLER( mz2500_portb_r )
 {
-	return 0xff;
+	static UINT8 vblank_bit;
+
+	vblank_bit = device->machine->primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+
+	return 0xfe | vblank_bit;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_portc_r )
