@@ -76,28 +76,31 @@ static VIDEO_START( mz2500 )
 [2] xx-- ---- kanji select
 */
 
-static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 map_addr)
 {
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
+	UINT8 s_y;
 
-	count = 0x70000;
+	count = (map_addr & 0x7ff);
 
 	y_step = (text_font_reg) ? 1 : 2;
+	s_y = text_reg[9] & 0xf;
 
-	for (y=0;y<25;y+=y_step)
+	for (y=0;y<26;y+=y_step)
 	{
 		for (x=0;x<80;x++)
 		{
-			int tile = vram[count+0x0000] & 0xff;
-			int attr = vram[count+0x0800];
-			int tile_bank = vram[count+0x1000] & 0x3f;
-			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
-			//int gfx_num;
+			int tile = vram[0x70000+count+0x0000] & 0xff;
+			int attr = vram[0x70000+count+0x0800];
+			int tile_bank = vram[0x70000+count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
 			int color = attr & 7;
 
+			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
+				gfx_data = memory_region(machine,"pcg");
 			if(gfx_sel == 0x80)
 			{
 				gfx_data = memory_region(machine,"kanji");
@@ -138,44 +141,65 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					}
 
 					if(pen)
-						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
+					{
+						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+					}
 				}
 			}
 				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
 			count++;
+			count&=0x7ff;
 		}
 	}
 }
 
-static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane)
+static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,UINT16 map_addr)
 {
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
+	UINT8 s_y;
 
-	count = 0x70000 + (plane * 0x400);
+	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
 	y_step = (text_font_reg) ? 1 : 2;
+	s_y = text_reg[9] & 0xf;
 
-	for (y=0;y<25;y+=y_step)
+	for (y=0;y<26;y+=y_step)
 	{
 		for (x=0;x<40;x++)
 		{
-			int tile = vram[count+0x0000] & 0xff;
-			int attr = vram[count+0x0800];
-			int tile_bank = vram[count+0x1000] & 0x3f;
-			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
+			int tile = vram[0x70000+count+0x0000] & 0xff;
+			int attr = vram[0x70000+count+0x0800];
+			int tile_bank = vram[0x70000+count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
 			//int gfx_num;
 			int color = attr & 7;
 
-			if(gfx_sel == 0x80 || gfx_sel == 0xc0)
-				gfx_data = memory_region(machine,"kanji"); //TODO
-			else
+			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
 				gfx_data = memory_region(machine,"pcg");
-
-			tile|= tile_bank << 8;
+			else if(gfx_sel == 0x80)
+			{
+				gfx_data = memory_region(machine,"kanji");
+				tile|= tile_bank << 8;
+				if(y_step == 2)
+					tile &= 0x3ffe;
+			}
+			else if(gfx_sel == 0xc0)
+			{
+				gfx_data = memory_region(machine,"kanji");
+				tile|= (tile_bank << 8);
+				if(y_step == 2)
+					tile &= 0x3ffe;
+				tile|=0x4000;
+			}
+			else
+			{
+				gfx_data = memory_region(machine,"pcg");
+			}
 
 			for(yi=0;yi<8*y_step;yi++)
 			{
@@ -195,21 +219,30 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
 
 					if(pen)
-						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
+					{
+						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+					}
 				}
 			}
 				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
 			count++;
+			count&=0x7ff;
 		}
 	}
 }
 
 static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	//w = (text_col_size) ? 2 : 1; //80 : 40
+	UINT16 base_addr;
+
+	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
+
+//	popmessage("%02x",text_reg[9]);
+
 	if(text_col_size)
-		draw_80x25(machine,bitmap,cliprect);
+		draw_80x25(machine,bitmap,cliprect,base_addr);
 	else
 	{
 		int tv_mode;
@@ -220,14 +253,14 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 		{
 //			case 0: mixed 6bpp mode
 			case 1:
-				draw_40x25(machine,bitmap,cliprect,0);
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
 			case 2:
-				draw_40x25(machine,bitmap,cliprect,1);
+				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				break;
 			case 3:
-				draw_40x25(machine,bitmap,cliprect,0);
-				draw_40x25(machine,bitmap,cliprect,1);
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				break;
 			default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
@@ -242,9 +275,12 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
 	UINT8 s_x;
+	UINT8 base_mask;
 
-	count = (cg_reg[0x10]) | ((cg_reg[0x11] & 0x3f) << 8);
-	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & 0x3f) << 8);
+	base_mask = (x_size == 640) ? 0x3f : 0x1f;
+
+	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
 
@@ -267,7 +303,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 					*BITMAP_ADDR16(bitmap, y, x+xi+s_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
 			}
 			count++;
-			count&=0x3fff;
+			count&=((base_mask<<8) | 0xff);
 			if(count > wa_reg)
 				count = 0;
 		}
@@ -341,7 +377,7 @@ static VIDEO_UPDATE( mz2500 )
 		draw_tv_screen(screen->machine,bitmap,cliprect);
 		draw_cg_screen(screen->machine,bitmap,cliprect);
 		//draw_tv_screen(screen->machine,bitmap,cliprect);
-		popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
+	//	popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
 	}
 	else //4096 mode colors
 	{
@@ -460,8 +496,15 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 			//printf("%04x %02x\n",offset+bank_num*0x2000,data);
 			break;
 		}
+		case 0x38:
+		{
+			// TVRAM
+			ram[offset+cur_bank*0x2000] = data;
+			break;
+		}
 		case 0x39:
 		{
+			ram[offset+cur_bank*0x2000] = data;
 			if(kanji_bank & 0x80) //kanji ROM
 			{
 				//NOP
@@ -529,8 +572,6 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 
 	bank_val[bank_addr] = data & 0x3f;
 
-	//printf("%02x %02x\n",data & 0x3f,bank_addr);
-
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
 
@@ -562,7 +603,7 @@ static READ8_HANDLER( mz2500_crtc_hvblank_r )
 [1] xxxx xxxx TV map offset low address value
 [2] ---- -xxx TV map offset high address value
 
-[9] ---- xxxx vertical scrolling? (val * 2)
+[9] ---- xxxx vertical scrolling shift position
 */
 
 static UINT8 pal_256_param(int index, int param)
@@ -658,7 +699,7 @@ static WRITE8_HANDLER( mz2500_irq_sel_w )
 	irq_mask[2] = (data & 0x02); //printer
 	irq_mask[3] = (data & 0x01); //RP5c15
 
-	printf("%02x\n",data);
+//	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
@@ -889,7 +930,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		hs = (cg_reg[0x0c] & 0x7f)*8;
 		he = (cg_reg[0x0d] & 0x7f)*8;
 
-		popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+		//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
 
 		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
 	}
@@ -1524,7 +1565,7 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "file.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) ) //optional?
