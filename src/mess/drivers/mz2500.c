@@ -137,7 +137,8 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
 					}
 
-					*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
+					if(pen)
+						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
 				}
 			}
 				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
@@ -231,52 +232,6 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 			default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
 	}
-
-	#if 0
-	if(text_font_reg)
-	{
-
-	}
-	else
-	{
-		for (y=0;y<25;y+=2)
-		{
-			for (x=0;x<40*w;x++)
-			{
-				int tile = vram[count+0x0000] & 0xfe;
-				int attr = vram[count+0x0800];
-				int tile_bank = vram[count+0x1000] & 0x3f;
-				int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
-				//int gfx_num;
-				int color = attr & 7;
-
-				if(gfx_sel == 0x80 || gfx_sel == 0xc0)
-					gfx_data = memory_region(machine,"kanji"); //TODO
-				else
-					gfx_data = memory_region(machine,"pcg");
-
-				tile|= tile_bank << 8;
-
-				for(yi=0;yi<16;yi++)
-				{
-					for(xi=0;xi<8;xi++)
-					{
-						UINT8 pen;
-
-						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
-
-						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
-					}
-				}
-
-//				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
-//				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile+1,color,0,0,x*8,(y+1)*8);
-
-				count++;
-			}
-		}
-	}
-	#endif
 }
 
 static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size)
@@ -286,7 +241,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 
-	count = 0x40000 + plane * 0x10000;
+	count = 0x40000 + (plane * 0x2000);
 
 	for(y=0;y<200;y++)
 	{
@@ -377,7 +332,7 @@ static VIDEO_UPDATE( mz2500 )
 	{
 		draw_tv_screen(screen->machine,bitmap,cliprect);
 		draw_cg_screen(screen->machine,bitmap,cliprect);
-//		draw_tv_screen(screen->machine,bitmap,cliprect);
+		//draw_tv_screen(screen->machine,bitmap,cliprect);
 	}
 	else //4096 mode colors
 	{
