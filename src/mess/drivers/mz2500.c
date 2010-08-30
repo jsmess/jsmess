@@ -8,20 +8,19 @@
 	- 4096 color mode;
 	- Kanji text is cutted in half when font_size is 1, different data used?
 	  (check Back to the Future);
-	- check how crtc really changes the screen resolution;
-	- Add cg latch read;
 	- Implement unlatched ROMs (Phone and Dictionary);
+	- Find real CRTC registers
 	- Implement external ROM hook-up;
 	- FDC loading without the IPLPRO doesn't work at all, why?
 	- reverse / blanking tvram attributes;
+	- clean-ups! ^^'
 
     per-game/program specific TODO:
-	- (Koei Simulation War Game): title screen background is grey when it should be black;
-	- (Mahjong): white on configurations,same as above?
 	- (Renju): hangs on the "presents" screen;
 	- (Xtal Soft - The Prince of Darkness): dies on IPLPRO loading, presumably a wd17xx core bug;
 	- (Sound Gal): dies with bad code, another wd17xx core bug;
 	- Basic: vertical scrolling returns wrap-around that shouldn't wrap;
+	- Basic: loading has an alignment bug with the bitmap
 	- (K2): doesn't seem to work, there was a "Disk I/O error" msg before;
 	- LayDock: hangs by reading the FDC status and expecting it to become 0x81;
 	- Mappy: TVRAM layer is double x sized than it should be;
@@ -30,11 +29,11 @@
 	- Multiplan: hangs after you set the RTC;
 	- Murder Club: has lots of CG artifacts;
 	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-	- Personal CP/M: black screen, writes bit 7 to i/o port 0xde
 	- Relics: doesn't boot, bad dump?
 	- Super MZ Demo 1: Hangs at the logo "roar".
 	- Telephone Soft: shows garbage with the CG layer;
 	- The Black Onyx: hangs at the title screen, background should also animate;
+	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
 	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
 	- Ys 3: crashes if you try to load it with different DSW settings
 
@@ -77,6 +76,7 @@ static UINT16 clut256[0x100];
 static UINT8 cg_mask;
 static UINT8 wid_40;
 static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
+static UINT8 cg_latch[4];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -310,7 +310,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				break;
-			default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
+			//default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
 	}
 }
@@ -455,6 +455,24 @@ static VIDEO_UPDATE( mz2500 )
     return 0;
 }
 
+static UINT8 mz2500_cg_latch_compare(void)
+{
+	UINT8 compare_val = cg_reg[0x07] & 0xf;
+	UINT8 pix_val;
+	UINT8 res;
+	UINT16 i;
+	res = 0;
+
+	for(i=1;i<0x100;i<<=1)
+	{
+		pix_val = ((cg_latch[0] & i) ? 1 : 0) | ((cg_latch[1] & i) ? 2 : 0) | ((cg_latch[2] & i) ? 4 : 0) | ((cg_latch[3] & i) ? 8 : 0);
+		if(pix_val == compare_val)
+			res|=i;
+	}
+
+	return res;
+}
+
 static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank_num)
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
@@ -462,6 +480,32 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 
 	switch(cur_bank)
 	{
+		case 0x30:
+		case 0x31:
+		case 0x32:
+		case 0x33:
+		{
+			// READ MODIFY WRITE
+			if(cg_reg[0x0e] == 0x3)
+			{
+				// ...
+			}
+			else
+			{
+				int plane;
+				cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
+				cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
+				cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
+				cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
+				plane = cg_reg[0x07] & 3;
+
+				if(cg_reg[0x07] & 0x10)
+					return mz2500_cg_latch_compare();
+				else
+					return cg_latch[plane];
+			}
+		}
+		break;
 		case 0x39:
 		{
 			if(kanji_bank & 0x80) //kanji ROM
@@ -666,12 +710,25 @@ static READ8_HANDLER( mz2500_crtc_hvblank_r )
 }
 
 /*
-[0] ---x ---- line height (0) 16 (1) 20
-[0] ---- xx-- 40 column mode (0) 64 colors (1) screen 1 (2) screen 2 (3) screen 1 + screen 2
-[1] xxxx xxxx TV map offset low address value
-[2] ---- -xxx TV map offset high address value
+TVRAM / CRTC registers
 
-[9] ---- xxxx vertical scrolling shift position
+[0x00] ---x ---- line height (0) 16 (1) 20
+[0x00] ---- xx-- 40 column mode (0) 64 colors (1) screen 1 (2) screen 2 (3) screen 1 + screen 2
+[0x00] ---- --x- (related to the transparent pen)
+[0x01] xxxx xxxx TV map offset low address value
+[0x02] ---- -xxx TV map offset high address value
+[0x03] xxxx xxxx CRTC vertical start register
+
+[0x05] xxxx xxxx CRTC vertical end register
+
+[0x07] -xxx xxxx CRTC horizontal start register
+[0x08] -xxx xxxx CRTC horizontal end register
+[0x09] ---- xxxx vertical scrolling shift position
+[0x0a] --GG RRBB 256 color mode
+[0x0b] -r-- ---- Back plane red gradient
+[0x0b] ---- -b-- Back plane blue gradient
+[0x0b] ---- ---i Back plane i gradient
+[0x0c] ---- ---g Back plane green gradient
 */
 
 static UINT8 pal_256_param(int index, int param)
@@ -696,7 +753,16 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 		case 0: text_reg_index = data; break;
 		case 1:
 			text_reg[text_reg_index] = data;
-			//printf("[%02x] %02x\n",text_reg_index,data);
+			#if 0
+			//printf("[%02x] <- %02x\n",text_reg_index,data);
+			popmessage("(%02x %02x) (%02x %02x %02x %02x) (%02x %02x %02x) (%02x %02x %02x %02x)"
+			,text_reg[0] & ~0x1e,text_reg[3]
+			,text_reg[4],text_reg[5],text_reg[6],text_reg[7]
+			,text_reg[8],text_reg[10],text_reg[11]
+			,text_reg[12],text_reg[13],text_reg[14],text_reg[15]);
+
+			#endif
+			//popmessage("%d %02x %d %02x %d %d",text_reg[3],text_reg[4],text_reg[5],text_reg[6],text_reg[7]*8,text_reg[8]*8);
 
 			if(text_reg_index == 0x0a) // set 256 color palette
 			{
@@ -841,13 +907,6 @@ static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bank7_r,bank7_w)
 ADDRESS_MAP_END
 
-#if 0
-static READ8_HANDLER( kludge_r )
-{
-	return 0xff; //mame_rand(space->machine);
-}
-#endif
-
 static UINT32 rom_index;
 static UINT8 hrom_index,lrom_index;
 
@@ -904,20 +963,14 @@ static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 	wd17xx_w(device, offset, data ^ fdc_reverse);
 }
 
-/*
-"GDE" CRTC registers
+static READ8_HANDLER( mz2500_bplane_latch_r )
+{
+	if(cg_reg[7] & 0x10)
+		return mz2500_cg_latch_compare();
+	else
+		return cg_latch[0];
+}
 
-0x05: clear bitmap buffer register
-
-0x08: screen res vertical start lo reg
-0x09: screen res vertical start hi reg (upper 1 bit)
-0x0a: screen res vertical end lo reg
-0x0b: screen res vertical end hi reg (upper 1 bit)
-0x0c: screen res horizontal start reg (7 bits, val x 8)
-0x0d: screen res horizontal end reg (7 bits, val x 8)
-0x0e: screen size reg
-
-*/
 
 static READ8_HANDLER( mz2500_rplane_latch_r )
 {
@@ -931,8 +984,48 @@ static READ8_HANDLER( mz2500_rplane_latch_r )
 		return vblank_bit;
 	}
 	else
-		return 0xff;
+		return cg_latch[1];
 }
+
+static READ8_HANDLER( mz2500_gplane_latch_r )
+{
+	return cg_latch[2];
+}
+
+static READ8_HANDLER( mz2500_iplane_latch_r )
+{
+	return cg_latch[3];
+}
+
+/*
+"GDE" CRTC registers
+
+0x00: CG B - Replace / Pset register data mask
+0x01: CG R - Replace / Pset register data mask
+0x02: CG G - Replace / Pset register data mask
+0x03: CG I - Replace / Pset register data mask
+0x04: CG Replace / Pset active pixel
+0x05: CG Replace / Pset mode register
+0x06: CG Replace data register
+0x07: compare CG buffer register
+0x08: CG window vertical start lo reg
+0x09: CG window vertical start hi reg (upper 1 bit)
+0x0a: CG window vertical end lo reg
+0x0b: CG window vertical end hi reg (upper 1 bit)
+0x0c: CG window horizontal start reg (7 bits, val x 8)
+0x0d: CG window horizontal end reg (7 bits, val x 8)
+0x0e: CG mode
+0x0f: vertical scroll shift (---- xxxx)
+0x10: CG map base lo reg
+0x11: CG map base hi reg
+0x12: CG layer 0 end address lo reg
+0x13: CG layer 0 end address hi reg
+0x14: CG layer 1 start address lo reg
+0x15: CG layer 1 start address hi reg
+0x16: CG layer 1 y pixel start lo reg
+0x17: CG layer 1 y pixel start hi reg
+0x18: CG color masking
+*/
 
 static WRITE8_HANDLER( mz2500_cg_addr_w )
 {
@@ -977,9 +1070,6 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		}
 	}
 
-	if(cg_reg_index & 0x80) //enable auto-inc
-		cg_reg_index = (cg_reg_index & 0xfc) | ((cg_reg_index + 1) & 0x03);
-
 	{
 		rectangle visarea;
 		static int x_size,y_size;
@@ -1004,6 +1094,9 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 
 		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
 	}
+
+	if(cg_reg_index & 0x80) //enable auto-inc
+		cg_reg_index = (cg_reg_index & 0xfc) | ((cg_reg_index + 1) & 0x03);
 }
 
 static WRITE8_HANDLER( timer_w )
@@ -1053,6 +1146,22 @@ static WRITE8_HANDLER( mz2500_joystick_w )
 	joy_mode = data;
 }
 
+static UINT16 kanji_index;
+
+static READ8_HANDLER( mz2500_kanji_r )
+{
+	UINT8 *knj2_rom = memory_region(space->machine, "kanji2");
+
+	printf("Read from kanji 2 ROM\n");
+
+	return knj2_rom[(kanji_index << 1) | (offset & 1)];
+}
+
+static WRITE8_HANDLER( mz2500_kanji_w )
+{
+	(offset & 1) ? (kanji_index = (data << 8) | (kanji_index & 0xff)) : (kanji_index = (data & 0xff) | (kanji_index & 0xff00));
+}
+
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1068,10 +1177,11 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
-//  AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
-	AM_RANGE(0xbc, 0xbc) AM_WRITE(mz2500_cg_addr_w)
+	AM_RANGE(0xb8, 0xb9) AM_READWRITE(mz2500_kanji_r,mz2500_kanji_w)
+	AM_RANGE(0xbc, 0xbc) AM_READ(mz2500_bplane_latch_r) AM_WRITE(mz2500_cg_addr_w)
 	AM_RANGE(0xbd, 0xbd) AM_READ(mz2500_rplane_latch_r) AM_WRITE(mz2500_cg_data_w)
-//	AM_RANGE(0xbc, 0xbf) AM_READ(mz2500_crtc_cg_r) //reads plane
+	AM_RANGE(0xbe, 0xbe) AM_READ(mz2500_gplane_latch_r)
+	AM_RANGE(0xbf, 0xbf) AM_READ(mz2500_iplane_latch_r)
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
@@ -1631,6 +1741,9 @@ ROM_START( mz2500 )
 
 	ROM_REGION( 0x40000, "kanji", 0 )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(dd426767) SHA1(cc8fae0cd1736bc11c110e1c84d3f620c5e35b80) )
+
+	ROM_REGION( 0x20000, "kanji2", 0 )
+	ROM_LOAD( "kanji2.rom", 0x0000, 0x20000, CRC(eaaf20c9) SHA1(771c4d559b5241390215edee798f3bce169d418c) )
 
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
