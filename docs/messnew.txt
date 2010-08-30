@@ -14,6 +14,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
+- Cromemco C-10
 - CZK-80
 
 
