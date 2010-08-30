@@ -11034,13 +11034,35 @@
 		</part>
 	</software>
 
-	<software name="rakuxrak">
+	<software name="rakuxcs">
+		<description>Raku x Raku - Cut Shuu (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="raku x raku - cut shuu (japan).bin" size="2097152" crc="430cfcf3" sha1="b51a62358c37539021bc980c1699825596b118ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rakuxmis">
 		<description>Raku x Raku - Mishin (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="raku x raku - mishin (japan).bin" size="1048576" crc="0ba0711b" sha1="58bf5df55d2bab8877f7ec43110339ebe1a5d4c5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rakuxmoj">
+		<description>Raku x Raku - Moji (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="raku x raku - moji (japan).bin" size="2097152" crc="abe58a8b" sha1="d9502543c6cd05c7e06a3b89286eec155aff83a0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

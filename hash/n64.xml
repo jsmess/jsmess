@@ -7909,6 +7909,17 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="starcrftg" cloneof="starcrft">
+		<description>StarCraft 64 (Ger, Prototype)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="starcraft 64 (australia).bin" size="33554432" crc="35f8c03c" sha1="499c53f3d54293edb6889b6953b6e752e94322de" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starcrftub" cloneof="starcrft">
 		<description>StarCraft 64 (USA, Prototype)</description>
 		<year>2000</year>
