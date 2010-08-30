@@ -1740,5 +1740,6 @@ const game_driver * const drivers[] =
 	DRIVER( c10 )
 	DRIVER( k8915 )
 	DRIVER( mes )
+	DRIVER( cc10 )
 
 #endif /* DRIVER_RECURSIVE */

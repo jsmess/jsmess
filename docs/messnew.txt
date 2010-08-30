@@ -18,6 +18,7 @@ Skeleton drivers:
 - CZK-80
 - Robotron K8915
 - Schleicher MES
+- Fidelity Chess Challenger 10
 
 
 
