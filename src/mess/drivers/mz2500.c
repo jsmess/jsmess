@@ -102,7 +102,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
 				gfx_data = memory_region(machine,"pcg");
-			if(gfx_sel == 0x80)
+			else if(gfx_sel == 0x80)
 			{
 				gfx_data = memory_region(machine,"kanji");
 				tile|= tile_bank << 8;
@@ -285,7 +285,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size)
+static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size,int pri)
 {
 	static UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
@@ -317,7 +317,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pen != 0 || clut16[pen] & 0x10)
+				if(pri == ((clut16[pen] & 0x10) >> 4))
 					*BITMAP_ADDR16(bitmap, y, x+xi+s_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
 			}
 			count++;
@@ -328,7 +328,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	}
 }
 
-static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	static UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
@@ -356,7 +356,7 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pen != 0 || clut256[pen] & 0x100)
+				if(pri == ((clut256[pen] & 0x100) >> 8))
 					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[(clut256[pen] & 0xff)+0x100];
 			}
 			count++;
@@ -364,24 +364,24 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 	}
 }
 
-static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	switch(cg_reg[0x0e])
 	{
 		case 0x03: /* CG 4 color mode */ break;
 		case 0x14:
-			draw_cg16_screen(machine,bitmap,cliprect,0,320);
-			draw_cg16_screen(machine,bitmap,cliprect,1,320);
+			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
+			draw_cg16_screen(machine,bitmap,cliprect,1,320,pri);
 			break;
 		case 0x15:
-			draw_cg16_screen(machine,bitmap,cliprect,1,320);
-			draw_cg16_screen(machine,bitmap,cliprect,0,320);
+			draw_cg16_screen(machine,bitmap,cliprect,1,320,pri);
+			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
 			break;
 		case 0x17:
-			draw_cg16_screen(machine,bitmap,cliprect,0,640);
+			draw_cg16_screen(machine,bitmap,cliprect,0,640,pri);
 			break;
 		case 0x1d:
-			draw_cg256_screen(machine,bitmap,cliprect);
+			draw_cg256_screen(machine,bitmap,cliprect,pri);
 			break;
 	}
 }
@@ -390,11 +390,13 @@ static VIDEO_UPDATE( mz2500 )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[(clut16[0] & 0xf)+0x200]); //TODO: correct?
 
+	popmessage("%02x",cg_mask);
+
 	if(pal_select)
 	{
+		draw_cg_screen(screen->machine,bitmap,cliprect,0);
 		draw_tv_screen(screen->machine,bitmap,cliprect);
-		draw_cg_screen(screen->machine,bitmap,cliprect);
-		//draw_tv_screen(screen->machine,bitmap,cliprect);
+		draw_cg_screen(screen->machine,bitmap,cliprect,1);
 	//	popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
 	}
 	else //4096 mode colors
@@ -685,6 +687,7 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 				---- xxxx clut number
 				*/
 				clut16[text_reg_index & 0xf] = data & 0x1f;
+				//printf("%02x -> [%02x]\n",text_reg[text_reg_index],text_reg_index);
 
 				{
 					int i;
@@ -695,7 +698,6 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 					}
 				}
 			}
-			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
 			break;
 		case 2: /* CG Mask reg (priority mixer) */
 			cg_mask = data;
