@@ -11,7 +11,7 @@
 
     memory map:
     0x00000-0x3ffff Work RAM
-    0x40000-0x5ffff CG RAM (address bitswapped?)
+    0x40000-0x5ffff CG RAM
     0x60000-0x67fff "Read modify write" area (related to the CG RAM) (0x30-0x33)
     0x68000-0x6ffff IPL ROM (0x34-0x37)
     0x70000-0x71fff TVRAM (0x38)
@@ -45,6 +45,7 @@ static UINT8 cg_reg_index;
 static UINT8 cg_reg[0x20];
 static UINT8 clut16[0x10];
 static UINT16 clut256[0x100];
+static UINT8 cg_mask;
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -64,6 +65,16 @@ static UINT8 pal_select;
 static VIDEO_START( mz2500 )
 {
 }
+
+/*
+[0] xxxx xxxx tile
+[1] ---- -xxx color offset
+[1] ---- x--- PCG combine mode
+[1] --xx ---- PCG select
+[1] xx-- ---- reverse / blink attributes
+[2] --xx xxxx tile bank (for kanji ROMs)
+[2] xx-- ---- kanji select
+*/
 
 static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
@@ -87,12 +98,25 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			//int gfx_num;
 			int color = attr & 7;
 
-			if(gfx_sel == 0x80 || gfx_sel == 0xc0)
-				gfx_data = memory_region(machine,"kanji"); //TODO
+			if(gfx_sel == 0x80)
+			{
+				gfx_data = memory_region(machine,"kanji");
+				tile|= tile_bank << 8;
+				if(y_step == 2)
+					tile &= 0x3ffe;
+			}
+			else if(gfx_sel == 0xc0)
+			{
+				gfx_data = memory_region(machine,"kanji");
+				tile|= (tile_bank << 8);
+				if(y_step == 2)
+					tile &= 0x3ffe;
+				tile|=0x4000;
+			}
 			else
+			{
 				gfx_data = memory_region(machine,"pcg");
-
-			tile|= tile_bank << 8;
+			}
 
 			for(yi=0;yi<8*y_step;yi++)
 			{
@@ -109,7 +133,9 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 					}
 					else
-						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+					{
+						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
+					}
 
 					*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
 				}
@@ -165,17 +191,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 					}
 					else
-					{
-						if((gfx_sel & 0x30) == 0x30)
-							pen = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? color : 0; //G
-						else if((gfx_sel & 0x30) == 0x20)
-							pen = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? color : 0; //R
-						else if((gfx_sel & 0x30) == 0x10)
-							pen = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? color : 0; //B
-						else
-							pen = ((gfx_data[tile*8+yi+0x0000]>>(7-xi)) & 1) ? color : 0;
-					}
-
+						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
 
 					if(pen)
 						*BITMAP_ADDR16(bitmap, (y*8+yi), x*8+xi) = machine->pens[pen];
@@ -270,7 +286,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 
-	count = 0x40000;
+	count = 0x40000 + plane * 0x10000;
 
 	for(y=0;y<200;y++)
 	{
@@ -278,10 +294,10 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				pen_bit[0] = (vram[count+0x0000 + plane*0x2000]>>(xi)) & 1 ? 1 : 0; //B
-				pen_bit[1] = (vram[count+0x4000 + plane*0x2000]>>(xi)) & 1 ? 2 : 0; //R
-				pen_bit[2] = (vram[count+0x8000 + plane*0x2000]>>(xi)) & 1 ? 4 : 0; //G
-				pen_bit[3] = (vram[count+0xc000 + plane*0x2000]>>(xi)) & 1 ? 8 : 0; //I
+				pen_bit[0] = (vram[count+0x0000]>>(xi)) & 1 ? 1 : 0; //B
+				pen_bit[1] = (vram[count+0x4000]>>(xi)) & 1 ? 2 : 0; //R
+				pen_bit[2] = (vram[count+0x8000]>>(xi)) & 1 ? 4 : 0; //G
+				pen_bit[3] = (vram[count+0xc000]>>(xi)) & 1 ? 8 : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
@@ -295,7 +311,6 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	}
 }
 
-/* TODO: this probably allocates CLUT to somewhere ... */
 static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	static UINT32 count;
@@ -332,35 +347,41 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 	}
 }
 
+static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	switch(cg_reg[0x0e])
+	{
+		case 0x03: /* CG 4 color mode */ break;
+		case 0x14:
+			draw_cg16_screen(machine,bitmap,cliprect,0,320);
+			draw_cg16_screen(machine,bitmap,cliprect,1,320);
+			break;
+		case 0x15:
+			draw_cg16_screen(machine,bitmap,cliprect,1,320);
+			draw_cg16_screen(machine,bitmap,cliprect,0,320);
+			break;
+		case 0x17:
+			draw_cg16_screen(machine,bitmap,cliprect,0,640);
+			break;
+		case 0x1d:
+			draw_cg256_screen(machine,bitmap,cliprect);
+			break;
+	}
+}
+
 static VIDEO_UPDATE( mz2500 )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[(clut16[0] & 0xf)+0x200]); //TODO: correct?
 
 	if(pal_select)
+	{
 		draw_tv_screen(screen->machine,bitmap,cliprect);
+		draw_cg_screen(screen->machine,bitmap,cliprect);
+//		draw_tv_screen(screen->machine,bitmap,cliprect);
+	}
 	else //4096 mode colors
 	{
 		// ...
-	}
-
-
-	switch(cg_reg[0x0e])
-	{
-		case 0x03: /* CG 4 color mode */ break;
-		case 0x14:
-			draw_cg16_screen(screen->machine,bitmap,cliprect,0,320);
-			draw_cg16_screen(screen->machine,bitmap,cliprect,1,320);
-			break;
-		case 0x15:
-			draw_cg16_screen(screen->machine,bitmap,cliprect,1,320);
-			draw_cg16_screen(screen->machine,bitmap,cliprect,0,320);
-			break;
-		case 0x17:
-			draw_cg16_screen(screen->machine,bitmap,cliprect,0,640);
-			break;
-		case 0x1d:
-			draw_cg256_screen(screen->machine,bitmap,cliprect);
-			break;
 	}
 
     return 0;
@@ -653,7 +674,9 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 			}
 			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
 			break;
-		case 2: /* CG MASK reg */ break;
+		case 2: /* CG Mask reg (priority mixer) */
+			cg_mask = data;
+			break;
 		case 3:
 			/* Font size reg */
 			text_font_reg = data & 1;
@@ -1282,7 +1305,6 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8 * 8
 };
-
 
 static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
