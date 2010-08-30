@@ -1671,6 +1671,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mycom.o		\
 	$(MESS_DRIVERS)/nanos.o		\
 	$(MESS_DRIVERS)/next.o		\
+	$(MESS_DRIVERS)/p112.o		\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/pegasus.o	\
 	$(MESS_VIDEO)/pegasus.o 	\

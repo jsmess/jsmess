@@ -20,7 +20,7 @@ Skeleton drivers:
 - Schleicher MES
 - Fidelity Chess Challenger 10
 - Systec Z80
-
+- P112 Single Board Computer
 
 
 System Driver Changes:
