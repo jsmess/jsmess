@@ -2,12 +2,41 @@
 
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese
 
 	TODO:
-	- floppy device;
-	- graphics are really a bare minimum, this system is very complex;
-	- keyboard inputs (needs something that actually works);
+	- 4096 color mode;
+	- Kanji text is cutted in half when font_size is 1, different data used?
+	  (check Back to the Future);
+	- check how crtc really changes the screen resolution;
+	- Add cg latch read;
+	- Implement unlatched ROMs (Phone and Dictionary);
+	- Implement external ROM hook-up;
+	- FDC loading without the IPLPRO doesn't work at all, why?
+	- reverse / blanking tvram attributes;
+
+    per-game/program specific TODO:
+	- (Koei Simulation War Game): title screen background is grey when it should be black;
+	- (Mahjong): white on configurations,same as above?
+	- (Renju): hangs on the "presents" screen;
+	- (Xtal Soft - The Prince of Darkness): dies on IPLPRO loading, presumably a wd17xx core bug;
+	- (Sound Gal): dies with bad code, another wd17xx core bug;
+	- Basic: vertical scrolling returns wrap-around that shouldn't wrap;
+	- (K2): doesn't seem to work, there was a "Disk I/O error" msg before;
+	- LayDock: hangs by reading the FDC status and expecting it to become 0x81;
+	- Mappy: TVRAM layer is double x sized than it should be;
+	- Marchen Veil I: dies with garbage on screen;
+	- Moon Child: needs mixed 3+3bpp tvram supported;
+	- Multiplan: hangs after you set the RTC;
+	- Murder Club: has lots of CG artifacts;
+	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
+	- Personal CP/M: black screen, writes bit 7 to i/o port 0xde
+	- Relics: doesn't boot, bad dump?
+	- Super MZ Demo 1: Hangs at the logo "roar".
+	- Telephone Soft: shows garbage with the CG layer;
+	- The Black Onyx: hangs at the title screen, background should also animate;
+	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
+	- Ys 3: crashes if you try to load it with different DSW settings
 
     memory map:
     0x00000-0x3ffff Work RAM
@@ -47,6 +76,7 @@ static UINT8 clut16[0x10];
 static UINT16 clut256[0x100];
 static UINT8 cg_mask;
 static UINT8 wid_40;
+static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -294,6 +324,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT32 wa_reg;
 	UINT8 s_x;
 	UINT8 base_mask;
+	int res_x,res_y;
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
@@ -302,12 +333,21 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
 
+	//popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
+
 	for(y=0;y<200;y++)
 	{
 		for(x=0;x<x_size;x+=8)
 		{
 			for(xi=0;xi<8;xi++)
 			{
+				res_x = x+xi+s_x;
+				res_y = y;
+
+				/* check window boundaries */
+				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+					continue;
+
 				pen_bit[0] = (vram[count+0x40000+(plane * 0x2000)]>>(xi)) & 1 ? 1 : 0; //B
 				pen_bit[1] = (vram[count+0x44000+(plane * 0x2000)]>>(xi)) & 1 ? 2 : 0; //R
 				pen_bit[2] = (vram[count+0x48000+(plane * 0x2000)]>>(xi)) & 1 ? 4 : 0; //G
@@ -318,7 +358,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((clut16[pen] & 0x10) >> 4))
-					*BITMAP_ADDR16(bitmap, y, x+xi+s_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -334,6 +374,7 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
+	int res_x,res_y;
 
 	count = 0x40000;
 
@@ -343,6 +384,13 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 		{
 			for(xi=0;xi<8;xi++)
 			{
+				res_x = x+xi;
+				res_y = y;
+
+				/* check window boundaries */
+				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+					continue;
+
 				pen_bit[0] = (vram[count + 0x2000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x10) : 0; // B1
 				pen_bit[1] = (vram[count + 0x0000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x01) : 0; // B0
 				pen_bit[2] = (vram[count + 0x6000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x20) : 0; // R1
@@ -357,7 +405,7 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((clut256[pen] & 0x100) >> 8))
-					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[(clut256[pen] & 0xff)+0x100];
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
 			}
 			count++;
 		}
@@ -388,9 +436,9 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 static VIDEO_UPDATE( mz2500 )
 {
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[(clut16[0] & 0xf)+0x200]); //TODO: correct?
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //TODO: correct?
 
-	popmessage("%02x",cg_mask);
+	//popmessage("%02x",cg_mask);
 
 	if(pal_select)
 	{
@@ -401,7 +449,7 @@ static VIDEO_UPDATE( mz2500 )
 	}
 	else //4096 mode colors
 	{
-		// ...
+		draw_tv_screen(screen->machine,bitmap,cliprect);
 	}
 
     return 0;
@@ -933,7 +981,6 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		cg_reg_index = (cg_reg_index & 0xfc) | ((cg_reg_index + 1) & 0x03);
 
 	{
-		static UINT16 vs,ve,hs,he;
 		rectangle visarea;
 		static int x_size,y_size;
 
@@ -948,10 +995,10 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 
 		wid_40 = (x_size == 640);
 
-		vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
-		ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
-		hs = (cg_reg[0x0c] & 0x7f)*8;
-		he = (cg_reg[0x0d] & 0x7f)*8;
+		cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
+		cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
+		cg_hs = (cg_reg[0x0c] & 0x7f)*8;
+		cg_he = (cg_reg[0x0d] & 0x7f)*8;
 
 		//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
 
@@ -1588,7 +1635,7 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "file.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) ) //optional?
