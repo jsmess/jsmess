@@ -10,6 +10,7 @@
 	  (check Back to the Future);
 	- Implement unlatched ROMs (Phone and Dictionary);
 	- Find real CRTC registers
+	- Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
 	- Implement external ROM hook-up;
 	- FDC loading without the IPLPRO doesn't work at all, why?
 	- reverse / blanking tvram attributes;
@@ -120,7 +121,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	y_step = (text_font_reg) ? 1 : 2;
 	s_y = text_reg[9] & 0xf;
 
-	for (y=0;y<26;y+=y_step)
+	for (y=0;y<26*y_step;y+=y_step)
 	{
 		for (x=0;x<80;x++)
 		{
@@ -176,7 +177,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 					if(pen)
 					{
-						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
 							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 					}
 				}
@@ -202,7 +203,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	y_step = (text_font_reg) ? 1 : 2;
 	s_y = text_reg[9] & 0xf;
 
-	for (y=0;y<26;y+=y_step)
+	for (y=0;y<26*y_step;y+=y_step)
 	{
 		for (x=0;x<40;x++)
 		{
@@ -259,7 +260,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					{
 						if(wid_40) // 640 x 200 with 40 x 25, double x size
 						{
-							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
 							{
 								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+0) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+1) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
@@ -267,7 +268,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						}
 						else
 						{
-							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
 								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
 						}
 					}
@@ -325,6 +326,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT8 s_x;
 	UINT8 base_mask;
 	int res_x,res_y;
+	UINT8 cg_interlace;
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
@@ -332,8 +334,10 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
+	cg_interlace = text_font_reg ? 1 : 2;
 
 	//popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
+	popmessage("%d %d",cg_vs,cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -357,8 +361,19 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((clut16[pen] & 0x10) >> 4))
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+				if(cg_interlace == 2)
+				{
+					if(pri == ((clut16[pen] & 0x10) >> 4))
+					{
+						*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+						*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+					}
+				}
+				else
+				{
+					if(pri == ((clut16[pen] & 0x10) >> 4))
+						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+				}
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -375,8 +390,10 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
+	UINT8 cg_interlace;
 
 	count = 0x40000;
+	cg_interlace = text_font_reg ? 1 : 2;
 
 	for(y=0;y<200;y++)
 	{
@@ -404,8 +421,19 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((clut256[pen] & 0x100) >> 8))
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
+				if(cg_interlace == 2)
+				{
+					if(pri == ((clut256[pen] & 0x100) >> 8))
+					{
+						*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
+						*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
+					}
+				}
+				else
+				{
+					if(pri == ((clut256[pen] & 0x100) >> 8))
+						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
+				}
 			}
 			count++;
 		}
@@ -1069,7 +1097,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 
 		/* TODO: not convinced about this arrangement ... */
 		x_size = ((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03) ? 640 : 320;
-		y_size = ((cg_reg[0x0e] & 0x1f) == 0x03) ? 400 : 200;
+		y_size = ((cg_reg[0x0e] & 0x1f) == 0x03) ? 400 : 200*((text_font_reg) ? 1 : 2); //enables interlace?
 
 		visarea.min_x = 0;
 		visarea.min_y = 0;
@@ -1160,8 +1188,11 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
+	AM_RANGE(0x60, 0x63) AM_NOP
 //  AM_RANGE(0xa0, 0xa3) AM_READWRITE(sio_r,sio_w)
+	AM_RANGE(0xa0, 0xa3) AM_NOP
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
+	AM_RANGE(0xa4, 0xa5) AM_NOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
 //  AM_RANGE(0xac, 0xad) AM_WRITE(emm_w)
@@ -1170,6 +1201,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
+	AM_RANGE(0xb7, 0xb7) AM_WRITENOP
 	AM_RANGE(0xb8, 0xb9) AM_READWRITE(mz2500_kanji_r,mz2500_kanji_w)
 	AM_RANGE(0xbc, 0xbc) AM_READ(mz2500_bplane_latch_r) AM_WRITE(mz2500_cg_addr_w)
 	AM_RANGE(0xbd, 0xbd) AM_READ(mz2500_rplane_latch_r) AM_WRITE(mz2500_cg_data_w)
@@ -1180,14 +1212,15 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 //  AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
+	AM_RANGE(0xcc, 0xcd) AM_NOP
 //  AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
+	AM_RANGE(0xce, 0xce) AM_NOP
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
+	AM_RANGE(0xde, 0xde) AM_WRITENOP
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
-//	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
-//	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
@@ -1327,32 +1360,6 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_START("UNUSED")
 	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED )
 
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "DSW0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 	/* this enables HD-loader */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
@@ -1367,15 +1374,12 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x30, 0x30, "IPLPRO" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Monitor Interlace" ) //not all games support this
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -1610,6 +1614,13 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 	DEVCB_NULL
 };
 
+static UINT8 ym_porta;
+
+static READ8_DEVICE_HANDLER( opn_porta_r )
+{
+	return ym_porta;
+}
+
 static WRITE8_DEVICE_HANDLER( opn_porta_w )
 {
 	/*
@@ -1618,9 +1629,15 @@ static WRITE8_DEVICE_HANDLER( opn_porta_w )
 	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
 	*/
 
-//	printf("%02x\n",data);
 	fdc_reverse = (data & 2) ? 0x00 : 0xff;
 	pal_select = (data & 4) ? 1 : 0;
+
+	ym_porta = data;
+}
+
+static WRITE8_DEVICE_HANDLER( opn_portb_w )
+{
+	logerror("B %02x\n",data);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1628,10 +1645,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW0"),	// read A
+		DEVCB_HANDLER(opn_porta_r),	// read A
 		DEVCB_INPUT_PORT("DSW1"),	// read B
 		DEVCB_HANDLER(opn_porta_w),	// write A
-		DEVCB_NULL					// write B
+		DEVCB_HANDLER(opn_portb_w)	// write B
 	},
 	NULL
 };
@@ -1710,7 +1727,7 @@ static MACHINE_DRIVER_START( mz2500 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 6000000/2) //unknown clock / divider
+	MDRV_SOUND_ADD("ym", YM2203, 6000000/4) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
