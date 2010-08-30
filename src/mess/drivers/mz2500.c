@@ -46,6 +46,7 @@ static UINT8 cg_reg[0x20];
 static UINT8 clut16[0x10];
 static UINT16 clut256[0x100];
 static UINT8 cg_mask;
+static UINT8 wid_40;
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -140,6 +141,9 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
 					}
 
+					if(attr & 0x40)
+						pen ^= 0x7;
+
 					if(pen)
 					{
 						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
@@ -218,10 +222,24 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					else
 						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
 
+					if(attr & 0x40)
+						pen ^= 0x7;
+
 					if(pen)
 					{
-						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
-							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+						if(wid_40) // 640 x 200 with 40 x 25, double x size
+						{
+							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+							{
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+0) = machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+1) = machine->pens[pen];
+							}
+						}
+						else
+						{
+							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200)
+								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen];
+						}
 					}
 				}
 			}
@@ -917,6 +935,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		rectangle visarea;
 		static int x_size,y_size;
 
+		/* TODO: not convinced about this arrangement ... */
 		x_size = ((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03) ? 640 : 320;
 		y_size = ((cg_reg[0x0e] & 0x1f) == 0x03) ? 400 : 200;
 
@@ -924,6 +943,8 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		visarea.min_y = 0;
 		visarea.max_x = x_size - 1;
 		visarea.max_y = y_size - 1;
+
+		wid_40 = (x_size == 640);
 
 		vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
 		ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
@@ -1137,7 +1158,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_START("KEYB")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH")
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SLOCK")
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT")
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA")
 	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL")
 	PORT_BIT(0xe0,IP_ACTIVE_LOW,IPT_UNUSED)
