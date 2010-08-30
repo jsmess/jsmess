@@ -1736,5 +1736,6 @@ const game_driver * const drivers[] =
 	DRIVER( rex6000 )
 	DRIVER( mycom )
 	DRIVER( tk80bs )
+	DRIVER( czk80 )
 
 #endif /* DRIVER_RECURSIVE */
