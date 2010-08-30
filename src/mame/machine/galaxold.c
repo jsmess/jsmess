@@ -319,11 +319,11 @@ DRIVER_INIT( mooncrgx )
 DRIVER_INIT( moonqsr )
 {
 	offs_t i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	for (i = 0;i < 0x8000;i++)
 		decrypt[i] = decode_mooncrst(rom[i],i);
@@ -397,7 +397,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( 4in1 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t i, len = memory_region_length(machine, "maincpu");
 	UINT8 *RAM = memory_region(machine, "maincpu");
 

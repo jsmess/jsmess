@@ -689,7 +689,7 @@ static TIMER_CALLBACK( stmsp_sync_update )
 }
 
 
-INLINE void stmsp_sync_w(const address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
+INLINE void stmsp_sync_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	UINT16 newdata = state->stmsp_sync[which][offset];
@@ -1164,7 +1164,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 
 		while (count68k > 0 && state->adsp_data_memory[0x16e6] > 0)
 		{
-			memory_write_word(space, destaddr, state->ds3_gdata);
+			space->write_word(destaddr, state->ds3_gdata);
 			{
 				state->adsp_data_memory[0x16e6]--;
 				state->ds3_gdata = state->adsp_pgm_memory[i6] >> 8;

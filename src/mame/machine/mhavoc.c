@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/avgdvg.h"
 #include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/mhavoc.h"
@@ -101,7 +100,7 @@ MACHINE_START( mhavoc )
 
 MACHINE_RESET( mhavoc )
 {
-	const address_space *space = cputag_get_address_space(machine, "alpha", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "alpha", ADDRESS_SPACE_PROGRAM);
 	has_gamma_cpu = (machine->device("gamma") != NULL);
 
 	memory_configure_bank(machine, "bank1", 0, 1, mhavoc_zram0, 0);

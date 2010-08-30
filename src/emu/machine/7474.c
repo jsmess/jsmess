@@ -49,7 +49,7 @@
 //-------------------------------------------------
 
 ttl7474_device_config::ttl7474_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "TTL7474", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "7474", tag, owner, clock)
 {
 }
 
@@ -76,7 +76,7 @@ device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  static_set_target_tag - configuration helper 
+//  static_set_target_tag - configuration helper
 //  to set the target tag
 //-------------------------------------------------
 
@@ -107,7 +107,7 @@ void ttl7474_device_config::static_set_output_cb(device_config *device, write_li
 
 
 //-------------------------------------------------
-//  static_set_comp_output_cb - configuration 
+//  static_set_comp_output_cb - configuration
 //  helper to set the comp. output callback
 //-------------------------------------------------
 
@@ -176,7 +176,7 @@ void ttl7474_device::device_reset()
 
 void ttl7474_device::update()
 {
-    if (!m_preset && m_clear)          	/* line 1 in truth table */
+    if (!m_preset && m_clear)       	/* line 1 in truth table */
 	{
         m_output    = 1;
         m_output_comp = 0;
@@ -191,7 +191,7 @@ void ttl7474_device::update()
         m_output    = 1;
         m_output_comp = 1;
 	}
-    else if (!m_last_clock && m_clk)  	/* line 4 in truth table */
+    else if (!m_last_clock && m_clk)	/* line 4 in truth table */
 	{
         m_output    =  m_d;
         m_output_comp = !m_d;

@@ -1356,15 +1356,15 @@ ROM_END
 static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
 	state->decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &state->decrypted[0x0000]);
-	memory_set_decrypted_region(space, 0xd000, 0xdbff, &state->decrypted[0xd000]);
-	memory_set_decrypted_region(space, 0xf000, 0xffff, &state->decrypted[0xf000]);
+	space->set_decrypted_region(0x0000, 0xc7ff, &state->decrypted[0x0000]);
+	space->set_decrypted_region(0xd000, 0xdbff, &state->decrypted[0xd000]);
+	space->set_decrypted_region(0xf000, 0xffff, &state->decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xf000; A < 0x10000; A++)

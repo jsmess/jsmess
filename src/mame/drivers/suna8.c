@@ -82,8 +82,8 @@ static DRIVER_INIT( hardhead )
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
@@ -95,13 +95,13 @@ static DRIVER_INIT( hardhedb )
 
 static UINT8 *brickzn_decrypt(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Opcodes and data */
 	for (i = 0; i < 0x50000; i++)
@@ -205,14 +205,14 @@ static DRIVER_INIT( brickzn3 )
 
 static DRIVER_INIT( hardhea2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -292,14 +292,14 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 static DRIVER_INIT( starfigh )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -360,14 +360,14 @@ static DRIVER_INIT( starfigh )
 
 static DRIVER_INIT( sparkman )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -573,7 +573,7 @@ static WRITE8_HANDLER( sranger_prot_w )
 {
 	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
        estabilish if what I'm doing can be considered or not a kludge... -AS */
-	memory_write_byte(space,0xcd99,0xff);
+	space->write_byte(0xcd99,0xff);
 }
 
 static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1665,7 +1665,7 @@ static INTERRUPT_GEN( hardhea2_interrupt )
 
 static MACHINE_RESET( hardhea2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
 }
 

@@ -432,13 +432,13 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 
 		case 3:
 
-			const address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
+			address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
 
 			if (LOG_VRAM) printf("%02x ", data);
 			prev_writes++;
 			vram_addr++;
 
-			memory_write_byte_8le(vdp_space, vram_addr, data);
+			vdp_space->write_byte(vram_addr, data);
 			break;
 	}
 }

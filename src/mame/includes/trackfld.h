@@ -32,7 +32,7 @@ public:
 	tilemap_t  *bg_tilemap;
 	int      bg_bank, sprite_bank1, sprite_bank2;	// trackfld
 	int      old_gfx_bank;					// needed by atlantol
-
+	int		 sprites_gfx_banked;
 
 	/* sound-related */
 	int      SN76496_latch;
@@ -81,7 +81,7 @@ WRITE8_HANDLER( atlantol_gfxbank_w );
 PALETTE_INIT( trackfld );
 VIDEO_START( trackfld );
 VIDEO_UPDATE( trackfld );
-
+VIDEO_START( atlantol );
 
 /*----------- defined in video/hyperspt.c -----------*/
 
@@ -93,7 +93,6 @@ PALETTE_INIT( hyperspt );
 VIDEO_START( hyperspt );
 VIDEO_UPDATE( hyperspt );
 VIDEO_START( roadf );
-
 
 /*----------- defined in video/sbasketb.c -----------*/
 

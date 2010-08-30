@@ -28,30 +28,7 @@
 
 #define RAIZING_TX_GFXRAM_SIZE  0x8000	/* GFX data decode RAM size */
 
-#define CPU_2_NONE		0x00
-#define CPU_2_Z80		0x5a
-#define CPU_2_HD647180	0xa5
-#define CPU_2_V25		0xff
 
-
-
-UINT16 *toaplan2_txvideoram16;		/* Video ram for extra text layer */
-UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
-UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
-UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
-UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
-
-size_t toaplan2_tx_vram_size;		 /* 0x2000 Text layer RAM size */
-size_t toaplan2_tx_offs_vram_size;	 /* 0x200 Text layer tile flip and positon ? */
-size_t toaplan2_tx_scroll_vram_size; /* 0x200 Text layer scroll ? */
-size_t batrider_paletteram16_size;
-
-
-
-static int display_tx;
-static UINT8 tx_flip = 0;
-
-static tilemap_t *tx_tilemap;	/* Tilemap for extra-text-layer */
 
 /***************************************************************************
 
@@ -61,9 +38,10 @@ static tilemap_t *tx_tilemap;	/* Tilemap for extra-text-layer */
 
 static TILE_GET_INFO( get_text_tile_info )
 {
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	int color, tile_number, attrib;
 
-	attrib = toaplan2_txvideoram16[tile_index];
+	attrib = state->txvideoram16[tile_index];
 	tile_number = attrib & 0x3ff;
 	color = ((attrib >> 10) | 0x40) & 0x7f;
 	SET_TILE_INFO(
@@ -82,47 +60,66 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static void truxton2_create_tx_tilemap(running_machine *machine)
 {
-	tx_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,32);
-	tilemap_set_scroll_rows(tx_tilemap,8*32);	/* line scrolling */
-	tilemap_set_scroll_cols(tx_tilemap,1);
-	tilemap_set_transparent_pen(tx_tilemap,0);
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
+	state->tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->tx_tilemap, 8*32);	/* line scrolling */
+	tilemap_set_scroll_cols(state->tx_tilemap, 1);
+	tilemap_set_transparent_pen(state->tx_tilemap, 0);
 }
 
 static void register_state_save(running_machine *machine)
 {
-	state_save_register_global(machine, tx_flip);
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
+	state_save_register_global(machine, state->tx_flip);
 }
 
 
 VIDEO_START( toaplan2 )
 {
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
 
 	/* cache the VDP device */
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	state->vdp0 = machine->device<gp9001vdp_device>("gp9001vdp0");
 	state->vdp1 = machine->device<gp9001vdp_device>("gp9001vdp1");
 
 	/* our current VDP implementation needs this bitmap to work with */
-	gp9001_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
+	state->custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
+	state->displog = 0; // debug flag
 
-	gp9001_displog = 0; // debug flag
+	if (state->vdp0 != NULL)
+	{
+		state->secondary_render_bitmap = NULL;
+		state->vdp0->custom_priority_bitmap = state->custom_priority_bitmap;
+		state->vdp0->displog = &state->displog;
+	}
 
-	display_tx = 1;
+	if (state->vdp1 != NULL)
+	{
+		state->secondary_render_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		state->vdp1->custom_priority_bitmap = state->custom_priority_bitmap;
+		state->vdp1->displog = &state->displog;
+	}
+
+	state->display_tx = 1;
 
 	register_state_save(machine);
 }
 
 VIDEO_START( truxton2 )
 {
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
 	truxton2_create_tx_tilemap(machine);
 	if (machine->gfx[2]->srcdata == NULL)
-		gfx_element_set_source(machine->gfx[2], (UINT8 *)toaplan2_tx_gfxram16);
-	tilemap_set_scrolldx(tx_tilemap, 0x1d4 +1, 0x2a);
+		gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
+	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4 +1, 0x2a);
 }
 
 VIDEO_START( fixeighb )
@@ -142,16 +139,18 @@ VIDEO_START( fixeighb )
 	state->vdp0->extra_yoffset[2]=-15;
 	state->vdp0->extra_yoffset[3]=8;
 
-	tilemap_set_scrolldx(tx_tilemap, 0, 0);
+	tilemap_set_scrolldx(state->tx_tilemap, 0, 0);
 }
 
 VIDEO_START( bgaregga )
 {
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
 	truxton2_create_tx_tilemap(machine);
-	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
+	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4, 0x2a);
 }
 
 VIDEO_START( batrider )
@@ -162,11 +161,11 @@ VIDEO_START( batrider )
 	state->vdp0->spriteram16_n = state->vdp0->spriteram16_new;
 
 	/* Create the Text tilemap for this game */
-	raizing_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
-	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
-	gfx_element_set_source(machine->gfx[2], (UINT8 *)raizing_tx_gfxram16);
+	state->tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
+	state_save_register_global_pointer(machine, state->tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
+	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
 	truxton2_create_tx_tilemap(machine);
-	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
+	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4, 0x2a);
 
 	/* Has special banking */
 	state->vdp0->gp9001_gfxrom_is_banked = 1;
@@ -174,20 +173,27 @@ VIDEO_START( batrider )
 
 READ16_HANDLER( toaplan2_txvideoram16_r )
 {
-	return toaplan2_txvideoram16[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	return state->txvideoram16[offset];
 }
 
 WRITE16_HANDLER( toaplan2_txvideoram16_w )
 {
-	COMBINE_DATA(&toaplan2_txvideoram16[offset]);
-	if (offset < (toaplan2_tx_vram_size/4))
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	COMBINE_DATA(&state->txvideoram16[offset]);
+	if (offset < (state->tx_vram_size/4))
+		tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 READ16_HANDLER( toaplan2_txvideoram16_offs_r )
 {
-	return toaplan2_txvideoram16_offs[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	return state->txvideoram16_offs[offset];
 }
+
 WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 {
 	/* Besides containing flip, function of this RAM is still unknown */
@@ -195,7 +201,8 @@ WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 	/* Maybe specifies which line to draw text info (line number data is */
 	/*   opposite when flip bits are on) */
 
-	UINT16 oldword = toaplan2_txvideoram16_offs[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	UINT16 oldword = state->txvideoram16_offs[offset];
 
 	if (oldword != data)
 	{
@@ -203,72 +210,84 @@ WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 		{
 			if (data & 0x8000)		/* Flip off */
 			{
-				tx_flip = 0;
-				tilemap_set_flip(tx_tilemap, tx_flip);
-				tilemap_set_scrolly(tx_tilemap, 0, 0);
+				state->tx_flip = 0;
+				tilemap_set_flip(state->tx_tilemap, state->tx_flip);
+				tilemap_set_scrolly(state->tx_tilemap, 0, 0);
 			}
 			else					/* Flip on */
 			{
-				tx_flip = (TILEMAP_FLIPY | TILEMAP_FLIPX);
-				tilemap_set_flip(tx_tilemap, tx_flip);
-				tilemap_set_scrolly(tx_tilemap, 0, -16);
+				state->tx_flip = (TILEMAP_FLIPY | TILEMAP_FLIPX);
+				tilemap_set_flip(state->tx_tilemap, state->tx_flip);
+				tilemap_set_scrolly(state->tx_tilemap, 0, -16);
 			}
 		}
-		COMBINE_DATA(&toaplan2_txvideoram16_offs[offset]);
+		COMBINE_DATA(&state->txvideoram16_offs[offset]);
 	}
 //  logerror("Writing %04x to text offs RAM offset %04x\n",data,offset);
 }
 
 READ16_HANDLER( toaplan2_txscrollram16_r )
 {
-	return toaplan2_txscrollram16[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	return state->txscrollram16[offset];
 }
+
 WRITE16_HANDLER( toaplan2_txscrollram16_w )
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 	int data_tx = data;
 
-	tilemap_set_scrollx(tx_tilemap, offset, data_tx);
+	tilemap_set_scrollx(state->tx_tilemap, offset, data_tx);
 
 //  logerror("Writing %04x to text scroll RAM offset %04x\n",data,offset);
-	COMBINE_DATA(&toaplan2_txscrollram16[offset]);
+	COMBINE_DATA(&state->txscrollram16[offset]);
 }
 
 READ16_HANDLER( toaplan2_tx_gfxram16_r )
 {
-	return toaplan2_tx_gfxram16[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	return state->tx_gfxram16[offset];
 }
 
 WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
-	UINT16 oldword = toaplan2_tx_gfxram16[offset];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	UINT16 oldword = state->tx_gfxram16[offset];
 
 	if (oldword != data)
 	{
 		int code = offset/32;
-		COMBINE_DATA(&toaplan2_tx_gfxram16[offset]);
+		COMBINE_DATA(&state->tx_gfxram16[offset]);
 		gfx_element_mark_dirty(space->machine->gfx[2], code);
 	}
 }
 
 READ16_HANDLER( raizing_tx_gfxram16_r )
 {
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
 	offset += 0x3400/2;
-	return raizing_tx_gfxram16[offset];
+	return state->tx_gfxram16[offset];
 }
+
 WRITE16_HANDLER( raizing_tx_gfxram16_w )
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 
-	UINT16 oldword = raizing_tx_gfxram16[offset + (0x3400 / 2)];
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	UINT16 oldword;
 
+	offset += 0x3400/2;
+	oldword = state->tx_gfxram16[offset];
 	if (oldword != data)
 	{
-		offset += 0x3400/2;
-		COMBINE_DATA(&raizing_tx_gfxram16[offset]);
+		COMBINE_DATA(&state->tx_gfxram16[offset]);
 	}
 }
 
@@ -277,16 +296,17 @@ WRITE16_HANDLER( batrider_textdata_decode )
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
 
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 	int code;
-	UINT16 *dest = (UINT16 *)raizing_tx_gfxram16;
+	UINT16 *dest = (UINT16 *)state->tx_gfxram16;
 
-	memcpy(dest, toaplan2_txvideoram16, toaplan2_tx_vram_size);
-	dest += (toaplan2_tx_vram_size/2);
-	memcpy(dest, space->machine->generic.paletteram.u16, batrider_paletteram16_size);
-	dest += (batrider_paletteram16_size/2);
-	memcpy(dest, toaplan2_txvideoram16_offs, toaplan2_tx_offs_vram_size);
-	dest += (toaplan2_tx_offs_vram_size/2);
-	memcpy(dest, toaplan2_txscrollram16, toaplan2_tx_scroll_vram_size);
+	memcpy(dest, state->txvideoram16, state->tx_vram_size);
+	dest += (state->tx_vram_size/2);
+	memcpy(dest, space->machine->generic.paletteram.u16, state->paletteram16_size);
+	dest += (state->paletteram16_size/2);
+	memcpy(dest, state->txvideoram16_offs, state->tx_offs_vram_size);
+	dest += (state->tx_offs_vram_size/2);
+	memcpy(dest, state->txscrollram16, state->tx_scroll_vram_size);
 
 	/* Decode text characters; force them to update immediately */
 	for (code = 0; code < 1024; code++)
@@ -308,11 +328,141 @@ WRITE16_HANDLER( batrider_objectbank_w )
 	}
 }
 
+// Dogyuun doesn't appear to require fancy mixing?
+VIDEO_UPDATE( toaplan2_dual )
+{
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
+	if (state->vdp1)
+	{
+		gp9001_log_vram(state->vdp1, screen->machine);
+
+		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
+		state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+	if (state->vdp0)
+	{
+		gp9001_log_vram(state->vdp0, screen->machine);
+
+	//  bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
+		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+
+
+	return 0;
+}
+
+
+// renders to 2 bitmaps, and mixes output
+VIDEO_UPDATE( toaplan2_mixed )
+{
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
+//  bitmap_fill(bitmap,cliprect,0);
+//  bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+
+	if (state->vdp0)
+	{
+		gp9001_log_vram(state->vdp0, screen->machine);
+
+		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
+		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+	if (state->vdp1)
+	{
+		gp9001_log_vram(state->vdp1, screen->machine);
+
+		bitmap_fill(state->secondary_render_bitmap,cliprect,0);
+		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
+		state->vdp1->gp9001_render_vdp(screen->machine, state->secondary_render_bitmap, cliprect);
+	}
+
+
+	// key test places in batsugun
+	// level 2 - the two layers of clouds (will appear under background, or over ships if wrong)
+	// level 3 - the special effect 'layer' which should be under everything (will appear over background if wrong)
+	// level 4(?) - the large clouds (will obscure player if wrong)
+	// high score entry - letters will be missing if wrong
+	// end credits - various issues if wrong, clouds like level 2
+	//
+	// when implemented based directly on the PAL equation it doesn't work, however, my own equations roughly based
+	// on that do.
+	//
+
+	if (state->vdp0 && state->vdp1)
+	{
+		int width = screen->width();
+		int height = screen->height();
+		int y,x;
+		UINT16* src_vdp0; // output buffer of vdp0
+		UINT16* src_vdp1; // output buffer of vdp1
+
+		for (y=0;y<height;y++)
+		{
+			src_vdp0 = BITMAP_ADDR16(bitmap, y, 0);
+			src_vdp1 = BITMAP_ADDR16(state->secondary_render_bitmap, y, 0);
+
+			for (x=0;x<width;x++)
+			{
+				UINT16 GPU0_LUTaddr = src_vdp0[x];
+				UINT16 GPU1_LUTaddr = src_vdp1[x];
+
+				// these equations is derived from the PAL, but doesn't seem to work?
+
+				int COMPARISON = ((GPU0_LUTaddr & 0x0780) > (GPU1_LUTaddr & 0x0780));
+
+				// note: GPU1_LUTaddr & 0x000f - transparency check for vdp1? (gfx are 4bpp, the low 4 bits of the lookup would be the pixel data value)
+#if 0
+				int result =
+					     ((GPU0_LUTaddr & 0x0008) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0008) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0004) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0004) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0002) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0002) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0001) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0001) & !(GPU1_LUTaddr & 0x000f));
+
+				if (result) src_vdp0[x] = GPU0_LUTaddr;
+				else src_vdp0[x] = GPU1_LUTaddr;
+#endif
+				// this seems to work tho?
+				if (!(GPU1_LUTaddr & 0x000f))
+				{
+					src_vdp0[x] = GPU0_LUTaddr;
+				}
+				else
+				{
+					if (!(GPU0_LUTaddr & 0x000f))
+					{
+						src_vdp0[x] = GPU1_LUTaddr; // bg pen
+					}
+					else
+					{
+						if (COMPARISON)
+						{
+							src_vdp0[x] = GPU1_LUTaddr;
+						}
+						else
+						{
+							src_vdp0[x] = GPU0_LUTaddr;
+						}
+
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
 
 VIDEO_UPDATE( toaplan2 )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
-
 
 	if (state->vdp0)
 	{
@@ -323,7 +473,7 @@ VIDEO_UPDATE( toaplan2 )
 		if (screen == screen1)
 		{
 			bitmap_fill(bitmap,cliprect,0);
-			bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+			bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 			state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 		}
 	}
@@ -339,7 +489,7 @@ VIDEO_UPDATE( toaplan2 )
 		if (screen == screen2)
 		{
 			bitmap_fill(bitmap,cliprect,0);
-			bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+			bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 			state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 		}
 	}
@@ -350,14 +500,18 @@ VIDEO_UPDATE( toaplan2 )
 
 VIDEO_UPDATE( truxton2 )
 {
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
 	VIDEO_UPDATE_CALL(toaplan2);
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( batrider )
 {
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
 	VIDEO_UPDATE_CALL( toaplan2 );
 
 	int line;
@@ -373,36 +527,20 @@ VIDEO_UPDATE( batrider )
 	for (line = 0; line < 256;line++)
 	{
 		clip.min_y = clip.max_y = line;
-		tilemap_set_scrolly(tx_tilemap,0,toaplan2_txvideoram16_offs[line&0xff]-line);
-		tilemap_draw(bitmap,&clip,tx_tilemap,0,0);
+		tilemap_set_scrolly(state->tx_tilemap, 0, state->txvideoram16_offs[line&0xff] - line);
+		tilemap_draw(bitmap, &clip, state->tx_tilemap, 0, 0);
 	}
 	return 0;
 }
 
 
 
-/* How do the dual VDP games mix? The internal mixing of each VDP chip is independent, if you view only a single
-   VDP then the priorities for that VDP are correct, however, it is completely unclear how the priorities of the
-   two VDPs should actually mix together, as a result these games are broken for now. */
 VIDEO_UPDATE( dogyuun )
 {
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
-
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
-
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-
-	state->vdp1->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
-	state->vdp0->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
+	VIDEO_UPDATE_CALL( toaplan2_dual );
 #endif
 
 	return 0;
@@ -410,26 +548,10 @@ VIDEO_UPDATE( dogyuun )
 
 VIDEO_UPDATE( batsugun )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
-	state->vdp1->tile_limit = 0x1fff; // 0x2000-0x3fff seem to be for sprites only? (corruption on level 1 otherwise)
-
-
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
-
-
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-
-	state->vdp1->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
-	state->vdp0->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
+	VIDEO_UPDATE_CALL( toaplan2_mixed );
 #endif
 
 	return 0;

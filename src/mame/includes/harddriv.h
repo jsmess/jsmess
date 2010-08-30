@@ -75,10 +75,6 @@ public:
 	UINT16 *				gsp_paletteram_hi;
 	size_t					gsp_vram_size;
 
-	/* driver state */
-	UINT32 *				rddsp32_speedup;
-	offs_t					rddsp32_speedup_pc;
-
 	/* machine state */
 	UINT8					irq_state;
 	UINT8					gsp_irq_state;
@@ -338,8 +334,8 @@ READ16_HANDLER( hdsnddsp_compare_r );
 /*----------- defined in video/harddriv.c -----------*/
 
 VIDEO_START( harddriv );
-void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
-void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
+void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void hdgsp_read_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 
 READ16_HANDLER( hdgsp_control_lo_r );
 WRITE16_HANDLER( hdgsp_control_lo_w );

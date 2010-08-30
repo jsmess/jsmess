@@ -746,7 +746,7 @@ WRITE32_HANDLER( drmath_intr2_ack )
 DRIVER_INIT( micro3d )
 {
 	micro3d_state *state = machine->driver_data<micro3d_state>();
-	const address_space *space = cputag_get_address_space(machine, "drmath", ADDRESS_SPACE_DATA);
+	address_space *space = cputag_get_address_space(machine, "drmath", ADDRESS_SPACE_DATA);
 
 	i8051_set_serial_tx_callback(machine->device("audiocpu"), data_from_i8031);
 	i8051_set_serial_rx_callback(machine->device("audiocpu"), data_to_i8031);
@@ -755,7 +755,7 @@ DRIVER_INIT( micro3d )
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
-	memory_write_dword(space, 0x00470000, 0xa5a5a5a5);
+	space->write_dword(0x00470000, 0xa5a5a5a5);
 
 	state->mc68901.timer_a = timer_alloc(machine, mfp_timer_a_cb, NULL);
 
@@ -767,7 +767,7 @@ DRIVER_INIT( micro3d )
 
 DRIVER_INIT( botssa )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Required to pass the hardware version check */
 	memory_install_read16_handler(space, 0x140000, 0x140001, 0, 0, botssa_140000_r );

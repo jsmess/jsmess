@@ -57,6 +57,7 @@ CPUS += S2650
 CPUS += TMS340X0
 CPUS += TMS9900
 CPUS += Z8000
+#CPUS += Z8001
 CPUS += TMS32010
 CPUS += TMS32025
 CPUS += TMS32031
@@ -222,6 +223,7 @@ SOUNDS += CDP1863
 SOUNDS += CDP1864
 SOUNDS += ZSG2
 SOUNDS += MOS656X
+SOUNDS += S2636
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -374,6 +376,7 @@ $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/aristmk5.o \
 	$(MACHINE)/archimds.o \
+	$(VIDEO)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
@@ -1112,12 +1115,12 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
-	$(DRIVERS)/genesisb.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/megadriv.o \
+	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
@@ -1148,7 +1151,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
 	$(DRIVERS)/timetrv.o \
-	$(DRIVERS)/topshoot.o \
 	$(DRIVERS)/turbo.o $(AUDIO)/turbo.o $(VIDEO)/turbo.o \
 	$(DRIVERS)/vicdual.o $(AUDIO)/vicdual.o $(VIDEO)/vicdual.o \
 	$(DRIVERS)/zaxxon.o $(AUDIO)/zaxxon.o $(VIDEO)/zaxxon.o \
@@ -1547,6 +1549,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hitpoker.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
+	$(DRIVERS)/hotstuff.o \
 	$(DRIVERS)/ilpag.o \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
@@ -1620,6 +1623,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/re900.o \
 	$(DRIVERS)/rgum.o \
 	$(DRIVERS)/roul.o \
+	$(DRIVERS)/savquest.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skeetsht.o \

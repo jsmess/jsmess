@@ -397,13 +397,13 @@ static const _DrawTemplate DrawTile[]=
 	TILENAME(16,1,2),
 };
 
-#define Packet(i) memory_read_word(space, PacketPtr + 2 * i)
+#define Packet(i) space->read_word(PacketPtr + 2 * i)
 
 //Returns TRUE if the operation was a flip (sync or async)
 int vrender0_ProcessPacket(running_device *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)
 {
 	vr0video_state *vr0 = get_safe_token(device);
-	const address_space *space = cpu_get_address_space(vr0->cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(vr0->cpu, ADDRESS_SPACE_PROGRAM);
 	UINT32 Dx = Packet(1) & 0x3ff;
 	UINT32 Dy = Packet(2) & 0x1ff;
 	UINT32 Endx = Packet(3) & 0x3ff;

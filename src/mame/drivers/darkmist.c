@@ -423,7 +423,7 @@ static void decrypt_snd(running_machine *machine)
 
 static DRIVER_INIT(darkmist)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);
@@ -457,7 +457,7 @@ static DRIVER_INIT(darkmist)
 		decrypt[i] = p;
 	}
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 	memory_set_bankptr(space->machine, "bank1",&ROM[0x010000]);
 
 	/* adr line swaps */

@@ -83,7 +83,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = memory_read_word_16be(space, cpu_get_pc(space->cpu));
+	result = space->read_word(cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -163,7 +163,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 }
 
 
-static void memory_mapper_w(const address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
+static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
 {
 	UINT8 oldval;
 
@@ -212,16 +212,16 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
-				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
+				targetspace->write_word(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
-				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				result = memory_read_word(targetspace, addr);
+				result = targetspace->read_word(addr);
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;
 			}
@@ -295,11 +295,12 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt)
 {
 	int rgnum;
+	address_space *space = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(space, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -328,13 +329,18 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read != NULL)
-			memory_install_read16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(space, region_start, region_end, 0, region_mirror, read);
 		else if (readbank != NULL)
-			memory_install_read_bank(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, readbank);
+			memory_install_read_bank(space, region_start, region_end, 0, region_mirror, readbank);
+		else
+			memory_install_read16_handler(space, region_start, region_end, 0, region_mirror, segaic16_open_bus_r);
+
 		if (write != NULL)
-			memory_install_write16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(space, region_start, region_end, 0, region_mirror, write);
 		else if (writebank != NULL)
-			memory_install_write_bank(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, writebank);
+			memory_install_write_bank(space, region_start, region_end, 0, region_mirror, writebank);
+		else
+			memory_unmap_write(space, region_start, region_end, 0, region_mirror);
 
 		/* set the bank pointer */
 		if (readbank != NULL)

@@ -81,7 +81,7 @@ static MACHINE_RESET( atarigt )
 
 static void cage_irq_callback(running_machine *machine, int reason)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (reason)
 		atarigen_sound_int_gen(machine->device("maincpu"));
@@ -280,7 +280,7 @@ static void tmek_update_mode(offs_t offset)
 }
 
 
-static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 data)
+static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
 /*
     T-Mek init:
@@ -303,7 +303,7 @@ static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 
 	}
 }
 
-static void tmek_protection_r(const address_space *space, offs_t offset, UINT16 *data)
+static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 
@@ -369,7 +369,7 @@ static void primage_update_mode(offs_t offset)
 
 
 
-static void primrage_protection_w(const address_space *space, offs_t offset, UINT16 data)
+static void primrage_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
 	if (LOG_PROTECTION)
 	{
@@ -439,7 +439,7 @@ static void primrage_protection_w(const address_space *space, offs_t offset, UIN
 
 
 
-static void primrage_protection_r(const address_space *space, offs_t offset, UINT16 *data)
+static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	/* track accesses */
 	primage_update_mode(offset);
@@ -467,8 +467,8 @@ if (LOG_PROTECTION)
 			break;
 		case 0x275cc:
 			a6 = cpu_get_reg(space->cpu, M68K_A6);
-			p1 = (memory_read_word(space, a6+8) << 16) | memory_read_word(space, a6+10);
-			p2 = (memory_read_word(space, a6+12) << 16) | memory_read_word(space, a6+14);
+			p1 = (space->read_word(a6+8) << 16) | space->read_word(a6+10);
+			p2 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
@@ -485,7 +485,7 @@ if (LOG_PROTECTION)
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
 			a6 = cpu_get_reg(space->cpu, M68K_A6);
-			p1 = (memory_read_word(space, a6+12) << 16) | memory_read_word(space, a6+14);
+			p1 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
@@ -496,7 +496,7 @@ if (LOG_PROTECTION)
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
 			a6 = cpu_get_reg(space->cpu, M68K_A6);
-			p1 = memory_read_dword(space, a6+14) & 0xffffff;
+			p1 = space->read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:

@@ -61,7 +61,6 @@ VIDEO_START( artmagic )
 	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
 	blitter_mask = memory_region_length(machine, "gfx1")/2 - 1;
 
-	tlc34076_state_save(machine);
 	state_save_register_global_array(machine, artmagic_xor);
 	state_save_register_global(machine, artmagic_is_stoneball);
 	state_save_register_global_array(machine, blitter_data);
@@ -76,7 +75,7 @@ VIDEO_START( artmagic )
  *
  *************************************/
 
-void artmagic_to_shiftreg(const address_space *space, offs_t address, UINT16 *data)
+void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
 	UINT16 *vram = address_to_vram(&address);
 	if (vram)
@@ -84,7 +83,7 @@ void artmagic_to_shiftreg(const address_space *space, offs_t address, UINT16 *da
 }
 
 
-void artmagic_from_shiftreg(const address_space *space, offs_t address, UINT16 *data)
+void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
 	UINT16 *vram = address_to_vram(&address);
 	if (vram)
@@ -201,7 +200,7 @@ static void execute_blit(running_machine *machine)
 }
 #endif
 
-	profiler_mark_start(PROFILER_VIDEO);
+	g_profiler.start(PROFILER_VIDEO);
 
 	last = 0;
 	sy = y;
@@ -306,7 +305,7 @@ static void execute_blit(running_machine *machine)
 		offset += w/4;
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 
 #if (!INSTANT_BLIT)
 	blitter_busy_until = attotime_add(timer_get_time(machine), ATTOTIME_IN_NSEC(w*h*20));
@@ -356,7 +355,7 @@ void artmagic_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, co
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	UINT16 *vram = address_to_vram(&offset);
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 

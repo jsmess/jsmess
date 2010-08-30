@@ -1026,7 +1026,7 @@ static void sound_w(running_machine *machine, UINT8 data)
 
 	if (state->soundcpu != NULL)
 	{
-		const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 		soundlatch_w(space, 0, data & 0xff);
 		cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
 	}
@@ -1418,7 +1418,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1458,7 +1458,7 @@ static void altbeast_i8751_sim(running_machine *machine)
 static void ddux_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1496,7 +1496,7 @@ static void goldnaxe_i8751_init(running_machine *machine)
 static void goldnaxe_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1528,7 +1528,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 static void tturf_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1552,7 +1552,7 @@ static void tturf_i8751_sim(running_machine *machine)
 static void wb3_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -5996,6 +5996,7 @@ ROM_END
     Tough Turf, Sega System 16B
     CPU: 68000 + i8751 (317-0099)
     ROM Board: 171-5358
+    Sega ID# for ROM board: 834-6949
  */
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */

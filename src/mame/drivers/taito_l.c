@@ -456,7 +456,7 @@ static READ8_HANDLER( rambankswitch_r )
 	return state->cur_rambank[offset];
 }
 
-static void bank_w(const address_space *space, offs_t offset, UINT8 data, int banknum )
+static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum )
 {
 	taitol_state *state = space->machine->driver_data<taitol_state>();
 
@@ -2323,6 +2323,7 @@ static MACHINE_DRIVER_START( evilston )
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_DRIVER_END
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( lagirl )
 
 	/* basic machine hardware */
@@ -2336,6 +2337,7 @@ static MACHINE_DRIVER_START( lagirl )
 
 	MDRV_MACHINE_RESET(cachat)
 MACHINE_DRIVER_END
+#endif
 
 
 ROM_START( raimais )

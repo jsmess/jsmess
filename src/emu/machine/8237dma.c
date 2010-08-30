@@ -48,7 +48,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8237, "I8237")
+GENERIC_DEVICE_CONFIG_SETUP(i8237, "Intel 8237")
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -245,7 +245,7 @@ void i8237_device::i8237_advance()
 }
 
 
-void i8237_device::set_dack(int channel)
+void i8237_device::i8327_set_dack(int channel)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -284,7 +284,7 @@ void i8237_device::i8237_timerproc()
 
 		/* Check if a new DMA request has been received. */
 		/* Bit 6 of the command register determines whether the DREQ signals are active
-		  high or active low. */
+          high or active low. */
 		UINT16 pending_request = ( ( m_command & 0x40 ) ? ~m_drq : m_drq ) & ~m_mask;
 
 		if ( pending_request & 0x0f )
@@ -342,7 +342,7 @@ void i8237_device::i8237_timerproc()
 
 	case DMA8237_S2:	/* Output A7-A0 */
 		/* set DACK */
-		set_dack(m_service_channel);
+		i8327_set_dack(m_service_channel);
 
 		/* Check for compressed timing */
 		if ( m_command & 0x08 )
@@ -436,7 +436,7 @@ void i8237_device::i8237_timerproc()
 		}
 
 		/* clear DACK */
-		set_dack(-1);
+		i8327_set_dack(-1);
 		break;
 
 	case DMA8237_S11:	/* Output A8-A15 */

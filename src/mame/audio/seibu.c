@@ -104,12 +104,12 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
-	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	for (i = 0;i < length;i++)
 	{

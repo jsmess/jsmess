@@ -380,7 +380,7 @@ static STREAM_UPDATE( leland_80186_dac_update )
 
 static STREAM_UPDATE( leland_80186_dma_update )
 {
-	const address_space *dmaspace = (const address_space *)param;
+	address_space *dmaspace = (address_space *)param;
 	stream_sample_t *buffer = outputs[0];
 	int i, j;
 
@@ -429,7 +429,7 @@ static STREAM_UPDATE( leland_80186_dma_update )
 				/* sample-rate convert to the output frequency */
 				for (j = 0; j < samples && count > 0; j++)
 				{
-					buffer[j] += ((int)memory_read_byte(dmaspace, source) - 0x80) * volume;
+					buffer[j] += ((int)dmaspace->read_byte(source) - 0x80) * volume;
 					frac += step;
 					source += frac >> 24;
 					count -= frac >> 24;
@@ -514,7 +514,7 @@ static TIMER_CALLBACK( dma_timer_callback );
 static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
-	const address_space *dmaspace = cputag_get_address_space(machine, "audiocpu", AS_PROGRAM);
+	address_space *dmaspace = cputag_get_address_space(machine, "audiocpu", AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */

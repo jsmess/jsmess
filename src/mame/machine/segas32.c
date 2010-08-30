@@ -36,13 +36,14 @@ static const UINT8 ga2_v25_opcode_table[256] = {
 static void nec_v25_cpu_decrypt(running_machine *machine)
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "mcu");
-	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x100000);
+	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// set CPU3 opcode base
-	memory_set_decrypted_region(space, 0x00000, 0xfffff, decrypted);
+	space->set_decrypted_region(0x00000, 0x0ffff, decrypted);
+	space->set_decrypted_region(0xf0000, 0xfffff, decrypted);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(temp, rom, 0x10000);
@@ -57,9 +58,6 @@ static void nec_v25_cpu_decrypt(running_machine *machine)
 		// decryped opcodes with address swap undone
 		decrypted[i] = ga2_v25_opcode_table[ temp[j] ];
 	}
-
-	memcpy(rom+0xf0000, rom, 0x10000);
-	memcpy(decrypted+0xf0000, decrypted, 0x10000);
 
 	auto_free(machine, temp);
 }
@@ -228,17 +226,17 @@ WRITE16_HANDLER(brival_protection_w)
 
 void darkedge_fd1149_vblank(running_device *device)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	memory_write_word(space, 0x20f072, 0);
-	memory_write_word(space, 0x20f082, 0);
+	space->write_word(0x20f072, 0);
+	space->write_word(0x20f082, 0);
 
-	if( memory_read_byte(space, 0x20a12c) != 0 )
+	if( space->read_byte(0x20a12c) != 0 )
 	{
-		memory_write_byte(space, 0x20a12c, memory_read_byte(space, 0x20a12c)-1 );
+		space->write_byte(0x20a12c, space->read_byte(0x20a12c)-1 );
 
-		if( memory_read_byte(space, 0x20a12c) == 0 )
-			memory_write_byte(space, 0x20a12e, 1);
+		if( space->read_byte(0x20a12c) == 0 )
+			space->write_byte(0x20a12e, 1);
 	}
 }
 
@@ -267,7 +265,7 @@ READ16_HANDLER( darkedge_protection_r )
 
 WRITE16_HANDLER( dbzvrvs_protection_w )
 {
-	memory_write_word( space, 0x2080c8, memory_read_word( space, 0x200044 ) );
+	space->write_word( 0x2080c8, space->read_word( 0x200044 ) );
 }
 
 
@@ -331,12 +329,12 @@ WRITE16_HANDLER( jleague_protection_w )
 		// Map team browser selection to opponent browser selection
 		// using same lookup table that V60 uses for sound sample mapping.
 		case 0:
-			memory_write_byte( space, 0x20f708, memory_read_word( space, 0x7bbc0 + data*2 ) );
+			space->write_byte( 0x20f708, space->read_word( 0x7bbc0 + data*2 ) );
 			break;
 
 		// move on to team browser
 		case 4/2:
-			memory_write_byte( space, 0x200016, data & 0xff );
+			space->write_byte( 0x200016, data & 0xff );
 			break;
 
 		default:

@@ -3356,7 +3356,7 @@ static DRIVER_INIT( goldnaxeb1 )
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *KEY = memory_region(machine, "decryption");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 data[0x1000];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
@@ -3375,7 +3375,7 @@ static DRIVER_INIT( goldnaxeb1 )
 		state->decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
 	}
 
-	memory_set_decrypted_region(space, 0x00000, 0xbffff, state->decrypted_region);
+	space->set_decrypted_region(0x00000, 0xbffff, state->decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 

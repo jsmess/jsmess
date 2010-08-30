@@ -179,7 +179,18 @@ VIDEO_START( trackfld )
 	trackfld_state *state = machine->driver_data<trackfld_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	state->sprites_gfx_banked = 0;
 }
+
+
+VIDEO_START( atlantol )
+{
+	trackfld_state *state = machine->driver_data<trackfld_state>();
+	VIDEO_START_CALL( trackfld );
+	state->sprites_gfx_banked = 1;
+}
+
+
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
@@ -193,6 +204,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
 		int color = attr & 0x0f;
+		if (!state->sprites_gfx_banked)
+			if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
 		int flipx = ~attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = spriteram[offs] - 1;
@@ -207,6 +220,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		/* Note that this adjustement must be done AFTER handling flip screen, thus */
 		/* proving that this is a hardware related "feature" */
 		sy += 1;
+
+		// to fix the title screen in yieartf it would have to be like this, the same as yiear.c, this should be verified on the hw
+		//
+		//if (offs < 0x26)
+		//{
+		//  sy++;   /* fix title screen & garbage at the bottom of the screen */
+		//}
+
 
 		drawgfx_transmask(bitmap, cliprect,
 			machine->gfx[0],
@@ -225,6 +246,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
+
+
 VIDEO_UPDATE( trackfld )
 {
 	trackfld_state *state = screen->machine->driver_data<trackfld_state>();
@@ -241,3 +264,4 @@ VIDEO_UPDATE( trackfld )
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
+

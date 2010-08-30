@@ -283,16 +283,18 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 
 /* binary counter (1.4MHz update) */
-static UINT8 sasuke_counter;
-
 static TIMER_DEVICE_CALLBACK( sasuke_update_counter )
 {
-	sasuke_counter += 0x10;
+	snk6502_state *state = timer.machine->driver_data<snk6502_state>();
+
+	state->sasuke_counter += 0x10;
 }
 
 static void sasuke_start_counter(running_machine *machine)
 {
-	sasuke_counter = 0;
+	snk6502_state *state = machine->driver_data<snk6502_state>();
+
+	state->sasuke_counter = 0;
 }
 
 
@@ -304,12 +306,14 @@ static void sasuke_start_counter(running_machine *machine)
 
 static CUSTOM_INPUT( snk6502_music0_r )
 {
-	return (snk6502_music0_playing() ? 0x01 : 0x00);
+	return (snk6502_music0_playing(field->port->machine) ? 0x01 : 0x00);
 }
 
 static CUSTOM_INPUT( sasuke_count_r )
 {
-	return (sasuke_counter >> 4);
+	snk6502_state *state = field->port->machine->driver_data<snk6502_state>();
+
+	return (state->sasuke_counter >> 4);
 }
 
 
@@ -321,10 +325,10 @@ static CUSTOM_INPUT( sasuke_count_r )
 
 static ADDRESS_MAP_START( sasuke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
@@ -340,10 +344,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( satansat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
@@ -359,10 +363,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanguard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x3100, 0x3102) AM_WRITE(vanguard_sound_w)
@@ -380,10 +384,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x2100, 0x2103) AM_WRITE(fantasy_sound_w)
@@ -400,10 +404,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pballoon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -780,12 +784,12 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_RESET( sasuke )
 {
-	//snk6502_set_music_clock(M_LN2 * (RES_K(1) + RES_K(10) * 2) * CAP_U(1));
+	//snk6502_set_music_clock(machine, M_LN2 * (RES_K(1) + RES_K(10) * 2) * CAP_U(1));
 	// adjusted
-	snk6502_set_music_clock(1 / 72.1);
+	snk6502_set_music_clock(machine, 1 / 72.1);
 
 	// adjusted
-	snk6502_set_music_freq(38000);
+	snk6502_set_music_freq(machine, 38000);
 
 	sasuke_start_counter(machine);
 }
@@ -793,7 +797,7 @@ static MACHINE_RESET( sasuke )
 static MACHINE_RESET( satansat )
 {
 	// same as sasuke
-	snk6502_set_music_freq(38000);
+	snk6502_set_music_freq(machine, 38000);
 
 	sasuke_start_counter(machine);
 }
@@ -801,13 +805,13 @@ static MACHINE_RESET( satansat )
 static MACHINE_RESET( vanguard )
 {
 	// 41.6 Hz update (measured)
-	snk6502_set_music_clock(1 / 41.6);
+	snk6502_set_music_clock(machine, 1 / 41.6);
 }
 
 static MACHINE_RESET( pballoon )
 {
 	// 40.3 Hz update (measured)
-	snk6502_set_music_clock(1 / 40.3);
+	snk6502_set_music_clock(machine, 1 / 40.3);
 }
 
 
@@ -818,6 +822,9 @@ static MACHINE_RESET( pballoon )
  *************************************/
 
 static MACHINE_DRIVER_START( sasuke )
+
+	MDRV_DRIVER_DATA( snk6502_state )
+
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
 	MDRV_CPU_PROGRAM_MAP(sasuke_map)
@@ -893,6 +900,9 @@ static MACHINE_DRIVER_START( satansat )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vanguard )
+
+	MDRV_DRIVER_DATA( snk6502_state )
+
 	// basic machine hardware
 	//MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MDRV_CPU_ADD("maincpu", M6502, 930000)		// adjusted
@@ -976,9 +986,7 @@ static MACHINE_DRIVER_START( pballoon )
 
 	MDRV_MACHINE_RESET(pballoon)
 
-	// video hardware
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_VIDEO_START( pballoon )
 MACHINE_DRIVER_END
 
 
@@ -1311,6 +1319,33 @@ ROM_START( pballoon )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
 ROM_END
 
+
+ROM_START( pballoonr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sk7_ic12.bin",        0x3000, 0x1000, CRC(dfe2ae05) SHA1(21c98bef9d4d5fcb65ce5e9b20cde2259840459e) )
+	ROM_LOAD( "rock-ola_skpb1.ic7",  0x4000, 0x1000, CRC(dfd802e8) SHA1(2014295c678d0534585e27d9b5c7ac525113cd0c) )
+	ROM_LOAD( "rock-ola_skpb1.ic8",  0x5000, 0x1000, CRC(c433c062) SHA1(63df947c56f51a623b378d2a8a5b2cd05c23c414) )
+	ROM_LOAD( "rock-ola_skpb1.ic9",  0x6000, 0x1000, CRC(f85b9c37) SHA1(905eb162436a0a46688df9343296c140480d00cb) )
+	ROM_LOAD( "rock-ola_skpb1.ic10", 0x7000, 0x1000, CRC(8020e52d) SHA1(fbe2a27560904225b4406171c1cdbae9941887bd) )
+	ROM_LOAD( "sk7_ic14.bin",        0x8000, 0x1000, CRC(6a8817a5) SHA1(4cf8eda68d21b1fad0f12eedaeb88b256bba44da) )
+	ROM_RELOAD(                      0xf000, 0x1000 )  /* for the reset and interrupt vectors */
+	ROM_LOAD( "sk7_ic15.bin",        0x9000, 0x1000, CRC(1f78d814) SHA1(7e618971f1bbf8859284531e94989c43c3285b4a) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sk8_ic50.bin", 0x0000, 0x1000, CRC(560df07f) SHA1(e57945de829d22d39390a649eddaf78c989af679) )
+	ROM_LOAD( "sk8_ic51.bin", 0x1000, 0x1000, CRC(d415de51) SHA1(257cf939efec8adee87baf827315c69fde90da4c) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sk8_ic7.bin",  0x0000, 0x0020, CRC(ef6c82a0) SHA1(95b522d6389f25bf5fa2fca5f3f826ef43b2885b) ) /* foreground colors */
+	ROM_LOAD( "sk8_ic6.bin",  0x0020, 0x0020, CRC(eabc6a00) SHA1(942af5e22e49e578c6a24651476e3b60d40e2076) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_LOAD( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
+	ROM_LOAD( "sk7_ic52.bin", 0x0800, 0x0800, CRC(5d6d68ea) SHA1(d3e03720eff5c85c1c2fb1d4bf960f45a99dc86a) )
+	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
+ROM_END
+
+
 ROM_START( nibbler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-0960-52.ic12", 0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
@@ -1437,6 +1472,7 @@ GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (W
 GAME( 1981, fantasyu, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", GAME_IMPERFECT_SOUND )
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK", "Fantasy (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Balloon", 0 )
+GAME( 1982, pballoonr,pballoon, pballoon, pballoon, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", 0 )
 GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 )
 GAME( 1982, nibblera, nibbler,  nibbler,  nibblera, 0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 )
 GAME( 1982, nibblerb, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 )

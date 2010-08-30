@@ -404,14 +404,14 @@ static void clear_decrypted(running_machine &machine)
 
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int size = memory_region_length(machine, "maincpu");
 	int A;
 	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, clear_decrypted);
-	memory_set_decrypted_region(space, 0x000000, size - 1, decrypted);
+	space->set_decrypted_region(0x000000, size - 1, decrypted);
 
 	for (A = 0;A < size;A+=2)
 	{

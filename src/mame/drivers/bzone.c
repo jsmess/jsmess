@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("discrete", bzone_sounds_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_r, atari_vg_earom_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -800,7 +800,7 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_ram(space, 0x400, 0x7ff, 0, 0, NULL);
 	memory_install_read_port(space, 0x1808, 0x1808, 0, 0, "1808");
 	memory_install_read_port(space, 0x1809, 0x1809, 0, 0, "1809");

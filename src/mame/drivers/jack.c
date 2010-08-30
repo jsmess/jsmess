@@ -1312,12 +1312,12 @@ ROM_END
 static void treahunt_decode( running_machine *machine )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypt);
 
 	/* Thanks to Mike Balfour for helping out with the decryption */
 	for (A = 0; A < 0x4000; A++)

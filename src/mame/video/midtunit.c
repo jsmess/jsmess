@@ -220,13 +220,13 @@ READ16_HANDLER( midtunit_vram_color_r )
  *
  *************************************/
 
-void midtunit_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+void midtunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
-void midtunit_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+void midtunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }
@@ -687,7 +687,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 	if (!(command & 0x8000))
 		return;
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	/* determine bpp */
 	bpp = (command >> 12) & 7;
@@ -795,7 +795,7 @@ if (LOG_DMA)
 skipdma:
 	timer_set(space->machine, ATTOTIME_IN_NSEC(41 * pixels), NULL, 0, dma_callback);
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

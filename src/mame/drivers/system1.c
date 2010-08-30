@@ -555,11 +555,11 @@ static WRITE8_HANDLER( mcu_io_w )
 	switch ((mcu_control >> 3) & 3)
 	{
 		case 0:
-			memory_write_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
+			space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->write_byte(offset, data);
 			break;
 
 		case 2:
-			memory_write_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), offset, data);
+			space->machine->device<z80_device>("maincpu")->space(AS_IO)->write_byte(offset, data);
 			break;
 
 		default:
@@ -575,13 +575,13 @@ static READ8_HANDLER( mcu_io_r )
 	switch ((mcu_control >> 3) & 3)
 	{
 		case 0:
-			return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
+			return space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
 
 		case 1:
 			return memory_region(space->machine, "maincpu")[offset + 0x10000];
 
 		case 2:
-			return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), offset);
+			return space->machine->device<z80_device>("maincpu")->space(AS_IO)->read_byte(offset);
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
@@ -4600,8 +4600,8 @@ static READ8_HANDLER( nob_start_r )
 
 static DRIVER_INIT( nob )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4632,7 +4632,7 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	UINT8 *ROM2 = memory_region(machine, "soundcpu");
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
@@ -4648,16 +4648,16 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
 
 
 static DRIVER_INIT( bootsys2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
@@ -4676,7 +4676,7 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
 	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");

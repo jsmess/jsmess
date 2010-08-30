@@ -445,7 +445,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 }
 
 
-static DIRECT_UPDATE_HANDLER( missile_direct_handler )
+DIRECT_UPDATE_HANDLER( missile_direct_handler )
 {
 	/* offset accounts for lack of A15 decoding */
 	int offset = address & 0x8000;
@@ -454,14 +454,14 @@ static DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		direct->raw = direct->decrypted = space->machine->generic.videoram.u8 - offset;
+		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, direct.space().m_machine.generic.videoram.u8);
 		return ~0;
 	}
 
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		direct->raw = direct->decrypted = memory_region(space->machine, "maincpu") - offset;
+		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().m_machine.region("maincpu")->base() + 0x5000);
 		return ~0;
 	}
 
@@ -477,7 +477,8 @@ static MACHINE_START( missile )
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), missile_direct_handler);
+	address_space *space = machine->device<m6502_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, *machine));
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
@@ -511,7 +512,7 @@ static MACHINE_RESET( missile )
  *
  *************************************/
 
-INLINE int get_madsel(const address_space *space)
+INLINE int get_madsel(address_space *space)
 {
 	UINT16 pc = cpu_get_previouspc(space->cpu);
 
@@ -522,7 +523,7 @@ INLINE int get_madsel(const address_space *space)
 	/* MADSEL signal disables standard address decoding and routes
         writes to video RAM; it is enabled if the IRQ signal is clear
         and the low 5 bits of the fetched opcode are 0x01 */
-	if (!irq_state && (memory_decrypted_read_byte(space, pc) & 0x1f) == 0x01)
+	if (!irq_state && (space->direct().read_decrypted_byte(pc) & 0x1f) == 0x01)
 	{
 		/* the MADSEL signal goes high 5 cycles after the opcode is identified;
             this effectively skips the indirect memory read. Since this is difficult
@@ -548,7 +549,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 }
 
 
-static void write_vram(const address_space *space, offs_t address, UINT8 data)
+static void write_vram(address_space *space, offs_t address, UINT8 data)
 {
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -578,7 +579,7 @@ static void write_vram(const address_space *space, offs_t address, UINT8 data)
 }
 
 
-static UINT8 read_vram(const address_space *space, offs_t address)
+static UINT8 read_vram(address_space *space, offs_t address)
 {
 	offs_t vramaddr;
 	UINT8 vramdata;

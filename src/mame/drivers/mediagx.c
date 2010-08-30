@@ -846,7 +846,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
-	return memory_read_byte(space, page_offset + offset);
+	return space->read_byte(page_offset + offset);
 }
 
 
@@ -856,7 +856,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
-	memory_write_byte(space, page_offset + offset, data);
+	space->write_byte(page_offset + offset, data);
 }
 
 static void set_dma_channel(running_device *device, int channel, int _state)
@@ -1206,7 +1206,7 @@ static void init_mediagx(running_machine *machine)
 
 #if SPEEDUP_HACKS
 
-INLINE UINT32 generic_speedup(const address_space *space, int idx)
+INLINE UINT32 generic_speedup(address_space *space, int idx)
 {
 	mediagx_state *state = space->machine->driver_data<mediagx_state>();
 

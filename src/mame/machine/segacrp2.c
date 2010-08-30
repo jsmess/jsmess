@@ -60,11 +60,11 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 	};
 
 
-	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, cputag);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x8000);
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypted);
 
 
 	for (A = 0x0000;A < 0x8000;A++)

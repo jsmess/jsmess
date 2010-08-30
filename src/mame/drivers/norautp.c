@@ -14,7 +14,7 @@
    * Noraut Deluxe Poker (console),       198?,  Noraut Ltd.
    * Noraut Deluxe Poker (bootleg),       198?,  Unknown.
    * Noraut Joker Poker (original),       198?,  Noraut Ltd.
-   * Noraut Joker Poker (Prologic HW),    198?,  Prologic / Noraut Ltd.
+   * Noraut Joker Poker (Prologic HW),    198?,  Video Fun Games Ltd.
    * Noraut Joker Poker (alt),            1988,  Noraut Ltd.
    * Noraut Red Hot Joker Poker,          1988,  Noraut Ltd.
    * Noraut Red Hot Joker Poker (alt HW), 198?,  Noraut Ltd.
@@ -848,10 +848,12 @@ static ADDRESS_MAP_START( norautx4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( norautx8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* need to be checked */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START( kimble_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -1322,6 +1324,7 @@ static MACHINE_DRIVER_START( norautx4 )
 MACHINE_DRIVER_END
 
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( norautx8 )
 	MDRV_IMPORT_FROM(noraut_base)
 
@@ -1330,6 +1333,7 @@ static MACHINE_DRIVER_START( norautx8 )
 	MDRV_CPU_PROGRAM_MAP(norautx8_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
+#endif
 
 
 static MACHINE_DRIVER_START( kimble )
@@ -3477,7 +3481,7 @@ GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,   ROT0, "Noraut Ltd.",   
 GAMEL( 198?, norautdx, 0,       norautp,  norautpn, 0,   ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
 GAMEL( 198?, norautpn, norautp, norautp,  norautpn, 0,   ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
 GAMEL( 198?, norautjo, 0,       norautp,  mainline, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                layout_noraut12 )
-GAMEL( 198?, norautpl, 0,       norautpl, mainline, 0,   ROT0, "Prologic / Noraut Ltd.",   "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
+GAMEL( 198?, norautpl, 0,       norautpl, mainline, 0,   ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
 GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
 GAMEL( 198?, norautra, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...

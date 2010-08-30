@@ -4229,7 +4229,7 @@ static DRIVER_INIT( multiwin )
 ******************************************************/
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
 
@@ -4247,7 +4247,7 @@ static DRIVER_INIT( multiwin )
 		ROM[x+0x10000] = code;
 	}
 
-	memory_set_decrypted_region(space, 0x8000, 0xffff, memory_region(machine, "maincpu") + 0x18000);
+	space->set_decrypted_region(0x8000, 0xffff, memory_region(machine, "maincpu") + 0x18000);
 }
 
 static DRIVER_INIT( royalcdc )
@@ -4262,7 +4262,7 @@ static DRIVER_INIT( royalcdc )
 ******************************************************/
 
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
 
@@ -4300,7 +4300,7 @@ static DRIVER_INIT( royalcdc )
 		ROM[x+0x10000] = code;
 	}
 
-	memory_set_decrypted_region(space, 0x6000, 0xffff, memory_region(machine, "maincpu") + 0x16000);
+	space->set_decrypted_region(0x6000, 0xffff, memory_region(machine, "maincpu") + 0x16000);
 }
 
 

@@ -158,8 +158,6 @@ guns might be slightly off center
 
 'external' rowscroll not hooked up correctly (1st attract level, highscores)
 
-can't find the flip bits used for the tiles.. (p2 start screen, reload indicator)
-
 maybe some priority issues / sprite placement issues..
 
 ***************************************************************************/
@@ -275,6 +273,15 @@ static READ8_HANDLER( le_4800_r )
 				case 0x44:
 				case 0x45:
 				case 0x46:
+				case 0x47:
+				case 0x48:
+				case 0x49:
+				case 0x4a:
+				case 0x4b:
+				case 0x4c:
+				case 0x4d:
+				case 0x4e:
+				case 0x4f:
 					return k053244_r(state->k053244, offset - 0x40);
 
 				case 0x80:
@@ -359,6 +366,15 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x44:
 				case 0x45:
 				case 0x46:
+				case 0x47:
+				case 0x48:
+				case 0x49:
+				case 0x4a:
+				case 0x4b:
+				case 0x4c:
+				case 0x4d:
+				case 0x4e:
+				case 0x4f:
 					k053244_w(state->k053244, offset - 0x40, data);
 					break;
 

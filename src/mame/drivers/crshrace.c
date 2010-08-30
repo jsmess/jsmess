@@ -157,11 +157,8 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
-
-	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
-
 
 static WRITE16_HANDLER( sound_command_w )
 {
@@ -448,6 +445,8 @@ static const k053936_interface crshrace_k053936_intf =
 static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine->driver_data<crshrace_state>();
+
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
 
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");

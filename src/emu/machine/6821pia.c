@@ -35,10 +35,6 @@
 #define C2_INPUT(c)				(!(((c) >> 5) & 0x01))
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
@@ -48,7 +44,7 @@
 //-------------------------------------------------
 
 pia6821_device_config::pia6821_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "PIA6821", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "6822 PIA", tag, owner, clock)
 {
 }
 
@@ -85,7 +81,9 @@ void pia6821_device_config::device_config_complete()
 	// inherit a copy of the static data
 	const pia6821_interface *intf = reinterpret_cast<const pia6821_interface *>(static_config());
 	if (intf != NULL)
+	{
 		*static_cast<pia6821_interface *>(this) = *intf;
+	}
 
 	// or initialize to defaults if none provided
 	else

@@ -28,7 +28,7 @@ WRITE16_HANDLER( hitice_pixel_scroll_w )
 static void hitice_clear_pixel_bitmap( running_machine *machine )
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
 		hitice_pixelram_w(space, i, 0, 0xffff);
@@ -258,7 +258,7 @@ static void draw_framebuffer( running_machine *machine, bitmap_t *bitmap, const 
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->tc0180vcu, 0);
 
-profiler_mark_start(PROFILER_USER1);
+g_profiler.start(PROFILER_USER1);
 
 	priority <<= 4;
 
@@ -266,7 +266,7 @@ profiler_mark_start(PROFILER_USER1);
 	{
 		if (priority)
 		{
-			profiler_mark_end();
+			g_profiler.stop();
 			return;
 		}
 
@@ -352,7 +352,7 @@ profiler_mark_start(PROFILER_USER1);
 			}
 		}
 	}
-profiler_mark_end();
+g_profiler.stop();
 }
 
 VIDEO_UPDATE( taitob )

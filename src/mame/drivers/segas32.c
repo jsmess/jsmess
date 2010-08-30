@@ -489,7 +489,7 @@ static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
 }
 
 
-static void int_control_w(const address_space *space, int offset, UINT8 data)
+static void int_control_w(address_space *space, int offset, UINT8 data)
 {
 	int duration;
 
@@ -628,7 +628,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT16 common_io_chip_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	static const char *const portnames[2][8] =
 			{
@@ -679,7 +679,7 @@ static UINT16 common_io_chip_r(const address_space *space, int which, offs_t off
 }
 
 
-static void common_io_chip_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT8 old;
 
@@ -1311,7 +1311,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( ga2_v25_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&ga2_dpram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
 ADDRESS_MAP_END
@@ -2834,7 +2834,7 @@ ROM_START( ga2 )
 	ROM_LOAD( "mpr14943",     0x300000, 0x100000, CRC(24d40333) SHA1(38faf8f3eac317a163e93bd2247fe98189b13d2d) )
 	ROM_LOAD( "mpr14942",     0x400000, 0x100000, CRC(a89b0e90) SHA1(e14c62418eb7f9a2deb2a6dcf635bedc1c73c253) )
 
-	ROM_REGION( 0x100000, "mcu", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr14468", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
@@ -4063,7 +4063,7 @@ static WRITE16_HANDLER( f1en_comms_echo_w )
 {
 	// pretend that slave is following master op, enables attract mode video with sound
 	if (ACCESSING_BITS_0_7)
-		memory_write_byte( space, 0x810049, data );
+		space->write_byte( 0x810049, data );
 }
 
 static DRIVER_INIT( f1en )

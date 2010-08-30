@@ -5348,13 +5348,13 @@ ROM_END
 
 static void maketrax_rom_decode(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
@@ -5380,13 +5380,13 @@ static DRIVER_INIT( maketrax )
 
 static void korosuke_rom_decode(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
