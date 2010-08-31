@@ -1,14 +1,11 @@
-/***************************************************************************
+/********************************************************************************************************************************
 
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
     driver by Angelo Salese
 
 	TODO:
-	- 4096 color mode;
-	- Kanji text is cutted in half when font_size is 1, different data used?
-	  (check Back to the Future);
-	- Implement unlatched ROMs (Phone and Dictionary);
+	- Kanji text is cutted in half when font_size is 1 / interlace is disabled, different data used? (check Back to the Future);
 	- Find real CRTC registers
 	- Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
 	- Implement external ROM hook-up;
@@ -30,7 +27,7 @@
 	- Multiplan: hangs after you set the RTC;
 	- Murder Club: has lots of CG artifacts;
 	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-	- Relics: doesn't boot, bad dump?
+	- Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
 	- Super MZ Demo 1: Hangs at the logo "roar".
 	- Telephone Soft: shows garbage with the CG layer;
 	- The Black Onyx: hangs at the title screen, background should also animate;
@@ -49,7 +46,7 @@
     0x76000-0x77fff NOP (0x3b)
     0x78000-0x7ffff Phone ROM (0x3c-0x3f)
 
-****************************************************************************/
+********************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -67,17 +64,9 @@
 /* machine stuff */
 static UINT8 bank_val[8],bank_addr;
 static UINT8 irq_sel,irq_vector[4],irq_mask[4];
-static UINT8 kanji_bank;
+static UINT8 kanji_bank,dic_bank;
 static UINT8 fdc_reverse;
 static UINT8 key_mux;
-static UINT8 cg_reg_index;
-static UINT8 cg_reg[0x20];
-static UINT8 clut16[0x10];
-static UINT16 clut256[0x100];
-static UINT8 cg_mask;
-static UINT8 wid_40;
-static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
-static UINT8 cg_latch[4];
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -93,6 +82,14 @@ static const UINT8 bank_reset_val[2][8] =
 static UINT8 text_reg[0x100], text_reg_index;
 static UINT8 text_col_size, text_font_reg;
 static UINT8 pal_select;
+static UINT8 wid_40;
+static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
+static UINT8 cg_latch[4];
+static UINT8 cg_reg_index;
+static UINT8 cg_reg[0x20];
+static UINT8 clut16[0x10];
+static UINT16 clut256[0x100];
+static UINT8 cg_mask;
 
 static VIDEO_START( mz2500 )
 {
@@ -337,7 +334,6 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	cg_interlace = text_font_reg ? 1 : 2;
 
 	//popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
-	popmessage("%d %d",cg_vs,cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -543,6 +539,23 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 			}
 		}
 		break;
+		case 0x3a:
+		{
+			UINT8 *dic_rom = memory_region(machine, "dictionary");
+
+			return dic_rom[(offset & 0x1fff) + ((dic_bank & 0x1f)*0x2000)];
+		}
+		break;
+		case 0x3c:
+		case 0x3d:
+		case 0x3e:
+		case 0x3f:
+		{
+			UINT8 *phone_rom = memory_region(machine, "phone");
+
+			return phone_rom[offset+(cur_bank & 3)*0x2000];
+		}
+		break;
 		default: return ram[offset+cur_bank*0x2000];
 	}
 
@@ -653,6 +666,19 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 			}
 		}
 		break;
+		case 0x3a:
+		{
+			// DIC ROM, WRITENOP
+			break;
+		}
+		case 0x3c:
+		case 0x3d:
+		case 0x3e:
+		case 0x3f:
+		{
+			// PHONE ROM, WRITENOP
+			break;
+		}
 		default: ram[offset+cur_bank*0x2000] = data; break;
 	}
 }
@@ -717,6 +743,11 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 static WRITE8_HANDLER( mz2500_kanji_bank_w )
 {
 	kanji_bank = data;
+}
+
+static WRITE8_HANDLER( mz2500_dictionary_bank_w )
+{
+	dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
@@ -1213,8 +1244,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 //  AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
 	AM_RANGE(0xcc, 0xcd) AM_NOP
-//  AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
-	AM_RANGE(0xce, 0xce) AM_NOP
+	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
@@ -1740,6 +1770,8 @@ MACHINE_DRIVER_END
 ROM_START( mz2500 )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 
+	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 
@@ -1756,10 +1788,11 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF ) //iplpro
+	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
 
-	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF )
-	ROM_LOAD( "file.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) ) //optional?
+	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
+	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
 ROM_END
 
 /* Driver */
