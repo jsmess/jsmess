@@ -22,6 +22,7 @@ Skeleton drivers:
 - Systec Z80
 - P112 Single Board Computer
 - NEC TK-80
+- SEL Z80 Trainer
 
 System Driver Changes:
 ----------------------
