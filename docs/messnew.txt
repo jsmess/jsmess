@@ -21,7 +21,7 @@ Skeleton drivers:
 - Fidelity Chess Challenger 10
 - Systec Z80
 - P112 Single Board Computer
-
+- NEC TK-80
 
 System Driver Changes:
 ----------------------

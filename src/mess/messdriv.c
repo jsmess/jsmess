@@ -1735,6 +1735,7 @@ const game_driver * const drivers[] =
 	DRIVER( psionp464 )
 	DRIVER( rex6000 )
 	DRIVER( mycom )
+	DRIVER( tk80 )
 	DRIVER( tk80bs )
 	DRIVER( czk80 )
 	DRIVER( c10 )

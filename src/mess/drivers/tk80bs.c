@@ -15,6 +15,35 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 
+
+
+static VIDEO_START( tk80 )
+{
+}
+
+static VIDEO_UPDATE( tk80 )
+{
+    return 0;
+}
+
+static ADDRESS_MAP_START(tk80_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM // RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tk80_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+/* Input ports */
+INPUT_PORTS_START( tk80 )
+INPUT_PORTS_END
+
+static MACHINE_RESET(tk80)
+{
+}
+
 static UINT8 *vram;
 static UINT8 keyb_press,keyb_press_flag,shift_press_flag;
 
@@ -302,6 +331,28 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 #endif
 
+static MACHINE_DRIVER_START( tk80 )
+    /* basic machine hardware */
+    MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz)
+    MDRV_CPU_PROGRAM_MAP(tk80_mem)
+    MDRV_CPU_IO_MAP(tk80_io)	
+
+    MDRV_MACHINE_RESET(tk80)
+	
+    /* video hardware */
+    MDRV_SCREEN_ADD("screen", RASTER)
+    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MDRV_SCREEN_SIZE(640, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
+
+    MDRV_VIDEO_START(tk80)
+    MDRV_VIDEO_UPDATE(tk80)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( tk80bs )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
@@ -328,6 +379,13 @@ static MACHINE_DRIVER_START( tk80bs )
 MACHINE_DRIVER_END
 
 /* ROM definition */
+ROM_START( tk80 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "tk80-1.bin", 0x0000, 0x0100, CRC(897295e4) SHA1(50fb42b07252fc48044830e2f228e218fc59481c))
+	ROM_LOAD( "tk80-2.bin", 0x0100, 0x0100, CRC(d54480c3) SHA1(354962aca1710ac75b40c8c23a6c303938f9d596))
+	ROM_LOAD( "tk80-3.bin", 0x0200, 0x0100, CRC(8d4b02ef) SHA1(2b5a1ee8f97db23ffec48b96f12986461024c995))
+ROM_END
+
 ROM_START( tk80bs )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     /* all of these aren't taken from an original machine*/
@@ -356,5 +414,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, tk80bs, 0,      0,       tk80bs,    tk80bs,  0,       "Nippon Electronic Company",   "TK-80BS",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1976, tk80, 	0,      0,       tk80,      tk80,    0,       "Nippon Electronic Company",   "TK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, tk80bs, tk80,   0,       tk80bs,    tk80bs,  0,       "Nippon Electronic Company",   "TK-80BS",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
