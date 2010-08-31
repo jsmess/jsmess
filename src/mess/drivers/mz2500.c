@@ -441,7 +441,8 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 {
 	switch(cg_reg[0x0e])
 	{
-		case 0x03: /* CG 4 color mode */ break;
+		case 0x00:
+			break;
 		case 0x14:
 			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
 			draw_cg16_screen(machine,bitmap,cliprect,1,320,pri);
@@ -455,6 +456,9 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 			break;
 		case 0x1d:
 			draw_cg256_screen(machine,bitmap,cliprect,pri);
+			break;
+		default:
+			popmessage("Unsupported CG mode %02x, contact MESS dev",cg_reg[0x0e]);
 			break;
 	}
 }
@@ -1233,19 +1237,55 @@ static WRITE8_DEVICE_HANDLER( rp5c15_8_w )
 	rp5c15_w(device,rtc_index,data,0xff);
 }
 
+static UINT32 emm_offset;
+
+static READ8_HANDLER( mz2500_emm_data_r )
+{
+	UINT8 *emm_ram = memory_region(space->machine, "emm");
+	UINT8 emm_lo_index;
+
+	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+
+	emm_offset = (emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+
+	if(emm_offset < 0x100000) //emm max size
+		return emm_ram[emm_offset];
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( mz2500_emm_addr_w )
+{
+	UINT8 emm_hi_index;
+
+	emm_hi_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+
+	emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (emm_offset & 0xff);
+}
+
+static WRITE8_HANDLER( mz2500_emm_data_w )
+{
+	UINT8 *emm_ram = memory_region(space->machine, "emm");
+	UINT8 emm_lo_index;
+
+	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+
+	emm_offset = (emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+
+	if(emm_offset < 0x100000) //emm max size
+		emm_ram[emm_offset] = data;
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
-	AM_RANGE(0x60, 0x63) AM_NOP
 //  AM_RANGE(0xa0, 0xa3) AM_READWRITE(sio_r,sio_w)
-	AM_RANGE(0xa0, 0xa3) AM_NOP
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
-	AM_RANGE(0xa4, 0xa5) AM_NOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
-//  AM_RANGE(0xac, 0xad) AM_WRITE(emm_w)
-//  AM_RANGE(0xad, 0xad) AM_READ(emm_r)
+	AM_RANGE(0xac, 0xac) AM_WRITE(mz2500_emm_addr_w)
+	AM_RANGE(0xad, 0xad) AM_READ(mz2500_emm_data_r) AM_WRITE(mz2500_emm_data_w)
 	AM_RANGE(0xae, 0xae) AM_WRITE(palette4096_io_w)
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
 	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
@@ -1802,6 +1842,8 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
