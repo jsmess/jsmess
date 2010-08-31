@@ -133,7 +133,9 @@ static UINT8 pcw_printer_status;
 
 static UINT16 pcw_kb_scan_row;
 
-static UINT8* mcu_shared_ram;
+static UINT8 mcu_keyboard_data[16];
+static UINT8 mcu_transmit_reset_seq;
+static UINT8 mcu_transmit_count;
 
 static void pcw_update_interrupt_counter(void)
 {
@@ -227,7 +229,7 @@ static ADDRESS_MAP_START(pcw_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-/* Keyboard is read by the MCU and passed onto an area of RAM */
+/* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
 static  READ8_HANDLER(pcw_keyboard_r)
 {
 	static const char *const keynames[] = {
@@ -235,14 +237,12 @@ static  READ8_HANDLER(pcw_keyboard_r)
 		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
 	};
 
-	if(offset == 10)  // the MCU swaps the low 7 bits read from scan row 9, and places them in 0x3A.  This should fix any issue until we know just how the MCU transmits the RAM contents.
-		return (input_port_read(space->machine, keynames[offset]) & 0x80) | (input_port_read(space->machine, keynames[offset-1]) & 0x7f);
 	return input_port_read(space->machine, keynames[offset]);
 }
 
-static READ8_HANDLER(pcw_mcu_shared_r)
+static READ8_HANDLER(pcw_keyboard_data_r)
 {
-	return mcu_shared_ram[offset];
+	return mcu_keyboard_data[offset];
 }
 
 /* -----------------------------------------------------------------------
@@ -262,7 +262,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
            handler */
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
-			pcw_mcu_shared_r);
+			pcw_keyboard_data_r);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
@@ -717,6 +717,48 @@ static READ8_HANDLER(mcu_printer_command_r)
 	return pcw_printer_command;
 }
 
+/*
+ *  Keyboard MCU (i8048)
+ *  P1 = keyboard scan row select (low 8 bits)
+ *  P2 = bits 7-4: keyboard scan row select (high 4 bits)
+ *       bit 1: keyboard serial clock
+ *       bit 0: keyboard serial data
+ */
+static void mcu_transmit_serial(UINT8 bit)
+{
+	static UINT8 selected;
+	static UINT8 buffer;
+	int seq;
+
+	/* Keyboard data is sent in serial from the MCU through the keyboard port, to the ASIC
+	   Sends a string of 12-bit sequences, first 4 bits are the RAM location (from &3ff0),
+	   then 8 bits for the data to be written there. */
+	logerror("KB: Transmitting bit #%i [%i]\n",mcu_transmit_count,bit);
+	seq = mcu_transmit_count % 12;
+	if(seq < 4)
+	{
+		if(bit == 0)
+			selected &= ~(8 >> seq);
+		else
+			selected |= (8 >> seq);
+	}
+	else
+	{
+		seq -= 4;
+		if(bit == 0)
+			buffer &= ~(128 >> seq);
+		else
+			buffer |= (128 >> seq);
+	}
+	mcu_transmit_count++;
+	if(mcu_transmit_count >= 12)
+	{
+		mcu_keyboard_data[selected] = buffer;
+		mcu_transmit_count = 0;
+		logerror("KB: Recieved data byte #%i [%02x]\n",selected,buffer);
+	}
+}
+
 static READ8_HANDLER(mcu_kb_scan_r)
 {
 	return pcw_kb_scan_row & 0xff;
@@ -734,7 +776,23 @@ static READ8_HANDLER(mcu_kb_scan_high_r)
 
 static WRITE8_HANDLER(mcu_kb_scan_high_w)
 {
+	static UINT8 prev;
+
+	if((prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
+	{
+		mcu_transmit_serial(data & 0x01);
+		mcu_transmit_reset_seq = 0;
+	}
+
+	if((prev & 0x01) != (data & 0x01))  // two high->low transitions on the data pin signals the beginning of a new transfer
+	{
+		mcu_transmit_reset_seq++;
+		if(mcu_transmit_reset_seq > 3)
+			mcu_transmit_count = 0;
+	}
+
 	pcw_kb_scan_row = (pcw_kb_scan_row & 0x00ff) | ((data & 0xff) << 8);
+	prev = data;
 }
 
 static READ8_HANDLER(mcu_kb_data_r)
@@ -831,10 +889,6 @@ static ADDRESS_MAP_START(pcw_keyboard_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(mcu_kb_data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pcw_keyboard_data, ADDRESS_SPACE_DATA, 8)
-	AM_RANGE(0x30, 0x3f) AM_RAM AM_BASE(&mcu_shared_ram)
-ADDRESS_MAP_END
-
 
 static TIMER_CALLBACK(setup_beep)
 {
@@ -870,7 +924,6 @@ static MACHINE_RESET( pcw )
 	pcw_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 
 	/* copy boot code into RAM - yes, it's skipping a step */
-
 	memset(messram_get_ptr(machine->device("messram")),0x00,messram_get_size(machine->device("messram")));
 	for(x=0;x<256;x++)
 		messram_get_ptr(machine->device("messram"))[x+2] = code[x+0x300];
@@ -1045,9 +1098,9 @@ static INPUT_PORTS_START(pcw)
 	/* 2008-05  FP: not sure if this key is correct, "Caps Lock" is already mapped above.
     For now, I let it with no default mapping. */
 	PORT_START("LINE13")	/* 0x03ffd */
-	PORT_BIT(0x3f, 0xff, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") //PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x80, 0xff, IPT_UNUSED)
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+//	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") //PORT_CODE(KEYCODE_CAPSLOCK)
+//	PORT_BIT(0x80, 0xff, IPT_UNUSED)
 
 	PORT_START("LINE14")	/* 0x03ffe */
 	PORT_BIT ( 0xff, 0xff,	 IPT_UNUSED )
@@ -1119,7 +1172,6 @@ static MACHINE_DRIVER_START( pcw )
 
 	MDRV_CPU_ADD("keyboard_mcu", I8048, 1000000) // clock is a guess for now
 	MDRV_CPU_IO_MAP(pcw_keyboard_io)
-	MDRV_CPU_DATA_MAP(pcw_keyboard_data)
 
 	MDRV_I8243_ADD("printer_8243", NULL, pcw_printer_output_w)
 
