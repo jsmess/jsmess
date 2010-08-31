@@ -589,7 +589,6 @@ static READ8_HANDLER(pcw_system_status_r)
 	/* from Jacob Nevins docs */
 	UINT8 ret = pcw_get_sys_status(space->machine);
 
-  LOG(("SYS: Status port returning %02x\n",ret));
 	return ret;
 }
 
@@ -733,7 +732,6 @@ static void mcu_transmit_serial(UINT8 bit)
 	/* Keyboard data is sent in serial from the MCU through the keyboard port, to the ASIC
 	   Sends a string of 12-bit sequences, first 4 bits are the RAM location (from &3ff0),
 	   then 8 bits for the data to be written there. */
-	logerror("KB: Transmitting bit #%i [%i]\n",mcu_transmit_count,bit);
 	seq = mcu_transmit_count % 12;
 	if(seq < 4)
 	{
@@ -755,7 +753,6 @@ static void mcu_transmit_serial(UINT8 bit)
 	{
 		mcu_keyboard_data[selected] = buffer;
 		mcu_transmit_count = 0;
-		logerror("KB: Recieved data byte #%i [%02x]\n",selected,buffer);
 	}
 }
 
