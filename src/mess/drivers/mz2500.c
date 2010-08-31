@@ -55,6 +55,7 @@
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
 #include "sound/2203intf.h"
+#include "machine/rp5c15.h"
 
 //#include "devices/cassette.h"
 #include "devices/flopdrv.h"
@@ -885,7 +886,7 @@ static WRITE8_HANDLER( mz2500_irq_sel_w )
 	irq_mask[2] = (data & 0x02); //printer
 	irq_mask[3] = (data & 0x01); //RP5c15
 
-//	printf("%02x\n",data);
+	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
@@ -1214,6 +1215,23 @@ static WRITE8_HANDLER( mz2500_kanji_w )
 	(offset & 1) ? (kanji_index = (data << 8) | (kanji_index & 0xff)) : (kanji_index = (data & 0xff) | (kanji_index & 0xff00));
 }
 
+static READ8_DEVICE_HANDLER( rp5c15_8_r )
+{
+	UINT8 rtc_index;
+
+	rtc_index = (cpu_get_reg(device->machine->device("maincpu"), Z80_B));
+
+	return rp5c15_r(device,rtc_index,0xff);
+}
+
+static WRITE8_DEVICE_HANDLER( rp5c15_8_w )
+{
+	UINT8 rtc_index;
+
+	rtc_index = (cpu_get_reg(device->machine->device("maincpu"), Z80_B));
+
+	rp5c15_w(device,rtc_index,data,0xff);
+}
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1242,8 +1260,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
-//  AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
-	AM_RANGE(0xcc, 0xcd) AM_NOP
+	AM_RANGE(0xcc, 0xcc) AM_DEVREADWRITE("rp5c15", rp5c15_8_r, rp5c15_8_w)
 	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
@@ -1534,6 +1551,8 @@ static INTERRUPT_GEN( mz2500_vbl )
 
 static READ8_DEVICE_HANDLER( mz2500_porta_r )
 {
+	logerror("PPI PORTA R\n");
+
 	return 0xff;
 }
 
@@ -1548,15 +1567,19 @@ static READ8_DEVICE_HANDLER( mz2500_portb_r )
 
 static READ8_DEVICE_HANDLER( mz2500_portc_r )
 {
+	logerror("PPI PORTC R\n");
+
 	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_porta_w )
 {
+	logerror("PPI PORTA W %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_portb_w )
 {
+	logerror("PPI PORTB W %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
@@ -1579,7 +1602,8 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 
 	reset_lines = data;
 
-	//printf("%02x\n",data);
+	if(data & ~0x0a)
+		logerror("PPI PORTC W %02x\n",data & ~0x0a);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -1665,11 +1689,6 @@ static WRITE8_DEVICE_HANDLER( opn_porta_w )
 	ym_porta = data;
 }
 
-static WRITE8_DEVICE_HANDLER( opn_portb_w )
-{
-	logerror("B %02x\n",data);
-}
-
 static const ym2203_interface ym2203_interface_1 =
 {
 	{
@@ -1678,7 +1697,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_HANDLER(opn_porta_r),	// read A
 		DEVCB_INPUT_PORT("DSW1"),	// read B
 		DEVCB_HANDLER(opn_porta_w),	// write A
-		DEVCB_HANDLER(opn_portb_w)	// write B
+		DEVCB_NULL					// write B
 	},
 	NULL
 };
@@ -1701,7 +1720,7 @@ static PALETTE_INIT( mz2500 )
 
 static WRITE_LINE_DEVICE_HANDLER( pit8253_clk1_irq )
 {
-	if(irq_mask[1])
+	if(irq_mask[1]/* && state & 1*/)
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
 }
 
@@ -1726,6 +1745,18 @@ static const struct pit8253_config mz2500_pit8253_intf =
 	}
 };
 
+static void mz2500_rtc_alarm_irq(int state)
+{
+	/* TODO: doesn't work yet */
+//	if(irq_mask[3] && state & 1)
+//		cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,irq_vector[3]);
+}
+
+static const struct rp5c15_interface rtc_intf =
+{
+	mz2500_rtc_alarm_irq
+};
+
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -1737,10 +1768,10 @@ static MACHINE_DRIVER_START( mz2500 )
 
 	MDRV_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
+	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 
 	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
-
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
