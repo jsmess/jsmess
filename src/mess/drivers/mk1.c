@@ -169,7 +169,7 @@ static void mk1_interrupt( running_device *device, UINT16 addr, int level )
 }
 
 
-static const f3853_config mk1_config =
+static const f3853_interface mk1_config =
 {
 	mk1_interrupt
 };
