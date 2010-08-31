@@ -1164,10 +1164,10 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_CPU_IO_MAP(pcw_io)
 	MDRV_QUANTUM_TIME(HZ(50))
 
-	MDRV_CPU_ADD("printer_mcu", I8041, 1000000)  // clock is a guess for now
+	MDRV_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
 	MDRV_CPU_IO_MAP(pcw_printer_io)
 
-	MDRV_CPU_ADD("keyboard_mcu", I8048, 1000000) // clock is a guess for now
+	MDRV_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MDRV_CPU_IO_MAP(pcw_keyboard_io)
 
 	MDRV_I8243_ADD("printer_8243", NULL, pcw_printer_output_w)
