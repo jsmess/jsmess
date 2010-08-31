@@ -314,6 +314,47 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
+static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+{
+	static UINT32 count;
+	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 pen,pen_bit[2];
+	int x,y,xi,pen_i;
+	int res_x,res_y;
+
+	count = 0x40000;
+
+	for(y=0;y<400;y++)
+	{
+		for(x=0;x<640;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				res_x = x+xi;
+				res_y = y;
+
+				/* check window boundaries */
+				//if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+				//	continue;
+
+				/* TODO: very preliminary, just Yukar K2 uses this so far*/
+				pen_bit[0] = (vram[count + 0x00000]>>(xi)) & 1 ? 7 : 0; // B
+				pen_bit[1] = (vram[count + 0x0c000]>>(xi)) & 1 ? 7 : 0; // R
+
+				pen = 0;
+				for(pen_i=0;pen_i<2;pen_i++)
+					pen |= pen_bit[pen_i];
+
+				{
+					//if(pri == ((clut256[pen] & 0x100) >> 8))
+						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[pen];
+				}
+			}
+			count++;
+		}
+	}
+}
+
 static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size,int pri)
 {
 	static UINT32 count;
@@ -442,6 +483,9 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	switch(cg_reg[0x0e])
 	{
 		case 0x00:
+			break;
+		case 0x03:
+			draw_cg4_screen(machine,bitmap,cliprect,0);
 			break;
 		case 0x14:
 			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
