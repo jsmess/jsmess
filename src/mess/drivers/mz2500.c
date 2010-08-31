@@ -14,26 +14,26 @@
 	- clean-ups! ^^'
 
     per-game/program specific TODO:
-	- (Renju): hangs on the "presents" screen;
-	- (Xtal Soft - The Prince of Darkness): dies on IPLPRO loading, presumably a wd17xx core bug;
-	- (Sound Gal): dies with bad code, another wd17xx core bug;
 	- Basic: vertical scrolling returns wrap-around that shouldn't wrap;
 	- Basic: loading has an alignment bug with the bitmap
-	- (K2): doesn't seem to work, there was a "Disk I/O error" msg before;
+	- Gomoku Narabe: hangs on the "presents" screen;
 	- LayDock: hangs by reading the FDC status and expecting it to become 0x81;
 	- Mappy: TVRAM layer is double x sized than it should be;
 	- Marchen Veil I: dies with garbage on screen;
 	- Moon Child: needs mixed 3+3bpp tvram supported;
+	- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
 	- Multiplan: hangs after you set the RTC;
 	- Murder Club: has lots of CG artifacts;
 	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
 	- Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
+	- Sound Gal Music Editor: dies with bad code, another wd17xx core bug;
 	- Super MZ Demo 1: Hangs at the logo "roar".
 	- Telephone Soft: shows garbage with the CG layer;
 	- The Black Onyx: hangs at the title screen, background should also animate;
 	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
 	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
 	- Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
+	- Yukar K2 (normal version): moans about something;
 
     memory map:
     0x00000-0x3ffff Work RAM
@@ -994,7 +994,7 @@ static const floppy_config mz2500_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	NULL
+	"mz2500_flop"
 };
 
 static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -1856,6 +1856,7 @@ static MACHINE_DRIVER_START( mz2500 )
 
 	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
+	MDRV_SOFTWARE_LIST_ADD("flop_list","mz2500")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
