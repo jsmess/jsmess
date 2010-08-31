@@ -23,6 +23,7 @@ Skeleton drivers:
 - P112 Single Board Computer
 - NEC TK-80
 - SEL Z80 Trainer
+- mc-CP/M-Computer
 
 System Driver Changes:
 ----------------------
