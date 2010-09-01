@@ -1642,6 +1642,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/c10.o		\
+	$(MESS_DRIVERS)/casloopy.o 	\
 	$(MESS_DRIVERS)/cc10.o		\
 	$(MESS_DRIVERS)/chaos.o 	\
 	$(MESS_DRIVERS)/cd2650.o	\
