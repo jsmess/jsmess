@@ -1,13 +1,17 @@
 /*****************************************************************************
 
-    Casio Loopy (c) 1995 Casio
+	Casio Loopy (c) 1995 Casio
 
-    skeleton driver
+	skeleton driver
 
-    Note:
-    - just a placeholder for any HW discovery, until we decap/trojan the BIOS,
-      the idea is to understand the HW enough to extract the SH-1 internal BIOS
-      data via a trojan;
+	TODO:
+	- Identify what actually is the NEC CDT-109 CPU, it should contain a program
+	  controller for the thermal printer device
+
+	Note:
+	- just a placeholder for any HW discovery, until we decap/trojan the BIOS,
+	  the idea is to understand the HW enough to extract the SH-1 internal BIOS
+	  data via a trojan;
 
 ===============================================================================
 
@@ -136,6 +140,7 @@ PCB 'Z545-1 A240570-1'
 
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
+//#include "cpu/v60/v60.h"
 #include "devices/cartslot.h"
 
 static VIDEO_START( casloopy )
@@ -152,6 +157,11 @@ static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("cart",0) // wrong
 ADDRESS_MAP_END
 
+#if 0
+static ADDRESS_MAP_START( casloopy_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("subcpu",0)
+ADDRESS_MAP_END
+#endif
 
 static INPUT_PORTS_START( casloopy )
 INPUT_PORTS_END
@@ -161,11 +171,14 @@ static MACHINE_RESET( casloopy )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 }
 
-static MACHINE_CONFIG_START( casloopy, driver_data_t )
+static MACHINE_DRIVER_START( casloopy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH1,8000000)
 	MDRV_CPU_PROGRAM_MAP(casloopy_map)
+
+//	MDRV_CPU_ADD("subcpu",V60,8000000)
+//	MDRV_CPU_PROGRAM_MAP(casloopy_sub_map)
 
 	MDRV_MACHINE_RESET(casloopy)
 
@@ -182,12 +195,12 @@ static MACHINE_CONFIG_START( casloopy, driver_data_t )
 	MDRV_VIDEO_UPDATE(casloopy)
 
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_EXTENSION_LIST("ic1")
 	MDRV_CARTSLOT_MANDATORY
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -197,7 +210,10 @@ MACHINE_CONFIG_END
 
 ROM_START( casloopy )
 	ROM_REGION( 0x80000, "maincpu", 0)
-	ROM_LOAD( "bios", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "bios1", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "subcpu", 0) //NEC CDT-109
+	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
 
 	ROM_REGION( 0x200000, "cart", 0 )
 	ROM_CART_LOAD("cart",    0x00000, 0x200000, ROM_NOMIRROR)
