@@ -7,8 +7,6 @@
     TODO:
     - floppy support (but floppy images are unobtainable at current time)
     - Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
-    - advanced BASIC commands (width 80, circle, line ...) makes the emulation to go to la-la-land
-    - some text garbage pops up in place, first example is when you type "10 for a=0 to n"
 
 ***************************************************************************************************/
 
@@ -123,6 +121,8 @@ static VIDEO_UPDATE( paso7 )
 	int count;
 	int width;
 
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+
 	fake_keyboard_data(screen->machine);
 
 	width = x_width ? 80 : 40;
@@ -196,8 +196,12 @@ static READ8_HANDLER( vram_r )
 {
 	static UINT8 res;
 
-	//if(!vram_sel)
-	//  return 0xff;
+	if(vram_sel == 0)
+	{
+		UINT8 *cpu = memory_region(space->machine, "maincpu");
+
+		return cpu[offset+0x8000];
+	}
 
 	if(pal_sel && (plane_reg & 0x70) == 0x00)
 		return p7_pal[offset & 0xf];
@@ -220,7 +224,7 @@ static READ8_HANDLER( vram_r )
 
 static WRITE8_HANDLER( vram_w )
 {
-	//if(vram_sel)
+	if(vram_sel)
 	{
 		if(pal_sel && (plane_reg & 0x70) == 0x00)
 		{
@@ -239,6 +243,12 @@ static WRITE8_HANDLER( vram_w )
 			p7_vram[offset | 0xc000] = attr_latch;
 			i8255a_w(space->machine->device("ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
 		}
+	}
+	else
+	{
+		UINT8 *cpu = memory_region(space->machine, "maincpu");
+
+		cpu[offset+0x8000] = data;
 	}
 }
 
@@ -270,7 +280,7 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 
 	// bank4 is always RAM
 
-//  printf("%02x\n",data);
+	printf("%02x\n",vram_sel);
 }
 
 #if 0
@@ -379,6 +389,7 @@ static READ8_HANDLER( pasopia7_io_r )
 	if(mio_sel)
 	{
 		address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
 		mio_sel = 0;
 		//printf("%08x\n",offset);
 		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
