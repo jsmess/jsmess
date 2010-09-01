@@ -1,62 +1,137 @@
 /*
-    abc800.c
 
-    MESS Driver by Curt Coder
+Luxor ABC 800M
 
-    Luxor ABC 800C
-    --------------
-    (c) 1981 Luxor Datorer AB, Sweden
+---------------
+Main PCB Layout
 
-    CPU:            Z80 @ 3 MHz
-    ROM:            32 KB
-    RAM:            16 KB, 1 KB frame buffer, 16 KB high-resolution videoram (800C/HR)
-    Resolution:     240x240
-    Colors:         8
+55 10970-02 (video board)
 
-    Luxor ABC 800M
-    --------------
-    (c) 1981 Luxor Datorer AB, Sweden
+|-----------------------|-----------------------------------|
+|   4116    4116        |                                   |
+|   4116    4116        |                                   |
+|   4116    4116        |                                   |
+|   4116    4116        |C          Z80         Z80CTC      |
+|   4116    4116        |N                                  |
+|   4116    4116        |1                                  |
+|   4116    4116        |                       Z80DART     |
+|                       |                       CN6         |
+|   ROM3    ROM7        |                                   |
+|                       |                       Z80SIO2     |
+|   ROM2    ROM6        |-----------------------------------|
+|                                                           |
+|   ROM1    ROM5                                            |
+|                                                       CN2 |
+|   ROM0    ROM4                                            |
+|                       CN7                                 |
+|-------------------------------------------|           CN3 |
+|                                           |               |
+|               2114                        |               |
+|               2114                        |           CN4 |
+|                                      12MHz|               |
+|               2114                        |               |
+|               2114                        |           CN5 |
+|                                           |               |
+|               CRTC            ROM8        |               |
+|                                           |               |
+|-------------------------------------------|---------------|
 
-    CPU:            Z80 @ 3 MHz
-    ROM:            32 KB
-    RAM:            16 KB, 2 KB frame buffer, 16 KB high-resolution videoram (800M/HR)
-    CRTC:           6845
-    Resolution:     480x240, 240x240 (HR)
-    Colors:         2
+Notes:
+    Important IC's shown.
 
-    Luxor ABC 802
-    -------------
-    (c) 1983 Luxor Datorer AB, Sweden
+    Z80     - ? Z80A CPU (labeled "Z80A (800) KASS.")
+    Z80CTC  - Sharp LH0082A Z80A-CTC
+    Z80DART - SGS Z8470AB1 Z80A-DART
+    Z8OSIO2 - SGS Z8442AB1 Z80A-SIO/2
+    4116    - Toshiba TMS4116-20NL 1Kx8 RAM
+    2114    - Toshiba TMM314AP-1 1Kx4 RAM
+    CRTC    - Hitachi HD46505SP CRTC
+    ROM0    - NEC D2732D 4Kx8 EPROM "ABC M-12"
+    ROM1    - NEC D2732D 4Kx8 EPROM "ABC 1-12"
+    ROM2    - NEC D2732D 4Kx8 EPROM "ABC 2-12"
+    ROM3    - NEC D2732D 4Kx8 EPROM "ABC 3-12"
+    ROM4    - NEC D2732D 4Kx8 EPROM "ABC 4-12"
+    ROM5    - NEC D2732D 4Kx8 EPROM "ABC 5-12"
+    ROM6    - Hitachi HN462732G 4Kx8 EPROM "ABC 6-52"
+    ROM7    - NEC D2732D 4Kx8 EPROM "ABC 7-22"
+    ROM8    - NEC D2716D 2Kx8 EPROM "VUM SE"
+    CN1     - ABC bus connector
+    CN2     - tape connector
+    CN3     - RS-232 channel B connector
+    CN4     - RS-232 channel A connector
+    CN5     - video connector
+    CN6     - keyboard connector
+    CN7     - video board connector
 
-    CPU:            Z80 @ 3 MHz
-    ROM:            32 KB
-    RAM:            16 KB, 2 KB frame buffer, 16 KB ram-floppy
-    CRTC:           6845
-    Resolution:     480x240
-    Colors:         2
 
-    Luxor ABC 806
-    -------------
-    (c) 1983 Luxor Datorer AB, Sweden
+Keyboard PCB Layout
+-------------------
 
-    CPU:            Z80 @ 3 MHz
-    ROM:            32 KB
-    RAM:            32 KB, 4 KB frame buffer, 128 KB scratch pad ram
-    CRTC:           6845
-    Resolution:     240x240, 256x240, 512x240
-    Colors:         8
+    |---------------|
+|---|      CN1      |---------------------------------------------------|
+|                                                                       |
+|       LS193       LS374                       8048        22-008-03   |
+|   LS13    LS193               22-050-3B   XTAL                        |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
 
-    http://www.devili.iki.fi/Computers/Luxor/
-    http://hem.passagen.se/mani/abc/
+Notes:
+    All IC's shown.
+
+    8048        - National Semiconductor 8048 MCU
+    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix amplifier latch
+    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix driver with 4 to 12 decoder/demultiplexer
+    XTAL        - Luxor part number 48-300-06
+    CN1         - keyboard data connector
+
+
+    XR 22-908-03(B): capacitive readout latch
+
+               +---,_,---+
+        D0  -> |  1   20 | --  VCC
+        D1  -> |  2   19 | <-  /OE (is this what causes it to latch? on which edge?)
+        D2  -> |  3   18 | ->  Q0
+        D3  -> |  4   17 | ->  Q1
+       TST? ?> |  5   16 | ->  Q2
+        D4  -> |  6   15 | ->  Q3
+        D5  -> |  7   14 | ->  Q4
+        D6  -> |  8   13 | ->  Q5
+        D7  -> |  9   12 | ->  Q6
+        GND -- | 10   11 | ->  Q7
+               +---------+
+
+
+    XR 22-950-3B: row driver
+
+               +---,_,---+
+         Y8 <- |  1   20 | --  VCC
+         Y9 <- |  2   19 | ->  Y7
+        Y10 <- |  3   18 | ->  Y6
+        Y11 <- |  4   17 | ->  Y5
+       /RST -> |  5   16 | ->  Y4
+       A    -> |  6   15 | ->  Y3
+       B    -> |  7   14 | ->  Y2
+       C    -> |  8   13 | ->  Y1
+       D    -> |  9   12 | ->  Y0
+       GND  -- | 10   11 | <-  OE
+               +---------+
+
 */
 
 /*
 
     TODO:
 
-    - replace the 2nd Z80DART with Z80SIO when it is implemented properly
-    - ABC 77 keyboard
-    - bit accurate Z80 SIO/2 (cassette)
+    - find ROMs for ABC800C
+    - ABC800M/C integrated keyboard
+    - ABC802/806 ABC77 keyboard
     - floppy controller board
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
@@ -1280,8 +1355,11 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
 	ROM_LOAD( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
+	ROM_REGION( 0x400, I8048_TAG, 0 )
+	ROM_LOAD( "8048-132",  0x0000, 0x0400, NO_DUMP )
+
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "vu m-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
+	ROM_LOAD( "vum se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 
 	ROM_REGION( 0x200, "fgctl", 0 )
 	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
@@ -1474,5 +1552,5 @@ static DRIVER_INIT( abc806 )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND)
