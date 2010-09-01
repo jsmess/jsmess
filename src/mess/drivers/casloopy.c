@@ -143,6 +143,8 @@ PCB 'Z545-1 A240570-1'
 //#include "cpu/v60/v60.h"
 #include "devices/cartslot.h"
 
+static UINT32 *bios_rom;
+
 static VIDEO_START( casloopy )
 {
 
@@ -154,7 +156,10 @@ static VIDEO_UPDATE( casloopy )
 }
 
 static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("cart",0) // wrong
+	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE(&bios_rom)
+//	AM_RANGE(0x01000000, 0x017fffff) - i/o?
+	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
+	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 ADDRESS_MAP_END
 
 #if 0
@@ -168,13 +173,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( casloopy )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
+	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
+
 }
 
 static MACHINE_CONFIG_START( casloopy, driver_data_t )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",SH1,8000000)
+	MDRV_CPU_ADD("maincpu",SH2,8000000)
 	MDRV_CPU_PROGRAM_MAP(casloopy_map)
 
 //	MDRV_CPU_ADD("subcpu",V60,8000000)
@@ -209,7 +215,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( casloopy )
-	ROM_REGION( 0x80000, "maincpu", 0)
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios1", 0x0000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "subcpu", 0) //NEC CDT-109
@@ -219,4 +225,11 @@ ROM_START( casloopy )
 	ROM_CART_LOAD("cart",    0x00000, 0x200000, ROM_NOMIRROR)
 ROM_END
 
-GAME( 1995, casloopy,  0,   casloopy,  casloopy,  0, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
+static DRIVER_INIT( casloopy )
+{
+	/* load hand made bios data*/
+	bios_rom[0/4] = 0x6000964; //SPC
+	bios_rom[4/4] = 0xffffff0; //SSP
+}
+
+GAME( 1995, casloopy,  0,   casloopy,  casloopy,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
