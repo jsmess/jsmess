@@ -445,7 +445,7 @@ DEVICE_GET_INFO(cassette)
 			{
 				strcpy(info->s, ((cassette_config *)device->static_config())->interface );
 			}
-			break;			
+			break;
 	}
 }
 

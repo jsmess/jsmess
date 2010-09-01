@@ -3,7 +3,7 @@
         Schleicher MES
 
         30/08/2010 Skeleton driver
-		
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -70,5 +70,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 198?, mes,  0,       0, 	mes, 	mes, 	 0,  	  "Schleicher",   "MES",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 198?, mes,  0,       0,	mes,	mes,	 0, 	  "Schleicher",   "MES",		GAME_NOT_WORKING | GAME_NO_SOUND)

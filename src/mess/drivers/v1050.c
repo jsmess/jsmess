@@ -379,23 +379,23 @@ static WRITE8_HANDLER( dvint_clr_w )
 
 /*static READ8_HANDLER( keyboard_r )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
+    v1050_state *state = space->machine->driver_data<v1050_state>();
 
-	static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
+    static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
 
-	return input_port_read(space->machine, KEY_ROW[state->keylatch]);
+    return input_port_read(space->machine, KEY_ROW[state->keylatch]);
 }
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
+    v1050_state *state = space->machine->driver_data<v1050_state>();
 
-	state->keylatch = data & 0x0f;
+    state->keylatch = data & 0x0f;
 }
 */
 //static WRITE8_HANDLER( p2_w )
 //{
-//	/*
+//  /*
 //
 //        bit     description
 //
@@ -410,11 +410,11 @@ static WRITE8_HANDLER( keyboard_w )
 //
 //    */
 //
-//	v1050_state *state = space->machine->driver_data<v1050_state>();
+//  v1050_state *state = space->machine->driver_data<v1050_state>();
 //
-//	output_set_led_value(0, BIT(data, 5));
+//  output_set_led_value(0, BIT(data, 5));
 ////  discrete_sound_w(discrete, NODE_01, BIT(data, 6));
-//	state->kb_so = BIT(data, 7);
+//  state->kb_so = BIT(data, 7);
 //}
 
 /* Memory Maps */
@@ -460,8 +460,8 @@ static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 //static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
-//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 //ADDRESS_MAP_END
 
 /* Input Ports */
@@ -1165,8 +1165,8 @@ static MACHINE_RESET( v1050 )
 	state->bank = 0;
 
 	v1050_bankswitch(machine);
-	
-	state->timer_sio->adjust(attotime_zero, 0, ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16));	
+
+	state->timer_sio->adjust(attotime_zero, 0, ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16));
 }
 
 

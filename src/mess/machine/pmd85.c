@@ -945,5 +945,5 @@ MACHINE_RESET( pmd85 )
 
 	timer_set(machine, attotime_zero, NULL, 0, setup_machine_state);
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));					
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));
 }

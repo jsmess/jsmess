@@ -1,30 +1,30 @@
 /***************************************************************************
 
-		Systec Z80
-        
-		More data :
-			http://www.hd64180-cpm.de/html/systecz80.html
+        Systec Z80
+
+        More data :
+            http://www.hd64180-cpm.de/html/systecz80.html
 
         30/08/2010 Skeleton driver
 
-		Systec Platine 1
+        Systec Platine 1
 
-		SYSTEC 155.1L
-		EPROM 2764 CP/M LOADER 155 / 9600 Baud
-		Z8400APS CPU
-		Z8420APS PIO
-		Z8430APS CTC
-		Z8470APS DART
+        SYSTEC 155.1L
+        EPROM 2764 CP/M LOADER 155 / 9600 Baud
+        Z8400APS CPU
+        Z8420APS PIO
+        Z8430APS CTC
+        Z8470APS DART
 
-		Systec Platine 2
+        Systec Platine 2
 
-		SYSTEC 100.3B
-		MB8877A FDC Controller
-		FDC9229BT SMC 8608
-		Z8410APS DMA
-		Z8420APS PIO
+        SYSTEC 100.3B
+        MB8877A FDC Controller
+        FDC9229BT SMC 8608
+        Z8410APS DMA
+        Z8420APS PIO
 
-		MB8877A Compatible FD1793		
+        MB8877A Compatible FD1793
 ****************************************************************************/
 
 #include "emu.h"
@@ -89,5 +89,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 19??, systec,  0,       0, 	systec, 	systec, 	 0,  	  "Systec",   "Systec Z80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 19??, systec,  0,       0,	systec, 	systec, 	 0, 	  "Systec",   "Systec Z80",		GAME_NOT_WORKING | GAME_NO_SOUND)

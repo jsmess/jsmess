@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 //static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x000, 0x7ff) AM_ROM
+//  AM_RANGE(0x000, 0x7ff) AM_ROM
 //ADDRESS_MAP_END
 
 /*-------------------------------------------------

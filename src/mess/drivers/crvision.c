@@ -9,7 +9,7 @@
 
     TODO:
 
-	CreatiVision
+    CreatiVision
 
     - fix Diagnostic A (video) sprites generator test
     - proper keyboard emulation, need keyboard schematics
@@ -22,12 +22,12 @@
         * Titanic Frogger Demo 1.0
         * Titanic Frogger Demo 1.1
 
-	Salora Manager
+    Salora Manager
 
-	- keyboard Ctrl+I/J/N don't print out BASIC commands
-	- RAM mapping
-	- cassette (figure out correct input level)
-	- floppy (interface cartridge needed)
+    - keyboard Ctrl+I/J/N don't print out BASIC commands
+    - RAM mapping
+    - cassette (figure out correct input level)
+    - floppy (interface cartridge needed)
 
 */
 
@@ -86,7 +86,7 @@ CN2     - RF board connector (17x1 pin header)
 CN3     - printer connector (7x2 PCB edge male)
 CN4     - expansion connector (30x2 PCB edge male)
 CN5     - cartridge connector (18x2 PCB edge female)
-CN6		- keyboard connector (16x1 pin header)
+CN6     - keyboard connector (16x1 pin header)
 
 
 Sub board
@@ -393,8 +393,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( manager )
 	PORT_START("ROW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('-')
@@ -403,8 +403,8 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 
 	PORT_START("ROW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84 \xC3\xA4") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4) PORT_CHAR(0x00E4)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -414,10 +414,10 @@ static INPUT_PORTS_START( manager )
 
 	PORT_START("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x85 \xC3\xA5") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(0x00C5) PORT_CHAR(0x00E5)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -433,8 +433,8 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
 
 	PORT_START("ROW4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( manager )
 
 	PORT_START("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
 
 	PORT_START("ROW6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
@@ -471,7 +471,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
-	
+
 	PORT_START("JOY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -761,7 +761,7 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
 
 	/* keyboard latch */
 	state->keylatch = data;
-	
+
 	/* centronics data */
 	centronics_data_w(device, 0, data);
 }
@@ -779,7 +779,7 @@ static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_ca2_w )
 static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
 {
 	crvision_state *state = device->machine->driver_data<crvision_state>();
-	
+
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
 	return sn76496_ready_r(state->psg) & (centronics_not_busy_r(state->centronics) | pia6821_get_output_ca2_z(device));
 }
@@ -1207,7 +1207,7 @@ CONS( 1982,	rameses,    crvision,   0,		pal,		crvision,	0,		"Hanimex",					"Rame
 CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
 CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision,	0,		"Video Technology",			"CreatiVision MK-II (Europe)", 0 )
 /*
-COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001,   0,      "Video Technology",			"Laser 2001", GAME_NOT_WORKING )
-COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001,   0,      "Dick Smith Electronics",	"VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001,   0,      "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
+COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
 */
 COMP( 1983,	manager,	0,			0,		lasr2001,	manager,	0,		"Salora",					"Manager (Finland)", 0 )

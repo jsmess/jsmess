@@ -44,7 +44,7 @@ struct _file_info
 	char publisher[MAX_PATH];
 	char year[10];
 	char full_name[MAX_PATH*2];
-	
+
 	char device[MAX_PATH];
 };
 
@@ -159,7 +159,7 @@ BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LP
 	strcpy(pInfo->year, pszYear);
 	strcpy(pInfo->device, pszDevice);
 	sprintf(pInfo->full_name,"%s:%s", pszListname,pszName);
-	
+
 
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));

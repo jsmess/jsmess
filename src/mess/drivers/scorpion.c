@@ -222,7 +222,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	running_device *beta = machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)

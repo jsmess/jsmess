@@ -100,7 +100,7 @@ static MACHINE_START( palm )
     state_save_register_global(machine, spim_data);
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
-	}	
+	}
 }
 
 static MACHINE_RESET( palm )

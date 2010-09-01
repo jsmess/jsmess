@@ -158,8 +158,8 @@ static MACHINE_CONFIG_START( 3do, _3do_state )
 
 	MDRV_MACHINE_RESET( 3do )
 
-//	MDRV_VIDEO_START( generic_bitmapped )
-//	MDRV_VIDEO_UPDATE( generic_bitmapped )
+//  MDRV_VIDEO_START( generic_bitmapped )
+//  MDRV_VIDEO_UPDATE( generic_bitmapped )
 	MDRV_VIDEO_START( _3do )
 	MDRV_VIDEO_UPDATE( _3do )
 

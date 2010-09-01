@@ -1833,8 +1833,8 @@ static TIMER_CALLBACK(mac_adb_tick)
 					}
 				}
 
-//				mac->adb_timer_ticks = 8;
-//				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+//              mac->adb_timer_ticks = 8;
+//              timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 
 				if ((mac->adb_datasize == 0) && (mac->adb_streaming == MCU_STREAMING_NONE))
 				{
@@ -1872,7 +1872,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	ret = (mac->adb_send & 0x80)>>7;
 	mac->adb_send <<= 1;
 
-//	printf("VIA IN CB2 = %x\n", ret);
+//  printf("VIA IN CB2 = %x\n", ret);
 
 	return ret;
 }
@@ -1964,7 +1964,7 @@ static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
 	mac->adb_buffer[4] = 1;	// type
 	mac->adb_buffer[3] = 0;	// flag
 	mac->adb_buffer[2] = cmd; // command
-	mac->adb_buffer[1] = mac->rtc_ram[addr]; 
+	mac->adb_buffer[1] = mac->rtc_ram[addr];
 
 	mac->adb_state |= 1;
 	mac->adb_timer_ticks = 8;
@@ -2834,7 +2834,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
-		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, *machine));				
+		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, *machine));
 	}
 
 	/* setup keyboard */

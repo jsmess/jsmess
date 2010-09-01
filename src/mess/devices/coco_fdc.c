@@ -228,7 +228,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<const legacy_cart_slot_device_config_base *>(&device->baseconfig())->get_config_ptr(FDCINFO_PTR_HWTYPE);	
+    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<const legacy_cart_slot_device_config_base *>(&device->baseconfig())->get_config_ptr(FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
@@ -631,7 +631,7 @@ static void fdc_dragon_w(running_device *device, offs_t addr, UINT8 data)
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
 	MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
 MACHINE_CONFIG_END
-	
+
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
 	static const fdc_hardware_type hwtype =

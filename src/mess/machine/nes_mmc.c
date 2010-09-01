@@ -86,7 +86,7 @@
     * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
     * 153 - Famicom Jump II uses a different board (or the same in a very different way)
     * 242 - DQ8 has no mirroring (missing graphics is due to other reasons though)
- 
+
     crc_hacks have been added also to handle a few wiring settings which would require submappers:
     * CHR protection pins for mapper 185
     * VRC-2, VRC-4 and VRC-6 line wiring
@@ -374,12 +374,12 @@ static void prg8_67( running_machine *machine, int bank )
 static void prg8_x( running_machine *machine, int start, int bank )
 {
 	nes_state *state = machine->driver_data<nes_state>();
-	
+
 	assert(start < 4);
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	
+
 	state->prg_bank[start] = bank;
 	prg_bank_refresh(machine);
 }

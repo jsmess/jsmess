@@ -216,7 +216,7 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 
 	if (state->b2m_drive!=drive) {
 		wd17xx_set_drive(state->fdc,drive);
-		floppy_mon_w(floppy_get_device(device->machine, 0), 0);			
+		floppy_mon_w(floppy_get_device(device->machine, 0), 0);
 		floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 1);
 		state->b2m_drive = drive;
 	}

@@ -382,7 +382,7 @@ void floppy_drive_seek(running_device *img, signed int signed_tracks)
 	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
 
 	/* inform disk image of step operation so it can cache information */
-	if (image->exists()) 
+	if (image->exists())
 		pDrive->track = pDrive->current_track;
 
 	pDrive->id_index = 0;

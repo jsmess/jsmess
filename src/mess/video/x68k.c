@@ -51,40 +51,40 @@ INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 /*
 static bitmap_t* x68k_get_gfx_page(int pri,int type)
 {
-	if(type == GFX16)
-	{
-		switch(pri)
-		{
-		case 0:
-			return x68k_gfx_0_bitmap_16;
-		case 1:
-			return x68k_gfx_1_bitmap_16;
-		case 2:
-			return x68k_gfx_2_bitmap_16;
-		case 3:
-			return x68k_gfx_3_bitmap_16;
-		default:
-			return x68k_gfx_0_bitmap_16;  // should never reach here.
-		}
-	}
-	if(type == GFX256)
-	{
-		switch(pri)
-		{
-		case 0:
-		case 1:
-			return x68k_gfx_0_bitmap_256;
-		case 2:
-		case 3:
-			return x68k_gfx_1_bitmap_256;
-		default:
-			return x68k_gfx_0_bitmap_256;  // should never reach here.
-		}
-	}
-	if(type == GFX65536)
-		return x68k_gfx_0_bitmap_65536;
+    if(type == GFX16)
+    {
+        switch(pri)
+        {
+        case 0:
+            return x68k_gfx_0_bitmap_16;
+        case 1:
+            return x68k_gfx_1_bitmap_16;
+        case 2:
+            return x68k_gfx_2_bitmap_16;
+        case 3:
+            return x68k_gfx_3_bitmap_16;
+        default:
+            return x68k_gfx_0_bitmap_16;  // should never reach here.
+        }
+    }
+    if(type == GFX256)
+    {
+        switch(pri)
+        {
+        case 0:
+        case 1:
+            return x68k_gfx_0_bitmap_256;
+        case 2:
+        case 3:
+            return x68k_gfx_1_bitmap_256;
+        default:
+            return x68k_gfx_0_bitmap_256;  // should never reach here.
+        }
+    }
+    if(type == GFX65536)
+        return x68k_gfx_0_bitmap_65536;
 
-	return NULL;  // should never reach here either.
+    return NULL;  // should never reach here either.
 }
 */
 static void x68k_crtc_text_copy(int src, int dest)
@@ -432,12 +432,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 				break;
 			}
 		}
-/*		if(ACCESSING_BITS_8_15)
-		{
-			x68k_sys.crtc.interlace = 0;
-			if(data & 0x0400)
-				x68k_sys.crtc.interlace = 1;
-		}*/
+/*      if(ACCESSING_BITS_8_15)
+        {
+            x68k_sys.crtc.interlace = 0;
+            if(data & 0x0400)
+                x68k_sys.crtc.interlace = 1;
+        }*/
 		x68k_crtc_refresh_mode(space->machine);
 		break;
 	case 576:  // operation register
@@ -499,7 +499,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 WRITE16_HANDLER( x68k_gvram_w )
 {
-//	int xloc,yloc,pageoffset;
+//  int xloc,yloc,pageoffset;
 	/*
        G-VRAM usage is determined by colour depth and "real" screen size.
 

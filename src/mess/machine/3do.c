@@ -232,22 +232,22 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
     During booting the following things get written/read:
     - write 03180000 to 03180000 (init reading sequence)
     - 4 read actions from 03180000 bit#0, if lower bit is 1 0 1 0 then   (expect to read 0x0a)
-	- read from 03180000 (init writing sequence)
-	- write 0x0100 to shift register bit#0
-	- reset PON bit in CSTATBITS
+    - read from 03180000 (init writing sequence)
+    - write 0x0100 to shift register bit#0
+    - reset PON bit in CSTATBITS
     - wait a little while
     - read from 03180000
-	- write 0x0200 to shift register bit#0
-	- write 0x0002 to shift register bit#1
-	- dummy write to 03180000
-	- read from shift register bits #0 and #1.
-	- check if data read equals 0x44696167 (=Diag)   If so, jump 302196c in default bios
-	- dummy read from shift register
-	- write 0x0300 to shift register bit #0
-	- dummy write to shift register
+    - write 0x0200 to shift register bit#0
+    - write 0x0002 to shift register bit#1
+    - dummy write to 03180000
+    - read from shift register bits #0 and #1.
+    - check if data read equals 0x44696167 (=Diag)   If so, jump 302196c in default bios
+    - dummy read from shift register
+    - write 0x0300 to shift register bit #0
+    - dummy write to shift register
     - read data from shift register bit #0.
     - xor that data with 0x07ff
-	- write that data & 0x00ff | 0x4000 to the shift register
+    - write that data & 0x00ff | 0x4000 to the shift register
 3022630
 */
 

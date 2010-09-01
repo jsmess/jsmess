@@ -2,22 +2,22 @@
 
         Psion Organiser II series
 
-		Driver by Sandro Ronco
+        Driver by Sandro Ronco
 
-		TODO:
-		- implement Datapack read/write interface
-		- add save state and NVRAM
-		- dump CGROM of the HD44780
-		- move HD44780 implementation in a device
+        TODO:
+        - implement Datapack read/write interface
+        - add save state and NVRAM
+        - dump CGROM of the HD44780
+        - move HD44780 implementation in a device
 
-		Note:
-		- 4 lines display has an custom LCD controller derived from an HD66780
-		- NVRAM works only if the machine is turned off (with OFF menu) before closing MESS
+        Note:
+        - 4 lines display has an custom LCD controller derived from an HD66780
+        - NVRAM works only if the machine is turned off (with OFF menu) before closing MESS
 
         16/07/2010 Skeleton driver.
 
-		Memory map info :
-			http://archive.psion2.org/org2/techref/memory.htm
+        Memory map info :
+            http://archive.psion2.org/org2/techref/memory.htm
 
 ****************************************************************************/
 
@@ -315,12 +315,12 @@ UINT8 datapack_r(running_machine *machine)
 	struct datapack *pack = get_active_slot(machine, psion.port6);
 
 	if (pack != NULL && pack->len > 0 && !(psion.port6 & 0x80))
- 	{
+	{
 		UINT32 pack_addr = pack->counter + ((pack->id & 0x04) ? 0x100 * pack->page : 0);
 
 		if (pack_addr < pack->len * 0x2000)
 			return pack->data[pack_addr];
- 	}
+	}
 
 	return 0;
 }
@@ -347,22 +347,22 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 		break;
 	case 0x17:
 		/*
-		datapack control lines
-		x--- ---- slot on/off
-		-x-- ---- slot 3
-		--x- ---- slot 2
-		---x ---- slot 1
-		---- x--- output enable
-		---- -x-- program line
-		---- --x- reset line
-		---- ---x clock line
-		*/
+        datapack control lines
+        x--- ---- slot on/off
+        -x-- ---- slot 3
+        --x- ---- slot 2
+        ---x ---- slot 1
+        ---- x--- output enable
+        ---- -x-- program line
+        ---- --x- reset line
+        ---- ---x clock line
+        */
 		if (psion.port6_ddr == 0xff)
 		{
 			struct datapack *pack = get_active_slot(space->machine, data);
 
 			if (pack != NULL)
- 			{
+			{
 				if ((psion.port6 & 0x01) != (data & 0x01))
 				{
 					pack->counter++;
@@ -384,7 +384,7 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 					pack->counter = 0;
 					pack->page = 0;
 				}
- 			}
+			}
 
 			psion.port6 = data;
 		}
@@ -405,11 +405,11 @@ READ8_HANDLER( hd63701_int_reg_r )
 		return (hd63701_internal_registers_r(space, offset)&0x7f) | (psion.stby_pwr<<7);
 	case 0x15:
 		/*
-		x--- ---- ON key active high
-		-xxx xx-- keys matrix active low
-		---- --x- ??
-		---- ---x battery status
-		*/
+        x--- ---- ON key active high
+        -xxx xx-- keys matrix active low
+        ---- --x- ??
+        ---- ---x battery status
+        */
 		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (psion.kb_counter == 0x7ff)<<1;
 	case 0x17:
 		return psion.port6;
@@ -1085,11 +1085,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm, 		psion, 	 0,   "Psion",   "Organiser II CM",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionla,	psioncm, 0, 	psionla, 	    psion, 	 0,   "Psion",   "Organiser II LA",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionp350,	psioncm, 0, 	psionp350, 	    psion, 	 0,   "Psion",   "Organiser II P350",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionlam,	psioncm, 0, 	psionlam, 	    psion, 	 0,   "Psion",   "Organiser II LAM",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz64,  psioncm, 0, 	psionlz, 	    psion, 	 0,   "Psion",   "Organiser II LZ64",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz, 	    psion, 	 0,   "Psion",   "Organiser II LZ64S",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz,	psioncm, 0, 	psionlz, 	    psion, 	 0,   "Psion",   "Organiser II LZ",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionp464,	psioncm, 0, 	psionlz, 	    psion, 	 0,   "Psion",   "Organiser II P464",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_NOT_WORKING | GAME_NO_SOUND)

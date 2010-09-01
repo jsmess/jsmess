@@ -222,7 +222,7 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 MACHINE_RESET( lviv )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, *machine));	
+	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, *machine));
 
 	lviv_video_ram = messram_get_ptr(machine->device("messram")) + 0xc000;
 

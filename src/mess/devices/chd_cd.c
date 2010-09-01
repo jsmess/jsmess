@@ -184,7 +184,7 @@ DEVICE_GET_INFO(cdrom)
 				strcpy(info->s, get_config_dev(device)->interface );
 			}
 			break;
-		
+
 	}
 }
 

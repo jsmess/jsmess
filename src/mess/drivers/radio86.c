@@ -513,7 +513,7 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 COMP( 1986, radio86,  0,       0,	radio86,	radio86, radio86,  "<unknown>", "Radio-86RK",	0)
 COMP( 1986, radio16,  radio86, 0,	radio16,	radio86, radio86,  "<unknown>", "Radio-86RK (16K RAM)",	0)
-COMP( 1986, kr03, 	  radio86, 0,	radio86,	radio86, radio86,  "Elektronika", "KR-03",	0)
+COMP( 1986, kr03,	  radio86, 0,	radio86,	radio86, radio86,  "Elektronika", "KR-03",	0)
 COMP( 1986, radio4k,  radio86, 0,	radio86,	radio86, radio86,  "<unknown>", "Radio-86RK (4K ROM)",	0)
 COMP( 1986, radiorom, radio86, 0,	radiorom,	radio86, radio86,  "<unknown>", "Radio-86RK (ROM-Disk)",	0)
 COMP( 1986, radioram, radio86, 0,	radioram,	radio86, radioram, "<unknown>", "Radio-86RK (ROM/RAM Disk)",	0)

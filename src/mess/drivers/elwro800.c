@@ -42,7 +42,7 @@ DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	if (state->ram_at_0000 && address == 0x66)
 	{
-		direct.explicit_configure(0x66, 0x66, 0, &state->df_on_databus);			
+		direct.explicit_configure(0x66, 0x66, 0, &state->df_on_databus);
 		return ~0;
 	}
 	return address;

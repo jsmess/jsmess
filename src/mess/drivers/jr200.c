@@ -2,16 +2,16 @@
 
     JR-200 (c) 1982 National / Panasonic
 
-	preliminary driver by Roberto Zandonà and Angelo Salese
+    preliminary driver by Roberto Zandon? and Angelo Salese
 
     http://www.armchairarcade.com/neo/node/1598
 
-	TODO:
-	- Timings are basically screwed, it takes too much to load the POST but
-	  then the cursor blink is too fast
-	- keyboard MCU irq and data polling simulation should be inside a timer
-	  callback
-	- MN1544 4-bit CPU core and ROM dump
+    TODO:
+    - Timings are basically screwed, it takes too much to load the POST but
+      then the cursor blink is too fast
+    - keyboard MCU irq and data polling simulation should be inside a timer
+      callback
+    - MN1544 4-bit CPU core and ROM dump
 
 ****************************************************************************/
 
@@ -106,15 +106,15 @@ static VIDEO_UPDATE( jr200 )
 					if(attr & 0x80) //bitmap mode
 					{
 						/*
-							this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
+                            this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
 
-							tile def
-							00xx x--- up-right
-							00-- -xxx up-left
-							attr def
-							10xx x--- down-right
-							10-- -xxx down-left
-						*/
+                            tile def
+                            00xx x--- up-right
+                            00-- -xxx up-left
+                            attr def
+                            10xx x--- down-right
+                            10-- -xxx down-left
+                        */
 						int step;
 
 						step = ((xi & 4) ? 3 : 0);
@@ -178,11 +178,11 @@ static READ8_HANDLER( jr200_bios_char_r )
 
 static WRITE8_HANDLER( jr200_bios_char_w )
 {
-//	static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+//  static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
 
 	/* TODO: writing is presumably controlled by an I/O bit */
-//	gfx[offset] = data;
-//	gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
+//  gfx[offset] = data;
+//  gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
 }
 
 /*
@@ -258,9 +258,9 @@ static TIMER_CALLBACK(timer_d_callback)
 }
 
 static READ8_HANDLER( mn1271_io_r )
-{	
+{
 	UINT8 retVal = mn1271_ram[offset];
-	if((offset+0xc800) > 0xca00) 
+	if((offset+0xc800) > 0xca00)
 		retVal= 0xff;
 
 	switch(offset+0xc800)
@@ -274,7 +274,7 @@ static READ8_HANDLER( mn1271_io_r )
 		case 0xc810: retVal= 0; break;
 		case 0xc816: retVal= 0x4e; break;
 		case 0xc81c: retVal= (mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
-		case 0xc81d: retVal= (mn1271_ram[0x1d] & 0xed); break;		
+		case 0xc81d: retVal= (mn1271_ram[0x1d] & 0xed); break;
 	}
 	//logerror("mn1271_io_r [%04x] = %02x\n",offset+0xc800,retVal);
 	return retVal;
@@ -287,9 +287,9 @@ static WRITE8_HANDLER( mn1271_io_w )
 	{
 		case 0xc805: break; //LPT printer port W
 		case 0xc816: if (data!=0) {
-					timer_adjust_periodic(timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (mn1271_ram[0x17]*0x100 + mn1271_ram[0x18]))); 
+					timer_adjust_periodic(timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (mn1271_ram[0x17]*0x100 + mn1271_ram[0x18])));
 				} else {
-					timer_adjust_periodic(timer_d, attotime_zero, 0,  attotime_zero); 
+					timer_adjust_periodic(timer_d, attotime_zero, 0,  attotime_zero);
 				}
 				break;
 		case 0xc819: jr200_beep_w(space,0,data); break;
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc400, 0xc4ff) AM_READWRITE(jr200_pcg_2_r,jr200_pcg_2_w) //PCG area (2)
 	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
 
-//	0xc800 - 0xcfff I / O area
+//  0xc800 - 0xcfff I / O area
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_BASE(&mn1271_ram)
 
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( jr200 )
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
@@ -452,7 +452,7 @@ GFXDECODE_END
 static MACHINE_START(jr200)
 {
 	beep_set_frequency(machine->device("beeper"),0);
-	beep_set_state(machine->device("beeper"),0);	
+	beep_set_state(machine->device("beeper"),0);
 	timer_d = timer_alloc(machine, timer_d_callback, NULL);
 }
 
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( jr200, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 
-//	MDRV_CPU_ADD("mn1544", MN1544, ?)
+//  MDRV_CPU_ADD("mn1544", MN1544, ?)
 
 	MDRV_MACHINE_START(jr200)
 	MDRV_MACHINE_RESET(jr200)

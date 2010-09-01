@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	Acorn Archimedes 7000/7000+
+    Acorn Archimedes 7000/7000+
 
     preliminary driver by Angelo Salese,
     based on work by Tomasz Slanina and Tom Walker
 
-	???
-	bp (0382827C) (second trigger)
-	do R13 = SR13
+    ???
+    bp (0382827C) (second trigger)
+    do R13 = SR13
 
 ****************************************************************************/
 
@@ -28,14 +28,14 @@ static emu_timer *flyback_timer;
 
 static const char *const vidc20_regnames[] =
 {
-	"Video Palette", 					// 0
-	"Video Palette Address", 			// 1
+	"Video Palette",					// 0
+	"Video Palette Address",			// 1
 	"RESERVED", 						// 2
-	"LCD offset", 						// 3
+	"LCD offset",						// 3
 	"Border Colour",					// 4
-	"Cursor Palette Logical Colour 1", 	// 5
-	"Cursor Palette Logical Colour 2", 	// 6
-	"Cursor Palette Logical Colour 3", 	// 7
+	"Cursor Palette Logical Colour 1",	// 5
+	"Cursor Palette Logical Colour 2",	// 6
+	"Cursor Palette Logical Colour 3",	// 7
 	"Horizontal",						// 8
 	"Vertical",							// 9
 	"Stereo Image",						// A
@@ -49,21 +49,21 @@ static const char *const vidc20_regnames[] =
 static const char *const vidc20_horz_regnames[] =
 {
 	"Horizontal Cycle", 				// 0x80 HCR
-	"Horizontal Sync Width", 			// 0x81 HSWR
-	"Horizontal Border Start", 			// 0x82 HBSR
-	"Horizontal Display Start",		 	// 0x83 HDSR
-	"Horizontal Display End", 			// 0x84 HDER
-	"Horizontal Border End", 			// 0x85 HBER
-	"Horizontal Cursor Start", 			// 0x86 HCSR
+	"Horizontal Sync Width",			// 0x81 HSWR
+	"Horizontal Border Start",			// 0x82 HBSR
+	"Horizontal Display Start",			// 0x83 HDSR
+	"Horizontal Display End",			// 0x84 HDER
+	"Horizontal Border End",			// 0x85 HBER
+	"Horizontal Cursor Start",			// 0x86 HCSR
 	"Horizontal Interlace", 			// 0x87 HIR
-	"Horizontal Counter TEST", 			// 0x88
-	"Horizontal <UNDEFINED>", 			// 0x89
-	"Horizontal <UNDEFINED>", 			// 0x8a
-	"Horizontal <UNDEFINED>", 			// 0x8b
-	"Horizontal All TEST", 				// 0x8c
-	"Horizontal <UNDEFINED>", 			// 0x8d
-	"Horizontal <UNDEFINED>", 			// 0x8e
-	"Horizontal <UNDEFINED>" 			// 0x8f
+	"Horizontal Counter TEST",			// 0x88
+	"Horizontal <UNDEFINED>",			// 0x89
+	"Horizontal <UNDEFINED>",			// 0x8a
+	"Horizontal <UNDEFINED>",			// 0x8b
+	"Horizontal All TEST",				// 0x8c
+	"Horizontal <UNDEFINED>",			// 0x8d
+	"Horizontal <UNDEFINED>",			// 0x8e
+	"Horizontal <UNDEFINED>"			// 0x8f
 };
 
 #define HCR  0
@@ -77,22 +77,22 @@ static const char *const vidc20_horz_regnames[] =
 
 static const char *const vidc20_vert_regnames[] =
 {
-	"Vertical Cycle", 					// 0x90 VCR
-	"Vertical Sync Width", 				// 0x91 VSWR
-	"Vertical Border Start", 			// 0x92 VBSR
-	"Vertical Display Start", 			// 0x93 VDSR
+	"Vertical Cycle",					// 0x90 VCR
+	"Vertical Sync Width",				// 0x91 VSWR
+	"Vertical Border Start",			// 0x92 VBSR
+	"Vertical Display Start",			// 0x93 VDSR
 	"Vertical Display End", 			// 0x94 VDER
-	"Vertical Border End", 				// 0x95 VBER
-	"Vertical Cursor Start", 			// 0x96 VCSR
-	"Vertical Cursor End", 				// 0x97 VCER
-	"Vertical Counter TEST", 			// 0x98
-	"Horizontal <UNDEFINED>", 			// 0x99
-	"Vertical Counter Increment TEST", 	// 0x9a
-	"Horizontal <UNDEFINED>", 			// 0x9b
-	"Vertical All TEST", 				// 0x9c
-	"Horizontal <UNDEFINED>", 			// 0x9d
-	"Horizontal <UNDEFINED>", 			// 0x9e
-	"Horizontal <UNDEFINED>" 			// 0x9f
+	"Vertical Border End",				// 0x95 VBER
+	"Vertical Cursor Start",			// 0x96 VCSR
+	"Vertical Cursor End",				// 0x97 VCER
+	"Vertical Counter TEST",			// 0x98
+	"Horizontal <UNDEFINED>",			// 0x99
+	"Vertical Counter Increment TEST",	// 0x9a
+	"Horizontal <UNDEFINED>",			// 0x9b
+	"Vertical All TEST",				// 0x9c
+	"Horizontal <UNDEFINED>",			// 0x9d
+	"Horizontal <UNDEFINED>",			// 0x9e
+	"Horizontal <UNDEFINED>"			// 0x9f
 };
 
 #define VCR  0
@@ -108,15 +108,15 @@ static void vidc20_dynamic_screen_change(running_machine *machine)
 {
 	/* sanity checks - first pass */
 	/*
-	total cycles + border start/end
-	*/
+    total cycles + border start/end
+    */
 	if(vidc20_horz_reg[HCR] && vidc20_horz_reg[HBSR] && vidc20_horz_reg[HBER] &&
 	   vidc20_vert_reg[VCR] && vidc20_vert_reg[VBSR] && vidc20_vert_reg[VBER])
 	{
 		/* sanity checks - second pass */
 		/*
-		total cycles > border end > border start
-		*/
+        total cycles > border end > border start
+        */
 		if((vidc20_horz_reg[HCR] > vidc20_horz_reg[HBER]) &&
 		   (vidc20_horz_reg[HBER] > vidc20_horz_reg[HBSR]) &&
 		   (vidc20_vert_reg[VCR] > vidc20_vert_reg[VBER]) &&
@@ -262,7 +262,7 @@ static VIDEO_UPDATE( a7000 )
 	if(x_size <= 0 || y_size <= 0)
 		return 0;
 
-//	popmessage("%d",vidc20_bpp_mode);
+//  popmessage("%d",vidc20_bpp_mode);
 
 	count = 0;
 
@@ -513,7 +513,7 @@ static const char *const iomd_regnames[] =
 	"<RESERVED>"						// 0x1fc
 };
 
-#define IOMD_IOCR 		0x000/4
+#define IOMD_IOCR		0x000/4
 #define IOMD_KBDDAT		0x004/4
 #define IOMD_KBDCR		0x008/4
 
@@ -531,8 +531,8 @@ static const char *const iomd_regnames[] =
 #define IOMD_T1GO		0x058/4
 #define IOMD_T1LATCH	0x05c/4
 
-#define IOMD_ID0 		0x094/4
-#define IOMD_ID1 		0x098/4
+#define IOMD_ID0		0x094/4
+#define IOMD_ID1		0x098/4
 #define IOMD_VERSION	0x09c/4
 
 #define IOMD_VIDCUR		0x1d0/4
@@ -610,8 +610,8 @@ static void viddma_transfer_start(address_space *space)
 
 static READ32_HANDLER( a7000_iomd_r )
 {
-//	if(offset != IOMD_KBDCR)
-//		logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
+//  if(offset != IOMD_KBDCR)
+//      logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
 
 
 	switch(offset)
@@ -626,18 +626,18 @@ static READ32_HANDLER( a7000_iomd_r )
 
 			return IOMD_IO_ctrl | 0x34 | flyback;
 		}
-		case IOMD_KBDCR: 	return IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
+		case IOMD_KBDCR:	return IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
 
 		/*
-		1--- ---- always high
-		-x-- ---- Timer 1
-		--x- ---- Timer 0
-		---x ---- Power On Reset
-		---- x--- Flyback
-		---- -x-- nINT1
-		---- --0- always low
-		---- ---x INT2
-		*/
+        1--- ---- always high
+        -x-- ---- Timer 1
+        --x- ---- Timer 0
+        ---x ---- Power On Reset
+        ---- x--- Flyback
+        ---- -x-- nINT1
+        ---- --0- always low
+        ---- ---x INT2
+        */
 		case IOMD_IRQSTA:	return (IRQ_status_A & ~2) | 0x80;
 		case IOMD_IRQRQA:	return (IRQ_status_A & IRQ_mask_A) | 0x80;
 		case IOMD_IRQMSKA:	return (IRQ_mask_A);
@@ -648,15 +648,15 @@ static READ32_HANDLER( a7000_iomd_r )
 		case IOMD_T1LOW:	return timer_out[1] & 0xff;
 		case IOMD_T1HIGH:	return (timer_out[1] >> 8) & 0xff;
 
-		case IOMD_ID0: 		return io_id & 0xff; // IOMD ID low
-		case IOMD_ID1: 		return (io_id >> 8) & 0xff; // IOMD ID high
+		case IOMD_ID0:		return io_id & 0xff; // IOMD ID low
+		case IOMD_ID1:		return (io_id >> 8) & 0xff; // IOMD ID high
 		case IOMD_VERSION:	return 0;
 
-		case IOMD_VIDEND: 	return (viddma_addr_end & 0x00fffff8); //bits 31:24 undefined
+		case IOMD_VIDEND:	return (viddma_addr_end & 0x00fffff8); //bits 31:24 undefined
 		case IOMD_VIDSTART: return (viddma_addr_start & 0x1ffffff8); //bits 31, 30, 29 undefined
 		case IOMD_VIDCR:	return (viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
 
-		default: 	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
+		default:	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
 	}
 
 	return 0;
@@ -664,7 +664,7 @@ static READ32_HANDLER( a7000_iomd_r )
 
 static WRITE32_HANDLER( a7000_iomd_w )
 {
-//	logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
+//  logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 
 	switch(offset)
 	{
@@ -678,8 +678,8 @@ static WRITE32_HANDLER( a7000_iomd_w )
 		case IOMD_IRQRQA:	IRQ_status_A &= ~data; break;
 		case IOMD_IRQMSKA:	IRQ_mask_A = (data & ~2) | 0x80; break;
 
-		case IOMD_T0LOW: 	timer_in[0] = (timer_in[0] & 0xff00) | (data & 0xff); break;
-		case IOMD_T0HIGH: 	timer_in[0] = (timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T0LOW:	timer_in[0] = (timer_in[0] & 0xff00) | (data & 0xff); break;
+		case IOMD_T0HIGH:	timer_in[0] = (timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
 		case IOMD_T0GO:
 			timer_counter[0] = timer_in[0];
 			fire_iomd_timer(0,timer_counter[0]);
@@ -698,8 +698,8 @@ static WRITE32_HANDLER( a7000_iomd_w )
 			}
 			break;
 
-		case IOMD_T1LOW: 	timer_in[1] = (timer_in[1] & 0xff00) | (data & 0xff); break;
-		case IOMD_T1HIGH: 	timer_in[1] = (timer_in[1] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T1LOW:	timer_in[1] = (timer_in[1] & 0xff00) | (data & 0xff); break;
+		case IOMD_T1HIGH:	timer_in[1] = (timer_in[1] & 0x00ff) | ((data & 0xff) << 8); break;
 		case IOMD_T1GO:
 			timer_counter[1] = timer_in[1];
 			fire_iomd_timer(1,timer_counter[1]);
@@ -718,7 +718,7 @@ static WRITE32_HANDLER( a7000_iomd_w )
 			}
 			break;
 
-		case IOMD_VIDEND: 	viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
+		case IOMD_VIDEND:	viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
 		case IOMD_VIDSTART: viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
 		case IOMD_VIDCR:
 			viddma_status = data & 0xa0; if(data & 0x20) { viddma_transfer_start(space); }
@@ -731,23 +731,23 @@ static WRITE32_HANDLER( a7000_iomd_w )
 
 static ADDRESS_MAP_START( a7000_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0x0)
-//	AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
-//	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
-//	I/O 03000000 - 033fffff
-//	AM_RANGE(0x03010000, 0x03011fff) //Super IO
-//	AM_RANGE(0x03012000, 0x03029fff) //FDC
-//	AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
-//	AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
-//	AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
+//  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
+//  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
+//  I/O 03000000 - 033fffff
+//  AM_RANGE(0x03010000, 0x03011fff) //Super IO
+//  AM_RANGE(0x03012000, 0x03029fff) //FDC
+//  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
+//  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
+//  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers //mirrored at 0x03000000-0x1ff?
-//	AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
+//  AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
 
 	AM_RANGE(0x03400000, 0x037fffff) AM_WRITE(a7000_vidc20_w)
-//	AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+//  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
 	AM_RANGE(0x10000000, 0x13ffffff) AM_RAM //SIMM 0 bank 0
 	AM_RANGE(0x14000000, 0x17ffffff) AM_RAM //SIMM 0 bank 1
-//	AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
-//	AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
+//  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
+//  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
 ADDRESS_MAP_END
 
 
@@ -767,7 +767,7 @@ static MACHINE_START(a7000)
 static MACHINE_RESET(a7000)
 {
 	IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
-//	IRQ_status_A = 0x10; // set POR bit ON
+//  IRQ_status_A = 0x10; // set POR bit ON
 	IRQ_mask_A = 0x00;
 
 	IOMD_keyb_ctrl = 0x00;

@@ -1,12 +1,12 @@
 /***************************************************************************
 
-		Fidelity Chess Challenger 10
-        
-		More data :
-			http://home.germany.net/nils.eilers/cc10.htm
+        Fidelity Chess Challenger 10
+
+        More data :
+            http://home.germany.net/nils.eilers/cc10.htm
 
         30/08/2010 Skeleton driver
-		
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -71,5 +71,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 1978, cc10,  0,       0, 	cc10, 	cc10, 	 0,  	  "Fidelity",   "Chess Challenger 10",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1978, cc10,  0,       0,	cc10,	cc10,	 0, 	  "Fidelity",   "Chess Challenger 10",		GAME_NOT_WORKING | GAME_NO_SOUND)

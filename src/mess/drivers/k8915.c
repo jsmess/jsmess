@@ -3,7 +3,7 @@
         Robotron K8915
 
         30/08/2010 Skeleton driver
-		
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -71,5 +71,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0, 	k8915, 	k8915, 	 0,  	  "Robotron",   "K8915",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1982, k8915,  0,       0, 	k8915,	k8915,	 0, 	  "Robotron",   "K8915",		GAME_NOT_WORKING | GAME_NO_SOUND)

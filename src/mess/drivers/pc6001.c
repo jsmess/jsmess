@@ -19,27 +19,27 @@
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
 
-	TODO (game specific):
-	- (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work
-	- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be a solid green (plain PC-6001) or solid white (Mk2 version),
-	              but, according to an original video reference that I've seen, that screen should actually some kind of weird garbage on it ...
-	- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the player to press either 'B' or 'C' then a number but
-	                        nothing is shown on screen, other emus behaves the same, bad dump?
-	(Mk2 mode 5 games)
-	- 3D Golf Simulation Super Version: gameplay / inputs looks broken
-	- American Truck: Screen is offset at the loading screen, loading bug?
-	- Castle Excellent: copyright text drawing is quite bogus, scans text in vertical instead of horizontal?
-	- Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it with current cassette kludge, also, for Dezeni Land(s) keyboard irqs
-	                                              doesn't seem to work too well with halt opcode execution?
-	- Dezeni Land 1/4: dies after loading of main program
-	- Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
-	- (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-	- Grobda: when "get ready" speech plays, screen should be full white but instead it's all black, same issue as AX-6 Demo?
-	- Pac-Man / Tiny Xevious 2: gameplay is too fast
-	- Salad no Kunino Tomato-Hime: can't start a play
-	- Space Harrier: inputs doesn't work properly
-	- The Black Onyx: dies when it attempts to save the character, that obviously means saving on the tape
-	- Yakyukyo / Punchball Mario: waits for an irq, check which one;
+    TODO (game specific):
+    - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work
+    - AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be a solid green (plain PC-6001) or solid white (Mk2 version),
+                  but, according to an original video reference that I've seen, that screen should actually some kind of weird garbage on it ...
+    - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the player to press either 'B' or 'C' then a number but
+                            nothing is shown on screen, other emus behaves the same, bad dump?
+    (Mk2 mode 5 games)
+    - 3D Golf Simulation Super Version: gameplay / inputs looks broken
+    - American Truck: Screen is offset at the loading screen, loading bug?
+    - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical instead of horizontal?
+    - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it with current cassette kludge, also, for Dezeni Land(s) keyboard irqs
+                                                  doesn't seem to work too well with halt opcode execution?
+    - Dezeni Land 1/4: dies after loading of main program
+    - Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
+    - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
+    - Grobda: when "get ready" speech plays, screen should be full white but instead it's all black, same issue as AX-6 Demo?
+    - Pac-Man / Tiny Xevious 2: gameplay is too fast
+    - Salad no Kunino Tomato-Hime: can't start a play
+    - Space Harrier: inputs doesn't work properly
+    - The Black Onyx: dies when it attempts to save the character, that obviously means saving on the tape
+    - Yakyukyo / Punchball Mario: waits for an irq, check which one;
 
 ========================================================================================================================================================
 
@@ -97,26 +97,26 @@
 ==================================================================================
 
 PC-6001 irq table:
-irq vector 0x00: writes 0x00 to [$fa19]													  	;(unused)
+irq vector 0x00: writes 0x00 to [$fa19]                                                     ;(unused)
 irq vector 0x02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
-irq vector 0x04: 																			;uart irq
-irq vector 0x06: operates with $fa28, $fa2e, $fd1b 											;timer irq
-irq vector 0x08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] 				;tape data ready
-irq vector 0x0a: writes 0x00 to [$fa19]														;(unused)
-irq vector 0x0c: writes 0x00 to [$fa19]														;(unused)
-irq vector 0x0e: same as 2, (A = 0x03, B = 0x00) 											;keyboard data ready, unknown type
-irq vector 0x10: same as 2, (A = 0x03, B = 0x00)											;(unused)
-irq vector 0x12: writes 0x10 to [$fa19] 													;end of tape reached
-irq vector 0x14: same as 2, (A = 0x00, B = 0x01) 											;kanji lock enabled
-irq vector 0x16: tests ppi port c, writes the result to $feca. 								;joystick
-irq vector 0x18: 																			;TVR (?)
-irq vector 0x1a: 																			;Date
-irq vector 0x1c: 																			;(unused)
-irq vector 0x1e: 																			;(unused)
-irq vector 0x20: 																			;voice
-irq vector 0x22: 																			;VRTC (?)
-irq vector 0x24: 																			;(unused)
-irq vector 0x26: 																			;(unused)
+irq vector 0x04:                                                                            ;uart irq
+irq vector 0x06: operates with $fa28, $fa2e, $fd1b                                          ;timer irq
+irq vector 0x08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19]                ;tape data ready
+irq vector 0x0a: writes 0x00 to [$fa19]                                                     ;(unused)
+irq vector 0x0c: writes 0x00 to [$fa19]                                                     ;(unused)
+irq vector 0x0e: same as 2, (A = 0x03, B = 0x00)                                            ;keyboard data ready, unknown type
+irq vector 0x10: same as 2, (A = 0x03, B = 0x00)                                            ;(unused)
+irq vector 0x12: writes 0x10 to [$fa19]                                                     ;end of tape reached
+irq vector 0x14: same as 2, (A = 0x00, B = 0x01)                                            ;kanji lock enabled
+irq vector 0x16: tests ppi port c, writes the result to $feca.                              ;joystick
+irq vector 0x18:                                                                            ;TVR (?)
+irq vector 0x1a:                                                                            ;Date
+irq vector 0x1c:                                                                            ;(unused)
+irq vector 0x1e:                                                                            ;(unused)
+irq vector 0x20:                                                                            ;voice
+irq vector 0x22:                                                                            ;VRTC (?)
+irq vector 0x24:                                                                            ;(unused)
+irq vector 0x26:                                                                            ;(unused)
 
 
 *******************************************************************************************************************************************************/
@@ -410,14 +410,14 @@ static VIDEO_UPDATE( pc6001m2 )
 					int pen[2];
 
 					/*
-					palette reference:
-					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
-					                    0x02, 0x06, 0x03, 0x07,
-					                    0x08, 0x0c, 0x09, 0x0d,
-					                    0x0a, 0x0e, 0x0b, 0x0f };
+                    palette reference:
+                    UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
+                                        0x02, 0x06, 0x03, 0x07,
+                                        0x08, 0x0c, 0x09, 0x0d,
+                                        0x0a, 0x0e, 0x0b, 0x0f };
 
-					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
-					*/
+                    color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
+                    */
 
 					pen[0] = pc6001_video_ram[count+0x0000] >> (6-i*2) & 3;
 					pen[1] = pc6001_video_ram[count+0x2000] >> (6-i*2) & 3;
@@ -453,11 +453,11 @@ static VIDEO_UPDATE( pc6001m2 )
 					int pen[2];
 
 					/*
-					palette reference:
-					UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
+                    palette reference:
+                    UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
 
-					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
-					*/
+                    color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
+                    */
 
 					pen[0] = pc6001_video_ram[count+0x0000] >> (7-i) & 1;
 					pen[1] = pc6001_video_ram[count+0x2000] >> (7-i) & 1;
@@ -496,12 +496,12 @@ static VIDEO_UPDATE( pc6001m2 )
 			for(x=0;x<40;x++)
 			{
 				/*
-				exgfx attr format:
-				x--- ---- rom bank select
-				-xxx ---- bg color
-				---- xxxx fg color
-				Note that the exgfx banks a different gfx ROM
-				*/
+                exgfx attr format:
+                x--- ---- rom bank select
+                -xxx ---- bg color
+                ---- xxxx fg color
+                Note that the exgfx banks a different gfx ROM
+                */
 				tile = pc6001_video_ram[(x+(y*40))+0x400] + 0x200;
 				attr = pc6001_video_ram[(x+(y*40)) & 0x3ff];
 				tile+= ((attr & 0x80) << 1);
@@ -940,7 +940,7 @@ static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 
 	bank_r0 = data;
 
-//	printf("%02x BANK | %02x\n",data,bank_opt);
+//  printf("%02x BANK | %02x\n",data,bank_opt);
 	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[(data & 0xf)+(bank_opt*0x10)][0]]);
 	memory_set_bankptr(space->machine, "bank2", &ROM[banksw_table_r0[(data & 0xf)+(bank_opt*0x10)][1]]);
 	memory_set_bankptr(space->machine, "bank3", &ROM[banksw_table_r0[((data & 0xf0)>>4)+(bank_opt*0x10)][2]]);
@@ -959,7 +959,7 @@ static WRITE8_HANDLER( pc6001m2_bank_r1_w )
 
 	bank_r1 = data;
 
-//	printf("%02x BANK\n",data);
+//  printf("%02x BANK\n",data);
 	memory_set_bankptr(space->machine, "bank5", &ROM[banksw_table_r1[(data & 0xf)+(bank_opt*0x10)][0]]);
 	memory_set_bankptr(space->machine, "bank6", &ROM[banksw_table_r1[(data & 0xf)+(bank_opt*0x10)][1]]);
 	memory_set_bankptr(space->machine, "bank7", &ROM[banksw_table_r1[((data & 0xf0)>>4)+(bank_opt*0x10)][2]]);
@@ -977,11 +977,11 @@ static WRITE8_HANDLER( pc6001m2_opt_bank_w )
 	UINT8 *gfx_data = memory_region(space->machine, "gfx1");
 
 	/*
-	0 - TVROM / VOICE ROM
-	1 - KANJI ROM bank 0
-	2 - KANJI ROM bank 1
-	3 - TVROM / VOICE ROM
-	*/
+    0 - TVROM / VOICE ROM
+    1 - KANJI ROM bank 0
+    2 - KANJI ROM bank 1
+    3 - TVROM / VOICE ROM
+    */
 	bank_opt = data & 3;
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[(bank_r0 & 0xf)+(bank_opt*0x10)][0]]);
@@ -1052,7 +1052,7 @@ static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 {
 	UINT8 *work_ram = memory_region(machine, "maincpu");
 
-//	popmessage("%02x",vram_bank);
+//  popmessage("%02x",vram_bank);
 
 	switch(vram_bank & 0x66)
 	{
@@ -1103,7 +1103,7 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 
 static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 {
-//	UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
+//  UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
 
 	ex_vram_bank = data;
 	vram_bank_change(space->machine,(ex_vram_bank & 0x06) | ((sys_latch & 0x06) << 4));
@@ -1130,9 +1130,9 @@ static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 		}
 	}
 
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 
-//	pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+//  pc6001_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
 }
 
 static WRITE8_HANDLER( pc6001m2_col_bank_w )
@@ -1182,15 +1182,15 @@ static WRITE8_HANDLER( upd7752_reg_w )
 static WRITE8_HANDLER( pc6001m2_0xf3_w )
 {
 	/*
-	x--- ---- M1 (?) wait setting
-	-x-- ---- ROM wait setting
-	--x- ---- RAM wait setting
-	---x ---- custom irq 2 address output
-	---- x--- custom irq 1 address output
-	---- -x-- timer irq mask 2 (mirror?)
-	---- --x- custom irq 2 mask
-	---- ---x custom irq 1 mask
-	*/
+    x--- ---- M1 (?) wait setting
+    -x-- ---- ROM wait setting
+    --x- ---- RAM wait setting
+    ---x ---- custom irq 2 address output
+    ---- x--- custom irq 1 address output
+    ---- -x-- timer irq mask 2 (mirror?)
+    ---- --x- custom irq 2 mask
+    ---- ---x custom irq 1 mask
+    */
 	timer_irq_mask2 = data & 4;
 }
 
@@ -1271,8 +1271,8 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
-//	AM_RANGE(0xf4
-//	AM_RANGE(0xf5
+//  AM_RANGE(0xf4
+//  AM_RANGE(0xf5
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
@@ -1302,9 +1302,9 @@ static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
 	/* these are disk related */
-//	AM_RANGE(0xb1
-//	AM_RANGE(0xb2
-//	AM_RANGE(0xb3
+//  AM_RANGE(0xb1
+//  AM_RANGE(0xb2
+//  AM_RANGE(0xb3
 
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
@@ -1318,8 +1318,8 @@ static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
-//	AM_RANGE(0xf4
-//	AM_RANGE(0xf5
+//  AM_RANGE(0xf4
+//  AM_RANGE(0xf5
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
@@ -1513,13 +1513,13 @@ static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001sr_system_latch_w)
 	/* these are disk related */
-//	AM_RANGE(0xb1
-//	AM_RANGE(0xb2
-//	AM_RANGE(0xb3
+//  AM_RANGE(0xb1
+//  AM_RANGE(0xb2
+//  AM_RANGE(0xb3
 
-//	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
-//	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
-//	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
+//  AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
+//  AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
 
 	AM_RANGE(0xc8, 0xc8) AM_WRITE(pc6001sr_mode_w)
 	AM_RANGE(0xc9, 0xc9) AM_WRITE(pc6001sr_vram_bank_w)
@@ -1528,12 +1528,12 @@ static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
 
-//	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
-//	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
-//	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
+//  AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
+//  AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
+//  AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
-//	AM_RANGE(0xf4
-//	AM_RANGE(0xf5
+//  AM_RANGE(0xf4
+//  AM_RANGE(0xf5
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
@@ -1718,8 +1718,8 @@ static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
 {
-//	if(data != 0x06)
-//		printf("pc6001_8255_porta_w %02x\n",data);
+//  if(data != 0x06)
+//      printf("pc6001_8255_porta_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
@@ -1821,15 +1821,15 @@ static UINT8 check_joy_press(running_machine *machine)
 	static UINT8 joy_press;
 
 		/*
-			PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-			PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-			PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-			PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-			PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-			PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-			PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-			PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-		*/
+            PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+            PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+            PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+            PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+            PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+            PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+            PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+            PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+        */
 
 	joy_press = 0;
 
@@ -1902,7 +1902,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT32 key2 = input_port_read(machine,"key2");
 	UINT32 key3 = input_port_read(machine,"key3");
 	static UINT32 old_key1,old_key2,old_key3;
-//	UINT8 p1_key = input_port_read(machine, "P1");;
+//  UINT8 p1_key = input_port_read(machine, "P1");;
 
 	if(cas_switch == 0)
 	{
@@ -2020,7 +2020,7 @@ static MACHINE_RESET(pc6001sr)
 		sr_bank_r[5] = 0x0a; memory_set_bankptr(machine, "bank6", &ROM[SR_WRAM0(0x0a)]);
 		sr_bank_r[6] = 0x0c; memory_set_bankptr(machine, "bank7", &ROM[SR_WRAM0(0x0c)]);
 		sr_bank_r[7] = 0x0e; memory_set_bankptr(machine, "bank8", &ROM[SR_WRAM0(0x0e)]);
-//		bank_opt = 0x02; //tv rom
+//      bank_opt = 0x02; //tv rom
 
 		/* enable default work RAM writes */
 		sr_bank_w[0] = 0x00;
@@ -2190,7 +2190,7 @@ static MACHINE_CONFIG_START( pc6001, driver_data_t )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
-//	MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
+//  MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
 	MDRV_CARTSLOT_ADD("cass")
 	MDRV_CARTSLOT_EXTENSION_LIST("cas,p6")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -2339,12 +2339,12 @@ ROM_START( pc6001sr )
 	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
-//  cgrom 1	                   0x30000, 0x10000
-//  exrom 0	                   0x40000, 0x10000
-//  exrom 1	                   0x50000, 0x10000
-//  exram 0	                   0x60000, 0x10000
-//  work ram 0	               0x70000, 0x10000
-//	<invalid>                  0x80000, 0x10000
+//  cgrom 1                    0x30000, 0x10000
+//  exrom 0                    0x40000, 0x10000
+//  exrom 1                    0x50000, 0x10000
+//  exram 0                    0x60000, 0x10000
+//  work ram 0                 0x70000, 0x10000
+//  <invalid>                  0x80000, 0x10000
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )

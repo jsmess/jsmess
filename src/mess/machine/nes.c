@@ -449,24 +449,24 @@ READ8_HANDLER( nes_IN1_r )
 }
 
 
-// FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up 
+// FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up
 // to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
 static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
 {
 	nes_state *state = machine->driver_data<nes_state>();
 	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4", "CC_LEFT", "CC_RIGHT" };
-	
+
 	vals->i0 = 0;
 	vals->i1 = 0;
 	vals->i2 = 0;
-	
+
 	switch (cfg & 0x0f)
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
 				vals->i0 = input_port_read(machine, padnames[pad_port]);
 			break;
-			
+
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
@@ -475,7 +475,7 @@ static void nes_read_input_device( running_machine *machine, int cfg, nes_input 
 				vals->i2 = input_port_read(machine, "ZAPPER1_Y");
 			}
 			break;
-			
+
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
@@ -484,12 +484,12 @@ static void nes_read_input_device( running_machine *machine, int cfg, nes_input 
 				vals->i2 = input_port_read(machine, "ZAPPER2_Y");
 			}
 			break;
-			
+
 		case 0x04:	/* arkanoid paddle */
 			if (pad_port == 1)
 				vals->i0 = (UINT8) ((UINT8) input_port_read(machine, "PADDLE") + (UINT8)0x52) ^ 0xff;
 			break;
-			
+
 		case 0x05:	/* crazy climber controller */
 			if (pad_port == 0)
 			{
@@ -556,14 +556,14 @@ WRITE8_HANDLER( nes_IN0_w )
 	{
 		if (data & 0x01)
 			return;
-		
+
 		if (LOG_JOY)
 			logerror("joy 0 bits read: %d\n", state->in_0.shift);
-		
+
 		/* Toggling bit 0 high then low resets both controllers */
 		state->in_0.shift = 0;
 		state->in_1.shift = 0;
-		
+
 		/* Read the input devices */
 		if ((cfg & 0x000f) != 0x06)
 		{
@@ -579,10 +579,10 @@ WRITE8_HANDLER( nes_IN0_w )
 			nes_read_input_device(space->machine, 0, &state->in_3, 3, FALSE);
 			nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE);
 		}
-		
+
 		if (cfg & 0x0f00)
 			state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
-		
+
 		if (cfg & 0xf000)
 			state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
 	}
@@ -710,7 +710,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					state->prg_chunks = mapint3;
 					state->chr_chunks = mapint4;
 					logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
-//					printf("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
+//                  printf("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
 					goodcrcinfo = 1;
 					state->ines20 = 0;
 				}
@@ -725,7 +725,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			state->hard_mirroring = (local_options & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ;
-//			printf("%s\n", state->hard_mirroring & 0x01 ? "Vertical" : "Horizontal");
+//          printf("%s\n", state->hard_mirroring & 0x01 ? "Vertical" : "Horizontal");
 			state->battery = local_options & 0x02;
 			state->trainer = local_options & 0x04;
 			state->four_screen_vram = local_options & 0x08;
@@ -895,16 +895,16 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Allocate internal Mapper RAM for boards which require it */
 			if (state->pcb_id == STD_EXROM)
 				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x400);
-			
+
 			if (state->pcb_id == TAITO_X1_005 || state->pcb_id == TAITO_X1_005_A)
 				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x80);
-			
+
 			if (state->pcb_id == TAITO_X1_017)
 				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x1400);
-			
+
 			if (state->pcb_id == NAMCOT_163)
 				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x2000);
-			
+
 			/* Position past the header */
 			image.fseek(16, SEEK_SET);
 
@@ -1123,7 +1123,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						logerror("[MIRR] chunk found.\n");
 						image.fread(&buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-						
+
 						image.fread(&temp_byte, 1);
 						switch (temp_byte)
 						{
@@ -1153,7 +1153,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 								state->hard_mirroring = PPU_MIRROR_HORZ;
 								break;
 						}
-						
+
 						read_length += (chunk_length + 8);
 					}
 					else if ((magic2[0] == 'P') && (magic2[1] == 'C') && (magic2[2] == 'K'))

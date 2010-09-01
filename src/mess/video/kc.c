@@ -111,7 +111,7 @@ enum
 /* set new blink state - record blink state in event list */
 void kc85_video_set_blink_state(running_machine *machine, int data)
 {
-//	EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
+//  EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
 }
 
 
@@ -496,11 +496,11 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 {
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;
 
-//	EVENT_LIST_ITEM *pItem;
+//  EVENT_LIST_ITEM *pItem;
 //    int NumItems;
 
 	struct video_update_state video_update;
-//	int cycles_offset = 0;
+//  int cycles_offset = 0;
 
 	video_update.render_x = 0;
 	video_update.render_y = 0;
@@ -516,39 +516,39 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 	video_update.vertical.cycles_remaining_in_state = vertical_graphics_state_lines[video_update.vertical.state];
 	video_update.vertical.cycles_remaining = KC85_CYCLES_PER_FRAME;
 
-//	/* first item in list */
-//	pItem = EventList_GetFirstItem();
-//	/* number of items remaining */
-//	NumItems = EventList_NumEvents();
+//  /* first item in list */
+//  pItem = EventList_GetFirstItem();
+//  /* number of items remaining */
+//  NumItems = EventList_NumEvents();
 //
-//	while (NumItems)
-//	{
-//		int delta_cycles;
+//  while (NumItems)
+//  {
+//      int delta_cycles;
 //
-//		/* number of cycles until event will trigger */
-//		delta_cycles = pItem->Event_Time - cycles_offset;
+//      /* number of cycles until event will trigger */
+//      delta_cycles = pItem->Event_Time - cycles_offset;
 //
-//		//logerror("cycles between this event and next: %d\n",delta_cycles);
-//		kc85_common_vh_process_lines(&video_update, delta_cycles);
+//      //logerror("cycles between this event and next: %d\n",delta_cycles);
+//      kc85_common_vh_process_lines(&video_update, delta_cycles);
 //
-//		/* update number of cycles remaining in frame */
-//		cycles_remaining_in_frame -= delta_cycles;
-//		/* set new blink state */
-//		kc85_blink_state = pItem->Event_Data;
+//      /* update number of cycles remaining in frame */
+//      cycles_remaining_in_frame -= delta_cycles;
+//      /* set new blink state */
+//      kc85_blink_state = pItem->Event_Data;
 //
-//		/* set new cycles into frame */
-//		cycles_offset = pItem->Event_Time;
-//		/* next event */
-//		pItem++;
-//		/* update number of events remaining */
-//		NumItems--;
-//	}
+//      /* set new cycles into frame */
+//      cycles_offset = pItem->Event_Time;
+//      /* next event */
+//      pItem++;
+//      /* update number of events remaining */
+//      NumItems--;
+//  }
 
 
 	/* process remainder */
 	kc85_common_vh_process_lines(&video_update, cycles_remaining_in_frame);
-//	EventList_Reset();
-//	EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+//  EventList_Reset();
+//  EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 }
 
 
@@ -559,7 +559,7 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 static void kc85_common_vh_start(running_machine *machine)
 {
 	kc85_blink_state = 0;
-//	EventList_Initialise(machine, 30000);
+//  EventList_Initialise(machine, 30000);
 }
 
 static unsigned char *kc85_4_display_video_ram;

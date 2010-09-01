@@ -724,5 +724,5 @@ DRIVER_INIT( apple3 )
 	via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, *machine));	
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, *machine));
 }

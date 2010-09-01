@@ -433,7 +433,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, *image.device().machine));			
+	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, *image.device().machine));
 
 	return IMAGE_INIT_PASS;
 }

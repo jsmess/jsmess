@@ -584,7 +584,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			image.fread(ptr + address, 0x2000);
 			image.fread(ptr + 0xa000, 0x2000);
-			
+
 			memory_install_rom(program, address, address + 0x1fff, 0, 0, ptr + address);
 			memory_install_rom(program, 0xa000, 0xbfff, 0, 0, ptr + 0xa000);
 		}
@@ -603,7 +603,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 			memcpy(ptr + address, image.get_software_region("2000"), size);
 			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
 		}
-		
+
 		size = image.get_software_region_length("4000");
 		if (size)
 		{
@@ -611,7 +611,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 			memcpy(ptr + address, image.get_software_region("4000"), size);
 			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
 		}
-		
+
 		size = image.get_software_region_length("6000");
 		if (size)
 		{
@@ -619,7 +619,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 			memcpy(ptr + address, image.get_software_region("6000"), size);
 			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
 		}
-		
+
 		size = image.get_software_region_length("a000");
 		if (size)
 		{

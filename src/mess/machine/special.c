@@ -269,7 +269,7 @@ MACHINE_RESET( specimx )
 	specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
 	running_device *fdc = machine->device("wd1793");
-	wd17xx_set_pause_time(fdc,12);	
+	wd17xx_set_pause_time(fdc,12);
 	wd17xx_dden_w(fdc, 0);
 }
 

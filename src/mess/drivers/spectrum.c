@@ -639,7 +639,7 @@ MACHINE_RESET( spectrum )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	space->set_direct_update_handler(direct_update_delegate_create_static(spectrum_direct, *machine));
-	
+
 	state->port_7ffd_data = -1;
 	state->port_1ffd_data = -1;
 }

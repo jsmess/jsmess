@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( a1200n, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(a1200_map)
 
-//	MDRV_CPU_ADD("keyboard_mpu", MC68HC05)
+//  MDRV_CPU_ADD("keyboard_mpu", MC68HC05)
 
 	MDRV_MACHINE_RESET(amiga)
 

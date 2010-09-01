@@ -1605,7 +1605,7 @@ DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 		if (opptr != NULL)
 		{
 			direct.explicit_configure(address, address, ~0, opptr - address);
-			
+
 			address = ~0;
 		}
 	}
@@ -1690,7 +1690,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 	memory_install_read8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
 	memory_install_write8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
 	space->set_direct_update_handler(direct_update_delegate_create_static(apple2gs_opbase, *machine));
-	
+
 
 	/* install aux memory writes (for shadowing) */
 	memory_install_write8_handler(space, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);

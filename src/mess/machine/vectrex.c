@@ -79,7 +79,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	UINT8 *mem = memory_region(image.device().machine, "maincpu");
 	if (image.software_entry() == NULL)
-	{	
+	{
 		image.fread( mem, 0x8000);
 	} else {
 		int size = image.get_software_region_length("rom");

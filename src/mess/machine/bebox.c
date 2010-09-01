@@ -945,7 +945,7 @@ static WRITE64_HANDLER( scsi53c810_w )
 static UINT32 scsi53c810_fetch(running_machine *machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);	
+	result = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 

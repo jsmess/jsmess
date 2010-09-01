@@ -1147,8 +1147,8 @@ MACHINE_RESET( lisa )
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));		
-	cputag_get_address_space(machine, "fdccpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_fdc_OPbaseoverride, *machine));		
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
+	cputag_get_address_space(machine, "fdccpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_fdc_OPbaseoverride, *machine));
 
 	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 

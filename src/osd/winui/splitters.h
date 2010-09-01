@@ -53,7 +53,7 @@ int     GetSplitterCount(void);
 
 extern int *nSplitterOffset;
 
-typedef struct 
+typedef struct
 {
 	double dPosition;
 	int nSplitterWindow;

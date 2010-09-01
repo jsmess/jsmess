@@ -378,7 +378,7 @@ INLINE void vic2_suspend_cpu( running_machine *machine, vic2_state *vic2 )
 		vic2->first_ba_cycle = vic2->cycles_counter;
 		if ((vic2->rdy_workaround_cb != NULL) && (vic2->rdy_workaround_cb(machine) != 7 ))
 		{
-//			cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
+//          cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
 		}
 		vic2->cpu_suspended = 1;
 	}
@@ -391,7 +391,7 @@ INLINE void vic2_resume_cpu( running_machine *machine, vic2_state *vic2 )
 	{
 		if ((vic2->rdy_workaround_cb != NULL))
 		{
-//	cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
+//  cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
 		}
 		vic2->cpu_suspended = 0;
 	}
@@ -452,7 +452,7 @@ INLINE void vic2_check_sprite_dma( vic2_state *vic2 )
 // Video matrix access
 INLINE void vic2_matrix_access( running_machine *machine, vic2_state *vic2 )
 {
-//	if (vic2->cpu_suspended == 1)
+//  if (vic2->cpu_suspended == 1)
 	{
 		if ((vic2->cycles_counter - vic2->first_ba_cycle) < 0)
 			vic2->matrix_line[vic2->ml_index] = vic2->color_line[vic2->ml_index] = 0xff;
@@ -1005,7 +1005,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 	UINT8 vic_cycles = (vic2->cycles_counter + 1) & 0xff;
 	vic2->cycles_counter++;
 
-//	printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,rdy_cycles);
+//  printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,rdy_cycles);
 /*
 if (input_code_pressed(machine, KEYCODE_X))
 {
@@ -1028,7 +1028,7 @@ if (input_code_pressed_once(machine, KEYCODE_K)) adjust[8]--;
 if (input_code_pressed_once(machine, KEYCODE_C)) adjust[0]++;
 if (input_code_pressed_once(machine, KEYCODE_V)) adjust[0]--;
 if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
-								adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
+                                adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
 }
 */
 
@@ -1041,7 +1041,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		{
 			vic2->vblanking = 1;
 
-//			if (LIGHTPEN_BUTTON)
+//          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer start */
 				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);
@@ -1632,7 +1632,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 		{
 			vic2->vblanking = 1;
 
-//			if (LIGHTPEN_BUTTON)
+//          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer starten */
 				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);

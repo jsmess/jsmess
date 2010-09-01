@@ -91,7 +91,7 @@ static READ8_HANDLER(mac_asc_r)
 		case 0x800:	// VERSION
 			// LC/LCII return 0xe8 (V8 ASIC ASC emulation)
 			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
-		      	{
+		    	{
 				return 0xe8;
 			}
 
@@ -105,7 +105,7 @@ static READ8_HANDLER(mac_asc_r)
 
 		case 0x804:
 			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
-		      	{
+		    	{
 				return 3;
 			}
 			break;

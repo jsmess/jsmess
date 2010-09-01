@@ -1205,7 +1205,7 @@ DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		  multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
 		 /* clear op base override */
-		  cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(amstrad_default, *machine));				
+		  cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(amstrad_default, *machine));
 		}
 
 		return pc;

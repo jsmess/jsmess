@@ -403,7 +403,7 @@ DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 	opbase_ptr = avigo_banked_opbase[address / 0x4000];
 	if (opbase_ptr != NULL)
 	{
-		direct.explicit_configure(0x0000, 0xffff, 0xffff, (UINT8*)opbase_ptr);	
+		direct.explicit_configure(0x0000, 0xffff, 0xffff, (UINT8*)opbase_ptr);
 		address = ~0;
 	}
 	return address;

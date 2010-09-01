@@ -2,7 +2,7 @@
 
         Psion Organiser II Datapack
 
-		08/18/2010 Sandro Ronco
+        08/18/2010 Sandro Ronco
 
         Known file types:
          0x00         invalid record

@@ -296,7 +296,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 		}
 	}
 	logerror("%s loaded cartridge '%s' size %dK\n",
-		image.device().machine->gamedrv->name, image.filename() , size/1024);	
+		image.device().machine->gamedrv->name, image.filename() , size/1024);
 	return IMAGE_INIT_PASS;
 }
 
@@ -328,7 +328,7 @@ MACHINE_START( xegs )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *cart = memory_region(space->machine, "user1");
 	UINT8 *cpu  = memory_region(space->machine, "maincpu");
-	
+
 	atari_machine_start(machine);
 	memory_install_write8_handler(space, 0xd500, 0xd5ff, 0, 0, xegs_bankswitch);
 
@@ -349,7 +349,7 @@ DEVICE_IMAGE_LOAD( xegs_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = memory_region(image.device().machine, "user1");
-	
+
 	if (image.software_entry() == NULL)
 	{
 		// skip the header

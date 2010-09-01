@@ -92,7 +92,7 @@ public:
 	UINT8 mmc5_high_chr;
 	UINT8 mmc5_split_scr;
 	UINT8 *extended_ntram;
-	
+
 	UINT8 mmc5_last_chr_a;
 	UINT16 mmc5_vrom_regA[8];
 	UINT16 mmc5_vrom_regB[4];

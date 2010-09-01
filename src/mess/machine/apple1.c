@@ -258,7 +258,7 @@ SNAPSHOT_LOAD(apple1)
 		 addr <= end_addr;
 		 addr++, snapptr++)
 		cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM)->write_byte(addr, *snapptr);
-		
+
 
 	return IMAGE_INIT_PASS;
 }

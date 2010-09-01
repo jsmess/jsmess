@@ -3,7 +3,7 @@
         Cromemco C-10 Personal Computer
 
         30/08/2010 Skeleton driver
-		
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -90,10 +90,10 @@ ROM_START( c10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "c10_cros.bin", 0x0000, 0x4000, CRC(2ccf5983) SHA1(52f7c497f5284bf5df9eb0d6e9142bb1869d8c24))
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))	
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 1982, c10,  0,       0, 	c10, 	c10, 	 0,  	  "Cromemco",   "C-10",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1982, c10,  0,       0,	c10,	c10,	 0, 	  "Cromemco",   "C-10",		GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -15,7 +15,7 @@ DIRECT_UPDATE_HANDLER( pentagon_direct )
 	running_device *beta = machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	if (beta->started() && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
@@ -38,12 +38,12 @@ DIRECT_UPDATE_HANDLER( pentagon_direct )
 		if (state->ROMSelection == 3) {
 			if (beta->started()) {
 				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memory_region(machine, "beta:beta"));
-				memory_set_bankptr(machine, "bank1", memory_region(machine, "beta:beta"));				
+				memory_set_bankptr(machine, "bank1", memory_region(machine, "beta:beta"));
 			}
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));			
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));			
-		}		
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
+			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
+		}
 		return ~0;
 	}
 	return address;

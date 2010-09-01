@@ -80,7 +80,7 @@ DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 
 MACHINE_RESET ( zx80 )
 {
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));	
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));
 	zx_tape_bit = 0x80;
 }
 

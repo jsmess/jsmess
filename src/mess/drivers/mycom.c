@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	MYCOMZ-80A (c) 1981 Japan Electronics College
+    MYCOMZ-80A (c) 1981 Japan Electronics College
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- SN doesn't seem to work properly, needs to find out what's the WE bit
-	  for.
-	- Hook-up FDC and CMT load / save;
-	- Printer
-	- RTC
+    TODO:
+    - SN doesn't seem to work properly, needs to find out what's the WE bit
+      for.
+    - Hook-up FDC and CMT load / save;
+    - Printer
+    - RTC
 
 ****************************************************************************/
 
@@ -367,7 +367,7 @@ static WRITE8_DEVICE_HANDLER( vram_laddr_w )
 	/* doesn't work? */
 	//printf("%02x %02x\n",data,sn_we);
 	//if(sn_we)
-	//	sn76496_w(device->machine->device("sn1"), 0, data);
+	//  sn76496_w(device->machine->device("sn1"), 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( vram_haddr_w )
@@ -378,10 +378,10 @@ static WRITE8_DEVICE_HANDLER( vram_haddr_w )
 static READ8_DEVICE_HANDLER( input_1a )
 {
 	/*
-	x--- ---- display flag
-	---- --x- keyboard shift
-	---- ---x keyboard strobe
-	*/
+    x--- ---- display flag
+    ---- --x- keyboard shift
+    ---- ---x keyboard strobe
+    */
 	int res;
 
 	res = keyb_press_flag;
@@ -393,8 +393,8 @@ static READ8_DEVICE_HANDLER( input_1a )
 static READ8_DEVICE_HANDLER( input_0c )
 {
 	/*
-	xxxx ---- keyboard related, it expects to return 1101 here
-	*/
+    xxxx ---- keyboard related, it expects to return 1101 here
+    */
 	return (mame_rand(device->machine) & 0x20) | 0x00;
 }
 
@@ -407,19 +407,19 @@ static READ8_DEVICE_HANDLER( key_r )
 static WRITE8_DEVICE_HANDLER( output_1c )
 {
 	/*
-	x--- ---- width 80/40 (0 = 80, 1 = 40)
-	-x-- ---- video mode (0= tile, 1 = bitmap)
-	--x- ---- PSG Chip Select bit
-	---x ---- PSG Write Enable bit
-	---- x--- cmt remote
-	---- -x-- cmt output
-	---- --x- printer reset
-	---- ---x printer strobe
-	*/
+    x--- ---- width 80/40 (0 = 80, 1 = 40)
+    -x-- ---- video mode (0= tile, 1 = bitmap)
+    --x- ---- PSG Chip Select bit
+    ---x ---- PSG Write Enable bit
+    ---- x--- cmt remote
+    ---- -x-- cmt output
+    ---- --x- printer reset
+    ---- ---x printer strobe
+    */
 
 	video_mode = data & 0xc0;
 	sn_we = data & 0x10;
-//	printf("%02x\n",data & 0x10);
+//  printf("%02x\n",data & 0x10);
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( keyboard_callback )
 				if(!shift_press_flag)  // shift not pressed
 				{
 					//if(scancode >= 0x41 && scancode < 0x5b)
-					//	scancode += 0x20;  // lowercase, FIXME: 'A' doesn't work properly?
+					//  scancode += 0x20;  // lowercase, FIXME: 'A' doesn't work properly?
 				}
 				else
 				{
@@ -559,5 +559,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1981, mycom,  	0,       0, 		mycom, 	mycom, 	 0,  	   "Japan Electronics College",   "MYCOMZ-80A",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, mycom,  	0,       0, 		mycom,	mycom,	 0, 	   "Japan Electronics College",   "MYCOMZ-80A",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

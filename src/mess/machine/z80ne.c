@@ -212,7 +212,7 @@ DIRECT_UPDATE_HANDLER( nmi_delay_count )
 
 	if (!nmi_delay_counter)
 	{
-		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));		
+		cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_default, *machine));
 		cputag_set_input_line(machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
@@ -259,7 +259,7 @@ static void reset_lx382_banking(running_machine *machine)
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	reset_delay_counter = 2;
-	space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));		
+	space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));
 }
 
 static void reset_lx390_banking(running_machine *machine)
@@ -277,7 +277,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		reset_delay_counter = 2;
-		space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));			
+		space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));
 	    break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -517,7 +517,7 @@ WRITE8_HANDLER( lx383_w )
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
     	nmi_delay_counter = 1;
-		cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(nmi_delay_count, *space->machine));					
+		cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(nmi_delay_count, *space->machine));
 }
 
 

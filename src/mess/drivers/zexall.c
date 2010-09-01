@@ -137,7 +137,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 
 static MACHINE_CONFIG_START( zexall, driver_data_t )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)  
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
     MDRV_QUANTUM_TIME(HZ(60))

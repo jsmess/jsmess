@@ -587,7 +587,7 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 	{
 		const device_config_image_interface *dev;
 		for (bool gotone = s_config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
-		{			
+		{
 			s = GetSelectedSoftware(drvindex, s_config->mconfig, dev);
 			if ((s != NULL) && !mame_stricmp(s, pszFilename)) {
 				device = dev;
@@ -610,7 +610,7 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 		{
 		    const device_config_image_interface *dev;
 			for (bool gotone = s_config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
-			{				
+			{
 				s = GetSelectedSoftware(drvindex, s_config->mconfig, dev);
 				if (is_null_or_empty(s) && dev->uses_file_extension(file_extension)) {
 					device = dev;

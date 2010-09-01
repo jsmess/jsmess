@@ -358,7 +358,7 @@ static const nes_mmc mmc_list[] =
 	{ 172, TXC_22211B },
 	{ 173, TXC_22211C },
 	// 174 Unused
-	{ 175, KAISER_KS7022}, 
+	{ 175, KAISER_KS7022},
 	{ 176, UNL_XZY },
 	{ 177, HENGEDIANZI_BOARD },
 	{ 178, WAIXING_SGZLZ },
@@ -457,9 +457,9 @@ const nes_mmc *nes_mapper_lookup( int mapper )
 int nes_get_mmc_id( running_machine *machine, int mapper )
 {
 	const nes_mmc *mmc = nes_mapper_lookup(mapper);
-	
+
 	if (mmc == NULL)
 		fatalerror("Unimplemented Mapper %d", mapper);
-	
+
 	return mmc->pcb_id;
 }

@@ -1866,7 +1866,7 @@ static MACHINE_RESET( a2600 )
 		memory_set_bankptr(machine, "bank1", bank_base[1] );
 		memory_set_bankptr(machine, "bank2", bank_base[2] );
 		modeSS_write_enabled = 0;
-		modeSS_byte_started = 0;		
+		modeSS_byte_started = 0;
 		space->set_direct_update_handler(direct_update_delegate_create_static(modeSS_opbase, *machine));
 		/* The Supercharger has no motor control so just enable it */
 		cassette_change_state( machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
@@ -1881,7 +1881,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(space, 0x1000, 0x103f, 0, 0, modeDPC_r);
 		memory_install_write8_handler(space, 0x1040, 0x107f, 0, 0, modeDPC_w);
 		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);		
+		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		space->set_direct_update_handler(direct_update_delegate_create_static(modeDPC_opbase_handler, *machine));
 		{
 			int	data_fetcher;

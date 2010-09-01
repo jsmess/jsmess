@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Xircom / Intel REX 6000
 
         18/06/2009 Skeleton driver.
@@ -23,8 +23,8 @@ INPUT_PORTS_START( rex6000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(rex6000) 
-{	
+static MACHINE_RESET(rex6000)
+{
 }
 
 static VIDEO_START( rex6000 )
@@ -40,10 +40,10 @@ static MACHINE_CONFIG_START( rex6000, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(rex6000_mem)
-    MDRV_CPU_IO_MAP(rex6000_io)	
+    MDRV_CPU_IO_MAP(rex6000_io)
 
     MDRV_MACHINE_RESET(rex6000)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -67,5 +67,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 2000, rex6000,  0,       0, 	rex6000, 	rex6000, 	 0,   "Xircom / Intel",   "REX 6000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2000, rex6000,  0,       0,	rex6000,	rex6000,	 0,   "Xircom / Intel",   "REX 6000",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

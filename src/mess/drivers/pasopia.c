@@ -1,14 +1,14 @@
 /**************************************************************************************************
 
-	Toshiba Pasopia 7 (c) 1983 Toshiba
+    Toshiba Pasopia 7 (c) 1983 Toshiba
 
     preliminary driver by Angelo Salese
 
-	TODO:
-	- floppy support (but floppy images are unobtainable at current time)
-	- Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
-	- advanced BASIC commands (width 80, circle, line ...) makes the emulation to go to la-la-land
-	- some text garbage pops up in place, first example is when you type "10 for a=0 to n"
+    TODO:
+    - floppy support (but floppy images are unobtainable at current time)
+    - Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
+    - advanced BASIC commands (width 80, circle, line ...) makes the emulation to go to la-la-land
+    - some text garbage pops up in place, first example is when you type "10 for a=0 to n"
 
 ***************************************************************************************************/
 
@@ -97,7 +97,7 @@ static void fake_keyboard_data(running_machine *machine)
 	keyb_shift_press(KEYCODE_0, '=');
 	keyb_shift_press(KEYCODE_1, '!');
 	keyb_shift_press(KEYCODE_2, '"');
-	keyb_shift_press(KEYCODE_3, '£');
+	keyb_shift_press(KEYCODE_3, '?');
 	keyb_shift_press(KEYCODE_4, '$');
 	keyb_shift_press(KEYCODE_5, '%');
 	keyb_shift_press(KEYCODE_6, '&');
@@ -197,7 +197,7 @@ static READ8_HANDLER( vram_r )
 	static UINT8 res;
 
 	//if(!vram_sel)
-	//	return 0xff;
+	//  return 0xff;
 
 	if(pal_sel && (plane_reg & 0x70) == 0x00)
 		return p7_pal[offset & 0xf];
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 
 	// bank4 is always RAM
 
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 }
 
 #if 0
@@ -289,13 +289,13 @@ static WRITE8_HANDLER( pac2_w )
 	UINT8 *pac2_ram2 = memory_region(space->machine, "rampac2");
 
 	/*
-	select register:
-	4 = ram1;
-	3 = ram2;
-	2 = kanji ROM;
-	1 = joy;
-	anything else is nop
-	*/
+    select register:
+    4 = ram1;
+    3 = ram2;
+    2 = kanji ROM;
+    1 = joy;
+    anything else is nop
+    */
 
 
 	switch(offset)
@@ -387,17 +387,17 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
+	if(io_port >= 0x08 && io_port <= 0x0b)		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
-//	else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
+//  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x18);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), io_port-0x28);  }
 	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(space->machine->device("z80pio_0"), (io_port-0x30) & 3); }
-//	else if(io_port == 0x3a) 				  	{ SN1 }
-//	else if(io_port == 0x3b) 				  	{ SN2 }
-//	else if(io_port == 0x3c) 				  	{ bankswitch }
-//	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+//  else if(io_port == 0x3a)                    { SN1 }
+//  else if(io_port == 0x3b)                    { SN2 }
+//  else if(io_port == 0x3c)                    { bankswitch }
+//  else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
 	else
 	{
 		logerror("(PC=%06x) Read i/o address %02x\n",cpu_get_pc(space->cpu),io_port);
@@ -419,17 +419,17 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
+	if(io_port >= 0x08 && io_port <= 0x0b)		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x18, data);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), io_port-0x28,data);  }
 	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(space->machine->device("z80pio_0"), (io_port-0x30) & 3, data); }
-	else if(io_port == 0x3a) 				  	{ sn76496_w(space->machine->device("sn1"), 0, data); }
-	else if(io_port == 0x3b) 				  	{ sn76496_w(space->machine->device("sn2"), 0, data); }
-	else if(io_port == 0x3c) 				  	{ pasopia7_memory_ctrl_w(space,0, data); }
-//	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+	else if(io_port == 0x3a)					{ sn76496_w(space->machine->device("sn1"), 0, data); }
+	else if(io_port == 0x3b)					{ sn76496_w(space->machine->device("sn2"), 0, data); }
+	else if(io_port == 0x3c)					{ pasopia7_memory_ctrl_w(space,0, data); }
+//  else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
 	else
 	{
 		logerror("(PC=%06x) Write i/o address %02x = %02x\n",cpu_get_pc(space->cpu),offset,data);
@@ -561,33 +561,33 @@ static WRITE8_DEVICE_HANDLER( video_attr_w )
 static WRITE8_DEVICE_HANDLER( video_misc_w )
 {
 	/*
-		--x- ---- blinking
-		---x ---- attribute wrap
-		---- x--- pal disable
-		---- xx-- palette selector (both bits enables this, odd hook-up)
-	*/
-//	if(data & 2)
-//	{
-//		printf("VIDEO MISC %02x\n",data);
-//		debugger_break(device->machine);
-//	}
+        --x- ---- blinking
+        ---x ---- attribute wrap
+        ---- x--- pal disable
+        ---- xx-- palette selector (both bits enables this, odd hook-up)
+    */
+//  if(data & 2)
+//  {
+//      printf("VIDEO MISC %02x\n",data);
+//      debugger_break(device->machine);
+//  }
 	cursor_blink = data & 0x20;
 	attr_wrap = data & 0x10;
-//	pal_sel = data & 0x02;
+//  pal_sel = data & 0x02;
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 {
 	/*
-	--x- ---- (related to the data rec)
-	---x ---- data rec out
-	---- --x- sound off
-	---- ---x reset NMI (writes to port B = clears bits 1 & 2) (???)
-	*/
-//	printf("SYSTEM MISC %02x\n",data);
+    --x- ---- (related to the data rec)
+    ---x ---- data rec out
+    ---- --x- sound off
+    ---- ---x reset NMI (writes to port B = clears bits 1 & 2) (???)
+    */
+//  printf("SYSTEM MISC %02x\n",data);
 
-//	if(data & 1)
-//		i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
+//  if(data & 1)
+//      i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
 
 }
 
@@ -607,9 +607,9 @@ static UINT8 nmi_mask,nmi_enable_reg;
 static WRITE8_DEVICE_HANDLER( nmi_reg_w )
 {
 	/*
-		x--- ---- NMI mask
-		-x-- ---- enable NMI regs (?)
-	*/
+        x--- ---- NMI mask
+        -x-- ---- enable NMI regs (?)
+    */
 	nmi_mask = data & 0x80;
 	nmi_enable_reg = data & 0x40;
 
@@ -655,8 +655,8 @@ static MACHINE_RESET( paso7 )
 
 	memory_set_bankptr(machine, "bank1", bios + 0x10000);
 	memory_set_bankptr(machine, "bank2", bios + 0x10000);
-//	memory_set_bankptr(machine, "bank3", bios + 0x10000);
-//	memory_set_bankptr(machine, "bank4", bios + 0x10000);
+//  memory_set_bankptr(machine, "bank3", bios + 0x10000);
+//  memory_set_bankptr(machine, "bank4", bios + 0x10000);
 }
 
 static PALETTE_INIT( pasopia7 )
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( paso7, driver_data_t )
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(paso7_mem)
     MDRV_CPU_IO_MAP(paso7_io)
-//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_CONFIG(p7_daisy)
 
 	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz, ctc_intf )
@@ -738,10 +738,10 @@ ROM_START( pasopia7 )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
 
 	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASEFF )
-//	ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+//  ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 
 	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
-//	ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+//  ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 ROM_END
 
 static DRIVER_INIT( paso7 )
@@ -751,4 +751,4 @@ static DRIVER_INIT( paso7 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, pasopia7,  0,       0, 	 paso7,	paso7,   paso7,   "Toshiba",   "PASOPIA 7", GAME_NOT_WORKING )
+COMP( 1983, pasopia7,  0,       0,	 paso7,	paso7,   paso7,   "Toshiba",   "PASOPIA 7", GAME_NOT_WORKING )

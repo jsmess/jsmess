@@ -25,15 +25,15 @@
       (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
       a btanb;
     - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
-	- Hydlide 2 / 3: can't get the user disk to work properly
-	- Gruppe: shows a random bitmap graphic then returns "program load error"
-	- Sorcerian / Ys 3 / Psy-O-Blade (and others): they all fails tight loops with the fdc ready bit check
-	- Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
-	- Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
-	- "newtype": dies with a z80dma assert;
-	- Ys 2: fills the screen with "syntax errors"
-	- Thexder: Can't start a play, keyboard related issue?
-	- V.I.P.: can't get inputs to work at all there;
+    - Hydlide 2 / 3: can't get the user disk to work properly
+    - Gruppe: shows a random bitmap graphic then returns "program load error"
+    - Sorcerian / Ys 3 / Psy-O-Blade (and others): they all fails tight loops with the fdc ready bit check
+    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
+    - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
+    - "newtype": dies with a z80dma assert;
+    - Ys 2: fills the screen with "syntax errors"
+    - Thexder: Can't start a play, keyboard related issue?
+    - V.I.P.: can't get inputs to work at all there;
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5

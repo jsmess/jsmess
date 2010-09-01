@@ -47,7 +47,7 @@ const game_driver * const drivers[] =
 	DRIVER( a7800 )	 /* Atari 7800 NTSC   */
 	DRIVER( a7800p )	/* Atari 7800 PAL      */
 	DRIVER( lynx )	  /* Atari Lynx Handheld      */
-//	DRIVER( lynx2 )	 /* Atari Lynx II Handheld redesigned, no additions  */
+//  DRIVER( lynx2 )  /* Atari Lynx II Handheld redesigned, no additions  */
 	DRIVER( jaguar )	/* Atari Jaguar  */
 	DRIVER( jaguarcd )  /* Atari Jaguar CD    */
 
@@ -762,7 +762,7 @@ const game_driver * const drivers[] =
 
 	/* TI 99 clones */
 	DRIVER( tutor)	  /* 1983? Tomy Tutor    */
-	DRIVER( pyuuta )	/* 1982 Tomy Pyuuta		*/
+	DRIVER( pyuuta )	/* 1982 Tomy Pyuuta     */
 	DRIVER( geneve )	/* 1987? Myarc Geneve 9640    */
 	DRIVER( genmod )	/* 199?? Myarc Geneve 9640    */
 	DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)      */

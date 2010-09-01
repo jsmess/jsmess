@@ -3,11 +3,11 @@
         CZK-80
 
         30/08/2010 Skeleton driver
-		
-		On main board there are Z80A CPU, Z80A PIO, Z80A DART and Z80A CTC
-			there is 8K ROM and XTAL 16MHz
-		FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
-		Mega board contains 74LS612 and memory chips
+
+        On main board there are Z80A CPU, Z80A PIO, Z80A DART and Z80A CTC
+            there is 8K ROM and XTAL 16MHz
+        FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
+        Mega board contains 74LS612 and memory chips
 
 ****************************************************************************/
 
@@ -78,5 +78,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-COMP( 198?, czk80,  0,       0, 	czk80, 	czk80, 	 0,  	  "<unknown>",   "CZK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 198?, czk80,  0,       0, 	czk80,	czk80,	 0, 	  "<unknown>",   "CZK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)

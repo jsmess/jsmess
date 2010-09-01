@@ -91,9 +91,9 @@ MACHINE_START( jupiter )
 
 	if (jupiter_data)
 	{
-		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);		
+		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
 		space->set_direct_update_handler(direct_update_delegate_create_static(jupiter_opbaseoverride, *machine));
-		
+
 	}
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, jupiter_machine_stop);

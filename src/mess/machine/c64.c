@@ -608,7 +608,7 @@ void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 
 	c64_memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
 	c64_memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
-	
+
 }
 
 UINT8 c64_m6510_port_read( running_device *device, UINT8 direction )
@@ -1048,7 +1048,7 @@ static int c64_crt_load( device_image_interface &image )
 
 		if (i >= C64_MAX_ROMBANK)
 			return IMAGE_INIT_FAIL;
-		
+
 		/* Start to parse the .crt header */
 		/* 0x16-0x17 is Hardware type */
 		image.fseek(0x16, SEEK_SET);
@@ -1153,7 +1153,7 @@ static int c64_crt_load( device_image_interface &image )
 			/* Does CHIP contain any data? */
 			if (test != c64_cart.bank[i].size)
 				return IMAGE_INIT_FAIL;
-			
+
 			/* Advance to the next CHIP block */
 			i++;
 			j += chip_size;
@@ -1224,7 +1224,7 @@ static int c64_crt_load( device_image_interface &image )
 						a0_loaded = 1;
 					if (c64_cart.bank[ii].size > 0x3000)
 						b0_loaded = 1;
-//					printf("addr 0x8000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
+//                  printf("addr 0x8000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
 				if (c64_cart.bank[ii].addr == 0x9000 && !_90_loaded)
@@ -1235,7 +1235,7 @@ static int c64_crt_load( device_image_interface &image )
 						a0_loaded = 1;
 					if (c64_cart.bank[ii].size > 0x2000)
 						b0_loaded = 1;
-//					printf("addr 0x9000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
+//                  printf("addr 0x9000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
 				if (c64_cart.bank[ii].addr == 0xa000 && !a0_loaded)
@@ -1244,14 +1244,14 @@ static int c64_crt_load( device_image_interface &image )
 					a0_loaded = 1;
 					if (c64_cart.bank[ii].size > 0x1000)
 						b0_loaded = 1;
-//					printf("addr 0xa000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
+//                  printf("addr 0xa000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
 				if (c64_cart.bank[ii].addr == 0xb000 && !b0_loaded)
 				{
 					memcpy(roml + 0x3000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
 					b0_loaded = 1;
-//					printf("addr 0xb000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
+//                  printf("addr 0xb000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
 				if (c64_cart.bank[ii].addr == 0xe000 && !e0_loaded)
@@ -1260,14 +1260,14 @@ static int c64_crt_load( device_image_interface &image )
 					e0_loaded = 1;
 					if (c64_cart.bank[ii].size > 0x1000)
 						f0_loaded = 1;
-//					printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
+//                  printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
 				}
 
 				if (c64_cart.bank[ii].addr == 0xf000 && !f0_loaded)
 				{
 					memcpy(romh + 0x1000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
 					f0_loaded = 1;
-//					printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
+//                  printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
 				}
 			}
 		}

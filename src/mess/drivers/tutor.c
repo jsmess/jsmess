@@ -269,7 +269,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
-	
+
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
@@ -281,7 +281,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 		size = image.get_software_region_length("rom");
 		memcpy(ptr + cartridge_base, image.get_software_region("rom"), size);
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 

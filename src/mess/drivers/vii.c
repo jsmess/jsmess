@@ -884,7 +884,7 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 			return IMAGE_INIT_FAIL;
-		}		
+		}
 	}
 	else
 	{
@@ -977,8 +977,8 @@ static MACHINE_CONFIG_START( vii, vii_state )
 
 	MDRV_VIDEO_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
-	
-	MDRV_SOFTWARE_LIST_ADD("vii_cart","vii")	
+
+	MDRV_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vsmile, vii_state )

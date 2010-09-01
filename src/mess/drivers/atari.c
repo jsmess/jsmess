@@ -849,7 +849,7 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 {
 	UINT8 *base2, *base3, *base4;
-	
+
 	/* check if memory C000-FFFF changed */
 	if( new_mmu & 0x01 )
 	{
@@ -871,8 +871,8 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 	}
 	memory_set_bankptr(machine, "bank3", base3);
 	memory_set_bankptr(machine, "bank4", base4);
-	
-	
+
+
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
 	{
@@ -1239,7 +1239,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","a5200")
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")

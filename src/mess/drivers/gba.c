@@ -2472,7 +2472,7 @@ DIRECT_UPDATE_HANDLER( gba_direct )
 
 static DRIVER_INIT(gbadv)
 {
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, *machine));	
+	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, *machine));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

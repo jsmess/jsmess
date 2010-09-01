@@ -356,14 +356,14 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 	}
 
 	/* if boot is active, page in fake ROM */
-/*	if ((pcw_boot) && (block==0))
-	{
-		unsigned char *FakeROM;
+/*  if ((pcw_boot) && (block==0))
+    {
+        unsigned char *FakeROM;
 
-		FakeROM = &memory_region(machine, "maincpu")[0x010000];
+        FakeROM = &memory_region(machine, "maincpu")[0x010000];
 
-		memory_set_bankptr(machine, "bank1", FakeROM);
-	}*/
+        memory_set_bankptr(machine, "bank1", FakeROM);
+    }*/
 }
 
 /* from Jacob Nevins docs */
@@ -689,7 +689,7 @@ static WRITE8_HANDLER(pcw_printer_command_w)
 
 static  READ8_HANDLER(pcw_printer_data_r)
 {
-//	pcw_printer_data = 0xf8;
+//  pcw_printer_data = 0xf8;
 	pcw_printer_data = upi41_master_r(space->machine->device("printer_mcu"),0);
 	return pcw_printer_data;
 }
@@ -703,12 +703,12 @@ static  READ8_HANDLER(pcw_printer_status_r)
 /* MCU handlers */
 /*static READ8_HANDLER(mcu_printer_data_r)
 {
-	return pcw_printer_data;
+    return pcw_printer_data;
 }
 
 static WRITE8_HANDLER(mcu_printer_data_w)
 {
-	pcw_printer_data = data;
+    pcw_printer_data = data;
 }*/
 
 static READ8_HANDLER(mcu_printer_command_r)
@@ -730,8 +730,8 @@ static void mcu_transmit_serial(UINT8 bit)
 	int seq;
 
 	/* Keyboard data is sent in serial from the MCU through the keyboard port, to the ASIC
-	   Sends a string of 12-bit sequences, first 4 bits are the RAM location (from &3ff0),
-	   then 8 bits for the data to be written there. */
+       Sends a string of 12-bit sequences, first 4 bits are the RAM location (from &3ff0),
+       then 8 bits for the data to be written there. */
 	seq = mcu_transmit_count % 12;
 	if(seq < 4)
 	{
@@ -873,8 +873,8 @@ ADDRESS_MAP_END
 /* i8041 MCU */
 static ADDRESS_MAP_START(pcw_printer_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(mcu_printer_command_r)
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_data_r, mcu_printer_data_w)
-//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(mcu_printer_p2_r)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_data_r, mcu_printer_data_w)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(mcu_printer_p2_r)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("printer_8243",i8243_prog_w)
 ADDRESS_MAP_END
 
@@ -1065,7 +1065,7 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)							PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Stop") PORT_CODE(KEYCODE_ESC)		PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)							PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) 						PORT_CHAR('\t')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)						PORT_CHAR('\t')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)							PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)							PORT_CHAR('z') PORT_CHAR('Z')
@@ -1077,7 +1077,7 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[-]") PORT_CODE(KEYCODE_F4)			PORT_CHAR(UCHAR_MAMEKEY(PGDN))	// 1st key on the right from 'Spacebar'
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7  F8") PORT_CODE(KEYCODE_F7)		PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)					PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD) 					PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)					PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL<") PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(8)
 
 	PORT_START("LINE10")	/* 0x03ffa */
@@ -1096,8 +1096,8 @@ static INPUT_PORTS_START(pcw)
     For now, I let it with no default mapping. */
 	PORT_START("LINE13")	/* 0x03ffd */
 	PORT_BIT(0xff, 0xff, IPT_UNUSED)
-//	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") //PORT_CODE(KEYCODE_CAPSLOCK)
-//	PORT_BIT(0x80, 0xff, IPT_UNUSED)
+//  PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") //PORT_CODE(KEYCODE_CAPSLOCK)
+//  PORT_BIT(0x80, 0xff, IPT_UNUSED)
 
 	PORT_START("LINE14")	/* 0x03ffe */
 	PORT_BIT ( 0xff, 0xff,	 IPT_UNUSED )

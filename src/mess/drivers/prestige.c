@@ -41,36 +41,36 @@ Notes:
 */
 
 /*
-	
-	Undumped cartridges:
-  
-	80-1410   Super Science
-	80-1533   Famous Things & Places
-	80-0989   Bible Knowledge
-	80-1001   Fantasy Trivia
-	80-1002   General Knowledge II
-	80-1003   Sports History
-	80-2314   Familiar Faces
-	80-2315   Historical Happenings
-	80-2333   Arts, Entertainment & More
-	80-2334   Customs & Cultures
-	80-1531   32K RAM Memory Expansion Cartridge
-	80-12051  Space Scholar
-	80-12053  Frenzy of Facts
-	80-12052  Spreadsheet Success
+
+    Undumped cartridges:
+
+    80-1410   Super Science
+    80-1533   Famous Things & Places
+    80-0989   Bible Knowledge
+    80-1001   Fantasy Trivia
+    80-1002   General Knowledge II
+    80-1003   Sports History
+    80-2314   Familiar Faces
+    80-2315   Historical Happenings
+    80-2333   Arts, Entertainment & More
+    80-2334   Customs & Cultures
+    80-1531   32K RAM Memory Expansion Cartridge
+    80-12051  Space Scholar
+    80-12053  Frenzy of Facts
+    80-12052  Spreadsheet Success
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- identify unknown chips
-	- boot animation won't play
-	- keyboard
-	- mouse
-	- sound
-	- cartridges
+    - identify unknown chips
+    - boot animation won't play
+    - keyboard
+    - mouse
+    - sound
+    - cartridges
 
 */
 

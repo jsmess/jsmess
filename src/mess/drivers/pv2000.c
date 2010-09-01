@@ -40,7 +40,7 @@ class pv2000_state : public driver_data_t
 public:
 	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pv2000_state(machine)); }
 
-	pv2000_state(running_machine &machine) 
+	pv2000_state(running_machine &machine)
 		: driver_data_t(machine) { last_state = 0; }
 
 	int		last_state;
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( pv2000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE("sn76489a", sn76496_w)
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
-//	AM_RANGE(0x60, 0x60)
+//  AM_RANGE(0x60, 0x60)
 ADDRESS_MAP_END
 
 
@@ -443,10 +443,10 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pv2000_cart)
-	MDRV_CARTSLOT_INTERFACE("pv2000_cart")	
-	
+	MDRV_CARTSLOT_INTERFACE("pv2000_cart")
+
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","pv2000")	
+	MDRV_SOFTWARE_LIST_ADD("cart_list","pv2000")
 MACHINE_CONFIG_END
 
 

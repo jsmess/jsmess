@@ -23,7 +23,7 @@ char * GameInfoTitle(OPTIONS_TYPE opt_type, UINT nIndex);
 void	InitPropertyPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYPE opt_type, int folder_id, int game_num);
 
 #define PROPERTIES_PAGE 0
-#define AUDIT_PAGE      1   
+#define AUDIT_PAGE      1
 
 void	InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYPE opt_type, int folder_id, int game_num, int start_page);
 void    InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd);

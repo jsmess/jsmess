@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( vectrex, driver_data_t )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(vectrex_cart)
 	MDRV_CARTSLOT_INTERFACE("vectrex_cart")
-	
+
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","vectrex")
 MACHINE_CONFIG_END

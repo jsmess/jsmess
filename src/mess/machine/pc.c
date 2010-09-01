@@ -1355,7 +1355,7 @@ MACHINE_RESET( pc )
 	st->ppi_data_signal = 0;
 	st->ppi_shift_register = 0;
 	st->ppi_shift_enable = 0;
-	
+
 	pc_mouse_set_serial_port( machine->device("ins8250_0") );
 	pc_hdc_set_dma8237_device( st->dma8237 );
 	speaker_level_w( speaker, 0 );

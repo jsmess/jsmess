@@ -238,16 +238,16 @@ static const via6522_interface jr100_via_intf =
 	DEVCB_NULL,											/* in_a_func */
 	DEVCB_HANDLER(jr100_via_read_b),					/* in_b_func */
 	DEVCB_NULL,     									/* in_ca1_func */
-	DEVCB_NULL,      									/* in_cb1_func */
-	DEVCB_NULL,      									/* in_ca2_func */
-	DEVCB_NULL,      									/* in_cb2_func */
+	DEVCB_NULL,     									/* in_cb1_func */
+	DEVCB_NULL,     									/* in_ca2_func */
+	DEVCB_NULL,     									/* in_cb2_func */
 	DEVCB_HANDLER(jr100_via_write_a),					/* out_a_func */
 	DEVCB_HANDLER(jr100_via_write_b),   				/* out_b_func */
-	DEVCB_NULL,      									/* out_ca1_func */
+	DEVCB_NULL,     									/* out_ca1_func */
 	DEVCB_NULL,											/* out_cb1_func */
-	DEVCB_NULL,      									/* out_ca2_func */
-	DEVCB_LINE(jr100_via_write_cb2),      				/* out_cb2_func */
-	DEVCB_NULL    										/* irq_func */
+	DEVCB_NULL,     									/* out_ca2_func */
+	DEVCB_LINE(jr100_via_write_cb2),    				/* out_cb2_func */
+	DEVCB_NULL  										/* irq_func */
 };
 static const cassette_config jr100_cassette_config =
 {
@@ -307,7 +307,7 @@ static QUICKLOAD_LOAD(jr100)
 	pos += len; // skip name
 	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
 	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 flag  		 = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 flag 		 = readByLittleEndian(buf,pos); pos+= 4;
 
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code
@@ -380,7 +380,7 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT  		COMPANY   FULLNAME       FLAGS */
-//COMP( 1981, jr100,  0,       0, 	jr100, 	jr100, 	 0,  	  "National",   "JR-100",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, jr100u,  0,       0, 	jr100, 	jr100, 	 0,  	  "Panasonic",   "JR-100U",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+//COMP( 1981, jr100,  0,       0,   jr100,  jr100,   0,       "National",   "JR-100",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, jr100u,  0,       0,	jr100,	jr100,	 0, 	  "Panasonic",   "JR-100U",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

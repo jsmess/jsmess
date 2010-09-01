@@ -21,7 +21,7 @@
 
     TODO:
 
-	- fix direct update handler to make system work again
+    - fix direct update handler to make system work again
     - display interface INH
     - 2 segment display
     - single step

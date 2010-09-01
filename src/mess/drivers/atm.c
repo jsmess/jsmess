@@ -15,7 +15,7 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 	running_device *beta = machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	if (beta->started() && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
@@ -114,7 +114,7 @@ static MACHINE_RESET( atm )
 	}
 
 	space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, *machine));
-	
+
 	memset(messram,0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */

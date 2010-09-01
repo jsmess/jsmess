@@ -1342,7 +1342,7 @@ MACHINE_START( nimbus )
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
         debug_console_register_command(machine, "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
-        /* set up the instruction hook */        
+        /* set up the instruction hook */
 		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
     }
 

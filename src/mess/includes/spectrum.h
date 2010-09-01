@@ -146,7 +146,7 @@ void    EventList_SetOffsetStartTime(int StartTime);
 void    EventList_AddItemOffset(running_machine *machine, int ID, int Data,int Time);
 int     EventList_NumEvents(void);
 EVENT_LIST_ITEM *EventList_GetFirstItem(void);
-				
+
 /*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );
 extern VIDEO_UPDATE( ts2068 );

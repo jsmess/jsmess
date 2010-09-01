@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	TK-80BS (c) 1980 NEC
+    TK-80BS (c) 1980 NEC
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- (try to) dump proper roms, the whole driver is based off fake roms;
-	- Remove the PPI hack;
-	- BASIC doesn't seem to work properly;
+    TODO:
+    - (try to) dump proper roms, the whole driver is based off fake roms;
+    - Remove the PPI hack;
+    - BASIC doesn't seem to work properly;
 
 ****************************************************************************/
 
@@ -76,7 +76,7 @@ static VIDEO_UPDATE( tk80bs )
 /* FIXME: current i8255 core doesn't seem to like this system at all, so we use custom code here for now */
 static READ8_HANDLER( ppi_custom_r )
 {
-//	printf("%02x\n",offset);
+//  printf("%02x\n",offset);
 
 	switch(offset+0x7dfc)
 	{
@@ -101,9 +101,9 @@ static WRITE8_HANDLER( ppi_custom_w )
 static ADDRESS_MAP_START(tk80bs_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-//	AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
+//  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
-//	AM_RANGE(0x7dfc, 0x7dff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+//  AM_RANGE(0x7dfc, 0x7dff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
 	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_BASE(&vram) // video ram
 	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
@@ -248,7 +248,7 @@ static TIMER_CALLBACK( keyboard_callback )
 				if(!shift_press_flag)  // shift not pressed
 				{
 					//if(scancode >= 0x41 && scancode < 0x5b)
-					//	scancode += 0x20;  // lowercase doesn't exist here
+					//  scancode += 0x20;  // lowercase doesn't exist here
 				}
 				else
 				{
@@ -335,10 +335,10 @@ static MACHINE_CONFIG_START( tk80, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(tk80_mem)
-    MDRV_CPU_IO_MAP(tk80_io)	
+    MDRV_CPU_IO_MAP(tk80_io)
 
     MDRV_MACHINE_RESET(tk80)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( tk80bs, driver_data_t )
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
     MDRV_CPU_PROGRAM_MAP(tk80bs_mem)
 
-//	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+//  MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 
     MDRV_MACHINE_START(tk80bs)
     MDRV_MACHINE_RESET(tk80bs)
@@ -414,6 +414,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1976, tk80, 	0,      0,       tk80,      tk80,    0,       "Nippon Electronic Company",   "TK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1976, tk80,	0,      0,       tk80,      tk80,    0,       "Nippon Electronic Company",   "TK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, tk80bs, tk80,   0,       tk80bs,    tk80bs,  0,       "Nippon Electronic Company",   "TK-80BS",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

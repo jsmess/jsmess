@@ -311,7 +311,7 @@ FLOPPY_IDENTIFY(d88_dsk_identify)
 
 	if(floppy_image_size(floppy) == size)
 	{
-		*vote = 100;		
+		*vote = 100;
 	}
 	else
 	{
@@ -348,7 +348,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 	tag->disk_type = type;
 	tag->heads = 2;
 	if (tag->disk_type==0x30 || tag->disk_type==0x40) tag->heads = 1;
-	 
+
 	tag->image_size = size;
 	for(x=0;x<164;x++)
 		tag->trackoffset[x] = offs[x];

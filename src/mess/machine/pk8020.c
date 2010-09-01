@@ -875,7 +875,7 @@ static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 	floppy_mon_w(floppy_get_device(device->machine, 0), 1);
 	floppy_mon_w(floppy_get_device(device->machine, 1), 1);
 	floppy_mon_w(floppy_get_device(device->machine, 2), 1);
-	floppy_mon_w(floppy_get_device(device->machine, 3), 1);	
+	floppy_mon_w(floppy_get_device(device->machine, 3), 1);
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
 		wd17xx_set_drive(fdc,0);

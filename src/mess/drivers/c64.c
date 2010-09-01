@@ -985,8 +985,8 @@ COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business M
 COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "PET 64 (NTSC)", 0)
 COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "CBM 4064 (NTSC)", 0)
 COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "Educator 64 (NTSC)", 0) // maybe different palette?
-//COMP(1983, clipper,  c64,  0,	c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
-//COMP(1983, tesa6240, c64,  0,	c64pal,  c64,	  c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
+//COMP(1983, clipper,  c64,  0, c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
+//COMP(1983, tesa6240, c64,  0, c64pal,  c64,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
 
 COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
 COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    "Commodore Business Machines", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)

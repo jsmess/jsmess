@@ -38,40 +38,40 @@ DEVICE_IMAGE_LOAD( timex_cart )
 {
 	int file_size;
 	UINT8 * file_data;
-	
+
 	int chunks_in_file = 0;
-	
+
 	int i;
-	
+
 	logerror ("Trying to load cart\n");
-	
+
 	file_size = image.length();
-	
+
 	if (file_size < 0x09)
 	{
 		logerror ("Bad file size\n");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	file_data = (UINT8 *)malloc(file_size);
 	if (file_data == NULL)
 	{
 		logerror ("Memory allocating error\n");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	image.fread(file_data, file_size);
-	
+
 	for (i=0; i<8; i++)
 		if(file_data[i+1]&0x02) chunks_in_file++;
-	
+
 	if (chunks_in_file*0x2000+0x09 != file_size)
 	{
 		free (file_data);
 		logerror ("File corrupted\n");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	switch (file_data[0x00])
 	{
 		case 0x00:  logerror ("DOCK cart\n");
@@ -102,13 +102,13 @@ DEVICE_IMAGE_LOAD( timex_cart )
 				}
 				free (file_data);
 				break;
-	
+
 		default:    logerror ("Cart type not supported\n");
 				free (file_data);
 				timex_cart_type = TIMEX_CART_NONE;
 				return IMAGE_INIT_FAIL;
 	}
-	
+
 	logerror ("Cart loaded\n");
 	logerror ("Chunks %02x\n", timex_cart_chunks);
 	return IMAGE_INIT_PASS;

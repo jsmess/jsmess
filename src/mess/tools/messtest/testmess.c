@@ -356,7 +356,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 		/* get the path */
 		fullpath = assemble_software_path(astring_alloc(), driver, current_command->u.image_args.filename);
 
-		/* get the option name */		
+		/* get the option name */
 		device_opt = device_config_image_interface::device_typename(current_command->u.image_args.device_ident.type);
 
 		/* set the option */
@@ -435,7 +435,7 @@ static void testmess_exit(running_machine &machine)
 
 
 void osd_init(running_machine *machine)
-{	
+{
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
 	target = render_target_alloc(machine, NULL, 0);
 	render_target_set_orientation(target, 0);

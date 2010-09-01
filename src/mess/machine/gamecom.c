@@ -670,10 +670,10 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 
 	cartridge2 = memory_region(image.device().machine, "cart2");
 
-//	if (image.software_entry() == NULL)
+//  if (image.software_entry() == NULL)
 		filesize = image.length();
-//	else
-//		filesize = image.get_software_region_length("rom");
+//  else
+//      filesize = image.get_software_region_length("rom");
 
 	switch(filesize)
 	{
@@ -689,7 +689,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 			return IMAGE_INIT_FAIL;
 	}
 
-//	if (image.software_entry() == NULL)
+//  if (image.software_entry() == NULL)
 	{
 		if (image.fread( cartridge2 + load_offset, filesize) != filesize)
 		{
@@ -697,8 +697,8 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 			return IMAGE_INIT_FAIL;
 		}
 	}
-//	else
-//		memcpy(cartridge2 + load_offset, image.get_software_region("rom"), filesize);
+//  else
+//      memcpy(cartridge2 + load_offset, image.get_software_region("rom"), filesize);
 
 	if (filesize < 0x010000) { memcpy(cartridge2 + 0x008000, cartridge2, 0x008000); } /* ->64KB */
 	if (filesize < 0x020000) { memcpy(cartridge2 + 0x010000, cartridge2, 0x010000); } /* ->128KB */

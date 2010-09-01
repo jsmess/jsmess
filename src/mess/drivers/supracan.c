@@ -1979,9 +1979,9 @@ static INTERRUPT_GEN( supracan_irq )
     /*
     supracan_state *state = (supracan_state *)device->machine->driver_data<supracan_state>();
 
-	if(state->irq_mask)
+    if(state->irq_mask)
     {
-		cpu_set_input_line(device, 7, HOLD_LINE);
+        cpu_set_input_line(device, 7, HOLD_LINE);
     }
     */
 }

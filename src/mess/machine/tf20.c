@@ -5,7 +5,7 @@
     Dual floppy drive with HX-20 factory option
 
 
-    Status: Boots from system disk, missing µPD7201 emulation
+    Status: Boots from system disk, missing ??PD7201 emulation
 
 ***************************************************************************/
 

@@ -272,7 +272,7 @@ static WRITE8_HANDLER(towns_system_w)
 	switch(offset)
 	{
 		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset, bit 3 = A20 line?
-//			cputag_set_input_line(space->machine,"maincpu",INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+//          cputag_set_input_line(space->machine,"maincpu",INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 			logerror("SYS: port 0x20 write %02x\n",data);
 			break;
 		case 0x02:

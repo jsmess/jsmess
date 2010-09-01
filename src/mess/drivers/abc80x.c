@@ -54,7 +54,7 @@
 
     TODO:
 
-	- replace the 2nd Z80DART with Z80SIO when it is implemented properly
+    - replace the 2nd Z80DART with Z80SIO when it is implemented properly
     - ABC 77 keyboard
     - bit accurate Z80 SIO/2 (cassette)
     - floppy controller board
@@ -93,7 +93,7 @@ DISCRETE_SOUND_END
 
 /* Keyboard HACK */
 
-enum 
+enum
 {
 	CHANNEL_A = 0,
 	CHANNEL_B
@@ -937,7 +937,7 @@ static const cassette_config abc800_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-//	{ LUXOR_55_21046_ABCBUS("abc830") },
+//  { LUXOR_55_21046_ABCBUS("abc830") },
 	{ NULL }
 };
 

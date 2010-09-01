@@ -18,7 +18,7 @@
 static ADDRESS_MAP_START(a6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
-	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)	
+	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0x0800,0x0800) AM_DEVWRITE("mc6845", mc6845_address_w)
 	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE("mc6845", mc6845_register_r , mc6845_register_w)
 	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0)AM_DEVREADWRITE("via", via_r, via_w)
@@ -113,9 +113,9 @@ static MACHINE_CONFIG_START( a6809, driver_data_t )
 	MDRV_SAA5050_ADD("saa5050", a6809_saa5050_intf)
 
 	MDRV_VIDEO_UPDATE(a6809)
-	
+
 	MDRV_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
-	
+
 	MDRV_MC6845_ADD("mc6845", MC6845, XTAL_4MHz / 2, a6809_crtc6845_interface)
 MACHINE_CONFIG_END
 
@@ -127,7 +127,7 @@ ROM_START( a6809 )
 	/* This looks like some sort of prom */
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "acorn6809.ic11", 0x0000, 0x0100, CRC(7908317d) SHA1(e0f1e5bd3a8598d3b62bc432dd1f3892ed7e66d8) )
-	
+
 	/* This is SAA5050 so same char def is taken as in p2000t driver */
 	ROM_REGION(0x01000, "gfx1",0)
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))

@@ -1,13 +1,13 @@
 /*****************************************************************************
 
-	Casio Loopy (c) 1995 Casio
+    Casio Loopy (c) 1995 Casio
 
-	skeleton driver
+    skeleton driver
 
-	Note:
-	- just a placeholder for any HW discovery, until we decap/trojan the BIOS,
-	  the idea is to understand the HW enough to extract the SH-1 internal BIOS
-	  data via a trojan;
+    Note:
+    - just a placeholder for any HW discovery, until we decap/trojan the BIOS,
+      the idea is to understand the HW enough to extract the SH-1 internal BIOS
+      data via a trojan;
 
 ******************************************************************************/
 

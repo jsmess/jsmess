@@ -467,7 +467,7 @@ MACHINE_RESET( osborne1 )
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 	}
 
-	space->set_direct_update_handler(direct_update_delegate_create_static(osborne1_opbase, *machine));	
+	space->set_direct_update_handler(direct_update_delegate_create_static(osborne1_opbase, *machine));
 }
 
 

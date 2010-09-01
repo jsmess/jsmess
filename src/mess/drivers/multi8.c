@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	Multi 8 (c) 1983 Mitsubishi
+    Multi 8 (c) 1983 Mitsubishi
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- dunno how to trigger the text color mode in BASIC, I just modify
-	  $f0b1 to 1 for now
-	- bitmap B/W mode is untested
+    TODO:
+    - dunno how to trigger the text color mode in BASIC, I just modify
+      $f0b1 to 1 for now
+    - bitmap B/W mode is untested
 
 ****************************************************************************/
 
@@ -30,7 +30,7 @@ static VIDEO_START( multi8 )
 	cursor_addr = cursor_raster = 0;
 	for (bw_mode = 0; bw_mode < 8; bw_mode++) pen_clut[bw_mode]=0;
 	vram_bank = 8;
-	bw_mode = 0;	
+	bw_mode = 0;
 }
 
 static VIDEO_UPDATE( multi8 )
@@ -168,7 +168,7 @@ static READ8_HANDLER( key_input_r )
 
 static READ8_HANDLER( key_status_r )
 {
-	if(mcu_init == 0){ 				return 1; }
+	if(mcu_init == 0){				return 1; }
 	if(mcu_init == 1){ mcu_init++;	return 1; }
 	if(mcu_init == 2){ mcu_init++;	return 0; }
 
@@ -237,22 +237,22 @@ static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ymsnd", ym2203_w)
-//	AM_RANGE(0x18, 0x18) //opn read 0
+//  AM_RANGE(0x18, 0x18) //opn read 0
 	AM_RANGE(0x1a, 0x1a) AM_DEVREAD("ymsnd", ym2203_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
-//	AM_RANGE(0x20, 0x21) //sio, cmt
-//	AM_RANGE(0x24, 0x27) //pit
+//  AM_RANGE(0x20, 0x21) //sio, cmt
+//  AM_RANGE(0x24, 0x27) //pit
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
-//	AM_RANGE(0x2c, 0x2d) //i8259
+//  AM_RANGE(0x2c, 0x2d) //i8259
 	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
-//	AM_RANGE(0x40, 0x41) //kanji regs
-//	AM_RANGE(0x70, 0x74) //upd765a fdc
-//	AM_RANGE(0x78, 0x78) //memory banking
+//  AM_RANGE(0x40, 0x41) //kanji regs
+//  AM_RANGE(0x70, 0x74) //upd765a fdc
+//  AM_RANGE(0x78, 0x78) //memory banking
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -470,14 +470,14 @@ static READ8_DEVICE_HANDLER( porta_r )
 static WRITE8_DEVICE_HANDLER( portb_w )
 {
 	/*
-		x--- ---- color mode
-		-x-- ---- screen width (80 / 40)
-		---- x--- memory bank status
-		---- -xxx page screen graphics in B/W mode
-	*/
-//	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+        x--- ---- color mode
+        -x-- ---- screen width (80 / 40)
+        ---- x--- memory bank status
+        ---- -xxx page screen graphics in B/W mode
+    */
+//  address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-//	printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
+//  printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 
 	{
 		if((display_reg & 0x40) != (data & 0x40))
@@ -500,12 +500,12 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 
 static WRITE8_DEVICE_HANDLER( portc_w )
 {
-//	printf("Port C w = %02x\n",data);
+//  printf("Port C w = %02x\n",data);
 	vram_bank = data & 0x1f;
 
 	if(data & 0x20 && data != 0xff)
 		printf("Work RAM bank selected!\n");
-//		fatalerror("Work RAM bank selected");
+//      fatalerror("Work RAM bank selected");
 }
 
 
@@ -603,5 +603,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, multi8,  0,       0, 	multi8, 	multi8, 	 0,   "Mitsubishi",   "Multi 8",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, multi8,  0,       0,	multi8, 	multi8, 	 0,   "Mitsubishi",   "Multi 8",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

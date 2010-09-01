@@ -5,10 +5,10 @@
         10/06/2008 Preliminary driver.
 
 
-	Notes:
+    Notes:
 
-	- keyboard connected to sio channel a
-	- sio channel a clock output connected to ctc trigger 0
+    - keyboard connected to sio channel a
+    - sio channel a clock output connected to ctc trigger 0
 
 ****************************************************************************/
 

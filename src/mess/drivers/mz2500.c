@@ -4,35 +4,35 @@
 
     driver by Angelo Salese
 
-	TODO:
-	- Kanji text is cutted in half when font_size is 1 / interlace is disabled, different data used? (check Back to the Future);
-	- Find real CRTC registers
-	- Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
-	- Implement external ROM hook-up;
-	- FDC loading without the IPLPRO doesn't work at all, why?
-	- reverse / blanking tvram attributes;
-	- clean-ups! ^^'
+    TODO:
+    - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different data used? (check Back to the Future);
+    - Find real CRTC registers
+    - Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
+    - Implement external ROM hook-up;
+    - FDC loading without the IPLPRO doesn't work at all, why?
+    - reverse / blanking tvram attributes;
+    - clean-ups! ^^'
 
     per-game/program specific TODO:
-	- Basic: vertical scrolling returns wrap-around that shouldn't wrap;
-	- Basic: loading has an alignment bug with the bitmap
-	- LayDock: hangs by reading the FDC status and expecting it to become 0x81;
-	- Mappy: TVRAM layer is double x sized than it should be;
-	- Marchen Veil I: dies with garbage on screen;
-	- Moon Child: needs mixed 3+3bpp tvram supported;
-	- Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
-	- Mugen no Shinzou: returns an HW error if you attempt to start a play;
-	- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
-	- Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
-	- Murder Club: has lots of CG artifacts;
-	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-	- Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
-	- Sound Gal Music Editor: dies with bad code, another wd17xx core bug;
-	- Telephone Soft: shows garbage with the CG layer;
-	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
-	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
-	- Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
-	- Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
+    - Basic: vertical scrolling returns wrap-around that shouldn't wrap;
+    - Basic: loading has an alignment bug with the bitmap
+    - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
+    - Mappy: TVRAM layer is double x sized than it should be;
+    - Marchen Veil I: dies with garbage on screen;
+    - Moon Child: needs mixed 3+3bpp tvram supported;
+    - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
+    - Mugen no Shinzou: returns an HW error if you attempt to start a play;
+    - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
+    - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
+    - Murder Club: has lots of CG artifacts;
+    - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
+    - Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
+    - Sound Gal Music Editor: dies with bad code, another wd17xx core bug;
+    - Telephone Soft: shows garbage with the CG layer;
+    - The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
+    - Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
+    - Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
+    - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
     memory map:
     0x00000-0x3ffff Work RAM
@@ -285,7 +285,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
 
-//	popmessage("%02x",text_reg[9]);
+//  popmessage("%02x",text_reg[9]);
 
 	if(text_col_size)
 		draw_80x25(machine,bitmap,cliprect,base_addr);
@@ -297,7 +297,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 		switch(tv_mode & 3)
 		{
-//			case 0: mixed 6bpp mode
+//          case 0: mixed 6bpp mode
 			case 1:
 				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
@@ -334,7 +334,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 
 				/* check window boundaries */
 				//if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
-				//	continue;
+				//  continue;
 
 				/* TODO: very preliminary, just Yukar K2 uses this so far*/
 				pen_bit[0] = (vram[count + 0x00000]>>(xi)) & 1 ? 7 : 0; // B
@@ -515,7 +515,7 @@ static VIDEO_UPDATE( mz2500 )
 	draw_cg_screen(screen->machine,bitmap,cliprect,0);
 	draw_tv_screen(screen->machine,bitmap,cliprect);
 	draw_cg_screen(screen->machine,bitmap,cliprect,1);
-	//	popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
+	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
 
     return 0;
 }
@@ -615,8 +615,8 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 	UINT8 *ram = memory_region(machine, "maincpu");
 	UINT8 cur_bank = bank_val[bank_num];
 
-//	if(cur_bank >= 0x30 && cur_bank <= 0x33)
-//		printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",cg_reg[0],cg_reg[1],cg_reg[2],cg_reg[3],offset,data);
+//  if(cur_bank >= 0x30 && cur_bank <= 0x33)
+//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",cg_reg[0],cg_reg[1],cg_reg[2],cg_reg[3],offset,data);
 
 	switch(cur_bank)
 	{
@@ -756,7 +756,7 @@ static READ8_HANDLER( mz2500_bank_addr_r )
 
 static WRITE8_HANDLER( mz2500_bank_addr_w )
 {
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 	bank_addr = data & 7;
 }
 
@@ -897,9 +897,9 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 			if(text_reg_index >= 0x80 && text_reg_index <= 0x8f) //Bitmap 16 clut registers
 			{
 				/*
-				---x ---- priority
-				---- xxxx clut number
-				*/
+                ---x ---- priority
+                ---- xxxx clut number
+                */
 				clut16[text_reg_index & 0xf] = data & 0x1f;
 				//printf("%02x -> [%02x]\n",text_reg[text_reg_index],text_reg_index);
 
@@ -947,7 +947,7 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 	if(irq_sel & 0x10)
 		irq_vector[3] = data; //RP5c15
 
-//	popmessage("%02x %02x %02x %02x",irq_vector[0],irq_vector[1],irq_vector[2],irq_vector[3]);
+//  popmessage("%02x %02x %02x %02x",irq_vector[0],irq_vector[1],irq_vector[2],irq_vector[3]);
 }
 
 static WRITE8_HANDLER( mz2500_fdc_w )
@@ -1761,10 +1761,10 @@ static READ8_DEVICE_HANDLER( opn_porta_r )
 static WRITE8_DEVICE_HANDLER( opn_porta_w )
 {
 	/*
-	---- x--- mouse select
-	---- -x-- palette bit (16/4096 colors)
-	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
-	*/
+    ---- x--- mouse select
+    ---- -x-- palette bit (16/4096 colors)
+    ---- --x- floppy reverse bit (controls wd17xx bits in command registers)
+    */
 
 	fdc_reverse = (data & 2) ? 0x00 : 0xff;
 	pal_select = (data & 4) ? 1 : 0;
@@ -1831,8 +1831,8 @@ static const struct pit8253_config mz2500_pit8253_intf =
 static void mz2500_rtc_alarm_irq(int state)
 {
 	/* TODO: doesn't work yet */
-//	if(irq_mask[3] && state & 1)
-//		cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,irq_vector[3]);
+//  if(irq_mask[3] && state & 1)
+//      cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,irq_vector[3]);
 }
 
 static const struct rp5c15_interface rtc_intf =

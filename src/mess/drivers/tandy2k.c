@@ -200,7 +200,7 @@ static WRITE8_HANDLER( addr_ctrl_w )
 
 //static READ8_HANDLER( keyboard_x0_r )
 //{
-//	/*
+//  /*
 //
 //        bit     description
 //
@@ -215,29 +215,29 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
+//  tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
-//	UINT8 data = 0xff;
+//  UINT8 data = 0xff;
 //
-//	if (!BIT(state->keylatch,  0)) data &= input_port_read(space->machine,  "Y0");
-//	if (!BIT(state->keylatch,  1)) data &= input_port_read(space->machine,  "Y1");
-//	if (!BIT(state->keylatch,  2)) data &= input_port_read(space->machine,  "Y2");
-//	if (!BIT(state->keylatch,  3)) data &= input_port_read(space->machine,  "Y3");
-//	if (!BIT(state->keylatch,  4)) data &= input_port_read(space->machine,  "Y4");
-//	if (!BIT(state->keylatch,  5)) data &= input_port_read(space->machine,  "Y5");
-//	if (!BIT(state->keylatch,  6)) data &= input_port_read(space->machine,  "Y6");
-//	if (!BIT(state->keylatch,  7)) data &= input_port_read(space->machine,  "Y7");
-//	if (!BIT(state->keylatch,  8)) data &= input_port_read(space->machine,  "Y8");
-//	if (!BIT(state->keylatch,  9)) data &= input_port_read(space->machine,  "Y9");
-//	if (!BIT(state->keylatch, 10)) data &= input_port_read(space->machine, "Y10");
-//	if (!BIT(state->keylatch, 11)) data &= input_port_read(space->machine, "Y11");
+//  if (!BIT(state->keylatch,  0)) data &= input_port_read(space->machine,  "Y0");
+//  if (!BIT(state->keylatch,  1)) data &= input_port_read(space->machine,  "Y1");
+//  if (!BIT(state->keylatch,  2)) data &= input_port_read(space->machine,  "Y2");
+//  if (!BIT(state->keylatch,  3)) data &= input_port_read(space->machine,  "Y3");
+//  if (!BIT(state->keylatch,  4)) data &= input_port_read(space->machine,  "Y4");
+//  if (!BIT(state->keylatch,  5)) data &= input_port_read(space->machine,  "Y5");
+//  if (!BIT(state->keylatch,  6)) data &= input_port_read(space->machine,  "Y6");
+//  if (!BIT(state->keylatch,  7)) data &= input_port_read(space->machine,  "Y7");
+//  if (!BIT(state->keylatch,  8)) data &= input_port_read(space->machine,  "Y8");
+//  if (!BIT(state->keylatch,  9)) data &= input_port_read(space->machine,  "Y9");
+//  if (!BIT(state->keylatch, 10)) data &= input_port_read(space->machine, "Y10");
+//  if (!BIT(state->keylatch, 11)) data &= input_port_read(space->machine, "Y11");
 //
-//	return ~data;
+//  return ~data;
 //}
 //
 //static WRITE8_HANDLER( keyboard_y0_w )
 //{
-//	/*
+//  /*
 //
 //        bit     description
 //
@@ -252,15 +252,15 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
+//  tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
-//	/* keyboard row select */
-//	state->keylatch = (state->keylatch & 0xff00) | data;
+//  /* keyboard row select */
+//  state->keylatch = (state->keylatch & 0xff00) | data;
 //}
 //
 //static WRITE8_HANDLER( keyboard_y8_w )
 //{
-//	/*
+//  /*
 //
 //        bit     description
 //
@@ -275,10 +275,10 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
+//  tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
-//	/* keyboard row select */
-//	state->keylatch = ((data & 0x0f) << 8) | (state->keylatch & 0xff);
+//  /* keyboard row select */
+//  state->keylatch = ((data & 0x0f) << 8) | (state->keylatch & 0xff);
 //}
 
 /* Memory Maps */
@@ -320,9 +320,9 @@ static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 //static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
-//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
-//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
+//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
 //ADDRESS_MAP_END
 
 /* Input Ports */
