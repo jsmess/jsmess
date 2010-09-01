@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_END
 /* I strongly suspect this dump comes from a later machine, like an i386-based one, but I could be wrong... */
 ROM_START( pc9801 )
 	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0x08000, 0x18000, CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 
 	/* where shall we load this? */
@@ -1026,7 +1026,7 @@ ROM_END
 
 ROM_START( pc9821 )
 	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0x08000, 0x18000, CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
 	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -1035,6 +1035,19 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x50000, "gfx1", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 ROM_END
+
+ROM_START( pc9821ne )
+	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
+	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
+
+	ROM_REGION( 0x50000, "gfx1", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
+ROM_END
+
 
 static DRIVER_INIT( pc9801 )
 {
@@ -1098,5 +1111,6 @@ static DRIVER_INIT( pc9801 )
 
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY                        FULLNAME    FLAGS */
-COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   pc9801,      "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   pc9801, "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1993, pc9821ne, pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_NO_SOUND)

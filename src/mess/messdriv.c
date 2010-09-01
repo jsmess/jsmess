@@ -814,6 +814,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( pc9801 )
 	DRIVER( pc9821 )
+	DRIVER( pc9821ne )
 
 	/* Cantab */
 	DRIVER( jupiter )   /* Jupiter Ace    */
