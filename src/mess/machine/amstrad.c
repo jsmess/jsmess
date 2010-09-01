@@ -3110,17 +3110,17 @@ static TIMER_CALLBACK( cb_set_resolution )
 	if ( input_port_read( machine, "solder_links" ) & 0x10 )
 	{
 		/* PAL */
-		visarea.min_x = 32;
-		visarea.max_x = 32 + 640 + 64 - 1;
-		visarea.min_y = 56;
-		visarea.max_y = 56 + 15 + 200 + 15 - 1;
+		visarea.min_x = 0;
+		visarea.max_x = 64 + 640 + 64 - 1;
+		visarea.min_y = 34;
+		visarea.max_y = 34 + 15 + 242 + 15 - 1;
 		height = 312;
 	}
 	else
 	{
 		/* NTSC */
-		visarea.min_x = 32;
-		visarea.max_x = 32 + 640 + 64 - 1;
+		visarea.min_x = 0;
+		visarea.max_x = 64 + 640 + 64 - 1;
 		visarea.min_y = 16;
 		visarea.max_y = 16 + 15 + 200 + 15 - 1;
 		height = 262;
