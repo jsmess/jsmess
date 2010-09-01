@@ -288,7 +288,7 @@ static const floppy_config tf20_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( tf20 )
+static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MDRV_CPU_ADD("tf20", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MDRV_CPU_PROGRAM_MAP(tf20_mem)
 	MDRV_CPU_IO_MAP(tf20_io)
@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( tf20 )
 
 	/* 2 floppy drives */
 	MDRV_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -366,7 +366,7 @@ DEVICE_GET_INFO( tf20 )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(tf20);	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_CONFIG_NAME(tf20);	break;
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(tf20);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

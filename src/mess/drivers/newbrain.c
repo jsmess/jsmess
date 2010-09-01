@@ -1547,8 +1547,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(NEWBRAIN_SERIAL, newbrain_serial);
 #define MDRV_NEWBRAIN_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, NEWBRAIN_SERIAL, 0)
 
-static MACHINE_DRIVER_START( newbrain_a )
-	MDRV_DRIVER_DATA(newbrain_state)
+static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
@@ -1569,7 +1568,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_newbrain)
-	MDRV_IMPORT_FROM(newbrain_video)
+	MDRV_FRAGMENT_ADD(newbrain_video)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
@@ -1580,7 +1579,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_RAM_DEFAULT_SIZE("32K")
 
 	MDRV_NEWBRAIN_SERIAL_ADD("serial")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(newbrain)
 	// 180K img
@@ -1598,8 +1597,7 @@ static const floppy_config newbrain_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( newbrain_eim )
-	MDRV_IMPORT_FROM(newbrain_a)
+static MACHINE_CONFIG_DERIVED( newbrain_eim, newbrain_a )
 
 	/* basic system hardware */
 	MDRV_CPU_MODIFY(Z80_TAG)
@@ -1629,7 +1627,7 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("96K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

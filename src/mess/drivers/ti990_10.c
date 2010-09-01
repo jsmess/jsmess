@@ -194,7 +194,7 @@ static const ti990_tpc_interface ti990_tpc =
 	ti990_set_int9
 };
 
-static MACHINE_DRIVER_START(ti990_10)
+static MACHINE_CONFIG_START( ti990_10, driver_data_t )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)
@@ -227,10 +227,10 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_IMPORT_FROM( ti990_hdc )
+	MDRV_FRAGMENT_ADD( ti990_hdc )
 
 	MDRV_TI990_TAPE_CTRL_ADD("tpc",ti990_tpc)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

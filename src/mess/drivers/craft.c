@@ -842,9 +842,7 @@ static MACHINE_RESET( craft )
     dac_data_w(machine->device("dac"), 0x00);
 }
 
-static MACHINE_DRIVER_START( craft )
-
-    MDRV_DRIVER_DATA( craft_state )
+static MACHINE_CONFIG_START( craft, craft_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", AVR8, MASTER_CLOCK)
@@ -870,7 +868,7 @@ static MACHINE_DRIVER_START( craft )
     MDRV_SPEAKER_STANDARD_MONO("avr8")
     MDRV_SOUND_ADD("dac", DAC, 0)
     MDRV_SOUND_ROUTE(0, "avr8", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( craft )
 	ROM_REGION( 0x2000, "maincpu", 0 )  /* Main program store */

@@ -413,8 +413,7 @@ static const cassette_config pv2000_cassette_config =
 
 
 /* Machine Drivers */
-static MACHINE_DRIVER_START( pv2000 )
-	MDRV_DRIVER_DATA( pv2000_state )
+static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
@@ -426,7 +425,7 @@ static MACHINE_DRIVER_START( pv2000 )
 	MDRV_MACHINE_RESET(pv2000)
 
     // video hardware
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -448,7 +447,7 @@ static MACHINE_DRIVER_START( pv2000 )
 	
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","pv2000")	
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

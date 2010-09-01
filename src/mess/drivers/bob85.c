@@ -130,7 +130,7 @@ static MACHINE_RESET(bob85)
 {
 }
 
-static MACHINE_DRIVER_START( bob85 )
+static MACHINE_CONFIG_START( bob85, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, 2000000)
     MDRV_CPU_PROGRAM_MAP(bob85_mem)
@@ -140,7 +140,7 @@ static MACHINE_DRIVER_START( bob85 )
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_bob85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( bob85 )

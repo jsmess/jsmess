@@ -308,7 +308,7 @@ static const cassette_config jupiter_cassette_config =
 };
 
 /* machine definition */
-static MACHINE_DRIVER_START( jupiter )
+static MACHINE_CONFIG_START( jupiter, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem)
@@ -340,7 +340,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_CARTSLOT_EXTENSION_LIST("ace")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(jupiter_ace)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START (jupiter)

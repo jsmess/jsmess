@@ -98,7 +98,7 @@ INPUT_CHANGED( comx35_reset );
 WRITE8_HANDLER( comx35_videoram_w );
 READ8_HANDLER( comx35_videoram_r );
 
-MACHINE_DRIVER_EXTERN( comx35_pal_video );
-MACHINE_DRIVER_EXTERN( comx35_ntsc_video );
+MACHINE_CONFIG_EXTERN( comx35_pal_video );
+MACHINE_CONFIG_EXTERN( comx35_ntsc_video );
 
 #endif

@@ -60,7 +60,7 @@ static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
 	DEVCB_HANDLER(pimps_kbd_put)
 };
 
-static MACHINE_DRIVER_START( pimps )
+static MACHINE_CONFIG_START( pimps, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(pimps_mem)
@@ -69,9 +69,9 @@ static MACHINE_DRIVER_START( pimps )
     MDRV_MACHINE_RESET(pimps)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pimps_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pimps )

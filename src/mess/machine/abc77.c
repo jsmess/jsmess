@@ -320,7 +320,7 @@ INPUT_PORTS_END
     MACHINE_DRIVER( abc77 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( abc77 )
+static MACHINE_CONFIG_FRAGMENT( abc77 )
 	/* keyboard cpu */
 	MDRV_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MDRV_CPU_PROGRAM_MAP(abc77_map)
@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( abc77 )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(abc77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( abc77 )
@@ -439,7 +439,7 @@ DEVICE_GET_INFO( abc77 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = rom_abc77;				break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(abc77); break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(abc77); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abc77);		break;

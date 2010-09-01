@@ -680,8 +680,7 @@ static INTERRUPT_GEN( vic20_raster_interrupt )
 	mos6560_raster_interrupt_gen(state->mos6560);
 }
 
-static MACHINE_DRIVER_START( vic20_common )
-	MDRV_DRIVER_DATA(vic20_state)
+static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
 	MDRV_TIMER_ADD_PERIODIC(TIMER_C1530_TAG, cassette_tick, HZ(44100))
 
@@ -711,10 +710,9 @@ static MACHINE_DRIVER_START( vic20_common )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("5K")
 	MDRV_RAM_EXTRA_OPTIONS("8K,16K,24K,32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vic20_ntsc )
-	MDRV_IMPORT_FROM( vic20_common )
+static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
@@ -742,10 +740,9 @@ static MACHINE_DRIVER_START( vic20_ntsc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vic20_pal )
-	MDRV_IMPORT_FROM( vic20_common )
+static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
@@ -773,7 +770,7 @@ static MACHINE_DRIVER_START( vic20_pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

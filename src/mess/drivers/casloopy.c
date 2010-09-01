@@ -38,7 +38,7 @@ static MACHINE_RESET( casloopy )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 }
 
-static MACHINE_DRIVER_START( casloopy )
+static MACHINE_CONFIG_START( casloopy, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH1,8000000)
@@ -64,7 +64,7 @@ static MACHINE_DRIVER_START( casloopy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

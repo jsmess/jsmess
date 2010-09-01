@@ -504,13 +504,13 @@ DEVICE_GET_INFO( ti99_4_pio )
 
 DEFINE_LEGACY_IMAGE_DEVICE(TI99_4_PIO, ti99_4_pio);
 
-static MACHINE_DRIVER_START( ti99_4_rs232 )
+static MACHINE_CONFIG_FRAGMENT( ti99_4_rs232 )
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 	MDRV_TI99_4_RS232_ADD("port0")
 	MDRV_TI99_4_RS232_ADD("port1")
 	MDRV_TI99_4_PIO_ADD("pio")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DEVICE_START( ti99_4_rs232_card )
 {
@@ -529,7 +529,7 @@ DEVICE_GET_INFO( ti99_4_rs232_card )
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_rs232_card );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_rs232_card );			break;
 
-		case DEVINFO_PTR_MACHINE_CONFIG:			info->machine_config = MACHINE_DRIVER_NAME(ti99_4_rs232);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:			info->machine_config = MACHINE_CONFIG_NAME(ti99_4_rs232);		break;
 		case DEVINFO_STR_NAME:		                strcpy( info->s, "TI99 RS232 card");	                         break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "TI99 RS232 card");	                         break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;

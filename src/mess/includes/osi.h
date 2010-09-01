@@ -37,8 +37,8 @@ public:
 
 /* ---------- defined in video/osi.c ---------- */
 
-MACHINE_DRIVER_EXTERN( osi600_video );
-MACHINE_DRIVER_EXTERN( uk101_video );
-MACHINE_DRIVER_EXTERN( osi630_video );
+MACHINE_CONFIG_EXTERN( osi600_video );
+MACHINE_CONFIG_EXTERN( uk101_video );
+MACHINE_CONFIG_EXTERN( osi630_video );
 
 #endif

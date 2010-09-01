@@ -37,7 +37,7 @@ DECLARE_LEGACY_DEVICE(GENERIC_TERMINAL, terminal);
 
 WRITE8_DEVICE_HANDLER ( terminal_write );
 
-MACHINE_DRIVER_EXTERN( generic_terminal );
+MACHINE_CONFIG_EXTERN( generic_terminal );
 
 INPUT_PORTS_EXTERN(generic_terminal);
 

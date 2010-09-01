@@ -37,7 +37,7 @@ static VIDEO_UPDATE( sc1 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( sc1 )
+static MACHINE_CONFIG_START( sc1, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(sc1_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( sc1 )
 
     MDRV_VIDEO_START(sc1)
     MDRV_VIDEO_UPDATE(sc1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sc1 )			/* These are different bios versions */

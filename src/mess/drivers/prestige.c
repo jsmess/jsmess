@@ -210,7 +210,7 @@ static DEVICE_IMAGE_LOAD( prestige_cart )
 	return IMAGE_INIT_FAIL;
 }
 
-static MACHINE_DRIVER_START( prestige )
+static MACHINE_CONFIG_START( prestige, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(prestige_mem)
@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( prestige )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( prestige )

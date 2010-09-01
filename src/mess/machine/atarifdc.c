@@ -809,9 +809,9 @@ static const floppy_config atari_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( atari_fdc )
+static MACHINE_CONFIG_FRAGMENT( atari_fdc )
 	MDRV_FLOPPY_4_DRIVES_ADD(atari_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 running_device *atari_floppy_get_device_child(running_device *device,int drive)
 {
@@ -846,7 +846,7 @@ DEVICE_GET_INFO( atari_fdc )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(atari_fdc_t);								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(atari_fdc);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(atari_fdc);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(atari_fdc);					break;

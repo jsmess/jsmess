@@ -47,7 +47,7 @@ static VIDEO_UPDATE( pv9234 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( pv9234 )
+static MACHINE_CONFIG_START( pv9234, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
     MDRV_CPU_PROGRAM_MAP(pv9234_map)
@@ -66,7 +66,7 @@ static MACHINE_DRIVER_START( pv9234 )
 
     MDRV_VIDEO_START(pv9234)
     MDRV_VIDEO_UPDATE(pv9234)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pv9234 )

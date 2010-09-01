@@ -1827,7 +1827,7 @@ static MACHINE_RESET( gp32 )
 	s3c240x_machine_reset(machine);
 }
 
-static MACHINE_DRIVER_START( gp32 )
+static MACHINE_CONFIG_START( gp32, driver_data_t )
 	MDRV_CPU_ADD("maincpu", ARM9, 40000000)
 	MDRV_CPU_PROGRAM_MAP(gp32_map)
 
@@ -1857,7 +1857,7 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_NVRAM_HANDLER(gp32)
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )

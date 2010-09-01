@@ -206,8 +206,7 @@ static MACHINE_START(vcs80)
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( vcs80 )
-	MDRV_DRIVER_DATA(vcs80_state)
+static MACHINE_CONFIG_START( vcs80, vcs80_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
@@ -229,7 +228,7 @@ static MACHINE_DRIVER_START( vcs80 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

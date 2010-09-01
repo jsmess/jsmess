@@ -609,7 +609,7 @@ static const jaguar_cpu_config dsp_config =
 	jaguar_dsp_cpu_int
 };
 
-static MACHINE_DRIVER_START( jaguar )
+static MACHINE_CONFIG_START( jaguar, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, JAGUAR_CLOCK/2)
@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

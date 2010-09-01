@@ -166,7 +166,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_DRIVER_START( z1013 )
+static MACHINE_CONFIG_START( z1013, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1MHz )
 	MDRV_CPU_PROGRAM_MAP(z1013_mem)
@@ -193,13 +193,12 @@ static MACHINE_DRIVER_START( z1013 )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", z1013, "z80", 0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( z1013k76 )
-	MDRV_IMPORT_FROM(z1013)
+static MACHINE_CONFIG_DERIVED( z1013k76, z1013 )
 	MDRV_DEVICE_REMOVE("z80pio")
 	MDRV_Z80PIO_ADD("z80pio", XTAL_1MHz, z1013k7659_z80pio_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z1013 )

@@ -850,8 +850,7 @@ static MACHINE_RESET( px8 )
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( px8 )
-	MDRV_DRIVER_DATA(px8_state)
+static MACHINE_CONFIG_START( px8, px8_state )
 
 	/* main cpu (uPD70008) */
 	MDRV_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
@@ -906,7 +905,7 @@ static MACHINE_DRIVER_START( px8 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

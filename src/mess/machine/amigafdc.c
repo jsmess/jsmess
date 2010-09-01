@@ -835,9 +835,9 @@ static const floppy_config amiga_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( amiga_fdc )
+static MACHINE_CONFIG_FRAGMENT( amiga_fdc )
 	MDRV_FLOPPY_2_DRIVES_ADD(amiga_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 DEVICE_GET_INFO( amiga_fdc )
@@ -849,7 +849,7 @@ DEVICE_GET_INFO( amiga_fdc )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(amiga_fdc_t);								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(amiga_fdc);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(amiga_fdc);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(amiga_fdc);					break;

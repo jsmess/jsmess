@@ -747,8 +747,7 @@ static const cassette_config vip_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( vip )
-	MDRV_DRIVER_DATA(vip_state)
+static MACHINE_CONFIG_START( vip, vip_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
@@ -788,16 +787,15 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vp111 )
-	MDRV_IMPORT_FROM(vip)
+static MACHINE_CONFIG_DERIVED( vp111, vip )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
 	MDRV_RAM_EXTRA_OPTIONS("2K,4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

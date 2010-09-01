@@ -838,8 +838,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( xerox820 )
-	MDRV_DRIVER_DATA(xerox820_state)
+static MACHINE_CONFIG_START( xerox820, xerox820_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
@@ -878,10 +877,9 @@ static MACHINE_DRIVER_START( xerox820 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( xerox820ii )
-	MDRV_DRIVER_DATA(xerox820_state)
+static MACHINE_CONFIG_START( xerox820ii, xerox820_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
@@ -920,10 +918,9 @@ static MACHINE_DRIVER_START( xerox820ii )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( xerox168 )
-	MDRV_IMPORT_FROM( xerox820ii )
+static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
 
 	MDRV_CPU_ADD(I8086_TAG, I8086, 4770000)
     MDRV_CPU_PROGRAM_MAP(xerox168_mem)
@@ -932,7 +929,7 @@ static MACHINE_DRIVER_START( xerox168 )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("192K")
 	MDRV_RAM_EXTRA_OPTIONS("320K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

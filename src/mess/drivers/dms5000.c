@@ -37,7 +37,7 @@ static VIDEO_UPDATE( dms5000 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( dms5000 )
+static MACHINE_CONFIG_START( dms5000, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(dms5000_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( dms5000 )
 
     MDRV_VIDEO_START(dms5000)
     MDRV_VIDEO_UPDATE(dms5000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dms5000 )

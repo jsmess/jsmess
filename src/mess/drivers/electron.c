@@ -175,7 +175,7 @@ static const cassette_config electron_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( electron )
+static MACHINE_CONFIG_START( electron, driver_data_t )
 	MDRV_CPU_ADD( "maincpu", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem)
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( electron )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MDRV_CASSETTE_ADD( "cassette", electron_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  COMPANY  FULLNAME */

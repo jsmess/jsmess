@@ -392,7 +392,7 @@ static const cassette_config aquarius_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( aquarius )
+static MACHINE_CONFIG_START( aquarius, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem)
@@ -437,7 +437,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
 	MDRV_RAM_EXTRA_OPTIONS("8K,20K,36K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(aquarius)
 	/* 128K images, 64K/side */
@@ -455,8 +455,7 @@ static const floppy_config aquarius_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( aquarius_qd )
-	MDRV_IMPORT_FROM( aquarius )
+static MACHINE_CONFIG_DERIVED( aquarius_qd, aquarius )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(aquarius_qd_io)
@@ -464,7 +463,7 @@ static MACHINE_DRIVER_START( aquarius_qd )
 	MDRV_DEVICE_REMOVE("cart")
 
 	MDRV_FLOPPY_2_DRIVES_ADD(aquarius_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

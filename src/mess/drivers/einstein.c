@@ -726,14 +726,12 @@ static const floppy_config einstein_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( einstein )
+static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
 	MDRV_CPU_PROGRAM_MAP(einstein_mem)
 	MDRV_CPU_IO_MAP(einstein_io)
 	MDRV_CPU_CONFIG(einstein_daisy_chain)
-
-	MDRV_DRIVER_DATA(einstein_state)
 
 	MDRV_MACHINE_START(einstein)
 	MDRV_MACHINE_RESET(einstein)
@@ -754,7 +752,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_DEVICE_ADD("fire_daisy", EINSTEIN_FIRE_DAISY, 0)
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -779,11 +777,10 @@ static MACHINE_DRIVER_START( einstein )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( einstei2 )
-	MDRV_IMPORT_FROM( einstein )
+static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 
 	MDRV_CPU_MODIFY(IC_I001)
 	MDRV_CPU_IO_MAP(einstein2_io)
@@ -808,7 +805,7 @@ static MACHINE_DRIVER_START( einstei2 )
 
 	MDRV_VIDEO_UPDATE(einstein2)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

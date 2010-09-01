@@ -551,9 +551,7 @@ static GFXDECODE_START( elwro800 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( elwro800 )
-
-	MDRV_DRIVER_DATA(spectrum_state)
+static MACHINE_CONFIG_START( elwro800, spectrum_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */
@@ -600,7 +598,7 @@ static MACHINE_DRIVER_START( elwro800 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

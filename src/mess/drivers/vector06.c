@@ -167,7 +167,7 @@ const wd17xx_interface vector06_wd17xx_interface =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( vector06 )
+static MACHINE_CONFIG_START( vector06, driver_data_t )
   /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 3000000)
 //  MDRV_CPU_ADD("maincpu", Z80, 3000000)
@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

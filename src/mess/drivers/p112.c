@@ -38,7 +38,7 @@ static VIDEO_UPDATE( p112 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( p112 )
+static MACHINE_CONFIG_START( p112, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z180, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(p112_mem)
@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( p112 )
 
     MDRV_VIDEO_START(p112)
     MDRV_VIDEO_UPDATE(p112)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( p112 )

@@ -36,7 +36,7 @@ static VIDEO_UPDATE( hp16500 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( hp16500 )
+static MACHINE_CONFIG_START( hp16500, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(hp16500_map)
@@ -54,7 +54,7 @@ static MACHINE_DRIVER_START( hp16500 )
 	MDRV_VIDEO_UPDATE(hp16500)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp16500 )
 INPUT_PORTS_END

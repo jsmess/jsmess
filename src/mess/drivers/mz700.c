@@ -329,7 +329,7 @@ static const cassette_config mz700_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( mz700 )
+static MACHINE_CONFIG_START( mz700, mz_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
 	MDRV_CPU_PROGRAM_MAP(mz700_mem)
@@ -355,8 +355,6 @@ static MACHINE_DRIVER_START( mz700 )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_DRIVER_DATA(mz_state)
-
 	/* ne556 timers */
 	MDRV_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, HZ(1.5))
 	MDRV_TIMER_ADD_PERIODIC("other", ne556_other_callback, HZ(34.5))
@@ -371,11 +369,10 @@ static MACHINE_DRIVER_START( mz700 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mz800 )
-	MDRV_IMPORT_FROM(mz700)
+static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -394,7 +391,7 @@ static MACHINE_DRIVER_START( mz800 )
 	MDRV_PIT8253_ADD("pit8253", mz800_pit8253_config)
 	MDRV_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

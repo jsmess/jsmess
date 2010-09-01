@@ -699,7 +699,7 @@ static const floppy_config smc777_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( smc777 )
+static MACHINE_CONFIG_START( smc777, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
     MDRV_CPU_PROGRAM_MAP(smc777_mem)
@@ -734,7 +734,7 @@ static MACHINE_DRIVER_START( smc777 )
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( smc777 )

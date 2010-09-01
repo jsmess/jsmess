@@ -413,8 +413,7 @@ static const mc6847_interface mc1000_mc6847_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( mc1000 )
-	MDRV_DRIVER_DATA(mc1000_state)
+static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 3579545)
@@ -454,7 +453,7 @@ static MACHINE_DRIVER_START( mc1000 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("48K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

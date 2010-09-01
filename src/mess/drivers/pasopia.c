@@ -681,7 +681,7 @@ static PALETTE_INIT( pasopia7 )
 		palette_set_color_rgb(machine, i+0x020, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static MACHINE_DRIVER_START( paso7 )
+static MACHINE_CONFIG_START( paso7, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(paso7_mem)
@@ -721,7 +721,7 @@ static MACHINE_DRIVER_START( paso7 )
 
 	MDRV_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pasopia7 )

@@ -241,7 +241,7 @@ static const e05a03_interface lx800_e05a03_intf =
 	DEVCB_LINE(lx800_reset_w)
 };
 
-static MACHINE_DRIVER_START( lx800 )
+static MACHINE_CONFIG_START( lx800, lx800_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MDRV_CPU_CONFIG(lx800_cpu_config)
@@ -249,8 +249,6 @@ static MACHINE_DRIVER_START( lx800 )
 	MDRV_CPU_IO_MAP(lx800_io)
 
 	MDRV_MACHINE_START(lx800)
-
-	MDRV_DRIVER_DATA(lx800_state)
 
 	MDRV_DEFAULT_LAYOUT(layout_lx800)
 
@@ -261,7 +259,7 @@ static MACHINE_DRIVER_START( lx800 )
 
 	/* gate array */
 	MDRV_E05A03_ADD("ic3b", lx800_e05a03_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

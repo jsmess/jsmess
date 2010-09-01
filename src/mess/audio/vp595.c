@@ -90,10 +90,10 @@ void vp595_install_write_handlers(running_device *device, address_space *io, int
     MACHINE_DRIVER( vp595 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( vp595 )
+static MACHINE_CONFIG_FRAGMENT( vp595 )
 	MDRV_CDP1863_ADD(CDP1863_TAG, 0, 0) // TODO: clock2 should be CDP1863_XTAL
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     DEVICE_START( vp595 )
@@ -123,7 +123,7 @@ DEVICE_GET_INFO( vp595 )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp595 );	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME( vp595 );	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vp595);		break;

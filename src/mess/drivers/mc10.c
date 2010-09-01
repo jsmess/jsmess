@@ -405,8 +405,7 @@ static const mc6847_interface mc10_mc6847_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( mc10 )
-	MDRV_DRIVER_DATA(mc10_state)
+static MACHINE_CONFIG_START( mc10, mc10_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
@@ -435,7 +434,7 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("20K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -35,7 +35,7 @@ static VIDEO_UPDATE( a7150 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( a7150 )
+static MACHINE_CONFIG_START( a7150, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4915000)
 	MDRV_CPU_PROGRAM_MAP(a7150_mem)
@@ -54,7 +54,7 @@ static MACHINE_DRIVER_START( a7150 )
 
 	MDRV_VIDEO_START(a7150)
 	MDRV_VIDEO_UPDATE(a7150)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( a7150 )

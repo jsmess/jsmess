@@ -36,7 +36,7 @@ static VIDEO_UPDATE( rex6000 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( rex6000 )
+static MACHINE_CONFIG_START( rex6000, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(rex6000_mem)
@@ -56,7 +56,7 @@ static MACHINE_DRIVER_START( rex6000 )
 
     MDRV_VIDEO_START(rex6000)
     MDRV_VIDEO_UPDATE(rex6000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rex6000 )

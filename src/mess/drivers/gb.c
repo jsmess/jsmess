@@ -551,7 +551,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( gb_common )
+static MACHINE_CONFIG_START( gb_common, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map)
@@ -583,10 +583,9 @@ static MACHINE_DRIVER_START( gb_common )
 	MDRV_SOUND_ADD("custom", GAMEBOY, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gameboy )
-	MDRV_IMPORT_FROM(gb_common)
+static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
 
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
@@ -595,10 +594,9 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gameboy")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( supergb )
-	MDRV_IMPORT_FROM(gameboy)
+static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MDRV_CPU_REPLACE("maincpu", LR35902, 4295454)	/* 4.295454 MHz */
 	MDRV_CPU_PROGRAM_MAP(sgb_map)
 
@@ -617,10 +615,9 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_PALETTE_INIT(sgb)
 
 	MDRV_CARTSLOT_MODIFY("cart")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gbpocket )
-	MDRV_IMPORT_FROM(gameboy)
+static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(mgb_cpu_reset)
 	MDRV_MACHINE_RESET( gbpocket )
@@ -628,10 +625,9 @@ static MACHINE_DRIVER_START( gbpocket )
 
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gbcolor )
-	MDRV_IMPORT_FROM(gb_common)
+static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP( gbc_map)
 	MDRV_CPU_CONFIG(cgb_cpu_reset)
@@ -654,9 +650,9 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_CARTSLOT_LOAD(gb_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("gameboy","gameboy")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( megaduck )
+static MACHINE_CONFIG_START( megaduck, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map)
@@ -693,7 +689,7 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_CARTSLOT_INTERFACE("megaduck_cart")
 	MDRV_CARTSLOT_LOAD(megaduck_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","megaduck")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

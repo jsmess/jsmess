@@ -249,7 +249,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
-static MACHINE_DRIVER_START( a310 )
+static MACHINE_CONFIG_START( a310, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(a310_mem)
@@ -303,7 +303,7 @@ static MACHINE_DRIVER_START( a310 )
 
 	MDRV_SOUND_ADD("dac7", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(a310)
 	ROM_REGION( 0x800000, "maincpu", 0 )

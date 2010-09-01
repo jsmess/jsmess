@@ -861,9 +861,7 @@ static ADDRESS_MAP_START(apexc_io_map, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START(apexc)
-
-	MDRV_DRIVER_DATA( apexc_state )
+static MACHINE_CONFIG_START( apexc, apexc_state )
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
@@ -895,7 +893,7 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_APEXC_CYLINDER_ADD("cylinder")
 	MDRV_APEXC_TAPE_PUNCHER_ADD("tape_puncher")
 	MDRV_APEXC_TAPE_READER_ADD("tape_reader")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(apexc)
 	/*CPU memory space*/

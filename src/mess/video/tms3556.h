@@ -11,4 +11,4 @@ extern void tms3556_init(running_machine *machine, int vram_size);
 extern void tms3556_reset(void);
 extern void tms3556_interrupt(running_machine *machine);
 
-MACHINE_DRIVER_EXTERN( tms3556 );
+MACHINE_CONFIG_EXTERN( tms3556 );

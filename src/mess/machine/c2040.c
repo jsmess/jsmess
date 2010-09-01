@@ -1287,7 +1287,7 @@ static const floppy_config c8250_floppy_config =
     MACHINE_DRIVER( c2040 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c2040 )
+static MACHINE_CONFIG_FRAGMENT( c2040 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c2040_dos_map)
@@ -1303,13 +1303,13 @@ static MACHINE_DRIVER_START( c2040 )
 	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c2040_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c4040 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c4040 )
+static MACHINE_CONFIG_FRAGMENT( c4040 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c4040_dos_map)
@@ -1325,13 +1325,13 @@ static MACHINE_DRIVER_START( c4040 )
 	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c8050 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c8050 )
+static MACHINE_CONFIG_FRAGMENT( c8050 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
@@ -1347,13 +1347,13 @@ static MACHINE_DRIVER_START( c8050 )
 	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c8050_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c8250 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c8250 )
+static MACHINE_CONFIG_FRAGMENT( c8250 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
@@ -1369,13 +1369,13 @@ static MACHINE_DRIVER_START( c8250 )
 	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c8250_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( sfd1001 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( sfd1001 )
+static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(sfd1001_dos_map)
@@ -1391,7 +1391,7 @@ static MACHINE_DRIVER_START( sfd1001 )
 	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c2040 )
@@ -1614,7 +1614,7 @@ DEVICE_GET_INFO( c2040 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2040);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2040);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c2040);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c2040);						break;
@@ -1640,7 +1640,7 @@ DEVICE_GET_INFO( c3040 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2040);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2040);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c2040);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 3040");							break;
@@ -1659,7 +1659,7 @@ DEVICE_GET_INFO( c4040 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c4040);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c4040);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c4040);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 4040");							break;
@@ -1678,7 +1678,7 @@ DEVICE_GET_INFO( c8050 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c8050);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c8050);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c8050);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8050");							break;
@@ -1697,7 +1697,7 @@ DEVICE_GET_INFO( c8250 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c8050);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c8250);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c8250);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8250");							break;
@@ -1716,7 +1716,7 @@ DEVICE_GET_INFO( sfd1001 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(sfd1001);						break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(sfd1001);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(sfd1001);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore SFD-1001");						break;

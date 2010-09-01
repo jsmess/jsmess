@@ -95,7 +95,7 @@ static INTERRUPT_GEN( gamecom_interrupt )
 	cputag_set_input_line(device->machine, "maincpu", LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_DRIVER_START( gamecom )
+static MACHINE_CONFIG_START( gamecom, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)
@@ -141,7 +141,7 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,tgc")
 	MDRV_CARTSLOT_INTERFACE("gamecom_cart2")
 	MDRV_CARTSLOT_LOAD(gamecom_cart2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( gamecom )
 	ROM_REGION( 0x2000, "maincpu", 0 )

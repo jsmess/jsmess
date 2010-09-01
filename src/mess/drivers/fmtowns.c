@@ -2309,8 +2309,7 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( towns )
-	MDRV_DRIVER_DATA(towns_state)
+static MACHINE_CONFIG_START( towns, towns_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I386, 16000000)
@@ -2363,15 +2362,14 @@ static MACHINE_DRIVER_START( towns )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("6M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( marty )
-	MDRV_IMPORT_FROM(towns)
+static MACHINE_CONFIG_DERIVED( marty, towns )
 
 	MDRV_CPU_REPLACE("maincpu",I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(marty_mem)
 	MDRV_CPU_IO_MAP(towns_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START( fmtowns )

@@ -54,7 +54,7 @@ static INPUT_PORTS_START( mc80 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( mc8020 )
+static MACHINE_CONFIG_START( mc8020, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8020_mem)
@@ -77,9 +77,9 @@ static MACHINE_DRIVER_START( mc8020 )
 
 	MDRV_Z80PIO_ADD( "z80pio", XTAL_2_4576MHz, mc8020_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mc8030 )
+static MACHINE_CONFIG_START( mc8030, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8030_mem)
@@ -106,7 +106,7 @@ static MACHINE_DRIVER_START( mc8030 )
     MDRV_Z80PIO_ADD( "asp_pio", XTAL_2_4576MHz, mc8030_asp_z80pio_intf )
     MDRV_Z80CTC_ADD( "asp_ctc", XTAL_2_4576MHz, mc8030_asp_z80ctc_intf )
     MDRV_Z80SIO_ADD( "asp_sio", 4800, mc8030_asp_z80sio_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mc8020 )

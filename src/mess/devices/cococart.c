@@ -343,7 +343,7 @@ static DEVICE_GET_INFO(general_cartridge)
     COCO-SPECIFIC IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( coco_cartridge )
+static MACHINE_CONFIG_FRAGMENT( coco_cartridge )
 	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
 	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -353,7 +353,7 @@ static MACHINE_DRIVER_START( coco_cartridge )
 	MDRV_CARTSLOT_PCBTYPE(3, "rs232",		COCO_CARTRIDGE_PCB_RS232)
 	//MDRV_CARTSLOT_PCBTYPE(4, "coco_ssc",  COCO_CARTRIDGE_PCB_SSC)
 	MDRV_CARTSLOT_PCBTYPE(4, "",			COCO_CARTRIDGE_PCB_PAK)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge)
@@ -364,7 +364,7 @@ DEVICE_GET_INFO(coco_cartridge)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(coco_cartridge); break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(coco_cartridge); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Cartridge Slot");		break;
@@ -378,13 +378,13 @@ DEVICE_GET_INFO(coco_cartridge)
     DRAGON-SPECIFIC IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( dragon_cartridge )
+static MACHINE_CONFIG_FRAGMENT( dragon_cartridge )
 	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
 	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_PCBTYPE(0, "dragon_fdc", COCO_CARTRIDGE_PCB_FDC_DRAGON)
 	MDRV_CARTSLOT_PCBTYPE(1, "",           COCO_CARTRIDGE_PCB_PAK)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(dragon_cartridge)
@@ -395,7 +395,7 @@ DEVICE_GET_INFO(dragon_cartridge)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(dragon_cartridge); break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(dragon_cartridge); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Dragon Cartridge Slot");		break;

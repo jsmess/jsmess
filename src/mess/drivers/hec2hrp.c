@@ -259,7 +259,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 DISCRETE_SOUND_END
 
 /******************************************************************************/
-static MACHINE_DRIVER_START( hec2hr )
+static MACHINE_CONFIG_START( hec2hr, driver_data_t )
 /******************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -298,10 +298,10 @@ static MACHINE_DRIVER_START( hec2hr )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_DRIVER_START( hec2hrp )
+static MACHINE_CONFIG_START( hec2hrp, driver_data_t )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -340,10 +340,10 @@ static MACHINE_DRIVER_START( hec2hrp )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_DRIVER_START( hec2mx40 )
+static MACHINE_CONFIG_START( hec2mx40, driver_data_t )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -382,10 +382,10 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_DRIVER_START( hec2mx80 )
+static MACHINE_CONFIG_START( hec2mx80, driver_data_t )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( hec2hr )

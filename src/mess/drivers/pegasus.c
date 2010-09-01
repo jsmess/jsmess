@@ -350,7 +350,7 @@ static DRIVER_INIT( pegasus )
 	pegasus_decrypt_rom( machine, 0xf000 );
 }
 
-static MACHINE_DRIVER_START( pegasus )
+static MACHINE_CONFIG_START( pegasus, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)
@@ -388,13 +388,12 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_LOAD(pegasus_cart_5)
 	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pegasusm )
-	MDRV_IMPORT_FROM(pegasus)
+static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(pegasusm_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

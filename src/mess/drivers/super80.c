@@ -628,14 +628,14 @@ static const mc6845_interface super80v_crtc = {
 	NULL
 };
 
-static MACHINE_DRIVER_START( super80_cartslot )
+static MACHINE_CONFIG_FRAGMENT( super80_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(super80_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80 )
+static MACHINE_CONFIG_START( super80, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80_map)
@@ -675,23 +675,20 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
 
 	/* cartridge */
-	MDRV_IMPORT_FROM(super80_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(super80_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80d )
-	MDRV_IMPORT_FROM(super80)
+static MACHINE_CONFIG_DERIVED( super80d, super80 )
 	MDRV_GFXDECODE(super80d)
 	MDRV_VIDEO_UPDATE(super80d)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80e )
-	MDRV_IMPORT_FROM(super80)
+static MACHINE_CONFIG_DERIVED( super80e, super80 )
 	MDRV_GFXDECODE(super80e)
 	MDRV_VIDEO_UPDATE(super80e)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80m )
-	MDRV_IMPORT_FROM(super80)
+static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(super80m_map)
 
@@ -700,9 +697,9 @@ static MACHINE_DRIVER_START( super80m )
 	MDRV_PALETTE_INIT(super80m)
 	MDRV_VIDEO_EOF(super80m)
 	MDRV_VIDEO_UPDATE(super80m)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80v )
+static MACHINE_CONFIG_START( super80v, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map)
@@ -746,14 +743,13 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
 
 	/* cartridge */
-	MDRV_IMPORT_FROM(super80_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(super80_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( super80r )
-	MDRV_IMPORT_FROM(super80v)
+static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(super80r_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**************************** ROMS *****************************************************************/
 

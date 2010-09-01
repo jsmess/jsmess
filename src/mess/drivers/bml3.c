@@ -462,7 +462,7 @@ static GFXDECODE_START( bml3 )
 	GFXDECODE_ENTRY( "char", 0, bml3_charlayout, 0, 4 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( bml3 )
+static MACHINE_CONFIG_START( bml3, driver_data_t )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(bml3_mem)
@@ -492,7 +492,7 @@ static MACHINE_DRIVER_START( bml3 )
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( bml3 )

@@ -217,7 +217,7 @@ static const floppy_config ti990_4_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START(ti990_4)
+static MACHINE_CONFIG_START( ti990_4, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START(ti990_4)
 #endif
 	MDRV_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

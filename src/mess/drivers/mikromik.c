@@ -740,8 +740,7 @@ static MACHINE_RESET( mm1 )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( mm1 )
-	MDRV_DRIVER_DATA(mm1_state)
+static MACHINE_CONFIG_START( mm1, mm1_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
@@ -787,10 +786,9 @@ static MACHINE_DRIVER_START( mm1 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mm1m6 )
-	MDRV_IMPORT_FROM(mm1)
+static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
 
 	/* basic system hardware */
 	MDRV_CPU_MODIFY(I8085A_TAG)
@@ -798,7 +796,7 @@ static MACHINE_DRIVER_START( mm1m6 )
 
 	/* video hardware */
 	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

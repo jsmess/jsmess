@@ -39,7 +39,7 @@ static VIDEO_UPDATE( beehive )
     return 0;
 }
 
-static MACHINE_DRIVER_START( beehive )
+static MACHINE_CONFIG_START( beehive, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(beehive_mem)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( beehive )
 
     MDRV_VIDEO_START(beehive)
     MDRV_VIDEO_UPDATE(beehive)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( beehive )

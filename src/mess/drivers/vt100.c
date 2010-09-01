@@ -346,7 +346,7 @@ GFXDECODE_END
 
 #define XTAL_24_8832MHz	 24883200
 
-static MACHINE_DRIVER_START( vt100 )
+static MACHINE_CONFIG_START( vt100, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(vt100_mem)
@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* VT1xx models:
  * VT100 - 1978 base model. the 'later' rom is from 1979 or 1980.

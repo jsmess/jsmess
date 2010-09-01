@@ -579,8 +579,7 @@ static const cassette_config pc88_cassette_config =
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( pc88srl )
-	MDRV_DRIVER_DATA(pc88_state)
+static MACHINE_CONFIG_START( pc88srl, pc88_state )
 
 	/* basic machine hardware */
 
@@ -632,10 +631,9 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_config)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pc88srh )
-	MDRV_IMPORT_FROM( pc88srl )
+static MACHINE_CONFIG_DERIVED( pc88srh, pc88srl )
 	MDRV_QUANTUM_TIME(HZ(360000))
 
 	MDRV_MACHINE_START( pc88srh )
@@ -647,10 +645,9 @@ static MACHINE_DRIVER_START( pc88srh )
 	/*MDRV_ASPECT_RATIO(8, 5)*/
 	MDRV_SCREEN_SIZE(640, 440)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pc88va )
-	MDRV_DRIVER_DATA(pc88_state)
+static MACHINE_CONFIG_START( pc88va, pc88_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc88va_mem)
@@ -668,7 +665,7 @@ static MACHINE_DRIVER_START( pc88va )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT( pc8801 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

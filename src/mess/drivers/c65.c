@@ -282,7 +282,7 @@ static INTERRUPT_GEN( vic3_raster_irq )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( c65 )
+static MACHINE_CONFIG_START( c65, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
 	MDRV_CPU_PROGRAM_MAP(c65_mem)
@@ -324,16 +324,15 @@ static MACHINE_DRIVER_START( c65 )
 	/* floppy from serial bus */
 	MDRV_CBM_IEC_ADD("serial_bus", cbm_iec_daisy)
 
-	MDRV_IMPORT_FROM(c64_cartslot)
+	MDRV_FRAGMENT_ADD(c64_cartslot)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("640K,4224K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( c65pal )
-	MDRV_IMPORT_FROM( c65 )
+static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MDRV_SCREEN_SIZE(625 * 2, 520 * 2)
@@ -354,7 +353,7 @@ static MACHINE_DRIVER_START( c65pal )
 	MDRV_DEVICE_REMOVE("cia_1")
 	MDRV_MOS6526R1_ADD("cia_0", 3500000, c65_pal_cia0)
 	MDRV_MOS6526R1_ADD("cia_1", 3500000, c65_pal_cia1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

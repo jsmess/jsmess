@@ -398,7 +398,7 @@ static VIDEO_UPDATE(terminal )
 	return 0;
 }
 
-MACHINE_DRIVER_START( generic_terminal )
+MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MDRV_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -410,7 +410,7 @@ MACHINE_DRIVER_START( generic_terminal )
 
 	MDRV_VIDEO_START(terminal)
 	MDRV_VIDEO_UPDATE(terminal)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------

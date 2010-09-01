@@ -862,16 +862,16 @@ static const floppy_config aleste_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( cpcplus_cartslot )
+static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("cpr,bin")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("gx4000_cart")
 	MDRV_CARTSLOT_LOAD(amstrad_plus_cartridge)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gx4000")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( amstrad )
+static MACHINE_CONFIG_START( amstrad, driver_data_t )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
@@ -922,19 +922,18 @@ static MACHINE_DRIVER_START( amstrad )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kccomp )
-	MDRV_IMPORT_FROM(amstrad)
+static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
 	MDRV_MACHINE_START(kccomp)
 	MDRV_MACHINE_RESET(kccomp)
 
 	MDRV_PALETTE_INIT(kccomp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cpcplus )
+static MACHINE_CONFIG_START( cpcplus, driver_data_t )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
@@ -980,17 +979,17 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
-	MDRV_IMPORT_FROM(cpcplus_cartslot)
+	MDRV_FRAGMENT_ADD(cpcplus_cartslot)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gx4000 )
+static MACHINE_CONFIG_START( gx4000, driver_data_t )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1024,16 +1023,15 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_IMPORT_FROM(cpcplus_cartslot)
+	MDRV_FRAGMENT_ADD(cpcplus_cartslot)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( aleste )
-	MDRV_IMPORT_FROM(amstrad)
+static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MDRV_MACHINE_START(aleste)
 	MDRV_MACHINE_RESET(aleste)
 
@@ -1050,7 +1048,7 @@ static MACHINE_DRIVER_START( aleste )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

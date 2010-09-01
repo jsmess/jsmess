@@ -3426,12 +3426,12 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_gk8 )
 	MDRV_CARTSLOT_LOAD(ti99_cartridge) \
 	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
 
-static MACHINE_DRIVER_START(ti99_multicart)
+static MACHINE_CONFIG_FRAGMENT(ti99_multicart)
 	TI99_CARTRIDGE_SLOT("cartridge1")
 	TI99_CARTRIDGE_SLOT("cartridge2")
 	TI99_CARTRIDGE_SLOT("cartridge3")
 	TI99_CARTRIDGE_SLOT("cartridge4")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 

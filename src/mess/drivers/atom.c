@@ -828,8 +828,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	MDRV_CARTSLOT_LOAD(atom_cart)
 
 
-static MACHINE_DRIVER_START( atom )
-	MDRV_DRIVER_DATA(atom_state)
+static MACHINE_CONFIG_START( atom, atom_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(SY6502_TAG, M65C02, X2/4)
@@ -874,14 +873,13 @@ static MACHINE_DRIVER_START( atom )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","atom")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atomeb )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( atomeb )
-	MDRV_IMPORT_FROM(atom)
+static MACHINE_CONFIG_DERIVED( atomeb, atom )
 	MDRV_CPU_MODIFY(SY6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -908,7 +906,7 @@ static MACHINE_DRIVER_START( atomeb )
 
 	MDRV_ATOM_CARTSLOT_ADD("e0")
 	MDRV_ATOM_CARTSLOT_ADD("e1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

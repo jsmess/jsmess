@@ -124,7 +124,7 @@ static PALETTE_INIT( wscolor )
 	}
 }
 
-static MACHINE_DRIVER_START( wswan )
+static MACHINE_CONFIG_START( wswan, driver_data_t )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30MZ, 3072000)
 	MDRV_CPU_PROGRAM_MAP(wswan_mem)
@@ -166,16 +166,15 @@ static MACHINE_DRIVER_START( wswan )
 
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","wswan")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wscolor )
-	MDRV_IMPORT_FROM(wswan)
+static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wscolor_mem)
 	MDRV_MACHINE_START( wscolor )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT( wscolor )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -175,7 +175,7 @@ static const cassette_config ut88_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( ut88 )
+static MACHINE_CONFIG_START( ut88, driver_data_t )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88_mem)
@@ -206,9 +206,9 @@ static MACHINE_DRIVER_START( ut88 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ut88mini )
+static MACHINE_CONFIG_START( ut88mini, driver_data_t )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88mini_mem)
@@ -220,7 +220,7 @@ static MACHINE_DRIVER_START( ut88mini )
 	MDRV_DEFAULT_LAYOUT(layout_ut88mini)
 
 	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ut88 )

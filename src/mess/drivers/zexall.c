@@ -135,7 +135,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_DRIVER_START(zexall)
+static MACHINE_CONFIG_START( zexall, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)  
     MDRV_CPU_PROGRAM_MAP(z80_mem)
@@ -144,10 +144,10 @@ static MACHINE_DRIVER_START(zexall)
     MDRV_MACHINE_RESET(zexall)
 
     /* video hardware */
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

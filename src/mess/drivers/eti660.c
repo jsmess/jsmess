@@ -330,8 +330,7 @@ static const cassette_config eti660_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( eti660 )
-	MDRV_DRIVER_DATA(eti660_state)
+static MACHINE_CONFIG_START( eti660, eti660_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
@@ -360,7 +359,7 @@ static MACHINE_DRIVER_START( eti660 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("3K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

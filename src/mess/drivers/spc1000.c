@@ -274,7 +274,7 @@ static const mc6847_interface spc1000_mc6847_intf =
 	DEVCB_NULL									// RS (output)
 };
 
-static MACHINE_DRIVER_START( spc1000 )
+static MACHINE_CONFIG_START( spc1000, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(spc1000_mem)
@@ -309,7 +309,7 @@ static MACHINE_DRIVER_START( spc1000 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( spc1000 )

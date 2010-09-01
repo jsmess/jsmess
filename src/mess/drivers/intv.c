@@ -373,7 +373,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 	timer_set(device->machine, device->machine->device<cpu_device>("keyboard")->cycles_to_attotime(100), NULL, 0, intv_interrupt2_complete);
 }
 
-static MACHINE_DRIVER_START( intv )
+static MACHINE_CONFIG_START( intv, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem)
@@ -406,11 +406,10 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
 	MDRV_CARTSLOT_LOAD(intv_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( intvkbd )
-	MDRV_IMPORT_FROM( intv )
+static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(intvkbd_mem)
 
@@ -434,7 +433,7 @@ static MACHINE_DRIVER_START( intvkbd )
 	MDRV_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(intvkbd_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(intv)
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)

@@ -471,7 +471,7 @@ static MACHINE_RESET(jr200)
 }
 
 
-static MACHINE_DRIVER_START( jr200 )
+static MACHINE_CONFIG_START( jr200, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
@@ -502,7 +502,7 @@ static MACHINE_DRIVER_START( jr200 )
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -114,7 +114,7 @@ static const floppy_config ht68k_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( ht68k )
+static MACHINE_CONFIG_START( ht68k, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(ht68k_mem)
@@ -122,13 +122,13 @@ static MACHINE_DRIVER_START( ht68k )
     MDRV_MACHINE_RESET(ht68k)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ht68k_terminal_intf)
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 	MDRV_WD1770_ADD("wd1770", ht68k_wd17xx_interface )
 	MDRV_FLOPPY_4_DRIVES_ADD(ht68k_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ht68k )

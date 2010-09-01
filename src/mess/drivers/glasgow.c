@@ -689,7 +689,7 @@ static INPUT_PORTS_START( glasgow )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_KEYBOARD)
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START(glasgow )
+static MACHINE_CONFIG_START( glasgow, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(glasgow_mem)
@@ -702,26 +702,24 @@ static MACHINE_DRIVER_START(glasgow )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START(amsterd )
-	MDRV_IMPORT_FROM( glasgow )
+static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(amsterd_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START(dallas32 )
-	MDRV_IMPORT_FROM( glasgow )
+static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68020, 14000000)
 	MDRV_CPU_PROGRAM_MAP(dallas32_mem)
 	MDRV_MACHINE_START( dallas32 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

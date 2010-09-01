@@ -335,32 +335,29 @@ static MACHINE_RESET( ms_megadriv )
 	MACHINE_RESET_CALL( md_mappers );
 }
 
-static MACHINE_DRIVER_START( ms_megadriv )
-	MDRV_IMPORT_FROM(megadriv)
+static MACHINE_CONFIG_DERIVED( ms_megadriv, megadriv )
 
 	MDRV_MACHINE_START( ms_megadriv )
 	MDRV_MACHINE_RESET( ms_megadriv )
 
-	MDRV_IMPORT_FROM( genesis_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( genesis_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ms_megadpal )
-	MDRV_IMPORT_FROM(megadpal)
-
-	MDRV_MACHINE_START( ms_megadriv )
-	MDRV_MACHINE_RESET( ms_megadriv )
-
-	MDRV_IMPORT_FROM( genesis_cartslot )
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( ms_megdsvp )
-	MDRV_IMPORT_FROM(megdsvp)
+static MACHINE_CONFIG_DERIVED( ms_megadpal, megadpal )
 
 	MDRV_MACHINE_START( ms_megadriv )
 	MDRV_MACHINE_RESET( ms_megadriv )
 
-	MDRV_IMPORT_FROM( genesis_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( genesis_cartslot )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ms_megdsvp, megdsvp )
+
+	MDRV_MACHINE_START( ms_megadriv )
+	MDRV_MACHINE_RESET( ms_megadriv )
+
+	MDRV_FRAGMENT_ADD( genesis_cartslot )
+MACHINE_CONFIG_END
 
 
 
@@ -441,11 +438,10 @@ static DRIVER_INIT( mess_32x )
 	DRIVER_INIT_CALL(mess_md_common);
 }
 
-static MACHINE_DRIVER_START( ms_32x )
-	MDRV_IMPORT_FROM( genesis_32x )
+static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 
-	MDRV_IMPORT_FROM( _32x_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( _32x_cartslot )
+MACHINE_CONFIG_END
 
 
 ROM_START( 32x )
@@ -776,8 +772,7 @@ static INPUT_PORTS_START( pico )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( pico )
-	MDRV_IMPORT_FROM(megadriv)
+static MACHINE_CONFIG_DERIVED( pico, megadriv )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
@@ -786,11 +781,10 @@ static MACHINE_DRIVER_START( pico )
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 
-	MDRV_IMPORT_FROM( pico_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( pico_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( picopal )
-	MDRV_IMPORT_FROM(megadpal)
+static MACHINE_CONFIG_DERIVED( picopal, megadpal )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
@@ -799,8 +793,8 @@ static MACHINE_DRIVER_START( picopal )
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 
-	MDRV_IMPORT_FROM( pico_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( pico_cartslot )
+MACHINE_CONFIG_END
 
 
 

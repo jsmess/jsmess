@@ -13,8 +13,8 @@
 
 MACHINE_RESET( md_mappers );
 
-MACHINE_DRIVER_EXTERN( genesis_cartslot );
-MACHINE_DRIVER_EXTERN( _32x_cartslot );
-MACHINE_DRIVER_EXTERN( pico_cartslot );
+MACHINE_CONFIG_EXTERN( genesis_cartslot );
+MACHINE_CONFIG_EXTERN( _32x_cartslot );
+MACHINE_CONFIG_EXTERN( pico_cartslot );
 
 #endif /* GENESIS_H_ */

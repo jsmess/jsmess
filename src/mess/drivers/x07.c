@@ -1285,9 +1285,7 @@ static MACHINE_RESET( x07 )
 	state->regs_r[2] = input_port_read(machine, "CARDBATTERY");
 }
 
-static MACHINE_DRIVER_START( x07 )
-
-	MDRV_DRIVER_DATA(t6834_state)
+static MACHINE_CONFIG_START( x07, t6834_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", NSC800, XTAL_15_36MHz / 4)
@@ -1322,7 +1320,7 @@ static MACHINE_DRIVER_START( x07 )
 
 	MDRV_NVRAM_HANDLER(x07)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( x07 )

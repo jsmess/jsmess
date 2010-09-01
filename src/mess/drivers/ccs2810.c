@@ -50,7 +50,7 @@ static const ins8250_interface ccs2810_com_interface =
 	NULL
 };
 
-static MACHINE_DRIVER_START( ccs2810 )
+static MACHINE_CONFIG_START( ccs2810, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(ccs2810_mem)
@@ -72,7 +72,7 @@ static MACHINE_DRIVER_START( ccs2810 )
     MDRV_VIDEO_UPDATE(ccs2810)
 
 	MDRV_INS8250_ADD( "ins8250", ccs2810_com_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ccs2810 )

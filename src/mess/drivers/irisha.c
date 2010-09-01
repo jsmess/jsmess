@@ -152,7 +152,7 @@ static GFXDECODE_START( irisha )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_DRIVER_START( irisha )
+static MACHINE_CONFIG_START( irisha, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(irisha_mem)
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( irisha )
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

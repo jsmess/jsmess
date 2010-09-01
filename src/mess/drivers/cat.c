@@ -405,9 +405,7 @@ static NVRAM_HANDLER( cat )
 	}
 }
 
-static MACHINE_DRIVER_START( cat )
-
-	MDRV_DRIVER_DATA( cat_state )
+static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
@@ -432,11 +430,9 @@ static MACHINE_DRIVER_START( cat )
 	MDRV_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
 
 	MDRV_NVRAM_HANDLER( cat )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( swyft )
-
-	MDRV_DRIVER_DATA( cat_state )
+static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
@@ -457,7 +453,7 @@ static MACHINE_DRIVER_START( swyft )
 
 	MDRV_VIDEO_START(swyft)
 	MDRV_VIDEO_UPDATE(swyft)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( swyft )

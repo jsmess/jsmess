@@ -317,8 +317,7 @@ static const floppy_config tmc2000e_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( tmc2000e )
-	MDRV_DRIVER_DATA(tmc2000e_state)
+static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -350,7 +349,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("40K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

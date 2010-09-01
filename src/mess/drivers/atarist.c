@@ -1830,12 +1830,12 @@ static const floppy_config atarist_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( atarist_cartslot )
+static MACHINE_CONFIG_FRAGMENT( atarist_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("stc")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(atarist_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static RS232_INTERFACE( rs232_intf )
 {
@@ -1843,8 +1843,7 @@ static RS232_INTERFACE( rs232_intf )
 	{ NULL }
 };
 
-static MACHINE_DRIVER_START( atarist )
-	MDRV_DRIVER_DATA(atarist_state)
+static MACHINE_CONFIG_START( atarist, atarist_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
@@ -1887,16 +1886,15 @@ static MACHINE_DRIVER_START( atarist )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
-	MDRV_IMPORT_FROM(atarist_cartslot)
+	MDRV_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
 	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( megast )
-	MDRV_IMPORT_FROM(atarist)
+static MACHINE_CONFIG_DERIVED( megast, atarist )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megast_map)
@@ -1908,10 +1906,9 @@ static MACHINE_DRIVER_START( megast )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
 	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atariste )
-	MDRV_DRIVER_DATA(atarist_state)
+static MACHINE_CONFIG_START( atariste, atarist_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
@@ -1962,16 +1959,15 @@ static MACHINE_DRIVER_START( atariste )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
-	MDRV_IMPORT_FROM(atarist_cartslot)
+	MDRV_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
 	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( megaste )
-	MDRV_IMPORT_FROM(atariste)
+static MACHINE_CONFIG_DERIVED( megaste, atariste )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megaste_map)
@@ -1983,10 +1979,9 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
 	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( stbook )
-	MDRV_DRIVER_DATA(atarist_state)
+static MACHINE_CONFIG_START( stbook, atarist_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, U517/2)
@@ -2031,13 +2026,13 @@ static MACHINE_DRIVER_START( stbook )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
-	MDRV_IMPORT_FROM(atarist_cartslot)
+	MDRV_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("1M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

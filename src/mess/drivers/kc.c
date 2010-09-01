@@ -366,7 +366,7 @@ static const floppy_config kc85_floppy_config =
 };
 
 
-static MACHINE_DRIVER_START( cpu_kc_disc )
+static MACHINE_CONFIG_FRAGMENT( cpu_kc_disc )
 	MDRV_CPU_ADD("disc", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io)
@@ -375,11 +375,11 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_Z80CTC_ADD( "z80ctc_1", KC85_4_CLOCK, kc85_disc_ctc_intf )
 
 	MDRV_UPD765A_ADD("upd765", kc_fdc_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( kc85_3 )
+static MACHINE_CONFIG_START( kc85_3, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kc85_3_mem)
@@ -421,11 +421,10 @@ static MACHINE_DRIVER_START( kc85_3 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kc85_4 )
-	MDRV_IMPORT_FROM( kc85_3 )
+static MACHINE_CONFIG_DERIVED( kc85_4, kc85_3 )
 
 	MDRV_CPU_REPLACE("maincpu", Z80, KC85_4_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kc85_4_mem)
@@ -435,17 +434,16 @@ static MACHINE_DRIVER_START( kc85_4 )
 
 	MDRV_VIDEO_START( kc85_4 )
 	MDRV_VIDEO_UPDATE( kc85_4 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kc85_4d )
-	MDRV_IMPORT_FROM( kc85_4 )
-	MDRV_IMPORT_FROM( cpu_kc_disc )
+static MACHINE_CONFIG_DERIVED( kc85_4d, kc85_4 )
+	MDRV_FRAGMENT_ADD( cpu_kc_disc )
 	MDRV_QUANTUM_TIME(HZ(120))
 
 	MDRV_MACHINE_RESET( kc85_4d )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(kc85_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(kc85_4)

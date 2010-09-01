@@ -1075,8 +1075,7 @@ static MACHINE_RESET( abc806 )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( abc800m )
-	MDRV_DRIVER_DATA(abc800_state)
+static MACHINE_CONFIG_START( abc800m, abc800_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
@@ -1088,7 +1087,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_MACHINE_RESET(abc800)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(abc800m_video)
+	MDRV_FRAGMENT_ADD(abc800m_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1116,10 +1115,9 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( abc800c )
-	MDRV_DRIVER_DATA(abc800_state)
+static MACHINE_CONFIG_START( abc800c, abc800_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
@@ -1131,7 +1129,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_MACHINE_RESET(abc800)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(abc800c_video)
+	MDRV_FRAGMENT_ADD(abc800c_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1159,10 +1157,9 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( abc802 )
-	MDRV_DRIVER_DATA(abc802_state)
+static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
@@ -1174,7 +1171,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_MACHINE_RESET(abc802)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(abc802_video)
+	MDRV_FRAGMENT_ADD(abc802_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1201,10 +1198,9 @@ static MACHINE_DRIVER_START( abc802 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( abc806 )
-	MDRV_DRIVER_DATA(abc806_state)
+static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
@@ -1216,7 +1212,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_MACHINE_RESET(abc806)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(abc806_video)
+	MDRV_FRAGMENT_ADD(abc806_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1242,7 +1238,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
 	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -212,7 +212,7 @@ static MACHINE_RESET( comquest )
 static const UINT32 amask= 0xffff;
 
 
-static MACHINE_DRIVER_START( comquest )
+static MACHINE_CONFIG_START( comquest, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
 	/*MDRV_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( comquest )
 
 	/* sound hardware */
 	/* unknown ? */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(comquest)
 //  ROM_REGION(0x10000,"maincpu",0)

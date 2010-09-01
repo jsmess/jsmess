@@ -261,7 +261,7 @@ static VIDEO_UPDATE(teleprinter )
 	return 0;
 }
 
-MACHINE_DRIVER_START( generic_teleprinter )
+MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MDRV_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -273,7 +273,7 @@ MACHINE_DRIVER_START( generic_teleprinter )
 
 	MDRV_VIDEO_START(teleprinter)
 	MDRV_VIDEO_UPDATE(teleprinter)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------

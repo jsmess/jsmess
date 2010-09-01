@@ -317,7 +317,7 @@ static const tx0_reset_param_t tx0_reset_param =
 };
 
 
-static MACHINE_DRIVER_START(tx0_64kw)
+static MACHINE_CONFIG_START( tx0_64kw, driver_data_t )
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	MDRV_CPU_ADD("maincpu", TX0_64KW, 166667)
@@ -344,10 +344,9 @@ static MACHINE_DRIVER_START(tx0_64kw)
 	MDRV_VIDEO_START(tx0)
 	MDRV_VIDEO_EOF(crt)
 	MDRV_VIDEO_UPDATE(tx0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(tx0_8kw)
-	MDRV_IMPORT_FROM(tx0_64kw)
+static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
@@ -356,7 +355,7 @@ static MACHINE_DRIVER_START(tx0_8kw)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_8kw_map)
 	/*MDRV_CPU_PORTS(readport, writeport)*/
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(tx0_64kw)
 	/*CPU memory space*/

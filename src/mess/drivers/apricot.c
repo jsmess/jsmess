@@ -332,8 +332,7 @@ static const floppy_config apricot_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( apricot )
-	MDRV_DRIVER_DATA(apricot_state)
+static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
@@ -374,11 +373,10 @@ static MACHINE_DRIVER_START( apricot )
 	/* floppy */
 	MDRV_WD2793_ADD("ic68", apricot_wd17xx_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apricotxi )
-	MDRV_IMPORT_FROM(apricot)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( apricotxi, apricot )
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

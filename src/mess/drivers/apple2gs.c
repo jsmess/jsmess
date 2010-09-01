@@ -216,8 +216,7 @@ static const floppy_config apple2gs_floppy525_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( apple2gs )
-	MDRV_IMPORT_FROM( apple2e )
+static MACHINE_CONFIG_DERIVED( apple2gs, apple2e )
 	MDRV_CPU_REPLACE("maincpu", G65816, APPLE2GS_14M/5)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -256,7 +255,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

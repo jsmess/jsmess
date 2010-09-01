@@ -187,7 +187,7 @@ static const pia6821_interface aim65_pia_config =
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( aim65 )
+static MACHINE_CONFIG_START( aim65, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem)
@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
 	MDRV_RAM_EXTRA_OPTIONS("1K,2K,3K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -219,7 +219,7 @@ static const floppy_config kaypro2x_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( kayproii )
+static MACHINE_CONFIG_START( kayproii, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)
@@ -258,16 +258,15 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
 
 	MDRV_FLOPPY_2_DRIVES_ADD(kayproii_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kaypro4 )
-	MDRV_IMPORT_FROM(kayproii)
+static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
 
 	MDRV_DEVICE_REMOVE("z80pio_s")
 	MDRV_Z80PIO_ADD( "z80pio_s", 2500000, kaypro4_pio_s_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kaypro2x )
+static MACHINE_CONFIG_START( kaypro2x, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)
@@ -307,12 +306,11 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
 
 	MDRV_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( omni2 )
-	MDRV_IMPORT_FROM( kaypro4 )
+static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
 	MDRV_VIDEO_UPDATE( omni2 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***********************************************************
 

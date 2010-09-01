@@ -309,8 +309,7 @@ static const cassette_config elf_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( elf2 )
-	MDRV_DRIVER_DATA(elf2_state)
+static MACHINE_CONFIG_START( elf2, elf2_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
@@ -342,7 +341,7 @@ static MACHINE_DRIVER_START( elf2 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

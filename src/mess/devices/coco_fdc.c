@@ -477,11 +477,11 @@ static const floppy_config coco_floppy_config =
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco) -
     get info function for the CoCo FDC
 -------------------------------------------------*/
-static MACHINE_DRIVER_START(coco_fdc)
+static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 	MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
 	MDRV_MSM6242_ADD(DISTO_TAG)
 	MDRV_DS1315_ADD(CLOUD9_TAG)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 {
@@ -493,7 +493,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 		fdc_coco_w,
 		1,
 		WD1773,
-		MACHINE_DRIVER_NAME(coco_fdc)
+		MACHINE_CONFIG_NAME(coco_fdc)
 	};
 	general_fdc_get_info(device, state, info, &hwtype);
 }
@@ -628,9 +628,9 @@ static void fdc_dragon_w(running_device *device, offs_t addr, UINT8 data)
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon) -
     get info function for the CoCo FDC
 -------------------------------------------------*/
-static MACHINE_DRIVER_START(dragon_fdc)
+static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
 	MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 	
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
@@ -642,7 +642,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 		fdc_dragon_w,
 		0,
 		WD179X,
-		MACHINE_DRIVER_NAME(dragon_fdc)
+		MACHINE_CONFIG_NAME(dragon_fdc)
 	};
 	general_fdc_get_info(device, state, info, &hwtype);
 }

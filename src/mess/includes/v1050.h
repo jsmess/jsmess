@@ -90,6 +90,6 @@ WRITE8_HANDLER( v1050_attr_w );
 READ8_HANDLER( v1050_videoram_r );
 WRITE8_HANDLER( v1050_videoram_w );
 
-MACHINE_DRIVER_EXTERN( v1050_video );
+MACHINE_CONFIG_EXTERN( v1050_video );
 
 #endif

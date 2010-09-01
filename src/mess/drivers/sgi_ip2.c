@@ -422,7 +422,7 @@ static const duart68681_config sgi_ip2_duart68681b_config =
 	duartb_output
 };
 
-static MACHINE_DRIVER_START( sgi_ip2 )
+static MACHINE_CONFIG_START( sgi_ip2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(sgi_ip2_map)
@@ -432,7 +432,7 @@ static MACHINE_DRIVER_START( sgi_ip2 )
 	MDRV_MACHINE_RESET(sgi_ip2)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
 
     MDRV_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( sgi_ip2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD( "dac", DAC, 0 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
     PORT_START("SWTCH")

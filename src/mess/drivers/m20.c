@@ -136,7 +136,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static MACHINE_DRIVER_START( m20 )
+static MACHINE_CONFIG_START( m20, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
     MDRV_CPU_PROGRAM_MAP(m20_mem)
@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( m20 )
     MDRV_VIDEO_UPDATE(m20)
 
 	MDRV_GFXDECODE(m20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(m20)
 	ROM_REGION(0x12000,"maincpu",0)

@@ -329,7 +329,7 @@ static QUICKLOAD_LOAD(jr100)
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( jr100 )
+static MACHINE_CONFIG_START( jr100, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MDRV_CPU_PROGRAM_MAP(jr100_mem)
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( jr100 )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

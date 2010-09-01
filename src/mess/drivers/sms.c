@@ -371,7 +371,7 @@ static const smsvdp_interface sms_store_intf =
 	sms_pause_callback
 };
 
-static MACHINE_DRIVER_START( sms_cartslot )
+static MACHINE_CONFIG_FRAGMENT( sms_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -380,9 +380,9 @@ static MACHINE_DRIVER_START( sms_cartslot )
 	MDRV_CARTSLOT_LOAD(sms_cart)
 
 	MDRV_SOFTWARE_LIST_ADD("cart_list","sms")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gg_cartslot )
+static MACHINE_CONFIG_FRAGMENT( gg_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("gg,bin")
 	MDRV_CARTSLOT_MANDATORY
@@ -391,9 +391,9 @@ static MACHINE_DRIVER_START( gg_cartslot )
 	MDRV_CARTSLOT_LOAD(sms_cart)
 
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gamegear")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms_ntsc_base )
+static MACHINE_CONFIG_START( sms_ntsc_base, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
@@ -409,11 +409,10 @@ static MACHINE_DRIVER_START( sms_ntsc_base )
 	MDRV_SOUND_ADD("smsiii", SMSIII, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM( sms_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sms_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms2_ntsc )
-	MDRV_IMPORT_FROM( sms_ntsc_base )
+static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -426,10 +425,9 @@ static MACHINE_DRIVER_START( sms2_ntsc )
 	MDRV_VIDEO_UPDATE(sms)
 
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5246_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(sms1_ntsc)
-	MDRV_IMPORT_FROM( sms_ntsc_base )
+static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sms1_mem)	// This adds the SegaScope handlers for 3-D glasses
@@ -456,7 +454,7 @@ static MACHINE_DRIVER_START(sms1_ntsc)
 	MDRV_VIDEO_UPDATE(sms1)
 
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5124_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define MDRV_SMSSDISP_CARTSLOT_ADD(_tag) \
 	MDRV_CARTSLOT_ADD(_tag) \
@@ -466,8 +464,7 @@ MACHINE_DRIVER_END
 	MDRV_CARTSLOT_START(sms_cart) \
 	MDRV_CARTSLOT_LOAD(sms_cart)
 
-static MACHINE_DRIVER_START( sms_sdisp )
-	MDRV_IMPORT_FROM( sms2_ntsc )
+static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
 
 	MDRV_DEVICE_REMOVE("sms_vdp")
 	MDRV_SMSVDP_ADD("sms_vdp", sms_store_intf)
@@ -499,9 +496,9 @@ static MACHINE_DRIVER_START( sms_sdisp )
 	MDRV_SMSSDISP_CARTSLOT_ADD("cart14")
 	MDRV_SMSSDISP_CARTSLOT_ADD("cart15")
 	MDRV_SMSSDISP_CARTSLOT_ADD("cart16")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms_pal_base )
+static MACHINE_CONFIG_START( sms_pal_base, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
@@ -517,11 +514,10 @@ static MACHINE_DRIVER_START( sms_pal_base )
 	MDRV_SOUND_ADD("smsiii", SMSIII, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM( sms_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sms_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms2_pal )
-	MDRV_IMPORT_FROM( sms_pal_base )
+static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -534,10 +530,9 @@ static MACHINE_DRIVER_START( sms2_pal )
 	MDRV_VIDEO_UPDATE(sms)
 
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5246_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms1_pal )
-	MDRV_IMPORT_FROM( sms_pal_base )
+static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sms1_mem)	// This adds the SegaScope handlers for 3-D glasses
@@ -564,33 +559,30 @@ static MACHINE_DRIVER_START( sms1_pal )
 	MDRV_DEFAULT_LAYOUT(layout_sms1)
 
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5124_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms_fm )
-	MDRV_IMPORT_FROM(sms1_ntsc)
+static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
 
 	MDRV_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sg1000m3 )
-	MDRV_IMPORT_FROM(sms_fm)
+static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 
 	MDRV_CARTSLOT_MODIFY("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin,sg")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_START(sms_cart)
 	MDRV_CARTSLOT_LOAD(sms_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sms2_fm )
-	MDRV_IMPORT_FROM(sms2_ntsc)
+static MACHINE_CONFIG_DERIVED( sms2_fm, sms2_ntsc )
 
 	MDRV_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gamegear )
+static MACHINE_CONFIG_START( gamegear, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
@@ -619,8 +611,8 @@ static MACHINE_DRIVER_START( gamegear )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* cartridge */
-	MDRV_IMPORT_FROM( gg_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( gg_cartslot )
+MACHINE_CONFIG_END
 
 
 ROM_START(sms1)

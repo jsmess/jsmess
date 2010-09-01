@@ -688,7 +688,7 @@ static DEVICE_STOP(aes_multicart)
 //  printf("DEVICE_STOP(aes_multicart)\n");
 }
 
-static MACHINE_DRIVER_START(aes_multicart)
+static MACHINE_CONFIG_FRAGMENT(aes_multicart)
 	MDRV_CARTSLOT_ADD("cartridge1")
 	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
 	MDRV_CARTSLOT_PCBTYPE(0, "none", AES_CARTRIDGE_PCB_NONE)
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START(aes_multicart)
 	MDRV_CARTSLOT_UNLOAD(aes_cartridge)
 	MDRV_CARTSLOT_INTERFACE("aes_cart")
 	MDRV_CARTSLOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 DEVICE_GET_INFO(aes_multicart)
@@ -708,7 +708,7 @@ DEVICE_GET_INFO(aes_multicart)
 	{
 		/* --- the following bits of info are returned as pointers to data --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:
-			info->machine_config = MACHINE_DRIVER_NAME(aes_multicart); break;
+			info->machine_config = MACHINE_CONFIG_NAME(aes_multicart); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:

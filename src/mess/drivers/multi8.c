@@ -547,7 +547,7 @@ static MACHINE_RESET(multi8)
 	mcu_init = 0;
 }
 
-static MACHINE_DRIVER_START( multi8 )
+static MACHINE_CONFIG_START( multi8, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(multi8_mem)
@@ -582,7 +582,7 @@ static MACHINE_DRIVER_START( multi8 )
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( multi8 )

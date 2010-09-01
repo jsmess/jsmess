@@ -57,7 +57,7 @@ static const i2cmem_interface i2cmem_interface =
        I2CMEM_SLAVE_ADDRESS, 0, 0x2000
 };
 
-static MACHINE_DRIVER_START( pokemini )
+static MACHINE_CONFIG_START( pokemini, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map)
@@ -97,7 +97,7 @@ static MACHINE_DRIVER_START( pokemini )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","pokemini")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )

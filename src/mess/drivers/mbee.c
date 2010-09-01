@@ -404,7 +404,7 @@ static const floppy_config mbee_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( mbee )
+static MACHINE_CONFIG_START( mbee, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem)
@@ -442,10 +442,10 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mbeeic )
+static MACHINE_CONFIG_START( mbeeic, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
@@ -483,46 +483,41 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mbeepc )
-	MDRV_IMPORT_FROM( mbeeic )
+static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbeepc_mem)
 	MDRV_CPU_IO_MAP(mbeepc_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mbeepc85 )
-	MDRV_IMPORT_FROM( mbeeic )
+static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem)
 	MDRV_CPU_IO_MAP(mbeepc85_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mbeeppc )
-	MDRV_IMPORT_FROM( mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbeeppc, mbeepc85 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MDRV_CPU_IO_MAP(mbeeppc_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mbee56 )
-	MDRV_IMPORT_FROM( mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbee56, mbeepc85 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
 	MDRV_CPU_IO_MAP(mbee56_io)
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mbee64 )
-	MDRV_IMPORT_FROM( mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbee64, mbeepc85 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
 	MDRV_CPU_IO_MAP(mbee64_io)
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( mbee )
 {

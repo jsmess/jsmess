@@ -1542,8 +1542,7 @@ static GFXDECODE_START( pcmda )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 1, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pcmda )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pcmda, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1569,7 +1568,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_mda )
+	MDRV_FRAGMENT_ADD( pcvideo_mda )
 	MDRV_GFXDECODE(pcmda)
 
 	/* sound hardware */
@@ -1597,7 +1596,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1606,15 +1605,14 @@ static MACHINE_DRIVER_START( pcmda )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static GFXDECODE_START( pcherc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pcherc )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pcherc, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1638,7 +1636,7 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_hercules )
+	MDRV_FRAGMENT_ADD( pcvideo_hercules )
 	MDRV_GFXDECODE(pcherc)
 
 	/* sound hardware */
@@ -1666,7 +1664,7 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1675,7 +1673,7 @@ static MACHINE_DRIVER_START( pcherc )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const cassette_config ibm5150_cassette_config =
@@ -1691,8 +1689,7 @@ static GFXDECODE_START( ibm5150 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( ibm5150 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( ibm5150, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1718,7 +1715,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_FRAGMENT_ADD( pcvideo_cga )
 	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -1746,7 +1743,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 
@@ -1757,11 +1754,10 @@ static MACHINE_DRIVER_START( ibm5150 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pccga )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pccga, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
 
@@ -1784,7 +1780,7 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_FRAGMENT_ADD( pcvideo_cga )
 	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -1812,7 +1808,7 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1821,7 +1817,7 @@ static MACHINE_DRIVER_START( pccga )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const gfx_layout europc_8_charlayout =
@@ -1855,8 +1851,7 @@ static GFXDECODE_START( europc )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( europc )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( europc, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(europc, europc, I8088, 4772720*2, pc_frame_interrupt)
 
@@ -1877,7 +1872,7 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_aga )
+	MDRV_FRAGMENT_ADD( pcvideo_aga )
 	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
@@ -1898,7 +1893,7 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1907,11 +1902,10 @@ static MACHINE_DRIVER_START( europc )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ibm5160 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( ibm5160, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)
 
@@ -1932,7 +1926,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_FRAGMENT_ADD( pcvideo_cga )
 	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -1960,7 +1954,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1969,7 +1963,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const gfx_layout pc200_charlayout =
@@ -1989,8 +1983,7 @@ static GFXDECODE_START( pc200 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pc200 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pc200, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc200, pc200, I8086, 8000000, pc_frame_interrupt)
 
@@ -2011,7 +2004,7 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_pc200 )
+	MDRV_FRAGMENT_ADD( pcvideo_pc200 )
 	MDRV_GFXDECODE(pc200)
 
 	/* sound hardware */
@@ -2025,7 +2018,7 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2034,7 +2027,7 @@ static MACHINE_DRIVER_START( pc200 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2056,8 +2049,7 @@ static GFXDECODE_START( pc1512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1512_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( ppc512 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( ppc512, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ppc512_map)
@@ -2082,7 +2074,7 @@ static MACHINE_DRIVER_START( ppc512 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_pc200 )
+	MDRV_FRAGMENT_ADD( pcvideo_pc200 )
 	MDRV_GFXDECODE(pc200)
 
 	/* sound hardware */
@@ -2096,7 +2088,7 @@ static MACHINE_DRIVER_START( ppc512 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2105,20 +2097,18 @@ static MACHINE_DRIVER_START( ppc512 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ppc640 )
-	MDRV_IMPORT_FROM( ppc512 )
+static MACHINE_CONFIG_DERIVED( ppc640, ppc512 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ppc640_map)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pc1512 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pc1512, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc1512, pc1512, I8086, 8000000, pc_frame_interrupt)
 
@@ -2139,7 +2129,7 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_pc1512 )
+	MDRV_FRAGMENT_ADD( pcvideo_pc1512 )
 	MDRV_GFXDECODE(pc1512)
 
 	/* sound hardware */
@@ -2155,7 +2145,7 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2164,11 +2154,10 @@ static MACHINE_DRIVER_START( pc1512 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pc1640 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( pc1640, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_vga_frame_interrupt)
 
@@ -2189,7 +2178,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_ega )
+	MDRV_FRAGMENT_ADD( pcvideo_ega )
 	MDRV_GFXDECODE(pc1512)
 
 	/* sound hardware */
@@ -2205,7 +2194,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2214,11 +2203,10 @@ static MACHINE_DRIVER_START( pc1640 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( xtvga )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( xtvga, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc16, pc16, I8086, 12000000, pc_vga_frame_interrupt)
 
@@ -2239,7 +2227,7 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -2266,7 +2254,7 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2275,11 +2263,10 @@ static MACHINE_DRIVER_START( xtvga )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( t1000hx )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( t1000hx, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
 
@@ -2298,7 +2285,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_FRAGMENT_ADD( pcvideo_t1000 )
 	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
@@ -2316,7 +2303,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2325,11 +2312,10 @@ static MACHINE_DRIVER_START( t1000hx )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( t1000_16 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( t1000_16, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
 
@@ -2348,7 +2334,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_FRAGMENT_ADD( pcvideo_t1000 )
 	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
@@ -2366,7 +2352,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2375,11 +2361,10 @@ static MACHINE_DRIVER_START( t1000_16 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( t1000_286 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( t1000_286, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
 
@@ -2398,7 +2383,7 @@ static MACHINE_DRIVER_START( t1000_286 )
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_FRAGMENT_ADD( pcvideo_t1000 )
 	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
@@ -2416,7 +2401,7 @@ static MACHINE_DRIVER_START( t1000_286 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2425,15 +2410,14 @@ static MACHINE_DRIVER_START( t1000_286 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static GFXDECODE_START( ibmpcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( ibmpcjr )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
@@ -2450,7 +2434,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_pcjr )
+	MDRV_FRAGMENT_ADD( pcvideo_pcjr )
 	MDRV_GFXDECODE(ibmpcjr)
 
 	/* sound hardware */
@@ -2492,10 +2476,9 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( iskr1031 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( iskr1031, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
 
@@ -2518,7 +2501,7 @@ static MACHINE_DRIVER_START( iskr1031 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_FRAGMENT_ADD( pcvideo_cga )
 	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -2546,7 +2529,7 @@ static MACHINE_DRIVER_START( iskr1031 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2555,11 +2538,10 @@ static MACHINE_DRIVER_START( iskr1031 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( poisk2 )
-	MDRV_DRIVER_DATA(pc_state)
+static MACHINE_CONFIG_START( poisk2, pc_state )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
 
@@ -2582,7 +2564,7 @@ static MACHINE_DRIVER_START( poisk2 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_poisk2 )
+	MDRV_FRAGMENT_ADD( pcvideo_poisk2 )
 	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -2610,7 +2592,7 @@ static MACHINE_DRIVER_START( poisk2 )
 	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2619,7 +2601,7 @@ static MACHINE_DRIVER_START( poisk2 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 #if 0

@@ -37,7 +37,7 @@ static VIDEO_UPDATE( chessmst )
     return 0;
 }
 
-static MACHINE_DRIVER_START( chessmst )
+static MACHINE_CONFIG_START( chessmst, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(chessmst_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( chessmst )
 
     MDRV_VIDEO_START(chessmst)
     MDRV_VIDEO_UPDATE(chessmst)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( chessmst )

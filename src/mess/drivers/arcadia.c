@@ -531,7 +531,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( arcadia )
+static MACHINE_CONFIG_START( arcadia, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem)
@@ -567,7 +567,7 @@ static MACHINE_DRIVER_START( arcadia )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","arcadia")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(advsnha)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)

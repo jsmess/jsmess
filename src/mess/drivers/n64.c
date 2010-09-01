@@ -149,9 +149,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( n64 )
-
-	MDRV_DRIVER_DATA(_n64_state)
+static MACHINE_CONFIG_START( n64, _n64_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -195,7 +193,7 @@ static MACHINE_DRIVER_START( n64 )
 
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","n64")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( n64 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */

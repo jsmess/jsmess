@@ -60,7 +60,7 @@ static VIDEO_UPDATE( pcm )
 }
 
 
-static MACHINE_DRIVER_START( pcm )
+static MACHINE_CONFIG_START( pcm, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
     MDRV_CPU_PROGRAM_MAP(pcm_mem)
@@ -80,7 +80,7 @@ static MACHINE_DRIVER_START( pcm )
 
     MDRV_VIDEO_START(pcm)
     MDRV_VIDEO_UPDATE(pcm)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pcm )

@@ -108,6 +108,6 @@ public:
 
 /* ---------- defined in video/newbrain.c ---------- */
 
-MACHINE_DRIVER_EXTERN( newbrain_video );
+MACHINE_CONFIG_EXTERN( newbrain_video );
 
 #endif

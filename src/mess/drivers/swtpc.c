@@ -45,7 +45,7 @@ static GENERIC_TERMINAL_INTERFACE( swtpc_terminal_intf )
 	DEVCB_HANDLER(swtpc_kbd_put)
 };
 
-static MACHINE_DRIVER_START( swtpc )
+static MACHINE_CONFIG_START( swtpc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(swtpc_mem)
@@ -53,9 +53,9 @@ static MACHINE_DRIVER_START( swtpc )
     MDRV_MACHINE_RESET(swtpc)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, swtpc_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( swtpc )

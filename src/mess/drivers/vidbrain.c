@@ -501,11 +501,10 @@ static MACHINE_START( vidbrain )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( vidbrain )
+    MACHINE_CONFIG_START( vidbrain, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( vidbrain )
-	MDRV_DRIVER_DATA(vidbrain_state)
+static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(F3850_TAG, F8, XTAL_14_31818MHz/8)
@@ -550,7 +549,7 @@ static MACHINE_DRIVER_START( vidbrain )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

@@ -42,7 +42,7 @@ static VIDEO_UPDATE( vt240 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( vt240 )
+static MACHINE_CONFIG_START( vt240, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vt240_mem)
@@ -62,7 +62,7 @@ static MACHINE_DRIVER_START( vt240 )
 
 	MDRV_VIDEO_START(vt240)
 	MDRV_VIDEO_UPDATE(vt240)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mc7105 )

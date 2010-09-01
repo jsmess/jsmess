@@ -669,7 +669,7 @@ static const struct tms9995reset_param tutor_processor_config =
 	NULL		/* no IDLE callback */
 };
 
-static MACHINE_DRIVER_START(tutor)
+static MACHINE_CONFIG_START( tutor, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
@@ -682,7 +682,7 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_MACHINE_RESET( tutor )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -708,7 +708,7 @@ static MACHINE_DRIVER_START(tutor)
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","tutor")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

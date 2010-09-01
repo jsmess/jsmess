@@ -37,7 +37,7 @@ static VIDEO_UPDATE( d6809 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( d6809 )
+static MACHINE_CONFIG_START( d6809, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(d6809_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( d6809 )
 
     MDRV_VIDEO_START(d6809)
     MDRV_VIDEO_UPDATE(d6809)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( d6809 )

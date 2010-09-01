@@ -395,7 +395,7 @@ static const floppy_config c1581_floppy_config =
     MACHINE_DRIVER( c1581 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1581 )
+static MACHINE_CONFIG_FRAGMENT( c1581 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1581_map)
 
@@ -403,13 +403,13 @@ static MACHINE_DRIVER_START( c1581 )
 	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c1563 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1563 )
+static MACHINE_CONFIG_FRAGMENT( c1563 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1563_map)
 
@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( c1563 )
 	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c1581 )
@@ -501,7 +501,7 @@ DEVICE_GET_INFO( c1581 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1581);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1581);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1581);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1581);						break;
@@ -527,7 +527,7 @@ DEVICE_GET_INFO( c1563 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1563);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1563);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1563);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1563");							break;

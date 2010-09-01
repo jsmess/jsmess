@@ -754,7 +754,7 @@ static const tms9980areset_param reset_params =
 	idle_callback
 };
 
-static MACHINE_DRIVER_START(tm990_189)
+static MACHINE_CONFIG_START( tm990_189, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
@@ -798,14 +798,14 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
 
 	MDRV_TM990_189_RS232_ADD("rs232")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define LEFT_BORDER		15
 #define RIGHT_BORDER		15
 #define TOP_BORDER_60HZ		27
 #define BOTTOM_BORDER_60HZ	24
 
-static MACHINE_DRIVER_START(tm990_189_v)
+static MACHINE_CONFIG_START( tm990_189_v, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
@@ -817,7 +817,7 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	MDRV_MACHINE_RESET( tm990_189_v )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
 
 	MDRV_TM990_189_RS232_ADD("rs232")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

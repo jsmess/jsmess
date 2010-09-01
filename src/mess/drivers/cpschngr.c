@@ -356,7 +356,7 @@ static const ym2151_interface ym2151_config =
 *
 ********************************************************************/
 
-static MACHINE_DRIVER_START( cps1_10MHz )
+static MACHINE_CONFIG_START( cps1_10MHz, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -391,20 +391,18 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cps1_12MHz )
+static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_10MHz)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( qsound )
+static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	// 12MHz verified
 	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
@@ -426,7 +424,7 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************
 

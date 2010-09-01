@@ -577,11 +577,11 @@ ADDRESS_MAP_END
     MACHINE CONFIG
 *****************************************************************************/
 
-MACHINE_DRIVER_START( kb_keytr )
+MACHINE_CONFIG_FRAGMENT( kb_keytr )
 	MDRV_CPU_ADD("kb_keytr", I8051, 11060250)
 	MDRV_CPU_PROGRAM_MAP(keytronic_program)
 	MDRV_CPU_IO_MAP(keytronic_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -342,7 +342,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_DRIVER_START(rvoicepc)
+static MACHINE_CONFIG_START( rvoicepc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
     MDRV_CPU_PROGRAM_MAP(hd63701_main_mem)
@@ -360,10 +360,10 @@ static MACHINE_DRIVER_START(rvoicepc)
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

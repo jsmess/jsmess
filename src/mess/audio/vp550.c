@@ -206,7 +206,7 @@ static TIMER_DEVICE_CALLBACK( sync_tick )
     MACHINE_DRIVER( vp550 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( vp550 )
+static MACHINE_CONFIG_FRAGMENT( vp550 )
 	MDRV_TIMER_ADD_PERIODIC("sync", sync_tick, HZ(50))
 
 	MDRV_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
@@ -214,21 +214,21 @@ static MACHINE_DRIVER_START( vp550 )
 
 	MDRV_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( vp551 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( vp551 )
-	MDRV_IMPORT_FROM(vp550)
+static MACHINE_CONFIG_FRAGMENT( vp551 )
+	MDRV_FRAGMENT_ADD(vp550)
 
 	MDRV_CDP1863_ADD(CDP1863_C_TAG, 0, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CDP1863_ADD(CDP1863_D_TAG, 0, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     DEVICE_START( vp550 )
@@ -313,7 +313,7 @@ DEVICE_GET_INFO( vp550 )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp550 );	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME( vp550 );	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vp550);		break;
@@ -342,7 +342,7 @@ DEVICE_GET_INFO( vp551 )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp551 );	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME( vp551 );	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vp551);		break;

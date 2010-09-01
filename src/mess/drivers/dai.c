@@ -201,7 +201,7 @@ static GFXDECODE_START( dai )
 GFXDECODE_END
 
 /* machine definition */
-static MACHINE_DRIVER_START( dai )
+static MACHINE_CONFIG_START( dai, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dai_mem)
@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( dai )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define io_dai		io_NULL
 

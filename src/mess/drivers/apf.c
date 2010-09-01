@@ -705,9 +705,7 @@ static const mc6847_interface apf_mc6847_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( apf_imagination )
-
-	MDRV_DRIVER_DATA( apf_state )
+static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	/* basic machine hardware */
 	//  MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
@@ -740,10 +738,9 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(apfimag_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apf_m1000 )
-	MDRV_IMPORT_FROM( apf_imagination )
+static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( apf_m1000_map)
 
@@ -752,7 +749,7 @@ static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_DEVICE_REMOVE( "cassette" )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_FLOPPY_2_DRIVES_REMOVE()
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

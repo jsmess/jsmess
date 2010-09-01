@@ -1672,7 +1672,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
 
 /**********************************************************************************************************/
 
-static MACHINE_DRIVER_START( nc100 )
+static MACHINE_CONFIG_START( nc100, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MDRV_CPU_PROGRAM_MAP(nc_map)
@@ -1725,7 +1725,7 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_RAM_DEFAULT_SIZE("64K")
 
 	MDRV_NC_SERIAL_ADD("serial")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const floppy_config nc200_floppy_config =
 {
@@ -1739,8 +1739,7 @@ static const floppy_config nc200_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( nc200 )
-	MDRV_IMPORT_FROM( nc100 )
+static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(nc200_io)
@@ -1772,7 +1771,7 @@ static MACHINE_DRIVER_START( nc200 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

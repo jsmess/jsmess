@@ -672,7 +672,7 @@ static const floppy_config c1551_floppy_config =
     MACHINE_DRIVER( c1551 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1551 )
+static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MDRV_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1551_map)
 	MDRV_CPU_CONFIG(m6510t_intf)
@@ -683,7 +683,7 @@ static MACHINE_DRIVER_START( c1551 )
 	MDRV_TIMER_ADD_PERIODIC("irq", irq_tick, HZ(120))
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c1551 )
@@ -775,7 +775,7 @@ DEVICE_GET_INFO( c1551 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1551);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1551);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1551);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1551);						break;

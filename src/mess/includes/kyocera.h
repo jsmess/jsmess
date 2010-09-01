@@ -78,7 +78,7 @@ public:
 
 /* ---------- defined in video/kyocera.c ---------- */
 
-MACHINE_DRIVER_EXTERN( kc85_video );
-MACHINE_DRIVER_EXTERN( tandy200_video );
+MACHINE_CONFIG_EXTERN( kc85_video );
+MACHINE_CONFIG_EXTERN( tandy200_video );
 
 #endif

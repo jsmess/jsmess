@@ -186,7 +186,7 @@ static GFXDECODE_START( partner )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( partner )
+static MACHINE_CONFIG_START( partner, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(partner_mem)
@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( partner )

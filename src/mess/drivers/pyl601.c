@@ -522,7 +522,7 @@ static GFXDECODE_START( pyl601a )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pyl601 )
+static MACHINE_CONFIG_START( pyl601, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(pyl601_mem)
@@ -553,17 +553,16 @@ static MACHINE_DRIVER_START( pyl601 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("576K") // 64 + 512
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pyl601a )
-	MDRV_IMPORT_FROM(pyl601)
+static MACHINE_CONFIG_DERIVED( pyl601a, pyl601 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK( XTAL_2MHz)	
 	
 	MDRV_GFXDECODE(pyl601a)
 	MDRV_DEVICE_REMOVE("crtc")
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pyl601 )

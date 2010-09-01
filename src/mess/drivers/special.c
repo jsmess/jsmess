@@ -410,7 +410,7 @@ static const floppy_config specimx_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( special )
+static MACHINE_CONFIG_START( special, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem)
@@ -442,11 +442,11 @@ static MACHINE_DRIVER_START( special )
 
 	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( specialp )
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(special)
+static MACHINE_CONFIG_DERIVED( specialp, special )
+
+	/* basic machine hardware */
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_PROGRAM_MAP(specialp_mem)
 
@@ -455,10 +455,9 @@ static MACHINE_DRIVER_START( specialp )
     MDRV_VIDEO_UPDATE(specialp)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( specimx )
-    MDRV_IMPORT_FROM(special)
+static MACHINE_CONFIG_DERIVED( specimx, special )
     MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(specimx_mem)
 
@@ -485,9 +484,9 @@ static MACHINE_DRIVER_START( specimx )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( erik )
+static MACHINE_CONFIG_START( erik, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 4000000)
     MDRV_CPU_PROGRAM_MAP(erik_mem)
@@ -526,7 +525,7 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("192K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( special )

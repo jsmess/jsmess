@@ -36,7 +36,7 @@ static VIDEO_UPDATE( mes )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( mes )
+static MACHINE_CONFIG_START( mes, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(mes_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( mes )
 
     MDRV_VIDEO_START(mes)
     MDRV_VIDEO_UPDATE(mes)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

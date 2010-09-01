@@ -394,8 +394,7 @@ static const cassette_config vg5k_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( vg5k )
-	MDRV_DRIVER_DATA(vg5k_state)
+static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -441,7 +440,7 @@ static MACHINE_DRIVER_START( vg5k )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K,48k")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vg5k )

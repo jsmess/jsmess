@@ -68,7 +68,7 @@ static VIDEO_UPDATE( sol20 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( sol20 )
+static MACHINE_CONFIG_START( sol20, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
 	MDRV_CPU_PROGRAM_MAP(sol20_mem)
@@ -93,7 +93,7 @@ static MACHINE_DRIVER_START( sol20 )
 //  MDRV_RAM_ADD("messram")
 //  MDRV_RAM_DEFAULT_SIZE("8K")
 //  MDRV_RAM_EXTRA_OPTIONS("16K,32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sol20 )

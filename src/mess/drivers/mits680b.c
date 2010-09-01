@@ -38,7 +38,7 @@ static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
 	DEVCB_HANDLER(mits680b_kbd_put)
 };
 
-static MACHINE_DRIVER_START( mits680b )
+static MACHINE_CONFIG_START( mits680b, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
     MDRV_CPU_PROGRAM_MAP(mits680b_mem)
@@ -46,12 +46,12 @@ static MACHINE_DRIVER_START( mits680b )
     MDRV_MACHINE_RESET(mits680b)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,mits680b_terminal_intf)
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mits680b )

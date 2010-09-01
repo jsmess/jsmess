@@ -149,7 +149,7 @@ static const duart68681_config duart_config =
 	1000000, 1000000, // IP5, IP6
 };
 
-static MACHINE_DRIVER_START( esq1 )
+static MACHINE_CONFIG_START( esq1, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
 	MDRV_CPU_PROGRAM_MAP(esq1_map)
 
@@ -170,7 +170,7 @@ static MACHINE_DRIVER_START( esq1 )
 	MDRV_SOUND_CONFIG(esq1_es5503_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( esq1 )
 INPUT_PORTS_END

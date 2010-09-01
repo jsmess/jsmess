@@ -195,7 +195,7 @@ WRITE8_HANDLER(tms3556_reg_w)
 
     machine struct initialization helper
 */
-MACHINE_DRIVER_START( tms3556 )
+MACHINE_CONFIG_FRAGMENT( tms3556 )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -212,7 +212,7 @@ MACHINE_DRIVER_START( tms3556 )
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

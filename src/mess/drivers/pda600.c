@@ -92,7 +92,7 @@ static VIDEO_UPDATE( pda600 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( pda600 )
+static MACHINE_CONFIG_START( pda600, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
     MDRV_CPU_PROGRAM_MAP(pda600_mem)
@@ -112,7 +112,7 @@ static MACHINE_DRIVER_START( pda600 )
 
     MDRV_VIDEO_START(pda600)
     MDRV_VIDEO_UPDATE(pda600)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pda600 )

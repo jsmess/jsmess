@@ -509,7 +509,7 @@ static MACHINE_RESET(mycom)
 	mycom_amask = 0xc000;
 }
 
-static MACHINE_DRIVER_START( mycom )
+static MACHINE_CONFIG_START( mycom, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(mycom_map)
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( mycom )
 
 	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mycom )

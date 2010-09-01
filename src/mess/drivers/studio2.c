@@ -517,15 +517,14 @@ static MACHINE_RESET( mpt02 )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( studio2_cartslot )
+static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("st2")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(st2_cartslot_load)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( studio2 )
-	MDRV_DRIVER_DATA(studio2_state)
+static MACHINE_CONFIG_START( studio2, studio2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
@@ -550,11 +549,10 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM( studio2_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( studio2_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( visicom )
-	MDRV_DRIVER_DATA(studio2_state)
+static MACHINE_CONFIG_START( visicom, studio2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
@@ -579,11 +577,10 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM( studio2_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( studio2_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mpt02 )
-	MDRV_DRIVER_DATA(studio2_state)
+static MACHINE_CONFIG_START( mpt02, studio2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
@@ -608,8 +605,8 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_IMPORT_FROM( studio2_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( studio2_cartslot )
+MACHINE_CONFIG_END
 
 /* ROMs */
 

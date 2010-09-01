@@ -1026,12 +1026,12 @@ DEFINE_LEGACY_IMAGE_DEVICE(TI990_TAPE, ti990_tape);
 	MDRV_DEVICE_ADD((_tag),  TI990_TAPE, 0)
 
 
-static MACHINE_DRIVER_START( tap_990 )
+static MACHINE_CONFIG_FRAGMENT( tap_990 )
 	MDRV_TI990_TAPE_ADD("tape0")
 	MDRV_TI990_TAPE_ADD("tape1")
 	MDRV_TI990_TAPE_ADD("tape2")
 	MDRV_TI990_TAPE_ADD("tape3")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     Init the tape controller core
@@ -1063,7 +1063,7 @@ DEVICE_GET_INFO( tap_990 )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tap_990_t);								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(tap_990);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(tap_990);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tap_990);					break;

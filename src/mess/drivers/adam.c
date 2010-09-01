@@ -635,7 +635,7 @@ static const floppy_config adam_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( adam )
+static MACHINE_CONFIG_START( adam, driver_data_t )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(adam_mem)
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_MACHINE_RESET( adam )
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 
@@ -666,7 +666,7 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	MDRV_FLOPPY_4_DRIVES_ADD(adam_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

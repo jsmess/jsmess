@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( gp2x )
+static MACHINE_CONFIG_START( gp2x, driver_data_t )
 	MDRV_CPU_ADD("maincpu", ARM9, 80000000)
 	MDRV_CPU_PROGRAM_MAP(gp2x_map)
 
@@ -340,7 +340,7 @@ static MACHINE_DRIVER_START( gp2x )
 	MDRV_VIDEO_UPDATE(gp2x)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(gp2x)
 	ROM_REGION( 0x600000, "maincpu", 0 )	// contents of NAND flash

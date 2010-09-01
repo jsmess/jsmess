@@ -314,7 +314,7 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_DRIVER_START( llc1 )
+static MACHINE_CONFIG_START( llc1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_CONFIG(llc1_daisy_chain)
@@ -340,9 +340,9 @@ static MACHINE_DRIVER_START( llc1 )
 
 	MDRV_Z80PIO_ADD( "z80pio", XTAL_3MHz, llc1_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( llc2 )
+static MACHINE_CONFIG_START( llc2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_PROGRAM_MAP(llc2_mem)
@@ -370,7 +370,7 @@ static MACHINE_DRIVER_START( llc2 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 /* ROM definition */
 
 ROM_START( llc1 )

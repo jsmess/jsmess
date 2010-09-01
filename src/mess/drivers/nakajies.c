@@ -373,12 +373,10 @@ static GFXDECODE_START( drwrt400 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( nakajies210 )
+static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MDRV_CPU_PROGRAM_MAP( nakajies210_map)
 	MDRV_CPU_IO_MAP( nakajies_io_map)
-
-	MDRV_DRIVER_DATA( nakajies_state )
 
 	MDRV_MACHINE_RESET( nakajies )
 
@@ -394,19 +392,16 @@ static MACHINE_DRIVER_START( nakajies210 )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dator3k )
-	MDRV_IMPORT_FROM( nakajies210 )
+static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )
 	MDRV_GFXDECODE(dator3k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nakajies220 )
+static MACHINE_CONFIG_START( nakajies220, nakajies_state )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MDRV_CPU_PROGRAM_MAP( nakajies220_map)
 	MDRV_CPU_IO_MAP( nakajies_io_map)
-
-	MDRV_DRIVER_DATA( nakajies_state )
 
 	MDRV_MACHINE_RESET( nakajies )
 
@@ -422,15 +417,13 @@ static MACHINE_DRIVER_START( nakajies220 )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( nakajies250 )
+static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MDRV_CPU_PROGRAM_MAP( nakajies250_map)
 	MDRV_CPU_IO_MAP( nakajies_io_map)
-
-	MDRV_DRIVER_DATA( nakajies_state )
 
 	MDRV_MACHINE_RESET( nakajies )
 
@@ -446,7 +439,7 @@ static MACHINE_DRIVER_START( nakajies250 )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(drwrt400)

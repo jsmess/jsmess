@@ -388,8 +388,7 @@ static GFXDECODE_START( quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( scorpion )
-	MDRV_IMPORT_FROM( spectrum_128 )
+static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(scorpion_io)
 
@@ -402,17 +401,15 @@ static MACHINE_DRIVER_START( scorpion )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( profi )
-	MDRV_IMPORT_FROM( scorpion )
+static MACHINE_CONFIG_DERIVED( profi, scorpion )
 	MDRV_GFXDECODE(profi)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quorum )
-	MDRV_IMPORT_FROM( scorpion )
+static MACHINE_CONFIG_DERIVED( quorum, scorpion )
 	MDRV_GFXDECODE(quorum)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

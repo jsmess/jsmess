@@ -161,7 +161,7 @@ static MACHINE_RESET( bbcbc )
 }
 
 
-static MACHINE_DRIVER_START( bbcbc )
+static MACHINE_CONFIG_START( bbcbc, driver_data_t )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg)
 	MDRV_CPU_IO_MAP( bbcbc_io)
@@ -173,7 +173,7 @@ static MACHINE_DRIVER_START( bbcbc )
 
 	MDRV_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
 
-	MDRV_IMPORT_FROM( tms9928a )
+	MDRV_FRAGMENT_ADD( tms9928a )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 
@@ -185,7 +185,7 @@ static MACHINE_DRIVER_START( bbcbc )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","bbcbc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( bbcbc )

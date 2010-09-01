@@ -75,6 +75,6 @@ extern DRIVER_INIT( plus4sid );
 extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
-MACHINE_DRIVER_EXTERN( c16_cartslot );
+MACHINE_CONFIG_EXTERN( c16_cartslot );
 
 #endif /* __C16_H__ */

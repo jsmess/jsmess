@@ -584,8 +584,7 @@ static const cassette_config cosmicos_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( cosmicos )
-	MDRV_DRIVER_DATA(cosmicos_state)
+static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -624,7 +623,7 @@ static MACHINE_DRIVER_START( cosmicos )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")
 	MDRV_RAM_EXTRA_OPTIONS("4K,48K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

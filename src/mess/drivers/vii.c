@@ -953,9 +953,7 @@ static INTERRUPT_GEN( vii_vblank )
 	}
 }
 
-static MACHINE_DRIVER_START( vii )
-
-	MDRV_DRIVER_DATA( vii_state )
+static MACHINE_CONFIG_START( vii, vii_state )
 
 	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MDRV_CPU_PROGRAM_MAP( vii_mem )
@@ -981,11 +979,9 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
 	
 	MDRV_SOFTWARE_LIST_ADD("vii_cart","vii")	
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vsmile )
-
-	MDRV_DRIVER_DATA( vii_state )
+static MACHINE_CONFIG_START( vsmile, vii_state )
 
 	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MDRV_CPU_PROGRAM_MAP( vii_mem )
@@ -1009,16 +1005,14 @@ static MACHINE_DRIVER_START( vsmile )
 
 	MDRV_VIDEO_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
 {
        I2CMEM_SLAVE_ADDRESS, 0, 0x200
 };
 
-static MACHINE_DRIVER_START( batman )
-
-	MDRV_DRIVER_DATA( vii_state )
+static MACHINE_CONFIG_START( batman, vii_state )
 
 	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MDRV_CPU_PROGRAM_MAP( vii_mem )
@@ -1039,7 +1033,7 @@ static MACHINE_DRIVER_START( batman )
 
 	MDRV_VIDEO_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( vii )
 {

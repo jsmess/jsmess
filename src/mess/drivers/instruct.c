@@ -37,7 +37,7 @@ static VIDEO_UPDATE( instruct )
     return 0;
 }
 
-static MACHINE_DRIVER_START( instruct )
+static MACHINE_CONFIG_START( instruct, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(instruct_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( instruct )
 
     MDRV_VIDEO_START(instruct)
     MDRV_VIDEO_UPDATE(instruct)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( instruct )

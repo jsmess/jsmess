@@ -201,8 +201,7 @@ static const cassette_config exp85_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( exp85 )
-	MDRV_DRIVER_DATA(exp85_state)
+static MACHINE_CONFIG_START( exp85, exp85_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
@@ -241,7 +240,7 @@ static MACHINE_DRIVER_START( exp85 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

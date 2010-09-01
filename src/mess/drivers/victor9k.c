@@ -996,8 +996,7 @@ static MACHINE_START( victor9k )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( victor9k )
-	MDRV_DRIVER_DATA(victor9k_state)
+static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
@@ -1050,7 +1049,7 @@ static MACHINE_DRIVER_START( victor9k )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

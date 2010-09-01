@@ -151,22 +151,20 @@ static GFXDECODE_START( pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pentagon )
-	MDRV_IMPORT_FROM( spectrum_128 )
+static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pentagon_io)
 	MDRV_MACHINE_RESET( pentagon )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 	MDRV_GFXDECODE(pentagon)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pent1024 )
-	MDRV_IMPORT_FROM( pentagon )
+static MACHINE_CONFIG_DERIVED( pent1024, pentagon )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

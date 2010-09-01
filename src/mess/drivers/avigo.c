@@ -866,7 +866,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( avigo )
+static MACHINE_CONFIG_START( avigo, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(avigo_mem)
@@ -903,7 +903,7 @@ static MACHINE_DRIVER_START( avigo )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

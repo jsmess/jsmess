@@ -375,8 +375,7 @@ static GFXDECODE_START( amu880 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( amu880 )
-	MDRV_DRIVER_DATA(amu880_state)
+static MACHINE_CONFIG_START( amu880, amu880_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) /* U880D */
@@ -411,7 +410,7 @@ static MACHINE_DRIVER_START( amu880 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

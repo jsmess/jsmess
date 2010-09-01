@@ -385,7 +385,7 @@ static const floppy_config prav8d_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( oric )
+static MACHINE_CONFIG_START( oric, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem)
@@ -427,16 +427,14 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( prav8d)
-	MDRV_IMPORT_FROM( oric )
+static MACHINE_CONFIG_DERIVED( prav8d, oric )
 	MDRV_FLOPPY_4_DRIVES_REMOVE()
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( telstrat)
-	MDRV_IMPORT_FROM( oric )
+static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( telestrat_mem)
 
@@ -447,7 +445,7 @@ static MACHINE_DRIVER_START( telstrat)
 
 	/* via */
 	MDRV_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(oric1)

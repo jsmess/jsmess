@@ -356,8 +356,7 @@ static const cassette_config lc80_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( lc80 )
-	MDRV_DRIVER_DATA(lc80_state)
+static MACHINE_CONFIG_START( lc80, lc80_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
@@ -384,10 +383,9 @@ static MACHINE_DRIVER_START( lc80 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
 	MDRV_RAM_EXTRA_OPTIONS("2K,3K,4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lc80_2 )
-	MDRV_DRIVER_DATA(lc80_state)
+static MACHINE_CONFIG_START( lc80_2, lc80_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
@@ -414,16 +412,15 @@ static MACHINE_DRIVER_START( lc80_2 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_DRIVER_START( sc80 )
-	MDRV_IMPORT_FROM( lc80_2 )
+static MACHINE_CONFIG_DERIVED( sc80, lc80_2 )
 
 	/* basic machine hardware */
     MDRV_CPU_MODIFY(Z80_TAG)
     MDRV_CPU_PROGRAM_MAP(sc80_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
 /* ROMs */

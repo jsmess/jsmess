@@ -667,8 +667,7 @@ static GFXDECODE_START( jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( basic )
-	MDRV_DRIVER_DATA(jtc_state)
+static MACHINE_CONFIG_START( basic, jtc_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
@@ -690,10 +689,9 @@ static MACHINE_DRIVER_START( basic )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jtc )
-	MDRV_IMPORT_FROM(basic)
+static MACHINE_CONFIG_DERIVED( jtc, basic )
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -711,10 +709,9 @@ static MACHINE_DRIVER_START( jtc )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jtces88 )
-	MDRV_IMPORT_FROM(jtc)
+static MACHINE_CONFIG_DERIVED( jtces88, jtc )
 
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
@@ -723,10 +720,9 @@ static MACHINE_DRIVER_START( jtces88 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jtces23 )
-	MDRV_IMPORT_FROM(basic)
+static MACHINE_CONFIG_DERIVED( jtces23, basic )
 
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
@@ -749,10 +745,9 @@ static MACHINE_DRIVER_START( jtces23 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jtces40 )
-	MDRV_IMPORT_FROM(basic)
+static MACHINE_CONFIG_DERIVED( jtces40, basic )
 
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
@@ -776,7 +771,7 @@ static MACHINE_DRIVER_START( jtces40 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

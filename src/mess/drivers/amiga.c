@@ -359,13 +359,13 @@ static const tpi6525_interface cdtv_tpi_intf =
 };
 
 
-static MACHINE_DRIVER_START( amiga_cartslot )
+static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ntsc )
+static MACHINE_CONFIG_START( ntsc, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_mem)
@@ -408,22 +408,19 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
 
 	MDRV_AMIGA_FDC_ADD("fdc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a1000n )
-	MDRV_IMPORT_FROM(ntsc)
+static MACHINE_CONFIG_DERIVED( a1000n, ntsc )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(a1000_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a500n )
-	MDRV_IMPORT_FROM(ntsc)
-	MDRV_IMPORT_FROM(amiga_cartslot)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( a500n, ntsc )
+	MDRV_FRAGMENT_ADD(amiga_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cdtv )
-	MDRV_IMPORT_FROM(ntsc)
+static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 	MDRV_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem)
 
@@ -453,11 +450,10 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_DEVICE_REMOVE("cia_1")
 	MDRV_MOS8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
 	MDRV_MOS8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, cia_1_cdtv_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pal )
-	MDRV_IMPORT_FROM(ntsc)
+static MACHINE_CONFIG_DERIVED( pal, ntsc )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_MODIFY("maincpu")
@@ -471,18 +467,16 @@ static MACHINE_DRIVER_START( pal )
 	/* cia */
 	MDRV_DEVICE_REMOVE("cia_0")
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a500p )
-	MDRV_IMPORT_FROM(pal)
-	MDRV_IMPORT_FROM(amiga_cartslot)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( a500p, pal )
+	MDRV_FRAGMENT_ADD(amiga_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a1000p )
-	MDRV_IMPORT_FROM(pal)
+static MACHINE_CONFIG_DERIVED( a1000p, pal )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(a1000_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

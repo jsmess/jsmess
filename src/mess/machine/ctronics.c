@@ -72,10 +72,10 @@ const centronics_interface standard_centronics =
     PRINTER INTERFACE
 *****************************************************************************/
 
-static MACHINE_DRIVER_START( centronics )
+static MACHINE_CONFIG_FRAGMENT( centronics )
 	MDRV_PRINTER_ADD("printer")
 	MDRV_PRINTER_ONLINE(centronics_printer_online)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************
@@ -125,7 +125,7 @@ DEVICE_GET_INFO( centronics )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(centronics);	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_CONFIG_NAME(centronics);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(centronics);		break;

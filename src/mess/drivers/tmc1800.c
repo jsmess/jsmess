@@ -849,8 +849,7 @@ static const cassette_config tmc1800_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( tmc1800 )
-	MDRV_DRIVER_DATA(tmc1800_state)
+static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -862,7 +861,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_MACHINE_RESET(tmc1800)
 
 	// video hardware
-	MDRV_IMPORT_FROM(tmc1800_video)
+	MDRV_FRAGMENT_ADD(tmc1800_video)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -878,10 +877,9 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( osc1000b )
-	MDRV_DRIVER_DATA(osc1000b_state)
+static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -893,7 +891,7 @@ static MACHINE_DRIVER_START( osc1000b )
 	MDRV_MACHINE_RESET(osc1000b)
 
 	// video hardware
-	MDRV_IMPORT_FROM(osc1000b_video)
+	MDRV_FRAGMENT_ADD(osc1000b_video)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -909,10 +907,9 @@ static MACHINE_DRIVER_START( osc1000b )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tmc2000 )
-	MDRV_DRIVER_DATA(tmc2000_state)
+static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -924,7 +921,7 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_MACHINE_RESET(tmc2000)
 
 	// video hardware
-	MDRV_IMPORT_FROM(tmc2000_video)
+	MDRV_FRAGMENT_ADD(tmc2000_video)
 
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
@@ -934,10 +931,9 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
 	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( oscnano )
-	MDRV_DRIVER_DATA(oscnano_state)
+static MACHINE_CONFIG_START( oscnano, oscnano_state )
 
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -949,7 +945,7 @@ static MACHINE_DRIVER_START( oscnano )
 	MDRV_MACHINE_RESET(oscnano)
 
 	// video hardware
-	MDRV_IMPORT_FROM(oscnano_video)
+	MDRV_FRAGMENT_ADD(oscnano_video)
 
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
@@ -958,7 +954,7 @@ static MACHINE_DRIVER_START( oscnano )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

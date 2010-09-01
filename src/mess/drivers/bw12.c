@@ -808,8 +808,7 @@ GFXDECODE_END
 
 
 /* Machine Driver */
-static MACHINE_DRIVER_START( common )
-	MDRV_DRIVER_DATA(bw12_state)
+static MACHINE_CONFIG_START( common, bw12_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
@@ -851,10 +850,9 @@ static MACHINE_DRIVER_START( common )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bw12 )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( bw12, common )
 
 	/* floppy drives */
 	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
@@ -862,10 +860,9 @@ static MACHINE_DRIVER_START( bw12 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bw14 )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( bw14, common )
 
 	/* floppy drives */
 	MDRV_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
@@ -873,7 +870,7 @@ static MACHINE_DRIVER_START( bw14 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

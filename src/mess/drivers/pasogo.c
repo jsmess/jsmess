@@ -528,9 +528,7 @@ static DEVICE_IMAGE_LOAD( pasogo_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( pasogo )
-
-	MDRV_DRIVER_DATA( pasogo_state )
+static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MDRV_CPU_ADD("maincpu", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 	MDRV_CPU_PROGRAM_MAP(pasogo_mem)
@@ -564,7 +562,7 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_CARTSLOT_INTERFACE("pasogo_cart")
 	MDRV_CARTSLOT_LOAD(pasogo_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","pasogo")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(pasogo)

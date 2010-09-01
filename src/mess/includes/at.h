@@ -41,7 +41,7 @@ extern const ins8250_interface ibm5170_com_interface[4];
 READ8_HANDLER( at_page8_r );
 WRITE8_HANDLER( at_page8_w );
 
-MACHINE_DRIVER_EXTERN( at_kbdc8042 );
+MACHINE_CONFIG_EXTERN( at_kbdc8042 );
 
 READ8_HANDLER(at_kbdc8042_r);
 WRITE8_HANDLER(at_kbdc8042_w);

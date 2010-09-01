@@ -1192,8 +1192,7 @@ static const floppy_config v1050_floppy_config =
 };
 
 /* Machine Driver */
-static MACHINE_DRIVER_START( v1050 )
-	MDRV_DRIVER_DATA(v1050_state)
+static MACHINE_CONFIG_START( v1050, v1050_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
@@ -1215,7 +1214,7 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
 
     /* video hardware */
-	MDRV_IMPORT_FROM(v1050_video)
+	MDRV_FRAGMENT_ADD(v1050_video)
 
 	/* sound hardware */
 /*  MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1243,7 +1242,7 @@ static MACHINE_DRIVER_START( v1050 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

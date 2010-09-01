@@ -469,7 +469,7 @@ static GFXDECODE_START( pc2000 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( pc2000 )
+static MACHINE_CONFIG_START( pc2000, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
     MDRV_CPU_PROGRAM_MAP(pc2000_mem)
@@ -491,7 +491,7 @@ static MACHINE_DRIVER_START( pc2000 )
 
     MDRV_VIDEO_START(pc2000)
     MDRV_VIDEO_UPDATE(pc2000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pc2000 )

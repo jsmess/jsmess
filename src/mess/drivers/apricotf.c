@@ -291,9 +291,7 @@ static const floppy_config act_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( act_f1 )
-
-	MDRV_DRIVER_DATA( act_state )
+static MACHINE_CONFIG_START( act_f1, act_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
@@ -324,7 +322,7 @@ static MACHINE_DRIVER_START( act_f1 )
 	MDRV_VIDEO_UPDATE(act_f1)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( aprif1 )

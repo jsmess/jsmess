@@ -285,16 +285,16 @@ static const floppy_config svi318_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( svi318_cartslot )
+static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_START(svi318_cart)
 	MDRV_CARTSLOT_LOAD(svi318_cart)
 	MDRV_CARTSLOT_UNLOAD(svi318_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svi318 )
+static MACHINE_CONFIG_START( svi318, driver_data_t )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi318_mem)
@@ -311,7 +311,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
 
 	/* Video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -335,41 +335,38 @@ static MACHINE_DRIVER_START( svi318 )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
 
-	MDRV_IMPORT_FROM( svi318_cartslot )
+	MDRV_FRAGMENT_ADD( svi318_cartslot )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K,96K,160K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svi318n )
-	MDRV_IMPORT_FROM( svi318 )
+static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_START( svi318_ntsc )
 	MDRV_MACHINE_RESET( svi318 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svi328 )
-	MDRV_IMPORT_FROM( svi318 )
-
-	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( svi328n )
-	MDRV_IMPORT_FROM( svi318n )
+static MACHINE_CONFIG_DERIVED( svi328, svi318 )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
+MACHINE_CONFIG_END
 
 static const mc6845_interface svi806_crtc6845_interface =
 {
@@ -403,7 +400,7 @@ static GFXDECODE_START( svi328 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, svi328_charlayout, 0, 9 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( svi328_806 )
+static MACHINE_CONFIG_START( svi328_806, driver_data_t )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem)
@@ -422,7 +419,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	/* Video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_dualhsxs )
 
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)	/* 2 additional entries for monochrome svi806 output */
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -460,22 +457,21 @@ static MACHINE_DRIVER_START( svi328_806 )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
 
-	MDRV_IMPORT_FROM( svi318_cartslot )
+	MDRV_FRAGMENT_ADD( svi318_cartslot )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svi328n_806 )
-	MDRV_IMPORT_FROM( svi328_806 )
+static MACHINE_CONFIG_DERIVED( svi328n_806, svi328_806 )
 
 	MDRV_MACHINE_START( svi318_ntsc)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

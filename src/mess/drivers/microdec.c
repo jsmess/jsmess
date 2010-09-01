@@ -94,7 +94,7 @@ static const floppy_config microdec_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( microdec )
+static MACHINE_CONFIG_START( microdec, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(microdec_mem)
@@ -103,12 +103,12 @@ static MACHINE_DRIVER_START( microdec )
     MDRV_MACHINE_RESET(microdec)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
 
 	MDRV_UPD765A_ADD("upd765", microdec_upd765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( md2 )

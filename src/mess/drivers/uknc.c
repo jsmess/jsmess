@@ -45,7 +45,7 @@ static const struct t11_setup t11_data =
 };
 
 
-static MACHINE_DRIVER_START( uknc )
+static MACHINE_CONFIG_START( uknc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 8000000)
 	MDRV_CPU_CONFIG(t11_data)
@@ -69,7 +69,7 @@ static MACHINE_DRIVER_START( uknc )
 
     MDRV_VIDEO_START(uknc)
     MDRV_VIDEO_UPDATE(uknc)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( uknc )

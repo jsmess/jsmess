@@ -55,7 +55,7 @@ static GFXDECODE_START( unistar )
 	GFXDECODE_ENTRY( "gfx", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( unistar )
+static MACHINE_CONFIG_START( unistar, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(unistar_mem)
@@ -76,7 +76,7 @@ static MACHINE_DRIVER_START( unistar )
 
     MDRV_VIDEO_START(unistar)
     MDRV_VIDEO_UPDATE(unistar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( unistar )

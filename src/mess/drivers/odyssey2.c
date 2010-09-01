@@ -166,13 +166,13 @@ static const sp0256_interface the_voice_sp0256 =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( odyssey2_cartslot )
+static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( odyssey2 )
+static MACHINE_CONFIG_START( odyssey2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -203,10 +203,10 @@ static MACHINE_DRIVER_START( odyssey2 )
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM(odyssey2_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(odyssey2_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( videopac )
+static MACHINE_CONFIG_START( videopac, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -236,10 +236,10 @@ static MACHINE_DRIVER_START( videopac )
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM(odyssey2_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(odyssey2_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( g7400 )
+static MACHINE_CONFIG_START( g7400, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, 5911000 )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -265,8 +265,8 @@ static MACHINE_DRIVER_START( g7400 )
 	MDRV_SOUND_ADD("custom", ODYSSEY2, 3547000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_IMPORT_FROM(odyssey2_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(odyssey2_cartslot)
+MACHINE_CONFIG_END
 
 ROM_START (odyssey2)
     ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */

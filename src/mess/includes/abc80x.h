@@ -154,16 +154,16 @@ public:
 WRITE8_HANDLER( abc800_hrs_w );
 WRITE8_HANDLER( abc800_hrc_w );
 
-MACHINE_DRIVER_EXTERN(abc800m_video);
-MACHINE_DRIVER_EXTERN(abc800c_video);
+MACHINE_CONFIG_EXTERN(abc800m_video);
+MACHINE_CONFIG_EXTERN(abc800c_video);
 
 /*----------- defined in video/abc802.c -----------*/
 
-MACHINE_DRIVER_EXTERN(abc802_video);
+MACHINE_CONFIG_EXTERN(abc802_video);
 
 /*----------- defined in video/abc806.c -----------*/
 
-MACHINE_DRIVER_EXTERN(abc806_video);
+MACHINE_CONFIG_EXTERN(abc806_video);
 
 WRITE8_HANDLER( abc806_hrs_w );
 WRITE8_HANDLER( abc806_hrc_w );

@@ -487,8 +487,7 @@ static const kb_keytronic_interface at_keytronic_intf =
 };
 
 
-static MACHINE_DRIVER_START( ibm5170 )
-	MDRV_DRIVER_DATA(at_state)
+static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -514,7 +513,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
-	MDRV_IMPORT_FROM( pcvideo_ega )
+	MDRV_FRAGMENT_ADD( pcvideo_ega )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -531,7 +530,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MDRV_IMPORT_FROM( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( at_kbdc8042 )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
@@ -543,7 +542,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -552,23 +551,20 @@ static MACHINE_DRIVER_START( ibm5170 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ibm5170a )
-	MDRV_IMPORT_FROM( ibm5170 )
+static MACHINE_CONFIG_DERIVED( ibm5170a, ibm5170 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ec1849 )
-	MDRV_IMPORT_FROM( ibm5170 )
+static MACHINE_CONFIG_DERIVED( ec1849, ibm5170 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ibm5162 )
-	MDRV_DRIVER_DATA(at_state)
+static MACHINE_CONFIG_START( ibm5162, at_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -595,7 +591,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
-	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_FRAGMENT_ADD( pcvideo_cga )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -607,7 +603,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 
-	MDRV_IMPORT_FROM( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( at_kbdc8042 )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
@@ -619,7 +615,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -628,11 +624,10 @@ static MACHINE_DRIVER_START( ibm5162 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ps2m30286 )
-	MDRV_DRIVER_DATA(at_state)
+static MACHINE_CONFIG_START( ps2m30286, at_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -657,7 +652,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -679,7 +674,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
-	MDRV_IMPORT_FROM( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( at_kbdc8042 )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
@@ -691,7 +686,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -700,11 +695,10 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( atvga )
-	MDRV_DRIVER_DATA(at_state)
+static MACHINE_CONFIG_START( atvga, at_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -726,7 +720,7 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -753,7 +747,7 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_IMPORT_FROM( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( at_kbdc8042 )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
@@ -765,7 +759,7 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -774,11 +768,10 @@ static MACHINE_DRIVER_START( atvga )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( at386 )
-	MDRV_DRIVER_DATA(at_state)
+static MACHINE_CONFIG_START( at386, at_state )
     /* basic machine hardware */
 	/* original at 6 MHz, at03 8 megahertz */
 	MDRV_CPU_ADD("maincpu", I386, 12000000)
@@ -804,7 +797,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -828,7 +821,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_IMPORT_FROM( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( at_kbdc8042 )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
@@ -841,7 +834,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MDRV_IMPORT_FROM( pc_hdc )
+	MDRV_FRAGMENT_ADD( pc_hdc )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -850,19 +843,17 @@ static MACHINE_DRIVER_START( at386 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( at486 )
-	MDRV_IMPORT_FROM( at386 )
+static MACHINE_CONFIG_DERIVED( at486, at386 )
 
 	MDRV_CPU_REPLACE("maincpu", I486, 25000000)
 	MDRV_CPU_PROGRAM_MAP(at386_map)
 	MDRV_CPU_IO_MAP(at386_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( at586 )
-	MDRV_IMPORT_FROM( at386 )
+static MACHINE_CONFIG_DERIVED( at586, at386 )
 
 	MDRV_CPU_REPLACE("maincpu", PENTIUM, 60000000)
 	MDRV_CPU_PROGRAM_MAP(at586_map)
@@ -874,23 +865,21 @@ static MACHINE_DRIVER_START( at586 )
 	MDRV_PCI_BUS_ADD("pcibus", 0)
 	MDRV_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 	MDRV_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( megapc )
-	MDRV_IMPORT_FROM( at386 )
+static MACHINE_CONFIG_DERIVED( megapc, at386 )
 
 	MDRV_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(at386_map)
 	MDRV_CPU_IO_MAP(megapc_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( megapcpl )
-	MDRV_IMPORT_FROM( megapc )
+static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 
 	MDRV_CPU_REPLACE("maincpu", I486, 66000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(at386_map)
 	MDRV_CPU_IO_MAP(megapc_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

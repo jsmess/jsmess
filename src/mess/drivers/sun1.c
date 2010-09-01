@@ -63,7 +63,7 @@ static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 };
 
 
-static MACHINE_DRIVER_START( sun1 )
+static MACHINE_CONFIG_START( sun1, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
     MDRV_CPU_PROGRAM_MAP(sun1_mem)
@@ -71,9 +71,9 @@ static MACHINE_DRIVER_START( sun1 )
     MDRV_MACHINE_RESET(sun1)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sun1 )

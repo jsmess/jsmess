@@ -165,7 +165,7 @@ static GFXDECODE_START( mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( mikro80 )
+static MACHINE_CONFIG_START( mikro80, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(mikro80_mem)
@@ -193,17 +193,17 @@ static MACHINE_DRIVER_START( mikro80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", mikro80_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radio99 )
+static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mikro80)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(radio99_io)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

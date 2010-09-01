@@ -314,7 +314,7 @@ static MACHINE_RESET(bmjr)
 	cassette_change_state(bmjr_cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_DRIVER_START( bmjr )
+static MACHINE_CONFIG_START( bmjr, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
     MDRV_CPU_PROGRAM_MAP(bmjr_mem)
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( bmjr )
 
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( bmjr )

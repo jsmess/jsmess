@@ -119,7 +119,7 @@ static const cassette_config ondra_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( ondra )
+static MACHINE_CONFIG_START( ondra, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(ondra_mem)
@@ -153,7 +153,7 @@ static MACHINE_DRIVER_START( ondra )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

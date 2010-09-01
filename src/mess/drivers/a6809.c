@@ -90,7 +90,7 @@ static const via6522_interface via_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 
-static MACHINE_DRIVER_START( a6809 )
+static MACHINE_CONFIG_START( a6809, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(a6809_mem)
@@ -117,7 +117,7 @@ static MACHINE_DRIVER_START( a6809 )
 	MDRV_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
 	
 	MDRV_MC6845_ADD("mc6845", MC6845, XTAL_4MHz / 2, a6809_crtc6845_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( a6809 )

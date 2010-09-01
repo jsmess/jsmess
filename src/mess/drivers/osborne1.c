@@ -238,7 +238,7 @@ static GFXDECODE_START( osborne1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, osborne1_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( osborne1 )
+static MACHINE_CONFIG_START( osborne1, driver_data_t )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
 	MDRV_CPU_IO_MAP( osborne1_io)
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( osborne1 )

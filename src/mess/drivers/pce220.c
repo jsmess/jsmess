@@ -208,7 +208,7 @@ static GFXDECODE_START( pce220 )
 	GFXDECODE_ENTRY( "lcd_vram",   0x00000, test_decode,    0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pce220 )
+static MACHINE_CONFIG_START( pce220, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
     MDRV_CPU_PROGRAM_MAP(pce220_mem)
@@ -234,7 +234,7 @@ static MACHINE_DRIVER_START( pce220 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pce220 )

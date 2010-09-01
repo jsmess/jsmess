@@ -54,7 +54,7 @@ static VIDEO_UPDATE( vt520 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( vt520 )
+static MACHINE_CONFIG_START( vt520, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8032, XTAL_20MHz)
     MDRV_CPU_PROGRAM_MAP(vt520_mem)
@@ -80,7 +80,7 @@ static MACHINE_DRIVER_START( vt520 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vt520 )

@@ -38,7 +38,7 @@ static MACHINE_RESET(elekscmp)
 {
 }
 
-static MACHINE_DRIVER_START( elekscmp )
+static MACHINE_CONFIG_START( elekscmp, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(elekscmp_mem)
@@ -48,7 +48,7 @@ static MACHINE_DRIVER_START( elekscmp )
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_elekscmp)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( elekscmp )

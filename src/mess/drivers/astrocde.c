@@ -167,7 +167,7 @@ static DEVICE_IMAGE_LOAD( astrocde_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( astrocde )
+static MACHINE_CONFIG_START( astrocde, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem)
@@ -197,7 +197,7 @@ static MACHINE_DRIVER_START( astrocde )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","astrocde")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

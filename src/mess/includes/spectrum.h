@@ -91,7 +91,7 @@ public:
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec_plus );
 
-MACHINE_DRIVER_EXTERN( spectrum );
+MACHINE_CONFIG_EXTERN( spectrum );
 extern MACHINE_RESET( spectrum );
 
 extern READ8_HANDLER(spectrum_port_1f_r);
@@ -101,7 +101,7 @@ extern READ8_HANDLER(spectrum_port_fe_r);
 extern WRITE8_HANDLER(spectrum_port_fe_w);
 
 /*----------- defined in drivers/spec128.c -----------*/
-MACHINE_DRIVER_EXTERN( spectrum_128 );
+MACHINE_CONFIG_EXTERN( spectrum_128 );
 
 extern void spectrum_128_update_memory(running_machine *machine);
 

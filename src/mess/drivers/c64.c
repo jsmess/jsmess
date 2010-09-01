@@ -669,7 +669,7 @@ static const vic2_interface ultimax_vic2_intf = {
  *
  *************************************/
 
-static MACHINE_DRIVER_START( c64 )
+static MACHINE_CONFIG_START( c64, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
@@ -718,10 +718,10 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
 	MDRV_C1541_ADD("c1541", "iec", 8)
 
-	MDRV_IMPORT_FROM(c64_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(c64_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( c64pal )
+static MACHINE_CONFIG_START( c64pal, driver_data_t )
 	MDRV_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
 	MDRV_CPU_CONFIG( c64_m6510_interface )
@@ -769,11 +769,10 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
 	MDRV_C1541_ADD("c1541", "iec", 8)
 
-	MDRV_IMPORT_FROM(c64_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(c64_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ultimax )
-	MDRV_IMPORT_FROM( c64 )
+static MACHINE_CONFIG_DERIVED( ultimax, c64 )
 	MDRV_CPU_REPLACE( "maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP( ultimax_mem)
 	MDRV_CPU_CONFIG( c64_m6510_interface )
@@ -790,27 +789,24 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_DEVICE_REMOVE("cart1")
 	MDRV_DEVICE_REMOVE("cart2")
 
-	MDRV_IMPORT_FROM(ultimax_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(ultimax_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pet64 )
-	MDRV_IMPORT_FROM( c64 )
+static MACHINE_CONFIG_DERIVED( pet64, c64 )
 	MDRV_PALETTE_INIT( pet64 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( c64gs )
-	MDRV_IMPORT_FROM( c64pal )
+static MACHINE_CONFIG_DERIVED( c64gs, c64pal )
 	MDRV_DEVICE_REMOVE( "dac" )
 	MDRV_DEVICE_REMOVE( "cassette" )
 	MDRV_DEVICE_REMOVE( "quickload" )
 	//MDRV_DEVICE_REMOVE("iec")
 	//MDRV_DEVICE_REMOVE("c1541")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sx64 )
-	MDRV_IMPORT_FROM( c64pal )
+static MACHINE_CONFIG_DERIVED( sx64, c64pal )
 
 	MDRV_DEVICE_REMOVE( "c1541" )
 	MDRV_SX1541_ADD("c1541", "iec", 8)
@@ -822,7 +818,7 @@ static MACHINE_DRIVER_START( sx64 )
 #else
 	MDRV_QUANTUM_TIME(HZ(180000))
 #endif
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

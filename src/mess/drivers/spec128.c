@@ -293,8 +293,7 @@ static GFXDECODE_START( spec128 )
 GFXDECODE_END
 
 
-MACHINE_DRIVER_START( spectrum_128 )
-	MDRV_IMPORT_FROM( spectrum )
+MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spectrum_128_mem)
@@ -318,7 +317,7 @@ MACHINE_DRIVER_START( spectrum_128 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -97,7 +97,7 @@ static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
 	DEVCB_HANDLER(altair_kbd_put)
 };
 
-static MACHINE_DRIVER_START( altair )
+static MACHINE_CONFIG_START( altair, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(altair_mem)
@@ -106,12 +106,12 @@ static MACHINE_DRIVER_START( altair )
     MDRV_MACHINE_RESET(altair)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,altair_terminal_intf)
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD("quickload", altair, "bin", 0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( al8800bt )

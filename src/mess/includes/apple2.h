@@ -104,7 +104,7 @@ struct _apple2_memmap_config
 
 /*----------- defined in drivers/apple2.c -----------*/
 
-MACHINE_DRIVER_EXTERN( apple2e );
+MACHINE_CONFIG_EXTERN( apple2e );
 INPUT_PORTS_EXTERN( apple2ep );
 PALETTE_INIT( apple2 );
 

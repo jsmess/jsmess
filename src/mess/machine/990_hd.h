@@ -13,6 +13,6 @@ void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(running
 READ16_HANDLER(ti990_hdc_r);
 WRITE16_HANDLER(ti990_hdc_w);
 
-MACHINE_DRIVER_EXTERN( ti990_hdc );
+MACHINE_CONFIG_EXTERN( ti990_hdc );
 
 #endif

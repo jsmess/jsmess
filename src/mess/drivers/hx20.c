@@ -78,7 +78,7 @@ static GFXDECODE_START( hx20 )
 	GFXDECODE_ENTRY( "maincpu", 0xfe20, hx20_3_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( ehx20 )
+static MACHINE_CONFIG_START( ehx20, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 614000) // HD6301
     MDRV_CPU_PROGRAM_MAP(ehx20_mem)
@@ -98,7 +98,7 @@ static MACHINE_DRIVER_START( ehx20 )
 
     MDRV_VIDEO_START(ehx20)
     MDRV_VIDEO_UPDATE(ehx20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ehx20 )

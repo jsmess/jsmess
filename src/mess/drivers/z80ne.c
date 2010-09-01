@@ -465,7 +465,7 @@ static const mc6847_interface z80net_mc6847_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( z80ne )
+static MACHINE_CONFIG_START( z80ne, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80ne_mem)
@@ -484,10 +484,9 @@ static MACHINE_DRIVER_START( z80ne )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( z80net )
-	MDRV_IMPORT_FROM( z80ne )
+static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 
 	MDRV_CPU_MODIFY("z80ne")
 	MDRV_CPU_PROGRAM_MAP(z80net_mem)
@@ -517,9 +516,9 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( z80netb )
+static MACHINE_CONFIG_START( z80netb, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80netb_mem)
@@ -553,9 +552,9 @@ static MACHINE_DRIVER_START( z80netb )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( z80netf )
+static MACHINE_CONFIG_START( z80netf, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80netf_mem)
@@ -592,7 +591,7 @@ static MACHINE_DRIVER_START( z80netf )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("56K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************
  ROM Definitions

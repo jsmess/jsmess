@@ -346,7 +346,7 @@ static PALETTE_INIT( pdp1 )
 }
 
 
-static MACHINE_DRIVER_START(pdp1)
+static MACHINE_CONFIG_START( pdp1, driver_data_t )
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_VIDEO_START(pdp1)
 	MDRV_VIDEO_EOF(crt)
 	MDRV_VIDEO_UPDATE(pdp1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).

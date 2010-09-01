@@ -33,7 +33,7 @@ static VIDEO_UPDATE( next )
     return 0;
 }
 
-static MACHINE_DRIVER_START( next )
+static MACHINE_CONFIG_START( next, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68030, XTAL_25MHz)
     MDRV_CPU_PROGRAM_MAP(next_mem)
@@ -52,13 +52,12 @@ static MACHINE_DRIVER_START( next )
 
     MDRV_VIDEO_START(next)
     MDRV_VIDEO_UPDATE(next)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( next040 )
-	MDRV_IMPORT_FROM( next )
+static MACHINE_CONFIG_DERIVED( next040, next )
 
 	MDRV_CPU_REPLACE("maincpu", M68040, XTAL_33MHz)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( next )

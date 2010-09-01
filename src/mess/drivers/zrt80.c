@@ -204,7 +204,7 @@ static GFXDECODE_START( zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( zrt80 )
+static MACHINE_CONFIG_START( zrt80, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(zrt80_mem)
@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( zrt80 )
 	MDRV_VIDEO_UPDATE(zrt80)
 
 	MDRV_INS8250_ADD( "ins8250", zrt80_com_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( zrt80 )

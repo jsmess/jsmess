@@ -92,9 +92,7 @@ static GFXDECODE_START( z9001 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( z9001 )
-
-    MDRV_DRIVER_DATA( z9001_state )
+static MACHINE_CONFIG_START( z9001, z9001_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
@@ -116,7 +114,7 @@ static MACHINE_DRIVER_START( z9001 )
 
     MDRV_VIDEO_START(z9001)
     MDRV_VIDEO_UPDATE(z9001)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z9001 )

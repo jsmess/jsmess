@@ -780,7 +780,7 @@ static const floppy_config bbc_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( bbc_cartslot )
+static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -800,9 +800,9 @@ static MACHINE_DRIVER_START( bbc_cartslot )
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(bbcb_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bbca )
+static MACHINE_CONFIG_START( bbca, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem)
@@ -843,10 +843,9 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 
 	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bbcb )
-	MDRV_IMPORT_FROM( bbca )
+static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcb_mem)
 	MDRV_MACHINE_START( bbcb )
@@ -858,12 +857,11 @@ static MACHINE_DRIVER_START( bbcb )
 
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_IMPORT_FROM(bbc_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(bbc_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bbcbp )
-	MDRV_IMPORT_FROM( bbca )
+static MACHINE_CONFIG_DERIVED( bbcbp, bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcbp_mem)
 	MDRV_MACHINE_START( bbcbp )
@@ -874,12 +872,11 @@ static MACHINE_DRIVER_START( bbcbp )
 	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_IMPORT_FROM(bbc_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(bbc_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bbcbp128 )
-	MDRV_IMPORT_FROM( bbca )
+static MACHINE_CONFIG_DERIVED( bbcbp128, bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcbp128_mem)
 	MDRV_MACHINE_START( bbcbp )
@@ -891,12 +888,12 @@ static MACHINE_DRIVER_START( bbcbp128 )
 
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_IMPORT_FROM(bbc_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(bbc_cartslot)
+MACHINE_CONFIG_END
 
 
 /****BBC MASTER */
-static MACHINE_DRIVER_START( bbcm )
+static MACHINE_CONFIG_START( bbcm, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem)
@@ -944,8 +941,8 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 
-	MDRV_IMPORT_FROM(bbc_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(bbc_cartslot)
+MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */
 COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     "Acorn","BBC Micro Model A" , 0)

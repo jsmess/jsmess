@@ -49,6 +49,6 @@ WRITE16_HANDLER( cgc7900_z_mode_w );
 WRITE16_HANDLER( cgc7900_color_status_w );
 READ16_HANDLER( cgc7900_sync_r );
 
-MACHINE_DRIVER_EXTERN( cgc7900_video );
+MACHINE_CONFIG_EXTERN( cgc7900_video );
 
 #endif

@@ -119,7 +119,7 @@ static const floppy_config concept_floppy_config =
 };
 
 /* concept machine */
-static MACHINE_DRIVER_START( concept )
+static MACHINE_CONFIG_START( concept, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(concept_memmap)
@@ -155,7 +155,7 @@ static MACHINE_DRIVER_START( concept )
 	MDRV_WD179X_ADD("wd179x", concept_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static INPUT_PORTS_START( concept )

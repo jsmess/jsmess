@@ -1290,8 +1290,7 @@ static VIDEO_UPDATE( prof80 )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( prof80 )
-	MDRV_DRIVER_DATA(prof80_state)
+static MACHINE_CONFIG_START( prof80, prof80_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
@@ -1322,10 +1321,9 @@ static MACHINE_DRIVER_START( prof80 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grip )
-	MDRV_IMPORT_FROM(prof80)
+static MACHINE_CONFIG_DERIVED( grip, prof80 )
 
     MDRV_CPU_MODIFY(Z80_TAG)
     MDRV_CPU_IO_MAP(prof80_grip_io)
@@ -1357,23 +1355,20 @@ static MACHINE_DRIVER_START( grip )
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MDRV_I8255A_ADD(I8255A_TAG, grip_ppi8255_interface)
 	MDRV_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, grip_z80sti_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grip2 )
-	MDRV_IMPORT_FROM(grip)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( grip2, grip )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grip3 )
-	MDRV_IMPORT_FROM(grip)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( grip3, grip )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grip5 )
-	MDRV_IMPORT_FROM(grip)
+static MACHINE_CONFIG_DERIVED( grip5, grip )
 
     /* basic machine hardware */
 	MDRV_CPU_MODIFY(GRIP_Z80_TAG)
     MDRV_CPU_IO_MAP(grip5_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

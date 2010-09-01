@@ -38,7 +38,7 @@ static VIDEO_UPDATE( chaos )
     return 0;
 }
 
-static MACHINE_DRIVER_START( chaos )
+static MACHINE_CONFIG_START( chaos, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(chaos_mem)
@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( chaos )
 
     MDRV_VIDEO_START(chaos)
     MDRV_VIDEO_UPDATE(chaos)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( chaos )

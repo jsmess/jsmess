@@ -495,7 +495,7 @@ static const tms5220_interface exl100_tms5220_interface =
 };
 
 
-static MACHINE_DRIVER_START(exl100)
+static MACHINE_CONFIG_START( exl100, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7020 */
 	MDRV_CPU_PROGRAM_MAP(tms7020_mem)
@@ -512,7 +512,7 @@ static MACHINE_DRIVER_START(exl100)
 	MDRV_MACHINE_RESET( exelv )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms3556)
+	MDRV_FRAGMENT_ADD(tms3556)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -525,10 +525,10 @@ static MACHINE_DRIVER_START(exl100)
 	MDRV_SOUND_ADD("tms5220c", TMS5220C, 640000)
 	MDRV_SOUND_CONFIG(exl100_tms5220_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START(exeltel)
+static MACHINE_CONFIG_START( exeltel, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7040 */
 	MDRV_CPU_PROGRAM_MAP(tms7040_mem)
@@ -545,7 +545,7 @@ static MACHINE_DRIVER_START(exeltel)
 	MDRV_MACHINE_RESET( exelv )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms3556)
+	MDRV_FRAGMENT_ADD(tms3556)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -558,7 +558,7 @@ static MACHINE_DRIVER_START(exeltel)
 	MDRV_SOUND_ADD("tms5220c", TMS5220C, 640000)
 	MDRV_SOUND_CONFIG(exl100_tms5220_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

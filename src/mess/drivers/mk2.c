@@ -165,7 +165,7 @@ static MOS6530_INTERFACE( mk2_mos6530_interface )
 };
 
 
-static MACHINE_DRIVER_START( mk2 )
+static MACHINE_CONFIG_START( mk2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 6504 */
 	MDRV_CPU_PROGRAM_MAP(mk2_mem)
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( mk2 )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(mk2)

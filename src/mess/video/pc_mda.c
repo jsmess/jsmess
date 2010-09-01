@@ -77,7 +77,7 @@ static const mc6845_interface mc6845_mda_intf =
 	NULL
 };
 
-MACHINE_DRIVER_START( pcvideo_mda )
+MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MDRV_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
@@ -89,7 +89,7 @@ MACHINE_DRIVER_START( pcvideo_mda )
 
 	MDRV_VIDEO_START( pc_mda )
 	MDRV_VIDEO_UPDATE( mc6845_mda)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -435,7 +435,7 @@ static const mc6845_interface mc6845_hercules_intf =
 	NULL
 };
 
-MACHINE_DRIVER_START( pcvideo_hercules )
+MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MDRV_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
@@ -447,7 +447,7 @@ MACHINE_DRIVER_START( pcvideo_hercules )
 
 	MDRV_VIDEO_START( pc_hercules )
 	MDRV_VIDEO_UPDATE( mc6845_hercules )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static VIDEO_START( pc_hercules )

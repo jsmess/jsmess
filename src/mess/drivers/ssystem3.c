@@ -316,7 +316,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( ssystem3 )
+static MACHINE_CONFIG_START( ssystem3, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map)
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( ssystem3 )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, ssystem3_via_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(ssystem3)

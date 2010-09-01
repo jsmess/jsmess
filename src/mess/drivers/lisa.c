@@ -112,7 +112,7 @@ static const floppy_config lisa_floppy_config =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_DRIVER_START( lisa )
+static MACHINE_CONFIG_START( lisa, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MDRV_CPU_PROGRAM_MAP(lisa_map)
@@ -153,11 +153,10 @@ static MACHINE_DRIVER_START( lisa )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
 	MDRV_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lisa210 )
-	MDRV_IMPORT_FROM( lisa )
+static MACHINE_CONFIG_DERIVED( lisa210, lisa )
 	MDRV_CPU_MODIFY( "fdccpu" )
 	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
@@ -169,15 +168,14 @@ static MACHINE_DRIVER_START( lisa210 )
 	MDRV_DEVICE_REMOVE("via6522_1")
 	MDRV_VIA6522_ADD("via6522_0", 1250000, lisa_via6522_0_intf)
 	MDRV_VIA6522_ADD("via6522_1", 1250000, lisa_via6522_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( macxl )
-	MDRV_IMPORT_FROM( lisa210 )
+static MACHINE_CONFIG_DERIVED( macxl, lisa210 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(	768/* ???? */, 447/* ???? */)
 	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* 2008-05 FP:
 Small note about natural keyboard support: currently,

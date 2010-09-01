@@ -37,7 +37,7 @@ static VIDEO_UPDATE( cd2650 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( cd2650 )
+static MACHINE_CONFIG_START( cd2650, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(cd2650_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( cd2650 )
 
     MDRV_VIDEO_START(cd2650)
     MDRV_VIDEO_UPDATE(cd2650)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( cd2650 )

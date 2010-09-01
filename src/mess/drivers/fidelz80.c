@@ -248,7 +248,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_DRIVER_START(vcc)
+static MACHINE_CONFIG_START( vcc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START(vcc)
 
     /* video hardware */
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
 	/* other hardware */
@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START(vcc)
 	MDRV_SOUND_ADD("speech", S14001A, 25000) // around 25khz
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

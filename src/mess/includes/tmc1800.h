@@ -98,9 +98,9 @@ public:
 
 /* ---------- defined in video/tmc1800.c ---------- */
 
-MACHINE_DRIVER_EXTERN( tmc1800_video );
-MACHINE_DRIVER_EXTERN( osc1000b_video );
-MACHINE_DRIVER_EXTERN( tmc2000_video );
-MACHINE_DRIVER_EXTERN( oscnano_video );
+MACHINE_CONFIG_EXTERN( tmc1800_video );
+MACHINE_CONFIG_EXTERN( osc1000b_video );
+MACHINE_CONFIG_EXTERN( tmc2000_video );
+MACHINE_CONFIG_EXTERN( oscnano_video );
 
 #endif

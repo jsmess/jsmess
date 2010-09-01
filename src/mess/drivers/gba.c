@@ -2416,8 +2416,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( gbadv )
-	MDRV_DRIVER_DATA(gba_state)
+static MACHINE_CONFIG_START( gbadv, gba_state )
 
 	MDRV_CPU_ADD("maincpu", ARM7, 16777216)
 	MDRV_CPU_PROGRAM_MAP(gbadvance_map)
@@ -2453,7 +2452,7 @@ static MACHINE_DRIVER_START( gbadv )
 	MDRV_CARTSLOT_INTERFACE("gba_cart")
 	MDRV_CARTSLOT_LOAD(gba_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gba")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
    and some games verify that as a protection check (notably Metroid Fusion) */

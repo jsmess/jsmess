@@ -37,7 +37,7 @@ static VIDEO_UPDATE( prof180x )
     return 0;
 }
 
-static MACHINE_DRIVER_START( prof180x )
+static MACHINE_CONFIG_START( prof180x, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // HD64180
     MDRV_CPU_PROGRAM_MAP(prof180x_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( prof180x )
 
     MDRV_VIDEO_START(prof180x)
     MDRV_VIDEO_UPDATE(prof180x)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( prof180x )

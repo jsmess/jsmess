@@ -154,7 +154,7 @@ static const floppy_config c8280_floppy_config =
     MACHINE_DRIVER( c8280 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c8280 )
+static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MDRV_CPU_ADD(M6502_DOS_TAG, M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(c8280_dos_map)
 
@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( c8280 )
 	MDRV_CPU_PROGRAM_MAP(c8280_fdc_map)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c8280_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c8280 )
@@ -222,7 +222,7 @@ DEVICE_GET_INFO( c8280 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c8280);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c8280);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c8280);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c8280);						break;

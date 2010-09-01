@@ -182,7 +182,7 @@ static GFXDECODE_START( galaxy )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( galaxy )
+static MACHINE_CONFIG_START( galaxy, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem)
@@ -216,9 +216,9 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("6K")
 	MDRV_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( galaxyp )
+static MACHINE_CONFIG_START( galaxyp, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem)
@@ -254,7 +254,7 @@ static MACHINE_DRIVER_START( galaxyp )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("38K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START (galaxy)
 	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)

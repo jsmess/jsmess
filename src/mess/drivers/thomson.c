@@ -599,7 +599,7 @@ static const floppy_config thomson_floppy_config =
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( to7 )
+static MACHINE_CONFIG_START( to7, driver_data_t )
 
      MDRV_MACHINE_START ( to7 )
      MDRV_MACHINE_RESET ( to7 )
@@ -677,11 +677,10 @@ static MACHINE_DRIVER_START ( to7 )
 	MDRV_THOM_SERIAL_CC90323_ADD("cc90232")
 	MDRV_THOM_SERIAL_RF57232_ADD("rf57932")
 	MDRV_THOM_SERIAL_MODEM_ADD("modem")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START ( t9000 )
-     MDRV_IMPORT_FROM ( to7 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( t9000, to7 )
+MACHINE_CONFIG_END
 
 
 COMP ( 1982, to7, 0, 0, to7, to7, 0,  "Thomson", "TO7", 0 )
@@ -844,8 +843,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( to770 )
-    MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( to770, to7 )
     MDRV_MACHINE_START ( to770 )
     MDRV_MACHINE_RESET ( to770 )
 
@@ -860,11 +858,10 @@ static MACHINE_DRIVER_START ( to770 )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START ( to770a )
-     MDRV_IMPORT_FROM ( to770 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( to770a, to770 )
+MACHINE_CONFIG_END
 
 COMP ( 1984, to770, 0, 0, to770, to770, 0, "Thomson", "TO7/70", 0 )
 
@@ -1026,8 +1023,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( mo5 )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( mo5, to7 )
      MDRV_MACHINE_START ( mo5 )
      MDRV_MACHINE_RESET ( mo5 )
 
@@ -1047,11 +1043,10 @@ static MACHINE_DRIVER_START ( mo5 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("112K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START ( mo5e )
-     MDRV_IMPORT_FROM ( mo5 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( mo5e, mo5 )
+MACHINE_CONFIG_END
 
 
 COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, "Thomson", "MO5", 0 )
@@ -1367,8 +1362,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( to9 )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( to9, to7 )
      MDRV_MACHINE_START ( to9 )
      MDRV_MACHINE_RESET ( to9 )
 
@@ -1387,7 +1381,7 @@ static MACHINE_DRIVER_START ( to9 )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("192K")
 	MDRV_RAM_EXTRA_OPTIONS("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 COMP ( 1985, to9, 0, 0, to9, to9, 0, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
@@ -1586,8 +1580,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( to8 )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( to8, to7 )
      MDRV_MACHINE_START ( to8 )
      MDRV_MACHINE_RESET ( to8 )
 
@@ -1606,11 +1599,10 @@ static MACHINE_DRIVER_START ( to8 )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START ( to8d )
-     MDRV_IMPORT_FROM ( to8 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( to8d, to8 )
+MACHINE_CONFIG_END
 
 
 COMP ( 1986, to8, 0, 0, to8, to8, 0, "Thomson", "TO8", 0 )
@@ -1737,8 +1729,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( to9p )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( to9p, to7 )
      MDRV_MACHINE_START ( to9p )
      MDRV_MACHINE_RESET ( to9p )
 
@@ -1756,7 +1747,7 @@ static MACHINE_DRIVER_START ( to9p )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, "Thomson", "TO9+", 0 )
 
@@ -2069,8 +2060,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( mo6 )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( mo6, to7 )
      MDRV_MACHINE_START ( mo6 )
      MDRV_MACHINE_RESET ( mo6 )
 
@@ -2093,11 +2083,10 @@ static MACHINE_DRIVER_START ( mo6 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START ( pro128 )
-     MDRV_IMPORT_FROM ( mo6 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( pro128, mo6 )
+MACHINE_CONFIG_END
 
 COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, "Thomson", "MO6", 0 )
 
@@ -2297,8 +2286,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_DRIVER_START ( mo5nr )
-     MDRV_IMPORT_FROM ( to7 )
+static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
      MDRV_MACHINE_START ( mo5nr )
      MDRV_MACHINE_RESET ( mo5nr )
 
@@ -2321,6 +2309,6 @@ static MACHINE_DRIVER_START ( mo5nr )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, "Thomson", "MO5 NR", 0 )

@@ -503,7 +503,7 @@ static GFXDECODE_START( qx10 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( qx10 )
+static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MDRV_CPU_PROGRAM_MAP(qx10_mem)
@@ -523,8 +523,6 @@ static MACHINE_DRIVER_START( qx10 )
 	MDRV_UPD765A_ADD("upd765", qx10_upd765_interface)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
 
-	MDRV_DRIVER_DATA(qx10_state)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -542,7 +540,7 @@ static MACHINE_DRIVER_START( qx10 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( qx10 )

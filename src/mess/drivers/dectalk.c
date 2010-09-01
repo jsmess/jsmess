@@ -702,7 +702,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(dectalk_kbd_put)
 };
 
-static MACHINE_DRIVER_START(dectalk)
+static MACHINE_CONFIG_START( dectalk, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
     MDRV_CPU_PROGRAM_MAP(m68k_mem)
@@ -732,9 +732,9 @@ static MACHINE_DRIVER_START(dectalk)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

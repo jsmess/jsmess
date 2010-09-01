@@ -654,8 +654,7 @@ static const floppy_config tiki100_floppy_config =
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( tiki100 )
-	MDRV_DRIVER_DATA(tiki100_state)
+static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 2000000)
@@ -694,7 +693,7 @@ static MACHINE_DRIVER_START( tiki100 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

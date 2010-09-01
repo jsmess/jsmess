@@ -151,7 +151,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_DRIVER_START( apogee )
+static MACHINE_CONFIG_START( apogee, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(apogee_mem)
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( apogee )
 	MDRV_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", apogee_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( apogee )

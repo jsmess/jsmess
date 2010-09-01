@@ -70,7 +70,7 @@ static GENERIC_TERMINAL_INTERFACE( vector4_terminal_intf )
 };
 
 
-static MACHINE_DRIVER_START( vector4 )
+static MACHINE_CONFIG_START( vector4, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vector4_mem)
@@ -79,9 +79,9 @@ static MACHINE_DRIVER_START( vector4 )
     MDRV_MACHINE_RESET(vector4)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,vector4_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vector4 )

@@ -258,7 +258,7 @@ static const UPD7810_CONFIG config = {
 	gmaster_io_callback
 };
 
-static MACHINE_DRIVER_START( gmaster )
+static MACHINE_CONFIG_START( gmaster, driver_data_t )
 	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
 	MDRV_CPU_PROGRAM_MAP(gmaster_mem)
 	MDRV_CPU_IO_MAP( gmaster_io)
@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( gmaster )
 	MDRV_CARTSLOT_INTERFACE("gmaster_cart")
 	MDRV_CARTSLOT_LOAD(gmaster_cart)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gmaster")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(gmaster)

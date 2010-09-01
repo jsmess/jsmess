@@ -273,10 +273,10 @@ static const via6522_interface vic1112_via1_intf =
     MACHINE_DRIVER( vic1112 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( vic1112 )
+static MACHINE_CONFIG_FRAGMENT( vic1112 )
 	MDRV_VIA6522_ADD(M6522_0_TAG, 0, vic1112_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, 0, vic1112_via1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( vic1112 )
@@ -352,7 +352,7 @@ DEVICE_GET_INFO( vic1112 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(vic1112);						break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(vic1112);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(vic1112);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vic1112);					break;

@@ -299,7 +299,7 @@ static const cassette_config kim1_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( kim1 )
+static MACHINE_CONFIG_START( kim1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map)
@@ -321,7 +321,7 @@ static MACHINE_DRIVER_START( kim1 )
 
 	/* video */
 	MDRV_DEFAULT_LAYOUT( layout_kim1 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(kim1)

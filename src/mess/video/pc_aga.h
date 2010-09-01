@@ -21,8 +21,8 @@
 #define AGA_SCREEN_NAME "aga_screen"
 #define AGA_MC6845_NAME "mc6845_aga"
 
-MACHINE_DRIVER_EXTERN( pcvideo_aga );
-MACHINE_DRIVER_EXTERN( pcvideo_pc200 );
+MACHINE_CONFIG_EXTERN( pcvideo_aga );
+MACHINE_CONFIG_EXTERN( pcvideo_pc200 );
 
 
 typedef enum AGA_MODE { AGA_OFF, AGA_COLOR, AGA_MONO } AGA_MODE;

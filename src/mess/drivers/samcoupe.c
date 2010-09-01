@@ -555,7 +555,7 @@ static const wd17xx_interface samcoupe_wd17xx_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-static MACHINE_DRIVER_START( samcoupe )
+static MACHINE_CONFIG_START( samcoupe, coupe_asic )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem)
@@ -564,8 +564,7 @@ static MACHINE_DRIVER_START( samcoupe )
 
 	MDRV_MACHINE_START(samcoupe)
 	MDRV_MACHINE_RESET(samcoupe)
-	MDRV_DRIVER_DATA(coupe_asic)
-
+	
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
@@ -596,7 +595,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_EXTRA_OPTIONS("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

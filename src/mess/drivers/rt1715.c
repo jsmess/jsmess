@@ -299,7 +299,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ NULL }
 };
 
-static MACHINE_DRIVER_START( rt1715 )
+static MACHINE_CONFIG_START( rt1715, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(rt1715_mem)
@@ -340,11 +340,10 @@ static MACHINE_DRIVER_START( rt1715 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rt1715w )
-	MDRV_IMPORT_FROM(rt1715)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -355,7 +355,7 @@ static INTERRUPT_GEN( tvc_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( tvc )
+static MACHINE_CONFIG_START( tvc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3125000)
     MDRV_CPU_PROGRAM_MAP(tvc_mem)
@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( tvc )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("80K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( tvc64 )

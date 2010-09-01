@@ -250,7 +250,7 @@ static PALETTE_INIT(a7800p)
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( a7800_ntsc )
+static MACHINE_CONFIG_START( a7800_ntsc, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem)
@@ -287,11 +287,10 @@ static MACHINE_DRIVER_START( a7800_ntsc )
 	MDRV_CARTSLOT_START(a7800_cart)
 	MDRV_CARTSLOT_LOAD(a7800_cart)
 	MDRV_CARTSLOT_PARTIALHASH(a7800_partialhash)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( a7800_pal )
-	MDRV_IMPORT_FROM( a7800_ntsc )
+static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -311,7 +310,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 	/* devices */
 	MDRV_DEVICE_REMOVE("riot")
 	MDRV_RIOT6532_ADD("riot", 3546894/3, a7800_r6532_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

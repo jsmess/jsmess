@@ -147,9 +147,7 @@ static MACHINE_RESET( cdi )
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( cdimono1 )
-
-	MDRV_DRIVER_DATA( cdi_state )
+static MACHINE_CONFIG_START( cdimono1, cdi_state )
 
 	MDRV_CPU_ADD( "maincpu", SCC68070, CLOCK_A/2 )
 	MDRV_CPU_PROGRAM_MAP( cdimono1_mem )
@@ -196,7 +194,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
 	MDRV_MK48T08_ADD( "mk48t08" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************
 *        Rom Load        *

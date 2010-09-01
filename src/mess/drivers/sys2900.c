@@ -65,7 +65,7 @@ static VIDEO_UPDATE( sys2900 )
     return 0;
 }
 
-static MACHINE_DRIVER_START( sys2900 )
+static MACHINE_CONFIG_START( sys2900, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(sys2900_mem)
@@ -85,7 +85,7 @@ static MACHINE_DRIVER_START( sys2900 )
 
     MDRV_VIDEO_START(sys2900)
     MDRV_VIDEO_UPDATE(sys2900)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sys2900 )

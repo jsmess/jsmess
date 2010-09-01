@@ -54,7 +54,7 @@ static GENERIC_TERMINAL_INTERFACE( tricep_terminal_intf )
 	DEVCB_HANDLER(tricep_kbd_put)
 };
 
-static MACHINE_DRIVER_START( tricep )
+static MACHINE_CONFIG_START( tricep, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(tricep_mem)
@@ -62,9 +62,9 @@ static MACHINE_DRIVER_START( tricep )
     MDRV_MACHINE_RESET(tricep)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,tricep_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( tricep )

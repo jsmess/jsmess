@@ -396,8 +396,7 @@ static GFXDECODE_START( comx35 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( comx35_pal )
-	MDRV_DRIVER_DATA(comx35_state)
+static MACHINE_CONFIG_START( comx35_pal, comx35_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
@@ -409,7 +408,7 @@ static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_MACHINE_RESET(comx35)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(comx35_pal_video)
+	MDRV_FRAGMENT_ADD(comx35_pal_video)
 	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
@@ -424,10 +423,9 @@ static MACHINE_DRIVER_START( comx35_pal )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( comx35_ntsc )
-	MDRV_DRIVER_DATA(comx35_state)
+static MACHINE_CONFIG_START( comx35_ntsc, comx35_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
@@ -439,7 +437,7 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	MDRV_MACHINE_RESET(comx35)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(comx35_ntsc_video)
+	MDRV_FRAGMENT_ADD(comx35_ntsc_video)
 	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
@@ -454,7 +452,7 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -385,7 +385,7 @@ static const mm58274c_interface floppy_mm58274c_interface =
 /*
     Machine description.
 */
-static MACHINE_DRIVER_START(ti99_4p_60hz)
+static MACHINE_CONFIG_START( ti99_4p_60hz, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -457,7 +457,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(ti99_4p)

@@ -171,7 +171,7 @@ static const mc68328_interface palm_dragonball_iface =
 };
 
 
-static MACHINE_DRIVER_START( palm )
+static MACHINE_CONFIG_START( palm, driver_data_t )
 
     /* basic machine hardware */
     MDRV_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
@@ -203,7 +203,7 @@ static MACHINE_DRIVER_START( palm )
 
     MDRV_MC68328_ADD( palm_dragonball_iface )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palm )
     PORT_START( "PENX" )
@@ -417,58 +417,52 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-static MACHINE_DRIVER_START( pilot1k )
-	MDRV_IMPORT_FROM(palm)
+static MACHINE_CONFIG_DERIVED( pilot1k, palm )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pilot5k )
-	MDRV_IMPORT_FROM(palm)
+static MACHINE_CONFIG_DERIVED( pilot5k, palm )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( palmpro )
-	MDRV_IMPORT_FROM(palm)
+static MACHINE_CONFIG_DERIVED( palmpro, palm )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1M")
 	MDRV_RAM_EXTRA_OPTIONS("2M,4M,8M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( palmiii )
-	MDRV_IMPORT_FROM(palm)
-
-	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
-	MDRV_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( palmv )
-	MDRV_IMPORT_FROM(palm)
+static MACHINE_CONFIG_DERIVED( palmiii, palm )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
 	MDRV_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( palmvx )
-	MDRV_IMPORT_FROM(palm)
+static MACHINE_CONFIG_DERIVED( palmv, palm )
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("4M,8M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( palmvx, palm )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT         COMPANY FULLNAME */
 COMP( 1996, pilot1k,  0,        0,       pilot1k,     palm,     0,     "U.S. Robotics", "Pilot 1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )

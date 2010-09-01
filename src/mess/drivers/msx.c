@@ -1027,7 +1027,7 @@ static const floppy_config msx_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( msx_cartslot )
+static MACHINE_CONFIG_FRAGMENT( msx_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("mx1,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -1039,9 +1039,9 @@ static MACHINE_DRIVER_START( msx_cartslot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(msx_cart)
 	MDRV_CARTSLOT_UNLOAD(msx_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( msx )
+static MACHINE_CONFIG_START( msx, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(msx_memory_map)
@@ -1055,7 +1055,7 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_I8255A_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1085,15 +1085,14 @@ static MACHINE_DRIVER_START( msx )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
 
-	MDRV_IMPORT_FROM(msx_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(msx_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( msx_pal )
-	MDRV_IMPORT_FROM( msx )
+static MACHINE_CONFIG_DERIVED( msx_pal, msx )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define MSX2_XBORDER_PIXELS		16
 #define MSX2_YBORDER_PIXELS		28
@@ -1102,7 +1101,7 @@ MACHINE_DRIVER_END
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
-static MACHINE_DRIVER_START( msx2 )
+static MACHINE_CONFIG_START( msx2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(msx_memory_map)
@@ -1158,15 +1157,14 @@ static MACHINE_DRIVER_START( msx2 )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
 
-	MDRV_IMPORT_FROM(msx_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(msx_cartslot)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( msx2_pal )
-	MDRV_IMPORT_FROM( msx2 )
+static MACHINE_CONFIG_DERIVED( msx2_pal, msx2 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

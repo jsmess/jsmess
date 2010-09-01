@@ -452,7 +452,7 @@ static const via6522_interface via_intf =
     MACHINE_DRIVER( c9060 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c9060 )
+static MACHINE_CONFIG_FRAGMENT( c9060 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c9060_dos_map)
@@ -467,17 +467,17 @@ static MACHINE_DRIVER_START( c9060 )
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 
 	// Tandon TM602S
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c9090 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c9090 )
-	MDRV_IMPORT_FROM(c9060)
+static MACHINE_CONFIG_FRAGMENT( c9090 )
+	MDRV_FRAGMENT_ADD(c9060)
 
 	// Tandon TM603S
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c9060 )
@@ -552,7 +552,7 @@ DEVICE_GET_INFO( c9060 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c9060);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c9060);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c9060);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c9060);						break;
@@ -577,7 +577,7 @@ DEVICE_GET_INFO( c9090 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c9090);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c9090);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 9090");							break;

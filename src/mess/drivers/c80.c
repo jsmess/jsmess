@@ -248,8 +248,7 @@ static const cassette_config c80_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( c80 )
-	MDRV_DRIVER_DATA(c80_state)
+static MACHINE_CONFIG_START( c80, c80_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
@@ -270,7 +269,7 @@ static MACHINE_DRIVER_START( c80 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

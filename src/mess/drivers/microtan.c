@@ -215,7 +215,7 @@ static const ay8910_interface microtan_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( microtan )
+static MACHINE_CONFIG_START( microtan, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map)
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( microtan )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, microtan_via6522_0)
 	MDRV_VIA6522_ADD("via6522_1", 0, microtan_via6522_1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( microtan )
     ROM_REGION( 0x10000, "maincpu", 0 )

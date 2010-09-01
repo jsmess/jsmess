@@ -197,15 +197,14 @@ INPUT_PORTS_END
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( comxpl80 )
-	MDRV_DRIVER_DATA(comxpl80_state)
+static MACHINE_CONFIG_START( comxpl80, comxpl80_state )
 
 	// basic system hardware
 
 	MDRV_CPU_ADD("maincpu", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MDRV_CPU_PROGRAM_MAP(pl80_map)
 	MDRV_CPU_IO_MAP(pl80_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

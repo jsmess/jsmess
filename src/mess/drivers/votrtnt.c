@@ -58,7 +58,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_DRIVER_START(votrtnt)
+static MACHINE_CONFIG_START( votrtnt, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
     MDRV_CPU_PROGRAM_MAP(6802_mem)
@@ -78,7 +78,7 @@ static MACHINE_DRIVER_START(votrtnt)
 	/* printer */
 	//MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

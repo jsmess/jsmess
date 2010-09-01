@@ -2098,15 +2098,15 @@ static const cassette_config a2600_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( a2600_cartslot )
+static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,a26")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_START(a2600_cart)
 	MDRV_CARTSLOT_LOAD(a2600_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a2600 )
+static MACHINE_CONFIG_START( a2600, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem)
@@ -2133,12 +2133,12 @@ static MACHINE_DRIVER_START( a2600 )
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
-	MDRV_IMPORT_FROM(a2600_cartslot)
+	MDRV_FRAGMENT_ADD(a2600_cartslot)
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( a2600p )
+static MACHINE_CONFIG_START( a2600p, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem)
@@ -2165,9 +2165,9 @@ static MACHINE_DRIVER_START( a2600p )
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
-	MDRV_IMPORT_FROM(a2600_cartslot)
+	MDRV_FRAGMENT_ADD(a2600_cartslot)
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( a2600 )

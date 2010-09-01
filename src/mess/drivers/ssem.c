@@ -614,7 +614,7 @@ static MACHINE_RESET( ssem )
     store_line = 0;
 }
 
-static MACHINE_DRIVER_START( ssem )
+static MACHINE_CONFIG_START( ssem, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", SSEM, 700)
     MDRV_CPU_PROGRAM_MAP(ssem_map)
@@ -639,7 +639,7 @@ static MACHINE_DRIVER_START( ssem )
     MDRV_CARTSLOT_EXTENSION_LIST("snp,asm")
     MDRV_CARTSLOT_MANDATORY
     MDRV_CARTSLOT_LOAD(ssem_store)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( ssem )
     ROM_REGION( 0x80, "maincpu",0 )  /* Main Store */

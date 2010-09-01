@@ -1391,7 +1391,7 @@ static const floppy_config pcw16_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( pcw16 )
+static MACHINE_CONFIG_START( pcw16, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pcw16_map)
@@ -1431,7 +1431,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( pcw16 )

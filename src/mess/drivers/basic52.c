@@ -59,7 +59,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL					/* Port C write */
 };
 
-static MACHINE_DRIVER_START( basic31 )
+static MACHINE_CONFIG_START( basic31, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
@@ -68,13 +68,13 @@ static MACHINE_DRIVER_START( basic31 )
     MDRV_MACHINE_RESET(basic52)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( basic52 )
+static MACHINE_CONFIG_START( basic52, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
@@ -83,11 +83,11 @@ static MACHINE_DRIVER_START( basic52 )
     MDRV_MACHINE_RESET(basic52)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( basic52 )

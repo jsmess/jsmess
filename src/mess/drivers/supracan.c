@@ -1994,9 +1994,7 @@ static INTERRUPT_GEN( supracan_sound_irq )
     state->sound_irq_source_reg |= 0x80;
 }
 
-static MACHINE_DRIVER_START( supracan )
-
-	MDRV_DRIVER_DATA( supracan_state )
+static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
 	MDRV_CPU_PROGRAM_MAP( supracan_mem )
@@ -2032,7 +2030,7 @@ static MACHINE_DRIVER_START( supracan )
 
 	MDRV_VIDEO_START( supracan )
 	MDRV_VIDEO_UPDATE( supracan )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( supracan )

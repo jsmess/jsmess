@@ -904,7 +904,7 @@ static GFXDECODE_START( psion )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( psion_slot )
+static MACHINE_CONFIG_FRAGMENT( psion_slot )
 	/* Datapack slot 1 */
 	MDRV_CARTSLOT_ADD("pack1")
 	MDRV_CARTSLOT_EXTENSION_LIST("opk")
@@ -918,10 +918,10 @@ static MACHINE_DRIVER_START( psion_slot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(psion_pack2)
 	MDRV_CARTSLOT_UNLOAD(psion_pack2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* basic configuration for 2 lines display */
-static MACHINE_DRIVER_START( psion_2lines )
+static MACHINE_CONFIG_START( psion_2lines, driver_data_t )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
@@ -950,11 +950,11 @@ static MACHINE_DRIVER_START( psion_2lines )
 
 	MDRV_NVRAM_HANDLER(psion)
 
-	MDRV_IMPORT_FROM( psion_slot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( psion_slot )
+MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
-static MACHINE_DRIVER_START( psion_4lines )
+static MACHINE_CONFIG_START( psion_4lines, driver_data_t )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
@@ -983,43 +983,38 @@ static MACHINE_DRIVER_START( psion_4lines )
 
 	MDRV_NVRAM_HANDLER(psion)
 
-	MDRV_IMPORT_FROM( psion_slot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( psion_slot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psioncm )
-	MDRV_IMPORT_FROM( psion_2lines )
+static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(psioncm_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psionla )
-	MDRV_IMPORT_FROM( psion_2lines )
+static MACHINE_CONFIG_DERIVED( psionla, psion_2lines )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(psionla_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psionlam )
-	MDRV_IMPORT_FROM( psion_2lines )
+static MACHINE_CONFIG_DERIVED( psionlam, psion_2lines )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(psionlam_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psionp350 )
-	MDRV_IMPORT_FROM( psion_2lines )
+static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(psionp350_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psionlz )
-	MDRV_IMPORT_FROM( psion_4lines )
+static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(psionlz_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( psioncm )

@@ -148,7 +148,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_DRIVER_START( homelab )
+static MACHINE_CONFIG_START( homelab, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(homelab2_mem)
@@ -165,11 +165,11 @@ static MACHINE_DRIVER_START( homelab )
 
 	MDRV_VIDEO_START( homelab )
 	MDRV_VIDEO_UPDATE( homelab )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( homelab3 )
+static MACHINE_CONFIG_DERIVED( homelab3, homelab )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(homelab)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(homelab3_mem)
 
@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( homelab3 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*8-1)
 	MDRV_VIDEO_UPDATE( homelab3 )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

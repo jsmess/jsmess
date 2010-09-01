@@ -38,7 +38,7 @@ static VIDEO_UPDATE( clcd )
     return 0;
 }
 
-static MACHINE_DRIVER_START( clcd )
+static MACHINE_CONFIG_START( clcd, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6502, 2000000) // really M65C102
     MDRV_CPU_PROGRAM_MAP(clcd_mem)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( clcd )
 
     MDRV_VIDEO_START(clcd)
     MDRV_VIDEO_UPDATE(clcd)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( clcd )

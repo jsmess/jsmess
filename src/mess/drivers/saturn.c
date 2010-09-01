@@ -2382,7 +2382,7 @@ static const scsp_interface saturn_scsp_interface =
 	scsp_irq
 };
 
-static MACHINE_DRIVER_START( saturn )
+static MACHINE_CONFIG_START( saturn, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2429,7 +2429,7 @@ static MACHINE_DRIVER_START( saturn )
 
 	MDRV_CDROM_ADD( "cdrom" )
 	MDRV_CARTSLOT_ADD("cart")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Japanese Saturn */

@@ -100,8 +100,7 @@ static COP400_INTERFACE( advision_cop411_interface )
 	COP400_MICROBUS_DISABLED
 };
 
-static MACHINE_DRIVER_START( advision )
-	MDRV_DRIVER_DATA(advision_state)
+static MACHINE_CONFIG_START( advision, advision_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
@@ -143,7 +142,7 @@ static MACHINE_DRIVER_START( advision )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","advision")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

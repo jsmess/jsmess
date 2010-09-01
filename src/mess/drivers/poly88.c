@@ -144,7 +144,7 @@ static const cassette_config poly88_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( poly88 )
+static MACHINE_CONFIG_START( poly88, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1853000)
     MDRV_CPU_PROGRAM_MAP(poly88_mem)
@@ -179,15 +179,14 @@ static MACHINE_DRIVER_START( poly88 )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", poly88, "img", 0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( poly8813 )
-	MDRV_IMPORT_FROM(poly88)
+static MACHINE_CONFIG_DERIVED( poly8813, poly88 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(poly8813_mem)
 	MDRV_CPU_IO_MAP(poly8813_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( poly88 )

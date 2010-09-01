@@ -60,7 +60,7 @@ extern UINT8 c64_game, c64_exrom;
 extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;
 extern const mos6526_interface c64_ntsc_cia1, c64_pal_cia1;
 
-MACHINE_DRIVER_EXTERN( c64_cartslot );
-MACHINE_DRIVER_EXTERN( ultimax_cartslot );
+MACHINE_CONFIG_EXTERN( c64_cartslot );
+MACHINE_CONFIG_EXTERN( ultimax_cartslot );
 
 #endif /* C64_H_ */

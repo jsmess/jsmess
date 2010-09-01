@@ -32,7 +32,7 @@ static VIDEO_UPDATE( codata )
     return 0;
 }
 
-static MACHINE_DRIVER_START( codata )
+static MACHINE_CONFIG_START( codata, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
     MDRV_CPU_PROGRAM_MAP(codata_mem)
@@ -51,7 +51,7 @@ static MACHINE_DRIVER_START( codata )
 
     MDRV_VIDEO_START(codata)
     MDRV_VIDEO_UPDATE(codata)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( codata )

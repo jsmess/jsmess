@@ -256,8 +256,7 @@ static MACHINE_START( beta )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( beta )
-	MDRV_DRIVER_DATA(beta_state)
+static MACHINE_CONFIG_START( beta, beta_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
@@ -285,7 +284,7 @@ static MACHINE_DRIVER_START( beta )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

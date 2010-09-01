@@ -153,7 +153,7 @@ static const ins8154_interface ins8154_b1 =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( acrnsys1 )
+static MACHINE_CONFIG_START( acrnsys1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map)
@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( acrnsys1 )
 	/* devices */
 	MDRV_INS8154_ADD("b1", ins8154_b1)
 	MDRV_TTL74145_ADD("ic8_7445", default_ttl74145)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

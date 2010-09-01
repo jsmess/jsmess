@@ -152,20 +152,18 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( atm )
-	MDRV_IMPORT_FROM( spectrum_128 )
+static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(atm_io)
 	MDRV_MACHINE_RESET( atm )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 	MDRV_GFXDECODE(atm)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atmtb2 )
-	MDRV_IMPORT_FROM( atm )
+static MACHINE_CONFIG_DERIVED( atmtb2, atm )
 	MDRV_GFXDECODE(atmtb2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -686,10 +686,7 @@ static MACHINE_RESET( snes_mess )
 	state->oldjoy2_read = snes_oldjoy2_read;
 }
 
-static MACHINE_DRIVER_START( snes_base )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(snes_state)
+static MACHINE_CONFIG_START( snes_base, snes_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", _5A22, MCLK_NTSC)	/* 2.68 MHz, also 3.58 MHz */
@@ -718,57 +715,51 @@ static MACHINE_DRIVER_START( snes_base )
 	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snes )
-	MDRV_IMPORT_FROM(snes_base)
+static MACHINE_CONFIG_DERIVED( snes, snes_base )
 
-	MDRV_IMPORT_FROM(snes_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(snes_cartslot)
+MACHINE_CONFIG_END
 
 static SUPERFX_CONFIG( snes_superfx_config )
 {
 	DEVCB_LINE(snes_extern_irq_w)	/* IRQ line from cart */
 };
 
-static MACHINE_DRIVER_START( snessfx )
-	MDRV_IMPORT_FROM(snes)
+static MACHINE_CONFIG_DERIVED( snessfx, snes )
 
 	MDRV_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
 	MDRV_CPU_PROGRAM_MAP(superfx_map)
 	MDRV_CPU_CONFIG(snes_superfx_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snespal )
-	MDRV_IMPORT_FROM(snes)
+static MACHINE_CONFIG_DERIVED( snespal, snes )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_CLOCK( MCLK_PAL )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snespsfx )
-	MDRV_IMPORT_FROM(snespal)
+static MACHINE_CONFIG_DERIVED( snespsfx, snespal )
 
 	MDRV_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
 	MDRV_CPU_PROGRAM_MAP(superfx_map)
 	MDRV_CPU_CONFIG(snes_superfx_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snesst )
-	MDRV_IMPORT_FROM(snes_base)
+static MACHINE_CONFIG_DERIVED( snesst, snes_base )
 
 	MDRV_MACHINE_START(snesst)
 
-	MDRV_IMPORT_FROM(sufami_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sufami_cartslot)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snesbsx )
-	MDRV_IMPORT_FROM(snes_base)
+static MACHINE_CONFIG_DERIVED( snesbsx, snes_base )
 
-	MDRV_IMPORT_FROM(bsx_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(bsx_cartslot)
+MACHINE_CONFIG_END
 
 
 /*************************************

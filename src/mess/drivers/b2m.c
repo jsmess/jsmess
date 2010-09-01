@@ -198,8 +198,7 @@ static const floppy_config b2m_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( b2m )
-	MDRV_DRIVER_DATA(b2m_state)
+static MACHINE_CONFIG_START( b2m, b2m_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(b2m_mem)
@@ -248,13 +247,12 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( b2mrom )
-    MDRV_IMPORT_FROM(b2m)
+static MACHINE_CONFIG_DERIVED( b2mrom, b2m )
     MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(b2m_rom_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

@@ -121,7 +121,7 @@ static VIDEO_UPDATE( interact )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( interact )
+static MACHINE_CONFIG_START( interact, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
@@ -160,9 +160,9 @@ static MACHINE_DRIVER_START( interact )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hector1 )
+static MACHINE_CONFIG_START( hector1, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
@@ -201,7 +201,7 @@ static MACHINE_DRIVER_START( hector1 )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Input ports */
 static INPUT_PORTS_START( interact )

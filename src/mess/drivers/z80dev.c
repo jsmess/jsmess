@@ -39,7 +39,7 @@ static VIDEO_UPDATE( z80dev )
     return 0;
 }
 
-static MACHINE_DRIVER_START( z80dev )
+static MACHINE_CONFIG_START( z80dev, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(z80dev_mem)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( z80dev )
 
     MDRV_VIDEO_START(z80dev)
     MDRV_VIDEO_UPDATE(z80dev)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z80dev )

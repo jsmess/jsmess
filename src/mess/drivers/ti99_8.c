@@ -558,7 +558,7 @@ static const floppy_config ti99_8_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START(ti99_8_60hz)
+static MACHINE_CONFIG_START( ti99_8_60hz, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
@@ -574,7 +574,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_NVRAM_HANDLER( ti99 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -613,10 +613,10 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START(ti99_8_50hz)
+static MACHINE_CONFIG_START( ti99_8_50hz, driver_data_t )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
@@ -629,7 +629,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -667,7 +667,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     ROM loading

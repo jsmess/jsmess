@@ -794,8 +794,7 @@ static MACHINE_RESET( tandy2k )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( tandy2k )
-	MDRV_DRIVER_DATA(tandy2k_state)
+static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
@@ -841,10 +840,9 @@ static MACHINE_DRIVER_START( tandy2k )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tandy2k_hd )
-	MDRV_IMPORT_FROM(tandy2k)
+static MACHINE_CONFIG_DERIVED( tandy2k_hd, tandy2k )
 
     /* basic machine hardware */
 	MDRV_CPU_MODIFY(I80186_TAG)
@@ -852,7 +850,7 @@ static MACHINE_DRIVER_START( tandy2k_hd )
 
 	/* Tandon TM502 hard disk */
 	//MDRV_WD1010_ADD(WD1010_TAG, wd1010_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

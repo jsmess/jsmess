@@ -97,7 +97,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START(vectrex)
+static MACHINE_CONFIG_START( vectrex, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map)
@@ -133,7 +133,7 @@ static MACHINE_DRIVER_START(vectrex)
 	
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","vectrex")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(vectrex)
 	ROM_REGION(0x10000,"maincpu", 0)
@@ -204,8 +204,7 @@ static INPUT_PORTS_START(raaspec)
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START(raaspec)
-	MDRV_IMPORT_FROM(vectrex)
+static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raaspec_map)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -217,7 +216,7 @@ static MACHINE_DRIVER_START(raaspec)
 	MDRV_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
 
 	MDRV_DEVICE_REMOVE("cart")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(raaspec)
 	ROM_REGION(0x10000,"maincpu", 0)

@@ -1840,7 +1840,7 @@ static const struct rp5c15_interface rtc_intf =
 	mz2500_rtc_alarm_irq
 };
 
-static MACHINE_DRIVER_START( mz2500 )
+static MACHINE_CONFIG_START( mz2500, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
     MDRV_CPU_PROGRAM_MAP(mz2500_map)
@@ -1877,7 +1877,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

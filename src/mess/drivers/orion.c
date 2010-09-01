@@ -123,7 +123,7 @@ static const floppy_config orion_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( orion128 )
+static MACHINE_CONFIG_START( orion128, driver_data_t )
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(orion128_mem)
     MDRV_CPU_IO_MAP(orion128_io)
@@ -166,13 +166,12 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( orion128ms )
-	MDRV_IMPORT_FROM(orion128)
+static MACHINE_CONFIG_DERIVED( orion128ms, orion128 )
 	MDRV_DEVICE_REMOVE("ppi8255_2")
 	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const ay8910_interface orionz80_ay_interface =
 {
@@ -181,7 +180,7 @@ static const ay8910_interface orionz80_ay_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( orionz80 )
+static MACHINE_CONFIG_START( orionz80, driver_data_t )
     MDRV_CPU_ADD("maincpu", Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem)
     MDRV_CPU_IO_MAP(orionz80_io)
@@ -231,16 +230,15 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( orionz80ms )
-	MDRV_IMPORT_FROM(orionz80)
+static MACHINE_CONFIG_DERIVED( orionz80ms, orionz80 )
 
 	MDRV_DEVICE_REMOVE("ppi8255_2")
 	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( orionpro )
+static MACHINE_CONFIG_START( orionpro, driver_data_t )
     MDRV_CPU_ADD("maincpu", Z80, 5000000)
     MDRV_CPU_PROGRAM_MAP(orionpro_mem)
     MDRV_CPU_IO_MAP(orionpro_io)
@@ -286,7 +284,7 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 

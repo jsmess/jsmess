@@ -14,9 +14,9 @@ MACHINE_START( snesst );
 DRIVER_INIT( snes_mess );
 DRIVER_INIT( snesst );
 
-MACHINE_DRIVER_EXTERN( snes_cartslot );
-MACHINE_DRIVER_EXTERN( sufami_cartslot );
-MACHINE_DRIVER_EXTERN( bsx_cartslot );
+MACHINE_CONFIG_EXTERN( snes_cartslot );
+MACHINE_CONFIG_EXTERN( sufami_cartslot );
+MACHINE_CONFIG_EXTERN( bsx_cartslot );
 
 #endif /* _SNESCART_H */
 

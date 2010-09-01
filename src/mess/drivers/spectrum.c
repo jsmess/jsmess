@@ -704,9 +704,7 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_DRIVER_START( spectrum_common )
-
-	MDRV_DRIVER_DATA( spectrum_state )
+MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectum. Other clones are reported to have different clocks */
@@ -750,17 +748,16 @@ MACHINE_DRIVER_START( spectrum_common )
 	MDRV_CARTSLOT_LOAD(spectrum_cart)
 	MDRV_CARTSLOT_INTERFACE("spectrum_cart")
 	MDRV_SOFTWARE_LIST_ADD("cart_list","spectrum")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( spectrum )
-	MDRV_IMPORT_FROM( spectrum_common )
+MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")				// This configuration is verified only for the original ZX Spectrum.
 	MDRV_RAM_DEFAULT_SIZE("48K")		// It's likely, but still to be checked, that many clones were produced only
 	MDRV_RAM_EXTRA_OPTIONS("16K")		// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
 	MDRV_RAM_DEFAULT_VALUE(0xff)		// available via bankswitching.
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -765,8 +765,7 @@ static const UPD7810_CONFIG scv_cpu_config = { TYPE_7801, NULL };
 static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
 
 
-static MACHINE_DRIVER_START( scv )
-	MDRV_DRIVER_DATA( scv_state )
+static MACHINE_CONFIG_START( scv, scv_state )
 
 	MDRV_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MDRV_CPU_PROGRAM_MAP( scv_mem )
@@ -802,11 +801,10 @@ static MACHINE_DRIVER_START( scv )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","scv")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scv_pal )
-	MDRV_DRIVER_DATA( scv_state )
+static MACHINE_CONFIG_START( scv_pal, scv_state )
 
 	MDRV_CPU_ADD( "maincpu", UPD7801, 3780000 )
 	MDRV_CPU_PROGRAM_MAP( scv_mem )
@@ -842,7 +840,7 @@ static MACHINE_DRIVER_START( scv_pal )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","scv")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* The same bios is used in both the NTSC and PAL versions of the console */

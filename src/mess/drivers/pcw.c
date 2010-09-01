@@ -1157,7 +1157,7 @@ static const floppy_config pcw_floppy_config =
 };
 
 /* PCW8256, PCW8512, PCW9256 */
-static MACHINE_DRIVER_START( pcw )
+static MACHINE_CONFIG_START( pcw, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map)
@@ -1200,26 +1200,24 @@ static MACHINE_DRIVER_START( pcw )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(  pcw_512 )
-	MDRV_IMPORT_FROM( pcw )
+static MACHINE_CONFIG_DERIVED( pcw_512, pcw )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
-static MACHINE_DRIVER_START( pcw9512 )
-	MDRV_IMPORT_FROM( pcw )
+static MACHINE_CONFIG_DERIVED( pcw9512, pcw )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(pcw9512_io)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

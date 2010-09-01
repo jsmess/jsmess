@@ -426,7 +426,7 @@ static GFXDECODE_START( rx78 )
 	GFXDECODE_ENTRY( "maincpu", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( rx78 )
+static MACHINE_CONFIG_START( rx78, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
 	MDRV_CPU_PROGRAM_MAP(rx78_mem)
@@ -470,7 +470,7 @@ static MACHINE_DRIVER_START( rx78 )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","rx78")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rx78 )

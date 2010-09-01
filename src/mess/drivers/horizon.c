@@ -57,7 +57,7 @@ static GENERIC_TERMINAL_INTERFACE( horizon_terminal_intf )
 	DEVCB_HANDLER(horizon_kbd_put)
 };
 
-static MACHINE_DRIVER_START( horizon )
+static MACHINE_CONFIG_START( horizon, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(horizon_mem)
@@ -66,18 +66,17 @@ static MACHINE_DRIVER_START( horizon )
     MDRV_MACHINE_RESET(horizon)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,horizon_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( horizsd )
-	MDRV_IMPORT_FROM( horizon )
+static MACHINE_CONFIG_DERIVED( horizsd, horizon )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( horizon_sd_mem)
     MDRV_CPU_IO_MAP(horizon_sd_io)
 
     MDRV_MACHINE_RESET(horizon_sd)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( horizon )

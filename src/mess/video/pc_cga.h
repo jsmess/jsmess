@@ -7,11 +7,11 @@
 #define CGA_SCREEN_NAME	"cga_screen"
 #define CGA_MC6845_NAME	"mc6845_cga"
 
-MACHINE_DRIVER_EXTERN( pcvideo_cga );
+MACHINE_CONFIG_EXTERN( pcvideo_cga );
 INPUT_PORTS_EXTERN( pcvideo_cga );
 
 /* has a special 640x200 in 16 color mode, 4 banks at 0xb8000 */
-MACHINE_DRIVER_EXTERN( pcvideo_pc1512 );
+MACHINE_CONFIG_EXTERN( pcvideo_pc1512 );
 INPUT_PORTS_EXTERN( pcvideo_pc1512 );
 
 
@@ -20,5 +20,5 @@ READ16_HANDLER( pc1512_16le_r );
 WRITE16_HANDLER( pc1512_16le_w );
 WRITE16_HANDLER( pc1512_videoram16le_w );
 
-MACHINE_DRIVER_EXTERN( pcvideo_poisk2 );
+MACHINE_CONFIG_EXTERN( pcvideo_poisk2 );
 

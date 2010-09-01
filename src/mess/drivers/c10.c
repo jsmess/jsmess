@@ -60,7 +60,7 @@ static GFXDECODE_START( c10 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( c10 )
+static MACHINE_CONFIG_START( c10, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(c10_mem)
@@ -82,7 +82,7 @@ static MACHINE_DRIVER_START( c10 )
 
 	MDRV_VIDEO_START(c10)
 	MDRV_VIDEO_UPDATE(c10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

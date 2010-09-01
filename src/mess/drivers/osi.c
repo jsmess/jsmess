@@ -776,8 +776,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( osi600 )
-	MDRV_DRIVER_DATA(osi_state)
+static MACHINE_CONFIG_START( osi600, osi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
@@ -786,7 +785,7 @@ static MACHINE_DRIVER_START( osi600 )
 	MDRV_MACHINE_START(osi600)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(osi600_video)
+	MDRV_FRAGMENT_ADD(osi600_video)
 	MDRV_GFXDECODE(osi)
 
 	/* sound hardware */
@@ -805,10 +804,9 @@ static MACHINE_DRIVER_START( osi600 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
 	MDRV_RAM_EXTRA_OPTIONS("8K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( uk101 )
-	MDRV_DRIVER_DATA(osi_state)
+static MACHINE_CONFIG_START( uk101, osi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
@@ -817,7 +815,7 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_MACHINE_START(osi600)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(uk101_video)
+	MDRV_FRAGMENT_ADD(uk101_video)
 	MDRV_GFXDECODE(osi)
 
 	/* cassette ACIA */
@@ -830,10 +828,9 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
 	MDRV_RAM_EXTRA_OPTIONS("8K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( c1p )
-	MDRV_DRIVER_DATA(osi_state)
+static MACHINE_CONFIG_START( c1p, osi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
@@ -842,7 +839,7 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_MACHINE_START(c1p)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(osi630_video)
+	MDRV_FRAGMENT_ADD(osi630_video)
 	MDRV_GFXDECODE(osi)
 
 	/* sound hardware */
@@ -867,10 +864,9 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("20K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( c1pmf )
-	MDRV_IMPORT_FROM(c1p)
+static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
 
 	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(c1pmf_mem)
@@ -887,7 +883,7 @@ static MACHINE_DRIVER_START( c1pmf )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("20K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

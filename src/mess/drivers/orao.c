@@ -171,7 +171,7 @@ static const cassette_config orao_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( orao )
+static MACHINE_CONFIG_START( orao, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6502, 1000000)
     MDRV_CPU_PROGRAM_MAP(orao_mem)
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( orao )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", orao_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( orao )

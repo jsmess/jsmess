@@ -437,7 +437,7 @@ static const mos6526_interface cd32_cia_1_intf =
 	DEVCB_NULL									/* port B */
 };
 
-static MACHINE_DRIVER_START( a1200n )
+static MACHINE_CONFIG_START( a1200n, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
@@ -474,10 +474,9 @@ static MACHINE_DRIVER_START( a1200n )
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_1_intf)
 
 	MDRV_AMIGA_FDC_ADD("fdc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( a1200p )
-	MDRV_IMPORT_FROM(a1200n)
+static MACHINE_CONFIG_DERIVED( a1200p, a1200n )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_MODIFY("maincpu")
@@ -496,7 +495,7 @@ static MACHINE_DRIVER_START( a1200p )
 	MDRV_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
 	MDRV_DEVICE_MODIFY("cia_1")
 	MDRV_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define	NVRAM_SIZE 1024
 #define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
@@ -506,7 +505,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static MACHINE_DRIVER_START( cd32 )
+static MACHINE_CONFIG_START( cd32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
@@ -544,7 +543,7 @@ static MACHINE_DRIVER_START( cd32 )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -476,8 +476,7 @@ static MACHINE_RESET( micronic )
 	memory_unmap_write(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0);
 }
 
-static MACHINE_DRIVER_START( micronic )
-	MDRV_DRIVER_DATA(micronic_state)
+static MACHINE_CONFIG_START( micronic, micronic_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
@@ -515,7 +514,7 @@ static MACHINE_DRIVER_START( micronic )
 
 	MDRV_NVRAM_HANDLER(micronic)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( micronic )

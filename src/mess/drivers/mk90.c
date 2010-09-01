@@ -39,7 +39,7 @@ static const struct t11_setup t11_data =
 	1 << 13			/* start from 8000 */
 };
 
-static MACHINE_DRIVER_START( mk90 )
+static MACHINE_CONFIG_START( mk90, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",T11, XTAL_4MHz)
     MDRV_CPU_CONFIG(t11_data)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( mk90 )
 
     MDRV_VIDEO_START(mk90)
     MDRV_VIDEO_UPDATE(mk90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mk90 )

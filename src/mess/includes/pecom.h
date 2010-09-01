@@ -37,6 +37,6 @@ extern const cdp1802_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */
 
-MACHINE_DRIVER_EXTERN( pecom_video );
+MACHINE_CONFIG_EXTERN( pecom_video );
 
 #endif

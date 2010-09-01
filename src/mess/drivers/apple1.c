@@ -218,7 +218,7 @@ static const cassette_config apple1_cassette_config =
 };
 
 /* machine definition */
-static MACHINE_DRIVER_START( apple1 )
+static MACHINE_CONFIG_START( apple1, driver_data_t )
 	/* basic machine hardware */
 	/* Actual CPU speed is 1.023 MHz, but RAM refresh effectively
        slows it to 960 kHz. */
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_RAM_DEFAULT_SIZE("48K")
 	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(apple1)
 	ROM_REGION(0x10000, "maincpu",0)

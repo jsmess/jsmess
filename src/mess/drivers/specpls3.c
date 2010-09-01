@@ -408,8 +408,7 @@ static GFXDECODE_START( specpls3 )
 	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( spectrum_plus3 )
-	MDRV_IMPORT_FROM( spectrum_128 )
+static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spectrum_plus3_io)
 	MDRV_SCREEN_MODIFY("screen")
@@ -420,7 +419,7 @@ static MACHINE_DRIVER_START( spectrum_plus3 )
 
 	MDRV_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -423,7 +423,7 @@ static const floppy_config vtech2_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( laser350 )
+static MACHINE_CONFIG_START( laser350, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MDRV_CPU_PROGRAM_MAP(vtech2_mem)
@@ -465,22 +465,20 @@ static MACHINE_DRIVER_START( laser350 )
 
 	/* 5.25" Floppy drive */
 	MDRV_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( laser500 )
-	MDRV_IMPORT_FROM( laser350 )
+static MACHINE_CONFIG_DERIVED( laser500, laser350 )
 	MDRV_MACHINE_RESET( laser500 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( laser700 )
-	MDRV_IMPORT_FROM( laser350 )
+static MACHINE_CONFIG_DERIVED( laser700, laser350 )
 	MDRV_MACHINE_RESET( laser700 )
 
 	/* Second 5.25" floppy drive */
 	MDRV_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(laser350)

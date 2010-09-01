@@ -38,7 +38,7 @@ static VIDEO_UPDATE( qtsbc )
     return 0;
 }
 
-static MACHINE_DRIVER_START( qtsbc )
+static MACHINE_CONFIG_START( qtsbc, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
     MDRV_CPU_PROGRAM_MAP(qtsbc_mem)
@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( qtsbc )
 
     MDRV_VIDEO_START(qtsbc)
     MDRV_VIDEO_UPDATE(qtsbc)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( qtsbc )

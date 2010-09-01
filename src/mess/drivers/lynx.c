@@ -61,7 +61,7 @@ static PALETTE_INIT( lynx )
 }
 
 
-static MACHINE_DRIVER_START( lynx )
+static MACHINE_CONFIG_START( lynx, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem)
@@ -92,12 +92,11 @@ static MACHINE_DRIVER_START( lynx )
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", lynx, "o", 0)
 
-	MDRV_IMPORT_FROM(lynx_cartslot)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(lynx_cartslot)
+MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_DRIVER_START( lynx2 )
-	MDRV_IMPORT_FROM( lynx )
+static MACHINE_CONFIG_DERIVED( lynx2, lynx )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("mono")
@@ -106,7 +105,7 @@ static MACHINE_DRIVER_START( lynx2 )
 	MDRV_SOUND_ADD("lynx2", LYNX2, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
 /* these 2 dumps are saved from an running machine,

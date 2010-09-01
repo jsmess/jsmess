@@ -515,8 +515,7 @@ static MACHINE_START( abc80 )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( abc80 )
-	MDRV_DRIVER_DATA(abc80_state)
+static MACHINE_CONFIG_START( abc80, abc80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
@@ -539,7 +538,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_LUXOR_55_10828_ADD("abc830")
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(abc80_video)
+	MDRV_FRAGMENT_ADD(abc80_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -557,7 +556,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

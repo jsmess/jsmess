@@ -437,8 +437,7 @@ static MACHINE_RESET( e01 )
     MACHINE_DRIVER( e01 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( e01 )
-	MDRV_DRIVER_DATA(e01_state)
+static MACHINE_CONFIG_START( e01, e01_state )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD(R65C102_TAG, M65C02, 1000000) // Rockwell R65C102P3
@@ -464,7 +463,7 @@ static MACHINE_DRIVER_START( e01 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

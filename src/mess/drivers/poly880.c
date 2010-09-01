@@ -285,8 +285,7 @@ static const cassette_config poly880_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( poly880 )
-	MDRV_DRIVER_DATA(poly880_state)
+static MACHINE_CONFIG_START( poly880, poly880_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
@@ -308,7 +307,7 @@ static MACHINE_DRIVER_START( poly880 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

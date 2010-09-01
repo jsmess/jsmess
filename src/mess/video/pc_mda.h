@@ -4,7 +4,7 @@
 #define MDA_SCREEN_NAME	"mda_screen"
 #define MDA_MC6845_NAME	"mc6845_mda"
 
-MACHINE_DRIVER_EXTERN( pcvideo_mda );
+MACHINE_CONFIG_EXTERN( pcvideo_mda );
 
 
 /*
@@ -13,5 +13,5 @@ MACHINE_DRIVER_EXTERN( pcvideo_mda );
 #define HERCULES_SCREEN_NAME "hercules_screen"
 #define HERCULES_MC6845_NAME "mc6845_hercules"
 
-MACHINE_DRIVER_EXTERN( pcvideo_hercules );
+MACHINE_CONFIG_EXTERN( pcvideo_hercules );
 

@@ -37,7 +37,7 @@ DECLARE_LEGACY_DEVICE(GENERIC_TELEPRINTER, teleprinter);
 
 WRITE8_DEVICE_HANDLER ( teleprinter_write );
 
-MACHINE_DRIVER_EXTERN( generic_teleprinter );
+MACHINE_CONFIG_EXTERN( generic_teleprinter );
 
 INPUT_PORTS_EXTERN(generic_teleprinter);
 

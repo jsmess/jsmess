@@ -39,7 +39,7 @@ static VIDEO_UPDATE( cc10 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( cc10 )
+static MACHINE_CONFIG_START( cc10, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(cc10_mem)
@@ -60,7 +60,7 @@ static MACHINE_DRIVER_START( cc10 )
 
     MDRV_VIDEO_START(cc10)
     MDRV_VIDEO_UPDATE(cc10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

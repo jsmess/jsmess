@@ -817,8 +817,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
 	MDRV_DEVICE_ADD(_tag, BW2_SERIAL, 0)
 
 
-static MACHINE_DRIVER_START( bw2 )
-	MDRV_DRIVER_DATA(bw2_state)
+static MACHINE_CONFIG_START( bw2, bw2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
@@ -863,7 +862,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
 
 	MDRV_BW2_SERIAL_ADD("serial")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -867,12 +867,12 @@ WRITE32_HANDLER ( pc32le_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, spa
 WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, space, offset, data, mem_mask); }
 
 
-MACHINE_DRIVER_START( pc_hdc )
+MACHINE_CONFIG_FRAGMENT( pc_hdc )
 	/* harddisk */
 	MDRV_HARDDISK_ADD("harddisk1")
 	MDRV_HARDDISK_ADD("harddisk2")
 	MDRV_HARDDISK_ADD("harddisk3")
 	MDRV_HARDDISK_ADD("harddisk4")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 

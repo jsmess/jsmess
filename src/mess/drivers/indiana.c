@@ -40,7 +40,7 @@ static VIDEO_UPDATE( indiana )
     return 0;
 }
 
-static MACHINE_DRIVER_START( indiana )
+static MACHINE_CONFIG_START( indiana, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68030, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(indiana_mem)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( indiana )
 
     MDRV_VIDEO_START(indiana)
     MDRV_VIDEO_UPDATE(indiana)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( indiana )

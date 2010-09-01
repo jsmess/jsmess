@@ -85,6 +85,6 @@ public:
 
 /*----------- defined in video/abc80.c -----------*/
 
-MACHINE_DRIVER_EXTERN( abc80_video );
+MACHINE_CONFIG_EXTERN( abc80_video );
 
 #endif /* ABC80_H_ */

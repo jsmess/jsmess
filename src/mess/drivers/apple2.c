@@ -603,7 +603,7 @@ static const cassette_config apple2_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( apple2_common )
+static MACHINE_CONFIG_START( apple2_common, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple2_map)
@@ -646,10 +646,9 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config,15,16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2 )
-	MDRV_IMPORT_FROM( apple2_common )
+static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -659,10 +658,9 @@ static MACHINE_DRIVER_START( apple2 )
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
 	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2p )
-	MDRV_IMPORT_FROM( apple2_common )
+static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MDRV_VIDEO_START(apple2p)
 
 	/* internal ram */
@@ -674,7 +672,7 @@ static MACHINE_DRIVER_START( apple2p )
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
 	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(las3000)
 	ROM_REGION(0x0800,"gfx1",0)
@@ -685,8 +683,7 @@ ROM_START(las3000)
 	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
 ROM_END
 
-MACHINE_DRIVER_START( apple2e )
-	MDRV_IMPORT_FROM( apple2_common )
+MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MDRV_VIDEO_START(apple2e)
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -694,10 +691,9 @@ MACHINE_DRIVER_START( apple2e )
 	MDRV_RAM_EXTRA_OPTIONS("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
 	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #if 0
-MACHINE_DRIVER_START( apple2e_z80 )
-	MDRV_IMPORT_FROM( apple2_common )
+MACHINE_CONFIG_DERIVED( apple2e_z80, apple2_common )
 	MDRV_VIDEO_START(apple2e)
 
 	MDRV_CPU_ADD("softcard", Z80, 1021800*2)	// softcard Z80 runs at twice the 6502 clock
@@ -713,18 +709,16 @@ MACHINE_DRIVER_START( apple2e_z80 )
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
-static MACHINE_DRIVER_START( mprof3 )
-	MDRV_IMPORT_FROM( apple2e )
+static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2ee )
-	MDRV_IMPORT_FROM( apple2e )
+static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
 	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 
 	/* CFFA stuff */
@@ -733,24 +727,21 @@ static MACHINE_DRIVER_START( apple2ee )
 	MDRV_IDE_CONTROLLER_REGIONS("harddisk", NULL)
 	MDRV_A2CFFA_ADD("cffa")
 	MDRV_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2ep )
-	MDRV_IMPORT_FROM( apple2e )
+static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
 	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2c )
-	MDRV_IMPORT_FROM( apple2ee )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple2c_iwm )
-	MDRV_IMPORT_FROM( apple2c )
+static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
 
 	/* replace the old-style FDC with an IWM */
 	MDRV_DEVICE_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -64,7 +64,7 @@ DRIVER_INIT( superpet );
 MACHINE_RESET( pet );
 INTERRUPT_GEN( pet_frame_interrupt );
 
-MACHINE_DRIVER_EXTERN( pet_cartslot );
-MACHINE_DRIVER_EXTERN( pet4_cartslot );
+MACHINE_CONFIG_EXTERN( pet_cartslot );
+MACHINE_CONFIG_EXTERN( pet4_cartslot );
 
 #endif /* PET_H_ */

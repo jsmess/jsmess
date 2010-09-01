@@ -78,7 +78,7 @@ static MACHINE_RESET(k1003)
 {
 }
 
-static MACHINE_DRIVER_START( k1003 )
+static MACHINE_CONFIG_START( k1003, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8008, 800000)
     MDRV_CPU_PROGRAM_MAP(k1003_mem)
@@ -88,7 +88,7 @@ static MACHINE_DRIVER_START( k1003 )
 
     /* video hardware */
     MDRV_DEFAULT_LAYOUT(layout_k1003)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

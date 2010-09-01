@@ -196,7 +196,7 @@ static GFXDECODE_START( mekd2 )
 	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 16*2, 2 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( mekd2 )
+static MACHINE_CONFIG_START( mekd2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 614400)        /* 614.4 kHz */
 	MDRV_CPU_PROGRAM_MAP(mekd2_mem)
@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( mekd2 )
 	MDRV_CARTSLOT_EXTENSION_LIST("d2")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(mekd2_cart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(mekd2)

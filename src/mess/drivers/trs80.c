@@ -554,7 +554,7 @@ static const floppy_config trs80_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no extras
+static MACHINE_CONFIG_START( trs80, driver_data_t )		// the original model I, level I, with no extras
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
 	MDRV_CPU_PROGRAM_MAP(trs80_map)
@@ -587,10 +587,9 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 
 	/* devices */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model1 )		// model I, level II
-	MDRV_IMPORT_FROM( trs80 )
+static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( model1_map)
 	MDRV_CPU_IO_MAP( model1_io)
@@ -603,15 +602,13 @@ static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #if 0
-static MACHINE_DRIVER_START( model2 )
-	MDRV_IMPORT_FROM(model1)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( model2, model1 )
+MACHINE_CONFIG_END
 #endif
 
-static MACHINE_DRIVER_START( model3 )
-	MDRV_IMPORT_FROM( model1 )
+static MACHINE_CONFIG_DERIVED( model3, model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( model3_map)
 	MDRV_CPU_IO_MAP( model3_io)
@@ -624,34 +621,29 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*8, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model4 )
-	MDRV_IMPORT_FROM( model3 )
+static MACHINE_CONFIG_DERIVED( model4, model3 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( model4_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model4p )
-	MDRV_IMPORT_FROM( model3 )
+static MACHINE_CONFIG_DERIVED( model4p, model3 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( model4p_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sys80 )
-	MDRV_IMPORT_FROM( model1 )
+static MACHINE_CONFIG_DERIVED( sys80, model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( sys80_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ht1080z )
-	MDRV_IMPORT_FROM( sys80 )
+static MACHINE_CONFIG_DERIVED( ht1080z, sys80 )
 	MDRV_VIDEO_UPDATE( ht1080z )
 	MDRV_GFXDECODE(ht1080z)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lnw80 )
-	MDRV_IMPORT_FROM( model1 )
+static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( lnw80_map)
 	MDRV_CPU_IO_MAP( lnw80_io)
@@ -664,16 +656,15 @@ static MACHINE_DRIVER_START( lnw80 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*FW, 16*FH)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*FW-1,0,16*FH-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radionic )
-	MDRV_IMPORT_FROM( model1 )
+static MACHINE_CONFIG_DERIVED( radionic, model1 )
 	MDRV_VIDEO_UPDATE( radionic )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(64*8, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
 	MDRV_GFXDECODE(radionic)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

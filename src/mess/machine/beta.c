@@ -214,10 +214,10 @@ static const floppy_config beta_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( beta_disk )
+static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
 	MDRV_FLOPPY_4_DRIVES_ADD(beta_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( beta_disk )
 	ROM_REGION( 0x60000, "beta", ROMREGION_LOADBYNAME )
@@ -340,7 +340,7 @@ DEVICE_GET_INFO( beta_disk )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(beta_disk);						break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(beta_disk);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(beta_disk);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(beta_disk);					break;

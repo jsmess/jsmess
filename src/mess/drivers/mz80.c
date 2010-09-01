@@ -261,7 +261,7 @@ static TIMER_DEVICE_CALLBACK( ne555_tempo_callback )
 	mz80k_tempo_strobe ^= 1;
 }
 
-static MACHINE_DRIVER_START( mz80k )
+static MACHINE_CONFIG_START( mz80k, driver_data_t )
 	/* basic machine hardware */
 
 	/* main CPU */
@@ -298,12 +298,11 @@ static MACHINE_DRIVER_START( mz80k )
 	MDRV_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(34)) // 33.5Hz - 34.3Hz
 
 	MDRV_CASSETTE_ADD( "cassette", mz80k_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mz80kj )
-	MDRV_IMPORT_FROM( mz80k )
+static MACHINE_CONFIG_DERIVED( mz80kj, mz80k )
 	MDRV_GFXDECODE( mz80kj )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mz80k )

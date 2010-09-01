@@ -324,7 +324,7 @@ static const cassette_config pk8000_cassette_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( pk8000 )
+static MACHINE_CONFIG_START( pk8000, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1780000)
     MDRV_CPU_PROGRAM_MAP(pk8000_mem)
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( pk8000 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vesta )

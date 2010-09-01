@@ -52,7 +52,7 @@ static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
 	DEVCB_HANDLER(ccs2422_kbd_put)
 };
 
-static MACHINE_DRIVER_START( ccs2422 )
+static MACHINE_CONFIG_START( ccs2422, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(ccs2422_mem)
@@ -61,9 +61,9 @@ static MACHINE_DRIVER_START( ccs2422 )
     MDRV_MACHINE_RESET(ccs2422)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )
+    MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ccs2422_terminal_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ccs2422 )

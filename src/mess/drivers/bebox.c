@@ -115,7 +115,7 @@ static const floppy_config bebox_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( bebox )
+static MACHINE_CONFIG_START( bebox, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
 	MDRV_CPU_PROGRAM_MAP(bebox_mem)
@@ -143,7 +143,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -174,16 +174,15 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32M")
 	MDRV_RAM_EXTRA_OPTIONS("8M,16M")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bebox2 )
-	MDRV_IMPORT_FROM( bebox )
+static MACHINE_CONFIG_DERIVED( bebox2, bebox )
 	MDRV_CPU_REPLACE("ppc1", PPC603E, 133000000)	/* 133 MHz */
 	MDRV_CPU_PROGRAM_MAP(bebox_mem)
 	
 	MDRV_CPU_REPLACE("ppc2", PPC603E, 133000000)	/* 133 MHz */
 	MDRV_CPU_PROGRAM_MAP(bebox_slave_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( bebox )
 	PORT_INCLUDE( at_keyboard )

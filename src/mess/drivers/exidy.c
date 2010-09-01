@@ -376,7 +376,7 @@ static const floppy_config exidy_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( exidy )
+static MACHINE_CONFIG_START( exidy, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12638000/6)
 	MDRV_CPU_PROGRAM_MAP(exidy_mem)
@@ -428,16 +428,15 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	MDRV_FLOPPY_4_DRIVES_ADD(exidy_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( exidyd )
-	MDRV_IMPORT_FROM( exidy )
+static MACHINE_CONFIG_DERIVED( exidyd, exidy )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(exidyd_mem)
 
 	MDRV_FLOPPY_4_DRIVES_REMOVE()
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( exidy )
 {

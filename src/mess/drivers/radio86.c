@@ -336,7 +336,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_DRIVER_START( radio86 )
+static MACHINE_CONFIG_START( radio86, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(radio86_mem)
@@ -367,19 +367,19 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", radio86_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( radio16 )
+static MACHINE_CONFIG_DERIVED( radio16, radio86 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio86)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86_16_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radiorom )
+static MACHINE_CONFIG_DERIVED( radiorom, radio86 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio86)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86rom_mem)
 
@@ -388,41 +388,41 @@ static MACHINE_DRIVER_START( radiorom )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radioram )
+static MACHINE_CONFIG_DERIVED( radioram, radio86 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio86)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86ram_mem)
 
 	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rk7007 )
+static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio86)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(rk7007_io)
 
 	MDRV_I8255A_ADD( "ms7007", rk7007_ppi8255_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rk700716 )
+static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(rk7007_io)
 
 	MDRV_I8255A_ADD( "ms7007", rk7007_ppi8255_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mikron2 )
+static MACHINE_CONFIG_DERIVED( mikron2, radio86 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(radio86)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mikron2_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( radio86 )

@@ -368,8 +368,7 @@ static MACHINE_START( phc25 )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( phc25 )
-	MDRV_DRIVER_DATA(phc25_state)
+static MACHINE_CONFIG_START( phc25, phc25_state )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
@@ -394,10 +393,9 @@ static MACHINE_DRIVER_START( phc25 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pal )
-	MDRV_IMPORT_FROM(phc25)
+static MACHINE_CONFIG_DERIVED( pal, phc25 )
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -414,10 +412,9 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_MC6847_CHAR_ROM(phc25_char_rom_r)
 
 	MDRV_VIDEO_START(pal)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ntsc )
-	MDRV_IMPORT_FROM(phc25)
+static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -434,7 +431,7 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_MC6847_CHAR_ROM(phc25_char_rom_r)
 
 	MDRV_VIDEO_START(ntsc)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

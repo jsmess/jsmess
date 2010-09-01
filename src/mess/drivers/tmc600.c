@@ -339,8 +339,7 @@ static GFXDECODE_START( tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( tmc600 )
-	MDRV_DRIVER_DATA(tmc600_state)
+static MACHINE_CONFIG_START( tmc600, tmc600_state )
 
 	// basic system hardware
 
@@ -354,7 +353,7 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	// sound and video hardware
 
-	MDRV_IMPORT_FROM(tmc600_video)
+	MDRV_FRAGMENT_ADD(tmc600_video)
 	MDRV_GFXDECODE(tmc600)
 
 	/* printer */
@@ -369,7 +368,7 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("16K,24K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

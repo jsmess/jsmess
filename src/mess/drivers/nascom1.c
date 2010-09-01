@@ -275,7 +275,7 @@ static Z80PIO_INTERFACE( nascom1_z80pio_intf )
 };
 
 
-static MACHINE_DRIVER_START( nascom1 )
+static MACHINE_CONFIG_START( nascom1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem)
@@ -309,7 +309,7 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
 	MDRV_RAM_EXTRA_OPTIONS("1K,16K,32K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(nascom2)
 	FLOPPY_OPTION(nascom2_ss, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default,
@@ -338,8 +338,7 @@ static const floppy_config nascom2_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( nascom2 )
-	MDRV_IMPORT_FROM(nascom1)
+static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(nascom2_io)
 
@@ -353,7 +352,7 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(nascom2_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

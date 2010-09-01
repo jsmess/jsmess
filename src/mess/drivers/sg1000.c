@@ -1065,11 +1065,10 @@ static MACHINE_RESET( sf7000 )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( sg1000 )
+    MACHINE_CONFIG_START( sg1000, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( sg1000 )
-	MDRV_DRIVER_DATA(sg1000_state)
+static MACHINE_CONFIG_START( sg1000, sg1000_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
@@ -1080,7 +1079,7 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_MACHINE_START(sg1000)
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1103,14 +1102,13 @@ static MACHINE_DRIVER_START( sg1000 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( omv )
+    MACHINE_CONFIG_START( omv, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( omv )
-	MDRV_IMPORT_FROM(sg1000)
+static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 
 	MDRV_CPU_MODIFY(Z80_TAG)
 	MDRV_CPU_PROGRAM_MAP(omv_map)
@@ -1123,14 +1121,13 @@ static MACHINE_DRIVER_START( omv )
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( sc3000 )
+    MACHINE_CONFIG_START( sc3000, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( sc3000 )
-	MDRV_DRIVER_DATA(sg1000_state)
+static MACHINE_CONFIG_START( sc3000, sg1000_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
@@ -1141,7 +1138,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_MACHINE_START(sc3000)
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1168,14 +1165,13 @@ static MACHINE_DRIVER_START( sc3000 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( sf7000 )
+    MACHINE_CONFIG_START( sf7000, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( sf7000 )
-	MDRV_DRIVER_DATA(sg1000_state)
+static MACHINE_CONFIG_START( sf7000, sg1000_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
@@ -1187,7 +1183,7 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_MACHINE_RESET(sf7000)
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1210,7 +1206,7 @@ static MACHINE_DRIVER_START( sf7000 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

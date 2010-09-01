@@ -523,7 +523,7 @@ static MACHINE_RESET( tvlink )
 	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static MACHINE_DRIVER_START( svision )
+static MACHINE_CONFIG_START( svision, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem)
@@ -558,28 +558,25 @@ static MACHINE_DRIVER_START( svision )
 
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","svision")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svisionp )
-	MDRV_IMPORT_FROM( svision )
+static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(4430000)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_PALETTE_INIT( svisionp )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svisionn )
-	MDRV_IMPORT_FROM( svision )
+static MACHINE_CONFIG_DERIVED( svisionn, svision )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(3560000/*?*/)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_PALETTE_INIT( svisionn )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tvlinkp )
-	MDRV_IMPORT_FROM( svisionp )
+static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tvlink_mem)
 
@@ -589,7 +586,7 @@ static MACHINE_DRIVER_START( tvlinkp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_VIDEO_UPDATE( tvlink )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(svision)
 	ROM_REGION(0x20000, "user1", ROMREGION_ERASE00)

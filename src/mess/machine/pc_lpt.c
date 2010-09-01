@@ -50,9 +50,9 @@ static const centronics_interface pc_centronics_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( pc_lpt )
+static MACHINE_CONFIG_FRAGMENT( pc_lpt )
 	MDRV_CENTRONICS_ADD("centronics", pc_centronics_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************
@@ -115,7 +115,7 @@ DEVICE_GET_INFO( pc_lpt )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pc_lpt);	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_CONFIG_NAME(pc_lpt);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc_lpt);		break;

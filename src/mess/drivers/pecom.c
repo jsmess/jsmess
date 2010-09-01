@@ -172,8 +172,7 @@ static const cassette_config pecom_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_DRIVER_START( pecom64 )
-	MDRV_DRIVER_DATA(pecom_state)
+static MACHINE_CONFIG_START( pecom64, pecom_state )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CDP1802, CDP1869_DOT_CLK_PAL/3)
@@ -186,7 +185,7 @@ static MACHINE_DRIVER_START( pecom64 )
 
 	// sound and video hardware
 
-	MDRV_IMPORT_FROM(pecom_video)
+	MDRV_FRAGMENT_ADD(pecom_video)
 
 	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
 
@@ -194,7 +193,7 @@ static MACHINE_DRIVER_START( pecom64 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pecom64 )

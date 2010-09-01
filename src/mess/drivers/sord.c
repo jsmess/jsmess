@@ -562,9 +562,7 @@ static MACHINE_RESET( sord_m5 )
 }
 
 
-static MACHINE_DRIVER_START( sord_m5 )
-
-	MDRV_DRIVER_DATA( sord_state )
+static MACHINE_CONFIG_START( sord_m5, sord_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
@@ -577,7 +575,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_MACHINE_RESET(sord_m5)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -604,7 +602,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","sordm5")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static FLOPPY_OPTIONS_START( sordm5 )
@@ -628,8 +626,7 @@ static const floppy_config sordm5_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( sord_m5_fd5 )
-	MDRV_IMPORT_FROM( sord_m5 )
+static MACHINE_CONFIG_DERIVED( sord_m5_fd5, sord_m5 )
 
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_14_31818MHz/4)
 	MDRV_CPU_IO_MAP(srdm5fd5_io)
@@ -649,7 +646,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_NOT_MANDATORY
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

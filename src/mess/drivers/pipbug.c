@@ -37,7 +37,7 @@ static VIDEO_UPDATE( pipbug )
     return 0;
 }
 
-static MACHINE_DRIVER_START( pipbug )
+static MACHINE_CONFIG_START( pipbug, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(pipbug_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( pipbug )
 
     MDRV_VIDEO_START(pipbug)
     MDRV_VIDEO_UPDATE(pipbug)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pipbug )

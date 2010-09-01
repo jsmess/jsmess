@@ -1038,11 +1038,10 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( creativision )
+    MACHINE_CONFIG_START( creativision, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( creativision )
-	MDRV_DRIVER_DATA(crvision_state)
+static MACHINE_CONFIG_START( creativision, crvision_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
@@ -1080,46 +1079,43 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
 	MDRV_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( ntsc )
+    MACHINE_CONFIG_START( ntsc, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( ntsc )
-	MDRV_IMPORT_FROM(creativision)
+static MACHINE_CONFIG_DERIVED( ntsc, creativision )
 
 	MDRV_MACHINE_START(ntsc)
 
     /* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( pal )
+    MACHINE_CONFIG_START( pal, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( pal )
-	MDRV_IMPORT_FROM(creativision)
+static MACHINE_CONFIG_DERIVED( pal, creativision )
 
 	MDRV_MACHINE_START(pal)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER_START( lasr2001 )
+    MACHINE_CONFIG_START( lasr2001, driver_data_t )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( lasr2001 )
-	MDRV_DRIVER_DATA(crvision_state)
+static MACHINE_CONFIG_START( lasr2001, crvision_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, 17734470/9)
@@ -1163,11 +1159,11 @@ static MACHINE_DRIVER_START( lasr2001 )
 	MDRV_RAM_EXTRA_OPTIONS("32K")
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE((float)10738000/2/342/313)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS

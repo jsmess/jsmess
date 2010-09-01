@@ -417,9 +417,7 @@ static VIDEO_UPDATE( fk1 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( fk1 )
-
-	MDRV_DRIVER_DATA( fk1_state )
+static MACHINE_CONFIG_START( fk1, fk1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
@@ -451,7 +449,7 @@ static MACHINE_DRIVER_START( fk1 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("80K") // 64 + 16
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( fk1 )

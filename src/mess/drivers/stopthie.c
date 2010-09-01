@@ -52,12 +52,12 @@ static const tms0980_config stopthie_tms0980_config =
 };
 
 
-static MACHINE_DRIVER_START( stopthie )
+static MACHINE_CONFIG_START( stopthie, driver_data_t )
 	MDRV_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
 	MDRV_CPU_CONFIG( stopthie_tms0980_config )
 
 	MDRV_DEFAULT_LAYOUT(layout_stopthie)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )

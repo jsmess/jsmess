@@ -96,9 +96,7 @@ static GENERIC_TELEPRINTER_INTERFACE( mod8_teleprinter_intf )
 	DEVCB_HANDLER(mod8_kbd_put)
 };
 
-static MACHINE_DRIVER_START( mod8 )
-
-    MDRV_DRIVER_DATA( mod8_state )
+static MACHINE_CONFIG_START( mod8, mod8_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8008, 800000)
@@ -108,10 +106,10 @@ static MACHINE_DRIVER_START( mod8 )
     MDRV_MACHINE_RESET(mod8)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_teleprinter )
+    MDRV_FRAGMENT_ADD( generic_teleprinter )
 	MDRV_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

@@ -580,8 +580,7 @@ static const floppy_config xor100_floppy_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( xor100 )
-	MDRV_DRIVER_DATA(xor100_state)
+static MACHINE_CONFIG_START( xor100, xor100_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
@@ -592,7 +591,7 @@ static MACHINE_DRIVER_START( xor100 )
     MDRV_MACHINE_RESET(xor100)
 
     /* video hardware */
-	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_FRAGMENT_ADD( generic_terminal )
 
 	/* devices */
 	MDRV_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
@@ -609,7 +608,7 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

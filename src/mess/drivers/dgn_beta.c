@@ -316,7 +316,7 @@ static GFXDECODE_START( dgnbeta )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( dgnbeta )
+static MACHINE_CONFIG_START( dgnbeta, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)
@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	/* to exist was fitted with 256K, so I have made this the default. Also available           */
 	/* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
 	/* in blocks of 128K up to this maximum.                                                    */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(dgnbeta)
 	ROM_REGION(0x4000,MAINCPU_TAG,0)

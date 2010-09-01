@@ -879,7 +879,7 @@ static const floppy_config abc800_floppy_config =
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( luxor_55_10828 )
+static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slow_map)
 	MDRV_CPU_IO_MAP(slow_io_map)
@@ -889,9 +889,9 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_WD179X_ADD(FD1791_TAG, slow_wd17xx_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( luxor_55_21046 )
+static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MDRV_CPU_PROGRAM_MAP(fast_map)
 	MDRV_CPU_IO_MAP(fast_io_map)
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 
@@ -1012,7 +1012,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(luxor_55_10828);					break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(luxor_55_10828);	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(luxor_55_10828);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_10828);			break;
@@ -1084,7 +1084,7 @@ DEVICE_GET_INFO( luxor_55_21046 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(luxor_55_21046);					break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(luxor_55_21046);	break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(luxor_55_21046);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_21046);			break;

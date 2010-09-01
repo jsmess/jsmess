@@ -150,9 +150,7 @@ static MACHINE_RESET( 3do )
 }
 
 
-static MACHINE_DRIVER_START( 3do )
-
-	MDRV_DRIVER_DATA( _3do_state )
+static MACHINE_CONFIG_START( 3do, _3do_state )
 
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
@@ -170,12 +168,10 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
 
 	MDRV_CDROM_ADD( "cdrom" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( 3do_pal )
-
-	MDRV_DRIVER_DATA( _3do_state )
+static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
@@ -193,7 +189,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 
 	MDRV_CDROM_ADD( "cdrom" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(3do)

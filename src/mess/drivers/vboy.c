@@ -690,9 +690,7 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_DRIVER_START( vboy )
-
-	MDRV_DRIVER_DATA( vboy_state )
+static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", V810, XTAL_20MHz )
@@ -737,7 +735,7 @@ static MACHINE_DRIVER_START( vboy )
 
 	/* software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","vboy")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vboy )

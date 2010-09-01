@@ -169,7 +169,7 @@ static const cassette_config bk0010_cassette_config =
 };
 
 
-static MACHINE_DRIVER_START( bk0010 )
+static MACHINE_CONFIG_START( bk0010, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
@@ -196,9 +196,9 @@ static MACHINE_DRIVER_START( bk0010 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bk0010fd )
+static MACHINE_CONFIG_START( bk0010fd, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( bk0010fd )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

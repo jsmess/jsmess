@@ -217,9 +217,7 @@ static GFXDECODE_START( ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( ec65 )
-
-    MDRV_DRIVER_DATA( ec65_state )
+static MACHINE_CONFIG_START( ec65, ec65_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
@@ -249,11 +247,9 @@ static MACHINE_DRIVER_START( ec65 )
 	MDRV_VIA6522_ADD(VIA6522_0_TAG, XTAL_4MHz / 4, ec65_via_0_intf)
 	MDRV_VIA6522_ADD(VIA6522_1_TAG, XTAL_4MHz / 4, ec65_via_1_intf)
 	MDRV_ACIA6551_ADD(ACIA6551_TAG)     // have XTAL of 1.8432MHz connected
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ec65k )
-
-    MDRV_DRIVER_DATA( ec65_state )
+static MACHINE_CONFIG_START( ec65k, ec65_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
@@ -276,7 +272,7 @@ static MACHINE_DRIVER_START( ec65k )
 
     MDRV_VIDEO_START(ec65)
     MDRV_VIDEO_UPDATE(ec65)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ec65 )

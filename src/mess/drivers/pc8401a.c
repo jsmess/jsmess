@@ -633,8 +633,7 @@ static msm8251_interface pc8401a_msm8251_interface = {
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( common )
-	MDRV_DRIVER_DATA(pc8401a_state)
+static MACHINE_CONFIG_START( common, pc8401a_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
@@ -665,29 +664,27 @@ static MACHINE_DRIVER_START( common )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("96K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pc8401a )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( pc8401a, common )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(pc8401a_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(pc8401a_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pc8500 )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( pc8500, common )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY(Z80_TAG)
 	MDRV_CPU_IO_MAP(pc8500_io)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(pc8500_video)
+	MDRV_FRAGMENT_ADD(pc8500_video)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

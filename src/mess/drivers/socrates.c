@@ -872,7 +872,7 @@ static INTERRUPT_GEN( assert_irq )
 	socrates.vblankstate = 1;
 }
 
-static MACHINE_DRIVER_START(socrates)
+static MACHINE_CONFIG_START( socrates, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
     MDRV_CPU_PROGRAM_MAP(z80_mem)
@@ -899,7 +899,7 @@ static MACHINE_DRIVER_START(socrates)
 	MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -331,7 +331,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 #endif
 
-static MACHINE_DRIVER_START( tk80 )
+static MACHINE_CONFIG_START( tk80, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(tk80_mem)
@@ -351,9 +351,9 @@ static MACHINE_DRIVER_START( tk80 )
 
     MDRV_VIDEO_START(tk80)
     MDRV_VIDEO_UPDATE(tk80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tk80bs )
+static MACHINE_CONFIG_START( tk80bs, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
     MDRV_CPU_PROGRAM_MAP(tk80bs_mem)
@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( tk80bs )
 
     MDRV_VIDEO_START(tk80bs)
     MDRV_VIDEO_UPDATE(tk80bs)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( tk80 )

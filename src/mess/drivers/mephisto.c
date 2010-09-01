@@ -196,7 +196,7 @@ static MACHINE_RESET( mephisto )
 }
 
 
-static MACHINE_DRIVER_START( mephisto )
+static MACHINE_CONFIG_START( mephisto, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem)
@@ -211,15 +211,14 @@ static MACHINE_DRIVER_START( mephisto )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rebel5 )
-	MDRV_IMPORT_FROM( mephisto )
+static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(rebel5)
 	ROM_REGION(0x10000,"maincpu",0)

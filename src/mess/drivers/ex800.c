@@ -418,7 +418,7 @@ static const UPD7810_CONFIG ex800_cpu_config =
 ******************************************************************************/
 
 
-static MACHINE_DRIVER_START(ex800)
+static MACHINE_CONFIG_START( ex800, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)
@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START(ex800)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

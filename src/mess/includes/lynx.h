@@ -35,7 +35,7 @@ INTERRUPT_GEN( lynx_frame_int );
 int lynx_verify_cart (char *header, int kind);
 void lynx_crc_keyword(device_image_interface &image);
 
-MACHINE_DRIVER_EXTERN( lynx_cartslot );
+MACHINE_CONFIG_EXTERN( lynx_cartslot );
 
 
 /*----------- defined in audio/lynx.c -----------*/

@@ -1036,7 +1036,7 @@ static const floppy_config c1541_floppy_config =
     MACHINE_DRIVER( c1540 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1540 )
+static MACHINE_CONFIG_FRAGMENT( c1540 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c1540_map)
 
@@ -1044,24 +1044,24 @@ static MACHINE_DRIVER_START( c1540 )
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c1541 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1541 )
-	MDRV_IMPORT_FROM(c1540)
+static MACHINE_CONFIG_FRAGMENT( c1541 )
+	MDRV_FRAGMENT_ADD(c1540)
 
 	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(c1541_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c1541c )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1541c )
+static MACHINE_CONFIG_FRAGMENT( c1541c )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c1541c_map)
 
@@ -1069,35 +1069,35 @@ static MACHINE_DRIVER_START( c1541c )
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c1541ii )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1541ii )
-	MDRV_IMPORT_FROM(c1540)
+static MACHINE_CONFIG_FRAGMENT( c1541ii )
+	MDRV_FRAGMENT_ADD(c1540)
 
 	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(c1541ii_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( sx1541 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( sx1541 )
-	MDRV_IMPORT_FROM(c1540)
+static MACHINE_CONFIG_FRAGMENT( sx1541 )
+	MDRV_FRAGMENT_ADD(c1540)
 
 	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(sx1541_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( c2031 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c2031 )
+static MACHINE_CONFIG_FRAGMENT( c2031 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c2031_map)
 
@@ -1105,18 +1105,18 @@ static MACHINE_DRIVER_START( c2031 )
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( oc118 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( oc118 )
-	MDRV_IMPORT_FROM(c1540)
+static MACHINE_CONFIG_FRAGMENT( oc118 )
+	MDRV_FRAGMENT_ADD(c1540)
 
 	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(oc118_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     ROM( c1540 )
@@ -1278,7 +1278,7 @@ DEVICE_GET_INFO( c1540 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1540);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1540);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1540);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
@@ -1304,7 +1304,7 @@ DEVICE_GET_INFO( c1541 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1541);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1541");						break;
@@ -1323,7 +1323,7 @@ DEVICE_GET_INFO( c1541c )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541c);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541c);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1541c);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541C");							break;
@@ -1342,7 +1342,7 @@ DEVICE_GET_INFO( c1541ii )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541ii);						break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541ii);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c1541ii);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541-II");						break;
@@ -1361,7 +1361,7 @@ DEVICE_GET_INFO( sx1541 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(sx1541);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(sx1541);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(sx1541);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore SX1541");						break;
@@ -1380,7 +1380,7 @@ DEVICE_GET_INFO( c2031 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2031);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2031);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c2031);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 2031");							break;
@@ -1399,7 +1399,7 @@ DEVICE_GET_INFO( oc118 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(oc118);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(oc118);			break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(oc118);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Oceanic OC-118");							break;

@@ -39,7 +39,7 @@ static VIDEO_UPDATE( ipb )
     return 0;
 }
 
-static MACHINE_DRIVER_START( ipb )
+static MACHINE_CONFIG_START( ipb, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipb_mem)
@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( ipb )
 
     MDRV_VIDEO_START(ipb)
     MDRV_VIDEO_UPDATE(ipb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

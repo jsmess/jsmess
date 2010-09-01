@@ -425,7 +425,7 @@ static const cassette_config lviv_cassette_config =
 
 
 /* machine definition */
-static MACHINE_DRIVER_START( lviv )
+static MACHINE_CONFIG_START( lviv, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2500000)
 	MDRV_CPU_PROGRAM_MAP(lviv_mem)
@@ -467,7 +467,7 @@ static MACHINE_DRIVER_START( lviv )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(lviv)

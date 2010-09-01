@@ -37,7 +37,7 @@ static VIDEO_UPDATE( a5105 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( a5105 )
+static MACHINE_CONFIG_START( a5105, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(a5105_mem)
@@ -57,7 +57,7 @@ static MACHINE_DRIVER_START( a5105 )
 
 	MDRV_VIDEO_START(a5105)
 	MDRV_VIDEO_UPDATE(a5105)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( a5105 )

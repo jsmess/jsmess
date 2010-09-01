@@ -39,7 +39,7 @@ static VIDEO_UPDATE( k8915 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( k8915 )
+static MACHINE_CONFIG_START( k8915, driver_data_t )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(k8915_mem)
@@ -60,7 +60,7 @@ static MACHINE_DRIVER_START( k8915 )
 
     MDRV_VIDEO_START(k8915)
     MDRV_VIDEO_UPDATE(k8915)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

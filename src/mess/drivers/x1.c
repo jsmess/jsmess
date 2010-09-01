@@ -2197,7 +2197,7 @@ static const floppy_config x1_floppy_config =
 	"x1_flop"
 };
 
-static MACHINE_DRIVER_START( x1 )
+static MACHINE_CONFIG_START( x1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(x1_mem)
@@ -2251,10 +2251,9 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
 	MDRV_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( x1turbo )
-	MDRV_IMPORT_FROM( x1 )
+static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(x1turbo_io)
@@ -2266,7 +2265,7 @@ static MACHINE_DRIVER_START( x1turbo )
 	MDRV_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 //  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

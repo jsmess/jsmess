@@ -49,7 +49,7 @@ public:
 
 /* ---------- defined in video/pc8401a.c ---------- */
 
-MACHINE_DRIVER_EXTERN( pc8401a_video );
-MACHINE_DRIVER_EXTERN( pc8500_video );
+MACHINE_CONFIG_EXTERN( pc8401a_video );
+MACHINE_CONFIG_EXTERN( pc8500_video );
 
 #endif

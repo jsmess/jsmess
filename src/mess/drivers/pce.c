@@ -157,7 +157,7 @@ static const c6280_interface c6280_config =
 };
 
 
-static MACHINE_DRIVER_START( pce_cartslot )
+static MACHINE_CONFIG_FRAGMENT( pce_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
 	MDRV_CARTSLOT_MANDATORY
@@ -165,9 +165,9 @@ static MACHINE_DRIVER_START( pce_cartslot )
 	MDRV_CARTSLOT_LOAD(pce_cart)
 	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","pce")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tg16_cartslot )
+static MACHINE_CONFIG_FRAGMENT( tg16_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
 	MDRV_CARTSLOT_MANDATORY
@@ -175,19 +175,19 @@ static MACHINE_DRIVER_START( tg16_cartslot )
 	MDRV_CARTSLOT_LOAD(pce_cart)
 	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
 	MDRV_SOFTWARE_LIST_ADD("cart_list","tg16")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sgx_cartslot )
-MDRV_CARTSLOT_ADD("cart")
-MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
-MDRV_CARTSLOT_MANDATORY
-MDRV_CARTSLOT_INTERFACE("pce_cart")
-MDRV_CARTSLOT_LOAD(pce_cart)
-MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
-MDRV_SOFTWARE_LIST_ADD("cart_list","sgx")
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_FRAGMENT( sgx_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pce_cart")
+	MDRV_CARTSLOT_LOAD(pce_cart)
+	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
+	MDRV_SOFTWARE_LIST_ADD("cart_list","sgx")
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pce_common )
+static MACHINE_CONFIG_START( pce_common, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem)
@@ -227,19 +227,17 @@ static MACHINE_DRIVER_START( pce_common )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MDRV_CDROM_ADD( "cdrom" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pce )
-	MDRV_IMPORT_FROM( pce_common )
-	MDRV_IMPORT_FROM( pce_cartslot )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( pce, pce_common )
+	MDRV_FRAGMENT_ADD( pce_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tg16 )
-	MDRV_IMPORT_FROM( pce_common )
-	MDRV_IMPORT_FROM( tg16_cartslot )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( tg16, pce_common )
+	MDRV_FRAGMENT_ADD( tg16_cartslot )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sgx )
+static MACHINE_CONFIG_START( sgx, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(sgx_mem)
@@ -277,8 +275,8 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_IMPORT_FROM( sgx_cartslot )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sgx_cartslot )
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
