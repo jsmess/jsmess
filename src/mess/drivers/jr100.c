@@ -373,14 +373,18 @@ MACHINE_CONFIG_END
 
 
 /* ROM definition */
+ROM_START( jr100 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "jr100.rom", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
+ROM_END
+
 ROM_START( jr100u )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "jr100.rom", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
+	ROM_LOAD( "jr100u.rom", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
 
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-//COMP( 1981, jr100,  0,       0,   jr100,  jr100,   0,       "National",   "JR-100",       GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, jr100u,  0,       0,	jr100,	jr100,	 0, 	  "Panasonic",   "JR-100U",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1981, jr100,  0,  	  0,	jr100,	jr100,	 0, 	  "National",   "JR-100",		0)
+COMP( 1981, jr100u, jr100,    0,	jr100,	jr100,	 0, 	  "Panasonic",   "JR-100U",		0)

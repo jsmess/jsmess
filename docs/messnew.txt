@@ -5,6 +5,7 @@ New System Drivers Supported:
 - Tomy Pyuuta [anondumper]
 - Elektronika KR-03 [Miodrag Milanovic]
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
+- National JR-100 [anonymous, Miodrag Milanovic]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
