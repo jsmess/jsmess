@@ -16,20 +16,19 @@
     per-game/program specific TODO:
 	- Basic: vertical scrolling returns wrap-around that shouldn't wrap;
 	- Basic: loading has an alignment bug with the bitmap
-	- Gomoku Narabe: hangs on the "presents" screen;
 	- LayDock: hangs by reading the FDC status and expecting it to become 0x81;
 	- Mappy: TVRAM layer is double x sized than it should be;
 	- Marchen Veil I: dies with garbage on screen;
 	- Moon Child: needs mixed 3+3bpp tvram supported;
+	- Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
+	- Mugen no Shinzou: returns an HW error if you attempt to start a play;
 	- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
-	- Multiplan: hangs after you set the RTC;
+	- Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
 	- Murder Club: has lots of CG artifacts;
 	- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
 	- Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
 	- Sound Gal Music Editor: dies with bad code, another wd17xx core bug;
-	- Super MZ Demo 1: Hangs at the logo "roar".
 	- Telephone Soft: shows garbage with the CG layer;
-	- The Black Onyx: hangs at the title screen, background should also animate;
 	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
 	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
 	- Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
@@ -1802,7 +1801,7 @@ static PALETTE_INIT( mz2500 )
 
 /* PIT8253 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( pit8253_clk1_irq )
+static WRITE_LINE_DEVICE_HANDLER( pit8253_clk0_irq )
 {
 	if(irq_mask[1]/* && state & 1*/)
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
@@ -1814,17 +1813,17 @@ static const struct pit8253_config mz2500_pit8253_intf =
 		{
 			31250,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk1_irq)
-		},
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk2_w)
+			DEVCB_LINE(pit8253_clk0_irq)
 		},
 		{
 			0,
 			DEVCB_NULL,
 			DEVCB_NULL
+		},
+		{
+			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk1_w)
 		}
 	}
 };
