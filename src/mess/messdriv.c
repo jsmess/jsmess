@@ -726,8 +726,8 @@ const game_driver * const drivers[] =
 	DRIVER( mz80b )	 /* 1981 Sharp MZ80B     */
 	DRIVER( mz2000 )	 /* 1981 Sharp MZ2000     */
 
-	DRIVER( x1 )	/* 1982 Sharp X1    */
-	DRIVER( x1ck )	  /* 1984 Sharp X1Ck      */
+	DRIVER( x1 )		/* 1982 Sharp X1    */
+	DRIVER( x1twin )	/* 1986 Sharp X1 Twin      */
 	DRIVER( x1turbo )   /* 1984 Sharp X1 Turbo (Model 10)      */
 	DRIVER( x1turbo40 ) /* 1985 Sharp X1 Turbo (Model 40)      */
 //  DRIVER( x1turboz )  /* 1986 Sharp X1 TurboZ  */

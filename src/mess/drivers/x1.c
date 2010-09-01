@@ -10,7 +10,8 @@
     - Implement .rom format support (needs an image for it);
     - Implement tape commands;
     - Sort out / redump the BIOS gfx roms;
-    - Implement SIO, they are X1Turbo only features.
+    - X1Turbo: Implement SIO.
+    - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
     - clean-ups!
     - There are various unclear video things, these are:
         - Understand why some games still doesn't upload the proper PCG index;
@@ -2275,10 +2276,7 @@ MACHINE_CONFIG_END
 
  ROM_START( x1 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "default", "X1 IPL" )
-	ROMX_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "alt", "X1 IPL (alt)" )
-	ROMX_LOAD( "ipl_alt.x1", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a), ROM_BIOS(2) )
+	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2301,29 +2299,30 @@ MACHINE_CONFIG_END
 	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
-ROM_START( x1ck )
+ROM_START( x1twin )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "default", "X1 IPL" )
-	ROMX_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "alt", "X1 IPL (alt)" )
-	ROMX_LOAD( "ipl_alt.x1", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a), ROM_BIOS(2) )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a) )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
-	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+	ROM_REGION(0x1000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
+	ROM_LOAD( "ank16.rom", 0x0000, 0x1000, CRC(8f9fb213) SHA1(4f06d20c997a79ee6af954b69498147789bf1847) )
 
 	ROM_REGION(0x4d600, "cgrom", 0)
-	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_RELOAD(            0x00800, 0x00800)
-	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_RELOAD(          0x00800, 0x00800)
+	ROM_RELOAD(          0x01000, 0x00800)
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these comes from x1 turbo
+	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, BAD_DUMP CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
+	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, BAD_DUMP CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
+	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, BAD_DUMP CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
+	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 
 	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
@@ -2413,6 +2412,6 @@ static DRIVER_INIT( kanji )
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  COMPANY   FULLNAME      FLAGS */
 COMP( 1982, x1,        0,      0,       x1,      x1,    0,    "Sharp",  "X1 (CZ-800C)",         0)
-COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    "Sharp",  "X1Ck (CZ-804C)",       0)
+COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,    kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING)
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING) //model 10
 COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   GAME_NOT_WORKING) //model 40
