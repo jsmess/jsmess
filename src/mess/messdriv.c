@@ -566,6 +566,7 @@ const game_driver * const drivers[] =
 	DRIVER( px4p )	  /* 1985 Epson PX-4+    */
 	DRIVER( px8 )
 	DRIVER( qx10 )
+	DRIVER( qc10 )
 	DRIVER( ehx20 )
 
 	/* IBM PC & Clones */
