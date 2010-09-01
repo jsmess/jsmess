@@ -32,7 +32,7 @@
 	- The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
 	- Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
 	- Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
-	- Yukar K2 (normal version): moans about something;
+	- Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
     memory map:
     0x00000-0x3ffff Work RAM
