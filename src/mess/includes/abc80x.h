@@ -26,6 +26,7 @@
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
+#define I8048_TAG 		"i8048"
 #define E0516_TAG		"j13"
 #define MC6845_TAG		"b12"
 #define Z80CTC_TAG		"z80ctc"
