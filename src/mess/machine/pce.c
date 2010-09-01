@@ -279,13 +279,21 @@ WRITE8_HANDLER ( pce_joystick_w )
 
 READ8_HANDLER ( pce_joystick_r )
 {
+	static const char *const joyname[] = { "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" };
 	UINT8 ret;
-	int data = input_port_read(space->machine, "JOY");
+	int data;
+
+	if(joystick_port_select <= 4)
+		data = input_port_read(space->machine, joyname[joystick_port_select]);
+	else
+		data = 0xff;
+
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;
 #ifdef UNIFIED_PCE
 	ret &= ~0x40;
 #endif
+
 	return (ret);
 }
 
