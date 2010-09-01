@@ -131,7 +131,7 @@ static VIDEO_UPDATE( paso7 )
 
 	for(y=0;y<200;y++)
 	{
-		for(x=0;x<320;x+=8)
+		for(x=0;x<8*width;x+=8)
 		{
 			for(xi=0;xi<8;xi++)
 			{
@@ -280,7 +280,7 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 
 	// bank4 is always RAM
 
-	printf("%02x\n",vram_sel);
+//	printf("%02x\n",vram_sel);
 }
 
 #if 0
