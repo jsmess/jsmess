@@ -793,8 +793,12 @@ const game_driver * const drivers[] =
 	DRIVER( pc6001mk2 )
 	DRIVER( pc6600 )
 	DRIVER( pc6001sr )
+
 	DRIVER( pc8001 )
 	DRIVER( pc8001mk2 )
+
+	DRIVER( pc8201 )
+
 	DRIVER( pc8801 )
 	DRIVER( pc8801mk2 )
 	DRIVER( pc8801mk2sr )
@@ -806,6 +810,7 @@ const game_driver * const drivers[] =
 	DRIVER( pc8801ma2 )
 	DRIVER( pc8801mc )
 	DRIVER( pc88va )
+
 	DRIVER( pc9801 )
 	DRIVER( pc9821 )
 

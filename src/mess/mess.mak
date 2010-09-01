@@ -1138,6 +1138,7 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_VIDEO)/pc8801.o		\
 	$(MESS_DRIVERS)/pc98.o		\
 	$(MESS_DRIVERS)/tk80bs.o	\
+	$(MESS_DRIVERS)/pc8201.o	\
 
 $(MESSOBJ)/netronic.a:			\
 	$(MESS_DRIVERS)/elf.o		\
