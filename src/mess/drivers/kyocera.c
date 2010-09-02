@@ -1484,9 +1484,17 @@ ROM_START( kc85 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START( pc8201 )
+	ROM_REGION( 0x10000, I8085_TAG, 0 )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
+	
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
 ROM_START( pc8201a )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "pc8201rom.rom0", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
+	ROM_LOAD( "pc8201rom.rom", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1543,7 +1551,7 @@ COMP( 1983, m10,		kc85,	0,		kc85,		olivm10,	0,		"Olivetti",				"M-10", 0 )
 //COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    0,      "Olivetti",             "M-10 Modem (US)", 0 )
 COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
 COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		"Tandy Radio Shack",	"Tandy 102", 0 )
-//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", 0 )
-COMP( 1983, pc8201a,	0,		0,		pc8201,		pc8201a,	0,		"Nippon Electronic Company",					"PC-8201A", 0 )
+COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", 0 )
+COMP( 1983, pc8201a,	pc8201,	0,		pc8201,		pc8201a,	0,		"Nippon Electronic Company",					"PC-8201A", 0 )
 //COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      "Nippon Electronic Company",                  "PC-8300", 0 )
 COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		"Tandy Radio Shack",	"Tandy 200", 0 )

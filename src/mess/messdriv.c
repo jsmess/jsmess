@@ -798,8 +798,6 @@ const game_driver * const drivers[] =
 	DRIVER( pc8001 )
 	DRIVER( pc8001mk2 )
 
-	DRIVER( pc8201 )
-
 	DRIVER( pc8801 )
 	DRIVER( pc8801mk2 )
 	DRIVER( pc8801mk2sr )
@@ -1471,7 +1469,7 @@ const game_driver * const drivers[] =
 	DRIVER( trsm100 )
 	DRIVER( tandy102 )
 	DRIVER( tandy200 )
-//  DRIVER( pc8201 )
+    DRIVER( pc8201 )
 	DRIVER( pc8201a )
 //  DRIVER( npc8300 )
 //  DRIVER( pc8401a )
