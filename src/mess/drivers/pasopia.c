@@ -525,13 +525,17 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
+	if(io_port >= 0x30 && io_port <= 0x33)
+		printf("[%02x]\n",offset & 3);
+
 	if(io_port >= 0x08 && io_port <= 0x0b)		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
 //  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, (io_port-0x18) & 3);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), (io_port-0x28) & 3);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_ba_cd_r(space->machine->device("z80pio_0"), (io_port-0x30) & 3); }
+	else if(io_port == 0x30) 					{ return z80pio_d_r(space->machine->device("z80pio_0"), (io_port-0x30) & 1); }
+	else if(io_port == 0x31)				 	{ return z80pio_c_r(space->machine->device("z80pio_0"), (io_port-0x31) & 1); }
 //  else if(io_port == 0x3a)                    { SN1 }
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
@@ -540,6 +544,7 @@ static READ8_HANDLER( pasopia7_io_r )
 	{
 		logerror("(PC=%06x) Read i/o address %02x\n",cpu_get_pc(space->cpu),io_port);
 	}
+
 	return 0xff;
 }
 
@@ -557,13 +562,17 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
+	if(io_port >= 0x30 && io_port <= 0x33)
+		printf("[%02x] <- %02x\n",offset & 3,data);
+
 	if(io_port >= 0x08 && io_port <= 0x0b)		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, (io_port-0x18) & 3, data);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), (io_port-0x28) & 3,data);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_ba_cd_w(space->machine->device("z80pio_0"), (io_port-0x30) & 3, data); }
+	else if(io_port >= 0x30 && io_port <= 0x31) { z80pio_d_w(space->machine->device("z80pio_0"), (io_port-0x30) & 1, data); }
+	else if(io_port >= 0x32 && io_port <= 0x33) { z80pio_c_w(space->machine->device("z80pio_0"), (io_port-0x32) & 1, data); }
 	else if(io_port == 0x3a)					{ sn76496_w(space->machine->device("sn1"), 0, data); }
 	else if(io_port == 0x3b)					{ sn76496_w(space->machine->device("sn2"), 0, data); }
 	else if(io_port == 0x3c)					{ pasopia7_memory_ctrl_w(space,0, data); }
@@ -642,19 +651,34 @@ static Z80CTC_INTERFACE( ctc_intf )
 	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO0 callback
-	DEVCB_LINE(z80ctc_trg2_w),						// ZC/TO1 callback, beep interface
+	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO1 callback, beep interface
 	DEVCB_LINE(z80ctc_trg3_w)		// ZC/TO2 callback
 };
+
+static READ8_DEVICE_HANDLER( test_r )
+{
+	return mame_rand(device->machine);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( testa_w )
+{
+	printf("A %02x\n",state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( testb_w )
+{
+	printf("B %02x\n",state);
+}
 
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
+	DEVCB_HANDLER(test_r),
 	DEVCB_NULL,
+	DEVCB_LINE(testa_w),
+	DEVCB_HANDLER(test_r),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE(testb_w)
 };
 
 static const z80_daisy_config p7_daisy[] =
