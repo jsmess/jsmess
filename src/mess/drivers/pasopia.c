@@ -19,7 +19,7 @@
 #include "video/mc6845.h"
 
 static UINT8 vram_sel,mio_sel;
-static UINT8 *p7_vram,*p7_pal;
+static UINT8 *p7_pal;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink,cursor_raster;
@@ -27,7 +27,6 @@ static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width;
 
 static VIDEO_START( paso7 )
 {
-	p7_vram = auto_alloc_array(machine, UINT8, 0x10000);
 	p7_pal = auto_alloc_array(machine, UINT8, 0x10);
 }
 
@@ -117,6 +116,7 @@ static void fake_keyboard_data(running_machine *machine)
 
 static VIDEO_UPDATE( paso7 )
 {
+	static UINT8 *vram = memory_region(screen->machine, "vram");
 	int x,y,xi;
 	int count;
 	int width;
@@ -137,8 +137,8 @@ static VIDEO_UPDATE( paso7 )
 			{
 				int pen_b,pen_r,pen_g,color;
 
-				pen_b = (p7_vram[count+0x0000]>>(7-xi)) & 1;
-				pen_r = (p7_vram[count+0x4000]>>(7-xi)) & 1;
+				pen_b = (vram[count+0x0000]>>(7-xi)) & 1;
+				pen_r = (vram[count+0x4000]>>(7-xi)) & 1;
 				pen_g = 0;//(p7_vram[count+0x8000]>>(7-xi)) & 1;
 
 				color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
@@ -155,8 +155,8 @@ static VIDEO_UPDATE( paso7 )
 	{
 		for(x=0;x<width;x++)
 		{
-			int tile = p7_vram[count+0x8000];
-			int color = p7_vram[count+0xc000];
+			int tile = vram[count+0x8000];
+			int color = vram[count+0xc000];
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,0);
 
@@ -194,13 +194,14 @@ static VIDEO_UPDATE( paso7 )
 
 static READ8_HANDLER( vram_r )
 {
+	static UINT8 *vram = memory_region(space->machine, "vram");
 	static UINT8 res;
 
 	if(vram_sel == 0)
 	{
-		UINT8 *cpu = memory_region(space->machine, "maincpu");
+		UINT8 *work_ram = memory_region(space->machine, "maincpu");
 
-		return cpu[offset+0x8000];
+		return work_ram[offset+0x8000];
 	}
 
 	if(pal_sel && (plane_reg & 0x70) == 0x00)
@@ -209,13 +210,13 @@ static READ8_HANDLER( vram_r )
 	res = 0xff;
 
 	if((plane_reg & 0x11) == 0x11)
-		res &= p7_vram[offset | 0x0000];
+		res &= vram[offset | 0x0000];
 	if((plane_reg & 0x22) == 0x22)
-		res &= p7_vram[offset | 0x4000];
+		res &= vram[offset | 0x4000];
 	if((plane_reg & 0x44) == 0x44)
 	{
-		res &= p7_vram[offset | 0x8000];
-		attr_latch = p7_vram[offset | 0xc000];
+		res &= vram[offset | 0x8000];
+		attr_latch = vram[offset | 0xc000];
 		i8255a_w(space->machine->device("ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
 	}
 
@@ -224,6 +225,8 @@ static READ8_HANDLER( vram_r )
 
 static WRITE8_HANDLER( vram_w )
 {
+	static UINT8 *vram = memory_region(space->machine, "vram");
+
 	if(vram_sel)
 	{
 		if(pal_sel && (plane_reg & 0x70) == 0x00)
@@ -233,44 +236,44 @@ static WRITE8_HANDLER( vram_w )
 		}
 
 		if(plane_reg & 0x10)
-			p7_vram[offset | 0x0000] = (plane_reg & 1) ? data : 0xff;
+			vram[offset | 0x0000] = (plane_reg & 1) ? data : 0xff;
 		if(plane_reg & 0x20)
-			p7_vram[offset | 0x4000] = (plane_reg & 2) ? data : 0xff;
+			vram[offset | 0x4000] = (plane_reg & 2) ? data : 0xff;
 		if(plane_reg & 0x40)
 		{
-			p7_vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
+			vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
 			attr_latch = attr_wrap ? attr_latch : attr_data;
-			p7_vram[offset | 0xc000] = attr_latch;
+			vram[offset | 0xc000] = attr_latch;
 			i8255a_w(space->machine->device("ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
 		}
 	}
 	else
 	{
-		UINT8 *cpu = memory_region(space->machine, "maincpu");
+		UINT8 *work_ram = memory_region(space->machine, "maincpu");
 
-		cpu[offset+0x8000] = data;
+		work_ram[offset+0x8000] = data;
 	}
 }
 
 static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 {
-	UINT8 *cpu = memory_region(space->machine, "maincpu");
+	UINT8 *work_ram = memory_region(space->machine, "maincpu");
 	UINT8 *basic = memory_region(space->machine, "basic");
 
 	switch(data & 3)
 	{
 		case 0:
 		case 3: //select Basic ROM
-			memory_set_bankptr(space->machine, "bank1", basic + 0x00000);
-			memory_set_bankptr(space->machine, "bank2", basic + 0x04000);
+			memory_set_bankptr(space->machine, "bank1", basic    + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", basic    + 0x04000);
 			break;
 		case 1: //select Basic ROM + BIOS ROM
-			memory_set_bankptr(space->machine, "bank1", basic + 0x00000);
-			memory_set_bankptr(space->machine, "bank2", cpu   + 0x10000);
+			memory_set_bankptr(space->machine, "bank1", basic    + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", work_ram + 0x10000);
 			break;
 		case 2: //select Work RAM
-			memory_set_bankptr(space->machine, "bank1", cpu   + 0x00000);
-			memory_set_bankptr(space->machine, "bank2", cpu   + 0x04000);
+			memory_set_bankptr(space->machine, "bank1", work_ram + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", work_ram + 0x04000);
 			break;
 	}
 
@@ -354,9 +357,9 @@ static READ8_HANDLER( pac2_r )
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
 static WRITE8_HANDLER( ram_bank_w )
 {
-	UINT8 *cpu = memory_region(space->machine, "maincpu");
+	UINT8 *work_ram = memory_region(space->machine, "maincpu");
 
-	cpu[offset] = data;
+	work_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( pasopia7_6845_w )
@@ -753,6 +756,8 @@ ROM_START( pasopia7 )
 
 	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
 //  ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 static DRIVER_INIT( paso7 )
