@@ -23,7 +23,7 @@ static UINT8 *p7_pal;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink,cursor_raster;
-static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width;
+static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width,gfx_mode;
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
 
@@ -220,8 +220,7 @@ static READ8_HANDLER( vram_r )
 	if((plane_reg & 0x44) == 0x44)
 	{
 		res &= vram[offset | 0x8000];
-		attr_latch = vram[offset | 0xc000];
-		i8255a_w(space->machine->device("ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
+		attr_latch = vram[offset | 0xc000] & 0x87;
 	}
 
 	return res;
@@ -240,15 +239,14 @@ static WRITE8_HANDLER( vram_w )
 		}
 
 		if(plane_reg & 0x10)
-			vram[offset | 0x0000] = (plane_reg & 1) ? data : 0xff;
+			vram[(offset & 0x3fff) | 0x0000] = (plane_reg & 1) ? data : 0xff;
 		if(plane_reg & 0x20)
-			vram[offset | 0x4000] = (plane_reg & 2) ? data : 0xff;
+			vram[(offset & 0x3fff) | 0x4000] = (plane_reg & 2) ? data : 0xff;
 		if(plane_reg & 0x40)
 		{
-			vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
+			vram[(offset & 0x3fff) | 0x8000] = (plane_reg & 4) ? data : 0xff;
 			attr_latch = attr_wrap ? attr_latch : attr_data;
-			vram[offset | 0xc000] = attr_latch;
-			i8255a_w(space->machine->device("ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
+			vram[(offset & 0x3fff) | 0xc000] = attr_latch;
 		}
 	}
 	else
@@ -550,18 +548,24 @@ static const z80_daisy_config p7_daisy[] =
 static READ8_DEVICE_HANDLER( crtc_portb_r )
 {
 	// --x- ---- vsync bit
+	// ---x ---- lcd dip-sw
 	// ---- x--- disp bit
-	int lcd_bit = input_port_read(device->machine, "DSW") & 1;
-	int vdisp = (device->machine->primary_screen->vpos() < (lcd_bit ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
+	UINT8 lcd_bit = input_port_read(device->machine, "DSW") & 1;
+	UINT8 vdisp = (device->machine->primary_screen->vpos() < (lcd_bit ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
+	UINT8 vsync = vdisp ? 0x00 : 0x20;
 
-	return 0xe7 | vdisp | (lcd_bit << 4);
+	return 0x40 | (attr_latch & 0x87) | vsync | vdisp | (lcd_bit << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( screen_mode_w )
 {
-	if(data & 0xdf)
+	if(data & 0x7f)
 		printf("GFX MODE %02x\n",data);
+
 	x_width = data & 0x20;
+	gfx_mode = data & 0x80;
+
+//	printf("%02x\n",gfx_mode);
 }
 
 static WRITE8_DEVICE_HANDLER( plane_reg_w )
