@@ -329,7 +329,7 @@ static QUICKLOAD_LOAD(jr100)
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( jr100, driver_data_t )
+static MACHINE_CONFIG_START( jr100, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MDRV_CPU_PROGRAM_MAP(jr100_mem)
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( jr100, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)

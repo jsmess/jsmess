@@ -599,7 +599,7 @@ static const floppy_config thomson_floppy_config =
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_START( to7, driver_data_t )
+static MACHINE_CONFIG_START( to7, driver_device )
 
      MDRV_MACHINE_START ( to7 )
      MDRV_MACHINE_RESET ( to7 )

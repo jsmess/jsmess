@@ -477,7 +477,7 @@ static GFXDECODE_START( nanos )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nanos, driver_data_t )
+static MACHINE_CONFIG_START( nanos, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(nanos_mem)

@@ -46,13 +46,11 @@ text screen in the superior part of the graphical screen.
 */
 
 /* 6600, 6500-6503 wd179x disc controller? 6400, 6401 */
-class apf_state : public driver_data_t
+class apf_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apf_state(machine)); }
-
-	apf_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	apf_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	unsigned char keyboard_data;
 	unsigned char pad_data;
@@ -730,7 +728,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", apf_cassette_config )

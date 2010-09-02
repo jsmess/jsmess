@@ -97,7 +97,7 @@ static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
 	DEVCB_HANDLER(altair_kbd_put)
 };
 
-static MACHINE_CONFIG_START( altair, driver_data_t )
+static MACHINE_CONFIG_START( altair, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(altair_mem)

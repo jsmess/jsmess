@@ -65,7 +65,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( gamepock, driver_data_t )
+static MACHINE_CONFIG_START( gamepock, driver_device )
 	MDRV_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem)
 	MDRV_CPU_IO_MAP( gamepock_io)
@@ -86,7 +86,7 @@ static MACHINE_CONFIG_START( gamepock, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */

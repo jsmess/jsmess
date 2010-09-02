@@ -153,13 +153,11 @@ Notes:
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class vtech1_state : public driver_data_t
+class vtech1_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vtech1_state(machine)); }
-
-	vtech1_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	vtech1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* devices */
 	running_device *mc6847;
@@ -1027,7 +1025,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_CONFIG(vtech1_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

@@ -692,7 +692,7 @@ static PALETTE_INIT( pasopia7 )
 		palette_set_color_rgb(machine, i+0x020, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static MACHINE_CONFIG_START( paso7, driver_data_t )
+static MACHINE_CONFIG_START( paso7, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(paso7_mem)

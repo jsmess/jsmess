@@ -171,7 +171,7 @@ static const mc68328_interface palm_dragonball_iface =
 };
 
 
-static MACHINE_CONFIG_START( palm, driver_data_t )
+static MACHINE_CONFIG_START( palm, driver_device )
 
     /* basic machine hardware */
     MDRV_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */

@@ -802,7 +802,7 @@ static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MDRV_CARTSLOT_LOAD(bbcb_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbca, driver_data_t )
+static MACHINE_CONFIG_START( bbca, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem)
@@ -893,7 +893,7 @@ MACHINE_CONFIG_END
 
 
 /****BBC MASTER */
-static MACHINE_CONFIG_START( bbcm, driver_data_t )
+static MACHINE_CONFIG_START( bbcm, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem)

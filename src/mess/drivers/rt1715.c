@@ -299,7 +299,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ NULL }
 };
 
-static MACHINE_CONFIG_START( rt1715, driver_data_t )
+static MACHINE_CONFIG_START( rt1715, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(rt1715_mem)

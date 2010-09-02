@@ -57,7 +57,7 @@ static const i2cmem_interface i2cmem_interface =
        I2CMEM_SLAVE_ADDRESS, 0, 0x2000
 };
 
-static MACHINE_CONFIG_START( pokemini, driver_data_t )
+static MACHINE_CONFIG_START( pokemini, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map)
@@ -84,7 +84,7 @@ static MACHINE_CONFIG_START( pokemini, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_CONFIG(pokemini_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

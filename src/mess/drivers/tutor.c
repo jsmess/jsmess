@@ -669,7 +669,7 @@ static const struct tms9995reset_param tutor_processor_config =
 	NULL		/* no IDLE callback */
 };
 
-static MACHINE_CONFIG_START( tutor, driver_data_t )
+static MACHINE_CONFIG_START( tutor, driver_device )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)

@@ -161,7 +161,7 @@ static MACHINE_RESET( bbcbc )
 }
 
 
-static MACHINE_CONFIG_START( bbcbc, driver_data_t )
+static MACHINE_CONFIG_START( bbcbc, driver_device )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg)
 	MDRV_CPU_IO_MAP( bbcbc_io)

@@ -702,7 +702,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(dectalk_kbd_put)
 };
 
-static MACHINE_CONFIG_START( dectalk, driver_data_t )
+static MACHINE_CONFIG_START( dectalk, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
     MDRV_CPU_PROGRAM_MAP(m68k_mem)

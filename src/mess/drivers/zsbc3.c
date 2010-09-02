@@ -38,7 +38,7 @@ static VIDEO_UPDATE( zsbc3 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( zsbc3, driver_data_t )
+static MACHINE_CONFIG_START( zsbc3, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz /4)
     MDRV_CPU_PROGRAM_MAP(zsbc3_mem)

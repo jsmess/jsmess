@@ -37,7 +37,7 @@ static VIDEO_UPDATE( dolphin )
     return 0;
 }
 
-static MACHINE_CONFIG_START( dolphin, driver_data_t )
+static MACHINE_CONFIG_START( dolphin, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(dolphin_mem)

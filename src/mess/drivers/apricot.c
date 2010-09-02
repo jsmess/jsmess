@@ -25,13 +25,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class apricot_state : public driver_data_t
+class apricot_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apricot_state(machine)); }
-
-	apricot_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	apricot_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *pic8259;
 	running_device *wd2793;

@@ -177,7 +177,7 @@ static MACHINE_RESET( casloopy )
 
 }
 
-static MACHINE_CONFIG_START( casloopy, driver_data_t )
+static MACHINE_CONFIG_START( casloopy, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,8000000)

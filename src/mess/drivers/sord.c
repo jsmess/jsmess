@@ -58,13 +58,11 @@
 /* PI-5 interface is required. mode 2 of the 8255 is used to communicate with the FD-5 */
 
 
-class sord_state : public driver_data_t
+class sord_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sord_state(machine)); }
-
-	sord_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	sord_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 fd5_databus;
 	int fd5_port_0x020_data;

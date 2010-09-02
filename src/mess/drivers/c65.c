@@ -282,7 +282,7 @@ static INTERRUPT_GEN( vic3_raster_irq )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c65, driver_data_t )
+static MACHINE_CONFIG_START( c65, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
 	MDRV_CPU_PROGRAM_MAP(c65_mem)

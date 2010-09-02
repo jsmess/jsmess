@@ -184,7 +184,7 @@ static GFXDECODE_START( mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikrosha, driver_data_t )
+static MACHINE_CONFIG_START( mikrosha, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(mikrosha_mem)

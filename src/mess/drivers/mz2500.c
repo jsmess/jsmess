@@ -1840,7 +1840,7 @@ static const struct rp5c15_interface rtc_intf =
 	mz2500_rtc_alarm_irq
 };
 
-static MACHINE_CONFIG_START( mz2500, driver_data_t )
+static MACHINE_CONFIG_START( mz2500, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
     MDRV_CPU_PROGRAM_MAP(mz2500_map)

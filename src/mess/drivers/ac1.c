@@ -108,7 +108,7 @@ static INPUT_PORTS_START( ac1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ac1, driver_data_t )
+static MACHINE_CONFIG_START( ac1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(ac1_mem)

@@ -194,7 +194,7 @@ static const ti990_tpc_interface ti990_tpc =
 	ti990_set_int9
 };
 
-static MACHINE_CONFIG_START( ti990_10, driver_data_t )
+static MACHINE_CONFIG_START( ti990_10, driver_device )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)

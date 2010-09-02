@@ -120,7 +120,7 @@ static INPUT_PORTS_START( galeb )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( galeb, driver_data_t )
+static MACHINE_CONFIG_START( galeb, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6502, 1000000)
     MDRV_CPU_PROGRAM_MAP(galeb_mem)

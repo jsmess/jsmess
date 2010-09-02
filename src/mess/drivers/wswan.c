@@ -124,7 +124,7 @@ static PALETTE_INIT( wscolor )
 	}
 }
 
-static MACHINE_CONFIG_START( wswan, driver_data_t )
+static MACHINE_CONFIG_START( wswan, driver_device )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30MZ, 3072000)
 	MDRV_CPU_PROGRAM_MAP(wswan_mem)

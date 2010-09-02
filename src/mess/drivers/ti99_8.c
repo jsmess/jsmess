@@ -558,7 +558,7 @@ static const floppy_config ti99_8_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ti99_8_60hz, driver_data_t )
+static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ti99_8_50hz, driver_data_t )
+static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)

@@ -308,7 +308,7 @@ static const cassette_config jupiter_cassette_config =
 };
 
 /* machine definition */
-static MACHINE_CONFIG_START( jupiter, driver_data_t )
+static MACHINE_CONFIG_START( jupiter, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem)
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( jupiter, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )

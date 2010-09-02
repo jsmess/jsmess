@@ -275,7 +275,7 @@ static Z80PIO_INTERFACE( nascom1_z80pio_intf )
 };
 
 
-static MACHINE_CONFIG_START( nascom1, driver_data_t )
+static MACHINE_CONFIG_START( nascom1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem)

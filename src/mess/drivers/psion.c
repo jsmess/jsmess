@@ -921,7 +921,7 @@ static MACHINE_CONFIG_FRAGMENT( psion_slot )
 MACHINE_CONFIG_END
 
 /* basic configuration for 2 lines display */
-static MACHINE_CONFIG_START( psion_2lines, driver_data_t )
+static MACHINE_CONFIG_START( psion_2lines, driver_device )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_START( psion_2lines, driver_data_t )
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
-static MACHINE_CONFIG_START( psion_4lines, driver_data_t )
+static MACHINE_CONFIG_START( psion_4lines, driver_device )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 

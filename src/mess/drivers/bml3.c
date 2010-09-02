@@ -462,7 +462,7 @@ static GFXDECODE_START( bml3 )
 	GFXDECODE_ENTRY( "char", 0, bml3_charlayout, 0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bml3, driver_data_t )
+static MACHINE_CONFIG_START( bml3, driver_device )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(bml3_mem)

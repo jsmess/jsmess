@@ -82,7 +82,7 @@ static VIDEO_UPDATE( dm7000 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( dm7000, driver_data_t )
+static MACHINE_CONFIG_START( dm7000, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",PPC403GA, 252000000) // Should be PPC405
     MDRV_CPU_PROGRAM_MAP(dm7000_mem)

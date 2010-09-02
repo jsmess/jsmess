@@ -59,7 +59,7 @@ static I8255A_INTERFACE( amico_8255_intf )
 	DEVCB_NULL							// Port C write
 };
 
-static MACHINE_CONFIG_START( amico2k, driver_data_t )
+static MACHINE_CONFIG_START( amico2k, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)	/* 1MHz */
 	MDRV_CPU_PROGRAM_MAP(amico2k_mem)

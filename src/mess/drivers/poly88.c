@@ -144,7 +144,7 @@ static const cassette_config poly88_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( poly88, driver_data_t )
+static MACHINE_CONFIG_START( poly88, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1853000)
     MDRV_CPU_PROGRAM_MAP(poly88_mem)

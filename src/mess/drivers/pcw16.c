@@ -1391,7 +1391,7 @@ static const floppy_config pcw16_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( pcw16, driver_data_t )
+static MACHINE_CONFIG_START( pcw16, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pcw16_map)

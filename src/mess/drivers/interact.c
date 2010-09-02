@@ -121,7 +121,7 @@ static VIDEO_UPDATE( interact )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact, driver_data_t )
+static MACHINE_CONFIG_START( interact, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( interact, driver_data_t )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1, driver_data_t )
+static MACHINE_CONFIG_START( hector1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)

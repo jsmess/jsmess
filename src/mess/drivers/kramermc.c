@@ -104,7 +104,7 @@ static INPUT_PORTS_START( kramermc )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( kramermc, driver_data_t )
+static MACHINE_CONFIG_START( kramermc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1500000)
 	MDRV_CPU_PROGRAM_MAP(kramermc_mem)

@@ -136,7 +136,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static MACHINE_CONFIG_START( m20, driver_data_t )
+static MACHINE_CONFIG_START( m20, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
     MDRV_CPU_PROGRAM_MAP(m20_mem)

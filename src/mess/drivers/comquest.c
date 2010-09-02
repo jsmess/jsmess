@@ -212,7 +212,7 @@ static MACHINE_RESET( comquest )
 static const UINT32 amask= 0xffff;
 
 
-static MACHINE_CONFIG_START( comquest, driver_data_t )
+static MACHINE_CONFIG_START( comquest, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
 	/*MDRV_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */

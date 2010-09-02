@@ -36,7 +36,7 @@ static VIDEO_UPDATE( vt220 )
 }
 
 
-static MACHINE_CONFIG_START( vt220, driver_data_t )
+static MACHINE_CONFIG_START( vt220, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8051, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(vt220_mem)

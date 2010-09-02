@@ -355,7 +355,7 @@ static INTERRUPT_GEN( tvc_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tvc, driver_data_t )
+static MACHINE_CONFIG_START( tvc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3125000)
     MDRV_CPU_PROGRAM_MAP(tvc_mem)

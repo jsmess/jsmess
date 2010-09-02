@@ -523,7 +523,7 @@ static MACHINE_RESET( tvlink )
 	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static MACHINE_CONFIG_START( svision, driver_data_t )
+static MACHINE_CONFIG_START( svision, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem)

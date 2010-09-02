@@ -204,7 +204,7 @@ static GFXDECODE_START( zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( zrt80, driver_data_t )
+static MACHINE_CONFIG_START( zrt80, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(zrt80_mem)

@@ -7,13 +7,11 @@
 #ifndef _3DO_H_
 #define _3DO_H_
 
-class _3do_state : public driver_data_t
+class _3do_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _3do_state(machine)); }
-
-	_3do_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	_3do_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	legacy_cpu_device* maincpu;
 	UINT32 *dram;

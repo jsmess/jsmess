@@ -219,7 +219,7 @@ static const floppy_config kaypro2x_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( kayproii, driver_data_t )
+static MACHINE_CONFIG_START( kayproii, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
 	MDRV_Z80PIO_ADD( "z80pio_s", 2500000, kaypro4_pio_s_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kaypro2x, driver_data_t )
+static MACHINE_CONFIG_START( kaypro2x, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)

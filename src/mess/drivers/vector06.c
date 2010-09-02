@@ -167,7 +167,7 @@ const wd17xx_interface vector06_wd17xx_interface =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( vector06, driver_data_t )
+static MACHINE_CONFIG_START( vector06, driver_device )
   /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 3000000)
 //  MDRV_CPU_ADD("maincpu", Z80, 3000000)

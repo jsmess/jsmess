@@ -547,7 +547,7 @@ static MACHINE_RESET(multi8)
 	mcu_init = 0;
 }
 
-static MACHINE_CONFIG_START( multi8, driver_data_t )
+static MACHINE_CONFIG_START( multi8, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(multi8_mem)

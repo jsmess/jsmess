@@ -410,7 +410,7 @@ static const floppy_config specimx_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special, driver_data_t )
+static MACHINE_CONFIG_START( special, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem)
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik, driver_data_t )
+static MACHINE_CONFIG_START( erik, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 4000000)
     MDRV_CPU_PROGRAM_MAP(erik_mem)

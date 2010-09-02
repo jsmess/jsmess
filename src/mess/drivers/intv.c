@@ -373,7 +373,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 	timer_set(device->machine, device->machine->device<cpu_device>("keyboard")->cycles_to_attotime(100), NULL, 0, intv_interrupt2_complete);
 }
 
-static MACHINE_CONFIG_START( intv, driver_data_t )
+static MACHINE_CONFIG_START( intv, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem)

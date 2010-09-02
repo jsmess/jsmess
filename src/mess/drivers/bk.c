@@ -169,7 +169,7 @@ static const cassette_config bk0010_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( bk0010, driver_data_t )
+static MACHINE_CONFIG_START( bk0010, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( bk0010, driver_data_t )
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bk0010fd, driver_data_t )
+static MACHINE_CONFIG_START( bk0010fd, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)

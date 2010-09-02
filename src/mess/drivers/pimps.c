@@ -60,7 +60,7 @@ static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
 	DEVCB_HANDLER(pimps_kbd_put)
 };
 
-static MACHINE_CONFIG_START( pimps, driver_data_t )
+static MACHINE_CONFIG_START( pimps, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(pimps_mem)

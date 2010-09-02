@@ -215,7 +215,7 @@ static const ay8910_interface microtan_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( microtan, driver_data_t )
+static MACHINE_CONFIG_START( microtan, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map)

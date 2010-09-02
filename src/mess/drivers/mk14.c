@@ -127,7 +127,7 @@ static const ins8154_interface mk14_ins8154 =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( mk14, driver_data_t )
+static MACHINE_CONFIG_START( mk14, driver_device )
     /* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
     MDRV_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)

@@ -346,7 +346,7 @@ static PALETTE_INIT( pdp1 )
 }
 
 
-static MACHINE_CONFIG_START( pdp1, driver_data_t )
+static MACHINE_CONFIG_START( pdp1, driver_device )
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */

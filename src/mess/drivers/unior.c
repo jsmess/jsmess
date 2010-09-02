@@ -55,7 +55,7 @@ static GFXDECODE_START( unior )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( unior, driver_data_t )
+static MACHINE_CONFIG_START( unior, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 2222222)
     MDRV_CPU_PROGRAM_MAP(unior_mem)

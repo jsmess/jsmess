@@ -75,7 +75,7 @@ static const floppy_config apple3_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( apple3, driver_data_t )
+static MACHINE_CONFIG_START( apple3, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple3_map)

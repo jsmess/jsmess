@@ -509,7 +509,7 @@ static MACHINE_RESET(mycom)
 	mycom_amask = 0xc000;
 }
 
-static MACHINE_CONFIG_START( mycom, driver_data_t )
+static MACHINE_CONFIG_START( mycom, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(mycom_map)

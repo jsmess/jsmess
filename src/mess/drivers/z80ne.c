@@ -465,7 +465,7 @@ static const mc6847_interface z80net_mc6847_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( z80ne, driver_data_t )
+static MACHINE_CONFIG_START( z80ne, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80ne_mem)
@@ -518,7 +518,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MDRV_RAM_EXTRA_OPTIONS("1K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netb, driver_data_t )
+static MACHINE_CONFIG_START( z80netb, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80netb_mem)
@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( z80netb, driver_data_t )
 	MDRV_RAM_EXTRA_OPTIONS("1K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netf, driver_data_t )
+static MACHINE_CONFIG_START( z80netf, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MDRV_CPU_PROGRAM_MAP(z80netf_mem)

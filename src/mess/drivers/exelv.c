@@ -495,7 +495,7 @@ static const tms5220_interface exl100_tms5220_interface =
 };
 
 
-static MACHINE_CONFIG_START( exl100, driver_data_t )
+static MACHINE_CONFIG_START( exl100, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7020 */
 	MDRV_CPU_PROGRAM_MAP(tms7020_mem)
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( exl100, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( exeltel, driver_data_t )
+static MACHINE_CONFIG_START( exeltel, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7040 */
 	MDRV_CPU_PROGRAM_MAP(tms7040_mem)

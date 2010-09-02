@@ -72,12 +72,11 @@ struct towns_video_controller
 	UINT8 towns_layer_ctrl;
 };
 
-class towns_state : public driver_data_t
+class towns_state : public driver_device
 {
 	public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, towns_state(machine)); }
-	towns_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	towns_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 ftimer;
 	UINT8 nmi_mask;

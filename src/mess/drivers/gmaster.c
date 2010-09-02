@@ -22,8 +22,8 @@ static struct {
 
 typedef struct {
     UINT8 ports[5];
-} GMASTER;
-static GMASTER gmaster;
+} GMASTER_MACHINE;
+static GMASTER_MACHINE gmaster;
 
 static READ8_HANDLER( gmaster_io_r )
 {
@@ -258,7 +258,7 @@ static const UPD7810_CONFIG config = {
 	gmaster_io_callback
 };
 
-static MACHINE_CONFIG_START( gmaster, driver_data_t )
+static MACHINE_CONFIG_START( gmaster, driver_device )
 	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
 	MDRV_CPU_PROGRAM_MAP(gmaster_mem)
 	MDRV_CPU_IO_MAP( gmaster_io)

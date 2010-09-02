@@ -97,7 +97,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( vectrex, driver_data_t )
+static MACHINE_CONFIG_START( vectrex, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map)

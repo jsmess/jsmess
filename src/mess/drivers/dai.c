@@ -201,7 +201,7 @@ static GFXDECODE_START( dai )
 GFXDECODE_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( dai, driver_data_t )
+static MACHINE_CONFIG_START( dai, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dai_mem)

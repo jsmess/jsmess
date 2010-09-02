@@ -210,7 +210,7 @@ static DEVICE_IMAGE_LOAD( prestige_cart )
 	return IMAGE_INIT_FAIL;
 }
 
-static MACHINE_CONFIG_START( prestige, driver_data_t )
+static MACHINE_CONFIG_START( prestige, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(prestige_mem)

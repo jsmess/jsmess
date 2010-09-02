@@ -2596,7 +2596,7 @@ static DRIVER_INIT( x68030 )
 	x68k_sys.sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
-static MACHINE_CONFIG_START( x68000, driver_data_t )
+static MACHINE_CONFIG_START( x68000, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map)

@@ -113,7 +113,7 @@ static VIDEO_UPDATE( vk100 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( vk100, driver_data_t )
+static MACHINE_CONFIG_START( vk100, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
     MDRV_CPU_PROGRAM_MAP(vk100_mem)

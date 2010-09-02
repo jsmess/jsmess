@@ -499,7 +499,7 @@ static int TEDTIME_TO_CYCLES(int pal, attotime t)
 INLINE ted7360_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TED7360);
+	assert(device->type() == TED7360);
 
 	return (ted7360_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -507,7 +507,7 @@ INLINE ted7360_state *get_safe_token( running_device *device )
 INLINE const ted7360_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TED7360);
+	assert(device->type() == TED7360);
 
 	return (const ted7360_interface *) device->baseconfig().static_config();
 }

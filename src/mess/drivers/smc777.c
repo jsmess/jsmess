@@ -699,7 +699,7 @@ static const floppy_config smc777_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( smc777, driver_data_t )
+static MACHINE_CONFIG_START( smc777, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
     MDRV_CPU_PROGRAM_MAP(smc777_mem)

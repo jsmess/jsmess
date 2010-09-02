@@ -149,7 +149,7 @@ static const duart68681_config duart_config =
 	1000000, 1000000, // IP5, IP6
 };
 
-static MACHINE_CONFIG_START( esq1, driver_data_t )
+static MACHINE_CONFIG_START( esq1, driver_device )
 	MDRV_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
 	MDRV_CPU_PROGRAM_MAP(esq1_map)
 

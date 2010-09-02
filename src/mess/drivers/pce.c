@@ -231,7 +231,7 @@ static MACHINE_CONFIG_FRAGMENT( sgx_cartslot )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","sgx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pce_common, driver_data_t )
+static MACHINE_CONFIG_START( pce_common, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem)
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_DERIVED( tg16, pce_common )
 	MDRV_FRAGMENT_ADD( tg16_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sgx, driver_data_t )
+static MACHINE_CONFIG_START( sgx, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(sgx_mem)

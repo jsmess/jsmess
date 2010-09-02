@@ -57,7 +57,7 @@ static VIDEO_UPDATE( systec )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( systec, driver_data_t )
+static MACHINE_CONFIG_START( systec, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(systec_mem)

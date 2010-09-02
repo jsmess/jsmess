@@ -229,7 +229,7 @@ static const saa5050_interface p2000t_saa5050_intf =
 };
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000t, driver_data_t )
+static MACHINE_CONFIG_START( p2000t, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000t_mem)
@@ -255,13 +255,13 @@ static MACHINE_CONFIG_START( p2000t, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000m, driver_data_t )
+static MACHINE_CONFIG_START( p2000m, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem)
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( p2000m, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

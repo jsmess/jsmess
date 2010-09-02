@@ -42,7 +42,7 @@ static VIDEO_UPDATE( mccpm )
     return 0;
 }
 
-static MACHINE_CONFIG_START( mccpm, driver_data_t )
+static MACHINE_CONFIG_START( mccpm, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(mccpm_mem)

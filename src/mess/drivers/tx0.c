@@ -317,7 +317,7 @@ static const tx0_reset_param_t tx0_reset_param =
 };
 
 
-static MACHINE_CONFIG_START( tx0_64kw, driver_data_t )
+static MACHINE_CONFIG_START( tx0_64kw, driver_device )
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	MDRV_CPU_ADD("maincpu", TX0_64KW, 166667)

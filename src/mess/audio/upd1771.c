@@ -128,7 +128,7 @@ struct _upd1771_state
 INLINE upd1771_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->type() == SOUND_UPD1771C);
+    assert(device->type() == UPD1771C);
     return (upd1771_state *)downcast<legacy_device_base *>(device)->token();
 }
 

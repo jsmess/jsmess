@@ -21,13 +21,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class mc10_state : public driver_data_t
+class mc10_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mc10_state(machine)); }
-
-	mc10_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mc10_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *mc6847;
 	running_device *dac;

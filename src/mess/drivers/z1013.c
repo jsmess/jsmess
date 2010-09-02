@@ -166,7 +166,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( z1013, driver_data_t )
+static MACHINE_CONFIG_START( z1013, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1MHz )
 	MDRV_CPU_PROGRAM_MAP(z1013_mem)

@@ -103,7 +103,7 @@ static GFXDECODE_START( h19 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( h19, driver_data_t )
+static MACHINE_CONFIG_START( h19, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6) // From schematics
 	MDRV_CPU_PROGRAM_MAP(h19_mem)

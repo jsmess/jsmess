@@ -51,13 +51,11 @@
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
 
-class spectrum_state : public driver_data_t
+class spectrum_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spectrum_state(machine)); }
-
-	spectrum_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	spectrum_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	int port_fe_data;
 	int port_7ffd_data;

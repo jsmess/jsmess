@@ -689,7 +689,7 @@ static INPUT_PORTS_START( glasgow )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_KEYBOARD)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( glasgow, driver_data_t )
+static MACHINE_CONFIG_START( glasgow, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(glasgow_mem)

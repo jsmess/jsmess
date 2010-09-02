@@ -501,7 +501,7 @@ static MACHINE_START( vidbrain )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( vidbrain, driver_data_t )
+    MACHINE_CONFIG_START( vidbrain, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( vidbrain, vidbrain_state )

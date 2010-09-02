@@ -669,7 +669,7 @@ static const vic2_interface ultimax_vic2_intf = {
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c64, driver_data_t )
+static MACHINE_CONFIG_START( c64, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( c64, driver_data_t )
 	MDRV_FRAGMENT_ADD(c64_cartslot)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64pal, driver_data_t )
+static MACHINE_CONFIG_START( c64pal, driver_device )
 	MDRV_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
 	MDRV_CPU_CONFIG( c64_m6510_interface )

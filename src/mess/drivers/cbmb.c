@@ -84,7 +84,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 * Add better P500 emulation (almost everything: memory access, inputs,
     Datasette, etc.)
 
-* Was CBM 710 / 720 monitor at 50Hz? If not remove MACHINE_CONFIG_START( cbm700pal, driver_data_t )
+* Was CBM 710 / 720 monitor at 50Hz? If not remove MACHINE_CONFIG_START( cbm700pal, driver_device )
     and use the 60Hz version for the whole High Profile
 
 * Find info about the following models (if ever existed):

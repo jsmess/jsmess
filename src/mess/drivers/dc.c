@@ -220,7 +220,7 @@ static const aica_interface dc_aica_interface =
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-static MACHINE_CONFIG_START( dc, driver_data_t )
+static MACHINE_CONFIG_START( dc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
 	MDRV_CPU_CONFIG(sh4cpu_config)

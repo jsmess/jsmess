@@ -38,7 +38,7 @@ static VIDEO_UPDATE( chaos )
     return 0;
 }
 
-static MACHINE_CONFIG_START( chaos, driver_data_t )
+static MACHINE_CONFIG_START( chaos, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(chaos_mem)

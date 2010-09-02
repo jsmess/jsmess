@@ -27,7 +27,7 @@ typedef struct
 INLINE SocratesASIC *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SOCRATES);
+	assert(device->type() == SOCRATES);
 	return (SocratesASIC *)downcast<legacy_device_base *>(device)->token();
 }
 

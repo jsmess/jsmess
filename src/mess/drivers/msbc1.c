@@ -33,7 +33,7 @@ static VIDEO_UPDATE( msbc1 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( msbc1, driver_data_t )
+static MACHINE_CONFIG_START( msbc1, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(msbc1_mem)

@@ -2382,7 +2382,7 @@ static const scsp_interface saturn_scsp_interface =
 	scsp_irq
 };
 
-static MACHINE_CONFIG_START( saturn, driver_data_t )
+static MACHINE_CONFIG_START( saturn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

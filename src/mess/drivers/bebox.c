@@ -115,7 +115,7 @@ static const floppy_config bebox_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( bebox, driver_data_t )
+static MACHINE_CONFIG_START( bebox, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
 	MDRV_CPU_PROGRAM_MAP(bebox_mem)

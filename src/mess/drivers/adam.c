@@ -635,7 +635,7 @@ static const floppy_config adam_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( adam, driver_data_t )
+static MACHINE_CONFIG_START( adam, driver_device )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(adam_mem)

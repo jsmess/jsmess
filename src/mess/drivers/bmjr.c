@@ -314,7 +314,7 @@ static MACHINE_RESET(bmjr)
 	cassette_change_state(bmjr_cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr, driver_data_t )
+static MACHINE_CONFIG_START( bmjr, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
     MDRV_CPU_PROGRAM_MAP(bmjr_mem)

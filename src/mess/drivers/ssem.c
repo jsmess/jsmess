@@ -614,7 +614,7 @@ static MACHINE_RESET( ssem )
     store_line = 0;
 }
 
-static MACHINE_CONFIG_START( ssem, driver_data_t )
+static MACHINE_CONFIG_START( ssem, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", SSEM, 700)
     MDRV_CPU_PROGRAM_MAP(ssem_map)

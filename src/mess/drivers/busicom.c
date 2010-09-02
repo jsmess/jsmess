@@ -214,7 +214,7 @@ static MACHINE_RESET(busicom)
 
 static const char layout_busicom [] = "busicom";
 
-static MACHINE_CONFIG_START( busicom, driver_data_t )
+static MACHINE_CONFIG_START( busicom, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I4004, 750000)
     MDRV_CPU_PROGRAM_MAP(busicom_rom)

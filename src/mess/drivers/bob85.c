@@ -130,7 +130,7 @@ static MACHINE_RESET(bob85)
 {
 }
 
-static MACHINE_CONFIG_START( bob85, driver_data_t )
+static MACHINE_CONFIG_START( bob85, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, 2000000)
     MDRV_CPU_PROGRAM_MAP(bob85_mem)

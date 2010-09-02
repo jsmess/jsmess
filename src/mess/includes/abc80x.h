@@ -38,13 +38,11 @@
 #define ABC800_CHAR_WIDTH	6
 #define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
 
-class abc800_state : public driver_data_t
+class abc800_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc800_state(machine)); }
-
-	abc800_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	abc800_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	int fetch_charram;			/* opcode fetched from character RAM region (0x7800-0x7fff) */
@@ -73,13 +71,11 @@ public:
 	running_device *cassette;
 };
 
-class abc802_state : public driver_data_t
+class abc802_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc802_state(machine)); }
-
-	abc802_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	abc802_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	int lrs;				/* low RAM select */
@@ -104,13 +100,11 @@ public:
 	running_device *cassette;
 };
 
-class abc806_state : public driver_data_t
+class abc806_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc806_state(machine)); }
-
-	abc806_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	abc806_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory state */
 	int keydtr;				/* keyboard DTR */

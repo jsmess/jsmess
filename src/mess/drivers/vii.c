@@ -54,13 +54,11 @@
 #define TILE_X_FLIP				0x0004
 #define TILE_Y_FLIP				0x0008
 
-class vii_state : public driver_data_t
+class vii_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vii_state(machine)); }
-
-	vii_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	vii_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 *ram;
 	UINT16 *cart;

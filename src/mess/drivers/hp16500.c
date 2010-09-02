@@ -36,7 +36,7 @@ static VIDEO_UPDATE( hp16500 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hp16500, driver_data_t )
+static MACHINE_CONFIG_START( hp16500, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(hp16500_map)

@@ -13,13 +13,11 @@
 #include "machine/msm8251.h"
 #include "devices/messram.h"
 
-class fk1_state : public driver_data_t
+class fk1_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fk1_state(machine)); }
-
-	fk1_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	fk1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 video_rol;
 	UINT8 int_vector;

@@ -2154,7 +2154,7 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-static MACHINE_CONFIG_START( pc6001, driver_data_t )
+static MACHINE_CONFIG_START( pc6001, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MDRV_CPU_PROGRAM_MAP(pc6001_map)

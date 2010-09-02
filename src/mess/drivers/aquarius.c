@@ -392,7 +392,7 @@ static const cassette_config aquarius_cassette_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( aquarius, driver_data_t )
+static MACHINE_CONFIG_START( aquarius, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem)
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( aquarius, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914

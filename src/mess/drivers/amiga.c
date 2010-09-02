@@ -365,7 +365,7 @@ static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ntsc, driver_data_t )
+static MACHINE_CONFIG_START( ntsc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_mem)

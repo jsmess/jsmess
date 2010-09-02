@@ -1,13 +1,11 @@
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
 
-class comxpl80_state : public driver_data_t
+class comxpl80_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, comxpl80_state(machine)); }
-
-	comxpl80_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	comxpl80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* printer state */
 	UINT8 centronics_data;	/* centronics data */

@@ -94,7 +94,7 @@ static INPUT_PORTS_START( sapi1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1, driver_data_t )
+static MACHINE_CONFIG_START( sapi1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sapi1_mem)
@@ -122,7 +122,7 @@ static MACHINE_CONFIG_START( sapi1, driver_data_t )
 	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapizps3, driver_data_t )
+static MACHINE_CONFIG_START( sapizps3, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sapizps3_mem)

@@ -635,7 +635,7 @@ static MACHINE_CONFIG_FRAGMENT( super80_cartslot )
 	MDRV_CARTSLOT_LOAD(super80_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80, driver_data_t )
+static MACHINE_CONFIG_START( super80, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80_map)
@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( super80, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
@@ -699,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MDRV_VIDEO_UPDATE(super80m)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80v, driver_data_t )
+static MACHINE_CONFIG_START( super80v, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map)
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( super80v, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */

@@ -736,7 +736,7 @@ static INPUT_PORTS_START( z88 )
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)							PORT_CHAR('\xA3') PORT_CHAR('~')
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( z88, driver_data_t )
+static MACHINE_CONFIG_START( z88, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3276800)
 	MDRV_CPU_PROGRAM_MAP(z88_mem)
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_START( z88, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */

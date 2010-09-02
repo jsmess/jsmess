@@ -40,7 +40,7 @@ static VIDEO_UPDATE( indiana )
     return 0;
 }
 
-static MACHINE_CONFIG_START( indiana, driver_data_t )
+static MACHINE_CONFIG_START( indiana, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68030, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(indiana_mem)

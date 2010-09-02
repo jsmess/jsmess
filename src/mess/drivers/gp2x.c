@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gp2x, driver_data_t )
+static MACHINE_CONFIG_START( gp2x, driver_device )
 	MDRV_CPU_ADD("maincpu", ARM9, 80000000)
 	MDRV_CPU_PROGRAM_MAP(gp2x_map)
 

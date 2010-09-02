@@ -42,7 +42,7 @@ static VIDEO_UPDATE( sdk86 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( sdk86, driver_data_t )
+static MACHINE_CONFIG_START( sdk86, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
     MDRV_CPU_PROGRAM_MAP(sdk86_mem)

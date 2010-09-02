@@ -350,7 +350,7 @@ static DRIVER_INIT( pegasus )
 	pegasus_decrypt_rom( machine, 0xf000 );
 }
 
-static MACHINE_CONFIG_START( pegasus, driver_data_t )
+static MACHINE_CONFIG_START( pegasus, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)

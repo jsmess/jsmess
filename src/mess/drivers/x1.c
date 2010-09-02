@@ -2198,7 +2198,7 @@ static const floppy_config x1_floppy_config =
 	"x1_flop"
 };
 
-static MACHINE_CONFIG_START( x1, driver_data_t )
+static MACHINE_CONFIG_START( x1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(x1_mem)

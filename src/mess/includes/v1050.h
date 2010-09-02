@@ -34,13 +34,11 @@
 #define INT_EXPANSION_B		0x40
 #define INT_EXPANSION_A		0x80
 
-class v1050_state : public driver_data_t
+class v1050_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, v1050_state(machine)); }
-
-	v1050_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	v1050_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* interrupt state */
 	UINT8 int_mask;				/* interrupt mask */

@@ -208,7 +208,7 @@ static GFXDECODE_START( pce220 )
 	GFXDECODE_ENTRY( "lcd_vram",   0x00000, test_decode,    0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pce220, driver_data_t )
+static MACHINE_CONFIG_START( pce220, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
     MDRV_CPU_PROGRAM_MAP(pce220_mem)

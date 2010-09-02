@@ -418,7 +418,7 @@ static const UPD7810_CONFIG ex800_cpu_config =
 ******************************************************************************/
 
 
-static MACHINE_CONFIG_START( ex800, driver_data_t )
+static MACHINE_CONFIG_START( ex800, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)

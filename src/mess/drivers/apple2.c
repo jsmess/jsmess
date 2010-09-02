@@ -603,7 +603,7 @@ static const cassette_config apple2_cassette_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( apple2_common, driver_data_t )
+static MACHINE_CONFIG_START( apple2_common, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple2_map)
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( apple2_common, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("a2speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
 	MDRV_SOUND_CONFIG(apple2_ay8910_interface)

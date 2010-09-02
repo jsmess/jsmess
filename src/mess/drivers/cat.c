@@ -11,13 +11,11 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
-class cat_state : public driver_data_t
+class cat_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cat_state(machine)); }
-
-	cat_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	cat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 *video_ram;
 

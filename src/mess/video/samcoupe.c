@@ -28,7 +28,7 @@
 
 static void draw_mode4_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
 	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
@@ -52,7 +52,7 @@ static void draw_mode4_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode3_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
 	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
@@ -74,7 +74,7 @@ static void draw_mode3_line(running_machine *machine, int y, int hpos)
 	}
 }
 
-static void draw_mode12_block(coupe_asic *asic, bitmap_t *bitmap, int vpos, int hpos, UINT8 mask)
+static void draw_mode12_block(samcoupe_state *asic, bitmap_t *bitmap, int vpos, int hpos, UINT8 mask)
 {
 	/* extract colors from attribute */
 	UINT8 ink = asic->clut[ATTR_FG(asic->attribute)];
@@ -90,7 +90,7 @@ static void draw_mode12_block(coupe_asic *asic, bitmap_t *bitmap, int vpos, int 
 
 static void draw_mode2_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	int cell = (y - SAM_BORDER_TOP) * 32 + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2;
 
@@ -102,7 +102,7 @@ static void draw_mode2_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode1_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	UINT8 mask = machine->generic.videoram.u8[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 	asic->attribute = machine->generic.videoram.u8[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
@@ -112,7 +112,7 @@ static void draw_mode1_line(running_machine *machine, int y, int hpos)
 
 TIMER_CALLBACK( sam_video_update_callback )
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	int vpos = machine->primary_screen->vpos();
 	int hpos = machine->primary_screen->hpos();

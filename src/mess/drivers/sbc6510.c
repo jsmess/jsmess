@@ -72,7 +72,7 @@ const mos6526_interface sbc6510_ntsc_cia0 =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( sbc6510, driver_data_t )
+static MACHINE_CONFIG_START( sbc6510, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MDRV_CPU_CONFIG( sbc6510_m6510_interface )

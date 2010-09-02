@@ -945,7 +945,7 @@ static DEVICE_IMAGE_LOAD( pockstat_flash)
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( pockstat, driver_data_t )
+static MACHINE_CONFIG_START( pockstat, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pockstat_mem)

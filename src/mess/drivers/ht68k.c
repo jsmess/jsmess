@@ -114,7 +114,7 @@ static const floppy_config ht68k_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ht68k, driver_data_t )
+static MACHINE_CONFIG_START( ht68k, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(ht68k_mem)

@@ -522,7 +522,7 @@ static GFXDECODE_START( pyl601a )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pyl601, driver_data_t )
+static MACHINE_CONFIG_START( pyl601, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(pyl601_mem)

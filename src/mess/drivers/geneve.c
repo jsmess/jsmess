@@ -492,7 +492,7 @@ static const floppy_config geneve_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( geneve_60hz, driver_data_t )
+static MACHINE_CONFIG_START( geneve_60hz, driver_device )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 12000000)

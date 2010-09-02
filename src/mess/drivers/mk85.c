@@ -38,7 +38,7 @@ static const struct t11_setup t11_data =
 	5 << 13			/* start from 0000 */
 };
 
-static MACHINE_CONFIG_START( mk85, driver_data_t )
+static MACHINE_CONFIG_START( mk85, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",T11, XTAL_4MHz)
     MDRV_CPU_CONFIG(t11_data)

@@ -186,7 +186,7 @@ static GFXDECODE_START( partner )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( partner, driver_data_t )
+static MACHINE_CONFIG_START( partner, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(partner_mem)

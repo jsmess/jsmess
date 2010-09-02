@@ -1075,7 +1075,7 @@ static const psx_spu_interface psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static MACHINE_CONFIG_START( psxntsc, driver_data_t )
+static MACHINE_CONFIG_START( psxntsc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map)
@@ -1110,7 +1110,7 @@ static MACHINE_CONFIG_START( psxntsc, driver_data_t )
 	MDRV_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( psxpal, driver_data_t )
+static MACHINE_CONFIG_START( psxpal, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map)

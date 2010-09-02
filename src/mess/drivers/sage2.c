@@ -49,7 +49,7 @@ static GENERIC_TERMINAL_INTERFACE( sage2_terminal_intf )
 	DEVCB_HANDLER(sage2_kbd_put)
 };
 
-static MACHINE_CONFIG_START( sage2, driver_data_t )
+static MACHINE_CONFIG_START( sage2, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(sage2_mem)

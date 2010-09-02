@@ -68,7 +68,7 @@ static VIDEO_UPDATE( sol20 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sol20, driver_data_t )
+static MACHINE_CONFIG_START( sol20, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
 	MDRV_CPU_PROGRAM_MAP(sol20_mem)

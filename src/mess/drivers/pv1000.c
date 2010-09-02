@@ -14,11 +14,10 @@ DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 
 
-class d65010_state : public driver_data_t {
+class d65010_state : public driver_device {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, d65010_state(machine)); }
-	d65010_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	d65010_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8	io_regs[8];
 	UINT8	fd_data;

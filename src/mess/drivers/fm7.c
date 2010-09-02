@@ -1855,7 +1855,7 @@ static const floppy_config fm7_floppy_config =
 	"fm7_flop"
 };
 
-static MACHINE_CONFIG_START( fm7, driver_data_t )
+static MACHINE_CONFIG_START( fm7, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm7_mem)
@@ -1903,7 +1903,7 @@ static MACHINE_CONFIG_START( fm7, driver_data_t )
 	MDRV_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm77av, driver_data_t )
+static MACHINE_CONFIG_START( fm77av, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
 	MDRV_CPU_PROGRAM_MAP(fm77av_mem)

@@ -1827,7 +1827,7 @@ static MACHINE_RESET( gp32 )
 	s3c240x_machine_reset(machine);
 }
 
-static MACHINE_CONFIG_START( gp32, driver_data_t )
+static MACHINE_CONFIG_START( gp32, driver_device )
 	MDRV_CPU_ADD("maincpu", ARM9, 40000000)
 	MDRV_CPU_PROGRAM_MAP(gp32_map)
 

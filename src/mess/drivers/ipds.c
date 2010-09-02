@@ -85,7 +85,7 @@ static GFXDECODE_START( ipds )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ipds, driver_data_t )
+static MACHINE_CONFIG_START( ipds, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipds_mem)

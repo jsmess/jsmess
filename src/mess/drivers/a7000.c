@@ -777,7 +777,7 @@ static MACHINE_RESET(a7000)
 	timer_adjust_oneshot( flyback_timer, attotime_never, 0);
 }
 
-static MACHINE_CONFIG_START( a7000, driver_data_t )
+static MACHINE_CONFIG_START( a7000, driver_device )
 
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )

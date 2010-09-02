@@ -422,7 +422,7 @@ static const duart68681_config sgi_ip2_duart68681b_config =
 	duartb_output
 };
 
-static MACHINE_CONFIG_START( sgi_ip2, driver_data_t )
+static MACHINE_CONFIG_START( sgi_ip2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(sgi_ip2_map)

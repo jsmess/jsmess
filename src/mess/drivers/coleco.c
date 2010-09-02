@@ -571,7 +571,7 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco, driver_data_t )
+static MACHINE_CONFIG_START( coleco, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(coleco_map)
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( coleco, driver_data_t )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( czz50, driver_data_t )
+static MACHINE_CONFIG_START( czz50, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(czz50_map)

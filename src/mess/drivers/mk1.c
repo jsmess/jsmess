@@ -175,7 +175,7 @@ static const f3853_interface mk1_config =
 };
 
 
-static MACHINE_CONFIG_START( mk1, driver_data_t )
+static MACHINE_CONFIG_START( mk1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MDRV_CPU_PROGRAM_MAP( mk1_mem)

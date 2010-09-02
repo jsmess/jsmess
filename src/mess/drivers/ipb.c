@@ -39,7 +39,7 @@ static VIDEO_UPDATE( ipb )
     return 0;
 }
 
-static MACHINE_CONFIG_START( ipb, driver_data_t )
+static MACHINE_CONFIG_START( ipb, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipb_mem)

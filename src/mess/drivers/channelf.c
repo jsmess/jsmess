@@ -275,7 +275,7 @@ static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( channelf, driver_data_t )
+static MACHINE_CONFIG_START( channelf, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( channelf, driver_data_t )
 	MDRV_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sabavdpl, driver_data_t )
+static MACHINE_CONFIG_START( sabavdpl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( sabavdpl, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( channlf2, driver_data_t )
+static MACHINE_CONFIG_START( channlf2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( channlf2, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sabavpl2, driver_data_t )
+static MACHINE_CONFIG_START( sabavpl2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)

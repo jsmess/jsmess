@@ -1573,7 +1573,7 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -1641,7 +1641,7 @@ static MACHINE_CONFIG_START( pcherc, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -1720,7 +1720,7 @@ static MACHINE_CONFIG_START( ibm5150, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -1785,7 +1785,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -1877,7 +1877,7 @@ static MACHINE_CONFIG_START( europc, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -1931,7 +1931,7 @@ static MACHINE_CONFIG_START( ibm5160, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -2009,7 +2009,7 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -2079,7 +2079,7 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -2134,7 +2134,7 @@ static MACHINE_CONFIG_START( pc1512, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
@@ -2183,7 +2183,7 @@ static MACHINE_CONFIG_START( pc1640, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
@@ -2234,7 +2234,7 @@ static MACHINE_CONFIG_START( xtvga, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -2290,7 +2290,7 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("sn76496", NCR7496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2339,7 +2339,7 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("sn76496", NCR7496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2388,7 +2388,7 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("sn76496", NCR7496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2439,7 +2439,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("sn76496", SN76496, 2386360)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2506,7 +2506,7 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -2569,7 +2569,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)

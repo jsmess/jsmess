@@ -1037,7 +1037,7 @@ static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
 	MDRV_CARTSLOT_UNLOAD(a800_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( atari_common_nodac, driver_data_t )
+static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 

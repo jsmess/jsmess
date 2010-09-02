@@ -45,7 +45,7 @@ static const struct t11_setup t11_data =
 };
 
 
-static MACHINE_CONFIG_START( uknc, driver_data_t )
+static MACHINE_CONFIG_START( uknc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 8000000)
 	MDRV_CPU_CONFIG(t11_data)

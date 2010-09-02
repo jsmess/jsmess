@@ -62,7 +62,7 @@ static GENERIC_TERMINAL_INTERFACE( dual68_terminal_intf )
 	DEVCB_HANDLER(dual68_kbd_put)
 };
 
-static MACHINE_CONFIG_START( dual68, driver_data_t )
+static MACHINE_CONFIG_START( dual68, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
     MDRV_CPU_PROGRAM_MAP(dual68_mem)

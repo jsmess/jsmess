@@ -941,7 +941,7 @@ static const char layout_hp48s [] = "hp48s";
 /*************************** driver ********************************/
 
 
-static MACHINE_CONFIG_START( hp48_common, driver_data_t )
+static MACHINE_CONFIG_START( hp48_common, driver_device )
 	MDRV_MACHINE_RESET ( hp48 )
 
 	/* cpu */

@@ -161,7 +161,7 @@ static MACHINE_RESET(mmd2)
 {
 }
 
-static MACHINE_CONFIG_START( mmd1, driver_data_t )
+static MACHINE_CONFIG_START( mmd1, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd1_mem)
@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( mmd1, driver_data_t )
 	MDRV_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mmd2, driver_data_t )
+static MACHINE_CONFIG_START( mmd2, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd2_mem)

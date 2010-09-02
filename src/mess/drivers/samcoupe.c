@@ -123,13 +123,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	asic->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
@@ -150,20 +150,20 @@ static READ8_HANDLER( samcoupe_status_r )
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	asic->line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	return asic->lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 
 	asic->lmpr = data;
 	samcoupe_update_memory(space_program);
@@ -171,14 +171,14 @@ static WRITE8_HANDLER( samcoupe_lmpr_w )
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	return asic->hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 
 	asic->hmpr = data;
 	samcoupe_update_memory(space_program);
@@ -186,14 +186,14 @@ static WRITE8_HANDLER( samcoupe_hmpr_w )
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	return asic->vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 
 	asic->vmpr = data;
 	samcoupe_update_memory(space_program);
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 {
 	running_device *cassette = space->machine->device("cassette");
 	running_device *speaker = space->machine->device("speaker");
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 
 	asic->border = data;
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	return asic->attribute;
 }
 
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	coupe_asic *asic = machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* adjust STATUS register */
 	asic->status |= param;
@@ -338,7 +338,7 @@ static TIMER_CALLBACK( irq_off )
 
 void samcoupe_irq(running_device *device, UINT8 src)
 {
-	coupe_asic *asic = device->machine->driver_data<coupe_asic>();
+	samcoupe_state *asic = device->machine->driver_data<samcoupe_state>();
 
 	/* assert irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
@@ -555,7 +555,7 @@ static const wd17xx_interface samcoupe_wd17xx_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-static MACHINE_CONFIG_START( samcoupe, coupe_asic )
+static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem)
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( samcoupe, coupe_asic )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

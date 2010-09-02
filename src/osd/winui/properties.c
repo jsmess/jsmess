@@ -2603,8 +2603,8 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 		{
 			for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 			{
-				if (sound->devconfig().type() == SOUND_SAMPLES ||
-					sound->devconfig().type() == SOUND_VLM5030) {
+				if (sound->devconfig().type() == SAMPLES ||
+					sound->devconfig().type() == VLM5030) {
 					enabled = TRUE;
 				}
 			}

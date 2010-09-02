@@ -61,7 +61,7 @@ static PALETTE_INIT( lynx )
 }
 
 
-static MACHINE_CONFIG_START( lynx, driver_data_t )
+static MACHINE_CONFIG_START( lynx, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem)

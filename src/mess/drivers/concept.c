@@ -119,7 +119,7 @@ static const floppy_config concept_floppy_config =
 };
 
 /* concept machine */
-static MACHINE_CONFIG_START( concept, driver_data_t )
+static MACHINE_CONFIG_START( concept, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(concept_memmap)

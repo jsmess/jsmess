@@ -1065,7 +1065,7 @@ static MACHINE_RESET( sf7000 )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sg1000, driver_data_t )
+    MACHINE_CONFIG_START( sg1000, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( sg1000, sg1000_state )
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( omv, driver_data_t )
+    MACHINE_CONFIG_START( omv, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( omv, sg1000 )
@@ -1124,7 +1124,7 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sc3000, driver_data_t )
+    MACHINE_CONFIG_START( sc3000, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( sc3000, sg1000_state )
@@ -1168,7 +1168,7 @@ static MACHINE_CONFIG_START( sc3000, sg1000_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sf7000, driver_data_t )
+    MACHINE_CONFIG_START( sf7000, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( sf7000, sg1000_state )

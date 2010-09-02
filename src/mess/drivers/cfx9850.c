@@ -8,13 +8,11 @@
 #include "cpu/hcd62121/hcd62121.h"
 
 
-class cfx9850_state : public driver_data_t
+class cfx9850_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cfx9850_state(machine)); }
-
-	cfx9850_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	cfx9850_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *video_ram;
 	UINT8 *display_ram;

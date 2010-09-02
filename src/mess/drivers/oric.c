@@ -385,7 +385,7 @@ static const floppy_config prav8d_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( oric, driver_data_t )
+static MACHINE_CONFIG_START( oric, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem)

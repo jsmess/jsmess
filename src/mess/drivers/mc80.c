@@ -54,7 +54,7 @@ static INPUT_PORTS_START( mc80 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( mc8020, driver_data_t )
+static MACHINE_CONFIG_START( mc8020, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8020_mem)
@@ -79,7 +79,7 @@ static MACHINE_CONFIG_START( mc8020, driver_data_t )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mc8030, driver_data_t )
+static MACHINE_CONFIG_START( mc8030, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8030_mem)

@@ -351,7 +351,7 @@ static const struct tms9995reset_param ti99_2_processor_config =
 	1           /* enable automatic wait state generation */
 };
 
-static MACHINE_CONFIG_START( ti99_2, driver_data_t )
+static MACHINE_CONFIG_START( ti99_2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(ti99_2_processor_config)

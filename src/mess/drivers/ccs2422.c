@@ -52,7 +52,7 @@ static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
 	DEVCB_HANDLER(ccs2422_kbd_put)
 };
 
-static MACHINE_CONFIG_START( ccs2422, driver_data_t )
+static MACHINE_CONFIG_START( ccs2422, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(ccs2422_mem)

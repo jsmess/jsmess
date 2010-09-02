@@ -23,7 +23,7 @@ struct _gmaster_sound
 static gmaster_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_GMASTER);
+	assert(device->type() == GMASTER);
 	return (gmaster_sound *) downcast<legacy_device_base *>(device)->token();
 }
 

@@ -356,7 +356,7 @@ static const ym2151_interface ym2151_config =
 *
 ********************************************************************/
 
-static MACHINE_CONFIG_START( cps1_10MHz, driver_data_t )
+static MACHINE_CONFIG_START( cps1_10MHz, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)

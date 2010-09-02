@@ -289,7 +289,7 @@ static PALETTE_INIT( nimbus )
 }
 
 
-static MACHINE_CONFIG_START( nimbus, driver_data_t )
+static MACHINE_CONFIG_START( nimbus, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD(MAINCPU_TAG, I80186, 10000000)
     MDRV_CPU_PROGRAM_MAP(nimbus_mem)

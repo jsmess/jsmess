@@ -959,7 +959,7 @@ static I8237_INTERFACE( dma8237_1_config )
 
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
-static MACHINE_CONFIG_START( pc9801, driver_data_t )
+static MACHINE_CONFIG_START( pc9801, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pc9801_mem)

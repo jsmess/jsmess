@@ -78,7 +78,7 @@ static GFXDECODE_START( hx20 )
 	GFXDECODE_ENTRY( "maincpu", 0xfe20, hx20_3_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ehx20, driver_data_t )
+static MACHINE_CONFIG_START( ehx20, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 614000) // HD6301
     MDRV_CPU_PROGRAM_MAP(ehx20_mem)

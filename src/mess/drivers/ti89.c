@@ -17,13 +17,11 @@
 
 static UINT8 ti_68k_keypad_r (running_machine *machine);
 
-class t68k_state : public driver_data_t
+class t68k_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, t68k_state(machine)); }
-
-	t68k_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	t68k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* HW specifications */
 	UINT8 hw_version;

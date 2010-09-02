@@ -175,7 +175,7 @@ static const cassette_config ut88_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88, driver_data_t )
+static MACHINE_CONFIG_START( ut88, driver_device )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88_mem)
@@ -208,7 +208,7 @@ static MACHINE_CONFIG_START( ut88, driver_data_t )
 	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini, driver_data_t )
+static MACHINE_CONFIG_START( ut88mini, driver_device )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88mini_mem)

@@ -37,7 +37,7 @@ static VIDEO_UPDATE( pmi80 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( pmi80, driver_data_t )
+static MACHINE_CONFIG_START( pmi80, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(pmi80_mem)

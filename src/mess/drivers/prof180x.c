@@ -37,7 +37,7 @@ static VIDEO_UPDATE( prof180x )
     return 0;
 }
 
-static MACHINE_CONFIG_START( prof180x, driver_data_t )
+static MACHINE_CONFIG_START( prof180x, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // HD64180
     MDRV_CPU_PROGRAM_MAP(prof180x_mem)

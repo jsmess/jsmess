@@ -50,7 +50,7 @@ struct _mac_sound
 INLINE mac_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_MAC_SOUND);
+	assert(device->type() == MAC_SOUND);
 	return (mac_sound *) downcast<legacy_device_base *>(device)->token();
 }
 

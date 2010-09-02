@@ -68,13 +68,11 @@ static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072,
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class px4_state : public driver_data_t
+class px4_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, px4_state(machine)); }
-
-	px4_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	px4_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* internal ram */
 	running_device *ram;

@@ -2106,7 +2106,7 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MDRV_CARTSLOT_LOAD(a2600_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a2600, driver_data_t )
+static MACHINE_CONFIG_START( a2600, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem)
@@ -2138,7 +2138,7 @@ static MACHINE_CONFIG_START( a2600, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( a2600p, driver_data_t )
+static MACHINE_CONFIG_START( a2600p, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem)

@@ -316,7 +316,7 @@ static GFXDECODE_START( dgnbeta )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dgnbeta, driver_data_t )
+static MACHINE_CONFIG_START( dgnbeta, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)

@@ -486,7 +486,7 @@ static INPUT_PORTS_START (ti83)
 INPUT_PORTS_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( ti81, driver_data_t )
+static MACHINE_CONFIG_START( ti81, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(ti81_mem)
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_DERIVED( ti85, ti81 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

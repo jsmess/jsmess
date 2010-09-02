@@ -268,7 +268,7 @@ static const floppy_config compis_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( compis, driver_data_t )
+static MACHINE_CONFIG_START( compis, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(compis_mem)

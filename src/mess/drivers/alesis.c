@@ -49,7 +49,7 @@ static VIDEO_UPDATE( alesis )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hr16, driver_data_t )
+static MACHINE_CONFIG_START( hr16, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(hr16_mem)
@@ -71,7 +71,7 @@ static MACHINE_CONFIG_START( hr16, driver_data_t )
 	MDRV_VIDEO_UPDATE(alesis)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sr16, driver_data_t )
+static MACHINE_CONFIG_START( sr16, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sr16_mem)

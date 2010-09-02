@@ -90,7 +90,7 @@ static const via6522_interface via_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 
-static MACHINE_CONFIG_START( a6809, driver_data_t )
+static MACHINE_CONFIG_START( a6809, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(a6809_mem)

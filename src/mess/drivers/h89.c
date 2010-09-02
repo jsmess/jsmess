@@ -38,7 +38,7 @@ static VIDEO_UPDATE( h89 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( h89, driver_data_t )
+static MACHINE_CONFIG_START( h89, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6)
     MDRV_CPU_PROGRAM_MAP(h89_mem)

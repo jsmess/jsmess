@@ -52,7 +52,7 @@ static const tms0980_config stopthie_tms0980_config =
 };
 
 
-static MACHINE_CONFIG_START( stopthie, driver_data_t )
+static MACHINE_CONFIG_START( stopthie, driver_device )
 	MDRV_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
 	MDRV_CPU_CONFIG( stopthie_tms0980_config )
 

@@ -37,13 +37,11 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 * I/O devices                                        *
 \****************************************************/
 
-class craft_state : public driver_data_t
+class craft_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, craft_state(machine)); }
-
-	craft_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	craft_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 regs[0x100];
 	INT32 tcnt1_direction;

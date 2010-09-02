@@ -342,7 +342,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_CONFIG_START( rvoicepc, driver_data_t )
+static MACHINE_CONFIG_START( rvoicepc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
     MDRV_CPU_PROGRAM_MAP(hd63701_main_mem)

@@ -54,7 +54,7 @@ static VIDEO_UPDATE( vt520 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( vt520, driver_data_t )
+static MACHINE_CONFIG_START( vt520, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8032, XTAL_20MHz)
     MDRV_CPU_PROGRAM_MAP(vt520_mem)

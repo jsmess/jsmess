@@ -238,7 +238,7 @@ static GFXDECODE_START( osborne1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, osborne1_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( osborne1, driver_data_t )
+static MACHINE_CONFIG_START( osborne1, driver_device )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
 	MDRV_CPU_IO_MAP( osborne1_io)

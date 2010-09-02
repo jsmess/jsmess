@@ -251,7 +251,7 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 	{ NULL}
 };
 
-static MACHINE_CONFIG_START( primoa32, driver_data_t )
+static MACHINE_CONFIG_START( primoa32, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 2500000 )
 	MDRV_CPU_PROGRAM_MAP( primo32_mem)
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( primoa32, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */

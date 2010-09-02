@@ -35,13 +35,11 @@ For BIOS CRC confirmation
 #include "devices/cassette.h"
 
 
-class pv2000_state : public driver_data_t
+class pv2000_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pv2000_state(machine)); }
-
-	pv2000_state(running_machine &machine)
-		: driver_data_t(machine) { last_state = 0; }
+	pv2000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { last_state = 0; }
 
 	int		last_state;
 	UINT8	keyb_column;

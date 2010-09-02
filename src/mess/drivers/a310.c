@@ -249,7 +249,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
-static MACHINE_CONFIG_START( a310, driver_data_t )
+static MACHINE_CONFIG_START( a310, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(a310_mem)

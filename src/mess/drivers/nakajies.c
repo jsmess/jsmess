@@ -197,13 +197,11 @@ disabled). Perhaps power on/off related??
 #include "sound/speaker.h"
 
 
-class nakajies_state : public driver_data_t
+class nakajies_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nakajies_state(machine)); }
-
-	nakajies_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	nakajies_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* Device lookups */
 	running_device *cpu;
@@ -390,7 +388,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 
 	/* sound */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
+	MDRV_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -415,7 +413,7 @@ static MACHINE_CONFIG_START( nakajies220, nakajies_state )
 
 	/* sound */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
+	MDRV_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -437,7 +435,7 @@ static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 
 	/* sound */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "speaker", SPEAKER, 0 )
+	MDRV_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

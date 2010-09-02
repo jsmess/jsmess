@@ -19,13 +19,11 @@
 #include "machine/upd765.h"
 #include "machine/i8255a.h"
 
-class pc88_state : public driver_data_t
+class pc88_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pc88_state(machine)); }
-
-	pc88_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	pc88_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* floppy state */
 	UINT8 i8255_0_pc;

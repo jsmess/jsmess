@@ -57,7 +57,7 @@ static GENERIC_TERMINAL_INTERFACE( horizon_terminal_intf )
 	DEVCB_HANDLER(horizon_kbd_put)
 };
 
-static MACHINE_CONFIG_START( horizon, driver_data_t )
+static MACHINE_CONFIG_START( horizon, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(horizon_mem)

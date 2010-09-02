@@ -65,7 +65,7 @@ static VIDEO_UPDATE( sys2900 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( sys2900, driver_data_t )
+static MACHINE_CONFIG_START( sys2900, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(sys2900_mem)

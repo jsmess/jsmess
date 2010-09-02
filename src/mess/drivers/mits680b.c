@@ -38,7 +38,7 @@ static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
 	DEVCB_HANDLER(mits680b_kbd_put)
 };
 
-static MACHINE_CONFIG_START( mits680b, driver_data_t )
+static MACHINE_CONFIG_START( mits680b, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
     MDRV_CPU_PROGRAM_MAP(mits680b_mem)

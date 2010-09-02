@@ -316,7 +316,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ssystem3, driver_data_t )
+static MACHINE_CONFIG_START( ssystem3, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map)

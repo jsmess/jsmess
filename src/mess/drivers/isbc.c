@@ -95,7 +95,7 @@ static GENERIC_TERMINAL_INTERFACE( isbc_terminal_intf )
 	DEVCB_HANDLER(isbc_kbd_put)
 };
 
-static MACHINE_CONFIG_START( isbc86, driver_data_t )
+static MACHINE_CONFIG_START( isbc86, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8086, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(isbc86_mem)
@@ -108,7 +108,7 @@ static MACHINE_CONFIG_START( isbc86, driver_data_t )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, isbc_terminal_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc86, driver_data_t )
+static MACHINE_CONFIG_START( rpc86, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8086, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(rpc86_mem)
@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( rpc86, driver_data_t )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, isbc_terminal_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( isbc286, driver_data_t )
+static MACHINE_CONFIG_START( isbc286, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(isbc286_mem)
@@ -134,7 +134,7 @@ static MACHINE_CONFIG_START( isbc286, driver_data_t )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, isbc_terminal_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( isbc2861, driver_data_t )
+static MACHINE_CONFIG_START( isbc2861, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(isbc2861_mem)

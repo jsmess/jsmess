@@ -248,7 +248,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_CONFIG_START( vcc, driver_data_t )
+static MACHINE_CONFIG_START( vcc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)

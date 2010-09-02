@@ -15,13 +15,11 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
-class act_state : public driver_data_t
+class act_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, act_state(machine)); }
-
-	act_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	act_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 *paletteram;
 	UINT16 *vram;

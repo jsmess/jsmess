@@ -261,7 +261,7 @@ static TIMER_DEVICE_CALLBACK( ne555_tempo_callback )
 	mz80k_tempo_strobe ^= 1;
 }
 
-static MACHINE_CONFIG_START( mz80k, driver_data_t )
+static MACHINE_CONFIG_START( mz80k, driver_device )
 	/* basic machine hardware */
 
 	/* main CPU */
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( mz80k, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(34)) // 33.5Hz - 34.3Hz

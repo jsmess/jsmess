@@ -38,7 +38,7 @@ static VIDEO_UPDATE( ipc )
     return 0;
 }
 
-static MACHINE_CONFIG_START( ipc, driver_data_t )
+static MACHINE_CONFIG_START( ipc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipc_mem)

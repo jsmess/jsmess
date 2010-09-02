@@ -13,13 +13,11 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
-class b2m_state : public driver_data_t
+class b2m_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, b2m_state(machine)); }
-
-	b2m_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	b2m_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 b2m_8255_porta;
 	UINT8 b2m_video_scroll;

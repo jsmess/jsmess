@@ -40,7 +40,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( a3000, driver_data_t )
+static MACHINE_CONFIG_START( a3000, driver_device )
 	MDRV_CPU_ADD("maincpu", M68030, XTAL_U104 / 2)
 	MDRV_CPU_PROGRAM_MAP(a3000_mem)
 

@@ -125,7 +125,7 @@ static VIDEO_UPDATE( pippin )
     return 0;
 }
 
-static MACHINE_CONFIG_START( pippin, driver_data_t )
+static MACHINE_CONFIG_START( pippin, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",PPC603, 66000000)
     MDRV_CPU_PROGRAM_MAP(pippin_mem)

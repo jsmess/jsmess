@@ -180,7 +180,7 @@ struct _gb_sound_t
 INLINE gb_sound_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_GAMEBOY);
+	assert(device->type() == GAMEBOY);
 	return (gb_sound_t *) downcast<legacy_device_base *>(device)->token();
 }
 

@@ -10,13 +10,11 @@
 #define M6551_TAG		"m6551"
 #define SPEAKER_TAG		"speaker"
 
-class aim65_40_state : public driver_data_t
+class aim65_40_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, aim65_40_state(machine)); }
-
-	aim65_40_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	aim65_40_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* devices */
 	running_device *via0;

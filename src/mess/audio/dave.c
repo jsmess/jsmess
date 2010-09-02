@@ -99,7 +99,7 @@ struct _dave_t
 INLINE dave_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_DAVE);
+	assert(device->type() == DAVE);
 	return (dave_t *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -108,7 +108,7 @@ INLINE dave_t *get_token(running_device *device)
 INLINE const dave_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_DAVE);
+	assert(device->type() == DAVE);
 	return (const dave_interface *) device->baseconfig().static_config();
 }
 

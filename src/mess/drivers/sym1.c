@@ -122,7 +122,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 
 
-static MACHINE_CONFIG_START( sym1, driver_data_t )
+static MACHINE_CONFIG_START( sym1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(sym1_map)
@@ -132,7 +132,7 @@ static MACHINE_CONFIG_START( sym1, driver_data_t )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */

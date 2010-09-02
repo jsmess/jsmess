@@ -1157,7 +1157,7 @@ static const floppy_config pcw_floppy_config =
 };
 
 /* PCW8256, PCW8512, PCW9256 */
-static MACHINE_CONFIG_START( pcw, driver_data_t )
+static MACHINE_CONFIG_START( pcw, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map)

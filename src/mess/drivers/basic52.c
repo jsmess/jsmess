@@ -59,7 +59,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL					/* Port C write */
 };
 
-static MACHINE_CONFIG_START( basic31, driver_data_t )
+static MACHINE_CONFIG_START( basic31, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
@@ -74,7 +74,7 @@ static MACHINE_CONFIG_START( basic31, driver_data_t )
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( basic52, driver_data_t )
+static MACHINE_CONFIG_START( basic52, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)

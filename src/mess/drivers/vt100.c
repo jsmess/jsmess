@@ -346,7 +346,7 @@ GFXDECODE_END
 
 #define XTAL_24_8832MHz	 24883200
 
-static MACHINE_CONFIG_START( vt100, driver_data_t )
+static MACHINE_CONFIG_START( vt100, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(vt100_mem)
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( vt100, driver_data_t )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

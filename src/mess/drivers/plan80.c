@@ -79,7 +79,7 @@ static GFXDECODE_START( plan80 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( plan80, driver_data_t )
+static MACHINE_CONFIG_START( plan80, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 2048000)
     MDRV_CPU_PROGRAM_MAP(plan80_mem)

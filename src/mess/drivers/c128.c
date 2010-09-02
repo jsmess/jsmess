@@ -738,7 +738,7 @@ static const vdc8563_interface c128_vdc8563_intf = {
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c128, driver_data_t )
+static MACHINE_CONFIG_START( c128, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP( c128_z80_mem)

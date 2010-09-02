@@ -196,7 +196,7 @@ static GFXDECODE_START( mekd2 )
 	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 16*2, 2 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mekd2, driver_data_t )
+static MACHINE_CONFIG_START( mekd2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 614400)        /* 614.4 kHz */
 	MDRV_CPU_PROGRAM_MAP(mekd2_mem)

@@ -551,7 +551,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gb_common, driver_data_t )
+static MACHINE_CONFIG_START( gb_common, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map)
@@ -652,7 +652,7 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("gameboy","gameboy")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megaduck, driver_data_t )
+static MACHINE_CONFIG_START( megaduck, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map)

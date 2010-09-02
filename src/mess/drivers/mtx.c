@@ -323,7 +323,7 @@ static const cassette_config mtx_cassette_config =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx512, driver_data_t )
+    MACHINE_CONFIG_START( mtx512, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( mtx512, mtx_state )
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx500, driver_data_t )
+    MACHINE_CONFIG_START( mtx500, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( rs128, driver_data_t )
+    MACHINE_CONFIG_START( rs128, driver_device )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( rs128, mtx512 )

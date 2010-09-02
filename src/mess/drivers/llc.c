@@ -314,7 +314,7 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( llc1, driver_data_t )
+static MACHINE_CONFIG_START( llc1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_CONFIG(llc1_daisy_chain)
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( llc1, driver_data_t )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( llc2, driver_data_t )
+static MACHINE_CONFIG_START( llc2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_PROGRAM_MAP(llc2_mem)

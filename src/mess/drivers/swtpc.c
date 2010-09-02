@@ -45,7 +45,7 @@ static GENERIC_TERMINAL_INTERFACE( swtpc_terminal_intf )
 	DEVCB_HANDLER(swtpc_kbd_put)
 };
 
-static MACHINE_CONFIG_START( swtpc, driver_data_t )
+static MACHINE_CONFIG_START( swtpc, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(swtpc_mem)

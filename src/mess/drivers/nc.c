@@ -1672,7 +1672,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
 
 /**********************************************************************************************************/
 
-static MACHINE_CONFIG_START( nc100, driver_data_t )
+static MACHINE_CONFIG_START( nc100, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MDRV_CPU_PROGRAM_MAP(nc_map)

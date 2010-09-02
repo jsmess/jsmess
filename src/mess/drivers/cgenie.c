@@ -516,7 +516,7 @@ static const floppy_config cgenie_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( cgenie_common, driver_data_t )
+static MACHINE_CONFIG_START( cgenie_common, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem)

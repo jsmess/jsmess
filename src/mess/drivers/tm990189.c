@@ -754,7 +754,7 @@ static const tms9980areset_param reset_params =
 	idle_callback
 };
 
-static MACHINE_CONFIG_START( tm990_189, driver_data_t )
+static MACHINE_CONFIG_START( tm990_189, driver_device )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( tm990_189, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
@@ -805,7 +805,7 @@ MACHINE_CONFIG_END
 #define TOP_BORDER_60HZ		27
 #define BOTTOM_BORDER_60HZ	24
 
-static MACHINE_CONFIG_START( tm990_189_v, driver_data_t )
+static MACHINE_CONFIG_START( tm990_189_v, driver_device )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( tm990_189_v, driver_data_t )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )

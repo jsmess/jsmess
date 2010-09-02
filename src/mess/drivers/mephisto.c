@@ -196,7 +196,7 @@ static MACHINE_RESET( mephisto )
 }
 
 
-static MACHINE_CONFIG_START( mephisto, driver_data_t )
+static MACHINE_CONFIG_START( mephisto, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem)

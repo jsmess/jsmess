@@ -41,13 +41,11 @@ static void draw_char(running_machine *machine, UINT8 x, UINT8 y, UINT8 char_pos
 static void draw_point(running_machine *machine, UINT8 x, UINT8 y, UINT8 color);
 static void draw_udk(running_machine *machine);
 
-class t6834_state : public driver_data_t
+class t6834_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, t6834_state(machine)); }
-
-	t6834_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	t6834_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* General */
 	UINT8 *ram;

@@ -7,13 +7,11 @@
 #define CDP1864_TAG		"m3"
 #define CASSETTE_TAG	"cassette"
 
-class tmc1800_state : public driver_data_t
+class tmc1800_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc1800_state(machine)); }
-
-	tmc1800_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	tmc1800_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	int reset;				/* reset activated */
@@ -29,13 +27,11 @@ public:
 	running_device *cassette;
 };
 
-class osc1000b_state : public driver_data_t
+class osc1000b_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osc1000b_state(machine)); }
-
-	osc1000b_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	osc1000b_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	int reset;				/* reset activated */
@@ -47,13 +43,11 @@ public:
 	running_device *cassette;
 };
 
-class tmc2000_state : public driver_data_t
+class tmc2000_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000_state(machine)); }
-
-	tmc2000_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	tmc2000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* video state */
 	int cdp1864_efx;		/* EFx */
@@ -70,13 +64,11 @@ public:
 	running_device *cassette;
 };
 
-class oscnano_state : public driver_data_t
+class oscnano_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, oscnano_state(machine)); }
-
-	oscnano_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	oscnano_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	int monitor_ef4;		/* EF4 line */

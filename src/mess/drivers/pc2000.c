@@ -469,7 +469,7 @@ static GFXDECODE_START( pc2000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pc2000, driver_data_t )
+static MACHINE_CONFIG_START( pc2000, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
     MDRV_CPU_PROGRAM_MAP(pc2000_mem)

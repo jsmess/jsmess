@@ -15,13 +15,11 @@
 #define BW12_VIDEORAM_MASK	0x7ff
 #define BW12_CHARROM_MASK	0xfff
 
-class bw12_state : public driver_data_t
+class bw12_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bw12_state(machine)); }
-
-	bw12_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	bw12_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory state */
 	int bank;

@@ -872,7 +872,7 @@ static INTERRUPT_GEN( assert_irq )
 	socrates.vblankstate = 1;
 }
 
-static MACHINE_CONFIG_START( socrates, driver_data_t )
+static MACHINE_CONFIG_START( socrates, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
     MDRV_CPU_PROGRAM_MAP(z80_mem)

@@ -417,7 +417,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				const device_config_sound_interface *sound = NULL;
 				const char * const * samplenames = NULL;
 				for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound)) {
-					if (sound->devconfig().type() == SOUND_SAMPLES)
+					if (sound->devconfig().type() == SAMPLES)
 					{
 						const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
 						samplenames = intf->samplenames;

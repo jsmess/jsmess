@@ -69,7 +69,7 @@ static GFXDECODE_START( iq151 )
 	GFXDECODE_ENTRY( "chargen", 0x0400, iq151_64_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( iq151, driver_data_t )
+static MACHINE_CONFIG_START( iq151, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(iq151_mem)

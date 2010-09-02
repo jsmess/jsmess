@@ -496,7 +496,7 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( p8k, driver_data_t )
+static MACHINE_CONFIG_START( p8k, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz )
 	MDRV_CPU_CONFIG(p8k_daisy_chain)
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( p8k, driver_data_t )
 	MDRV_VIDEO_UPDATE(p8k)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( p8k_16, driver_data_t )
+static MACHINE_CONFIG_START( p8k_16, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
 	MDRV_CPU_CONFIG(p8k_16_daisy_chain)

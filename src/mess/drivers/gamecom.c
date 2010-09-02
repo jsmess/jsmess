@@ -95,7 +95,7 @@ static INTERRUPT_GEN( gamecom_interrupt )
 	cputag_set_input_line(device->machine, "maincpu", LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom, driver_data_t )
+static MACHINE_CONFIG_START( gamecom, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)
