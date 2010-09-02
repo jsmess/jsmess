@@ -7,6 +7,7 @@
     TODO:
     - floppy support (but floppy images are unobtainable at current time)
     - Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
+    - cassette device;
 
 ***************************************************************************************************/
 
@@ -24,6 +25,8 @@ static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink,cursor_raster;
 static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width,gfx_mode;
+
+static UINT8 nmi_mask,nmi_enable_reg,nmi_trap,nmi_reset;
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
 
@@ -509,6 +512,17 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	}
 }
 
+static void pasopia_nmi_trap(running_machine *machine)
+{
+	if(nmi_enable_reg)
+	{
+		nmi_trap |= 2;
+
+		if(nmi_mask == 0)
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
 static READ8_HANDLER( pasopia7_io_r )
 {
 	static UINT16 io_port;
@@ -532,7 +546,11 @@ static READ8_HANDLER( pasopia7_io_r )
 	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
 //  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, (io_port-0x18) & 3);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
+	else if(io_port >= 0x20 && io_port <= 0x23)
+	{
+		pasopia_nmi_trap(space->machine);
+		return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3);
+	}
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), (io_port-0x28) & 3);  }
 	else if(io_port == 0x30) 					{ return z80pio_d_r(space->machine->device("z80pio_0"), (io_port-0x30) & 1); }
 	else if(io_port == 0x31)				 	{ return z80pio_c_r(space->machine->device("z80pio_0"), (io_port-0x31) & 1); }
@@ -569,7 +587,11 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, (io_port-0x18) & 3, data);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
+	else if(io_port >= 0x20 && io_port <= 0x23)
+	{
+		i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data);
+		pasopia_nmi_trap(space->machine);
+	}
 	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), (io_port-0x28) & 3,data);  }
 	else if(io_port >= 0x30 && io_port <= 0x31) { z80pio_d_w(space->machine->device("z80pio_0"), (io_port-0x30) & 1, data); }
 	else if(io_port >= 0x32 && io_port <= 0x33) { z80pio_c_w(space->machine->device("z80pio_0"), (io_port-0x32) & 1, data); }
@@ -750,12 +772,16 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
     --x- ---- (related to the data rec)
     ---x ---- data rec out
     ---- --x- sound off
-    ---- ---x reset NMI (writes to port B = clears bits 1 & 2) (???)
+    ---- ---x reset NMI & trap
     */
 //  printf("SYSTEM MISC %02x\n",data);
 
-//  if(data & 1)
-//      i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
+	if(data & 1)
+	{
+		nmi_reset &= ~4;
+		nmi_trap &= ~2;
+		//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE); //guess
+	}
 
 }
 
@@ -767,25 +793,29 @@ static READ8_DEVICE_HANDLER( unk_r )
 
 static READ8_DEVICE_HANDLER( nmi_reg_r )
 {
+	//printf("C\n");
 	return 0xfc | bank_reg;//mame_rand(device->machine);
 }
-
-static UINT8 nmi_mask,nmi_enable_reg;
 
 static WRITE8_DEVICE_HANDLER( nmi_reg_w )
 {
 	/*
         x--- ---- NMI mask
-        -x-- ---- enable NMI regs (?)
+        -x-- ---- NMI enable trap on PPI8255 2 r/w
     */
 	nmi_mask = data & 0x80;
 	nmi_enable_reg = data & 0x40;
-
-	if(!nmi_mask && nmi_enable_reg)
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static READ8_DEVICE_HANDLER( nmi_porta_r )
+{
+	return 0xff;
+}
 
+static READ8_DEVICE_HANDLER( nmi_portb_r )
+{
+	return 0xf9 | nmi_trap | nmi_reset;
+}
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
@@ -809,8 +839,8 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(nmi_porta_r),		/* Port A read */
+	DEVCB_HANDLER(nmi_portb_r),		/* Port B read */
 	DEVCB_HANDLER(nmi_reg_r),		/* Port C read */
 	DEVCB_HANDLER(nmi_mask_w),		/* Port A write */
 	DEVCB_NULL,						/* Port B write */
@@ -825,6 +855,8 @@ static MACHINE_RESET( paso7 )
 	memory_set_bankptr(machine, "bank2", bios + 0x10000);
 //  memory_set_bankptr(machine, "bank3", bios + 0x10000);
 //  memory_set_bankptr(machine, "bank4", bios + 0x10000);
+
+	nmi_reset |= 4;
 }
 
 static PALETTE_INIT( pasopia7 )
