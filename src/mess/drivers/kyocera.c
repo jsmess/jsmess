@@ -1484,9 +1484,14 @@ ROM_START( kc85 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+// This BIOS is 99% bad: it contains no Japanese keyboard layout and if you enter the following BASIC program
+// 10 FOR A=0 TO 255
+// 20 PRINT CHR$(A);
+// 30 NEXT A
+// there are no Japanese characters printed out (contrary to what can be seen at Takeda's emu page)
 ROM_START( pc8201 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, BAD_DUMP CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
 	
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
