@@ -113,21 +113,14 @@ static void fake_keyboard_data(running_machine *machine)
 	keyb_press(KEYCODE_COMMA, ',');
 	keyb_shift_press(KEYCODE_COMMA, ';');
 	keyb_press(KEYCODE_MINUS_PAD, '-');
-
+	keyb_press(KEYCODE_PLUS_PAD, '+');
 }
 
-static VIDEO_UPDATE( paso7 )
+static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
-	static UINT8 *vram = memory_region(screen->machine, "vram");
+	static UINT8 *vram = memory_region(machine, "vram");
 	int x,y,xi,yi;
 	int count;
-	int width;
-
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
-
-	fake_keyboard_data(screen->machine);
-
-	width = x_width ? 80 : 40;
 
 	for(yi=0;yi<8;yi++)
 	{
@@ -146,12 +139,19 @@ static VIDEO_UPDATE( paso7 )
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x20];
+					*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x20];
 				}
 				count+=8;
 			}
 		}
 	}
+}
+
+static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
+{
+	static UINT8 *vram = memory_region(machine, "vram");
+	int x,y/*,xi,yi*/;
+	int count;
 
 	count = 0x0000;
 
@@ -160,9 +160,10 @@ static VIDEO_UPDATE( paso7 )
 		for(x=0;x<width;x++)
 		{
 			int tile = vram[count+0x8000];
-			int color = vram[count+0xc000];
+			int attr = vram[count+0xc000];
+			int color = attr & 7;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],tile,color & 7,0,0,x*8,y*8,0);
 
 			// draw cursor
 			if(cursor_addr*8 == count)
@@ -174,8 +175,8 @@ static VIDEO_UPDATE( paso7 )
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -184,13 +185,112 @@ static VIDEO_UPDATE( paso7 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = screen->machine->pens[0x27];
+							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine->pens[0x27];
 						}
 					}
 				}
 			}
 			count+=8;
 		}
+	}
+}
+
+static void draw_mixed_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
+{
+	static UINT8 *vram = memory_region(machine, "vram");
+	static UINT8 *gfx_data = memory_region(machine,"font");
+	int x,y,xi,yi;
+	int count;
+
+	count = 0x0000;
+
+	for(y=0;y<25;y++)
+	{
+		for(x=0;x<width;x++)
+		{
+			int tile = vram[count+0x8000];
+
+			for(yi=0;yi<8;yi++)
+			{
+				int attr = vram[count+0xc000+yi];
+
+				if(attr & 0x80)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						int pen,pen_b,pen_r,pen_g;
+
+						pen_b = (vram[count+yi+0x0000]>>(7-xi)) & 1;
+						pen_r = (vram[count+yi+0x4000]>>(7-xi)) & 1;
+						pen_g = (vram[count+yi+0x8000]>>(7-xi)) & 1;
+
+						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine->pens[pen+0x20];
+					}
+				}
+				else
+				{
+					int color = attr & 7;
+
+					for(xi=0;xi<8;xi++)
+					{
+						int pen;
+						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine->pens[pen+0x20];
+					}
+					//drawgfx_transpen(bitmap,cliprect,machine->gfx[0],tile,color & 7,0,0,x*8,y*8,0);
+				}
+			}
+
+			// draw cursor
+			if(cursor_addr*8 == count)
+			{
+				int xc,yc,cursor_on;
+
+				cursor_on = 0;
+				switch(cursor_raster & 0x60)
+				{
+					case 0x00: cursor_on = 1; break; //always on
+					case 0x20: cursor_on = 0; break; //always off
+					case 0x40: if(machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+				}
+
+				if(cursor_on)
+				{
+					for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+					{
+						for(xc=0;xc<8;xc++)
+						{
+							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine->pens[0x27];
+						}
+					}
+				}
+			}
+
+			count+=8;
+		}
+	}
+}
+
+static VIDEO_UPDATE( paso7 )
+{
+	int width;
+
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+
+	fake_keyboard_data(screen->machine);
+
+	width = x_width ? 80 : 40;
+
+	if(gfx_mode)
+		draw_mixed_screen(screen->machine,bitmap,cliprect,width);
+	else
+	{
+		draw_cg4_screen(screen->machine,bitmap,cliprect,width);
+		draw_tv_screen(screen->machine,bitmap,cliprect,width);
 	}
 
     return 0;
@@ -578,7 +678,7 @@ static WRITE8_DEVICE_HANDLER( plane_reg_w )
 static WRITE8_DEVICE_HANDLER( video_attr_w )
 {
 	//printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
-	attr_data = data & 0xf;
+	attr_data = (data & 0x7) | ((data & 0x8)<<4);
 }
 
 //#include "debugger.h"
