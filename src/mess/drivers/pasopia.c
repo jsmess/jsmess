@@ -25,6 +25,8 @@ static UINT16 cursor_addr;
 static UINT8 cursor_blink,cursor_raster;
 static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width;
 
+#define VDP_CLOCK XTAL_3_579545MHz/4
+
 static VIDEO_START( paso7 )
 {
 	p7_pal = auto_alloc_array(machine, UINT8, 0x10);
@@ -117,7 +119,7 @@ static void fake_keyboard_data(running_machine *machine)
 static VIDEO_UPDATE( paso7 )
 {
 	static UINT8 *vram = memory_region(screen->machine, "vram");
-	int x,y,xi;
+	int x,y,xi,yi;
 	int count;
 	int width;
 
@@ -127,25 +129,27 @@ static VIDEO_UPDATE( paso7 )
 
 	width = x_width ? 80 : 40;
 
-	count = 0x0000;
-
-	for(y=0;y<200;y++)
+	for(yi=0;yi<8;yi++)
 	{
-		for(x=0;x<8*width;x+=8)
+		count = yi;
+		for(y=0;y<200;y+=8)
 		{
-			for(xi=0;xi<8;xi++)
+			for(x=0;x<8*width;x+=8)
 			{
-				int pen_b,pen_r,pen_g,color;
+				for(xi=0;xi<8;xi++)
+				{
+					int pen_b,pen_r,pen_g,color;
 
-				pen_b = (vram[count+0x0000]>>(7-xi)) & 1;
-				pen_r = (vram[count+0x4000]>>(7-xi)) & 1;
-				pen_g = 0;//(p7_vram[count+0x8000]>>(7-xi)) & 1;
+					pen_b = (vram[count+0x0000]>>(7-xi)) & 1;
+					pen_r = (vram[count+0x4000]>>(7-xi)) & 1;
+					pen_g = 0;//(p7_vram[count+0x8000]>>(7-xi)) & 1;
 
-				color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[color+0x20];
+					*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x20];
+				}
+				count+=8;
 			}
-			count++;
 		}
 	}
 
@@ -382,6 +386,9 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
 
 		mc6845_register_w(space->machine->device("crtc"), 0,data);
+
+		/* double pump the pixel clock if we are in 640 x 200 mode */
+		mc6845_set_clock(space->machine->device("crtc"), (x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
 	}
 }
 
@@ -719,7 +726,7 @@ static MACHINE_CONFIG_START( paso7, driver_device )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MDRV_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
     MDRV_PALETTE_LENGTH(0x28)
     MDRV_PALETTE_INIT(pasopia7)
 
