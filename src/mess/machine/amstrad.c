@@ -126,6 +126,7 @@ static struct {
 	UINT8	addr_6845;			/* We need these to store a shadow copy of R1 of the mc6845 */
 	UINT8	horiz_disp;
 	UINT8	hscroll;
+	UINT8   de_start; 			/* flag to check if DE is been enabled this frame yet */
 
 	/* DMA */
 	UINT8	dma_status;
@@ -990,6 +991,8 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			}
 			// CPC+/GX4000 DMA channels
 			amstrad_plus_handle_dma(device->machine);  // a DMA command is handled at the leading edge of HSYNC (every 64us)
+			if(asic.de_start != 0)
+				asic.vpos++;
 		}
 	}
 	gate_array.hsync = state ? 1 : 0;
@@ -1007,7 +1010,8 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 
 		/* Start of new frame */
 		gate_array.y = -1;
-		asic.vpos = 0;
+		asic.vpos = 1;
+		asic.de_start = 0;
 	}
 
 	gate_array.vsync = state ? 1 : 0;
@@ -1025,7 +1029,8 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_vsync_changed )
 
 		/* Start of new frame */
 		gate_array.y = -1;
-		asic.vpos = 0;
+		asic.vpos = 1;
+		asic.de_start = 0;
 	}
 
 	gate_array.vsync = state ? 1 : 0;
@@ -1044,11 +1049,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
 		gate_array.ma = mc6845_get_ma( mc6845 );
 		gate_array.ra = mc6845_get_ra( mc6845 );
 		amstrad_gate_array_get_video_data( device->machine );
-	}
-
-	if ( gate_array.de && ! state )
-	{
-		asic.vpos++;
+		asic.de_start = 1;
 	}
 
 	gate_array.de = state ? 1 : 0;
@@ -1067,8 +1068,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
 		gate_array.ma = mc6845_get_ma( mc6845 );
 		gate_array.ra = mc6845_get_ra( mc6845 );
 		asic.h_start = gate_array.line_ticks;
+		asic.de_start = 1;
 
-		if ( asic.vpos == 0 )
+		if ( asic.vpos == 1 )
 		{
 			asic.split_ma_base = 0x0000;
 			asic.split_ma_started = 0x0000;
@@ -1090,7 +1092,6 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
 	{
 		asic.h_end = gate_array.line_ticks;
 		amstrad_plus_update_video_sprites( device->machine );
-		asic.vpos++;
 	}
 
 	gate_array.de = state ? 1 : 0;
