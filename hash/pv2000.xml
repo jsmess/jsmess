@@ -66,4 +66,15 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="suprcobr">
+		<description>Super Cobra</description>
+		<year>1981</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="suprcobr.bin" size="8192" crc="c382390f" sha1="fd8b85e5a58d0449908ae8f1bf7a32230a39d5eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
