@@ -982,6 +982,14 @@ static const wd17xx_interface x1_mb8877a_interface =
 };
 
 
+static const wd17xx_interface x1turbo_mb8877a_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("dma", z80dma_rdy_w),
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
+
 /*************************************
  *
  *  Programmable Character Generator
@@ -2262,6 +2270,9 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MDRV_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
 	MDRV_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
+
+	MDRV_DEVICE_REMOVE("fdc")
+	MDRV_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
 
 	MDRV_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 //  MDRV_SOUND_CONFIG(ay8910_config)
