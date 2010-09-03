@@ -28,7 +28,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "video/mc6845.h"
 
 /* Keyboard HACK */
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xef, 0xef) AM_DEVWRITE(FD1791_TAG, drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
@@ -863,19 +863,25 @@ static const centronics_interface centronics_intf =
 
 /* Z80-SIO/0 Interface */
 
-static void sio_interrupt(running_device *device, int state)
+static Z80DART_INTERFACE( sio_intf )
 {
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
+	0, 0, 0, 0,
 
-static const z80sio_interface sio_intf =
-{
-	sio_interrupt,			/* interrupt handler */
-	NULL,					/* DTR changed handler */
-	NULL,					/* RTS changed handler */
-	NULL,					/* BREAK changed handler */
-	NULL,					/* transmit handler */
-	NULL					/* receive handler */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
 
 /* Z80-CTC Interface */
@@ -898,9 +904,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              								/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxca_w),    /* ZC/TO0 callback */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_txca_w),    /* ZC/TO1 callback */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxtxcb_w)   /* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxca_w),	/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_txca_w),	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w)	/* ZC/TO2 callback */
 };
 
 /* FD1791 Interface */
@@ -1034,7 +1040,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
 
