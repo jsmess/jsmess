@@ -80,7 +80,7 @@ extern const char mess_disclaimer[];
 void mess_display_help(void);
 
 /* code used by print_mame_xml() */
-void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config *config);
+void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config &config);
 
 /* initialize MESS specific options (called from MAME core) */
 void mess_options_init(core_options *opts);

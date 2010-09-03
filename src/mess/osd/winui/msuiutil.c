@@ -8,9 +8,7 @@
 
 BOOL DriverIsComputer(int driver_index)
 {
-	machine_config *config;
 	ioport_list portlist;
-	config = global_alloc(machine_config(drivers[driver_index]->machine_config));
 	input_port_list_init(portlist, drivers[driver_index]->ipt, NULL, 0, FALSE);
 
 	const input_field_config *field;
@@ -26,7 +24,6 @@ BOOL DriverIsComputer(int driver_index)
 				break;
 		}
 	}
-	global_free(config);
 
 	return has_keyboard;
 }
@@ -39,13 +36,12 @@ BOOL DriverIsModified(int driver_index)
 BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 {
 	BOOL b = FALSE;
-	machine_config *config;
 	const device_config_image_interface *device;
 
 	// allocate the machine config
-	config = global_alloc(machine_config(gamedrv->machine_config));
+	machine_config config(*gamedrv);
 
-	for (bool gotone = config->m_devicelist.first(device); gotone; gotone = device->next(device))
+	for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
 	{
 		if (device->image_type() == type)
 		{
@@ -53,8 +49,6 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 			break;
 		}
 	}
-
-	global_free(config);
 	return b;
 }
 

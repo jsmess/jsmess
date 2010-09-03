@@ -454,10 +454,10 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	SoftwareList_SetDriver(hwndSoftwareList, s_config);
 
 	/* allocate the machine config */
-	machine_config *config = global_alloc(machine_config( drivers[drvindex]->machine_config ));
+	machine_config config(*drivers[drvindex]);
 
 	core_options *options = mame_options_init(NULL);
-	for (const device_config *dev = config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -475,7 +475,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 						software_part *part = software_find_part(swinfo, NULL, NULL);
 
 						// search for a device with the right interface
-						for (bool gotone = config->m_devicelist.first(image); gotone; gotone = image->next(image))
+						for (bool gotone = config.m_devicelist.first(image); gotone; gotone = image->next(image))
 						{
 							const char *interface = image->image_interface();
 							if (interface != NULL)
@@ -493,9 +493,6 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 			}
 		}
 	}
-
-	/* free the machine config */
-	global_free( config );
 }
 
 
@@ -510,7 +507,6 @@ void MessUpdateSoftwareList(void)
 
 BOOL MessApproveImageList(HWND hParent, int drvindex)
 {
-	machine_config *config;
 	const device_config_image_interface *dev;
 	char szMessage[256];
 	LPCSTR pszSoftware;
@@ -520,14 +516,14 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		return TRUE;
 	}
 	// allocate the machine config
-	config = global_alloc(machine_config(drivers[drvindex]->machine_config));
+	machine_config config(*drivers[drvindex]);
 
-	for (bool gotone = config->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
+	for (bool gotone = config.m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
 		// confirm any mandatory devices are loaded
 		if (dev->must_be_loaded())
 		{
-			pszSoftware = GetSelectedSoftware(drvindex, config, dev);
+			pszSoftware = GetSelectedSoftware(drvindex, &config, dev);
 			if (!pszSoftware || !*pszSoftware)
 			{
 				snprintf(szMessage, ARRAY_LENGTH(szMessage),
@@ -546,7 +542,6 @@ done:
 		win_message_box_utf8(hParent, szMessage, MAMEUINAME, MB_OK);
 	}
 
-	global_free(config);
 	return bResult;
 }
 
@@ -924,7 +919,6 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 	int drvindex;
 	HWND hwndList;
 	char* utf8_filename;
-	machine_config *config;
 	BOOL cfd_res;
 
 //  begin_resource_tracking();
@@ -933,10 +927,10 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 	drvindex = Picker_GetSelectedItem(hwndList);
 
 	// allocate the machine config
-	config = global_alloc(machine_config(drivers[drvindex]->machine_config));
+	machine_config config(*drivers[drvindex]);
 
-	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
-	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes);
+	SetupImageTypes(&config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
+	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, &config, imagetypes);
 	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 
 	if (cfd_res)
@@ -948,8 +942,6 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), utf8_filename);
 		osd_free(utf8_filename);
 	}
-
-	global_free(config);
 }
 
 

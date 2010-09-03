@@ -2739,10 +2739,10 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 
 		astring *basename;
 		astring *srcname;
-		machine_config *config = global_alloc(machine_config(driver->machine_config));
+		machine_config config(*driver);
 
 		/* parse "vector.ini" for vector games */
-		if (isDriverVector(config))
+		if (isDriverVector(&config))
 		{
 			ui_parse_ini_file(opts, "vector");
 		}
@@ -2768,7 +2768,6 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 		{
 			return opts;
 		}
-		global_free(config);
 
 
 		/* then parse "<sourcefile>.ini" */

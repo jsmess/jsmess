@@ -924,24 +924,15 @@ void CreateCPUFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	machine_config *config = NULL;
-	machine_config_constructor last_tokens = NULL;
 	const device_config_execute_interface *device;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)
 	{
-		// instantiate this device config (if it is different than the previous)
-		if (last_tokens != drivers[i]->machine_config)
-		{
-			if (config != NULL)
-				global_free(config);
-			config = global_alloc(machine_config(drivers[i]->machine_config));
-			last_tokens = drivers[i]->machine_config;
-		}
+		machine_config config(*drivers[i]);
 
 		// enumerate through all devices
-		for (bool gotone = config->m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 		
 			// get the name
@@ -986,9 +977,6 @@ void CreateCPUFolders(int parent_index)
 		}
 	}
 
-	// free the config that we're still holding on to
-	if (config != NULL)
-		global_free(config);	
 }
 
 void CreateSoundFolders(int parent_index)
@@ -996,25 +984,16 @@ void CreateSoundFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	machine_config *config = NULL;
-	machine_config_constructor last_tokens = NULL;
 	const device_config_sound_interface *device;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)
 	{
-		// instantiate this device config (if it is different than the previous)
-		if (last_tokens != drivers[i]->machine_config)
-		{
-			if (config != NULL)
-				global_free(config);
-			config = global_alloc(machine_config(drivers[i]->machine_config));
-			last_tokens = drivers[i]->machine_config;
-		}
+		machine_config config(*drivers[i]);
 
 		// enumerate through all devices
 		
-		for (bool gotone = config->m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			// get the name
 			const char *dev_name = device->devconfig().name();
@@ -1057,10 +1036,6 @@ void CreateSoundFolders(int parent_index)
 			AddGame(folder, i);
 		}
 	}
-
-	// free the config that we're still holding on to
-	if (config != NULL)
-		global_free(config);	
 }
 
 void CreateDeficiencyFolders(int parent_index)
@@ -1222,8 +1197,7 @@ void CreateDumpingFolders(int parent_index)
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	const rom_entry *region, *rom;
 	//const char *name;
-	const game_driver *gamedrv;
-	machine_config *config;
+	const game_driver *gamedrv;	
 
 	// create our two subfolders
 	LPTREEFOLDER lpBad, lpNo;
@@ -1265,10 +1239,11 @@ void CreateDumpingFolders(int parent_index)
 		bBadDump = FALSE;
 		bNoDump = FALSE;
 		/* Allocate machine config */
-		config = global_alloc(machine_config(gamedrv->machine_config));
-		for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+		machine_config config(*gamedrv);
+		
+		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 		{
-			for (region = rom_first_region(gamedrv,source); region; region = rom_next_region(region))
+			for (region = rom_first_region(*source); region; region = rom_next_region(region))
 			{
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
@@ -1283,8 +1258,6 @@ void CreateDumpingFolders(int parent_index)
 				}
 			}
 		}
-		/* Free the structure */
-		global_free(config);
 		if (bBadDump)
 		{
 			AddGame(lpBad,jj);

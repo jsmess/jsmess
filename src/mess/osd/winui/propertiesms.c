@@ -392,7 +392,6 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	UINT32 ram, current_ram;
 	const char *this_ram_string;
 	TCHAR* t_ramstring;
-	machine_config *cfg;
 	const device_config *device;
 
 	// identify the driver
@@ -403,10 +402,10 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	(void)ComboBox_ResetContent(control);
 
 	// allocate the machine config
-	cfg = global_alloc(machine_config(gamedrv->machine_config));
+	machine_config cfg(*gamedrv);
 
 	// identify how many options that we have
-	device = cfg->m_devicelist.first(MESSRAM);
+	device = cfg.m_devicelist.first(MESSRAM);
 
 	EnableWindow(control, (device != NULL));
 	i = 0;
@@ -481,11 +480,6 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 		// set the combo box
 		(void)ComboBox_SetCurSel(control, current_index);
-	}
-	if (cfg != NULL)
-	{
-		/* Free the structure */
-		global_free(cfg);
 	}
 	return TRUE;
 }

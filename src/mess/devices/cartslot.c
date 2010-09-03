@@ -153,9 +153,9 @@ static int process_cartridge(device_image_interface *image, process_mode mode)
 	const rom_entry *romrgn, *roment;
 	int result = 0;
 
-	for (source = rom_first_source(image->device().machine->gamedrv, image->device().machine->config); source != NULL; source = rom_next_source(image->device().machine->gamedrv, image->device().machine->config, source))
+	for (source = rom_first_source(*image->device().machine->config); source != NULL; source = rom_next_source(*source))
 	{
-		for (romrgn = rom_first_region(image->device().machine->gamedrv, source); romrgn != NULL; romrgn = rom_next_region(romrgn))
+		for (romrgn = rom_first_region(*source); romrgn != NULL; romrgn = rom_next_region(romrgn))
 		{
 			roment = romrgn + 1;
 			while(!ROMENTRY_ISREGIONEND(roment))

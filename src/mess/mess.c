@@ -58,14 +58,14 @@ void mess_display_help(void)
  *************************************/
 
 /* device iteration helpers */
-#define ram_first(config)				(config)->m_devicelist.first(MESSRAM)
+#define ram_first(config)				(config).m_devicelist.first(MESSRAM)
 #define ram_next(previous)				((previous)->typenext())
 
 /*-------------------------------------------------
     print_game_ramoptions - prints out all RAM
     options for this system
 -------------------------------------------------*/
-static void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const device_config *device;
 
@@ -104,7 +104,7 @@ static void print_game_ramoptions(FILE *out, const game_driver *game, const mach
     information.
 -------------------------------------------------*/
 
-void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config *config)
+void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config &config)
 {
 	print_game_ramoptions( out, game, config );
 }
