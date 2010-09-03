@@ -1026,6 +1026,12 @@ static READ8_HANDLER( x1_pcg_r )
 
 	addr = (offset & 0x300) >> 8;
 
+	if(pcg_reset)
+	{
+		pcg_index_r[0] = pcg_index_r[1] = pcg_index_r[2] = bios_offset = 0;
+		pcg_reset = 0;
+	}
+
 	if(addr == 0)
 	{
 		if(scrn_reg.pcg_mode)
