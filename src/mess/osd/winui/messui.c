@@ -471,7 +471,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 				{
 					for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 					{
-						const device_config_image_interface *image;
+						const device_config_image_interface *image = NULL;
 						software_part *part = software_find_part(swinfo, NULL, NULL);
 
 						// search for a device with the right interface
