@@ -105,6 +105,30 @@ static VIDEO_START( mz2500 )
 [2] xx-- ---- kanji select
 */
 
+/* helper function, to draw stuff without getting crazy with height / width conditions :) */
+static void mz2500_draw_pixel(running_machine *machine, bitmap_t *bitmap,int x,int y,UINT16	 pen,UINT8 width,UINT8 height)
+{
+	if(width && height)
+	{
+		*BITMAP_ADDR16(bitmap, y*2+0, x*2+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y*2+0, x*2+1) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y*2+1, x*2+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = machine->pens[pen];
+	}
+	else if(width)
+	{
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[pen];
+	}
+	else if(height)
+	{
+		*BITMAP_ADDR16(bitmap, y*2+0, x) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y*2+1, x) = machine->pens[pen];
+	}
+	else
+		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
+}
+
 static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 map_addr)
 {
 	UINT8 *vram = memory_region(machine, "maincpu");
@@ -175,11 +199,10 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-							*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
+							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),0,0);
 					}
 				}
 			}
-				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
 			count++;
 			count&=0x7ff;
@@ -258,15 +281,12 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						if(wid_40) // 640 x 200 with 40 x 25, double x size
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-							{
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+0) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), (x*8+xi)*2+1) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
-							}
+								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),1,0);
 						}
 						else
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-								*BITMAP_ADDR16(bitmap, (y*8+yi-s_y), x*8+xi) = machine->pens[pen+(pal_select ? 0x000 : 0x208)];
+								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),0,0);
 						}
 					}
 				}
@@ -346,7 +366,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 
 				{
 					//if(pri == ((clut256[pen] & 0x100) >> 8))
-						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[pen];
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen,0,0);
 				}
 			}
 			count++;
@@ -401,15 +421,13 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				if(cg_interlace == 2)
 				{
 					if(pri == ((clut16[pen] & 0x10) >> 4))
-					{
-						*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
-						*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
-					}
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x200,0,1);
+
 				}
 				else
 				{
 					if(pri == ((clut16[pen] & 0x10) >> 4))
-						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut16[pen] & 0x0f)+0x200];
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x200,0,0);
 				}
 			}
 			count++;
@@ -461,15 +479,12 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				if(cg_interlace == 2)
 				{
 					if(pri == ((clut256[pen] & 0x100) >> 8))
-					{
-						*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
-						*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
-					}
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,0,1);
 				}
 				else
 				{
 					if(pri == ((clut256[pen] & 0x100) >> 8))
-						*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[(clut256[pen] & 0xff)+0x100];
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,0,0);
 				}
 			}
 			count++;
