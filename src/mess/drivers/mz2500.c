@@ -5,33 +5,35 @@
     driver by Angelo Salese
 
     TODO:
-    - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different data used? (check Back to the Future);
+    - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used? (check Back to the Future);
     - Find real CRTC registers
     - Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
     - Implement external ROM hook-up;
     - FDC loading without the IPLPRO doesn't work at all, why?
     - reverse / blanking tvram attributes;
+    - there's a soft reset PCG init bug now (try for example Eiyuu Densetsu Saga then Excite Bike);
     - clean-ups! ^^'
 
     per-game/program specific TODO:
     - Basic: vertical scrolling returns wrap-around that shouldn't wrap;
-    - Basic: loading has an alignment bug with the bitmap
+    - Dust Box vol. n: they all dies after pressing a key on the 256 color CG layer shows up;
+    - Dust Box vol. n: three items returns "purple" text, presumably HW failures;
+    - Dust Box vol. 4: window effect transition is bugged;
     - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
-    - Mappy: TVRAM layer is double x sized than it should be;
-    - Marchen Veil I: dies with garbage on screen;
     - Moon Child: needs mixed 3+3bpp tvram supported;
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
-    - Mugen no Shinzou: returns an HW error if you attempt to start a play;
+    - Mugen no Shinzou: returns an HW error if you attempt to start a play, it seems to be a fdc writing issue;
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts;
     - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
     - Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
-    - Sound Gal Music Editor: dies with bad code, another wd17xx core bug;
+    - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
+    - Super MZ Demo: priority doesn't work properly on the "face" item;
     - Telephone Soft: shows garbage with the CG layer;
     - The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
     - Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
-    - Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run)
+    - Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run), same issue as the Basic one;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
     memory map:
@@ -82,7 +84,6 @@ static const UINT8 bank_reset_val[2][8] =
 static UINT8 text_reg[0x100], text_reg_index;
 static UINT8 text_col_size, text_font_reg;
 static UINT8 pal_select;
-static UINT8 wid_40;
 static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
 static UINT8 cg_latch[4];
 static UINT8 cg_reg_index;
@@ -90,6 +91,7 @@ static UINT8 cg_reg[0x20];
 static UINT8 clut16[0x10];
 static UINT16 clut256[0x100];
 static UINT8 cg_mask;
+static int scr_x_size,scr_y_size;
 
 static VIDEO_START( mz2500 )
 {
@@ -151,6 +153,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			int tile_bank = vram[0x70000+count+0x1000] & 0x3f;
 			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
 			int color = attr & 7;
+			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
 				gfx_data = memory_region(machine,"pcg");
@@ -187,14 +190,13 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
+
+						if(inv_col) { pen ^= 7; }
 					}
 					else
 					{
-						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
+						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? color : 0;
 					}
-
-					if(attr & 0x40)
-						pen ^= 0x7;
 
 					if(pen)
 					{
@@ -233,6 +235,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
 			//int gfx_num;
 			int color = attr & 7;
+			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
 				gfx_data = memory_region(machine,"pcg");
@@ -269,25 +272,16 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
+
+						if(inv_col) { pen ^= 7; }
 					}
 					else
-						pen = ((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ? color : 0;
-
-					if(attr & 0x40)
-						pen ^= 0x7;
+						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? color : 0;
 
 					if(pen)
 					{
-						if(wid_40) // 640 x 200 with 40 x 25, double x size
-						{
-							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),1,0);
-						}
-						else
-						{
-							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),0,0);
-						}
+						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
+							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),scr_x_size == 640,0);
 					}
 				}
 			}
@@ -384,17 +378,8 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(cg_interlace == 2)
-				{
-					if(pri == ((clut16[pen] & 0x10) >> 4))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,0,1);
-
-				}
-				else
-				{
-					if(pri == ((clut16[pen] & 0x10) >> 4))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,0,0);
-				}
+				if(pri == ((clut16[pen] & 0x10) >> 4))
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,(x_size == 320 && scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -442,16 +427,8 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(cg_interlace == 2)
-				{
-					if(pri == ((clut256[pen] & 0x100) >> 8))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,0,1);
-				}
-				else
-				{
-					if(pri == ((clut256[pen] & 0x100) >> 8))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,0,0);
-				}
+				if(pri == ((clut256[pen] & 0x100) >> 8))
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
 		}
@@ -531,6 +508,30 @@ static VIDEO_UPDATE( mz2500 )
 	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
 
     return 0;
+}
+
+static void mz2500_reconfigure_screen(running_machine *machine)
+{
+	rectangle visarea;
+
+	if((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03 || text_col_size)
+		scr_x_size = 640;
+	else
+		scr_x_size = 320;
+
+	if((cg_reg[0x0e] & 0x1f) == 0x03)
+		scr_y_size = 400;
+	else
+		scr_y_size = 200 * ((text_font_reg) ? 1 : 2);
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = scr_x_size - 1;
+	visarea.max_y = scr_y_size - 1;
+
+	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+
+	machine->primary_screen->configure(720, 480, visarea, machine->primary_screen->frame_period().attoseconds);
 }
 
 static UINT8 mz2500_cg_latch_compare(void)
@@ -931,6 +932,7 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 		case 3:
 			/* Font size reg */
 			text_font_reg = data & 1;
+			mz2500_reconfigure_screen(space->machine);
 			break;
 	}
 }
@@ -1182,29 +1184,13 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 		}
 	}
 
+	cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
+	cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
+	cg_hs = (cg_reg[0x0c] & 0x7f)*8;
+	cg_he = (cg_reg[0x0d] & 0x7f)*8;
+
 	{
-		rectangle visarea;
-		static int x_size,y_size;
-
-		/* TODO: not convinced about this arrangement ... */
-		x_size = ((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03) ? 640 : 320;
-		y_size = ((cg_reg[0x0e] & 0x1f) == 0x03) ? 400 : 200*((text_font_reg) ? 1 : 2); //enables interlace?
-
-		visarea.min_x = 0;
-		visarea.min_y = 0;
-		visarea.max_x = x_size - 1;
-		visarea.max_y = y_size - 1;
-
-		wid_40 = (x_size == 640);
-
-		cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
-		cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
-		cg_hs = (cg_reg[0x0c] & 0x7f)*8;
-		cg_he = (cg_reg[0x0d] & 0x7f)*8;
-
-		//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
-
-		space->machine->primary_screen->configure(720, 480, visarea, space->machine->primary_screen->frame_period().attoseconds); //TODO
+		mz2500_reconfigure_screen(space->machine);
 	}
 
 	if(cg_reg_index & 0x80) //enable auto-inc
@@ -1413,7 +1399,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BREAK") //PORT_CODE(KEYCODE_ESC)
 
 	PORT_START("KEY4")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/") //PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
@@ -1467,7 +1453,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(":")
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(";")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("-")
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("@")
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("[")
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_UNUSED)
@@ -1477,7 +1463,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("COPY")
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CLR")
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("INST")
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BS")
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("ESC")
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("* (PAD)") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/ (PAD)") PORT_CODE(KEYCODE_SLASH_PAD)
@@ -1713,8 +1699,15 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 {
+	static UINT8 prev_col_val;
 //  printf("%02x\n",data);
-	text_col_size = (data & 0x20) ? 1 : 0;
+
+	if(prev_col_val != ((data & 0x20) >> 5))
+	{
+		text_col_size = ((data & 0x20) >> 5);
+		prev_col_val = text_col_size;
+		mz2500_reconfigure_screen(device->machine);
+	}
 	key_mux = data & 0x1f;
 }
 
@@ -1897,8 +1890,7 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	//MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 320, 480, 0, 200) //TODO: fix this
+	MDRV_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 320, 480, 0, 200) //unknown clock / divider
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_PALETTE_INIT(mz2500)
 
@@ -1909,9 +1901,12 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 6000000/4) //unknown clock / divider
+	MDRV_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MDRV_SOUND_ROUTE(0, "mono", 0.25)
+	MDRV_SOUND_ROUTE(1, "mono", 0.25)
+	MDRV_SOUND_ROUTE(2, "mono", 0.50)
+	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
 MACHINE_CONFIG_END
@@ -1951,4 +1946,4 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,        0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, mz2500,   0,        0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2500", 0 )
