@@ -9,9 +9,10 @@
     - Find real CRTC registers
     - Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
     - Implement external ROM hook-up;
+    - Add remaining missing peripherals, SIO, HDD and w1300a network;
     - FDC loading without the IPLPRO doesn't work at all, why?
     - reverse / blanking tvram attributes;
-    - there's a soft reset PCG init bug now (try for example Eiyuu Densetsu Saga then Excite Bike);
+    - there's a soft reset PCG init bug now (try for example Eiyuu Densetsu Saga then Excite Bike), MAME / MESS core bug?
     - clean-ups! ^^'
 
     per-game/program specific TODO:
@@ -85,6 +86,7 @@ static UINT8 text_reg[0x100], text_reg_index;
 static UINT8 text_col_size, text_font_reg;
 static UINT8 pal_select;
 static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
+static UINT16 tv_vs,tv_ve,tv_hs,tv_he; //TV window parameters
 static UINT8 cg_latch[4];
 static UINT8 cg_reg_index;
 static UINT8 cg_reg[0x20];
@@ -183,6 +185,15 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 				{
 					UINT8 pen_bit[3],pen;
 
+					int res_x,res_y;
+
+					res_x = x*8+xi;
+					res_y = y*8+yi-s_y;
+
+					/* check TV window boundaries */
+					//if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+					//	continue;
+
 					if(gfx_sel & 0x8)
 					{
 						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
@@ -200,8 +211,8 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 					if(pen)
 					{
-						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x00 : 0x18),0,0);
+						if((res_y) >= 0 && (res_y) < 200*y_step)
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x18),0,0);
 					}
 				}
 			}
@@ -264,6 +275,14 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 				for(xi=0;xi<8;xi++)
 				{
 					UINT8 pen_bit[3],pen;
+					int res_x,res_y;
+
+					res_x = x*8+xi;
+					res_y = y*8+yi-s_y;
+
+					/* check TV window boundaries */
+					//if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+					//	continue;
 
 					if(gfx_sel & 0x8)
 					{
@@ -280,8 +299,8 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 					if(pen)
 					{
-						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),scr_x_size == 640,0);
+						if((res_y) >= 0 && (res_y) < 200*y_step)
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x000 : 0x18),scr_x_size == 640,0);
 					}
 				}
 			}
@@ -353,7 +372,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
 
-	popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
+//	popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -441,6 +460,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
 
 //  popmessage("%02x",text_reg[9]);
+//	popmessage("%d %d %d %d",tv_hs,(tv_he),tv_vs,(tv_ve));
 
 	if(text_col_size)
 		draw_80x25(machine,bitmap,cliprect,base_addr);
@@ -528,6 +548,11 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 	visarea.max_x = scr_x_size - 1;
 	visarea.max_y = scr_y_size - 1;
 
+	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+
+	machine->primary_screen->configure(720, 480, visarea, machine->primary_screen->frame_period().attoseconds);
+
+	/* calculate CG window parameters here */
 	cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
 	cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
 	cg_hs = ((cg_reg[0x0c] & 0x7f)*8);
@@ -539,9 +564,38 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 		cg_he /= 2;
 	}
 
-	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+	/* calculate TV window parameters here */
+	{
+		static int x_offs,y_offs;
 
-	machine->primary_screen->configure(720, 480, visarea, machine->primary_screen->frame_period().attoseconds);
+		switch((text_font_reg|text_col_size<<1) & 3)
+		{
+			case 0: x_offs = 64; break;
+			case 1: x_offs = 80; break;
+			case 2: x_offs = 72; break;
+			case 3: x_offs = 72; break;
+		}
+		//printf("%d %d %d\n",x_offs,(text_reg[7] & 0x7f) * 8,(text_reg[8] & 0x7f)* 8);
+
+		y_offs = text_font_reg ? 76 : 34;
+
+		tv_hs = ((text_reg[7] & 0x7f)*8) - x_offs;
+		tv_he = ((text_reg[8] & 0x7f)*8) - x_offs;
+		tv_vs = (text_reg[3]*2) - y_offs;
+		tv_ve = (text_reg[5]*2) - y_offs;
+
+		if(scr_x_size == 320)
+		{
+			tv_hs /= 2;
+			tv_he /= 2;
+		}
+
+		if(scr_y_size == 200)
+		{
+			tv_vs /= 2;
+			tv_ve /= 2;
+		}
+	}
 }
 
 static UINT8 mz2500_cg_latch_compare(void)
@@ -887,6 +941,8 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 
 			#endif
 			//popmessage("%d %02x %d %02x %d %d",text_reg[3],text_reg[4],text_reg[5],text_reg[6],text_reg[7]*8,text_reg[8]*8);
+
+			mz2500_reconfigure_screen(space->machine);
 
 			if(text_reg_index == 0x0a) // set 256 color palette
 			{
