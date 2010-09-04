@@ -58,21 +58,6 @@ static UINT8 n5380_Command[32];
 static INT32 cmd_ptr, d_ptr, d_limit, next_req_flag;
 static UINT8 n5380_Data[512];
 
-#if NCR5380_DEVICE_CONVERSION
-typedef struct _ncr5380_t ncr5380_t;
-struct _ncr5380_t
-{
-	SCSIInstance *devices[8];
-	struct NCR5380interface *intf;
-
-	UINT8 n5380_Registers[8];
-	UINT8 last_id;
-	UINT8 n5380_Command[32];
-	INT32 cmd_ptr, d_ptr, d_limit;
-	UINT8 n5380_Data[512];
-};
-#endif
-
 // get the length of a SCSI command based on it's command byte type
 static int get_cmd_len(int cbyte)
 {
@@ -380,22 +365,14 @@ READ8_HANDLER(ncr5380_r)
 
 void ncr5380_init( running_machine *machine, const struct NCR5380interface *interface )
 {
-	int i;
-
 	// save interface pointer for later
 	intf = interface;
 
 	memset(n5380_Registers, 0, sizeof(n5380_Registers));
+	memset(n5380_Data, 0, sizeof(n5380_Data));
 	memset(devices, 0, sizeof(devices));
 
 	next_req_flag = 0;
-
-	// try to open the devices
-	for (i = 0; i < interface->scsidevs->devs_present; i++)
-	{
-		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
-	}
-
 	state_save_register_item_array(machine, "ncr5380", NULL, 0, n5380_Registers);
 	state_save_register_item_array(machine, "ncr5380", NULL, 0, n5380_Command);
 	state_save_register_item_array(machine, "ncr5380", NULL, 0, n5380_Data);
@@ -404,6 +381,24 @@ void ncr5380_init( running_machine *machine, const struct NCR5380interface *inte
 	state_save_register_item(machine, "ncr5380", NULL, 0, d_ptr);
 	state_save_register_item(machine, "ncr5380", NULL, 0, d_limit);
 	state_save_register_item(machine, "ncr5380", NULL, 0, next_req_flag);
+}
+
+void ncr5380_scan_devices( running_machine *machine )
+{
+	int i;
+
+	// try to open the devices
+	for (i = 0; i < intf->scsidevs->devs_present; i++)
+	{
+		// if a device wasn't already allocated
+		if (!devices[intf->scsidevs->devices[i].scsiID])
+		{
+			SCSIAllocInstance( machine, 
+					intf->scsidevs->devices[i].scsiClass, 
+					&devices[intf->scsidevs->devices[i].scsiID],
+					intf->scsidevs->devices[i].diskregion );
+		}
+	}
 }
 
 void ncr5380_exit( const struct NCR5380interface *interface )
@@ -458,39 +453,132 @@ void *ncr5380_get_device(int id)
 	return NULL;
 }
 
-/* device interface */
-#if NCR5380_DEVICE_CONVERSION
-static DEVICE_START( ncr5380 )
+#if USE_5380_DEVICE
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+ncr5380_device_config::ncr5380_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "5380 SCSI", tag, owner, clock)
 {
 }
 
-
-static DEVICE_RESET( ncr5380 )
-{
+device_config *ncr5380_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{ 
+	return global_alloc(ncr5380_device_config(mconfig, tag, owner, clock));
 }
 
+device_t *ncr5380_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, ncr5380_device(machine, *this));
+}
 
-DEVICE_GET_INFO( ncr5380 ) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ncr5380_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;				    		break;
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(ncr5380);	break;
-		case DEVINFO_FCT_STOP:				/* nothing */					break;
-		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(ncr5380);	break;
+void ncr5380_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const NCR5380interface *intf = reinterpret_cast<const NCR5380interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<NCR5380interface *>(this) = *intf;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				strcpy(info->s, "NCR 5380");				break;
-		case DEVINFO_STR_FAMILY:			strcpy(info->s, "NCR53xx");				break;
-		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.1");				break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
+	// or initialize to defaults if none provided
+	else
+	{
+		scsidevs = NULL;
+		irq_callback = NULL;
 	}
 }
-#endif
 
-#if NCR5380_DEVICE_CONVERSION
-DEFINE_LEGACY_DEVICE(NCR5380, ncr5380);
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type NCR5380 = ncr5380_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  via6522_device - constructor
+//-------------------------------------------------
+
+ncr5380_device::ncr5380_device(running_machine &_machine, const ncr5380_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ncr5380_device::device_start()
+{
+	int i;
+
+	memset(m_5380_Registers, 0, sizeof(m_5380_Registers));
+	memset(m_5380_Data, 0, sizeof(m_5380_Data));
+	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
+
+	m_next_req_flag = 0;
+
+	// try to open the devices
+	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	{
+		SCSIAllocInstance( machine, 
+				m_config.scsidevs->devices[i].scsiClass, 
+				&m_scsi_devices[m_config.scsidevs->devices[i].scsiID],
+				m_config.scsidevs->devices[i].diskregion );
+	}
+
+	state_save_register_device_item_array(this, 0, m_5380_Registers);
+	state_save_register_device_item_array(this, 0, m_Command);
+	state_save_register_device_item_array(this, 0, m_5380_Data);
+	state_save_register_device_item(this, 0, m_last_id);
+	state_save_register_device_item(this, 0, m_cmd_ptr);
+	state_save_register_device_item(this, 0, m_d_ptr);
+	state_save_register_device_item(this, 0, m_d_limit);
+	state_save_register_device_item(this, 0, m_next_req_flag);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ncr5380_device::device_reset()
+{
+	memset(m_5380_Registers, 0, sizeof(m_5380_Registers));
+	memset(m_5380_Data, 0, sizeof(m_5380_Data));
+	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
+
+	m_next_req_flag = 0;
+	m_cmd_ptr = 0;
+	m_d_ptr = 0;
+	m_d_limit = 0;
+	m_last_id = 0;
+}
+
+UINT8 ncr5380_device::read(UINT8 offset)
+{
+	return 0;
+}
+
+void ncr5380_device::write(UINT8 offset, UINT8 data)
+{
+}
+
+void ncr5380_device::read_data(int bytes, UINT8 *pData)
+{
+}
+
+void ncr5380_device::write_data(int bytes, UINT8 *pData)
+{
+}
+
+void *ncr5380_device::get_scsi_device(int id)
+{
+	return NULL;
+}
 #endif

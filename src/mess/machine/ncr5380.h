@@ -8,7 +8,7 @@
 
 #include "machine/scsidev.h"
 
-#define NCR5380_DEVICE_CONVERSION (0)
+#define USE_5380_DEVICE (0)
 
 struct NCR5380interface
 {
@@ -43,13 +43,64 @@ extern void ncr5380_exit( const struct NCR5380interface *interface );
 extern void ncr5380_read_data(int bytes, UINT8 *pData);
 extern void ncr5380_write_data(int bytes, UINT8 *pData);
 extern void *ncr5380_get_device(int id);
+extern void ncr5380_scan_devices( running_machine *machine );
 extern READ8_HANDLER(ncr5380_r);
 extern WRITE8_HANDLER(ncr5380_w);
 
 // device stuff
+#if USE_5380_DEVICE
+#define MDRV_NCR5380_ADD(_tag, _clock, _intrf) \
+    MDRV_DEVICE_ADD(_tag, NCR5380, _clock) \
+    MDRV_DEVICE_CONFIG(_intrf)
 
-#if NCR5380_DEVICE_CONVERSION
-DECLARE_LEGACY_DEVICE(NCR5380, ncr5380);
+class ncr5380_device_config : public device_config, public NCR5380interface
+{
+	friend class ncr5380_device;
+
+	// construction/destruction
+	ncr5380_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+};
+
+class ncr5380_device : public device_t
+{
+	friend class ncr5380_device_config;
+
+	// construction/destruction
+	ncr5380_device(running_machine &_machine, const ncr5380_device_config &_config);
+
+public:
+	UINT8 read(UINT8 offset);
+	void write(UINT8 offset, UINT8 data);
+
+	void read_data(int bytes, UINT8 *pData);
+	void write_data(int bytes, UINT8 *pData);
+
+	void *get_scsi_device(int id);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	SCSIInstance *m_scsi_devices[8];
+
+	UINT8 m_5380_Registers[8];
+	UINT8 m_last_id;
+	UINT8 m_Command[32];
+	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
+	UINT8 m_5380_Data[512];
+
+	const ncr5380_device_config &m_config;
+};
 #endif
-
 #endif

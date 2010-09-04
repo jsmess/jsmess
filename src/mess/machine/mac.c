@@ -358,7 +358,78 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		if (((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC))|| (mac->mac_model == MODEL_MAC_LC_II) || (mac->mac_model == MODEL_MAC_POWERMAC_6100) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
+		if (((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC)) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
+		{
+//			printf("V8 style machine: memory_size = %x (%s)\n", memory_size, is_rom ? "ROM" : "RAM");
+
+			if (is_rom)
+			{
+				mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+			}
+			else
+			{	
+				address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+				UINT32 v8_internal_mirror_base;
+
+				v8_internal_mirror_base = 0xffffffff;	// default to "none"
+
+				// force unmap of entire RAM region
+				memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
+
+				// install the total RAM size at 0
+				mac_install_memory(machine, 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+
+				// LC has 2 MB built-in, all other V8-style machines have 4 MB
+				if (mac->mac_model == MODEL_MAC_LC)
+				{
+					switch (memory_size / 0x100000)
+					{
+						case 2:	// 2 MB: RAM at 0 and mirrored at 800000
+							v8_internal_mirror_base = 0x000000;				
+							break;
+
+						case 4:	// 4 MB: 2 MB SIMM at 0, internal RAM at 200000, mirrored at 800000
+							v8_internal_mirror_base = 0x200000;				
+							break;
+
+						case 6: // 6 MB: 4 MB SIMM at 0, internal RAM at 400000, mirrored at 800000
+							v8_internal_mirror_base = 0x400000;
+							break;
+
+						case 10: // 10 MB: 8 MB SIMM at 0, internal RAM at 800000, no mirror
+							break;
+					}
+				}
+				else
+				{
+					switch (memory_size / 0x100000)
+					{
+						case 2:	// 2 MB: RAM at 0 and mirrored at 800000
+						case 4:	// 4 MB: RAM at 0 and mirrored at 800000
+							v8_internal_mirror_base = 0x000000;				
+							break;
+
+						case 6: // 6 MB: 2 MB SIMM at 0, internal RAM at 200000, mirrored at 800000
+							v8_internal_mirror_base = 0x200000;
+							break;
+
+						case 8: // 8 MB: 4 MB SIMM at 0, internal RAM at 400000, mirrored at 800000
+							v8_internal_mirror_base = 0x400000;
+							break;
+
+						case 10: // 10 MB: 8 MB SIMM at 0, internal RAM at 800000, no mirror
+							break;
+					}
+				}
+
+				if (v8_internal_mirror_base != 0xffffffff)
+				{
+//					printf("V8 style machine: setting internal RAM mirror from offset %x\n", v8_internal_mirror_base);
+					mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, &memory_data[v8_internal_mirror_base], is_rom, "bank2");
+				}
+			}
+		}
+		else if (mac->mac_model == MODEL_MAC_POWERMAC_6100)
 		{
 			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -2677,6 +2748,26 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
  * Main
  * *************************************************************************/
 
+static const SCSIConfigTable dev_table =
+{
+	2,                                      /* 2 SCSI devices */
+	{
+	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
+	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
+	}
+};
+
+static const struct NCR5380interface macplus_5380intf =
+{
+	&dev_table,	// SCSI device table
+	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
+};
+
+static void macscsi_exit(running_machine &machine)
+{
+	ncr5380_exit(&macplus_5380intf);
+}
+
 MACHINE_START( mac )
 {
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -2697,7 +2788,6 @@ MACHINE_RESET(mac)
 	// clear mac state struct
 	model_save = mac->mac_model;
 	timer_save = mac->inquiry_timeout;
-	//memset(mac, 0, sizeof(mac_state));
 	mac->mac_model = model_save;
 	mac->inquiry_timeout = timer_save;
 
@@ -2722,6 +2812,11 @@ MACHINE_RESET(mac)
 	if (has_adb(mac))
 	{
 		adb_reset(mac);
+	}
+
+	if (mac->mac_model >= MODEL_MAC_PLUS)
+	{
+		ncr5380_scan_devices(machine);
 	}
 
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
@@ -2857,32 +2952,11 @@ DRIVER_INIT(mac512ke)
 	mac_driver_init(machine, MODEL_MAC_512KE);
 }
 
-static const SCSIConfigTable dev_table =
-{
-	2,                                      /* 2 SCSI devices */
-	{
-	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
-	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
-	}
-};
-
-static const struct NCR5380interface macplus_5380intf =
-{
-	&dev_table,	// SCSI device table
-	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
-};
-
-static void macscsi_exit(running_machine &machine)
-{
-	ncr5380_exit(&macplus_5380intf);
-}
-
 MACHINE_START( macscsi )
 {
 	MACHINE_START_CALL(mac);
 
 	ncr5380_init(machine, &macplus_5380intf);
-
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, macscsi_exit);
 }
 
