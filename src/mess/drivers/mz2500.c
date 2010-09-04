@@ -191,7 +191,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 
-						if(inv_col) { pen ^= 7; }
+						//if(inv_col) { pen ^= 7; } breaks Mappy
 					}
 					else
 					{
@@ -273,7 +273,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 
-						if(inv_col) { pen ^= 7; }
+						//if(inv_col) { pen ^= 7; } breaks Mappy
 					}
 					else
 						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? color : 0;
@@ -353,7 +353,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
 
-	//popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
+	popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -527,6 +527,17 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 	visarea.min_y = 0;
 	visarea.max_x = scr_x_size - 1;
 	visarea.max_y = scr_y_size - 1;
+
+	cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
+	cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
+	cg_hs = ((cg_reg[0x0c] & 0x7f)*8);
+	cg_he = ((cg_reg[0x0d] & 0x7f)*8);
+
+	if(scr_x_size == 320)
+	{
+		cg_hs /= 2;
+		cg_he /= 2;
+	}
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
 
@@ -1182,11 +1193,6 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 				vram[i+0x4c000] = 0x00; //clear I
 		}
 	}
-
-	cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
-	cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
-	cg_hs = (cg_reg[0x0c] & 0x7f)*8;
-	cg_he = (cg_reg[0x0d] & 0x7f)*8;
 
 	{
 		mz2500_reconfigure_screen(space->machine);
