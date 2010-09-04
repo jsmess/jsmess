@@ -981,12 +981,16 @@ static const wd17xx_interface x1_mb8877a_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+	z80dma_rdy_w(device->machine->device("dma"), state ^ 1);
+}
 
 static const wd17xx_interface x1turbo_mb8877a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("dma", z80dma_rdy_w),
+	DEVCB_LINE(fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
