@@ -199,7 +199,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),0,0);
+							mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x00 : 0x18),0,0);
 					}
 				}
 			}
@@ -281,12 +281,12 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 						if(wid_40) // 640 x 200 with 40 x 25, double x size
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),1,0);
+								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),1,0);
 						}
 						else
 						{
 							if((y*8+yi-s_y) >= 0 && (y*8+yi-s_y) < 200*y_step)
-								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x208),0,0);
+								mz2500_draw_pixel(machine,bitmap,x*8+xi,y*8+yi-s_y,pen+(pal_select ? 0x000 : 0x18),0,0);
 						}
 					}
 				}
@@ -295,40 +295,6 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 			count++;
 			count&=0x7ff;
-		}
-	}
-}
-
-static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
-{
-	UINT16 base_addr;
-
-	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
-
-//  popmessage("%02x",text_reg[9]);
-
-	if(text_col_size)
-		draw_80x25(machine,bitmap,cliprect,base_addr);
-	else
-	{
-		int tv_mode;
-
-		tv_mode = text_reg[0] >> 2;
-
-		switch(tv_mode & 3)
-		{
-//          case 0: mixed 6bpp mode
-			case 1:
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
-				break;
-			case 2:
-				draw_40x25(machine,bitmap,cliprect,1,base_addr);
-				break;
-			case 3:
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
-				draw_40x25(machine,bitmap,cliprect,1,base_addr);
-				break;
-			//default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
 	}
 }
@@ -421,13 +387,13 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				if(cg_interlace == 2)
 				{
 					if(pri == ((clut16[pen] & 0x10) >> 4))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x200,0,1);
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,0,1);
 
 				}
 				else
 				{
 					if(pri == ((clut16[pen] & 0x10) >> 4))
-						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x200,0,0);
+						mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,0,0);
 				}
 			}
 			count++;
@@ -492,6 +458,40 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 	}
 }
 
+static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	UINT16 base_addr;
+
+	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
+
+//  popmessage("%02x",text_reg[9]);
+
+	if(text_col_size)
+		draw_80x25(machine,bitmap,cliprect,base_addr);
+	else
+	{
+		int tv_mode;
+
+		tv_mode = text_reg[0] >> 2;
+
+		switch(tv_mode & 3)
+		{
+//          case 0: mixed 6bpp mode
+			case 1:
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				break;
+			case 2:
+				draw_40x25(machine,bitmap,cliprect,1,base_addr);
+				break;
+			case 3:
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				draw_40x25(machine,bitmap,cliprect,1,base_addr);
+				break;
+			//default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
+		}
+	}
+}
+
 static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	switch(cg_reg[0x0e])
@@ -524,8 +524,6 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 static VIDEO_UPDATE( mz2500 )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //TODO: correct?
-
-	//popmessage("%02x",cg_mask);
 
 	draw_cg_screen(screen->machine,bitmap,cliprect,0);
 	draw_tv_screen(screen->machine,bitmap,cliprect);
@@ -907,7 +905,6 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 
 					palette_set_color_rgb(space->machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 				}
-
 			}
 			if(text_reg_index >= 0x80 && text_reg_index <= 0x8f) //Bitmap 16 clut registers
 			{
@@ -1047,7 +1044,7 @@ static WRITE8_HANDLER( mz2500_rom_w )
 	//printf("%02x\n",data);
 }
 
-/* sets first 16 color entries of the 4096 palette bank */
+/* sets 16 color entries out of 4096 possible combinations */
 static WRITE8_HANDLER( palette4096_io_w )
 {
 	static UINT8 r[16],g[16],b[16];
@@ -1065,7 +1062,7 @@ static WRITE8_HANDLER( palette4096_io_w )
 		b[pal_entry] = data & 0x0f;
 	}
 
-	palette_set_color_rgb(space->machine, pal_entry+0x200,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
+	palette_set_color_rgb(space->machine, pal_entry+0x10,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
 }
 
 static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
@@ -1804,14 +1801,39 @@ static PALETTE_INIT( mz2500 )
 {
 	int i;
 
-	/*set up 16 colors (TODO) */
+	for(i=0;i<0x200;i++)
+		palette_set_color_rgb(machine, i,pal1bit(0),pal1bit(0),pal1bit(0));
+
+	/* set up 8 colors (PCG) */
 	for(i=0;i<8;i++)
 		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
-	/* set up 256 colors (TODO) */
+	/* set up 16 colors (PCG / CG) */
 
-	/* set up 4096 colors */
-	// ...
+	/* set up 256 colors (CG) */
+	{
+		int r,g,b;
+
+		for(i = 0;i < 0x100;i++)
+		{
+			int bit0,bit1,bit2;
+
+			bit0 = pal_256_param(i,0) ? 1 : 0;
+			bit1 = i & 0x01 ? 2 : 0;
+			bit2 = i & 0x10 ? 4 : 0;
+			b = bit0|bit1|bit2;
+			bit0 = pal_256_param(i,0) ? 1 : 0;
+			bit1 = i & 0x02 ? 2 : 0;
+			bit2 = i & 0x20 ? 4 : 0;
+			r = bit0|bit1|bit2;
+			bit0 = pal_256_param(i,0) ? 1 : 0;
+			bit1 = i & 0x04 ? 2 : 0;
+			bit2 = i & 0x40 ? 4 : 0;
+			g = bit0|bit1|bit2;
+
+			palette_set_color_rgb(machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+		}
+	}
 }
 
 /* PIT8253 Interface */
@@ -1877,7 +1899,7 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 320, 312, 0, 200)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz, 640+108, 0, 320, 480, 0, 200) //TODO: fix this
-	MDRV_PALETTE_LENGTH(0x200+4096) // TODO: it needs more than this
+	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_PALETTE_INIT(mz2500)
 
 	MDRV_GFXDECODE(mz2500)
