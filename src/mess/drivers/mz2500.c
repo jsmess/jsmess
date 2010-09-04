@@ -285,7 +285,6 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					}
 				}
 			}
-				//drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_num],tile,color,0,0,x*8,(y)*8);
 
 			count++;
 			count&=0x7ff;
@@ -461,8 +460,8 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				break;
 			case 3:
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				draw_40x25(machine,bitmap,cliprect,1,base_addr);
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
 			//default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
 		}
