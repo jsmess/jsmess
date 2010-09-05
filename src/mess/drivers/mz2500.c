@@ -367,9 +367,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
 	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
-	count|= (plane & 2) ? 0x10000 : 0x00000;
 	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
-	wa_reg|= (plane & 2) ? 0x10000 : 0x00000;
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
@@ -390,10 +388,10 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
-				pen_bit[1] = (vram[count+0x44000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
-				pen_bit[2] = (vram[count+0x48000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
-				pen_bit[3] = (vram[count+0x4c000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
+				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
+				pen_bit[1] = (vram[count+0x44000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
+				pen_bit[2] = (vram[count+0x48000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
+				pen_bit[3] = (vram[count+0x4c000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
@@ -410,16 +408,24 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	}
 }
 
-static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int pri)
 {
 	static UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
+	UINT32 wa_reg;
+	UINT8 s_x;
+	UINT8 base_mask;
 	int res_x,res_y;
 	UINT8 cg_interlace;
 
-	count = 0x40000;
+	base_mask = 0x3f; //no x_size == 640
+
+	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
+	/* TODO: layer 2 scrolling */
+	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
 
 	for(y=0;y<200;y++)
@@ -428,21 +434,21 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				res_x = x+xi;
+				res_x = x+xi+s_x;
 				res_y = y;
 
 				/* check window boundaries */
 				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count + 0x2000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x10) : 0; // B1
-				pen_bit[1] = (vram[count + 0x0000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x01) : 0; // B0
-				pen_bit[2] = (vram[count + 0x6000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x20) : 0; // R1
-				pen_bit[3] = (vram[count + 0x4000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x02) : 0; // R0
-				pen_bit[4] = (vram[count + 0xa000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x40) : 0; // G1
-				pen_bit[5] = (vram[count + 0x8000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x04) : 0; // G0
-				pen_bit[6] = (vram[count + 0xe000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x80) : 0; // I1
-				pen_bit[7] = (vram[count + 0xc000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x08) : 0; // I0
+				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x10) : 0; // B1
+				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x01) : 0; // B0
+				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x20) : 0; // R1
+				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x02) : 0; // R0
+				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x40) : 0; // G1
+				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x04) : 0; // G0
+				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x80) : 0; // I1
+				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x08) : 0; // I0
 
 				pen = 0;
 				for(pen_i=0;pen_i<8;pen_i++)
@@ -452,6 +458,9 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
+			count&=((base_mask<<8) | 0xff);
+			if(count > wa_reg)
+				count = 0;
 		}
 	}
 }
@@ -514,7 +523,7 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 			draw_cg16_screen(machine,bitmap,cliprect,0,640,pri);
 			break;
 		case 0x1d:
-			draw_cg256_screen(machine,bitmap,cliprect,pri);
+			draw_cg256_screen(machine,bitmap,cliprect,0,pri);
 			break;
 		case 0x97:
 			draw_cg16_screen(machine,bitmap,cliprect,2,640,pri);
