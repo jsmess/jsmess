@@ -6,8 +6,7 @@
 
     TODO:
     - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used? (check Back to the Future);
-    - Find real CRTC registers
-    - Some games doesn't set proper registers if you have interlace enabled, is there any real reason?
+    - Some games doesn't set proper registers if you have interlace enabled, is it a BTANB?
     - Implement external ROM hook-up;
     - Add remaining missing peripherals, SIO, HDD and w1300a network;
     - FDC loading without the IPLPRO doesn't work at all, why?
@@ -86,7 +85,7 @@ static UINT8 text_reg[0x100], text_reg_index;
 static UINT8 text_col_size, text_font_reg;
 static UINT8 pal_select;
 static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
-static UINT16 tv_vs,tv_ve,tv_hs,tv_he; //TV window parameters
+static INT16 tv_vs,tv_ve,tv_hs,tv_he; //TV window parameters
 static UINT8 cg_latch[4];
 static UINT8 cg_reg_index;
 static UINT8 cg_reg[0x20];
@@ -191,8 +190,8 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					res_y = y*8+yi-s_y;
 
 					/* check TV window boundaries */
-					//if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
-					//	continue;
+					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+						continue;
 
 					if(gfx_sel & 0x8)
 					{
@@ -281,8 +280,8 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					res_y = y*8+yi-s_y;
 
 					/* check TV window boundaries */
-					//if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
-					//	continue;
+					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+						continue;
 
 					if(gfx_sel & 0x8)
 					{
@@ -573,7 +572,7 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 			case 0: x_offs = 64; break;
 			case 1: x_offs = 80; break;
 			case 2: x_offs = 72; break;
-			case 3: x_offs = 72; break;
+			case 3: x_offs = 88; break;
 		}
 		//printf("%d %d %d\n",x_offs,(text_reg[7] & 0x7f) * 8,(text_reg[8] & 0x7f)* 8);
 
@@ -595,6 +594,7 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 			tv_vs /= 2;
 			tv_ve /= 2;
 		}
+
 	}
 }
 
@@ -1012,8 +1012,6 @@ static WRITE8_HANDLER( mz2500_irq_sel_w )
 	irq_mask[1] = (data & 0x04); //i8253
 	irq_mask[2] = (data & 0x02); //printer
 	irq_mask[3] = (data & 0x01); //RP5c15
-
-	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
