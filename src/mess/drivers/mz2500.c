@@ -18,7 +18,8 @@
     - Dust Box vol. 4: window effect transition is bugged;
     - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed";
     - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
-    - Moon Child: needs mixed 3+3bpp tvram supported;
+    - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
+    - Moon Child: window masking doesn't mask bottom part of the screen?
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
    	- Marchen Veil I: doesn't load if you try to run it, it does if you load another game first (for example Mappy);
    	- Mugen no Shinzou: returns an HW error if you attempt to do a new game, it seems to be a fdc writing issue;
@@ -51,6 +52,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
@@ -487,7 +489,9 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 		switch(tv_mode & 3)
 		{
-//          case 0: mixed 6bpp mode
+			case 0: //mixed 6bpp mode, TODO
+				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				break;
 			case 1:
 				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
@@ -1404,7 +1408,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
-//  AM_RANGE(0xa0, 0xa3) AM_READWRITE(sio_r,sio_w)
+	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio_ba_cd_r,z80sio_ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
@@ -1970,6 +1974,16 @@ static const struct rp5c15_interface rtc_intf =
 	mz2500_rtc_alarm_irq
 };
 
+static const z80sio_interface mz2500_sio_intf =
+{
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( mz2500, driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -1981,6 +1995,7 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 
 	MDRV_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
+	MDRV_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
 
