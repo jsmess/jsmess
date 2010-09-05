@@ -139,10 +139,12 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	UINT8 *gfx_data;
 	UINT8 y_step;
 	UINT8 s_y;
+	UINT8 y_height;
 
 	count = (map_addr & 0x7ff);
 
 	y_step = (text_font_reg) ? 1 : 2;
+	y_height = (text_reg[0] & 0x10) ? 10 : 8;
 	s_y = text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
@@ -187,7 +189,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					int res_x,res_y;
 
 					res_x = x*8+xi;
-					res_y = y*8+yi-s_y;
+					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
 					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
@@ -229,10 +231,12 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 	UINT8 *gfx_data;
 	UINT8 y_step;
 	UINT8 s_y;
+	UINT8 y_height;
 
 	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
 	y_step = (text_font_reg) ? 1 : 2;
+	y_height = (text_reg[0] & 0x10) ? 10 : 8;
 	s_y = text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
@@ -277,7 +281,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					int res_x,res_y;
 
 					res_x = x*8+xi;
-					res_y = y*8+yi-s_y;
+					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
 					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
