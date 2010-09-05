@@ -11,18 +11,17 @@
     - Add remaining missing peripherals, SIO, HDD and w1300a network;
     - FDC loading without the IPLPRO doesn't work at all, why?
     - reverse / blanking tvram attributes;
-    - there's a soft reset PCG init bug now (try for example Eiyuu Densetsu Saga then Excite Bike), MAME / MESS core bug?
     - clean-ups! ^^'
 
     per-game/program specific TODO:
-    - Basic: vertical scrolling returns wrap-around that shouldn't wrap;
-    - Dust Box vol. n: they all dies after pressing a key on the 256 color CG layer shows up;
-    - Dust Box vol. n: three items returns "purple" text, presumably HW failures;
+    - Dust Box vol. 1-3: they die with text garbage;
     - Dust Box vol. 4: window effect transition is bugged;
+    - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed";
     - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
     - Moon Child: needs mixed 3+3bpp tvram supported;
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
-    - Mugen no Shinzou: returns an HW error if you attempt to start a play, it seems to be a fdc writing issue;
+   	- Marchen Veil I: doesn't load if you try to run it, it does if you load another game first (for example Mappy);
+   	- Mugen no Shinzou: returns an HW error if you attempt to do a new game, it seems to be a fdc writing issue;
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts;
@@ -362,6 +361,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	UINT8 base_mask;
 	int res_x,res_y;
 	UINT8 cg_interlace;
+	UINT8 pen_mask;
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
@@ -370,6 +370,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
+	pen_mask = (cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
 
 //	popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
 
@@ -386,16 +387,16 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count+0x40000+(plane * 0x2000)]>>(xi)) & 1 ? 1 : 0; //B
-				pen_bit[1] = (vram[count+0x44000+(plane * 0x2000)]>>(xi)) & 1 ? 2 : 0; //R
-				pen_bit[2] = (vram[count+0x48000+(plane * 0x2000)]>>(xi)) & 1 ? 4 : 0; //G
-				pen_bit[3] = (vram[count+0x4c000+(plane * 0x2000)]>>(xi)) & 1 ? 8 : 0; //I
+				pen_bit[0] = (vram[count+0x40000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
+				pen_bit[1] = (vram[count+0x44000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
+				pen_bit[2] = (vram[count+0x48000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
+				pen_bit[3] = (vram[count+0x4c000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((clut16[pen] & 0x10) >> 4))
+				if(pri == ((clut16[pen] & 0x10) >> 4) && clut16[pen] != 0x00 && pen_mask) //correct?
 					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,(x_size == 320 && scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
@@ -489,6 +490,8 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
+	//popmessage("%02x %02x",cg_reg[0x0e],cg_reg[0x18]);
+
 	switch(cg_reg[0x0e])
 	{
 		case 0x00:
@@ -790,8 +793,8 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 				else
 					gfx_element_mark_dirty(machine->gfx[4], (offset & 0x7ff) >> 3);
 			}
+			break;
 		}
-		break;
 		case 0x3a:
 		{
 			// DIC ROM, WRITENOP
@@ -1617,6 +1620,8 @@ static MACHINE_RESET(mz2500)
 	/* disable IRQ */
 	for(i=0;i<4;i++)
 		irq_mask[i] = 0;
+
+	kanji_bank = 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1976,7 +1981,7 @@ MACHINE_CONFIG_END
 ROM_START( mz2500 )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
 
