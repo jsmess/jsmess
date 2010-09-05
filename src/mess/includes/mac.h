@@ -146,6 +146,8 @@ void mac_fdc_set_enable_lines(running_device *device, int enable_mask);
 
 void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
 
+void mac_scsi_irq(running_machine *machine, int state);
+
 /*----------- defined in video/mac.c -----------*/
 
 extern UINT32 *mac_se30_vram;

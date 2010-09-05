@@ -911,6 +911,7 @@ Note:  Asserting the DACK signal applies only to write operations to
 READ16_HANDLER ( macplus_scsi_r )
 {
 	int reg = (offset>>3) & 0xf;
+	running_device *ncr = space->machine->device("ncr5380");
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
@@ -919,21 +920,23 @@ READ16_HANDLER ( macplus_scsi_r )
 		reg = R5380_CURDATA_DTACK;
 	}
 
-	return ncr5380_r(space, reg)<<8;
+	return ncr5380_read_reg(ncr, reg)<<8;
 }
 
 READ32_HANDLER (macii_scsi_drq_r)
 {
+	running_device *ncr = space->machine->device("ncr5380");
+
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			return ncr5380_r(space, R5380_CURDATA_DTACK)<<24;
+			return ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24;
 
 		case 0xffff0000:
-			return (ncr5380_r(space, R5380_CURDATA_DTACK)<<24) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<16);
+			return (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<16);
 
 		case 0xffffffff:
-			return (ncr5380_r(space, R5380_CURDATA_DTACK)<<24) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<16) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<8) | ncr5380_r(space, R5380_CURDATA_DTACK);
+			return (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<16) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<8) | ncr5380_read_reg(ncr, R5380_CURDATA_DTACK);
 
 		default:
 			logerror("macii_scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
@@ -944,22 +947,24 @@ READ32_HANDLER (macii_scsi_drq_r)
 
 WRITE32_HANDLER (macii_scsi_drq_w)
 {
+	running_device *ncr = space->machine->device("ncr5380");
+
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
 			break;
 
 		case 0xffff0000:
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>16);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>16);
 			break;
 
 		case 0xffffffff:
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>16);
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>8);
-			ncr5380_w(space, R5380_OUTDATA_DTACK, data&0xff);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>16);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>8);
+			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data&0xff);
 			break;
 
 		default:
@@ -971,6 +976,7 @@ WRITE32_HANDLER (macii_scsi_drq_w)
 WRITE16_HANDLER ( macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
+	running_device *ncr = space->machine->device("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
@@ -979,12 +985,13 @@ WRITE16_HANDLER ( macplus_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_w(space, reg, data);
+	ncr5380_write_reg(ncr, reg, data);
 }
 
 WRITE16_HANDLER ( macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
+	running_device *ncr = space->machine->device("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 
@@ -993,10 +1000,10 @@ WRITE16_HANDLER ( macii_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_w(space, reg, data>>8);
+	ncr5380_write_reg(ncr, reg, data>>8);
 }
 
-static void mac_scsi_irq(running_machine *machine, int state)
+void mac_scsi_irq(running_machine *machine, int state)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
 
@@ -2748,26 +2755,6 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
  * Main
  * *************************************************************************/
 
-static const SCSIConfigTable dev_table =
-{
-	2,                                      /* 2 SCSI devices */
-	{
-	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
-	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
-	}
-};
-
-static const struct NCR5380interface macplus_5380intf =
-{
-	&dev_table,	// SCSI device table
-	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
-};
-
-static void macscsi_exit(running_machine &machine)
-{
-	ncr5380_exit(&macplus_5380intf);
-}
-
 MACHINE_START( mac )
 {
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -2816,7 +2803,7 @@ MACHINE_RESET(mac)
 
 	if (mac->mac_model >= MODEL_MAC_PLUS)
 	{
-		ncr5380_scan_devices(machine);
+		ncr5380_scan_devices(machine->device("ncr5380"));
 	}
 
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
@@ -2950,14 +2937,6 @@ DRIVER_INIT(mac128k512k)
 DRIVER_INIT(mac512ke)
 {
 	mac_driver_init(machine, MODEL_MAC_512KE);
-}
-
-MACHINE_START( macscsi )
-{
-	MACHINE_START_CALL(mac);
-
-	ncr5380_init(machine, &macplus_5380intf);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, macscsi_exit);
 }
 
 DRIVER_INIT(macplus)

@@ -640,7 +640,20 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
+static const SCSIConfigTable dev_table =
+{
+	2,                                      /* 2 SCSI devices */
+	{
+	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
+	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
+	}
+};
 
+static const struct NCR5380interface macplus_5380intf =
+{
+	&dev_table,	// SCSI device table
+	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
+};
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -726,7 +739,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(macplus_map)
 
-	MDRV_MACHINE_START(macscsi)
+	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
@@ -792,7 +805,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MDRV_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 
-	MDRV_MACHINE_START(macscsi)
+	MDRV_MACHINE_START( mac )
 	MDRV_MACHINE_RESET( mac )
 
         /* video hardware */
@@ -820,6 +833,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MDRV_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
+
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
@@ -899,7 +914,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START(macscsi)
+	MDRV_MACHINE_START( mac )
 	MDRV_MACHINE_RESET( mac )
 
         /* video hardware */
@@ -928,6 +943,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MDRV_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
+
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
@@ -999,8 +1016,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MDRV_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 
-	MDRV_MACHINE_START(macscsi)
-	MDRV_MACHINE_RESET(mac)
+	MDRV_MACHINE_START( mac )
+	MDRV_MACHINE_RESET( mac )
 
         /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1027,6 +1044,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MDRV_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
+
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 

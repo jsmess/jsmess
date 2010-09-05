@@ -8,8 +8,6 @@
 
 #include "machine/scsidev.h"
 
-#define USE_5380_DEVICE (0)
-
 struct NCR5380interface
 {
 	const SCSIConfigTable *scsidevs;		/* SCSI devices */
@@ -38,17 +36,7 @@ enum
 #define R5380_OUTDATA_DTACK	(R5380_OUTDATA | 0x10)
 #define R5380_CURDATA_DTACK	(R5380_CURDATA | 0x10)
 
-extern void ncr5380_init( running_machine *machine, const struct NCR5380interface *interface );
-extern void ncr5380_exit( const struct NCR5380interface *interface );
-extern void ncr5380_read_data(int bytes, UINT8 *pData);
-extern void ncr5380_write_data(int bytes, UINT8 *pData);
-extern void *ncr5380_get_device(int id);
-extern void ncr5380_scan_devices( running_machine *machine );
-extern READ8_HANDLER(ncr5380_r);
-extern WRITE8_HANDLER(ncr5380_w);
-
 // device stuff
-#if USE_5380_DEVICE
 #define MDRV_NCR5380_ADD(_tag, _clock, _intrf) \
     MDRV_DEVICE_ADD(_tag, NCR5380, _clock) \
     MDRV_DEVICE_CONFIG(_intrf)
@@ -78,29 +66,45 @@ class ncr5380_device : public device_t
 	ncr5380_device(running_machine &_machine, const ncr5380_device_config &_config);
 
 public:
-	UINT8 read(UINT8 offset);
-	void write(UINT8 offset, UINT8 data);
+	// our API
+	UINT8 ncr5380_read_reg(UINT32 offset);
+	void ncr5380_write_reg(UINT32 offset, UINT8 data);
 
-	void read_data(int bytes, UINT8 *pData);
-	void write_data(int bytes, UINT8 *pData);
+	void ncr5380_read_data(int bytes, UINT8 *pData);
+	void ncr5380_write_data(int bytes, UINT8 *pData);
 
-	void *get_scsi_device(int id);
+	void *ncr5380_get_scsi_device(int id);
 
+	void ncr5380_scan_devices();
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_stop();
 
 private:
 	SCSIInstance *m_scsi_devices[8];
 
 	UINT8 m_5380_Registers[8];
 	UINT8 m_last_id;
-	UINT8 m_Command[32];
+	UINT8 m_5380_Command[32];
 	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
 	UINT8 m_5380_Data[512];
 
 	const ncr5380_device_config &m_config;
 };
-#endif
+
+// device type definition
+extern const device_type NCR5380;
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+READ8_DEVICE_HANDLER(ncr5380_read_reg);
+WRITE8_DEVICE_HANDLER(ncr5380_write_reg);
+
+void ncr5380_read_data(running_device *dev, int bytes, UINT8 *pData);
+void ncr5380_write_data(running_device *dev, int bytes, UINT8 *pData);
+void ncr5380_scan_devices(running_device *dev);
+
 #endif
