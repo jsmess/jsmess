@@ -55,6 +55,7 @@
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
 #include "sound/2203intf.h"
+#include "sound/beep.h"
 #include "machine/rp5c15.h"
 
 //#include "devices/cassette.h"
@@ -301,7 +302,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x000 : 0x10),scr_x_size == 640,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x10),scr_x_size == 640,0);
 					}
 				}
 			}
@@ -1644,6 +1645,9 @@ static MACHINE_RESET(mz2500)
 	kanji_bank = 0;
 
 	cg_clear_flag = 0;
+
+	beep_set_frequency(machine->device("beeper"),4096);
+	beep_set_state(machine->device("beeper"),0);
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1755,6 +1759,12 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 {
 	static UINT8 reset_lines;
 
+	/*
+	---- x--- 0->1 transition = IPL reset
+	---- -x-- beeper state
+	---- --x- 0->1 transition = Work RAM reset
+	*/
+
 	/* work RAM reset */
 	if((reset_lines & 0x02) == 0x00 && (data & 0x02))
 	{
@@ -1771,8 +1781,10 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 
 	reset_lines = data;
 
-	if(data & ~0x0a)
-		logerror("PPI PORTC W %02x\n",data & ~0x0a);
+	beep_set_state(device->machine->device("beeper"),data & 0x04);
+
+	if(data & ~0x0e)
+		logerror("PPI PORTC W %02x\n",data & ~0x0e);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -1970,6 +1982,7 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 	MDRV_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
+	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
 
 	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
@@ -1978,7 +1991,7 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 320, 480, 0, 200) //unknown clock / divider
+	MDRV_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_PALETTE_INIT(mz2500)
 
@@ -1996,7 +2009,8 @@ static MACHINE_CONFIG_START( mz2500, driver_device )
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 
