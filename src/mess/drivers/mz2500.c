@@ -197,23 +197,21 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 					if(gfx_sel & 0x8)
 					{
-						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
-						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
-						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
+						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? (4+8) : 0; //G
+						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? (2+8) : 0; //R
+						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? (1+8) : 0; //B
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 
 						//if(inv_col) { pen ^= 7; } breaks Mappy
 					}
 					else
-					{
-						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? color : 0;
-					}
+						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? (color+8) : 0;
 
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x18),0,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x10),0,0);
 					}
 				}
 			}
@@ -289,21 +287,21 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 					if(gfx_sel & 0x8)
 					{
-						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? 4 : 0; //G
-						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? 2 : 0; //R
-						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? 1 : 0; //B
+						pen_bit[0] = ((gfx_data[tile*8+yi+0x1800]>>(7-xi)) & 1) ? (4+8) : 0; //G
+						pen_bit[1] = ((gfx_data[tile*8+yi+0x1000]>>(7-xi)) & 1) ? (2+8) : 0; //R
+						pen_bit[2] = ((gfx_data[tile*8+yi+0x0800]>>(7-xi)) & 1) ? (1+8) : 0; //B
 
 						pen = (pen_bit[0]|pen_bit[1]|pen_bit[2]);
 
 						//if(inv_col) { pen ^= 7; } breaks Mappy
 					}
 					else
-						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? color : 0;
+						pen = (((gfx_data[tile*8+yi+((gfx_sel & 0x30)<<7)]>>(7-xi)) & 1) ^ inv_col) ? (color+8) : 0;
 
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x000 : 0x18),scr_x_size == 640,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x000 : 0x10),scr_x_size == 640,0);
 					}
 				}
 			}
@@ -475,7 +473,7 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
 
-//  popmessage("%02x",text_reg[9]);
+//	popmessage("%02x",clut16[0]);
 //	popmessage("%d %d %d %d",tv_hs,(tv_he),tv_vs,(tv_ve));
 
 	if(text_col_size)
@@ -1889,7 +1887,7 @@ static PALETTE_INIT( mz2500 )
 
 	/* set up 8 colors (PCG) */
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+		palette_set_color_rgb(machine, i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
 	/* set up 16 colors (PCG / CG) */
 
