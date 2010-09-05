@@ -1754,5 +1754,6 @@ const game_driver * const drivers[] =
 	DRIVER( selz80 )
 	DRIVER( mccpm )
 	DRIVER( casloopy )
+	DRIVER( tim011 )
 
 #endif /* DRIVER_RECURSIVE */

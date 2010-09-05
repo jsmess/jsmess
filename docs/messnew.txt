@@ -25,6 +25,7 @@ Skeleton drivers:
 - NEC TK-80
 - SEL Z80 Trainer
 - mc-CP/M-Computer
+- TIM-011
 
 System Driver Changes:
 ----------------------
