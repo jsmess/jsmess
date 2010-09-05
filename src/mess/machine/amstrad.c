@@ -303,6 +303,14 @@ WRITE_LINE_DEVICE_HANDLER( aleste_interrupt )
 }
 
 
+/* Some games set the 8255 to mode 1 and expect a strobe signal */
+/* on PC2. Apparently PC2 is always low on the CPC. ?!? */
+static TIMER_CALLBACK(amstrad_pc2_low)
+{
+	i8255a_pc2_w( machine->device("ppi8255"), 0 );
+}
+
+
 /*************************************************************************/
 /* KC Compact
 
@@ -1015,6 +1023,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 	}
 
 	gate_array.vsync = state ? 1 : 0;
+
+	/* Schedule a write to PC2 */
+	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
 }
 
 
@@ -1034,6 +1045,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_vsync_changed )
 	}
 
 	gate_array.vsync = state ? 1 : 0;
+
+	/* Schedule a write to PC2 */
+	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
 }
 
 
@@ -1070,11 +1084,13 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
 		asic.h_start = gate_array.line_ticks;
 		asic.de_start = 1;
 
+		/* Start of screen */
 		if ( asic.vpos == 1 )
 		{
 			asic.split_ma_base = 0x0000;
 			asic.split_ma_started = 0x0000;
 		}
+		/* Start of split screen section */
 		else if ( asic.enabled && asic.ram[0x2801] != 0 && asic.ram[0x2801] == asic.vpos - 1 )
 		{
 			asic.split_ma_started = gate_array.ma;
@@ -2761,6 +2777,7 @@ Note:
   On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
+
 READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 {
 	int data = 0;
@@ -2791,6 +2808,9 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 		else
 			data |= 0x02;
 	}
+
+	/* Schedule a write to PC2 */
+	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
 
 	return data;
 }
