@@ -25,6 +25,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
 #include "devices/cartslot.h"
+#include "video/hd44780.h"
 
 struct datapack
 {
@@ -60,187 +61,6 @@ static struct _psion
 	struct datapack pack2;
 } psion;
 
-/*************************************************
-
-    Hitachi HD44780 LCD controller implemantation
-
-*************************************************/
-
-static struct _hd44780
-{
-	UINT8 busy_flag;
-
-	//HD44780 has only 80 bytes of DDRAM, customized HD66780 has 128 bytes
-	UINT8 ddram[128];	//internal display data RAM,
-	UINT8 cgram[64];	//internal chargen RAM
-
-	UINT8 ac;			//address counter
-	UINT8 ddram_a;		//DDRAM address
-	UINT8 cgram_a;		//CGRAM address
-	UINT8 ac_mode;		//0=DDRAM 1=CGRAM
-
-	UINT8 cursor_pos;	//cursor position
-	UINT8 display_on;	//display on/off
-	UINT8 cursor_on;	//cursor on/off
-	UINT8 blink_on;		//blink on/off
-
-	UINT8 direction;	//auto increment/decrement
-	UINT8 data_len;		//interface data length 4 or 8 bit
-	UINT8 n_line;		//number of lines
-	UINT8 char_size;	//char size 5x8 or 5x10
-
-	UINT8 disp_shift;	//display shift
-
-	UINT8 blink;
-} hd44780;
-
-static TIMER_CALLBACK( bf_clear )
-{
-	hd44780.busy_flag = 0;
-}
-
-void set_busy_flag(running_machine *machine, UINT16 usec)
-{
-	hd44780.busy_flag = 1;
-	timer_set(machine, ATTOTIME_IN_USEC(usec), NULL, 0, bf_clear);
-}
-
-void hd44780_reset(running_machine *machine)
-{
-	memset(&hd44780, 0x00, sizeof(_hd44780));
-	hd44780.direction = 1;
-	hd44780.data_len = 1;
-	set_busy_flag(machine, 1520);
-}
-
-void hd44780_control_w(running_machine *machine, UINT8 data)
-{
-	if (BIT(data, 7))
-	{
-		hd44780.ac_mode = 0;
-		hd44780.ac = data & 0x7f;
-		hd44780.ddram_a = data & 0x7f;
-		if (data != 0x81)
-			hd44780.cursor_pos = hd44780.ddram_a;
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 6))
-	{
-		hd44780.ac_mode = 1;
-		hd44780.ac = data & 0x3f;
-		hd44780.cgram_a = data & 0x3f;
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 5))
-	{
-		hd44780.data_len = BIT(data, 4);
-		hd44780.n_line = BIT(data, 3);
-		hd44780.char_size = BIT(data, 2);
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 4))
-	{
-		UINT8 direction = (BIT(data, 2)) ? +1 : -1;
-
-		if (BIT(data, 3))
-			hd44780.disp_shift += direction;
-		else
-		{
-			hd44780.ac += direction;
-
-			if (hd44780.ac_mode == 0)
-			{
-				hd44780.ddram_a += hd44780.direction;
-				hd44780.cursor_pos += hd44780.direction;
-			}
-			else
-				hd44780.cgram_a += hd44780.direction;
-		}
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 3))
-	{
-		hd44780.display_on = BIT(data, 2);
-		hd44780.cursor_on = BIT(data, 1);
-		hd44780.blink_on = BIT(data, 0);
-
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 2))
-	{
-		hd44780.direction = (BIT(data, 1)) ? +1 : -1;
-		if (BIT(data, 0))
-			hd44780.disp_shift += hd44780.direction;
-
-		set_busy_flag(machine, 37);
-	}
-	else if (BIT(data, 1))
-	{
-		hd44780.ac = 0;
-		hd44780.ddram_a = 0;
-		hd44780.cgram_a = 0;
-		hd44780.cursor_pos = 0;
-		hd44780.ac_mode = 0;
-		hd44780.direction = 1;
-		set_busy_flag(machine, 1520);
-	}
-	else if (BIT(data, 0))
-	{
-		hd44780.ac = 0;
-		hd44780.ddram_a = 0;
-		hd44780.cgram_a = 0;
-		hd44780.cursor_pos = 0;
-		hd44780.ac_mode = 0;
-		hd44780.direction = 1;
-		memset(hd44780.ddram, 0x20, ARRAY_LENGTH(hd44780.ddram));
-		memset(hd44780.cgram, 0x20, ARRAY_LENGTH(hd44780.cgram));
-		set_busy_flag(machine, 1520);
-	}
-}
-
-UINT8 hd44780_control_r(running_machine *machine)
-{
-	return hd44780.busy_flag<<7 || hd44780.ac&0x7f;
-}
-
-void hd44780_data_w(running_machine *machine, UINT8 data)
-{
-	if (hd44780.ac_mode == 0)
-	{
-		hd44780.ddram[hd44780.ac] = data;
-		hd44780.ddram_a += hd44780.direction;
-		hd44780.cursor_pos += hd44780.direction;
-	}
-	else
-	{
-		hd44780.cgram[hd44780.ac] = data;
-		hd44780.cgram_a += hd44780.direction;
-	}
-
-	hd44780.ac += hd44780.direction;
-}
-
-UINT8 hd44780_data_r(running_machine *machine)
-{
-	UINT8 data;
-
-	if (hd44780.ac_mode == 0)
-	{
-		data = hd44780.ddram[hd44780.ac];
-		hd44780.ddram_a += hd44780.direction;
-		hd44780.cursor_pos += hd44780.direction;
-	}
-	else
-	{
-		data = hd44780.cgram[hd44780.ac];
-		hd44780.cgram_a += hd44780.direction;
-	}
-
-	hd44780.ac += hd44780.direction;
-
-	return data;
-}
-
 /***********************************************
 
     basic machine
@@ -251,11 +71,6 @@ static TIMER_CALLBACK( nmi_timer )
 {
 	if (psion.enable_nmi)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static TIMER_CALLBACK( blink_timer )
-{
-	hd44780.blink = ~hd44780.blink;
 }
 
 UINT8 kb_read(running_machine *machine)
@@ -482,13 +297,15 @@ void io_rw(address_space* space, UINT16 offset)
 
 WRITE8_HANDLER( io_w )
 {
+	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
+
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
 		if (offset & 1)
-			hd44780_data_w(space->machine, data);
+			hd44780->data_write(offset, data);
 		else
-			hd44780_control_w(space->machine, data);
+			hd44780->control_write(offset, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -497,13 +314,15 @@ WRITE8_HANDLER( io_w )
 
 READ8_HANDLER( io_r )
 {
+	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
+
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
 		if (offset& 1)
-			return hd44780_data_r(space->machine);
+			return hd44780->data_read(offset);
 		else
-			return hd44780_control_r(space->machine);
+			return hd44780->control_read(offset);
 	default:
 		io_rw(space, offset);
 	}
@@ -731,10 +550,6 @@ static MACHINE_START(psion)
 		psion.paged_ram = auto_alloc_array(machine, UINT8, psion.ram_bank_count * 0x4000);
 
 	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, nmi_timer);
-	timer_pulse(machine, ATTOTIME_IN_MSEC(500), NULL, 0, blink_timer);
-
-	state_save_register_global_array(machine, hd44780.ddram);
-	state_save_register_global_array(machine, hd44780.cgram);
 }
 
 static MACHINE_RESET(psion)
@@ -743,8 +558,6 @@ static MACHINE_RESET(psion)
 	psion.kb_counter=0;
 	psion.ram_bank=0;
 	psion.rom_bank=0;
-
-	hd44780_reset(machine);
 
 	if (psion.rom_bank_count || psion.ram_bank_count)
 		update_bank(machine);
@@ -756,130 +569,16 @@ static VIDEO_START( psion )
 
 static VIDEO_UPDATE( psion_2lines )
 {
-	char lcd_map[2][16];
-	UINT8 cur_x = 0;
-	UINT8 cur_y = 0;
-	UINT8 display_layout[2] = {0x00, 0x40};
+	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
 
-	memset(lcd_map, 0, 2*16);
-
-	for (int i=0; i<2; i++)
-	{
-		if (hd44780.cursor_pos >= display_layout[i] && hd44780.cursor_pos < display_layout[i]+16)
-		{
-			cur_y = i+1;
-			cur_x = hd44780.cursor_pos - display_layout[i];
-		}
-
-		memcpy(&lcd_map[i], hd44780.ddram + display_layout[i], 16);
-	}
-
-	bitmap_fill(bitmap, NULL, 0);
-
-	if (hd44780.display_on)
-	{
-		for (int l=0; l<2; l++)
-			for (int i=0; i<16; i++)
-				for (int y=0; y<8; y++)
-					for (int x=0; x<5; x++)
-						if (lcd_map[l][i] <= 0x10)
-						{
-							//draw CGRAM characters
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(hd44780.cgram[(lcd_map[l][i]&0x07)*8+y], 4-x);
-						}
-						else
-						{
-							//draw CGROM characters
-							UINT8 * gc_base = memory_region(screen->machine, "chargen");
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(gc_base[(lcd_map[l][i]-0x20)*8+y], 4-x);
-						}
-
-		//draw the cursor
-		if (hd44780.cursor_on)
-			for (int i=0; i<5; i++)
-				*BITMAP_ADDR16(bitmap, cur_y * 9-2, cur_x*6 + i) = 1;
-
-		if (!hd44780.blink && hd44780.blink_on)
-			for (int l=0; l<7; l++)
-				for (int i=0; i<5; i++)
-					*BITMAP_ADDR16(bitmap, (cur_y-1) * 9 + l, cur_x*6 + i) = 1;
-	}
-
-#if(0)
-	popmessage("cur: %u, pos %u, shift %u", hd44780.cursor_on, hd44780.ddram_a, hd44780.disp_shift);
-#endif
-    return 0;
+	return hd44780->video_update( bitmap, cliprect );
 }
 
 static VIDEO_UPDATE( psion_4lines )
 {
-	UINT8 lcd_map[4][20];
-	UINT8 cur_x = 0;
-	UINT8 cur_y = 0;
-	UINT8 line_pos = 0;
-	UINT8 display_layout[4][3]=
-	{
-		{0x00, 0x08, 0x18},
-		{0x40, 0x48, 0x58},
-		{0x04, 0x10, 0x20},
-		{0x44, 0x50, 0x60}
-	};
+	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
 
-	memset(lcd_map, 0, 4*20);
-
-	for (int i=0; i<4; i++)
-	{
-		line_pos = 0;
-
-		for (int j=0; j<3; j++)
-		{
-			if (hd44780.cursor_pos >= display_layout[i][j] && hd44780.cursor_pos < display_layout[i][j] + ((j==0)?4:8))
-			{
-				cur_y = i+1;
-				cur_x = line_pos + hd44780.cursor_pos - display_layout[i][j];
-			}
-
-			memcpy(&lcd_map[i][line_pos], hd44780.ddram + display_layout[i][j], ((j==0)?4:8));
-
-			line_pos += (j==0)?4:8;
-		}
-	}
-
-	bitmap_fill(bitmap, NULL, 0);
-
-	if (hd44780.display_on)
-	{
-		for (int l=0; l<4; l++)
-			for (int i=0; i<20; i++)
-				for (int y=0; y<8; y++)
-					for (int x=0; x<5; x++)
-						if (lcd_map[l][i] <= 0x10)
-						{
-							//draw CGRAM characters
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(hd44780.cgram[(lcd_map[l][i]&0x07)*8+y], 4-x);
-						}
-						else
-						{
-							//draw CGROM characters
-							UINT8 * gc_base = memory_region(screen->machine, "chargen");
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(gc_base[(lcd_map[l][i]-0x20)*8+y], 4-x);
-						}
-
-		//draw the cursor
-		if (hd44780.cursor_on)
-			for (int i=0; i<5; i++)
-				*BITMAP_ADDR16(bitmap, cur_y * 9-2, cur_x*6 + i) = 1;
-
-		if (!hd44780.blink && hd44780.blink_on)
-			for (int l=0; l<7; l++)
-				for (int i=0; i<5; i++)
-					*BITMAP_ADDR16(bitmap, (cur_y-1) * 9 + l, cur_x*6 + i) = 1;
-	}
-
-#if(0)
-	popmessage("cur: %u, pos %u, shift %u", hd44780.cursor_on, hd44780.cursor_pos, hd44780.disp_shift);
-#endif
-    return 0;
+	return hd44780->video_update( bitmap, cliprect );
 }
 
 static PALETTE_INIT( psion )
@@ -920,6 +619,13 @@ static MACHINE_CONFIG_FRAGMENT( psion_slot )
 	MDRV_CARTSLOT_UNLOAD(psion_pack2)
 MACHINE_CONFIG_END
 
+static const hd44780_interface psion_2line_display =
+{
+	2,					// number of lines
+	16,					// chars for line
+	NULL				// custom display layout
+};
+
 /* basic configuration for 2 lines display */
 static MACHINE_CONFIG_START( psion_2lines, driver_device )
 	/* basic machine hardware */
@@ -940,6 +646,8 @@ static MACHINE_CONFIG_START( psion_2lines, driver_device )
     MDRV_PALETTE_INIT(psion)
 	MDRV_GFXDECODE(psion)
 
+	MDRV_HD44780_ADD("hd44780", psion_2line_display)
+
     MDRV_VIDEO_START(psion)
     MDRV_VIDEO_UPDATE(psion_2lines)
 
@@ -952,6 +660,21 @@ static MACHINE_CONFIG_START( psion_2lines, driver_device )
 
 	MDRV_FRAGMENT_ADD( psion_slot )
 MACHINE_CONFIG_END
+
+UINT8 psion_4line_layout[] =
+{
+	0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+	0x40, 0x41, 0x42, 0x43, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
+	0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+	0x44, 0x45, 0x46, 0x47, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67
+};
+
+static const hd44780_interface psion_4line_display =
+{
+	4,					// number of lines
+	20,					// chars for line
+	psion_4line_layout	// custom display layout
+};
 
 /* basic configuration for 4 lines display */
 static MACHINE_CONFIG_START( psion_4lines, driver_device )
@@ -972,6 +695,8 @@ static MACHINE_CONFIG_START( psion_4lines, driver_device )
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(psion)
 	MDRV_GFXDECODE(psion)
+
+	MDRV_HD44780_ADD("hd44780", psion_4line_display)
 
     MDRV_VIDEO_START(psion)
     MDRV_VIDEO_UPDATE(psion_4lines)

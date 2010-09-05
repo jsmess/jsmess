@@ -1274,6 +1274,7 @@ $(MESSOBJ)/poly88.a:			\
 
 $(MESSOBJ)/psion.a:				\
 	$(MESS_DRIVERS)/psion.o		\
+	$(MESS_VIDEO)/hd44780.o		\
 
 $(MESSOBJ)/radio.a:				\
 	$(MESS_DRIVERS)/radio86.o	\
