@@ -92,6 +92,7 @@ static UINT8 clut16[0x10];
 static UINT16 clut256[0x100];
 static UINT8 cg_mask;
 static int scr_x_size,scr_y_size;
+static UINT8 cg_clear_flag;
 
 static VIDEO_START( mz2500 )
 {
@@ -366,7 +367,9 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
 	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
+	count|= (plane & 2) ? 0x10000 : 0x00000;
 	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
+	wa_reg|= (plane & 2) ? 0x10000 : 0x00000;
 	/* TODO: layer 2 scrolling */
 	s_x = (cg_reg[0x0f] & 0xf);
 	cg_interlace = text_font_reg ? 1 : 2;
@@ -387,10 +390,10 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count+0x40000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
-				pen_bit[1] = (vram[count+0x44000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
-				pen_bit[2] = (vram[count+0x48000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
-				pen_bit[3] = (vram[count+0x4c000+(plane * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
+				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
+				pen_bit[1] = (vram[count+0x44000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
+				pen_bit[2] = (vram[count+0x48000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
+				pen_bit[3] = (vram[count+0x4c000+((plane & 1) * 0x2000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
@@ -512,6 +515,9 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 			break;
 		case 0x1d:
 			draw_cg256_screen(machine,bitmap,cliprect,pri);
+			break;
+		case 0x97:
+			draw_cg16_screen(machine,bitmap,cliprect,2,640,pri);
 			break;
 		default:
 			popmessage("Unsupported CG mode %02x, contact MESS dev",cg_reg[0x0e]);
@@ -1159,8 +1165,7 @@ static READ8_HANDLER( mz2500_rplane_latch_r )
 	{
 		static UINT8 vblank_bit;
 
-		// ---- ---x clear flag
-		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80;
+		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80 | cg_clear_flag;
 
 		return vblank_bit;
 	}
@@ -1227,28 +1232,32 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 	{
 		UINT32 i;
 		UINT8 *vram = memory_region(space->machine, "maincpu");
+		UINT32 layer_bank;
+
+		layer_bank = (cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
 
 		/* TODO: this isn't yet 100% accurate */
 		if(cg_reg[0x05] & 1)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x40000] = 0x00; //clear B
+				vram[i+0x40000+layer_bank] = 0x00; //clear B
 		}
 		if(cg_reg[0x05] & 2)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x44000] = 0x00; //clear R
+				vram[i+0x44000+layer_bank] = 0x00; //clear R
 		}
 		if(cg_reg[0x05] & 4)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x48000] = 0x00; //clear G
+				vram[i+0x48000+layer_bank] = 0x00; //clear G
 		}
 		if(cg_reg[0x05] & 8)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x4c000] = 0x00; //clear I
+				vram[i+0x4c000+layer_bank] = 0x00; //clear I
 		}
+		cg_clear_flag = 1;
 	}
 
 	{
@@ -1622,6 +1631,8 @@ static MACHINE_RESET(mz2500)
 		irq_mask[i] = 0;
 
 	kanji_bank = 0;
+
+	cg_clear_flag = 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1692,6 +1703,8 @@ static INTERRUPT_GEN( mz2500_vbl )
 {
 	if(irq_mask[0])
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
+
+	cg_clear_flag = 0;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_porta_r )
