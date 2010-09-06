@@ -608,6 +608,8 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 		tv_vs = (text_reg[3]*2) - y_offs;
 		tv_ve = (text_reg[5]*2) - y_offs;
 
+		//popmessage("%d %d %d %d",tv_vs,tv_ve,y_offs,(text_font_reg|text_col_size<<1));
+
 		if(scr_x_size == 320)
 		{
 			tv_hs /= 2;
@@ -1303,7 +1305,7 @@ static READ8_HANDLER( mz2500_joystick_r )
 	static UINT8 res,dir_en,in_r;
 
 	res = 0xff;
-	in_r = ~input_port_read(space->machine,"JOY");
+	in_r = ~input_port_read(space->machine, joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
 
 	if(joy_mode & 0x40)
 	{
@@ -1600,13 +1602,23 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_START("JOY_1P")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("JOY_2P")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1711,12 +1723,13 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 	8 * 8
 };
 
+/* these are just for viewer sake, actually they aren't used in drawing routines */
 static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
-	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)	// for viewer only
-	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)		// for viewer only
-	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 1)
-	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 1)
+	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
+	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
+	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
+	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
 static INTERRUPT_GEN( mz2500_vbl )
