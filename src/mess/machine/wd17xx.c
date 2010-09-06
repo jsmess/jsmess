@@ -2043,7 +2043,7 @@ static DEVICE_RESET( wd1770 )
 
 	w->hd = 0;
 	w->hld_count = 0;
-
+	w->sector = 1;
 	wd17xx_command_restore(device);
 }
 

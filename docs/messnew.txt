@@ -26,6 +26,7 @@ Skeleton drivers:
 - SEL Z80 Trainer
 - mc-CP/M-Computer
 - TIM-011
+- WaveMate Bullet
 
 System Driver Changes:
 ----------------------
