@@ -720,7 +720,7 @@ static MACHINE_CONFIG_START( dectalk, driver_device )
     MDRV_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-    //MDRV_NVRAM_HANDLER(generic_0fill)
+    //MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash

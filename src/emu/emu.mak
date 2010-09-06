@@ -99,7 +99,6 @@ EMUOBJS = \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/watchdog.o \
 	$(EMUOBJ)/debug/debugcmd.o \
-	$(EMUOBJ)/debug/debugcmt.o \
 	$(EMUOBJ)/debug/debugcon.o \
 	$(EMUOBJ)/debug/debugcpu.o \
 	$(EMUOBJ)/debug/debughlp.o \
@@ -175,6 +174,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/mc146818.o \
 	$(EMUMACHINE)/microtch.o \
 	$(EMUMACHINE)/msm6242.o \
+	$(EMUMACHINE)/nvram.o \
 	$(EMUMACHINE)/pc16552d.o \
 	$(EMUMACHINE)/pci.o \
 	$(EMUMACHINE)/pic8259.o \

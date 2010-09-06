@@ -31,6 +31,7 @@ would commence ($C00000).
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
 #include "machine/ctronics.h"
+#include "machine/nvram.h"
 #include "sound/cdda.h"
 
 /* Devices */
@@ -150,7 +151,7 @@ static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
-	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_BASE_GENERIC(nvram)
+	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* CDTV & System ROM */
@@ -435,7 +436,7 @@ static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 	MDRV_MACHINE_START( cdtv )
 	MDRV_MACHINE_RESET( cdtv )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )

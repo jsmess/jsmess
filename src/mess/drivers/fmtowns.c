@@ -125,6 +125,7 @@
 #include "machine/upd71071.h"
 #include "devices/messram.h"
 #include "includes/fmtowns.h"
+#include "machine/nvram.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
@@ -957,13 +958,13 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 static READ8_HANDLER( towns_cmos8_r )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	return state->towns_cmos[offset];
+	return state->m_nvram[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos8_w )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	state->towns_cmos[offset] = data;
+	state->m_nvram[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_low_r )
@@ -972,7 +973,7 @@ static READ8_HANDLER( towns_cmos_low_r )
 	if(state->towns_mainmem_enable != 0)
 		return messram_get_ptr(state->messram)[offset + 0xd8000];
 
-	return state->towns_cmos[offset];
+	return state->m_nvram[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_low_w )
@@ -981,19 +982,19 @@ static WRITE8_HANDLER( towns_cmos_low_w )
 	if(state->towns_mainmem_enable != 0)
 		messram_get_ptr(state->messram)[offset+0xd8000] = data;
 	else
-		state->towns_cmos[offset] = data;
+		state->m_nvram[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_r )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	return state->towns_cmos[offset];
+	return state->m_nvram[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_w )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	state->towns_cmos[offset] = data;
+	state->m_nvram[offset] = data;
 }
 
 void towns_update_video_banks(address_space* space)
@@ -1837,7 +1838,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS? RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
@@ -1861,7 +1862,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS? RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
@@ -2148,7 +2149,6 @@ static DRIVER_INIT( towns )
 	state->pic_master = machine->device("pic8259_master");
 	state->pic_slave = machine->device("pic8259_slave");
 	state->towns_vram = auto_alloc_array(machine,UINT32,0x20000);
-	state->towns_cmos = machine->generic.nvram.u8;
 	state->towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
 	state->towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
 	//towns_sprram = auto_alloc_array(machine,UINT8,0x20000);
@@ -2354,7 +2354,7 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
 
-	MDRV_NVRAM_HANDLER( generic_0fill )
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)

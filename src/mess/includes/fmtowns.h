@@ -76,8 +76,9 @@ class towns_state : public driver_device
 {
 	public:
 	towns_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+		  
 	UINT8 ftimer;
 	UINT8 nmi_mask;
 	UINT8 compat_mode;
@@ -85,7 +86,6 @@ class towns_state : public driver_device
 	UINT32 towns_ankcg_enable;
 	UINT32 towns_mainmem_enable;
 	UINT32 towns_ram_enable;
-	UINT8* towns_cmos;
 	UINT32* towns_vram;
 	UINT8* towns_gfxvram;
 	UINT8* towns_txtvram;
@@ -117,6 +117,7 @@ class towns_state : public driver_device
 	UINT8 towns_mouse_y;
 	struct towns_cdrom_controller towns_cd;
 	struct towns_video_controller video;
+	required_shared_ptr<UINT8>	m_nvram;
 
 	/* devices */
 	running_device* maincpu;

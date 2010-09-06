@@ -14,6 +14,7 @@
 #include "devices/kermit.h"
 #include "cpu/saturn/saturn.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 #include "includes/hp48.h"
 
@@ -950,7 +951,7 @@ static MACHINE_CONFIG_START( hp48_common, driver_device )
 	MDRV_CPU_CONFIG( hp48_config )
 
 	/* memory */
-	MDRV_NVRAM_HANDLER( generic_0fill )
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video */
 	MDRV_SCREEN_ADD( "screen", RASTER )

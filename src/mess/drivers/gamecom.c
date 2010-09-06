@@ -35,7 +35,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                       /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                       /* External ROM/Flash. Controlled by MMU4 */
 	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE(&gamecom_vram)			/* VRAM */
-	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_BASE_SIZE_GENERIC(nvram)                  /* Extended I/O, Extended RAM */
+	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("nvram")                  /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
 static const SM8500_CONFIG gamecom_cpu_config = {
@@ -107,7 +107,7 @@ static MACHINE_CONFIG_START( gamecom, driver_device )
 	MDRV_SCREEN_VBLANK_TIME(500)
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_RESET( gamecom )
 

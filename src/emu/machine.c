@@ -1049,16 +1049,6 @@ driver_device::~driver_device()
 
 
 //-------------------------------------------------
-//  find_devices - default implementation which
-//  does nothing
-//-------------------------------------------------
-
-void driver_device::find_devices()
-{
-}
-
-
-//-------------------------------------------------
 //  driver_start - default implementation which
 //  does nothing
 //-------------------------------------------------
@@ -1186,8 +1176,9 @@ void driver_device::device_start()
 	if (next() != NULL)
 		throw device_missing_dependencies();
 	
-	// first find devices
-	find_devices();
+	// find all the registered devices
+	for (auto_finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
+		autodev->findit(*this);
 
 	// call the game-specific init
 	if (m_config.m_game->driver_init != NULL)
@@ -1217,6 +1208,40 @@ void driver_device::device_reset()
 	machine_reset();
 	sound_reset();
 	video_reset();
+}
+
+
+//-------------------------------------------------
+//  auto_finder_base - constructor
+//-------------------------------------------------
+
+void driver_device::register_auto_finder(auto_finder_base &autodev)
+{
+	// add to this list
+	autodev.m_next = m_auto_finder_list;
+	m_auto_finder_list = &autodev;
+}
+
+
+//-------------------------------------------------
+//  auto_finder_base - constructor
+//-------------------------------------------------
+
+driver_device::auto_finder_base::auto_finder_base(driver_device &base, const char *tag)
+	: m_next(NULL),
+	  m_tag(tag)
+{
+	// register ourselves with our device class
+	base.register_auto_finder(*this);
+}
+
+
+//-------------------------------------------------
+//  ~auto_finder_base - destructor
+//-------------------------------------------------
+
+driver_device::auto_finder_base::~auto_finder_base()
+{
 }
 
 

@@ -135,7 +135,20 @@
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
 #include "devices/messram.h"
+#include "machine/nvram.h"
 #include "x68000.lh"
+
+
+class x68000_state : public driver_device
+{
+public:
+	x68000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
+};
+
 
 struct x68k_system x68k_sys;
 
@@ -1506,14 +1519,17 @@ static void x68k_rtc_alarm_irq(int state)
 
 static WRITE16_HANDLER( x68k_sram_w )
 {
+	x68000_state *state = space->machine->driver_data<x68000_state>();
+
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(space->machine->generic.nvram.u16+offset);
+		COMBINE_DATA(state->m_nvram + offset);
 	}
 }
 
 static READ16_HANDLER( x68k_sram_r )
 {
+	x68000_state *state = space->machine->driver_data<x68000_state>();
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
@@ -1527,11 +1543,12 @@ static READ16_HANDLER( x68k_sram_r )
     if(offset == 0x70/2)
         return 0x0700;
 #endif
-	return space->machine->generic.nvram.u16[offset];
+	return state->m_nvram[offset];
 }
 
 static READ32_HANDLER( x68k_sram32_r )
 {
+	x68000_state *state = space->machine->driver_data<x68000_state>();
 	if(offset == 0x08/4)
 		return (messram_get_size(space->machine->device("messram")) & 0xffff0000);  // RAM size
 #if 0
@@ -1542,14 +1559,15 @@ static READ32_HANDLER( x68k_sram32_r )
     if(offset == 0x70/2)
         return 0x0700;
 #endif
-	return space->machine->generic.nvram.u32[offset];
+	return state->m_nvram[offset];
 }
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
+	x68000_state *state = space->machine->driver_data<x68000_state>();
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(space->machine->generic.nvram.u32+offset);
+		COMBINE_DATA(state->m_nvram + offset);
 	}
 }
 
@@ -1937,7 +1955,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 //  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
@@ -1972,7 +1990,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 //  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
@@ -2482,6 +2500,7 @@ static MACHINE_RESET( x68000 )
 static MACHINE_START( x68000 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	x68000_state *state = machine->driver_data<x68000_state>();
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
@@ -2496,7 +2515,7 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(machine, "bank3",x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_r);
 	memory_install_write16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_w);
-	memory_set_bankptr(machine, "bank4",space->machine->generic.nvram.u16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
@@ -2512,6 +2531,7 @@ static MACHINE_START( x68000 )
 static MACHINE_START( x68030 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	x68000_state *state = machine->driver_data<x68000_state>();
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
@@ -2529,7 +2549,7 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, "bank3",x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_r);
 	memory_install_write32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_w);
-	memory_set_bankptr(machine, "bank4",machine->generic.nvram.u32);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
@@ -2596,7 +2616,7 @@ static DRIVER_INIT( x68030 )
 	x68k_sys.sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
-static MACHINE_CONFIG_START( x68000, driver_device )
+static MACHINE_CONFIG_START( x68000, x68000_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map)
@@ -2646,7 +2666,7 @@ static MACHINE_CONFIG_START( x68000, driver_device )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_NVRAM_HANDLER( generic_0fill )
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_UPD72065_ADD("upd72065", fdc_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)

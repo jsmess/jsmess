@@ -16,6 +16,7 @@ Bruce Tomlin (hardware info)
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 UINT8 *gce_vectorram;
 size_t gce_vectorram_size;
@@ -178,7 +179,7 @@ ROM_END
 
 static ADDRESS_MAP_START(raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(&gce_vectorram) AM_SIZE(&gce_vectorram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE (vectrex_via_r, vectrex_via_w)
@@ -207,7 +208,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raaspec_map)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(raaspec)
 

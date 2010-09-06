@@ -13,7 +13,6 @@
 #include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcmt.h"
 #include "debug/debugcon.h"
 #include "debug/express.h"
 #include "debug/debugvw.h"
@@ -72,7 +71,6 @@ void debugger_init(running_machine *machine)
 		debug_cpu_init(machine);
 		debug_command_init(machine);
 		debug_console_init(machine);
-		debug_comment_init(machine);
 
 		/* always initialize the internal render debugger */
 		debugint_init(machine);

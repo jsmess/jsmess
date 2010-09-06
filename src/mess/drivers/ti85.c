@@ -191,6 +191,7 @@ TI-86 ports:
 #include "includes/ti85.h"
 #include "devices/snapquik.h"
 #include "formats/ti85_ser.h"
+#include "machine/nvram.h"
 
 /* port i/o functions */
 
@@ -270,7 +271,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ti81_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti86_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -485,8 +486,18 @@ static INPUT_PORTS_START (ti83)
 		PORT_DIPSETTING( 0x00, "Low Battery" )
 INPUT_PORTS_END
 
+class ti_state : public driver_device
+{
+public:
+	ti_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT8>	m_nvram;
+};
+
 /* machine definition */
-static MACHINE_CONFIG_START( ti81, driver_device )
+static MACHINE_CONFIG_START( ti81, ti_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(ti81_mem)
@@ -508,7 +519,7 @@ static MACHINE_CONFIG_START( ti81, driver_device )
 	MDRV_VIDEO_START( ti85 )
 	MDRV_VIDEO_UPDATE( ti85 )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
