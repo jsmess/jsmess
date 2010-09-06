@@ -11,6 +11,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
+#include "machine/z80dma.h"
 
 static ADDRESS_MAP_START(bullet_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -35,6 +36,7 @@ static ADDRESS_MAP_START( bullet_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w) 
 	AM_RANGE(0x15, 0x15) AM_READ(port15_w)
 	AM_RANGE(0x19, 0x19) AM_READ(port19_r)
 ADDRESS_MAP_END
@@ -110,6 +112,20 @@ static const wd17xx_interface bullet_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
+static Z80DMA_INTERFACE( bullet_dma )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte),
+};
+
 static MACHINE_CONFIG_START( bullet,driver_device )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -130,6 +146,9 @@ static MACHINE_CONFIG_START( bullet,driver_device )
 
     MDRV_VIDEO_START(bullet)
     MDRV_VIDEO_UPDATE(bullet)
+	
+	/* devices */
+	MDRV_Z80DMA_ADD("z80dma", XTAL_4MHz, bullet_dma)
 	
 	MDRV_WD179X_ADD("wd179x", bullet_wd17xx_interface )
 
