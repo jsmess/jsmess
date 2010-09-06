@@ -6,7 +6,6 @@
 
     TODO:
     - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used? (check Back to the Future);
-    - Some games doesn't set proper registers if you have interlace enabled, is it a BTANB?
     - Implement external ROM hook-up;
     - Add remaining missing peripherals, SIO, HDD and w1300a network;
     - FDC loading without the IPLPRO doesn't work at all, why?
@@ -71,6 +70,7 @@ static UINT8 irq_sel,irq_vector[4],irq_mask[4];
 static UINT8 kanji_bank,dic_bank;
 static UINT8 fdc_reverse;
 static UINT8 key_mux;
+static UINT8 monitor_type;
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
@@ -549,6 +549,8 @@ static VIDEO_UPDATE( mz2500 )
 	draw_tv_screen(screen->machine,bitmap,cliprect);
 	draw_cg_screen(screen->machine,bitmap,cliprect,1);
 	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
+	//  popmessage("%02x",text_reg[0x0f]);
+
 
     return 0;
 }
@@ -592,7 +594,9 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 	{
 		static int x_offs,y_offs;
 
-		switch((text_font_reg|text_col_size<<1) & 3)
+		monitor_type = ((text_reg[0x0f] & 0x08) >> 3);
+
+		switch((monitor_type|text_col_size<<1) & 3)
 		{
 			case 0: x_offs = 64; break;
 			case 1: x_offs = 80; break;
@@ -601,14 +605,12 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 		}
 		//printf("%d %d %d\n",x_offs,(text_reg[7] & 0x7f) * 8,(text_reg[8] & 0x7f)* 8);
 
-		y_offs = text_font_reg ? 76 : 34;
+		y_offs = (monitor_type) ? 76 : 34;
 
 		tv_hs = ((text_reg[7] & 0x7f)*8) - x_offs;
 		tv_he = ((text_reg[8] & 0x7f)*8) - x_offs;
 		tv_vs = (text_reg[3]*2) - y_offs;
 		tv_ve = (text_reg[5]*2) - y_offs;
-
-		//popmessage("%d %d %d %d",tv_vs,tv_ve,y_offs,(text_font_reg|text_col_size<<1));
 
 		if(scr_x_size == 320)
 		{
@@ -621,7 +623,6 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 			tv_vs /= 2;
 			tv_ve /= 2;
 		}
-
 	}
 }
 
@@ -934,6 +935,8 @@ TVRAM / CRTC registers
 [0x0b] ---- -b-- Back plane blue gradient
 [0x0b] ---- ---i Back plane i gradient
 [0x0c] ---- ---g Back plane green gradient
+
+[0x0f] ---- x--- sets monitor type interlace / progressive
 */
 
 static UINT8 pal_256_param(int index, int param)
@@ -958,6 +961,7 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 		case 0: text_reg_index = data; break;
 		case 1:
 			text_reg[text_reg_index] = data;
+
 			#if 0
 			//printf("[%02x] <- %02x\n",text_reg_index,data);
 			popmessage("(%02x %02x) (%02x %02x %02x %02x) (%02x %02x %02x) (%02x %02x %02x %02x)"
@@ -1665,6 +1669,8 @@ static MACHINE_RESET(mz2500)
 
 	beep_set_frequency(machine->device("beeper"),4096);
 	beep_set_state(machine->device("beeper"),0);
+
+//	monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
