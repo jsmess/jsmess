@@ -50,6 +50,7 @@ DRIVER_INIT( pce );
 DRIVER_INIT( tg16 );
 DRIVER_INIT( sgx );
 MACHINE_START( pce );
+MACHINE_RESET( pce );
 
 
 #endif /* PCE_H_ */
