@@ -266,6 +266,9 @@ MACHINE_RESET( pce )
 	joy_type[2] = (input_port_read(machine,"JOY_TYPE") & 0x04) >> 2;
 	joy_type[3] = (input_port_read(machine,"JOY_TYPE") & 0x08) >> 3;
 	joy_type[4] = (input_port_read(machine,"JOY_TYPE") & 0x10) >> 4;
+
+	for(joy_i=0;joy_i<5;joy_i++)
+		joy_6b_packet[joy_i] = 0;
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -305,7 +308,7 @@ READ8_HANDLER ( pce_joystick_r )
 		if(joystick_port_select <= 4)
 			data = (input_port_read(space->machine, joyname[joystick_port_select]) >> 8) & 0x0f;
 		else
-			data = 0;
+			data = 0xff;
 	}
 	else
 	{
