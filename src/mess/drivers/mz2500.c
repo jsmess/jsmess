@@ -16,7 +16,7 @@
     per-game/program specific TODO:
     - Dust Box vol. 1-3: they die with text garbage;
     - Dust Box vol. 4: window effect transition is bugged;
-    - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed";
+    - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed");
     - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
     - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
     - Moon Child: window masking doesn't mask bottom part of the screen?
@@ -1408,6 +1408,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
+//	AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
 	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio_ba_cd_r,z80sio_ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
