@@ -65,13 +65,13 @@ Notes:
 PCB Layout
 ----------
 
-55 21046-03
+55 11046-03
 
 |-----------------------------------|
 |   LD1 SW1             CON2        |
 |                                   |
-|                       CON3    S9  |
-|                               S8  |
+|                       CON3    S8  |
+|                               S9  |
 |   LS240   LS174   7406    7406    |
 |                                   |
 |   LS174   FDC9229 LS107   LS266   |
@@ -176,6 +176,11 @@ Notes:
 
     Fast Controller
     ---------------
+	- drive select
+	- side select
+	- motor on
+	- Z80 NMI
+	- FDC INTRQ
     - CPU is in HALT waiting for the FDC interrupt after commands
 
 */
@@ -200,8 +205,10 @@ Notes:
 #define Z80PIO_TAG	"3a"
 #define FD1791_TAG	"7a"
 
-#define Z80DMA_TAG	"z80dma"
-#define SAB1793_TAG	"sab1793"
+//#define Z80_TAG	"5ab"
+#define Z80DMA_TAG	"6ab"
+#define SAB1793_TAG	"7ab"
+#define FDC9229_TAG	"8b"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -555,6 +562,55 @@ static WRITE8_DEVICE_HANDLER( fast_status_w )
 	conkort->status = data;
 }
 
+static WRITE8_DEVICE_HANDLER( fast_fdc_ctrl_w )
+{
+	/*
+
+		bit		description
+
+		0		FD1793 _MR
+		1		FD1793 _DDEN, FDC9229 DENS
+		2		FDC9229 MINI
+		3		?
+		4		FDC9229 P2
+		5		FDC9229 P1
+		6
+		7
+
+		FDC9229 P0 is grounded
+
+	*/
+
+	/* master reset */
+	wd17xx_mr_w(device, BIT(data, 0));
+
+	/* density select */
+	wd17xx_dden_w(device, BIT(data, 1));
+
+	logerror("0x30 %02x\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( fast_other_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6
+		7
+
+		this has to be drive/side select
+
+	*/
+	logerror("0x40 %02x\n", data);
+}
+
 /* Memory Maps */
 
 // Slow Controller
@@ -585,8 +641,8 @@ static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG, fast_data_r)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_data_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_status_w)
-//  AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE()
-//  AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE()
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_fdc_ctrl_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_other_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ_PORT("SW1")
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
@@ -857,10 +913,20 @@ static const wd17xx_interface slow_wd17xx_interface =
 
 /* FD1793 */
 
+static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
+{
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	//if (INTRQ enabled)
+	{
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, state);
+	}
+}
+
 static const wd17xx_interface fast_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL, // TODO connect me!
+	DEVCB_LINE(fast_fd1793_intrq_w),
 	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
@@ -872,7 +938,7 @@ static const floppy_config abc800_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSHD, // FIXME
 	FLOPPY_OPTIONS_NAME(abc80),
 	NULL
 };
@@ -922,9 +988,9 @@ ROM_END
 
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x10000, "conkort", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "fast108.bin",	0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
-	ROM_LOAD( "6490318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
+	ROM_LOAD( "fast108.6cd", 0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.6cd", 0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
 ROM_END
 
 ROM_START( myab_turbo_kontroller )
