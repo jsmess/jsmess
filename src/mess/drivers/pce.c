@@ -47,8 +47,13 @@ Super System Card:
 /**********************************************************************
                           Known Bugs
 ***********************************************************************
-- TV Sports Basketball game freezes.
 - Ankoku Densetsu: graphics flake out during intro (DMA issues)
+- Benkei Gaiden: hangs after a few Sunsoft logo spins.
+- Busou Keiji Cyber Cross: hangs on attract mode
+- Fighting Run: has color and sprite issues during gameplay;
+- Hisou Kihei - Xserd: black screen;
+- Power Golf: black screen;
+- TV Sports Basketball: game freezes. (outdated note?)
 **********************************************************************/
 
 #include "emu.h"
