@@ -1014,7 +1014,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 	if ( ! gate_array.vsync && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
-		gate_array.hsync_after_vsync_counter = 2;
+		gate_array.hsync_after_vsync_counter = 3;
 
 		/* Start of new frame */
 		gate_array.y = -1;
@@ -1036,7 +1036,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_vsync_changed )
 	if ( ! gate_array.vsync && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
-		gate_array.hsync_after_vsync_counter = 2;
+		gate_array.hsync_after_vsync_counter = 3;
 
 		/* Start of new frame */
 		gate_array.y = -1;
@@ -1062,6 +1062,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
 
 		gate_array.ma = mc6845_get_ma( mc6845 );
 		gate_array.ra = mc6845_get_ra( mc6845 );
+logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", gate_array.y, gate_array.ma, gate_array.ra, ( ( gate_array.ma & 0x3000 ) << 2 ) | ( ( gate_array.ra & 0x07 ) << 11 ) | ( ( gate_array.ma & 0x3ff ) << 1 ) );
 		amstrad_gate_array_get_video_data( device->machine );
 		asic.de_start = 1;
 	}
@@ -1121,7 +1122,7 @@ VIDEO_START( amstrad )
 	amstrad_init_lookups();
 
 	gate_array.bitmap = auto_bitmap_alloc( machine, screen->width(), screen->height(), screen->format() );
-	gate_array.hsync_after_vsync_counter = 2;
+	gate_array.hsync_after_vsync_counter = 3;
 }
 
 
