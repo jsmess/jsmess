@@ -841,7 +841,7 @@
 		<description>Taito Chase H.Q.</description>
 		<year>1992</year>
 		<publisher>TTI</publisher>
-		<part name="cart" interface="393216">
+		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="taito chase h.q. (usa).pce" size="393216" crc="9298254c" sha1="d29a7440573324b5560185e6e012cb54a77e88f2" offset="000000" />
 			</dataarea>
