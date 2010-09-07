@@ -13,7 +13,7 @@
     - clean-ups! ^^'
 
     per-game/program specific TODO:
-    - Dust Box vol. 1-3: they die with text garbage;
+    - Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
     - Dust Box vol. 4: window effect transition is bugged;
     - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed");
     - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
@@ -26,13 +26,8 @@
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts;
     - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-    - Relics: doesn't boot, sets fdc register 0xdc bit 2 to 1
+    - Relics: doesn't boot, attempts to read at track 1 sector 17 that obviously doesn't exist.
     - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
-    - Super MZ Demo: priority doesn't work properly on the "face" item;
-    - Telephone Soft: shows garbage with the CG layer;
-    - The Tower of Druaga: has a small priority/layer clearance bug at the digital / analog screen select;
-    - Xevious: has issues with the window effects, it should actually be applied on TV layer and not CG.
-    - Ys 3: has garbage on top / bottom (note: you have to load both disks at start-up otherwise it refuses to run), same issue as the Basic one;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
     memory map:
