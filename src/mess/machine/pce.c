@@ -1,3 +1,36 @@
+/************************************************************
+
+PC Engine CD HW notes:
+
+CD Interface Register 0 - CDC status
+x--- ---- busy signal
+-x-- ---- request signal
+---x ---- cd signal
+---- x--- i/o signal
+
+CD Interface Register 3 - BRAM lock / CD status
+-x-- ---- acknowledge signal
+--x- ---- done signal
+---x ---- bram signal
+---- x--- ADPCM 2
+---- -x-- ADPCM 1
+---- --x- CDDA volume
+
+CD Inteface Register 0x0c - ADPCM status
+x--- ---- ?
+---- x--- ADPCM playback (0) stopped (1) currently playing
+---- -x-- CD -> DMA transfer busy flag?
+---- ---x ADPCM playback (1) stopped (0) currently playing
+
+CD Inteface Register 0x0d - ADPCM address control
+x--- ---- ADPCM reset
+-x-- ---- ADPCM play
+--x- ---- ADPCM repeat
+---x ---- ADPCM set length
+---- x--- ADPCM set read address
+---- --xx ADPCM set write address
+
+*************************************************************/
 
 #include "emu.h"
 #include "coreutil.h"
