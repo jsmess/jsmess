@@ -2,13 +2,13 @@
 
 PC Engine CD HW notes:
 
-CD Interface Register 0 - CDC status
+CD Interface Register 0x00 - CDC status
 x--- ---- busy signal
 -x-- ---- request signal
 ---x ---- cd signal
 ---- x--- i/o signal
 
-CD Interface Register 3 - BRAM lock / CD status
+CD Interface Register 0x03 - BRAM lock / CD status
 -x-- ---- acknowledge signal
 --x- ---- done signal
 ---x ---- bram signal
@@ -16,19 +16,35 @@ CD Interface Register 3 - BRAM lock / CD status
 ---- -x-- ADPCM 1
 ---- --x- CDDA volume
 
-CD Inteface Register 0x0c - ADPCM status
+CD Interface Register 0x07 - BRAM unlock / CD status
+x--- ---- Enables BRAM
+
+CD Interface Register 0x0c - ADPCM status
 x--- ---- ?
 ---- x--- ADPCM playback (0) stopped (1) currently playing
----- -x-- CD -> DMA transfer busy flag?
+---- -x-- CD -> DMA transfer busy flag
 ---- ---x ADPCM playback (1) stopped (0) currently playing
 
-CD Inteface Register 0x0d - ADPCM address control
+CD Interface Register 0x0d - ADPCM address control
 x--- ---- ADPCM reset
 -x-- ---- ADPCM play
 --x- ---- ADPCM repeat
 ---x ---- ADPCM set length
 ---- x--- ADPCM set read address
 ---- --xx ADPCM set write address
+
+CD Interface Register 0x0e - ADPCM playback rate
+
+CD Interface Register 0x0f - ADPCM fade in/out register
+---- xxxx command setting:
+0x00 ADPCM/CD-DA Fade-in
+0x01 CD-DA fade-in
+0x08 CD-DA fade-out (short) ADPCM fade-in
+0x09 CD-DA fade-out (long)
+0x0a ADPCM fade-out (long)
+0x0c CD-DA fade-out (short) ADPCM fade-in
+0x0d CD-DA fade-out (short)
+0x0e ADPCM fade-out (short)
 
 *************************************************************/
 
@@ -1097,6 +1113,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		{
 			/* Start CD to ADPCM transfer */
 			timer_adjust_periodic(pce_cd.adpcm_dma_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
+			pce_cd.regs[0x0c] |= 4;
 		}
 		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) )
 		{
@@ -1107,6 +1124,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 	case 0x0C:	/* ADPCM status */
 		break;
 	case 0x0D:	/* ADPCM address control */
+		//printf("%02x\n",data);
 		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) )
 		{
 			/* Reset ADPCM hardware */
@@ -1168,10 +1186,12 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine *machine)
 
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback )
 {
-	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO )
+	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO  )
 	{
 		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte(machine);
 		pce_cd.adpcm_write_ptr = ( pce_cd.adpcm_write_ptr + 1 ) & 0xFFFF;
+
+		pce_cd.regs[0x0c] &= ~4;
 	}
 }
 
@@ -1209,6 +1229,7 @@ READ8_HANDLER( pce_cd_intf_r )
 		break;
 	case 0x05:	/* Convert PCM data / PCM data */
 	case 0x06:	/* PCM data */
+		break;
 	case 0x07:	/* BRAM unlock / CD status */
 		data = ( pce_cd.bram_locked ? ( data & 0x7F ) : ( data | 0x80 ) );
 		break;
@@ -1218,10 +1239,12 @@ READ8_HANDLER( pce_cd_intf_r )
 	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0A:	/* ADPCM RAM data port */
 	case 0x0B:	/* ADPCM DMA control */
-	case 0x0C:	/* ADPCM status */
 	case 0x0D:	/* ADPCM address control */
 	case 0x0E:	/* ADPCM playback rate */
 	case 0x0F:	/* ADPCM and CD audio fade timer */
+		break;
+	case 0x0C:	/* ADPCM status */
+		//data |= 1;
 		break;
 	case 0xC1:
 		data = pce_sys3_card ? 0xAA : 0xFF;
