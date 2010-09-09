@@ -177,9 +177,6 @@ Notes:
     Fast Controller
     ---------------
 	- status bit 0
-	- drive select
-	- side select
-	- motor on
 
 */
 
@@ -614,19 +611,31 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 
 		bit		description
 
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
+		0		_MOTEA
+		1		_DRVSB
+		2		_DRVSA
+		3		_MOTEB
+		4		?
+		5		_SIDE1
 		6
 		7
 
 	*/
 
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	/* motor enable */
+	floppy_mon_w(conkort->image0, !BIT(data, 0));
+	floppy_mon_w(conkort->image1, !BIT(data, 3));
+	floppy_drive_set_ready_state(conkort->image0, 1, 1);
+	floppy_drive_set_ready_state(conkort->image1, 1, 1);
+
+	/* drive select */
+	if (BIT(data, 2)) wd17xx_set_drive(device, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
+
 	/* side select */
-	//wd17xx_set_side(device, BIT(data, 3));
+	wd17xx_set_side(device, BIT(data, 5));
 }
 
 static WRITE8_DEVICE_HANDLER( fast_8a_w )

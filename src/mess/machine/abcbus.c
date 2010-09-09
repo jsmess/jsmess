@@ -84,6 +84,8 @@ READ8_DEVICE_HANDLER( abcbus_rst_r )
 	abcbus_t *abcbus = get_safe_token(device);
 	abcbus_daisy_state *daisy = abcbus->daisy_state;
 
+	if (LOG) logerror("ABCBUS: '%s' RST\n", device->tag());
+
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
 		devcb_call_write_line(&daisy->out_rst_func, 0);

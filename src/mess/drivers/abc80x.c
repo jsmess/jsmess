@@ -85,7 +85,7 @@ Keyboard PCB Layout
 Notes:
     All IC's shown.
 
-    8048        - National Semiconductor 8048 MCU
+    8048        - National Semiconductor INS8048 MCU "8048-132"
     22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix amplifier latch
     22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix driver with 4 to 12 decoder/demultiplexer
     XTAL        - Luxor part number 48-300-06
@@ -1012,7 +1012,7 @@ static const cassette_config abc800_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-//  { LUXOR_55_21046_ABCBUS("abc830") },
+	{ LUXOR_55_21046_ABCBUS("abc830") },
 	{ NULL }
 };
 
