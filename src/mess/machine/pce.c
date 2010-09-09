@@ -59,6 +59,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 #define PCE_BRAM_SIZE				0x800
 #define PCE_ADPCM_RAM_SIZE			0x10000
+#define PCE_ACARD_RAM_SIZE			0x200000
 #define PCE_CD_COMMAND_BUFFER_SIZE	0x100
 
 #define PCE_CD_IRQ_TRANSFER_READY	0x40
@@ -110,6 +111,13 @@ static struct {
 	int		data_buffer_size;
 	int		data_buffer_index;
 	int		data_transferred;
+	UINT8	*acard_ram;
+	UINT8	acard_latch;
+	UINT8	acard_ctrl;
+	UINT32	acard_base_addr;
+	UINT16	acard_addr_offset;
+	UINT16	acard_addr_inc;
+
 	UINT32	current_frame;
 	UINT32	end_frame;
 	UINT32	last_frame;
@@ -1028,6 +1036,10 @@ static void pce_cd_init( running_machine *machine )
 	memset( pce_cd.command_buffer, 0, PCE_CD_COMMAND_BUFFER_SIZE );
 	pce_cd.command_buffer_index = 0;
 
+	/* Set up Arcade Card RAM buffer */
+	pce_cd.acard_ram = auto_alloc_array(machine, UINT8, PCE_ACARD_RAM_SIZE );
+	memset( pce_cd.acard_ram, 0, PCE_ACARD_RAM_SIZE );
+
 	pce_cd.data_buffer = auto_alloc_array(machine, UINT8, 8192 );
 	memset( pce_cd.data_buffer, 0, 8192 );
 	pce_cd.data_buffer_size = 0;
@@ -1065,11 +1077,12 @@ WRITE8_HANDLER( pce_cd_bram_w )
 
 WRITE8_HANDLER( pce_cd_intf_w )
 {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
 	pce_cd_update(space->machine);
 
 	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
 		return pce_cd_acard_w(space,offset,data);
+
+	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
 
 	switch( offset )
 	{
@@ -1202,11 +1215,12 @@ READ8_HANDLER( pce_cd_intf_r )
 {
 	UINT8 data = pce_cd.regs[offset & 0x0F];
 
-	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
 	pce_cd_update(space->machine);
 
 	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
 		return pce_cd_acard_r(space,offset);
+
+	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
 
 	switch( offset )
 	{
@@ -1287,8 +1301,49 @@ READ8_HANDLER( pce_cd_acard_r )
 	{
 		switch(offset & 0x2ef)
 		{
+			case 0x2e5: return pce_cd.acard_latch;
+			case 0x2ee: return 0x10;
 			case 0x2ef: return 0x51;
 		}
+
+		return 0;
+	}
+
+	switch(offset & 0x0f)
+	{
+		case 0x00:
+		case 0x01:
+		{
+			UINT8 res;
+			if(pce_cd.acard_ctrl & 2)
+				res = pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1FFFFF];
+			else
+				res = pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1FFFFF];
+
+			if(pce_cd.acard_ctrl & 0x1)
+			{
+				if(pce_cd.acard_ctrl & 0x10)
+				{
+					pce_cd.acard_base_addr += pce_cd.acard_addr_inc;
+					pce_cd.acard_base_addr &= 0xffffff;
+				}
+				else
+				{
+					pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
+
+				}
+			}
+
+			return res;
+		}
+		case 0x02: return (pce_cd.acard_base_addr >> 0) & 0xff;
+		case 0x03: return (pce_cd.acard_base_addr >> 8) & 0xff;
+		case 0x04: return (pce_cd.acard_base_addr >> 16) & 0xff;
+		case 0x05: return (pce_cd.acard_addr_offset >> 0) & 0xff;
+		case 0x06: return (pce_cd.acard_addr_offset >> 8) & 0xff;
+		case 0x07: return (pce_cd.acard_addr_inc >> 0) & 0xff;
+		case 0x08: return (pce_cd.acard_addr_inc >> 8) & 0xff;
+		case 0x09: return pce_cd.acard_ctrl;
 	}
 
 	return 0;
@@ -1297,4 +1352,52 @@ READ8_HANDLER( pce_cd_acard_r )
 WRITE8_HANDLER( pce_cd_acard_w )
 {
 //	printf("ACARD access W %04x %02x\n",offset,data);
+
+	if((offset & 0x2e0) == 0x2e0)
+	{
+		switch(offset & 0x0f)
+		{
+			case 5: pce_cd.acard_latch = data; break;
+		}
+	}
+	else
+	{
+		switch(offset & 0x0f)
+		{
+			case 0x00:
+			case 0x01:
+				if(pce_cd.acard_ctrl & 2)
+					pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1FFFFF] = data;
+				else
+					pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1FFFFF] = data;
+
+				if(pce_cd.acard_ctrl & 0x1)
+				{
+					if(pce_cd.acard_ctrl & 0x10)
+					{
+						pce_cd.acard_base_addr += pce_cd.acard_addr_inc;
+						pce_cd.acard_base_addr &= 0xffffff;
+					}
+					else
+					{
+						pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
+
+					}
+				}
+
+				break;
+
+			case 0x02: pce_cd.acard_base_addr = (data & 0xff) | (pce_cd.acard_base_addr & 0xffff00); 	break;
+			case 0x03: pce_cd.acard_base_addr = (data << 8) | (pce_cd.acard_base_addr & 0xff00ff); 		break;
+			case 0x04: pce_cd.acard_base_addr = (data << 16) | (pce_cd.acard_base_addr & 0x00ffff); 	break;
+			case 0x05: pce_cd.acard_addr_offset = (data & 0xff) | (pce_cd.acard_addr_offset & 0xff00); 	break;
+			case 0x06:
+				pce_cd.acard_addr_offset = (data << 8) | (pce_cd.acard_addr_offset & 0x00ff);
+
+				break;
+			case 0x07: pce_cd.acard_addr_inc = (data & 0xff) | (pce_cd.acard_addr_inc & 0xff00); 		break;
+			case 0x08: pce_cd.acard_addr_inc = (data << 8) | (pce_cd.acard_addr_inc & 0x00ff); 			break;
+			case 0x09: pce_cd.acard_ctrl = data & 0x7f; 												break;
+		}
+	}
 }
