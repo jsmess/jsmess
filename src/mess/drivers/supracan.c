@@ -849,6 +849,9 @@ static VIDEO_UPDATE( supracan )
 						if (scrollx&0x8000) scrollx-= 0x10000;
 						if (scrolly&0x8000) scrolly-= 0x10000;
 					
+					  	int mosaic_count = (state->tilemap_flags[layer] & 0x001c) >> 2;
+    					int mosaic_mask = 0xffffffff << mosaic_count;
+					
 						int y,x;
 						// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
 						
@@ -857,7 +860,9 @@ static VIDEO_UPDATE( supracan )
 							// these will have to change to ADDR32 etc. once alpha blending is supported
 							UINT16* screen = BITMAP_ADDR16(bitmap, y, 0);
 							
-							int realy = y+scrolly;
+							int actualy = y&mosaic_mask;
+							
+							int realy = actualy+scrolly;
 														
 							if (!wrap)
 								if (scrolly+y < 0 || scrolly+y > ((ysize*8)-1))
@@ -868,7 +873,8 @@ static VIDEO_UPDATE( supracan )
 							
 							for (x=cliprect->min_x;x<=cliprect->max_x;x++)
 							{
-								int realx = x+scrollx;
+								int actualx = x & mosaic_mask;
+								int realx = actualx+scrollx;
 								
 								if (!wrap)
 									if (scrollx+x < 0 || scrollx+x > ((xsize*8)-1))
