@@ -1068,6 +1068,9 @@ WRITE8_HANDLER( pce_cd_intf_w )
 	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
 	pce_cd_update(space->machine);
 
+	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
+		return pce_cd_acard_w(space,offset,data);
+
 	switch( offset )
 	{
 	case 0x00:	/* CDC status */
@@ -1199,9 +1202,12 @@ READ8_HANDLER( pce_cd_intf_r )
 {
 	UINT8 data = pce_cd.regs[offset & 0x0F];
 
+	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
 	pce_cd_update(space->machine);
 
-	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
+	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
+		return pce_cd_acard_r(space,offset);
+
 	switch( offset )
 	{
 	case 0x00:	/* CDC status */
@@ -1266,3 +1272,29 @@ READ8_HANDLER( pce_cd_intf_r )
 	return data;
 }
 
+
+/*
+
+PC Engine Arcade Card emulation
+
+*/
+
+READ8_HANDLER( pce_cd_acard_r )
+{
+//	printf("ACARD access R %04x\n",offset);
+
+	if((offset & 0x2e0) == 0x2e0)
+	{
+		switch(offset & 0x2ef)
+		{
+			case 0x2ef: return 0x51;
+		}
+	}
+
+	return 0;
+}
+
+WRITE8_HANDLER( pce_cd_acard_w )
+{
+//	printf("ACARD access W %04x %02x\n",offset,data);
+}
