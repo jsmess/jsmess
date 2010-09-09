@@ -176,12 +176,10 @@ Notes:
 
     Fast Controller
     ---------------
+	- status bit 0
 	- drive select
 	- side select
 	- motor on
-	- Z80 NMI
-	- FDC INTRQ
-    - CPU is in HALT waiting for the FDC interrupt after commands
 
 */
 
@@ -237,7 +235,8 @@ struct _fast_t
 {
 	int cs;					/* card selected */
 	UINT8 status;			/* ABC BUS status */
-	UINT8 data;				/* ABC BUS data */
+	UINT8 data_in;			/* ABC BUS data in */
+	UINT8 data_out;			/* ABC BUS data out */
 	int fdc_irq;			/* FDC interrupt */
 
 	/* devices */
@@ -482,7 +481,9 @@ READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
 
 	if (conkort->cs)
 	{
-		data = conkort->status;
+		// TODO: D0 handling (NANDed with something)
+		// LS240 inverts the data, D4/D5 not connected
+		data = (~conkort->status & 0xcf) | 0x31;
 	}
 
 	return data;
@@ -494,9 +495,9 @@ READ8_DEVICE_HANDLER( luxor_55_21046_inp_r )
 
 	UINT8 data = 0xff;
 
-	if (conkort->cs && !BIT(conkort->status, 6))
+	if (conkort->cs)
 	{
-		data = conkort->data;
+		data = conkort->data_out;
 	}
 
 	return data;
@@ -506,9 +507,9 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_utp_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	if (conkort->cs && BIT(conkort->status, 6))
+	if (conkort->cs)
 	{
-		conkort->data = data;
+		conkort->data_in = data;
 	}
 }
 
@@ -541,56 +542,73 @@ WRITE_LINE_DEVICE_HANDLER( luxor_55_21046_rst_w )
 	}
 }
 
-static READ8_DEVICE_HANDLER( fast_data_r )
-{
-	fast_t *conkort = get_safe_token_fast(device->owner());
-
-	return conkort->data;
-}
-
-static WRITE8_DEVICE_HANDLER( fast_data_w )
-{
-	fast_t *conkort = get_safe_token_fast(device->owner());
-
-	conkort->data = data;
-}
-
-static WRITE8_DEVICE_HANDLER( fast_status_w )
-{
-	fast_t *conkort = get_safe_token_fast(device->owner());
-
-	conkort->status = data;
-}
-
-static WRITE8_DEVICE_HANDLER( fast_fdc_ctrl_w )
+static READ8_DEVICE_HANDLER( fast_3d_r )
 {
 	/*
 
 		bit		description
 
-		0		FD1793 _MR
-		1		FD1793 _DDEN, FDC9229 DENS
-		2		FDC9229 MINI
-		3		?
-		4		FDC9229 P2
-		5		FDC9229 P1
-		6
-		7
-
-		FDC9229 P0 is grounded
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
 
 	*/
 
-	/* master reset */
-	wd17xx_mr_w(device, BIT(data, 0));
+	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	/* density select */
-	wd17xx_dden_w(device, BIT(data, 1));
-
-	logerror("0x30 %02x\n", data);
+	return conkort->data_in;
 }
 
-static WRITE8_DEVICE_HANDLER( fast_other_w )
+static WRITE8_DEVICE_HANDLER( fast_4d_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	conkort->data_out = data;
+}
+
+static WRITE8_DEVICE_HANDLER( fast_4b_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	conkort->status = data;
+}
+
+static WRITE8_DEVICE_HANDLER( fast_9b_w )
 {
 	/*
 
@@ -605,10 +623,36 @@ static WRITE8_DEVICE_HANDLER( fast_other_w )
 		6
 		7
 
-		this has to be drive/side select
+	*/
+
+	/* side select */
+	//wd17xx_set_side(device, BIT(data, 3));
+}
+
+static WRITE8_DEVICE_HANDLER( fast_8a_w )
+{
+	/*
+
+		bit		description
+
+		0		FD1793 _MR
+		1		FD1793 _DDEN, FDC9229 DENS
+		2		FDC9229 MINI
+		3		READY signal polarity (0=inverted)
+		4		FDC9229 P2
+		5		FDC9229 P1
+		6
+		7
+
+		FDC9229 P0 is grounded
 
 	*/
-	logerror("0x40 %02x\n", data);
+
+	/* master reset */
+	wd17xx_mr_w(device, BIT(data, 0));
+
+	/* density select */
+	wd17xx_dden_w(device, BIT(data, 1));
 }
 
 /* Memory Maps */
@@ -638,11 +682,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG, fast_data_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_data_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_status_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_fdc_ctrl_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_other_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG,  fast_3d_r)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_4d_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_4b_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_9b_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_8a_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ_PORT("SW1")
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
@@ -917,10 +961,7 @@ static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
 {
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	//if (INTRQ enabled)
-	{
-		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, state);
-	}
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
 }
 
 static const wd17xx_interface fast_wd17xx_interface =
@@ -1114,7 +1155,8 @@ static DEVICE_START( luxor_55_21046 )
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->cs);
 	state_save_register_device_item(device, 0, conkort->status);
-	state_save_register_device_item(device, 0, conkort->data);
+	state_save_register_device_item(device, 0, conkort->data_in);
+	state_save_register_device_item(device, 0, conkort->data_out);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 }
 

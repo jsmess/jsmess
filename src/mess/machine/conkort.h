@@ -20,12 +20,12 @@ DECLARE_LEGACY_DEVICE(LUXOR_55_21046, luxor_55_21046);
 #define LUXOR_55_10828_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_cs_w), DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_stat_r), \
 	DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_inp_r), DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_utp_w), DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_c1_w), \
-	DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_c3_w), DEVCB_DEVICE_LINE(_tag, luxor_55_10828_rst_w)
+	DEVCB_NULL, DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, luxor_55_10828_rst_w)
 
 #define LUXOR_55_21046_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_cs_w), DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_stat_r), \
 	DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_inp_r), DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_utp_w), DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_c1_w), \
-	DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_c3_w), DEVCB_DEVICE_LINE(_tag, luxor_55_21046_rst_w)
+	DEVCB_NULL, DEVCB_DEVICE_HANDLER(_tag, luxor_55_21046_c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, luxor_55_21046_rst_w)
 
 /***************************************************************************
     PROTOTYPES
