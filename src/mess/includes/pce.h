@@ -46,7 +46,8 @@ WRITE8_HANDLER( pce_cd_intf_w );
 READ8_HANDLER( pce_cd_intf_r );
 WRITE8_HANDLER( pce_cd_acard_w );
 READ8_HANDLER( pce_cd_acard_r );
-
+WRITE8_HANDLER( pce_cd_acard_wram_w );
+READ8_HANDLER( pce_cd_acard_wram_r );
 
 extern struct pce_struct pce;
 DRIVER_INIT( pce );

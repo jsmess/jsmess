@@ -291,6 +291,8 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			cartridge_ram = auto_alloc_array(image.device().machine, UINT8, 0x30000);
 			memory_set_bankptr(image.device().machine, "bank4", cartridge_ram);
 			memory_install_write8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w);
+			memory_install_readwrite8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cd_acard_wram_r,pce_cd_acard_wram_w);
+
 		}
 	}
 	return 0;
@@ -1297,8 +1299,6 @@ PC Engine Arcade Card emulation
 
 READ8_HANDLER( pce_cd_acard_r )
 {
-//	printf("ACARD access R %04x\n",offset);
-
 	if((offset & 0x2e0) == 0x2e0)
 	{
 		switch(offset & 0x2ef)
@@ -1323,9 +1323,9 @@ READ8_HANDLER( pce_cd_acard_r )
 		{
 			UINT8 res;
 			if(pce_cd.acard_ctrl & 2)
-				res = pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1FFFFF];
+				res = pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1fffff];
 			else
-				res = pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1FFFFF];
+				res = pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1fffff];
 
 			if(pce_cd.acard_ctrl & 0x1)
 			{
@@ -1390,7 +1390,7 @@ WRITE8_HANDLER( pce_cd_acard_w )
 			case 0x00:
 			case 0x01:
 				if(pce_cd.acard_ctrl & 2)
-					pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1FFFFF] = data;
+					pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1fffff] = data;
 				else
 					pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1FFFFF] = data;
 
@@ -1435,3 +1435,14 @@ WRITE8_HANDLER( pce_cd_acard_w )
 		}
 	}
 }
+
+READ8_HANDLER( pce_cd_acard_wram_r )
+{
+	return 	pce_cd_acard_r(space,0);
+}
+
+WRITE8_HANDLER( pce_cd_acard_wram_w )
+{
+	pce_cd_acard_w(space,0,data);
+}
+
