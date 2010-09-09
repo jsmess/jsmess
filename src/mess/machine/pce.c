@@ -117,6 +117,8 @@ static struct {
 	UINT32	acard_base_addr;
 	UINT16	acard_addr_offset;
 	UINT16	acard_addr_inc;
+	UINT32	acard_shift;
+	UINT8	acard_shift_reg;
 
 	UINT32	current_frame;
 	UINT32	end_frame;
@@ -1301,6 +1303,11 @@ READ8_HANDLER( pce_cd_acard_r )
 	{
 		switch(offset & 0x2ef)
 		{
+			case 0x2e0: return (pce_cd.acard_shift >> 0)  & 0xff;
+			case 0x2e1: return (pce_cd.acard_shift >> 8)  & 0xff;
+			case 0x2e2: return (pce_cd.acard_shift >> 16) & 0xff;
+			case 0x2e3: return (pce_cd.acard_shift >> 24) & 0xff;
+			case 0x2e4: return (pce_cd.acard_shift_reg);
 			case 0x2e5: return pce_cd.acard_latch;
 			case 0x2ee: return 0x10;
 			case 0x2ef: return 0x51;
@@ -1330,7 +1337,6 @@ READ8_HANDLER( pce_cd_acard_r )
 				else
 				{
 					pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
-
 				}
 			}
 
@@ -1344,6 +1350,7 @@ READ8_HANDLER( pce_cd_acard_r )
 		case 0x07: return (pce_cd.acard_addr_inc >> 0) & 0xff;
 		case 0x08: return (pce_cd.acard_addr_inc >> 8) & 0xff;
 		case 0x09: return pce_cd.acard_ctrl;
+		default:   return 0;
 	}
 
 	return 0;
@@ -1357,6 +1364,22 @@ WRITE8_HANDLER( pce_cd_acard_w )
 	{
 		switch(offset & 0x0f)
 		{
+			case 0: pce_cd.acard_shift = (data & 0xff) | (pce_cd.acard_shift & 0xffffff00); break;
+			case 1: pce_cd.acard_shift = (data << 8)   | (pce_cd.acard_shift & 0xffff00ff); break;
+			case 2: pce_cd.acard_shift = (data << 16)  | (pce_cd.acard_shift & 0xff00ffff); break;
+			case 3: pce_cd.acard_shift = (data << 24)  | (pce_cd.acard_shift & 0x00ffffff); break;
+			case 4:
+				{
+					pce_cd.acard_shift_reg = data & 0x0f;
+
+					if(pce_cd.acard_shift_reg != 0)
+					{
+						 pce_cd.acard_shift = (pce_cd.acard_shift_reg < 8) ?
+						 					(pce_cd.acard_shift << pce_cd.acard_shift_reg)
+						 					: (pce_cd.acard_shift >> (16 - pce_cd.acard_shift_reg));
+					}
+				}
+				break;
 			case 5: pce_cd.acard_latch = data; break;
 		}
 	}
@@ -1381,7 +1404,6 @@ WRITE8_HANDLER( pce_cd_acard_w )
 					else
 					{
 						pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
-
 					}
 				}
 
@@ -1394,10 +1416,22 @@ WRITE8_HANDLER( pce_cd_acard_w )
 			case 0x06:
 				pce_cd.acard_addr_offset = (data << 8) | (pce_cd.acard_addr_offset & 0x00ff);
 
+				if((pce_cd.acard_ctrl & 0x60) == 0x40)
+				{
+					pce_cd.acard_base_addr += pce_cd.acard_addr_offset + ((pce_cd.acard_ctrl & 0x08) ? 0xff0000 : 0);
+					pce_cd.acard_base_addr &= 0xffffff;
+				}
 				break;
 			case 0x07: pce_cd.acard_addr_inc = (data & 0xff) | (pce_cd.acard_addr_inc & 0xff00); 		break;
 			case 0x08: pce_cd.acard_addr_inc = (data << 8) | (pce_cd.acard_addr_inc & 0x00ff); 			break;
 			case 0x09: pce_cd.acard_ctrl = data & 0x7f; 												break;
+			case 0x0a:
+				if((pce_cd.acard_ctrl & 0x60) == 0x60)
+				{
+					pce_cd.acard_base_addr += pce_cd.acard_addr_offset;
+					pce_cd.acard_base_addr &= 0xffffff;
+				}
+				break;
 		}
 	}
 }
