@@ -544,6 +544,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 
 			/* sanitize values */
 			if ( track_start == 0 ) track_start++;
+			if ( track_end == 0 ) track_end++;
 			if ( track_end > cdrom_get_last_track(cd.cdrom) )
 				track_end = cdrom_get_last_track(cd.cdrom);
 
