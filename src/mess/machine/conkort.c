@@ -176,7 +176,9 @@ Notes:
 
     Fast Controller
     ---------------
-	- status bit 0
+	- status bit 0 (busy)
+	- SW2 reading
+	- "track 0 sector 25 not found!"
 
 */
 
@@ -235,6 +237,8 @@ struct _fast_t
 	UINT8 data_in;			/* ABC BUS data in */
 	UINT8 data_out;			/* ABC BUS data out */
 	int fdc_irq;			/* FDC interrupt */
+	int dma_irq;			/* DMA interrupt */
+	int busy;				/* busy bit */
 
 	/* devices */
 	running_device *cpu;
@@ -467,7 +471,7 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_cs_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	conkort->cs = (data == input_port_read(device->machine, "SW3"));
+	conkort->cs = (data == input_port_read(device->machine, "abc830:SW3"));
 }
 
 READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
@@ -478,9 +482,8 @@ READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
 
 	if (conkort->cs)
 	{
-		// TODO: D0 handling (NANDed with something)
 		// LS240 inverts the data, D4/D5 not connected
-		data = (~conkort->status & 0xcf) | 0x31;
+		data = (~conkort->status & 0xcf) | 0x30 | !(conkort->busy & BIT(conkort->status, 0));
 	}
 
 	return data;
@@ -495,6 +498,8 @@ READ8_DEVICE_HANDLER( luxor_55_21046_inp_r )
 	if (conkort->cs)
 	{
 		data = conkort->data_out;
+		conkort->busy = 1;
+		logerror("busy %u\n", conkort->busy);
 	}
 
 	return data;
@@ -507,6 +512,8 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_utp_w )
 	if (conkort->cs)
 	{
 		conkort->data_in = data;
+		conkort->busy = 1;
+		logerror("busy %u\n", conkort->busy);
 	}
 }
 
@@ -558,6 +565,9 @@ static READ8_DEVICE_HANDLER( fast_3d_r )
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
+	conkort->busy = 0;
+	logerror("busy %u\n", conkort->busy);
+
 	return conkort->data_in;
 }
 
@@ -579,6 +589,9 @@ static WRITE8_DEVICE_HANDLER( fast_4d_w )
 	*/
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
+	
+	conkort->busy = 0;
+	logerror("busy %u\n", conkort->busy);
 
 	conkort->data_out = data;
 }
@@ -589,20 +602,26 @@ static WRITE8_DEVICE_HANDLER( fast_4b_w )
 
 		bit		description
 
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+		0		busy
+		1		index pulse/DRQ
+		2		track 0/lost data
+		3		CRC error
+		4		seek error/RNF
+		5		head loaded/write fault
+		6		write protect
+		7		not ready
 
 	*/
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	conkort->status = data;
+
+	if (BIT(data, 0))
+	{
+		conkort->busy = 0;
+		logerror("busy %u\n", conkort->busy);
+	}
 }
 
 static WRITE8_DEVICE_HANDLER( fast_9b_w )
@@ -664,6 +683,52 @@ static WRITE8_DEVICE_HANDLER( fast_8a_w )
 	wd17xx_dden_w(device, BIT(data, 1));
 }
 
+static READ8_DEVICE_HANDLER( fast_9a_r )
+{
+	/*
+
+		bit		description
+
+		0		3A.8 (busy)
+		1		SW1-2
+		2		3A.12 (SW2)
+		3		GND
+		4		SW1-1
+		5		GND
+		6		SW1-3
+		7		SW1-4
+
+	*/
+
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	UINT8 data = 0;
+
+	/* busy */
+	data |= (conkort->busy & BIT(conkort->status, 0));
+
+	/* SW1 */
+	UINT8 sw1 = input_port_read(device->machine, "abc830:SW1");
+
+	data |= BIT(sw1, 0) << 4;
+	data |= BIT(sw1, 1) << 1;
+	data |= BIT(sw1, 2) << 6;
+	data |= BIT(sw1, 3) << 7;
+
+	/* SW2 */
+/*	UINT8 sw2 = input_port_read(device->machine, "abc830:SW2");
+
+	int sw2_1 = BIT(offset, 8) & BIT(sw2, 0);
+	int sw2_2 = BIT(offset, 9) & BIT(sw2, 1);
+	int sw2_3 = BIT(offset, 10) & BIT(sw2, 2);
+	int sw2_4 = BIT(offset, 11) & BIT(sw2, 3);
+	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
+	
+	data |= sw2_data << 2;*/
+
+	return data ^ 0xff;
+}
+
 /* Memory Maps */
 
 // Slow Controller
@@ -690,61 +755,62 @@ static ADDRESS_MAP_START( fast_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG,  fast_3d_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_4d_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_4b_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_9b_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_8a_w)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ_PORT("SW1")
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff0f) AM_DEVREAD(SAB1793_TAG, fast_3d_r)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff0f) AM_DEVWRITE(SAB1793_TAG, fast_4d_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff0f) AM_DEVWRITE(SAB1793_TAG, fast_4b_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0xff0f) AM_DEVWRITE(SAB1793_TAG, fast_9b_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff0f) AM_DEVWRITE(SAB1793_TAG, fast_8a_w)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff0f) AM_MASK(0xff00) AM_DEVREAD(SAB1793_TAG, fast_9a_r)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0xff0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
 
 INPUT_PORTS_START( luxor_55_21046 )
 	PORT_START("abc830:SW1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPNAME( 0x05, 0x00, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x04, "SS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x01, "DS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x05, "DS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x0a, 0x00, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x08, "SS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x02, "DS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x0a, "DS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x05, 0x01, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x04, "SS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x01, "DS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x05, "DS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x0a, 0x02, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x08, "SS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x02, "DS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x0a, "DS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0xf0, 0x80, "Disk Drive" ) PORT_DIPLOCATION("SW2:1,2,3,4")
-	PORT_DIPSETTING(    0x80, "BASF 6106/08 (ABC 830, 190 9206-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x90, "MPI 51 (ABC 830, 190 9206-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x40, "BASF 6118 (ABC 832, 190 9711-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x30, "Micropolis 1015F (ABC 832, 190 9711-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x50, "Micropolis 1115F (ABC 832, 190 9711-17)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x10, "TEAC FD55F (ABC 834, 230 7802-01)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x20, "BASF 6138 (ABC 850, 230 8440-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0xe0, "BASF 6105" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0xf0, "BASF 6106 (ABC 838, 230 8838-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPNAME( 0x05, 0x00, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "SS DD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x01, "DS SD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x05, "DS DD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x0a, 0x00, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x08, "SS DD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x02, "DS SD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x0a, "DS DD" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x05, 0x01, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x04, "SS DD 40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "DS DD 80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x05, "DS DD 40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x0a, 0x02, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x08, "SS DD 40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "DS DD 80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0a, "DS DD 40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
 
-	PORT_START("SW3")
+	PORT_START("abc830:SW2")
+	PORT_DIPNAME( 0x0f, 0x08, "Disk Drive" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832, 190 9711-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832, 190 9711-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832, 190 9711-17)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834, 230 7802-01)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850, 230 8440-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0e, "BASF 6105" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838, 230 8838-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	
+	PORT_START("abc830:SW3") // controller card ABC bus address
 	PORT_DIPNAME( 0x7f, 0x2d, "Disk Drive" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2c, "ABC 832/834/850" )
 	PORT_DIPSETTING(    0x2d, "ABC 830" )
 	PORT_DIPSETTING(    0x2e, "ABC 838" )
 
-	PORT_START("CONKORT_ROM")
+	PORT_START("abc830:CONKORT_ROM")
 	PORT_CONFNAME( 0x07, 0x00, "Controller PROM" )
 	PORT_CONFSETTING(    0x00, "Luxor v1.07" )
 	PORT_CONFSETTING(    0x01, "Luxor v1.08" )
@@ -907,13 +973,22 @@ static const z80_daisy_config slow_daisy_chain[] =
 
 */
 
+static WRITE_LINE_DEVICE_HANDLER( z80dma_int_w )
+{
+	fast_t *conkort = get_safe_token_fast(device->owner());
+
+	conkort->dma_irq = state;
+
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
+}
+
 static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
 static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
 
 static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_LINE(z80dma_int_w),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
@@ -970,7 +1045,9 @@ static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
 {
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
+	conkort->fdc_irq = state;
+
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
 }
 
 static const wd17xx_interface fast_wd17xx_interface =
@@ -1160,6 +1237,9 @@ static DEVICE_START( luxor_55_21046 )
 	conkort->wd1793 = device->subdevice(SAB1793_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
 	conkort->image1 = device->subdevice(FLOPPY_1);
+
+	conkort->fdc_irq = 0;
+	conkort->busy = 0;
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->cs);

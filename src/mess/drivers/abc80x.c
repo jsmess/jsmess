@@ -1012,7 +1012,7 @@ static const cassette_config abc800_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_21046_ABCBUS("abc830") },
+//	{ LUXOR_55_21046_ABCBUS("abc830") },
 	{ NULL }
 };
 
