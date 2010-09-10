@@ -86,7 +86,9 @@ static struct {
 	UINT8	*adpcm_ram;
 	int		bram_locked;
 	int		adpcm_read_ptr;
+	UINT8	adpcm_read_buf;
 	int		adpcm_write_ptr;
+	UINT8	adpcm_write_buf;
 	int		adpcm_length;
 	int		adpcm_clock_count;
 	int		adpcm_clock_divider;
@@ -112,6 +114,7 @@ static struct {
 	int		data_buffer_size;
 	int		data_buffer_index;
 	int		data_transferred;
+	/* Arcade Card specific */
 	UINT8	*acard_ram;
 	UINT8	acard_latch;
 	UINT8	acard_ctrl;
@@ -331,6 +334,11 @@ MACHINE_RESET( pce )
 
 	for(joy_i=0;joy_i<5;joy_i++)
 		joy_6b_packet[joy_i] = 0;
+
+	pce_cd.adpcm_read_buf = 0;
+	pce_cd.adpcm_write_buf = 0;
+
+	// TODO: add CD-DA stop command here
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -1080,6 +1088,20 @@ WRITE8_HANDLER( pce_cd_bram_w )
 	}
 }
 
+static void pce_cd_set_adpcm_ram_byte(running_machine *machine, UINT8 val)
+{
+	if(pce_cd.adpcm_write_buf > 0)
+	{
+		pce_cd.adpcm_write_buf--;
+	}
+	else
+	{
+		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = val;
+		pce_cd.adpcm_write_ptr = ((pce_cd.adpcm_write_ptr + 1) & 0xffff);
+		//TODO: length + 1
+	}
+}
+
 WRITE8_HANDLER( pce_cd_intf_w )
 {
 	pce_cd_update(space->machine);
@@ -1127,7 +1149,9 @@ WRITE8_HANDLER( pce_cd_intf_w )
 	case 0x08:	/* ADPCM address (LSB) / CD data */
 		break;
 	case 0x09:	/* ADPCM address (MSB) */
+		break;
 	case 0x0A:	/* ADPCM RAM data port */
+		pce_cd_set_adpcm_ram_byte(space->machine, data);
 		break;
 	case 0x0B:	/* ADPCM DMA control */
 		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) )
@@ -1160,10 +1184,12 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		if ( data & 0x08 )
 		{
 			pce_cd.adpcm_read_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
+			pce_cd.adpcm_read_buf = 2;
 		}
-		if ( ( data & 0x03 ) == 0x03 )
+		if ( ( data & 0x02 ) == 0x02 )
 		{
 			pce_cd.adpcm_write_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
+			pce_cd.adpcm_write_buf = data & 1;
 		}
 		break;
 	case 0x0E:	/* ADPCM playback rate */
@@ -1216,6 +1242,24 @@ static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback )
 	}
 }
 
+static UINT8 pce_cd_get_adpcm_ram_byte(running_machine *machine)
+{
+	if(pce_cd.adpcm_read_buf > 0)
+	{
+		pce_cd.adpcm_read_buf--;
+		return 0;
+	}
+	else
+	{
+		UINT8 res;
+
+		res = pce_cd.adpcm_ram[pce_cd.adpcm_read_ptr];
+		pce_cd.adpcm_read_ptr = ((pce_cd.adpcm_read_ptr + 1) & 0xffff);
+
+		return res;
+	}
+}
+
 READ8_HANDLER( pce_cd_intf_r )
 {
 	UINT8 data = pce_cd.regs[offset & 0x0F];
@@ -1262,6 +1306,7 @@ READ8_HANDLER( pce_cd_intf_r )
 		data = pce_cd_get_cd_data_byte(space->machine);
 		break;
 	case 0x0A:	/* ADPCM RAM data port */
+		data = pce_cd_get_adpcm_ram_byte(space->machine);
 		break;
 	case 0x0B:	/* ADPCM DMA control */
 		break;
