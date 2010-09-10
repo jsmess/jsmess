@@ -48,12 +48,13 @@ STATUS:
     - C.U.G.: Gameplay backgrounds are broken.
     - Sango Fighter: Possible missing masking on the upper edges of the screen during gameplay.
 	- Sango Fighter: Raster effects off by 1 line
+	- Sango Fighter: Specifies tiles out of range of video ram??
     - Speedy Dragon: Backgrounds are broken (wrong tile bank/region).
     - Super Taiwanese Baseball League: Does not boot for unknown reasons.
     - Super Taiwanese Baseball League: Missing window effect applied on tilemaps?
     - The Son of Evil: Does not boot for unknown reasons.
     - The Son of Evil: Many graphical issues.
-	
+
 	- All: are ALL the layers ROZ capable??
 
 DEBUG TRICKS:
@@ -135,7 +136,7 @@ public:
 	UINT16 *vram;
 	UINT16 *vram_swapped;
 	UINT8 *vram_addr_swapped;
-	
+
     UINT16 *pram;
 
     UINT16 sprite_count;
@@ -171,7 +172,7 @@ public:
 	UINT16 video_regs[256];
 
     bool hack_68k_to_6502_access;
-	
+
 	tilemap_t    *tilemap_sizes[4][4];
 	bitmap_t	 *sprite_final_bitmap;
 
@@ -213,14 +214,14 @@ int supracan_tilemap_get_region(running_machine* machine, int layer)
 	{
 		return 2;
 	}
-	
-	
+
+
 	if (layer==3)
 	{
 		// roz layer
 
 		int gfx_mode = (state->roz_mode & 3);
-		
+
 		switch(gfx_mode)
 		{
 			case 0:	return 4;
@@ -242,7 +243,7 @@ int supracan_tilemap_get_region(running_machine* machine, int layer)
 			case 2: return 1;
 			case 0: return 1;
 		}
-				
+
 		return 1;
 	}
 
@@ -259,7 +260,7 @@ static void supracan_tilemap_get_info_common(running_machine* machine, int layer
 	int region = supracan_tilemap_get_region(machine, layer);
 
 	count += base;
-  
+
     UINT16 tile_bank = 0;
     UINT16 palette_bank = 0;
 	switch(gfx_mode)
@@ -294,7 +295,7 @@ static void supracan_tilemap_get_info_common(running_machine* machine, int layer
     {
         tile_bank = 0x1000;
     }
-  
+
 	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (supracan_vram[count] & 0x0c00)>>10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
@@ -308,16 +309,16 @@ static void supracan_tilemap_get_info_roz(running_machine* machine, int layer, t
     supracan_state *state = machine->driver_data<supracan_state>();
 
 	UINT16* supracan_vram = state->vram;
-	
+
 	UINT32 base = state->roz_base_addr;
 
-  
+
     int region = 1;
     UINT16 tile_bank = 0;
     UINT16 palette_bank = 0;
-	
+
 	region = supracan_tilemap_get_region(machine, layer);
-	
+
     switch(state->roz_mode & 3) //FIXME: fix gfx bpp order
     {
         case 0:
@@ -326,10 +327,10 @@ static void supracan_tilemap_get_info_roz(running_machine* machine, int layer, t
            {
 				int tile = 0x880 + ((count & 7)*2);
 			//	tile += (count & 0x070) >> 2;
-				
+
 				if (count & 0x20) tile ^= 1;
 				tile |= (count & 0xc0)>>2;
-				
+
 				SET_TILE_INFO(region, tile, 0, 0);
 				return;
 			}
@@ -347,9 +348,9 @@ static void supracan_tilemap_get_info_roz(running_machine* machine, int layer, t
             tile_bank = (state->roz_tile_bank & 0xf000) >> 3;
             break;
     }
-    
+
 	count += base;
-	
+
 	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (supracan_vram[count] & 0x0c00)>>10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
@@ -387,7 +388,7 @@ static VIDEO_START( supracan )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
     state->sprite_final_bitmap = auto_bitmap_alloc(machine, 1024, 1024, BITMAP_FORMAT_INDEXED16);
-	
+
 	state->vram = (UINT16*)memory_region(machine,"ram_gfx");
 	state->vram_swapped = (UINT16*)memory_region(machine,"ram_gfx2");
 	state->vram_addr_swapped = (UINT8*)memory_region(machine,"ram_gfx3"); // hack for 1bpp layer at startup
@@ -410,20 +411,20 @@ static VIDEO_START( supracan )
 	state->tilemap_sizes[3][0] = tilemap_create(machine, get_supracan_roz_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->tilemap_sizes[3][1] = tilemap_create(machine, get_supracan_roz_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->tilemap_sizes[3][2] = tilemap_create(machine, get_supracan_roz_tile_info, tilemap_scan_rows, 8, 8, 128, 32);
-	state->tilemap_sizes[3][3] = tilemap_create(machine, get_supracan_roz_tile_info, tilemap_scan_rows, 8, 8, 64, 64);	
+	state->tilemap_sizes[3][3] = tilemap_create(machine, get_supracan_roz_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 }
 
 static int get_tilemap_dimensions(running_machine* machine, int &xsize, int &ysize, int layer)
 {
     supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
 	int select;
-	
+
 	xsize = 32;
 	ysize = 32;
-	
+
 	if (layer==3) select = (state->roz_mode & 0x0f00);
 	else select = state->tilemap_flags[layer] & 0x0f00;
-	
+
 	switch(select)
 	{
 		case 0x600:
@@ -474,20 +475,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT32 skip_count = 0;
     UINT32 start_word = (state->sprite_base_addr >> 1) + skip_count * 4;
     UINT32 end_word = start_word + (state->sprite_count - skip_count) * 4;
-	int region = (state->sprite_flags & 1) ? 0 : 1; //8bpp : 4bpp 
+	int region = (state->sprite_flags & 1) ? 0 : 1; //8bpp : 4bpp
+
+//	printf("frame\n");
+	#define VRAM_MASK (0xffff)
 
    for(int i = start_word; i < end_word; i += 4)
 	{
 		int x = supracan_vram[i+2] & 0x01ff;
 		int y = supracan_vram[i+0] & 0x01ff;
-				
-		int sprite_offset = supracan_vram[i+3] << 2;
+
+		int sprite_offset = (supracan_vram[i+3])<< 1;
+
+		sprite_offset &= VRAM_MASK; // there are only 0xffff words of vram? sango is specifying tiles outside of this, why, I'm sure it didn't used to, timing? DMA?
+
+
 		int bank = (supracan_vram[i+1] & 0xf000) >> 12;
         //int mask = (supracan_vram[i+1] & 0x0300) >> 8;
 		bool hflip = (supracan_vram[i+1] & 0x0800) ? true : false;
 		bool vflip = (supracan_vram[i+1] & 0x0400) ? true : false;
         //int xscale = (supracan_vram[i+2] & 0xf000) >> 12;
 		const gfx_element *gfx = machine->gfx[region];
+
+/*
+		printf("%d (unk Y %02x) (unk Y2 %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
+		(supracan_vram[i+0] & 0xe000) >> 12,
+		(supracan_vram[i+0] & 0x1e00) >> 8,
+		(supracan_vram[i+0] & 0x01ff),
+		(supracan_vram[i+1] & 0xf000) >> 12,
+		(supracan_vram[i+1] & 0x0c00) >> 10,
+		(supracan_vram[i+1] & 0x03f0) >> 4,
+		(supracan_vram[i+1] & 0x000f),
+		(supracan_vram[i+2] & 0xf000) >> 12,
+		(supracan_vram[i+2] & 0x0e00) >> 8,
+		(supracan_vram[i+2] & 0x01ff) >> 0,
+		(supracan_vram[i+3] & 0xffff));
+*/
+
+
+
 
 		// wraparound
 		if (y>=0x180) y-=0x200;
@@ -506,31 +532,31 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					{
 						for(int xtile = (xsize - 1); xtile >= 0; xtile--)
 						{
-                            UINT16 data = supracan_vram[sprite_offset/2+ytile*xsize+xtile];
+                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
 							int tile = (bank * 0x200) + (data & 0x03ff);
                             bool xflip = (data & 0x0800) ? false : true;
                             bool yflip = (data & 0x0400) ? false : true;
                             int palette = (data & 0xf000) >> 12;
 							int xpos = x + ((xsize - 1) - xtile)*8;
 							int ypos = y + ((ysize - 1) - ytile)*8;
-							
+
 							drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,xflip,yflip,
 							xpos,
 							ypos,
-							0);						
-							
+							0);
+
 						}
 					}
 					else
 					{
 						for(int xtile = 0; xtile < xsize; xtile++)
 						{
-                            UINT16 data = supracan_vram[sprite_offset/2+ytile*xsize+xtile];
+                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
 							int tile = (bank * 0x200) + (data & 0x03ff);
                             bool xflip = (data & 0x0800) ? true : false;
                             bool yflip = (data & 0x0400) ? false : true;
                             int palette = (data & 0xf000) >> 12;
-							
+
 							int xpos = x + xtile*8;
 							int ypos = y + ((ysize - 1) - ytile)*8;
 
@@ -550,7 +576,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					{
 						for(int xtile = (xsize - 1); xtile >= 0; xtile--)
 						{
-                            UINT16 data = supracan_vram[sprite_offset/2+ytile*xsize+xtile];
+                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
 							int tile = (bank * 0x200) + (data & 0x03ff);
                             bool xflip = (data & 0x0800) ? false : true;
                             bool yflip = (data & 0x0400) ? true : false;
@@ -569,7 +595,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					{
 						for(int xtile = 0; xtile < xsize; xtile++)
 						{
-                            UINT16 data = supracan_vram[sprite_offset/2+ytile*xsize+xtile];
+                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
 							int tile = (bank * 0x200) + (data & 0x03ff);
                             bool xflip = (data & 0x0800) ? true : false;
                             bool yflip = (data & 0x0400) ? true : false;
@@ -582,7 +608,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							xpos,
 							ypos,
 							0);
-							
+
 						}
 					}
 				}
@@ -602,8 +628,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
                     dx += delta;
                 }
             }
-#endif			
-			
+#endif
+
 		}
 	}
 }
@@ -615,7 +641,7 @@ void mark_active_tilemap_all_dirty(running_machine* machine, int layer)
     supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
 	int xsize = 0;
 	int ysize = 0;
-	
+
 	int which_tilemap_size;
 
 	which_tilemap_size = get_tilemap_dimensions(machine, xsize, ysize, layer);
@@ -627,7 +653,7 @@ void mark_active_tilemap_all_dirty(running_machine* machine, int layer)
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void supracan_suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
+static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
 {
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
@@ -683,15 +709,15 @@ static void supracan_suprnova_draw_roz(bitmap_t* bitmap, const rectangle *clipre
 					if (columnscroll)
 					{
 						int scroll = 0;//scrollram[(cx>>16)&0x3ff]);
-						
-						
+
+
 						UINT16 data = BITMAP_ADDR16(srcbitmap,
 						                        ((cy >> 16) - scroll) & ymask,
 					 	                        (cx >> 16) & xmask)[0];
-											
+
 						if ((data & transmask)!=0)
 							dest[0] = data;
-						
+
 						//destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
 					}
 					else
@@ -701,11 +727,11 @@ static void supracan_suprnova_draw_roz(bitmap_t* bitmap, const rectangle *clipre
 						UINT16 data =  BITMAP_ADDR16(srcbitmap,
 						                       (cy >> 16) & ymask,
 											   ((cx >> 16) - scroll) & xmask)[0];
-					
-						
+
+
 						if ((data & transmask)!=0)
 							dest[0] = data;
-						
+
 						//destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
 					}
 				}
@@ -764,26 +790,26 @@ static VIDEO_UPDATE( supracan )
 		if (cliprect->min_y == 0x00)
 		{
 			const rectangle &visarea = screen->visible_area();
-		
+
 			bitmap_fill(state->sprite_final_bitmap, &visarea, 0x00);
 			bitmap_fill(bitmap, &visarea, 0x80);
-			
+
 			draw_sprites(screen->machine, state->sprite_final_bitmap, &visarea);
-			
+
 
 		}
 	}
 	else
 	{
-	
+
 		bitmap_fill(state->sprite_final_bitmap, cliprect, 0x00);
 		bitmap_fill(bitmap, cliprect, 0x80);
-			
+
 		draw_sprites(screen->machine, state->sprite_final_bitmap, cliprect);
 
-	
+
 	}
-		
+
 
 
 	// mix screen
@@ -792,19 +818,19 @@ static VIDEO_UPDATE( supracan )
 	int tilemap_num;
 	int which_tilemap_size;
 	int priority = 0;
-	
 
-	for (int pri=7;pri>=0;pri--) 
+
+	for (int pri=7;pri>=0;pri--)
 	{
 
 		for (int layer = 3; layer >=0; layer--)
 		{
 		//	popmessage("%04x\n",state->video_flags);
 			int enabled = 0;
-			
+
 			if(state->video_flags & 0x04)
 				if (layer==3) enabled = 1;
-				
+
 			if(state->video_flags & 0x80)
 				if (layer==0) enabled = 1;
 
@@ -813,102 +839,152 @@ static VIDEO_UPDATE( supracan )
 
 			if(state->video_flags & 0x20)
 				if (layer==2) enabled = 1;
-			
-		
+
+
 			if (layer==3) priority = ((state->roz_mode >> 13) & 7); // roz case
 			else priority = ((state->tilemap_flags[layer] >> 13) & 7); // normal cases
-			
-			
+
+
 			if (priority==pri)
 			{
 				tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen->machine, xsize, ysize, layer);
-				src_bitmap = tilemap_get_pixmap(state->tilemap_sizes[layer][which_tilemap_size]);				
+				src_bitmap = tilemap_get_pixmap(state->tilemap_sizes[layer][which_tilemap_size]);
 				int gfx_region = supracan_tilemap_get_region(screen->machine, layer);
 				int transmask = 0xff;
-								
+
 				switch (gfx_region)
 				{
 					case 0:transmask = 0xff; break;
 					case 1:transmask = 0x0f; break;
 					case 2:transmask = 0x03; break;
 					case 3:transmask = 0x01; break;
-					case 4:transmask = 0x01; break;	
+					case 4:transmask = 0x01; break;
 				}
-			
+
 				if (enabled)
 				{
 					if (layer != 3) // standard layers, NOT roz
 					{
-					
+
 						int wrap = (state->tilemap_flags[layer] & 0x20);
-					
+
 						int scrollx = state->tilemap_scrollx[layer];
 						int scrolly = state->tilemap_scrolly[layer];
-					
+
 						if (scrollx&0x8000) scrollx-= 0x10000;
 						if (scrolly&0x8000) scrolly-= 0x10000;
-					
+
 					  	int mosaic_count = (state->tilemap_flags[layer] & 0x001c) >> 2;
     					int mosaic_mask = 0xffffffff << mosaic_count;
-					
+
 						int y,x;
 						// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
-						
+
 						for (y=cliprect->min_y;y<=cliprect->max_y;y++)
-						{	
+						{
 							// these will have to change to ADDR32 etc. once alpha blending is supported
 							UINT16* screen = BITMAP_ADDR16(bitmap, y, 0);
-							
+
 							int actualy = y&mosaic_mask;
-							
+
 							int realy = actualy+scrolly;
-														
+
 							if (!wrap)
 								if (scrolly+y < 0 || scrolly+y > ((ysize*8)-1))
 									continue;
 
-							
+
 							UINT16* src = BITMAP_ADDR16(src_bitmap, (realy)&((ysize*8)-1), 0);
-							
+
 							for (x=cliprect->min_x;x<=cliprect->max_x;x++)
 							{
 								int actualx = x & mosaic_mask;
 								int realx = actualx+scrollx;
-								
+
 								if (!wrap)
 									if (scrollx+x < 0 || scrollx+x > ((xsize*8)-1))
 										continue;
-								
+
 								UINT16 srcpix = src[(realx)&((xsize*8)-1)];
-								
+
 								if ((srcpix & transmask) != 0)
-									screen[x] = srcpix;						
-							}	
+									screen[x] = srcpix;
+							}
 						}
 					}
 					else
 					{
 						int wrap = state->roz_mode & 0x20;
-						
+
 						int incxx = (state->roz_coeffa);
 						int incyy = (state->roz_coeffd);
-						
+
 						int incxy = (state->roz_coeffc);
 						int incyx = (state->roz_coeffb);
-						
+
+						int scrollx = (state->roz_scrollx);
+						int scrolly = (state->roz_scrolly);
+
+
+
+
+
+
 						if (incyx & 0x8000) incyx -= 0x10000;
 						if (incxy & 0x8000) incxy -= 0x10000;
-						
+
 						if (incyy & 0x8000) incyy -= 0x10000;
 						if (incxx & 0x8000) incxx -= 0x10000;
 
-						
-						supracan_suprnova_draw_roz(bitmap, cliprect, state->tilemap_sizes[layer][which_tilemap_size], (state->roz_scrollx)<<8, (state->roz_scrolly)<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+						//popmessage("%04x %04x\n",state->video_flags, state->roz_mode);
+
+						// roz mode..
+						//4020 = enabled speedyd
+						//6c22 = enabled speedyd
+						//2c22 = enabled speedyd
+						//4622 = disabled jttlaugh
+						//2602 = disabled monopoly
+						//0402 = disabled (sango title)
+						// or is it always enabled, and only corrupt because we don't clear ram properly?
+						// (probably not this register?)
+
+						if (!(state->roz_mode & 0x0200) && (state->roz_mode&0xf000) ) // HACK - Not Trusted, Acan Logo, Speedy Dragon Intro ,Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
+						{
+							// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
+							for (int y=cliprect->min_y;y<=cliprect->max_y;y++)
+							{
+								rectangle clip;
+								clip.min_x = cliprect->min_x;
+								clip.max_x = cliprect->max_x;
+
+								clip.min_y = clip.max_y = y;
+
+								scrollx = (state->roz_scrollx);
+								scrolly = (state->roz_scrolly);
+								incxx = (state->roz_coeffa);
+
+								incxx += state->vram[state->roz_unk_base0/2 + y];
+
+								scrollx += state->vram[state->roz_unk_base1/2 + y*2] << 16;
+								scrollx += state->vram[state->roz_unk_base1/2 + y*2 + 1];
+
+								scrolly += state->vram[state->roz_unk_base2/2 + y*2] << 16;
+								scrolly += state->vram[state->roz_unk_base2/2 + y*2 + 1];
+
+								if (incxx & 0x8000) incxx -= 0x10000;
+
+								supracan_suprnova_draw_roz(screen->machine, bitmap, &clip, state->tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+							}
+						}
+						else
+						{
+							supracan_suprnova_draw_roz(screen->machine, bitmap, cliprect, state->tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+						}
 					}
 				}
 			}
-		}	
+		}
 	}
 
 
@@ -919,15 +995,15 @@ static VIDEO_UPDATE( supracan )
 		{
 			UINT16* src = BITMAP_ADDR16( state->sprite_final_bitmap, y, 0);
 			UINT16* dst = BITMAP_ADDR16( bitmap, y, 0);
-		
+
 			for (int x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{
 				UINT16 dat = src[x];
-				if (dat) dst[x] = dat;		
+				if (dat) dst[x] = dat;
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -976,7 +1052,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 			{
 //              if(data & 0x2000)
 //                  acan_dma_regs->source-=2;
-				verboselog("maincpu", space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
+				logerror("supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
 
 				for(int i = 0; i <= acan_dma_regs->count[ch]; i++)
 				{
@@ -1048,7 +1124,7 @@ static WRITE16_HANDLER( supracan_vram_w )
 	// hack for 1bpp layer at startup
 	write_swapped_byte(space->machine, offset*2+1, (data & 0xff00)>>8);
 	write_swapped_byte(space->machine, offset*2, (data & 0x00ff));
-	
+
 	// mark tiles of each depth as dirty
 	gfx_element_mark_dirty(space->machine->gfx[0], (offset*2)/(64));
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset*2)/(32));
@@ -1479,14 +1555,14 @@ static TIMER_CALLBACK( supracan_video_callback )
 	{
 	case 0:
 		state->video_regs[0] &= 0x7fff;
-		
+
 		// we really need better management of this
 		mark_active_tilemap_all_dirty(machine, 0);
 		mark_active_tilemap_all_dirty(machine, 1);
 		mark_active_tilemap_all_dirty(machine, 2);
 		mark_active_tilemap_all_dirty(machine, 3);
 
-		
+
 		break;
 	case 240:
 		state->video_regs[0] |= 0x8000;
@@ -1548,7 +1624,7 @@ static WRITE16_HANDLER( supracan_video_w )
             acan_sprdma_regs->src_inc = data;
             break;
 		case 0x1e/2:
-			verboselog("maincpu", space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs->src, acan_sprdma_regs->dst, acan_sprdma_regs->count, data);
+			logerror( "supracan_video_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs->src, acan_sprdma_regs->dst, acan_sprdma_regs->count, data);
 
 			/* TODO: what's 0x2000 and 0x4000 for? */
 			if(data & 0x8000)
@@ -1780,14 +1856,14 @@ static const gfx_layout supracan_gfx2bpp =
 };
 
 
-static const UINT32 xtexlayout_xoffset[64] = { 0,1,2,3,4,5,6,7,          8,9,10,11,12,13,14,15, 
+static const UINT32 xtexlayout_xoffset[64] = { 0,1,2,3,4,5,6,7,          8,9,10,11,12,13,14,15,
                                                16,17,18,19,20,21,22,23,  24,25,26,27,28,29,30,31,
-											   32,33,34,35,36,37,38,39,  40,41,42,43,44,45,46,47, 
+											   32,33,34,35,36,37,38,39,  40,41,42,43,44,45,46,47,
 											   48,49,50,51,52,53,54,55,  56,57,58,59,60,61,62,63 };
 static const UINT32 xtexlayout_yoffset[64] = {  0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
                                                 8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64,
 												16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-												24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64, 
+												24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64,
 												32*64,33*64,34*64,35*64,36*64,37*64,38*64,39*64,
 												40*64,41*64,42*64,43*64,44*64,45*64,46*64,47*64,
 												48*64,49*64,50*64,51*64,52*64,53*64,54*64,55*64,
