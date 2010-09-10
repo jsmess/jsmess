@@ -32,6 +32,7 @@ x--- ---- ADPCM reset
 ---x ---- ADPCM set length
 ---- x--- ADPCM set read address
 ---- --xx ADPCM set write address
+(note: some games reads bit 5 and wants it to be low otherwise they hangs, surely NOT an ADPCM repeat flag read because it doesn't make sense)
 
 CD Interface Register 0x0e - ADPCM playback rate
 
