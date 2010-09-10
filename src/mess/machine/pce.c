@@ -1260,16 +1260,18 @@ READ8_HANDLER( pce_cd_intf_r )
 	case 0x08:	/* ADPCM address (LSB) / CD data */
 		data = pce_cd_get_cd_data_byte(space->machine);
 		break;
-	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0A:	/* ADPCM RAM data port */
+		break;
 	case 0x0B:	/* ADPCM DMA control */
+		break;
+	case 0x0C:	/* ADPCM status */
+		break;
+	/* These are read-only registers */
+	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0D:	/* ADPCM address control */
 	case 0x0E:	/* ADPCM playback rate */
 	case 0x0F:	/* ADPCM and CD audio fade timer */
-		break;
-	case 0x0C:	/* ADPCM status */
-		//data |= 1;
-		break;
+		return 0;
 	case 0xC1:
 		data = pce_sys3_card ? 0xAA : 0xFF;
 		break;
