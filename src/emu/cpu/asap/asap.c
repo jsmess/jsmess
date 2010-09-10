@@ -189,6 +189,7 @@ device_t *asap_device_config::alloc_device(running_machine &machine) const
 	return auto_alloc(&machine, asap_device(machine, *this));
 }
 
+
 //-------------------------------------------------
 //  execute_min_cycles - return minimum number of
 //  cycles it takes for one instruction to execute
@@ -421,8 +422,8 @@ void asap_device::state_string_export(const device_state_entry &entry, astring &
 
 offs_t asap_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern offs_t asap_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-	return asap_disassemble(buffer, pc, oprom, opram);
+	extern CPU_DISASSEMBLE( asap );
+	return CPU_DISASSEMBLE_NAME(asap)(NULL, buffer, pc, oprom, opram, 0);
 }
 
 
