@@ -66,6 +66,13 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define PCE_CD_IRQ_TRANSFER_READY	0x40
 #define PCE_CD_IRQ_TRANSFER_DONE	0x20
 
+#define PCE_CD_SAMPLE_FULL_PLAY		0x08
+#define PCE_CD_SAMPLE_HALF_PLAY		0x04
+#define PCE_CD_SAMPLE_STOP_PLAY		0x00
+
+#define PCE_CD_ADPCM_PLAY_FLAG		0x08
+#define PCE_CD_ADPCM_STOP_FLAG		0x01
+
 #define PCE_CD_DATA_FRAMES_PER_SECOND	75
 
 enum {
@@ -90,11 +97,12 @@ static struct {
 	int		adpcm_write_ptr;
 	UINT8	adpcm_write_buf;
 	int		adpcm_length;
+	int		adpcm_clock_count;
+	int		adpcm_clock_divider;
 	UINT16  msm_start_addr;
 	UINT16	msm_end_addr;
 	UINT8	msm_nibble;
-	int		adpcm_clock_count;
-	int		adpcm_clock_divider;
+	UINT8	msm_idle;
 	/* SCSI signals */
 	int		scsi_BSY;	/* Busy. Bus in use */
 	int		scsi_SEL;	/* Select. Initiator has won arbitration and has selected a target */
@@ -342,6 +350,10 @@ MACHINE_RESET( pce )
 	pce_cd.adpcm_write_buf = 0;
 
 	// TODO: add CD-DA stop command here
+
+	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
+	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
+	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -418,6 +430,23 @@ static void pce_set_cd_bram( running_machine *machine )
 	memory_set_bankptr( machine, "bank10", pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
+static void adpcm_stop(void)
+{
+	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
+	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
+	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	pce_cd.msm_idle = 1;
+}
+
+static void adpcm_play(void)
+{
+	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_STOP_FLAG;
+	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_PLAY_FLAG;
+	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	pce_cd.msm_idle = 0;
+}
+
+
 /* Callback for new data from the MSM5205.
   The PCE cd unit actually divides the clock signal supplied to
   the MSM5205. Currently we can only use static clocks for the
@@ -427,18 +456,34 @@ static void pce_cd_msm5205_int(running_device *device)
 {
 	static UINT8 msm_data;
 
+	if ( pce_cd.msm_idle )
+		return;
+
+	//popmessage("%08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+
 	if ( ! pce_cd.adpcm_clock_count )
 	{
 		/* Supply new ADPCM data */
 		msm_data = (pce_cd.msm_nibble) ? (pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0x0f) : ((pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0xf0) >> 4);
 
+		msm5205_data_w(device, msm_data);
 		pce_cd.msm_nibble ^= 1;
 
 		if(pce_cd.msm_nibble == 0)
 		{
 			pce_cd.msm_start_addr++;
+
+			if(pce_cd.msm_start_addr >= ((pce_cd.msm_end_addr-pce_cd.msm_start_addr) / 2))
+				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_HALF_PLAY);
+
+			if(pce_cd.msm_start_addr == pce_cd.msm_end_addr)
+				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_FULL_PLAY);
+
 			if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
+			{
+				adpcm_stop();
 				msm5205_reset_w(device, 1);
+			}
 		}
 	}
 	else
@@ -1192,6 +1237,10 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			/* Reset ADPCM hardware */
 			pce_cd.adpcm_read_ptr = 0;
 			pce_cd.adpcm_write_ptr = 0;
+			pce_cd.msm_start_addr = 0;
+			pce_cd.msm_end_addr = 0;
+			pce_cd.msm_nibble = 0;
+			adpcm_stop();
 			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
 		}
 
@@ -1200,9 +1249,16 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
 			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
 			pce_cd.msm_nibble = 0;
+			adpcm_play();
 			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
 
 			//popmessage("%08x %08x",pce_cd.adpcm_read_ptr,pce_cd.adpcm_length);
+		}
+		else
+		{
+			/* used by Buster Bros to cancel an in-flight sample */
+			adpcm_stop();
+			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
 		}
 
 		if ( data & 0x10 ) //ADPCM set length
