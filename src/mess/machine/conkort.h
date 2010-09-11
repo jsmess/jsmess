@@ -43,6 +43,7 @@ struct _conkort_config
     PROTOTYPES
 ***************************************************************************/
 /* configuration dips */
+INPUT_PORTS_EXTERN( luxor_55_10828 );
 INPUT_PORTS_EXTERN( luxor_55_21046 );
 
 /* floppy options */
