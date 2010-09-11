@@ -95,9 +95,10 @@
 
 DECLARE_LEGACY_DEVICE(ABCBUS, abcbus);
 
-#define MDRV_ABCBUS_ADD(_tag, _daisy_chain) \
+#define MDRV_ABCBUS_ADD(_tag, _daisy_chain, _cpu_tag) \
 	MDRV_DEVICE_ADD(_tag, ABCBUS, 0) \
-	MDRV_DEVICE_CONFIG(_daisy_chain)
+	MDRV_DEVICE_CONFIG(_daisy_chain) \
+	MDRV_DEVICE_CONFIG_DATAPTR(abcbus_config, cpu_tag, _cpu_tag)
 
 #define ABCBUS_DAISY(_name) \
 	const abcbus_daisy_chain (_name)[] =
@@ -126,6 +127,12 @@ struct _abcbus_daisy_chain
 	devcb_write_line	out_rst_func;
 };
 
+typedef struct _abcbus_config abcbus_config;
+struct _abcbus_config
+{
+	const char *cpu_tag;		/* CPU device */
+};
+
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
@@ -147,5 +154,11 @@ WRITE8_DEVICE_HANDLER( abcbus_c1_w );
 WRITE8_DEVICE_HANDLER( abcbus_c2_w );
 WRITE8_DEVICE_HANDLER( abcbus_c3_w );
 WRITE8_DEVICE_HANDLER( abcbus_c4_w );
+
+/* inputs */
+WRITE_LINE_DEVICE_HANDLER( abcbus_resin_w );
+WRITE_LINE_DEVICE_HANDLER( abcbus_int_w );
+WRITE_LINE_DEVICE_HANDLER( abcbus_nmi_w );
+WRITE_LINE_DEVICE_HANDLER( abcbus_rdy_w );
 
 #endif

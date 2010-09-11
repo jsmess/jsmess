@@ -178,7 +178,9 @@ Notes:
     ---------------
 	- status bit 0 (busy)
 	- SW2 reading
-	- "track 0 sector 25 not found!"
+	- "track 0 sector 25 not found!" -> SW2 options were wrong, though always ABC838
+	- INT/NMI to ABC800 ?
+	- Z80 DMA INT on end of block ?
 
 */
 
@@ -222,6 +224,7 @@ struct _slow_t
 	int wait_enable;		/* wait enable */
 
 	/* devices */
+	running_device *bus;
 	running_device *cpu;
 	running_device *z80pio;
 	running_device *fd1791;
@@ -241,6 +244,7 @@ struct _fast_t
 	int busy;				/* busy bit */
 
 	/* devices */
+	running_device *bus;
 	running_device *cpu;
 	running_device *z80dma;
 	running_device *wd1793;
@@ -264,6 +268,13 @@ INLINE fast_t *get_safe_token_fast(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == LUXOR_55_21046);
 	return (fast_t *)downcast<legacy_device_base *>(device)->token();
+}
+
+INLINE conkort_config *get_safe_config(running_device *device)
+{
+	assert(device != NULL);
+	assert((device->type() == LUXOR_55_10828) || (device->type() == LUXOR_55_21046));
+	return (conkort_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -416,7 +427,10 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
-	conkort->status = data;
+	/* interrupt */
+	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+
+	conkort->status = data & 0xfe;
 }
 
 static READ8_DEVICE_HANDLER( slow_fdc_r )
@@ -432,10 +446,10 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 
 	switch (offset & 0x03)
 	{
-	case 0: data = wd17xx_status_r(device, 0);
-	case 1:	data = wd17xx_track_r(device, 0);
-	case 2:	data = wd17xx_sector_r(device, 0);
-	case 3:	data = wd17xx_data_r(device, 0);
+	case 0: data = wd17xx_status_r(device, 0); break;
+	case 1:	data = wd17xx_track_r(device, 0); break;
+	case 2:	data = wd17xx_sector_r(device, 0); break;
+	case 3:	data = wd17xx_data_r(device, 0); break;
 	}
 
 	/* FD1791 has inverted data lines */
@@ -459,9 +473,9 @@ static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 	switch (offset & 0x03)
 	{
 	case 0: wd17xx_command_w(device, 0, data); break;
-	case 1:	wd17xx_track_w(device, 0, data);   break;
-	case 2: wd17xx_sector_w(device, 0, data);  break;
-	case 3: wd17xx_data_w(device, 0, data);    break;
+	case 1:	wd17xx_track_w(device, 0, data); break;
+	case 2: wd17xx_sector_w(device, 0, data); break;
+	case 3: wd17xx_data_w(device, 0, data); break;
 	}
 }
 
@@ -716,7 +730,7 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 	data |= BIT(sw1, 3) << 7;
 
 	/* SW2 */
-/*	UINT8 sw2 = input_port_read(device->machine, "abc830:SW2");
+	UINT8 sw2 = input_port_read(device->machine, "abc830:SW2");
 
 	int sw2_1 = BIT(offset, 8) & BIT(sw2, 0);
 	int sw2_2 = BIT(offset, 9) & BIT(sw2, 1);
@@ -724,7 +738,7 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 	int sw2_4 = BIT(offset, 11) & BIT(sw2, 3);
 	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
 	
-	data |= sw2_data << 2;*/
+	data |= sw2_data << 2;
 
 	return data ^ 0xff;
 }
@@ -793,16 +807,16 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x0a, "DS DD 40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
 
 	PORT_START("abc830:SW2")
-	PORT_DIPNAME( 0x0f, 0x08, "Disk Drive" ) PORT_DIPLOCATION("SW2:1,2,3,4")
-	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832, 190 9711-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832, 190 9711-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832, 190 9711-17)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834, 230 7802-01)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850, 230 8440-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x0e, "BASF 6105" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838, 230 8838-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPNAME( 0x0f, 0x0b, "Disk Drive" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x07, "BASF 6106/08 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x06, "MPI 51 (ABC 830, 190 9206-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x0b, "BASF 6118 (ABC 832, 190 9711-16)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0c, "Micropolis 1015F (ABC 832, 190 9711-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0a, "Micropolis 1115F (ABC 832, 190 9711-17)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0e, "TEAC FD55F (ABC 834, 230 7802-01)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0d, "BASF 6138 (ABC 850, 230 8440-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "BASF 6105" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x00, "BASF 6106 (ABC 838, 230 8838-15)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
 	
 	PORT_START("abc830:SW3") // controller card ABC bus address
 	PORT_DIPNAME( 0x7f, 0x2d, "Disk Drive" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
@@ -1150,11 +1164,13 @@ ROM_END
 static DEVICE_START( luxor_55_10828 )
 {
 	slow_t *conkort = get_safe_token_slow(device);
+	const conkort_config *config = get_safe_config(device);
 
 	/* find our CPU */
 	conkort->cpu = device->subdevice(Z80_TAG);
 
 	/* find devices */
+	conkort->bus = device->machine->device(config->bus_tag);
 	conkort->z80pio = device->subdevice(Z80PIO_TAG);
 	conkort->fd1791 = device->subdevice(FD1791_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
@@ -1200,7 +1216,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(conkort_config);							break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(slow_t);									break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -1228,11 +1244,13 @@ DEVICE_GET_INFO( luxor_55_10828 )
 static DEVICE_START( luxor_55_21046 )
 {
 	fast_t *conkort = get_safe_token_fast(device);
+	const conkort_config *config = get_safe_config(device);
 
 	/* find our CPU */
 	conkort->cpu = device->subdevice(Z80_TAG);
 
 	/* find devices */
+	conkort->bus = device->machine->device(config->bus_tag);
 	conkort->z80dma = device->subdevice(Z80DMA_TAG);
 	conkort->wd1793 = device->subdevice(SAB1793_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
@@ -1276,7 +1294,7 @@ DEVICE_GET_INFO( luxor_55_21046 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(conkort_config);							break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(fast_t);									break;
 
 		/* --- the following bits of info are returned as pointers --- */

@@ -1180,8 +1180,8 @@ static MACHINE_CONFIG_START( abc800m, abc800_state )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_LUXOR_55_21046_ADD("abc830", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1222,8 +1222,8 @@ static MACHINE_CONFIG_START( abc800c, abc800_state )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_LUXOR_55_21046_ADD("abc830", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1264,8 +1264,8 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_LUXOR_55_21046_ADD("abc830", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1303,8 +1303,8 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	/* ABC bus */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_21046_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_LUXOR_55_21046_ADD("abc830", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))

@@ -534,8 +534,8 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
 
 	/* Luxor Conkort 55-10828 */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MDRV_LUXOR_55_10828_ADD("abc830")
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_LUXOR_55_10828_ADD("abc830", ABCBUS_TAG)
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(abc80_video)
