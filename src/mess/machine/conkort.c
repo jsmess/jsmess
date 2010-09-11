@@ -176,11 +176,8 @@ Notes:
 
     Fast Controller
     ---------------
-	- status bit 0 (busy)
-	- SW2 reading
-	- "track 0 sector 25 not found!" -> SW2 options were wrong, though always ABC838
-	- INT/NMI to ABC800 ?
-	- Z80 DMA INT on end of block ?
+	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
+	- status bit 0 (busy) ?
 
 */
 
@@ -648,7 +645,7 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 		1		_DRVSB
 		2		_DRVSA
 		3		_MOTEB
-		4		?
+		4		pin 2 of 50-pin floppy connector, not used
 		5		_SIDE1
 		6
 		7
@@ -1010,12 +1007,6 @@ static Z80DMA_INTERFACE( dma_intf )
 	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
 };
 
-static const z80_daisy_config fast_daisy_chain[] =
-{
-	{ Z80DMA_TAG },
-	{ NULL }
-};
-
 /* FD1791 */
 
 static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
@@ -1060,7 +1051,7 @@ static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	conkort->fdc_irq = state;
-
+	logerror("FDC interrupt %u\n", state);
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
 }
 
@@ -1102,7 +1093,6 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MDRV_CPU_PROGRAM_MAP(fast_map)
 	MDRV_CPU_IO_MAP(fast_io_map)
-	MDRV_CPU_CONFIG(fast_daisy_chain)
 
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface)
