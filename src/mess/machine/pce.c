@@ -90,6 +90,9 @@ static struct {
 	int		adpcm_write_ptr;
 	UINT8	adpcm_write_buf;
 	int		adpcm_length;
+	UINT16  msm_start_addr;
+	UINT16	msm_end_addr;
+	UINT8	msm_nibble;
 	int		adpcm_clock_count;
 	int		adpcm_clock_divider;
 	/* SCSI signals */
@@ -422,15 +425,29 @@ static void pce_set_cd_bram( running_machine *machine )
  */
 static void pce_cd_msm5205_int(running_device *device)
 {
-	pce_cd.adpcm_clock_count = ( pce_cd.adpcm_clock_count + 1 ) % pce_cd.adpcm_clock_divider;
+	static UINT8 msm_data;
+
 	if ( ! pce_cd.adpcm_clock_count )
 	{
 		/* Supply new ADPCM data */
+		msm_data = (pce_cd.msm_nibble) ? (pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0x0f) : ((pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0xf0) >> 4);
+
+		pce_cd.msm_nibble ^= 1;
+
+		if(pce_cd.msm_nibble == 0)
+		{
+			pce_cd.msm_start_addr++;
+			if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
+				msm5205_reset_w(device, 1);
+		}
 	}
 	else
 	{
 		/* Make sure the sample does not change */
+		msm5205_data_w(device, msm_data);
 	}
+
+	pce_cd.adpcm_clock_count = ( pce_cd.adpcm_clock_count + 1 ) % pce_cd.adpcm_clock_divider;
 }
 
 #define	SCSI_STATUS_OK			0x00
@@ -1170,23 +1187,34 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		break;
 	case 0x0D:	/* ADPCM address control */
 		//printf("%02x\n",data);
-		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) )
+		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) ) // ADPCM reset
 		{
 			/* Reset ADPCM hardware */
 			pce_cd.adpcm_read_ptr = 0;
 			pce_cd.adpcm_write_ptr = 0;
-			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
+			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
 		}
-		if ( data & 0x10 )
+
+		if ( data & 0x40 ) // ADPCM play
+		{
+			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
+			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
+			pce_cd.msm_nibble = 0;
+			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
+
+			//popmessage("%08x %08x",pce_cd.adpcm_read_ptr,pce_cd.adpcm_length);
+		}
+
+		if ( data & 0x10 ) //ADPCM set length
 		{
 			pce_cd.adpcm_length = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 		}
-		if ( data & 0x08 )
+		if ( data & 0x08 ) //ADPCM set read address
 		{
 			pce_cd.adpcm_read_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 			pce_cd.adpcm_read_buf = 2;
 		}
-		if ( ( data & 0x02 ) == 0x02 )
+		if ( ( data & 0x02 ) == 0x02 ) //ADPCM set write address
 		{
 			pce_cd.adpcm_write_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 			pce_cd.adpcm_write_buf = data & 1;

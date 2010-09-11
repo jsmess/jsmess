@@ -49,6 +49,7 @@ Super System Card:
 ***********************************************************************
 - Benkei Gaiden: hangs after a few Sunsoft logo spins.
 - Busou Keiji Cyber Cross: hangs on attract mode
+- Cadash: After choosing character and name, the game starts and the display 'jiggles' like tracking if off a VCR
 - Fighting Run: has color and sprite issues during gameplay;
 - Hisou Kihei - Xserd: black screen;
 **********************************************************************/
@@ -303,8 +304,8 @@ static MACHINE_CONFIG_START( pce_common, driver_device )
 
 	MDRV_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
 	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.00 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
