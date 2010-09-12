@@ -1517,6 +1517,7 @@ const game_driver * const drivers[] =
 
 	/* Novag */
 	DRIVER( ssystem3 )  /* Chess Champion Super System III / MK III  */
+	DRIVER( supercon )
 
 	/* Hegener & Glaser Munich */
 //  DRIVER( mephisto )  /* Mephisto  */

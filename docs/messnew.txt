@@ -6,6 +6,7 @@ New System Drivers Supported:
 - Elektronika KR-03 [Miodrag Milanovic]
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
+- Novag SuperConstellation Chess Computer [Ralf Schaefer]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------

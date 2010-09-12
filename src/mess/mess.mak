@@ -1183,6 +1183,7 @@ $(MESSOBJ)/novag.a:				\
 	$(MESS_DRIVERS)/mk2.o		\
 	$(MESS_VIDEO)/ssystem3.o	\
 	$(MESS_DRIVERS)/ssystem3.o	\
+	$(MESS_DRIVERS)/supercon.o	\
 
 $(MESSOBJ)/olivetti.a:			\
 	$(MESS_DRIVERS)/m20.o		\
@@ -1789,6 +1790,7 @@ $(MESS_DRIVERS)/px8.o:		$(MESS_LAYOUT)/px8.lh
 $(MESS_DRIVERS)/sms.o:		$(MESS_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
+$(MESS_DRIVERS)/supercon.o:	$(MESS_LAYOUT)/supercon.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh
