@@ -1449,7 +1449,7 @@ WRITE16_HANDLER ( mac_iwm_w )
 	if (ACCESSING_BITS_0_7)
 		applefdc_w(fdc, (offset >> 8), data & 0xff);
 	else
-		applefdc_w(fdc, (offset >> 8), data<<8);
+		applefdc_w(fdc, (offset >> 8), data>>8);
 }
 
 /* *************************************************************************
