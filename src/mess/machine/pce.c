@@ -334,17 +334,13 @@ MACHINE_START( pce )
 	pce_cd_init( machine );
 }
 
-static UINT8 joy_type[5],joy_6b_packet[5],joy_i;
+static UINT8 joy_6b_packet[5];
 
 MACHINE_RESET( pce )
 {
-	joy_type[0] = (input_port_read(machine,"JOY_TYPE") & 0x01) >> 0;
-	joy_type[1] = (input_port_read(machine,"JOY_TYPE") & 0x02) >> 1;
-	joy_type[2] = (input_port_read(machine,"JOY_TYPE") & 0x04) >> 2;
-	joy_type[3] = (input_port_read(machine,"JOY_TYPE") & 0x08) >> 3;
-	joy_type[4] = (input_port_read(machine,"JOY_TYPE") & 0x10) >> 4;
+	int joy_i;
 
-	for(joy_i=0;joy_i<5;joy_i++)
+	for (joy_i = 0; joy_i < 5; joy_i++)
 		joy_6b_packet[joy_i] = 0;
 
 	pce_cd.adpcm_read_buf = 0;
@@ -360,9 +356,13 @@ MACHINE_RESET( pce )
 /* todo: how many input ports does the PCE have? */
 WRITE8_HANDLER ( pce_joystick_w )
 {
+	int joy_i;
+	UINT8 joy_type = input_port_read(space->machine,"JOY_TYPE");
+
 	h6280io_set_buffer(space->cpu, data);
+
     /* bump counter on a low-to-high transition of bit 1 */
-    if((!joystick_data_select) && (data & JOY_CLOCK))
+    if ((!joystick_data_select) && (data & JOY_CLOCK))
     {
         joystick_port_select = (joystick_port_select + 1) & 0x07;
     }
@@ -371,40 +371,42 @@ WRITE8_HANDLER ( pce_joystick_w )
     joystick_data_select = data & JOY_CLOCK;
 
     /* clear counter if bit 2 is set */
-    if(data & JOY_RESET)
+    if (data & JOY_RESET)
     {
-        joystick_port_select = 0;
+		joystick_port_select = 0;
 
-		for(joy_i=0;joy_i<5;joy_i++)
+		for (joy_i = 0; joy_i < 5; joy_i++)
 		{
-			if(joy_type[joy_i] & 1)
-        		joy_6b_packet[joy_i]^=1;
+			if (BIT(joy_type, joy_i))
+        		joy_6b_packet[joy_i] ^= 1;
 		}
     }
 }
 
 READ8_HANDLER ( pce_joystick_r )
 {
-	static const char *const joyname[] = { "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" };
-	UINT8 ret;
-	int data;
+	static const char *const joyname[2][5] = {
+		{ "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" },
+		{ "JOY6B_P1", "JOY6B_P2", "JOY6B_P3", "JOY6B_P4", "JOY6B_P5" }
+	};
+	UINT8 joy_type = input_port_read(space->machine, "JOY_TYPE");
+	UINT8 ret, data;
 
-	if(joy_6b_packet[joystick_port_select])
+	if (joystick_port_select <= 4)
 	{
-		if(joystick_port_select <= 4)
-			data = (input_port_read(space->machine, joyname[joystick_port_select]) >> 8) & 0x0f;
+		if (joy_6b_packet[joystick_port_select])
+			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f);
 		else
-			data = 0xff;
+			data = input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]);
 	}
 	else
-	{
-		if(joystick_port_select <= 4)
-			data = input_port_read(space->machine, joyname[joystick_port_select]);
-		else
-			data = 0xff;
-	}
-	if(joystick_data_select) data >>= 4;
-	ret = (data & 0x0F) | pce.io_port_options;
+		data = 0xff;
+
+
+	if (joystick_data_select) 
+		data >>= 4;
+
+	ret = (data & 0x0f) | pce.io_port_options;
 #ifdef UNIFIED_PCE
 	ret &= ~0x40;
 #endif
