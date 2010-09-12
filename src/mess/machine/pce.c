@@ -104,6 +104,7 @@ static struct {
 	UINT16	msm_half_addr;
 	UINT8	msm_nibble;
 	UINT8	msm_idle;
+
 	/* SCSI signals */
 	int		scsi_BSY;	/* Busy. Bus in use */
 	int		scsi_SEL;	/* Select. Initiator has won arbitration and has selected a target */
@@ -126,6 +127,7 @@ static struct {
 	int		data_buffer_size;
 	int		data_buffer_index;
 	int		data_transferred;
+
 	/* Arcade Card specific */
 	UINT8	*acard_ram;
 	UINT8	acard_latch;
@@ -142,6 +144,7 @@ static struct {
 	UINT8	cdda_status;
 	UINT8	cdda_play_mode;
 	UINT8	*subcode_buffer;
+	UINT8	end_mark;
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
 	emu_timer	*data_timer;
@@ -404,7 +407,7 @@ READ8_HANDLER ( pce_joystick_r )
 		data = 0xff;
 
 
-	if (joystick_data_select) 
+	if (joystick_data_select)
 		data >>= 4;
 
 	ret = (data & 0x0f) | pce.io_port_options;
@@ -460,7 +463,7 @@ static void pce_cd_msm5205_int(running_device *device)
 {
 	static UINT8 msm_data;
 
-	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+//	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
 	if ( pce_cd.msm_idle )
 		return;
@@ -553,6 +556,7 @@ static void pce_cd_read_6( running_machine *machine )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( machine->device( "cdda" ) );
+		pce_cd.end_mark = 0;
 	}
 
 	pce_cd.current_frame = frame;
@@ -597,17 +601,21 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 	}
 
 	pce_cd.current_frame = frame;
-	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
+	pce_cd.cdda_play_mode = pce_cd.command_buffer[1] & 0x03;
+
+	//printf("Set Start %02x\n",pce_cd.cdda_play_mode);
 	if ( pce_cd.cdda_play_mode )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+		pce_cd.end_mark = 0;
 	}
 	else
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( machine->device( "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
+		pce_cd.end_mark = 0;
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -643,7 +651,9 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 	}
 
 	pce_cd.end_frame = frame;
-	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
+	pce_cd.cdda_play_mode = pce_cd.command_buffer[1] & 0x03;
+
+	//printf("Set End %02x\n",pce_cd.cdda_play_mode);
 	if ( pce_cd.cdda_play_mode )
 	{
 		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED )
@@ -653,6 +663,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		else
 		{
 			cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			pce_cd.end_mark = 1;
 		}
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 	}
@@ -661,6 +672,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( machine->device( "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
+		pce_cd.end_mark = 0;
 //      assert( NULL == pce_cd_nec_set_audio_stop_position );
 	}
 
@@ -1013,6 +1025,17 @@ logerror("Setting CD in device selection\n");
 					pce_cd_handle_data_output( machine );
 				}
 			}
+		}
+	}
+
+	/* FIXME: presumably CD-DA needs an irq interface for this */
+	if(cdda_audio_ended(machine->device("cdda")) && pce_cd.end_mark == 1)
+	{
+		switch(pce_cd.cdda_play_mode & 3)
+		{
+			case 1: cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame ); pce_cd.end_mark = 1; break; //play with repeat
+			case 2: pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE ); pce_cd.end_mark = 0; break; //irq when finished
+			case 3: pce_cd.end_mark = 0; break; //play without repeat
 		}
 	}
 }
