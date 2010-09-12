@@ -394,9 +394,10 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if (joystick_port_select <= 4)
 	{
-		if (joy_6b_packet[joystick_port_select])
-			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f);
-		else
+		if (joy_6b_packet[joystick_port_select])	// directions + III, IV, V, VI
+			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f)
+				| (input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) & 0xf0);
+		else	// directions + I, II, Run, Select
 			data = input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]);
 	}
 	else
