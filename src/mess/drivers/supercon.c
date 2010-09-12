@@ -26,14 +26,6 @@
 #define VERBOSE 0
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#define ClearBit(x,y)	( y &= ~( 1 << x ) )
-#define SetBit(x,y)		( y |= (1 << x ) )
-#define ToggleBit(x,y)	( y ^= (1 << x ) )
-
-#define IsBitSet(x,y)	( y & (1<<x) )
-#define IsBitClear(x,y)	( !( y & (1<<x) ) )
-
-
 enum
 {
 	EM,		/*No piece*/
@@ -146,8 +138,8 @@ static int get_first_cleared_bit(UINT8 data)
 {
 	int i;
 
-	for (i=0;i<8;i++)
-		if (IsBitClear(i,data))
+	for (i = 0; i < 8; i++)
+		if (!BIT(data, i))
 			return i;
 
 	return NOT_VALID;
@@ -157,8 +149,8 @@ static int get_first_bit(UINT8 data)
 {
 	int i;
 
-	for (i=0;i<8;i++)
-		if (IsBitSet(i,data))
+	for (i = 0; i < 8; i++)
+		if (BIT(data, i))
 			return i;
 
 	return NOT_VALID;
@@ -169,22 +161,22 @@ static void update_leds( void )
 {
 	int i;
 
-	for (i=0;i<8;i++)
+	for (i = 0; i < 8; i++)
 	{
-		if (IsBitSet(i,LED_18))
-			output_set_led_value(i+1,1);
+		if (BIT(LED_18, i))
+			output_set_led_value(i + 1, 1);
 		else
-			output_set_led_value(i+1,0);
+			output_set_led_value(i + 1, 0);
 
-		if (IsBitSet(i,LED_AH))
-			output_set_led_value(i+9,1);
+		if (BIT(LED_AH, i))
+			output_set_led_value(i + 9, 1);
 		else
-			output_set_led_value(i+9,0);
+			output_set_led_value(i + 9, 0);
 
-		if (IsBitSet(i,LED_ST))
-			output_set_led_value(i+17,1);
+		if (BIT(LED_ST, i))
+			output_set_led_value(i + 17, 1);
 		else
-			output_set_led_value(i+17,0);
+			output_set_led_value(i + 17, 0);
 	}
 }
 
