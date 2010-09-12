@@ -1,0 +1,160 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><h1><a name="compiling_mess" id="compiling_mess">Compiling MESS</a></h1>
+<div class="level1">
+
+<p>
+
+Compiling <acronym title="Multi Emulator Super System">MESS</acronym> is essentially the same process as building <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>, but after the <code>make</code> or <code>mingw32-make</code> command you add <code>TARGET=mess</code>. Read on for step-by-step instructions.
+</p>
+
+<p>
+Note: the compiler used for <acronym title="Multi Emulator Super System">MESS</acronym> and <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>
+ on Windows has changed starting with version 0.137. You will need to 
+download a new set of build tools if you were previously set up for 
+compiling 0.136. See <a href="http://mess.redump.net/compiling_mess_0136" class="wikilink1" title="compiling_mess_0136">Compiling MESS 0.136</a> for the older instructions.
+</p>
+
+</div>
+<!-- SECTION "Compiling MESS" [1-485] -->
+<h2><a name="setting_up_the_source" id="setting_up_the_source">Setting up the source</a></h2>
+<div class="level2">
+
+<p>
+
+<acronym title="Multi Emulator Super System">MESS</acronym> is developed as a patch for the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source, so the <acronym title="Multi Emulator Super System">MESS</acronym> source distribution does not include important files like the makefile, which come from <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>.
+</p>
+
+<p>
+To obtain the complete source from SVN, follow the instructions <a href="http://mess.redump.net/subversion" class="wikilink1" title="subversion">here</a>.
+</p>
+
+<p>
+Otherwise, <a href="http://mess.redump.net/downloads" class="wikilink1" title="downloads">download the MESS source</a> and the <a href="http://mamedev.org/release.html" class="urlextern" title="http://mamedev.org/release.html" rel="nofollow">MAME source</a> with the same version number. Extract the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source into a directory somewhere, then extract the <acronym title="Multi Emulator Super System">MESS</acronym> source overtop of it, overwriting files if prompted.
+</p>
+
+</div>
+<!-- SECTION "Setting up the source" [486-1027] -->
+<h2><a name="setting_up_the_build_tools_on_windows" id="setting_up_the_build_tools_on_windows">Setting up the build tools on Windows</a></h2>
+<div class="level2">
+
+<p>
+
+Download the <a href="http://mess.redump.net/build_tools" class="wikilink1" title="build_tools">build tools</a> (or from <a href="http://mamedev.org/tools/" class="urlextern" title="http://mamedev.org/tools/" rel="nofollow">MAMEDev.org</a>) and follow the instructions to install them. To verify your install, open a command line window and try the following:
+</p>
+<pre class="code">C:\&gt;gcc --version
+gcc (GCC) 4.4.3 20091223 (prerelease) r155431
+Copyright (C) 2009 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</pre>
+<p>
+The output should be the same or similar. If there is an error message like this:
+</p>
+<pre class="code">C:\&gt;gcc --version
+'gcc' is not recognized as an internal or external command,
+operable program or batch file.</pre>
+<p>
+Then your path environment variable is not setup correctly. To fix this temporarily, use the following command:
+</p>
+<pre class="code">C:\&gt;path C:\MinGW\mingw64-w32\bin;%path%</pre>
+<p>
+
+(32-bit)
+</p>
+<pre class="code">C:\&gt;path C:\MinGW\mingw64-w64\bin;%path%</pre>
+<p>
+
+(64-bit)
+</p>
+
+<p>
+If you installed the tools into a different directory, change the location appropriately.
+
+</p>
+
+</div>
+<!-- SECTION "Setting up the build tools on Windows" [1028-2104] -->
+<h2><a name="building_mess_on_windows" id="building_mess_on_windows">Building MESS on Windows</a></h2>
+<div class="level2">
+
+<p>
+
+You are now ready to compile <acronym title="Multi Emulator Super System">MESS</acronym>. To do so, change to the directory where you installed the <acronym title="Multi Emulator Super System">MESS</acronym> (and <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>) sources using the <code>cd</code> command and drive letters. For example:
+</p>
+<pre class="code">C:\&gt;D:
+
+D:\&gt;cd mess
+
+D:\mess&gt;</pre>
+<p>
+To start the build process, type &nbsp;&nbsp;<code>make TARGET=mess</code>
+</p>
+<pre class="code">D:\mess&gt;make TARGET=mess
+mkdir.exe -p obj/windows/mess
+mkdir.exe -p obj/windows/mess/build
+mkdir.exe -p obj/windows/mess/emu/audio
+mkdir.exe -p obj/windows/mess/emu/cpu
+mkdir.exe -p obj/windows/mess/emu/cpu/apexc
+...</pre>
+<p>
+
+This builds the code mess executables…
+</p>
+
+<p>
+When it's finished, you will have a new executable, <code>mess.exe</code>.
+</p>
+
+<p>
+You will need to create <acronym title="Multi Emulator Super System">MESS</acronym>'s config files before running, to do that, type <code>mess -cc</code>:
+</p>
+<pre class="code">D:\mess&gt;mess -cc</pre>
+<p>
+You have now fully compiled <acronym title="Multi Emulator Super System">MESS</acronym>, have fun! :)
+</p>
+
+<p>
+To compile the <acronym title="Multi Emulator Super System">MESS</acronym> UI, add <code>MESSUI=1</code>:
+</p>
+<pre class="code">D:\mess&gt;make TARGET=mess MESSUI=1</pre>
+<p>
+To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools (chdman, imgtool, etc.), add <code>tools</code>:
+</p>
+<pre class="code">D:\mess&gt;make TARGET=mess tools</pre>
+<p>
+If you are building on a windows platform and you want to build the mess.chm help file (you will need to have installed the <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=00535334-c8a6-452f-9aa0-d597d16580cc&amp;displaylang=en" class="urlextern" title="http://www.microsoft.com/downloads/details.aspx?FamilyID=00535334-c8a6-452f-9aa0-d597d16580cc&amp;displaylang=en" rel="nofollow">HTML Help Workshop</a>), type:
+
+</p>
+<pre class="code">D:\mess&gt;make mess.chm TARGET=mess</pre>
+<p>
+To compile a symbols-enabled version for backtracing add <code>SYMBOLS=1</code>:
+</p>
+<pre class="code">D:\mess&gt;make TARGET=mess SYMBOLS=1</pre>
+</div>
+<!-- SECTION "Building MESS on Windows" [2105-3581] -->
+<h2><a name="building_mess_on_nix" id="building_mess_on_nix">Building MESS on *nix</a></h2>
+<div class="level2">
+
+<p>
+
+Once you've <a href="#setting_up_the_source" title="compiling_mess ↵" class="wikilink1">set up the source</a>, building <acronym title="Multi Emulator Super System">MESS</acronym> on Linux or other UNIX-based systems is simple (assuming you have the appropriate packages installed for make, gcc, etc.):
+</p>
+<pre class="code">$ make TARGET=mess</pre>
+<p>
+To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools (chdman, imgtool, etc.), add <code>tools</code>:
+</p>
+<pre class="code">$ make TARGET=mess tools</pre>
+<p>
+<acronym title="Multi Emulator Super System">MESS</acronym> does not provide a 'make install' target at this time; binaries are placed in the top-level <acronym title="Multi Emulator Super System">MESS</acronym> directory.
+</p>
+
+</div>
+<!-- SECTION "Building MESS on *nix" [3582-4069] -->
+<h2><a name="see_also" id="see_also">See also</a></h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a href="http://mamedev.org/devwiki/index.php/Building_MAME_using_Microsoft_Visual_Studio_compilers" class="urlextern" title="http://mamedev.org/devwiki/index.php/Building_MAME_using_Microsoft_Visual_Studio_compilers" rel="nofollow">Building MAME using Microsoft Visual Studio compilers</a></div>
+</li>
+</ul>
+
+</div>
+<!-- SECTION "See also" [4070-] --></body></html>

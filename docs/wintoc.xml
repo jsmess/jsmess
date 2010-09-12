@@ -2,6 +2,7 @@
 <help title="MESS Help">
 	<topic		filepath="windows/main.htm"		text="Overview"/>
 	<topic		filepath="messnew.txt"			text="What's new?"/>
+	<topic		filepath="howto.htm"			text="MESS User's Manual"/>
 	<topic		filepath="windows/install.htm"	text="Installing MESS"/>
 	<topic		filepath="windows/choice.htm"	text="Choosing which MESS"/>
 	<topic		filepath="windows/update.htm"	text="Updating MESS"/>
@@ -12,7 +13,7 @@
 	<topic		filepath="windows/win32cmd.htm"	text="Using MESS at the Command Line"/>
 	<topic		filepath="windows/config.htm"	text="MESS Configuration Files"/>
 	
-	<folder text="The MESS Front End">
+	<folder text="The MESSUI Front End">
 		<topic	filepath="windows/guiconf.htm"	text="Configuration"/>
 		<topic	filepath="windows/guiuse.htm"	text="Usage"/>
 	</folder>
