@@ -101,6 +101,7 @@ static struct {
 	int		adpcm_clock_divider;
 	UINT16  msm_start_addr;
 	UINT16	msm_end_addr;
+	UINT16	msm_half_addr;
 	UINT8	msm_nibble;
 	UINT8	msm_idle;
 	/* SCSI signals */
@@ -456,10 +457,10 @@ static void pce_cd_msm5205_int(running_device *device)
 {
 	static UINT8 msm_data;
 
+	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+
 	if ( pce_cd.msm_idle )
 		return;
-
-	//popmessage("%08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
 	if ( ! pce_cd.adpcm_clock_count )
 	{
@@ -473,13 +474,13 @@ static void pce_cd_msm5205_int(running_device *device)
 		{
 			pce_cd.msm_start_addr++;
 
-			if(pce_cd.msm_start_addr >= ((pce_cd.msm_end_addr-pce_cd.msm_start_addr) / 2))
+			if(pce_cd.msm_start_addr >= pce_cd.msm_half_addr)
 				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_HALF_PLAY);
 
 			if(pce_cd.msm_start_addr == pce_cd.msm_end_addr)
 				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_FULL_PLAY);
 
-			if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
+			if(pce_cd.msm_start_addr >= pce_cd.msm_end_addr)
 			{
 				adpcm_stop();
 				msm5205_reset_w(device, 1);
@@ -1239,6 +1240,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			pce_cd.adpcm_write_ptr = 0;
 			pce_cd.msm_start_addr = 0;
 			pce_cd.msm_end_addr = 0;
+			pce_cd.msm_half_addr = 0;
 			pce_cd.msm_nibble = 0;
 			adpcm_stop();
 			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
@@ -1248,6 +1250,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		{
 			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
 			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
+			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / 2)) & 0xffff;
 			pce_cd.msm_nibble = 0;
 			adpcm_play();
 			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
