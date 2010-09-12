@@ -395,6 +395,7 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if (joystick_port_select <= 4)
 	{
+		/* Note: six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this on real HW. */
 		if (joy_6b_packet[joystick_port_select])	// 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
 			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f);
 		else	// directions + I, II, Run, Select
@@ -460,7 +461,7 @@ static void pce_cd_msm5205_int(running_device *device)
 {
 	static UINT8 msm_data;
 
-	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+//	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
 	if ( pce_cd.msm_idle )
 		return;
@@ -1073,7 +1074,7 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state )
 		if ( state == ASSERT_LINE )
 		{
 			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_FULL_PLAY;
-			printf("x %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
+			//printf("x %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
 		}
 		else
 		{
@@ -1084,7 +1085,7 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state )
 		if ( state == ASSERT_LINE )
 		{
 			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_HALF_PLAY;
-			printf("y %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
+			//printf("y %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
 		}
 		else
 		{
