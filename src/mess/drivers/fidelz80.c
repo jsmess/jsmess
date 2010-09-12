@@ -113,105 +113,221 @@ add me
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
+#include "sound/beep.h"
 #include "sound/s14001a.h"
-//#include "dectalk.lh" //  hack to avoid screenless system crash
-#include "machine/terminal.h"
+#include "fidelz80.lh"
+
+//#include "debugger.h"
 
 /* Defines */
 
-/* Components */
-
-static struct
+class fidelz80_state : public driver_device
 {
-UINT8 data[8]; // what is this for? to suppress the scalar initializer warning?
-UINT8 led_7seg_data[4]; // data for the 4x 7seg leds, bits are 0bxABCDEFG
-UINT8 led_data; // data for the two individual leds, in 0bxxxx12xx format
-UINT8 led_selected; // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
-UINT8 columnlatch;
-} fidelz80={ {0}};
+public:
+	fidelz80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 kp_matrix;		// keypad matrix
+	UINT8 led_7seg_data[4];	// data for the 4x 7seg leds, bits are 0bxABCDEFG
+	UINT8 led_data;			// data for the two individual leds, in 0bxxxx12xx format
+	UINT8 led_selected;		// 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
+	UINT8 digit_data;		// data for 7 seg leds
+
+	device_t *beep;
+	device_t *speech;
+};
 
 /* Devices */
 
-/* I8255 Device */
+/******************************************************************************
+    I8255 Device
+******************************************************************************/
 
-/*static READ8_DEVICE_HANDLER( vcc_porta_r )
+void update_display(running_machine *machine)
 {
-    return 0;
-};*/
+	fidelz80_state *state = machine->driver_data<fidelz80_state>();
+	UINT8 digit_data = BITSWAP8( state->digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
-static READ8_DEVICE_HANDLER( vcc_portb_r )
-{
-	device = device->machine->device("speech");
-	if (s14001a_bsy_r(device) != 0)
-		return 0x80;
-	else
-		return 0;
-};
+	output_set_led_value(0, (state->led_data & 0x08) ? 1 : 0);
+	output_set_led_value(1, (state->led_data & 0x04) ? 1 : 0);
 
-static READ8_DEVICE_HANDLER( vcc_portc_r )
-{
-	return 0xFF; // TODO: emulate button input
-};
-
-static WRITE8_DEVICE_HANDLER( vcc_porta_w )
-{
-	device = device->machine->device("speech");
-	s14001a_set_volume(device, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-	s14001a_reg_w(device, data & 0x3f);
-	s14001a_rst_w(device, (data & 0x80)>>7);
-	/* handle digits below */
-	if (fidelz80.led_selected & 0x4)
-		fidelz80.led_7seg_data[0] = data&0x7F;
-	if (fidelz80.led_selected & 0x8)
-		fidelz80.led_7seg_data[1] = data&0x7F;
-	if (fidelz80.led_selected & 0x10)
-		fidelz80.led_7seg_data[2] = data&0x7F;
-	if (fidelz80.led_selected & 0x20)
-		fidelz80.led_7seg_data[3] = data&0x7F;
-};
-
-static WRITE8_DEVICE_HANDLER( vcc_portb_w )
-{
-	if (data&0x1) // common for two leds
+	if (state->led_selected&0x04)
 	{
-		fidelz80.led_data = (data&0xc);
+		output_set_digit_value(0, digit_data);
+		state->led_7seg_data[0] = digit_data;
 	}
-	fidelz80.led_selected = (data&0x3d);
+	if (state->led_selected&0x08)
+	{
+		output_set_digit_value(1, digit_data);
+		state->led_7seg_data[1] = digit_data;
+	}
+	if (state->led_selected&0x10)
+	{
+		output_set_digit_value(2, digit_data);
+		state->led_7seg_data[2] = digit_data;
+	}
+	if (state->led_selected&0x20)
+	{
+		output_set_digit_value(3, digit_data);
+		state->led_7seg_data[3] = digit_data;
+	}
+}
+
+static READ8_DEVICE_HANDLER( fidelz80_portc_r )
+{
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	UINT8 data = 0xff;
+
+	switch (state->kp_matrix & 0xf0)
+	{
+		case 0xe0:
+			data = input_port_read(device->machine, "LINE1");
+			break;
+		case 0xd0:
+			data = input_port_read(device->machine, "LINE2");
+			break;
+		case 0xb0:
+			data = input_port_read(device->machine, "LINE3");
+			break;
+		case 0x70:
+			data = input_port_read(device->machine, "LINE4");
+			break;
+	}
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER( fidelz80_portb_w )
+{
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	if (!(data & 0x80))
+	{
+		if (data&0x1) // common for two leds
+			state->led_data = (data&0xc);
+
+		state->led_selected = data;
+
+		update_display(device->machine);
+	}
+
 	// ignoring the language switch enable for now, is bit 0x40
 };
 
-static WRITE8_DEVICE_HANDLER( vcc_portc_w )
+static WRITE8_DEVICE_HANDLER( fidelz80_portc_w )
 {
-	fidelz80.columnlatch = (data&0x80);
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	state->kp_matrix = data;
+};
+
+static READ8_DEVICE_HANDLER( cc10_portb_r )
+{
+	/*
+	x--- ---- level select
+	-xxx xxxx ??
+	*/
+
+	return input_port_read(device->machine, "LEVEL");
+}
+
+static WRITE8_DEVICE_HANDLER( cc10_porta_w )
+{
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	beep_set_state(state->beep, (data & 0x80) ? 0 : 1);
+
+	state->digit_data = data;
+
+	update_display(device->machine);
+}
+
+static READ8_DEVICE_HANDLER( vcc_portb_r )
+{
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	if (s14001a_bsy_r(state->speech) != 0)
+		return 0x80;
+	else
+		return 0x00;
+}
+
+static WRITE8_DEVICE_HANDLER( vcc_porta_w )
+{
+	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+
+	s14001a_set_volume(state->speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	s14001a_reg_w(state->speech, data & 0x3f);
+	s14001a_rst_w(state->speech, (data & 0x80)>>7);
+
+	if (!(data & 0x80))
+	{
+		state->digit_data = data;
+
+		update_display(device->machine);
+	}
+}
+
+static I8255A_INTERFACE( cc10_ppi8255_intf )
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(cc10_portb_r),
+	DEVCB_HANDLER(fidelz80_portc_r),
+	DEVCB_HANDLER(cc10_porta_w),
+	DEVCB_HANDLER(fidelz80_portb_w),
+	DEVCB_HANDLER(fidelz80_portc_w)
 };
 
 static I8255A_INTERFACE( vcc_ppi8255_intf )
 {
 	DEVCB_NULL, // only bit 6 is readable (and only sometimes) and I'm not emulating the language latch unless needed
 	DEVCB_HANDLER(vcc_portb_r), // bit 7 is readable and is the done line from the s14001a
-	DEVCB_HANDLER(vcc_portc_r), // bits 0,1,2,3 are readable, have to do with input
+	DEVCB_HANDLER(fidelz80_portc_r), // bits 0,1,2,3 are readable, have to do with input
 	DEVCB_HANDLER(vcc_porta_w), // display segments and s14001a lines
-	DEVCB_HANDLER(vcc_portb_w), // display digits and led dots
-	DEVCB_HANDLER(vcc_portc_w), // bits 4,5,6,7 are writable, have to do with input
+	DEVCB_HANDLER(fidelz80_portb_w), // display digits and led dots
+	DEVCB_HANDLER(fidelz80_portc_w), // bits 4,5,6,7 are writable, have to do with input
 };
+
+/******************************************************************************
+    basic machine
+******************************************************************************/
+
+static MACHINE_START(cc10)
+{
+	fidelz80_state *state = machine->driver_data<fidelz80_state>();
+
+	state->beep = machine->device("beep");
+}
+
+static MACHINE_START(vcc)
+{
+	fidelz80_state *state = machine->driver_data<fidelz80_state>();
+
+	state->speech = machine->device("speech");
+}
 
 static MACHINE_RESET( fidelz80 )
 {
+	fidelz80_state *state = machine->driver_data<fidelz80_state>();
+
 	// data for the 4x 7seg leds, bits are 0bxABCDEFG
-	fidelz80.led_7seg_data[0] = 0;
-	fidelz80.led_7seg_data[1] = 0;
-	fidelz80.led_7seg_data[2] = 0;
-	fidelz80.led_7seg_data[3] = 0;
-	fidelz80.led_data = 0;
-	fidelz80.led_selected = 0;
-	fidelz80.columnlatch = 0;
+	memset(state->led_7seg_data, 0, ARRAY_LENGTH(state->led_7seg_data));
+	state->led_data = 0;
+	state->led_selected = 0;
+	state->kp_matrix = 0;
+	state->digit_data = 0;
 }
 
-
-
 /******************************************************************************
- Address Maps
+    Address Maps
 ******************************************************************************/
+
+static ADDRESS_MAP_START(cc10_z80_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x3000, 0x31ff) AM_RAM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vcc_z80_mem, ADDRESS_SPACE_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
@@ -221,64 +337,107 @@ static ADDRESS_MAP_START(vcc_z80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vcc_z80_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(fidel_z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("vcc_ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip
 ADDRESS_MAP_END
 
 
 /******************************************************************************
  Input Ports
 ******************************************************************************/
+
 static INPUT_PORTS_START( fidelz80 )
-	PORT_INCLUDE(generic_terminal)
+	PORT_START("LEVEL")		// cc10 only
+		PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
+		PORT_CONFSETTING( 0x00, "10" )
+		PORT_CONFSETTING( 0x80, "3" )
+
+	PORT_START("LINE1")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5)
+
+	PORT_START("LINE2")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_D)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6)
+
+	PORT_START("LINE3")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7)
+
+	PORT_START("LINE4")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8)
 INPUT_PORTS_END
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( null_kbd_put )
-{
-}
-
-static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
-{
-	DEVCB_HANDLER(null_kbd_put)
-};
-
-static MACHINE_CONFIG_START( vcc, driver_device )
+static MACHINE_CONFIG_START( cc10, fidelz80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)
-    MDRV_CPU_IO_MAP(vcc_z80_io)
+    MDRV_CPU_PROGRAM_MAP(cc10_z80_mem)
+    MDRV_CPU_IO_MAP(fidel_z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_START(cc10)
     MDRV_MACHINE_RESET(fidelz80)
 
     /* video hardware */
-    //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
-	MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MDRV_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
-	MDRV_I8255A_ADD("vcc_ppi8255", vcc_ppi8255_intf)
+	MDRV_I8255A_ADD("ppi8255", cc10_ppi8255_intf)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO( "mono" )
+	MDRV_SOUND_ADD( "beep", BEEP, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( vcc, fidelz80_state )
+    /* basic machine hardware */
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+    MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)
+    MDRV_CPU_IO_MAP(fidel_z80_io)
+    MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_START(vcc)
+    MDRV_MACHINE_RESET(fidelz80)
+
+    /* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_fidelz80)
+
+	/* other hardware */
+	MDRV_I8255A_ADD("ppi8255", vcc_ppi8255_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speech", S14001A, 25000) // around 25khz
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
 MACHINE_CONFIG_END
-
 
 
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
 
-ROM_START(vcc)
+ROM_START( cc10 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cc10.bin",   0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63))
+ROM_END
 
+ROM_START(vcc)
     ROM_REGION(0x10000, "maincpu", 0)
     ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257BB5AB) SHA1(F7589225BB8E5F3EAC55F23E2BD526BE780B38B5)) // 32014.VCC???
     ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(F33095E7) SHA1(692FCAB1B88C910B74D04FE4D0660367AEE3F4F0))
@@ -295,5 +454,6 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
+COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, 0,      "Fidelity Electronics",   "Chess Challenger 10",						GAME_NOT_WORKING )
 COMP( 1982, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
 

@@ -1646,7 +1646,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/c10.o		\
 	$(MESS_DRIVERS)/casloopy.o 	\
-	$(MESS_DRIVERS)/cc10.o		\
 	$(MESS_DRIVERS)/chaos.o 	\
 	$(MESS_DRIVERS)/cd2650.o	\
 	$(MESS_DRIVERS)/codata.o	\
@@ -1756,7 +1755,6 @@ $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
-$(MESS_DRIVERS)/cc10.o:		$(MESS_LAYOUT)/cc10.lh
 $(MESS_DRIVERS)/cdi.o:		$(MESS_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
@@ -1766,6 +1764,7 @@ $(MESS_DRIVERS)/e01.o:		$(MESS_LAYOUT)/e01.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
+$(MESS_DRIVERS)/fidelz80.o:	$(MESS_LAYOUT)/fidelz80.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/k1003.o:	$(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
