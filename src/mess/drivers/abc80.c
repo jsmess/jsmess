@@ -343,6 +343,8 @@ static INPUT_PORTS_START( abc80 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_INCLUDE(luxor_55_10828)
 INPUT_PORTS_END
 
 /* Sound Interface */
@@ -488,7 +490,7 @@ static const cassette_config abc80_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_10828_ABCBUS("abc830") },
+	{ LUXOR_55_10828_ABCBUS("luxor_55_10828") },
 	{ NULL }
 };
 
@@ -535,7 +537,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 
 	/* Luxor Conkort 55-10828 */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_LUXOR_55_10828_ADD("abc830", ABCBUS_TAG)
+	MDRV_LUXOR_55_10828_ADD("luxor_55_10828", ABCBUS_TAG)
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(abc80_video)

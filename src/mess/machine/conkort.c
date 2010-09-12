@@ -51,7 +51,7 @@ Notes:
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
     SW1     - Disk drive type (SS/DS, SD/DD)
-    S1      -
+    S1      - ABC bus card address bit 0
     S2      -
     S3      -
     S4      -
@@ -60,7 +60,7 @@ Notes:
     S7      -
     S8      -
     S9      -
-    LD1     -
+    LD1     - LED
 
 PCB Layout
 ----------
@@ -170,13 +170,17 @@ Notes:
         0704: rr   a
         0706: call $073F
 
-    - DS/DD SS/DS jumpers
-    - S1-S5 jumpers
+    - S2-S5 jumpers
+	- ABC80 ERR 48 on boot
+	- side select makes controller go crazy and try to WRITE_TRK
 
     Fast Controller
     ---------------
+	- controller reads a couple of sectors on boot, bails out, and starts to STEP_OUT ad infinitum
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
 	- status bit 0 (busy) ?
+	- 2KB RAM option
+	- some SW2 options make controller try to WRITE_TRK
 
 */
 
@@ -218,6 +222,8 @@ struct _slow_t
 	int fdc_irq;			/* floppy interrupt */
 	int fdc_drq;			/* floppy data request */
 	int wait_enable;		/* wait enable */
+	int sel0;				/* drive select 0 */
+	int sel1;				/* drive select 1 */
 
 	/* devices */
 	running_device *bus;
@@ -282,8 +288,9 @@ INLINE conkort_config *get_safe_config(running_device *device)
 WRITE8_DEVICE_HANDLER( luxor_55_10828_cs_w )
 {
 	slow_t *conkort = get_safe_token_slow(device);
+	UINT8 address = 0x2c | BIT(input_port_read(device->machine, "luxor_55_10828:S1"), 0);
 
-	conkort->cs = (data == 0x2d); // TODO: bit 0 of this is configurable with S1
+	conkort->cs = (data == address);
 }
 
 READ8_DEVICE_HANDLER( luxor_55_10828_inp_r )
@@ -385,6 +392,8 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
 //  if (BIT(data, 2)) wd17xx_set_drive(device, 2);
+	conkort->sel0 = BIT(data, 0);
+	conkort->sel1 = BIT(data, 1);
 
 	/* motor enable */
 	floppy_mon_w(conkort->image0, BIT(data, 3));
@@ -393,15 +402,13 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 
 	/* disk side selection */
-//  wd17xx_set_side(device, BIT(data, 4));
+	//wd17xx_set_side(device, BIT(data, 4));
 
 	/* wait enable */
 	conkort->wait_enable = BIT(data, 6);
 
 	/* FDC master reset */
 	wd17xx_mr_w(device, BIT(data, 7));
-
-	logerror("CTRL %02x\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER( slow_status_w )
@@ -481,7 +488,7 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_cs_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	conkort->cs = (data == input_port_read(device->machine, "abc830:SW3"));
+	conkort->cs = (data == input_port_read(device->machine, "luxor_55_21046:SW3"));
 }
 
 READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
@@ -557,49 +564,19 @@ WRITE_LINE_DEVICE_HANDLER( luxor_55_21046_rst_w )
 
 static READ8_DEVICE_HANDLER( fast_3d_r )
 {
-	/*
-
-		bit		description
-
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
-
-	*/
-
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	conkort->busy = 0;
-	logerror("3d read %02x\n", conkort->data_in);
+
 	return conkort->data_in;
 }
 
 static WRITE8_DEVICE_HANDLER( fast_4d_w )
 {
-	/*
-
-		bit		description
-
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
-
-	*/
-
 	fast_t *conkort = get_safe_token_fast(device->owner());
 	
 	conkort->busy = 0;
-	logerror("4d write %02x\n", data);
+
 	conkort->data_out = data;
 }
 
@@ -698,7 +675,7 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 		0		3A.8 (busy)
 		1		50-pin floppy connector pin 10, not used
 		2		3A.12 (SW2)
-		3		?
+		3		? GND
 		4		SW1-1
 		5		SW1-2
 		6		SW1-3
@@ -714,12 +691,12 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 	data |= (conkort->busy & BIT(conkort->status, 0));
 
 	/* SW1 */
-	UINT8 sw1 = input_port_read(device->machine, "abc830:SW1") & 0x0f;
+	UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
 
 	data |= sw1 << 4;
 
 	/* SW2 */
-	UINT8 sw2 = input_port_read(device->machine, "abc830:SW2") & 0x0f;
+	UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
 
 	int sw2_1 = BIT(offset, 8) & BIT(sw2, 0);
 	int sw2_2 = BIT(offset, 9) & BIT(sw2, 1);
@@ -738,7 +715,7 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 
 static ADDRESS_MAP_START( slow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc830:abc830", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("luxor_55_10828:abc830", 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -755,7 +732,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fast_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("abc830:conkort", 0) // TODO , 0x2000
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("luxor_55_21046:conkort", 0x2000)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -776,69 +753,89 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( luxor_55_10828 )
 	PORT_START("luxor_55_10828:SW1")
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x04, "Double" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x08, "Double" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+
+	PORT_START("luxor_55_10828:S1")
+	PORT_DIPNAME( 0x01, 0x01, "Card Address" ) PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(    0x00, "44" )
+	PORT_DIPSETTING(    0x01, "45" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( luxor_55_21046 )
-	PORT_START("abc830:SW1")
+	PORT_START("luxor_55_21046:SW1")
 	// ABC 838
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
 	// ABC 830
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x04, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x08, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x08, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
 	// ABC 832/834/850
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x04, "40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Tracks" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x08, "40" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x04, "40" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Tracks" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x08, "40" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
 
-	PORT_START("abc830:SW2")
+	PORT_START("luxor_55_21046:SW2")
 	PORT_DIPNAME( 0x0f, 0x0b, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
-	PORT_DIPSETTING(    0x0e, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
-	PORT_DIPSETTING(    0x0d, "BASF 6138 (ABC 850)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
-	PORT_DIPSETTING(    0x0c, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
-	PORT_DIPSETTING(    0x0b, "BASF 6118 (ABC 832)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
-	PORT_DIPSETTING(    0x0a, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
-	PORT_DIPSETTING(    0x07, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x06, "MPI 51 (ABC 830)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x01, "BASF 6105 (ABC 838)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x00, "BASF 6106 (ABC 838)" ) PORT_CONDITION("abc830:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
+	PORT_DIPSETTING(    0x0e, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
+	PORT_DIPSETTING(    0x0d, "BASF 6138 (ABC 850)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
+	PORT_DIPSETTING(    0x0c, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
+	PORT_DIPSETTING(    0x0b, "BASF 6118 (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
+	PORT_DIPSETTING(    0x0a, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
+	PORT_DIPSETTING(    0x07, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x06, "MPI 51 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x01, "BASF 6105 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x00, "BASF 6106 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
 	
-	PORT_START("abc830:SW3")
+	PORT_START("luxor_55_21046:SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2c, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x2d, "45 (ABC 830)" )
 	PORT_DIPSETTING(    0x2e, "46 (ABC 838)" )
+
+	PORT_START("luxor_55_21046:S6")
+	PORT_DIPNAME( 0x01, 0x01, "RAM Size" ) PORT_DIPLOCATION("S6:1")
+	PORT_DIPSETTING(    0x00, "2 KB" )
+	PORT_DIPSETTING(    0x01, "8 KB" )
+
+	PORT_START("luxor_55_21046:S8")
+	PORT_DIPNAME( 0x01, 0x01, "Drive Type" ) PORT_DIPLOCATION("S8:1")
+	PORT_DIPSETTING(    0x00, "8\"" )
+	PORT_DIPSETTING(    0x01, "5.25\"" )
+
+	PORT_START("luxor_55_21046:S9")
+	PORT_DIPNAME( 0x01, 0x01, "RDY Pin" ) PORT_DIPLOCATION("S9:1")
+	PORT_DIPSETTING(    0x00, "P2-6 (8\")" )
+	PORT_DIPSETTING(    0x01, "P2-34 (5.25\")" )
 INPUT_PORTS_END
 
 /* Z80 PIO */
@@ -876,13 +873,18 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
-	UINT8 data = 4;
+	UINT8 data = 0x04;
 
 	/* single/double sided drive */
-//  data |= 0x01;
+	UINT8 sw1 = input_port_read(device->machine, "luxor_55_10828:SW1") & 0x0f;
+	int ds0 = conkort->sel0 ? BIT(sw1, 0) : 1;
+	int ds1 = conkort->sel1 ? BIT(sw1, 1) : 1;
+	data |= !(ds0 & ds1);
 
 	/* single/double density drive */
-	data |= 0x02;
+	int dd0 = conkort->sel0 ? BIT(sw1, 2) : 1;
+	int dd1 = conkort->sel1 ? BIT(sw1, 3) : 1;
+	data |= !(dd0 & dd1) << 1;
 
 	/* radial/binary drive select */
 	data |= 0x10;
@@ -1131,10 +1133,10 @@ ROM_START( luxor_55_10828 )
 ROM_END
 
 ROM_START( luxor_55_21046 )
-	ROM_REGION( 0x10000, "conkort", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "fast108.6cd", 0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.6cd", 0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
-	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
+	ROM_REGION( 0x4000, "conkort", ROMREGION_LOADBYNAME ) // A13 is always high
+	ROM_LOAD( "fast108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
 ROM_END
 
 ROM_START( myab_turbo_kontroller )
@@ -1186,6 +1188,8 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 	state_save_register_device_item(device, 0, conkort->fdc_drq);
 	state_save_register_device_item(device, 0, conkort->wait_enable);
+	state_save_register_device_item(device, 0, conkort->sel0);
+	state_save_register_device_item(device, 0, conkort->sel1);
 
 	/* patch out protection checks */
 	UINT8 *rom = device->subregion("abc830")->base();
@@ -1259,6 +1263,7 @@ static DEVICE_START( luxor_55_21046 )
 	conkort->image0 = device->subdevice(FLOPPY_0);
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
+	conkort->dma_irq = 0;
 	conkort->fdc_irq = 0;
 	conkort->busy = 0;
 
@@ -1268,6 +1273,8 @@ static DEVICE_START( luxor_55_21046 )
 	state_save_register_device_item(device, 0, conkort->data_in);
 	state_save_register_device_item(device, 0, conkort->data_out);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
+	state_save_register_device_item(device, 0, conkort->dma_irq);
+	state_save_register_device_item(device, 0, conkort->busy);
 }
 
 /*-------------------------------------------------
