@@ -178,7 +178,6 @@ Notes:
     ---------------
 	- controller reads a couple of sectors on boot, bails out, and starts to STEP_OUT ad infinitum
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
-	- status bit 0 (busy) ?
 	- 2KB RAM option
 	- some SW2 options make controller try to WRITE_TRK
 
@@ -244,6 +243,7 @@ struct _fast_t
 	int fdc_irq;			/* FDC interrupt */
 	int dma_irq;			/* DMA interrupt */
 	int busy;				/* busy bit */
+	int force_busy;			/* force busy bit */
 
 	/* devices */
 	running_device *bus;
@@ -396,10 +396,11 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 	conkort->sel1 = BIT(data, 1);
 
 	/* motor enable */
-	floppy_mon_w(conkort->image0, BIT(data, 3));
-	floppy_mon_w(conkort->image1, BIT(data, 3));
-	floppy_drive_set_ready_state(conkort->image0, 1, 1);
-	floppy_drive_set_ready_state(conkort->image1, 1, 1);
+	int mtron = BIT(data, 3);
+	floppy_mon_w(conkort->image0, mtron);
+	floppy_mon_w(conkort->image1, mtron);
+	floppy_drive_set_ready_state(conkort->image0, !mtron, 1);
+	floppy_drive_set_ready_state(conkort->image1, !mtron, 1);
 
 	/* disk side selection */
 	//wd17xx_set_side(device, BIT(data, 4));
@@ -495,15 +496,15 @@ READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	UINT8 data = 0xff;
+	UINT8 data = 0;
 
 	if (conkort->cs)
 	{
-		// LS240 inverts the data, D4/D5 not connected
-		data = (~conkort->status & 0xcf) | 0x30 | !(conkort->busy & BIT(conkort->status, 0));
+		data = (conkort->status & 0xce) | conkort->busy;
 	}
 
-	return data;
+	// LS240 inverts the data
+	return data ^ 0xff;
 }
 
 READ8_DEVICE_HANDLER( luxor_55_21046_inp_r )
@@ -566,7 +567,10 @@ static READ8_DEVICE_HANDLER( fast_3d_r )
 {
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	conkort->busy = 0;
+	if (BIT(conkort->status, 0))
+	{
+		conkort->busy = 0;
+	}
 
 	return conkort->data_in;
 }
@@ -575,7 +579,10 @@ static WRITE8_DEVICE_HANDLER( fast_4d_w )
 {
 	fast_t *conkort = get_safe_token_fast(device->owner());
 	
-	conkort->busy = 0;
+	if (BIT(conkort->status, 0))
+	{
+		conkort->busy = 0;
+	}
 
 	conkort->data_out = data;
 }
@@ -586,14 +593,14 @@ static WRITE8_DEVICE_HANDLER( fast_4b_w )
 
 		bit		description
 
-		0		busy
-		1		index pulse/DRQ
-		2		track 0/lost data
-		3		CRC error
-		4		seek error/RNF
-		5		head loaded/write fault
-		6		write protect
-		7		not ready
+		0		force busy
+		1		
+		2		
+		3		
+		4		N/C
+		5		N/C
+		6		
+		7		
 
 	*/
 
@@ -601,9 +608,10 @@ static WRITE8_DEVICE_HANDLER( fast_4b_w )
 
 	conkort->status = data;
 
-	if (BIT(data, 0))
+	/* busy */
+	if (!BIT(conkort->status, 0))
 	{
-		conkort->busy = 0;
+		conkort->busy = 1;
 	}
 }
 
@@ -613,12 +621,12 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 
 		bit		description
 
-		0		_MOTEA
-		1		_DRVSB
-		2		_DRVSA
-		3		_MOTEB
+		0		DS0
+		1		DS1
+		2		DS2
+		3		MTRON
 		4		pin 2 of 50-pin floppy connector, not used
-		5		_SIDE1
+		5		SIDE1
 		6
 		7
 
@@ -626,15 +634,17 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	/* motor enable */
-	floppy_mon_w(conkort->image0, !BIT(data, 0));
-	floppy_mon_w(conkort->image1, !BIT(data, 3));
-	floppy_drive_set_ready_state(conkort->image0, 1, 1);
-	floppy_drive_set_ready_state(conkort->image1, 1, 1);
-
 	/* drive select */
-	if (BIT(data, 2)) wd17xx_set_drive(device, 0);
+	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
+	//if (BIT(data, 2)) wd17xx_set_drive(device, 2);
+
+	/* motor enable */
+	int mtron = BIT(data, 3);
+	floppy_mon_w(conkort->image0, !mtron);
+	floppy_mon_w(conkort->image1, !mtron);
+	floppy_drive_set_ready_state(conkort->image0, mtron, 1);
+	floppy_drive_set_ready_state(conkort->image1, mtron, 1);
 
 	/* side select */
 	wd17xx_set_side(device, BIT(data, 5));
@@ -688,7 +698,7 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 	UINT8 data = 0;
 
 	/* busy */
-	data |= (conkort->busy & BIT(conkort->status, 0));
+	data |= conkort->busy;
 
 	/* SW1 */
 	UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
