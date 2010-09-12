@@ -385,15 +385,30 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 	memset(pspages, 0, sizeof(PROPSHEETPAGE) * possiblePropSheets);
 
 	maxPropSheets = 0;
-	
+
 	i = ( isGame ) ? 0 : 2;
 
 	for (; g_propSheets[i].pfnDlgProc; i++)
 	{
+		if (!gamedrv)
+		{
+			if (g_propSheets[i].bOnDefaultPage)
+			{
+				pspages[maxPropSheets].dwSize      = sizeof(PROPSHEETPAGE);
+				pspages[maxPropSheets].dwFlags     = 0;
+				pspages[maxPropSheets].hInstance   = hInst;
+				pspages[maxPropSheets].pszTemplate = MAKEINTRESOURCE(g_propSheets[i].dwDlgID);
+				pspages[maxPropSheets].pfnCallback = NULL;
+				pspages[maxPropSheets].lParam      = 0;
+				pspages[maxPropSheets].pfnDlgProc  = g_propSheets[i].pfnDlgProc;
+				maxPropSheets++;
+			}
+		}
+		else
 		if ((gamedrv != NULL) || g_propSheets[i].bOnDefaultPage)
 		{
 			machine_config config(*gamedrv);
-			
+
 			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(&config, gamedrv))
 			{
 				pspages[maxPropSheets].dwSize      = sizeof(PROPSHEETPAGE);
@@ -407,7 +422,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 			}
 		}
 	}
-	
+
 	if (pnMaxPropSheets)
 		*pnMaxPropSheets = maxPropSheets;
 
