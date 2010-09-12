@@ -63,12 +63,10 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define PCE_ACARD_RAM_SIZE			0x200000
 #define PCE_CD_COMMAND_BUFFER_SIZE	0x100
 
-#define PCE_CD_IRQ_TRANSFER_READY	0x40
-#define PCE_CD_IRQ_TRANSFER_DONE	0x20
-
-#define PCE_CD_SAMPLE_FULL_PLAY		0x08
-#define PCE_CD_SAMPLE_HALF_PLAY		0x04
-#define PCE_CD_SAMPLE_STOP_PLAY		0x00
+#define PCE_CD_IRQ_TRANSFER_READY		0x40
+#define PCE_CD_IRQ_TRANSFER_DONE		0x20
+#define PCE_CD_IRQ_SAMPLE_FULL_PLAY		0x08
+#define PCE_CD_IRQ_SAMPLE_HALF_PLAY		0x04
 
 #define PCE_CD_ADPCM_PLAY_FLAG		0x08
 #define PCE_CD_ADPCM_STOP_FLAG		0x01
@@ -353,7 +351,7 @@ MACHINE_RESET( pce )
 
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
-	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -397,9 +395,8 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if (joystick_port_select <= 4)
 	{
-		if (joy_6b_packet[joystick_port_select])	// directions + III, IV, V, VI
-			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f)
-				| (input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) & 0xf0);
+		if (joy_6b_packet[joystick_port_select])	// 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
+			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f);
 		else	// directions + I, II, Run, Select
 			data = input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]);
 	}
@@ -441,7 +438,7 @@ static void adpcm_stop(void)
 {
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
-	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 	pce_cd.msm_idle = 1;
 }
 
@@ -449,7 +446,7 @@ static void adpcm_play(void)
 {
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_PLAY_FLAG;
-	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 	pce_cd.msm_idle = 0;
 }
 
@@ -463,7 +460,7 @@ static void pce_cd_msm5205_int(running_device *device)
 {
 	static UINT8 msm_data;
 
-//	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
 	if ( pce_cd.msm_idle )
 		return;
@@ -480,14 +477,22 @@ static void pce_cd_msm5205_int(running_device *device)
 		{
 			pce_cd.msm_start_addr++;
 
-			if(pce_cd.msm_start_addr >= pce_cd.msm_half_addr)
-				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_HALF_PLAY);
+			if(pce_cd.msm_start_addr == pce_cd.msm_half_addr)
+			{
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE );
+			}
 
 			if(pce_cd.msm_start_addr == pce_cd.msm_end_addr)
-				pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_FULL_PLAY);
+			{
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, ASSERT_LINE );
+			}
 
 			if(pce_cd.msm_start_addr >= pce_cd.msm_end_addr)
 			{
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
+				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
 				adpcm_stop();
 				msm5205_reset_w(device, 1);
 			}
@@ -1064,11 +1069,33 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state )
 			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_TRANSFER_READY;
 		}
 		break;
+	case PCE_CD_IRQ_SAMPLE_FULL_PLAY:
+		if ( state == ASSERT_LINE )
+		{
+			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_FULL_PLAY;
+			printf("x %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
+		}
+		else
+		{
+			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_SAMPLE_FULL_PLAY;
+		}
+		break;
+	case PCE_CD_IRQ_SAMPLE_HALF_PLAY:
+		if ( state == ASSERT_LINE )
+		{
+			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_HALF_PLAY;
+			printf("y %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
+		}
+		else
+		{
+			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_SAMPLE_HALF_PLAY;
+		}
+		break;
 	default:
 		break;
 	}
 
-	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) )
+	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY | PCE_CD_IRQ_SAMPLE_HALF_PLAY | PCE_CD_IRQ_SAMPLE_FULL_PLAY) )
 	{
 		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE );
 	}
