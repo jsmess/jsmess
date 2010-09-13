@@ -14,15 +14,19 @@ CD Interface Register 0x03 - BRAM lock / CD status
 ---x ---- bram signal
 ---- x--- ADPCM 2
 ---- -x-- ADPCM 1
----- --x- CDDA volume
+---- --x- CDDA left/right speaker select
+
+CD Interface Register 0x05 - CD-DA Volume low 8-bit port
+
+CD Interface Register 0x06 - CD-DA Volume high 8-bit port
 
 CD Interface Register 0x07 - BRAM unlock / CD status
 x--- ---- Enables BRAM
 
 CD Interface Register 0x0c - ADPCM status
-x--- ---- ?
+x--- ---- ADPCM is reading data
 ---- x--- ADPCM playback (0) stopped (1) currently playing
----- -x-- CD -> DMA transfer busy flag
+---- -x-- pending ADPCM data write
 ---- ---x ADPCM playback (1) stopped (0) currently playing
 
 CD Interface Register 0x0d - ADPCM address control
@@ -1228,7 +1232,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 
 	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
 
-	switch( offset )
+	switch( offset & 0xf )
 	{
 	case 0x00:	/* CDC status */
 		/* select device (which bits??) */
@@ -1407,12 +1411,25 @@ READ8_HANDLER( pce_cd_intf_r )
 
 	pce_cd_update(space->machine);
 
-	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
+	if(offset & 0x200 && pce_sys3_card) // Arcade Card handling
 		return pce_cd_acard_r(space,offset);
 
 	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
 
-	switch( offset )
+	if((offset & 0xc0) == 0xc0 && pce_sys3_card) //System 3 Card header handling
+	{
+		switch(offset & 0xcf)
+		{
+			case 0xc1: return 0xaa;
+			case 0xc2: return 0x55;
+			case 0xc3: return 0x00;
+			case 0xc5: return 0xaa;
+			case 0xc6: return 0x55;
+			case 0xc7: return 0x03;
+		}
+	}
+
+	switch( offset & 0xf )
 	{
 	case 0x00:	/* CDC status */
 		data &= 0x07;
@@ -1459,18 +1476,6 @@ READ8_HANDLER( pce_cd_intf_r )
 	case 0x0E:	/* ADPCM playback rate */
 	case 0x0F:	/* ADPCM and CD audio fade timer */
 		return 0;
-	case 0xC1:
-		data = pce_sys3_card ? 0xAA : 0xFF;
-		break;
-	case 0xC2:
-		data = pce_sys3_card ? 0x55 : 0xFF;
-		break;
-	case 0xC5:
-		data = pce_sys3_card ? 0x55 : 0xFF;
-		break;
-	case 0xC6:
-		data = pce_sys3_card ? 0xAA : 0xFF;
-		break;
 	default:
 		data = 0xFF;
 		break;
