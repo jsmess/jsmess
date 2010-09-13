@@ -1097,7 +1097,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define SET 													\
 	P |= _fT;													\
-	logerror("%04x: WARNING H6280 SET\n",PCW)
+	printf("%04x: WARNING H6280 SET\n",PCW)
 
 /* 6280 ********************************************************
  *  SMB Set memory bit
