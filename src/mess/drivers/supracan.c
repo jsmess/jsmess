@@ -470,7 +470,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 //      zzzz ---- ---- ---- X scale
 //      ---- ---x xxxx xxxx X position
 //      [3]
-//      oooo oooo oooo oooo Sprite address
+//      d--- ---- ---- ---- Direct Sprite (use details from here, not looked up in vram)
+//      -ooo oooo oooo oooo Sprite address
 
 	UINT32 skip_count = 0;
     UINT32 start_word = (state->sprite_base_addr >> 1) + skip_count * 4;
@@ -480,6 +481,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 //	printf("frame\n");
 	#define VRAM_MASK (0xffff)
 
+
    for(int i = start_word; i < end_word; i += 4)
 	{
 		int x = supracan_vram[i+2] & 0x01ff;
@@ -487,13 +489,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		int sprite_offset = (supracan_vram[i+3])<< 1;
 
-		sprite_offset &= VRAM_MASK; // there are only 0xffff words of vram? sango is specifying tiles outside of this, why, I'm sure it didn't used to, timing? DMA?
+		//sprite_offset &= VRAM_MASK; // there are only 0xffff words of vram? sango is specifying tiles outside of this, why, I'm sure it didn't used to, timing? DMA?
 
 
 		int bank = (supracan_vram[i+1] & 0xf000) >> 12;
         //int mask = (supracan_vram[i+1] & 0x0300) >> 8;
-		bool hflip = (supracan_vram[i+1] & 0x0800) ? true : false;
-		bool vflip = (supracan_vram[i+1] & 0x0400) ? true : false;
+		bool sprite_xflip = (supracan_vram[i+1] & 0x0800) ? true : false;
+		bool sprite_yflip = (supracan_vram[i+1] & 0x0400) ? true : false;
         //int xscale = (supracan_vram[i+2] & 0xf000) >> 12;
 		const gfx_element *gfx = machine->gfx[region];
 
@@ -513,107 +515,122 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 */
 
 
-
-
 		// wraparound
 		if (y>=0x180) y-=0x200;
 		if (x>=0x180) x-=0x200;
 
 		if(supracan_vram[i+3] != 0)
 		{
-            int xsize = 1 << (supracan_vram[i+1] & 7);
-            int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9) + 1;
-
-			if(vflip)
+			if (supracan_vram[i+3] &0x8000)
 			{
-				for(int ytile = (ysize - 1); ytile >= 0; ytile--)
-				{
-					if(hflip)
-					{
-						for(int xtile = (xsize - 1); xtile >= 0; xtile--)
-						{
-                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-                            bool xflip = (data & 0x0800) ? false : true;
-                            bool yflip = (data & 0x0400) ? false : true;
-                            int palette = (data & 0xf000) >> 12;
-							int xpos = x + ((xsize - 1) - xtile)*8;
-							int ypos = y + ((ysize - 1) - ytile)*8;
+				UINT16 data = supracan_vram[i+3];
+				int tile = (bank * 0x200) + (data & 0x03ff);
+				
+				int palette = (data & 0xf000) >> 12; // this might not be correct, due to the &0x8000 condition above this would force all single tile sprites to be using palette >=0x8 only
+				
+				//printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
 
-							drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,xflip,yflip,
-							xpos,
-							ypos,
-							0);
-
-						}
-					}
-					else
-					{
-						for(int xtile = 0; xtile < xsize; xtile++)
-						{
-                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-                            bool xflip = (data & 0x0800) ? true : false;
-                            bool yflip = (data & 0x0400) ? false : true;
-                            int palette = (data & 0xf000) >> 12;
-
-							int xpos = x + xtile*8;
-							int ypos = y + ((ysize - 1) - ytile)*8;
-
-							drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,xflip,yflip,
-							xpos,
-							ypos,
-							0);
-						}
-					}
-				}
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,sprite_xflip,sprite_yflip,
+					x,
+					y,
+					0);
+			
 			}
 			else
 			{
-				for(int ytile = 0; ytile < ysize; ytile++)
+				int xsize = 1 << (supracan_vram[i+1] & 7);
+				int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9) + 1;
+
+				if(sprite_yflip)
 				{
-					if(hflip)
+					for(int ytile = (ysize - 1); ytile >= 0; ytile--)
 					{
-						for(int xtile = (xsize - 1); xtile >= 0; xtile--)
+						if(sprite_xflip)
 						{
-                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-                            bool xflip = (data & 0x0800) ? false : true;
-                            bool yflip = (data & 0x0400) ? true : false;
-                            int palette = (data & 0xf000) >> 12;
+							for(int xtile = (xsize - 1); xtile >= 0; xtile--)
+							{
+								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
+								int tile = (bank * 0x200) + (data & 0x03ff);
+								int tile_xflip = (data & 0x0800) ? false : true;
+								int tile_yflip = (data & 0x0400) ? false : true;
+								int palette = (data & 0xf000) >> 12;
+								int xpos = x + ((xsize - 1) - xtile)*8;
+								int ypos = y + ((ysize - 1) - ytile)*8;
 
-							int xpos = x + ((xsize - 1) - xtile)*8;
-							int ypos = y + ytile*8;
+								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
+								xpos,
+								ypos,
+								0);
 
-							drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,xflip,yflip,
-							xpos,
-							ypos,
-							0);
+							}
+						}
+						else
+						{
+							for(int xtile = 0; xtile < xsize; xtile++)
+							{
+								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
+								int tile = (bank * 0x200) + (data & 0x03ff);
+								int tile_xflip = (data & 0x0800) ? true : false;
+								int tile_yflip = (data & 0x0400) ? false : true;
+								int palette = (data & 0xf000) >> 12;
+
+								int xpos = x + xtile*8;
+								int ypos = y + ((ysize - 1) - ytile)*8;
+
+								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
+								xpos,
+								ypos,
+								0);
+							}
 						}
 					}
-					else
+				}
+				else
+				{
+					for(int ytile = 0; ytile < ysize; ytile++)
 					{
-						for(int xtile = 0; xtile < xsize; xtile++)
+						if(sprite_xflip)
 						{
-                            UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-                            bool xflip = (data & 0x0800) ? true : false;
-                            bool yflip = (data & 0x0400) ? true : false;
-                            int palette = (data & 0xf000) >> 12;
+							for(int xtile = (xsize - 1); xtile >= 0; xtile--)
+							{
+								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
+								int tile = (bank * 0x200) + (data & 0x03ff);
+								int tile_xflip = (data & 0x0800) ? false : true;
+								int tile_yflip = (data & 0x0400) ? true : false;
+								int palette = (data & 0xf000) >> 12;
 
-							int xpos = x + xtile*8;
-							int ypos = y + ytile*8;
+								int xpos = x + ((xsize - 1) - xtile)*8;
+								int ypos = y + ytile*8;
 
-							drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,xflip,yflip,
-							xpos,
-							ypos,
-							0);
+								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
+								xpos,
+								ypos,
+								0);
+							}
+						}
+						else
+						{
+							for(int xtile = 0; xtile < xsize; xtile++)
+							{
+								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
+								int tile = (bank * 0x200) + (data & 0x03ff);
+								int tile_xflip = (data & 0x0800) ? true : false;
+								int tile_yflip = (data & 0x0400) ? true : false;
+								int palette = (data & 0xf000) >> 12;
 
+								int xpos = x + xtile*8;
+								int ypos = y + ytile*8;
+
+								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
+								xpos,
+								ypos,
+								0);
+
+							}
 						}
 					}
 				}
 			}
-
 #if 0
             if(xscale == 0) continue;
             UINT32 delta = (1 << 17) / xscale;
