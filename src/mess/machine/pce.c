@@ -129,10 +129,10 @@ static struct {
 	/* Arcade Card specific */
 	UINT8	*acard_ram;
 	UINT8	acard_latch;
-	UINT8	acard_ctrl;
-	UINT32	acard_base_addr;
-	UINT16	acard_addr_offset;
-	UINT16	acard_addr_inc;
+	UINT8	acard_ctrl[4];
+	UINT32	acard_base_addr[4];
+	UINT16	acard_addr_offset[4];
+	UINT16	acard_addr_inc[4];
 	UINT32	acard_shift;
 	UINT8	acard_shift_reg;
 
@@ -1488,6 +1488,8 @@ PC Engine Arcade Card emulation
 
 READ8_HANDLER( pce_cd_acard_r )
 {
+	static UINT8 r_num;
+
 	if((offset & 0x2e0) == 0x2e0)
 	{
 		switch(offset & 0x2ef)
@@ -1505,40 +1507,42 @@ READ8_HANDLER( pce_cd_acard_r )
 		return 0;
 	}
 
+	r_num = (offset & 0x30) >> 4;
+
 	switch(offset & 0x0f)
 	{
 		case 0x00:
 		case 0x01:
 		{
 			UINT8 res;
-			if(pce_cd.acard_ctrl & 2)
-				res = pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1fffff];
+			if(pce_cd.acard_ctrl[r_num] & 2)
+				res = pce_cd.acard_ram[(pce_cd.acard_base_addr[r_num] + pce_cd.acard_addr_offset[r_num]) & 0x1fffff];
 			else
-				res = pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1fffff];
+				res = pce_cd.acard_ram[pce_cd.acard_base_addr[r_num] & 0x1fffff];
 
-			if(pce_cd.acard_ctrl & 0x1)
+			if(pce_cd.acard_ctrl[r_num] & 0x1)
 			{
-				if(pce_cd.acard_ctrl & 0x10)
+				if(pce_cd.acard_ctrl[r_num] & 0x10)
 				{
-					pce_cd.acard_base_addr += pce_cd.acard_addr_inc;
-					pce_cd.acard_base_addr &= 0xffffff;
+					pce_cd.acard_base_addr[r_num] += pce_cd.acard_addr_inc[r_num];
+					pce_cd.acard_base_addr[r_num] &= 0xffffff;
 				}
 				else
 				{
-					pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
+					pce_cd.acard_addr_offset[r_num] += pce_cd.acard_addr_inc[r_num];
 				}
 			}
 
 			return res;
 		}
-		case 0x02: return (pce_cd.acard_base_addr >> 0) & 0xff;
-		case 0x03: return (pce_cd.acard_base_addr >> 8) & 0xff;
-		case 0x04: return (pce_cd.acard_base_addr >> 16) & 0xff;
-		case 0x05: return (pce_cd.acard_addr_offset >> 0) & 0xff;
-		case 0x06: return (pce_cd.acard_addr_offset >> 8) & 0xff;
-		case 0x07: return (pce_cd.acard_addr_inc >> 0) & 0xff;
-		case 0x08: return (pce_cd.acard_addr_inc >> 8) & 0xff;
-		case 0x09: return pce_cd.acard_ctrl;
+		case 0x02: return (pce_cd.acard_base_addr[r_num] >> 0) & 0xff;
+		case 0x03: return (pce_cd.acard_base_addr[r_num] >> 8) & 0xff;
+		case 0x04: return (pce_cd.acard_base_addr[r_num] >> 16) & 0xff;
+		case 0x05: return (pce_cd.acard_addr_offset[r_num] >> 0) & 0xff;
+		case 0x06: return (pce_cd.acard_addr_offset[r_num] >> 8) & 0xff;
+		case 0x07: return (pce_cd.acard_addr_inc[r_num] >> 0) & 0xff;
+		case 0x08: return (pce_cd.acard_addr_inc[r_num] >> 8) & 0xff;
+		case 0x09: return pce_cd.acard_ctrl[r_num];
 		default:   return 0;
 	}
 
@@ -1547,7 +1551,7 @@ READ8_HANDLER( pce_cd_acard_r )
 
 WRITE8_HANDLER( pce_cd_acard_w )
 {
-//	printf("ACARD access W %04x %02x\n",offset,data);
+	static UINT8 w_num;
 
 	if((offset & 0x2e0) == 0x2e0)
 	{
@@ -1574,51 +1578,53 @@ WRITE8_HANDLER( pce_cd_acard_w )
 	}
 	else
 	{
+		w_num = (offset & 0x30) >> 4;
+
 		switch(offset & 0x0f)
 		{
 			case 0x00:
 			case 0x01:
-				if(pce_cd.acard_ctrl & 2)
-					pce_cd.acard_ram[(pce_cd.acard_base_addr + pce_cd.acard_addr_offset) & 0x1fffff] = data;
+				if(pce_cd.acard_ctrl[w_num] & 2)
+					pce_cd.acard_ram[(pce_cd.acard_base_addr[w_num] + pce_cd.acard_addr_offset[w_num]) & 0x1fffff] = data;
 				else
-					pce_cd.acard_ram[pce_cd.acard_base_addr & 0x1FFFFF] = data;
+					pce_cd.acard_ram[pce_cd.acard_base_addr[w_num] & 0x1FFFFF] = data;
 
-				if(pce_cd.acard_ctrl & 0x1)
+				if(pce_cd.acard_ctrl[w_num] & 0x1)
 				{
-					if(pce_cd.acard_ctrl & 0x10)
+					if(pce_cd.acard_ctrl[w_num] & 0x10)
 					{
-						pce_cd.acard_base_addr += pce_cd.acard_addr_inc;
-						pce_cd.acard_base_addr &= 0xffffff;
+						pce_cd.acard_base_addr[w_num] += pce_cd.acard_addr_inc[w_num];
+						pce_cd.acard_base_addr[w_num] &= 0xffffff;
 					}
 					else
 					{
-						pce_cd.acard_addr_offset += pce_cd.acard_addr_inc;
+						pce_cd.acard_addr_offset[w_num] += pce_cd.acard_addr_inc[w_num];
 					}
 				}
 
 				break;
 
-			case 0x02: pce_cd.acard_base_addr = (data & 0xff) | (pce_cd.acard_base_addr & 0xffff00); 	break;
-			case 0x03: pce_cd.acard_base_addr = (data << 8) | (pce_cd.acard_base_addr & 0xff00ff); 		break;
-			case 0x04: pce_cd.acard_base_addr = (data << 16) | (pce_cd.acard_base_addr & 0x00ffff); 	break;
-			case 0x05: pce_cd.acard_addr_offset = (data & 0xff) | (pce_cd.acard_addr_offset & 0xff00); 	break;
+			case 0x02: pce_cd.acard_base_addr[w_num] = (data & 0xff) | (pce_cd.acard_base_addr[w_num] & 0xffff00); 	break;
+			case 0x03: pce_cd.acard_base_addr[w_num] = (data << 8) | (pce_cd.acard_base_addr[w_num] & 0xff00ff); 		break;
+			case 0x04: pce_cd.acard_base_addr[w_num] = (data << 16) | (pce_cd.acard_base_addr[w_num] & 0x00ffff); 	break;
+			case 0x05: pce_cd.acard_addr_offset[w_num] = (data & 0xff) | (pce_cd.acard_addr_offset[w_num] & 0xff00); 	break;
 			case 0x06:
-				pce_cd.acard_addr_offset = (data << 8) | (pce_cd.acard_addr_offset & 0x00ff);
+				pce_cd.acard_addr_offset[w_num] = (data << 8) | (pce_cd.acard_addr_offset[w_num] & 0x00ff);
 
-				if((pce_cd.acard_ctrl & 0x60) == 0x40)
+				if((pce_cd.acard_ctrl[w_num] & 0x60) == 0x40)
 				{
-					pce_cd.acard_base_addr += pce_cd.acard_addr_offset + ((pce_cd.acard_ctrl & 0x08) ? 0xff0000 : 0);
-					pce_cd.acard_base_addr &= 0xffffff;
+					pce_cd.acard_base_addr[w_num] += pce_cd.acard_addr_offset[w_num] + ((pce_cd.acard_ctrl[w_num] & 0x08) ? 0xff0000 : 0);
+					pce_cd.acard_base_addr[w_num] &= 0xffffff;
 				}
 				break;
-			case 0x07: pce_cd.acard_addr_inc = (data & 0xff) | (pce_cd.acard_addr_inc & 0xff00); 		break;
-			case 0x08: pce_cd.acard_addr_inc = (data << 8) | (pce_cd.acard_addr_inc & 0x00ff); 			break;
-			case 0x09: pce_cd.acard_ctrl = data & 0x7f; 												break;
+			case 0x07: pce_cd.acard_addr_inc[w_num] = (data & 0xff) | (pce_cd.acard_addr_inc[w_num] & 0xff00); 		break;
+			case 0x08: pce_cd.acard_addr_inc[w_num] = (data << 8) | (pce_cd.acard_addr_inc[w_num] & 0x00ff); 			break;
+			case 0x09: pce_cd.acard_ctrl[w_num] = data & 0x7f; 												break;
 			case 0x0a:
-				if((pce_cd.acard_ctrl & 0x60) == 0x60)
+				if((pce_cd.acard_ctrl[w_num] & 0x60) == 0x60)
 				{
-					pce_cd.acard_base_addr += pce_cd.acard_addr_offset;
-					pce_cd.acard_base_addr &= 0xffffff;
+					pce_cd.acard_base_addr[w_num] += pce_cd.acard_addr_offset[w_num];
+					pce_cd.acard_base_addr[w_num] &= 0xffffff;
 				}
 				break;
 		}
@@ -1627,11 +1633,11 @@ WRITE8_HANDLER( pce_cd_acard_w )
 
 READ8_HANDLER( pce_cd_acard_wram_r )
 {
-	return 	pce_cd_acard_r(space,0);
+	return pce_cd_intf_r(space,0x200 | (offset & 0x6000) >> 9);
 }
 
 WRITE8_HANDLER( pce_cd_acard_wram_w )
 {
-	pce_cd_acard_w(space,0,data);
+	pce_cd_intf_w(space,0x200 | (offset & 0x6000) >> 9,data);
 }
 
