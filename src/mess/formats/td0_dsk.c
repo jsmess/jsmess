@@ -229,7 +229,7 @@ static floperr_t td0_get_indexed_sector_info(floppy_image *floppy, int head, int
 
 	retVal = get_offset(floppy, head, track, sector_index, FALSE, &offset);
 	sector_info = get_tag(floppy)->data + offset;
-	logerror("h %u t %u si %u : c %u s %u se %u\n", head,track,sector_index,sector_info[0],sector_info[1],sector_info[2]);
+
 	if (cylinder)
 		*cylinder = sector_info[0];
 	if (side)
