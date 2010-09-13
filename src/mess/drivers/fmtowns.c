@@ -1073,7 +1073,6 @@ static WRITE32_HANDLER( towns_video_404_w )
 	{
 		state->towns_mainmem_enable = data & 0x80;
 		towns_update_video_banks(space);
-		logerror("mainmem_enable - set to 0x%02x\n",state->towns_mainmem_enable);
 	}
 }
 
@@ -1082,7 +1081,6 @@ static READ32_HANDLER( towns_video_404_r )
 	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 	{
-		logerror("mainmem_enable - reading 0x%02x\n",state->towns_mainmem_enable);
 		if(state->towns_mainmem_enable != 0)
 			return 0x00000080;
 	}
@@ -1790,12 +1788,12 @@ void towns_pcm_irq(running_device* device, int channel)
 	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic = state->pic_slave;
 
-	state->towns_pcm_irq_flag = 1;
 	if(state->towns_pcm_channel_mask & (1 << channel))
 	{
+		state->towns_pcm_irq_flag = 1;
 		state->towns_pcm_channel_flag |= (1 << channel);
 		pic8259_ir5_w(pic, 1);
-		logerror("PIC: IRQ13 (PCM) set high\n");
+		logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
 }
 
