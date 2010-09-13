@@ -17,6 +17,8 @@ struct basicdsk_geometry
 	int tracks;
 	int sectors;
 	int first_sector_id;
+	int interleave;
+	int sector_map[256];
 	UINT32 sector_length;
 	UINT64 offset;
 

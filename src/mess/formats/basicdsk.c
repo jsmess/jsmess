@@ -117,6 +117,16 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
+static int internal_basicdsk_translate_sector_interleave(floppy_image *floppy, int sector)
+{
+	const struct basicdsk_geometry *geom = get_geometry(floppy);
+	if (sector >= geom->sectors) 
+		return sector;
+	return geom->sector_map[sector];
+}
+
+
+
 static floperr_t internal_basicdsk_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
@@ -285,9 +295,28 @@ static void basicdsk_default_geometry(const struct FloppyFormat *format, struct 
 	assert(!err);
 	err = option_resolution_getdefault(format->param_guidelines, PARAM_FIRST_SECTOR_ID,	&geometry->first_sector_id);
 	assert(!err);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_INTERLEAVE,		&geometry->interleave);
+	assert(!err);
 	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTOR_LENGTH,	&sector_length);
 	assert(!err);
 	geometry->sector_length = sector_length;
+
+	if (geometry->interleave > 1)
+	{
+		int sector = 0;
+
+		for (int i = 0; i < geometry->sectors; i++)
+		{
+			geometry->sector_map[i] = sector;
+			
+			sector += geometry->interleave;
+			
+			if (sector >= geometry->sectors)
+				sector -= geometry->sectors;
+		}
+
+		geometry->translate_sector = internal_basicdsk_translate_sector_interleave;
+	}
 }
 
 

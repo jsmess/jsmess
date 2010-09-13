@@ -180,6 +180,7 @@ Notes:
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
 	- 2KB RAM option
 	- some SW2 options make controller try to WRITE_TRK
+	- 640KB disks have 7:1 sector interleave (logical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
 
 */
 
@@ -1285,6 +1286,25 @@ static DEVICE_START( luxor_55_21046 )
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 	state_save_register_device_item(device, 0, conkort->dma_irq);
 	state_save_register_device_item(device, 0, conkort->busy);
+
+	/* patch out sector skew table */
+/*	UINT8 *rom = device->subregion("conkort")->base();
+	rom[0x2dd3] = 0;
+	rom[0x2dd4] = 1;
+	rom[0x2dd5] = 2;
+	rom[0x2dd6] = 3;
+	rom[0x2dd7] = 4;
+	rom[0x2dd8] = 5;
+	rom[0x2dd9] = 6;
+	rom[0x2dda] = 7;
+	rom[0x2ddb] = 8;
+	rom[0x2ddc] = 9;
+	rom[0x2ddd] = 10;
+	rom[0x2dde] = 11;
+	rom[0x2ddf] = 12;
+	rom[0x2de0] = 13;
+	rom[0x2de1] = 14;
+	rom[0x2de1] = 15;*/
 }
 
 /*-------------------------------------------------
@@ -1341,25 +1361,26 @@ FLOPPY_OPTIONS_START(abc80)
 		TRACKS([40])
 		SECTORS([8])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(abc80, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(abc80, "dsk", "ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		INTERLEAVE([7])
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(abc80, "dsk", "ABC 838", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([26])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 DEFINE_LEGACY_DEVICE(LUXOR_55_10828, luxor_55_10828);

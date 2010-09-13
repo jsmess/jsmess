@@ -50,6 +50,9 @@ Source Changes:
 
 - Fixed sector counting in TeleDisk images. [Curt Coder]
 
+- Added automatic sector translation to the basicdsk format when the 
+  INTERLEAVE parameter is specified in a FLOPPY_OPTION block. [Curt Coder]
+
 
 
 0.139
