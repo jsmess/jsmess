@@ -101,9 +101,9 @@ static struct {
 	int		adpcm_length;
 	int		adpcm_clock_count;
 	int		adpcm_clock_divider;
-	UINT16  msm_start_addr;
-	UINT16	msm_end_addr;
-	UINT16	msm_half_addr;
+	UINT32  msm_start_addr;
+	UINT32	msm_end_addr;
+	UINT32	msm_half_addr;
 	UINT8	msm_nibble;
 	UINT8	msm_idle;
 
@@ -439,19 +439,22 @@ static void pce_set_cd_bram( running_machine *machine )
 	memory_set_bankptr( machine, "bank10", pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
-static void adpcm_stop(void)
+static void adpcm_stop(running_machine *machine)
 {
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
 	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	pce_cd_set_irq_line( machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, ASSERT_LINE );
+	pce_cd.regs[0x0d] &= ~0x60;
 	pce_cd.msm_idle = 1;
 }
 
-static void adpcm_play(void)
+static void adpcm_play(running_machine *machine)
 {
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_PLAY_FLAG;
-	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	pce_cd_set_irq_line( machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
+	pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c);
 	pce_cd.msm_idle = 0;
 }
 
@@ -488,17 +491,11 @@ static void pce_cd_msm5205_int(running_device *device)
 				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE );
 			}
 
-			if(pce_cd.msm_start_addr == pce_cd.msm_end_addr)
-			{
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, ASSERT_LINE );
-			}
-
-			if(pce_cd.msm_start_addr >= pce_cd.msm_end_addr)
+			if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
 			{
 				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
 				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-				adpcm_stop();
+				adpcm_stop(device->machine);
 				msm5205_reset_w(device, 1);
 			}
 		}
@@ -1290,7 +1287,6 @@ WRITE8_HANDLER( pce_cd_intf_w )
 	case 0x0C:	/* ADPCM status */
 		break;
 	case 0x0D:	/* ADPCM address control */
-		//printf("%02x\n",data);
 		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) ) // ADPCM reset
 		{
 			/* Reset ADPCM hardware */
@@ -1300,25 +1296,27 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			pce_cd.msm_end_addr = 0;
 			pce_cd.msm_half_addr = 0;
 			pce_cd.msm_nibble = 0;
-			adpcm_stop();
+			adpcm_stop(space->machine);
 			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
 		}
 
-		if ( data & 0x40 ) // ADPCM play
+		if(data & 0x20)
+			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / ((data & 0x40) ? 2 : 1))) & 0xffff;
+
+		if ( ( data & 0x40) && ((pce_cd.regs[0x0D] & 0x40) == 0) ) // ADPCM play
 		{
 			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
 			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
-			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / 2)) & 0xffff;
 			pce_cd.msm_nibble = 0;
-			adpcm_play();
+			adpcm_play(space->machine);
 			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
 
 			//popmessage("%08x %08x",pce_cd.adpcm_read_ptr,pce_cd.adpcm_length);
 		}
-		else
+		else if ( (data & 0x40) == 0 )
 		{
 			/* used by Buster Bros to cancel an in-flight sample */
-			adpcm_stop();
+			adpcm_stop(space->machine);
 			msm5205_reset_w( space->machine->device( "msm5205"), 1 );
 		}
 
@@ -1470,9 +1468,10 @@ READ8_HANDLER( pce_cd_intf_r )
 		break;
 	case 0x0C:	/* ADPCM status */
 		break;
+	case 0x0D:	/* ADPCM address control */
+		break;
 	/* These are read-only registers */
 	case 0x09:	/* ADPCM address (MSB) */
-	case 0x0D:	/* ADPCM address control */
 	case 0x0E:	/* ADPCM playback rate */
 	case 0x0F:	/* ADPCM and CD audio fade timer */
 		return 0;
