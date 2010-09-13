@@ -48,6 +48,8 @@ Source Changes:
 
 - Fixed Z80-SIO and DMA to allow trs80m2 to boot CP/M and TRSDOS. [Curt Coder]
 
+- Fixed sector counting in TeleDisk images. [Curt Coder]
+
 
 
 0.139
