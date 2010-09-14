@@ -50,9 +50,9 @@ STATUS:
 	- Sango Fighter: Raster effects off by 1 line
 	- Sango Fighter: Specifies tiles out of range of video ram??
     - Speedy Dragon: Backgrounds are broken (wrong tile bank/region).
-    - Super Taiwanese Baseball League: Does not boot for unknown reasons.
+    - Super Taiwanese Baseball League: Does not boot, uses an unemulated DMA type
     - Super Taiwanese Baseball League: Missing window effect applied on tilemaps?
-    - The Son of Evil: Does not boot for unknown reasons.
+    - The Son of Evil: Does not boot, missing irq firing;
     - The Son of Evil: Many graphical issues.
 
 	- All: are ALL the layers ROZ capable??
@@ -525,16 +525,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				UINT16 data = supracan_vram[i+3];
 				int tile = (bank * 0x200) + (data & 0x03ff);
-				
+
 				int palette = (data & 0xf000) >> 12; // this might not be correct, due to the &0x8000 condition above this would force all single tile sprites to be using palette >=0x8 only
-				
+
 				//printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,sprite_xflip,sprite_yflip,
 					x,
 					y,
 					0);
-			
+
 			}
 			else
 			{
@@ -1581,7 +1581,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 
 
 		break;
-	case 240:
+	case 224: //FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it to crash
 		state->video_regs[0] |= 0x8000;
         if(state->irq_mask & 1)
         {
