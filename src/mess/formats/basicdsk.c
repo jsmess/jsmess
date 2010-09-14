@@ -256,10 +256,13 @@ static floperr_t basicdsk_get_sector_length(floppy_image *floppy, int head, int 
 
 static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
-	const struct basicdsk_geometry *geom;
-	geom = get_geometry(floppy);
+	const struct basicdsk_geometry *geom = get_geometry(floppy);
 
-	sector_index += get_geometry(floppy)->first_sector_id;
+	if (geom->translate_sector)
+		sector_index = geom->translate_sector(floppy, sector_index);
+
+	sector_index += geom->first_sector_id;
+
 	if (cylinder)
 		*cylinder = track;
 	if (side)
