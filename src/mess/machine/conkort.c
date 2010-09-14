@@ -16,7 +16,7 @@ PCB Layout
 |       S                           |
 |   74276   S                       |
 |           S   S                   |
-|   LS32    S   C140E       LS273   |
+|   LS32    S   ULA         LS273   |
 |                                   |
 |                                   |
 |       MB8876          ROM         |
@@ -46,7 +46,7 @@ Notes:
     MB8876  - Mitsubishi MB8876 Floppy Disc Controller (FD1791 compatible)
     TC5514  - Toshiba TC5514AP-2 1Kx4 bit Static RAM
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
-    C140E   - Ferranti 2C140E "copy protection device"
+    ULA     - Ferranti ULA 2C140E "copy protection device"
     N8T97N  - SA N8T97N ?
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
@@ -110,7 +110,7 @@ Notes:
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
-    CON3    - 34-pin header floppy connector
+    CON3    - 34-pin header floppy connector (Shugart pinout)
     SW1     - Disk drive type (SS/DS, SD/DD)
     SW2     - Disk drive model
     SW3     - ABC bus address
@@ -122,6 +122,35 @@ Notes:
     S8      - Disk drive type (0:8", 1:5.25")
     S9      - Location of RDY signal (A:8" P2-6, B:5.25" P2-34)
     LD1     - LED
+
+CON2 Pinout
+-----------
+
+	1		SIDE SEL
+	2		WRITE PROTECT
+	3		GND
+	4		GND
+	5		GND
+	6		GND
+	7		GND
+	8		GND
+	9		GND
+	10		SEL 0
+	11		GND
+	12		TG43
+	13		TWOSID
+	14		READ DATA
+	15		TRACK 00
+	16		WRITE GATE
+	17		WRITE DATA
+	18		STEP
+	19		DIRECTION
+	20		MOTOR ON
+	21		
+	22		SEL 1
+	23		INDEX PULSE
+	24		READY
+	25		HEAD LOAD
 
 */
 
@@ -180,7 +209,17 @@ Notes:
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
 	- 2KB RAM option
 	- some SW2 options make controller try to WRITE_TRK
-	- 640KB disks have 7:1 sector interleave (logical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
+	- 640KB disks have 7:1 sector interleave (physical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
+	- ABC830 mode double steps the head
+
+		wd17xx_command_w $59 STEP_IN
+		wd17xx_command_w $49 STEP_IN
+		wd17xx_set_drive: $00
+		wd17xx_sector_w $01
+		wd17xx_command_w $88 READ_SEC
+		cmd=03, trk=01, sec=01, dat=0A
+		wd179x: Read Sector callback.
+		track 1 sector 1 not found!
 
 */
 
@@ -244,7 +283,6 @@ struct _fast_t
 	int fdc_irq;			/* FDC interrupt */
 	int dma_irq;			/* DMA interrupt */
 	int busy;				/* busy bit */
-	int force_busy;			/* force busy bit */
 
 	/* devices */
 	running_device *bus;
@@ -433,7 +471,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	/* interrupt */
-	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+//	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	conkort->status = data & 0xfe;
 }
@@ -441,7 +479,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 static READ8_DEVICE_HANDLER( slow_fdc_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
-	UINT8 data = 0xff;
+	UINT8 data = 0;
 
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
 	{
@@ -626,7 +664,7 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 		1		DS1
 		2		DS2
 		3		MTRON
-		4		pin 2 of 50-pin floppy connector, not used
+		4		TG43 (8" only)
 		5		SIDE1
 		6
 		7
@@ -683,10 +721,10 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 
 		bit		description
 
-		0		3A.8 (busy)
-		1		50-pin floppy connector pin 10, not used
-		2		3A.12 (SW2)
-		3		? GND
+		0		busy
+		1		TWOSID
+		2		SW2
+		3		DSKCHG ?
 		4		SW1-1
 		5		SW1-2
 		6		SW1-3
@@ -851,21 +889,21 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
+static READ8_DEVICE_HANDLER( pio_pa_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	return conkort->data;
 }
 
-static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
+static WRITE8_DEVICE_HANDLER( pio_pa_w )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->data = data;
 }
 
-static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
+static READ8_DEVICE_HANDLER( pio_pb_r )
 {
 	/*
 
@@ -910,7 +948,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
+static WRITE8_DEVICE_HANDLER( pio_pb_w )
 {
 	/*
 
@@ -936,15 +974,15 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 //  wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
-static Z80PIO_INTERFACE( conkort_pio_intf )
+static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
-	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
-	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
-	DEVCB_NULL,								/* port A ready callback */
-	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
-	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
-	DEVCB_NULL								/* port B ready callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt callback */
+	DEVCB_HANDLER(pio_pa_r),						/* port A read callback */
+	DEVCB_HANDLER(pio_pa_w),						/* port A write callback */
+	DEVCB_NULL,										/* port A ready callback */
+	DEVCB_HANDLER(pio_pb_r),						/* port B read callback */
+	DEVCB_HANDLER(pio_pb_w),						/* port B write callback */
+	DEVCB_NULL										/* port B ready callback */
 };
 
 static const z80_daisy_config slow_daisy_chain[] =
@@ -1062,7 +1100,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 	}
 }
 
-static const wd17xx_interface slow_wd17xx_interface =
+static const wd17xx_interface slow_fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(slow_fd1791_intrq_w),
@@ -1081,7 +1119,7 @@ static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
 }
 
-static const wd17xx_interface fast_wd17xx_interface =
+static const wd17xx_interface fast_fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(fast_fd1793_intrq_w),
@@ -1100,7 +1138,55 @@ static const floppy_config abc800_floppy_config =
 	FLOPPY_OPTIONS_NAME(abc80),
 	NULL
 };
+/*
+static const floppy_config fd2_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD_40,
+	FLOPPY_OPTIONS_NAME(abc830),
+	NULL
+};
 
+static const floppy_config abc830_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD_40,
+	FLOPPY_OPTIONS_NAME(abc830),
+	NULL
+};
+
+static const floppy_config abc832_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(abc832),
+	NULL
+};
+
+static const floppy_config abc838_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_8_DS,
+	FLOPPY_OPTIONS_NAME(abc838),
+	NULL
+};
+*/
 /* Machine Driver */
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
@@ -1109,8 +1195,8 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MDRV_CPU_IO_MAP(slow_io_map)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, conkort_pio_intf)
-	MDRV_WD179X_ADD(FD1791_TAG, slow_wd17xx_interface)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
+	MDRV_WD179X_ADD(FD1791_TAG, slow_fdc_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_CONFIG_END
@@ -1121,7 +1207,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MDRV_CPU_IO_MAP(fast_io_map)
 
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface)
+	MDRV_WD1793_ADD(SAB1793_TAG, fast_fdc_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_CONFIG_END
@@ -1130,23 +1216,23 @@ MACHINE_CONFIG_END
 
 ROM_START( luxor_55_10828 )
 	ROM_REGION( 0x1000, "abc830", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (5510760-01)
-	ROM_LOAD( "basf6106.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6106
+	ROM_LOAD( "mpi02.7c",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (5510760-01)
+	ROM_LOAD( "basf6106.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6106
 
 	ROM_REGION( 0x1800, "abc832", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
-	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
-	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
+	ROM_LOAD( "micr1015.7c", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
+	ROM_LOAD( "micr1115.7c", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
+	ROM_LOAD( "basf6118.7c", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
 
 	ROM_REGION( 0x1000, "abc838", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "basf6104.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6104
-	ROM_LOAD( "basf6115.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6115
+	ROM_LOAD( "basf6104.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6104
+	ROM_LOAD( "basf6115.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6115
 ROM_END
 
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x4000, "conkort", ROMREGION_LOADBYNAME ) // A13 is always high
-	ROM_LOAD( "fast108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	ROM_LOAD( "fast108.6cd", 0x2000, 0x2000, BAD_DUMP CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.6cd", 0x2000, 0x2000, BAD_DUMP CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
 ROM_END
 
