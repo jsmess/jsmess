@@ -1421,8 +1421,8 @@ READ8_HANDLER( pce_cd_intf_r )
 			case 0xc1: return 0xaa;
 			case 0xc2: return 0x55;
 			case 0xc3: return 0x00;
-			case 0xc5: return 0xaa;
-			case 0xc6: return 0x55;
+			case 0xc5: return 0x55; // - TODO: JP version wants this inverted?
+			case 0xc6: return 0xaa; // /
 			case 0xc7: return 0x03;
 		}
 	}
