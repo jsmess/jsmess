@@ -52,8 +52,10 @@ STATUS:
     - Speedy Dragon: Backgrounds are broken (wrong tile bank/region).
     - Super Taiwanese Baseball League: Does not boot, uses an unemulated DMA type
     - Super Taiwanese Baseball League: Missing window effect applied on tilemaps?
-    - The Son of Evil: Does not boot, missing irq firing;
     - The Son of Evil: Many graphical issues.
+	- Visible area, looks like it should be 224 pixels high at most, most games need 8 off the top and 8 off the bottom (or a global scroll)
+	  Sango looks like it needs 16 off the bottom instead
+	  Visible area is almost certainly 224 as Son of Evil has an explicit check in the vblank handler
 
 	- All: are ALL the layers ROZ capable??
 
@@ -451,13 +453,13 @@ static int get_tilemap_dimensions(running_machine* machine, int &xsize, int &ysi
 
 
 
-
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->vram;
 
 //      [0]
+//      -e-- ---- ---- ---- sprite enable?
 //      ---h hhh- ---- ---- Y size (not always right)
 //      ---- ---y yyyy yyyy Y position
 //      [1]
@@ -481,7 +483,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 //	printf("frame\n");
 	#define VRAM_MASK (0xffff)
 
-
    for(int i = start_word; i < end_word; i += 4)
 	{
 		int x = supracan_vram[i+2] & 0x01ff;
@@ -489,38 +490,41 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		int sprite_offset = (supracan_vram[i+3])<< 1;
 
-		//sprite_offset &= VRAM_MASK; // there are only 0xffff words of vram? sango is specifying tiles outside of this, why, I'm sure it didn't used to, timing? DMA?
-
-
 		int bank = (supracan_vram[i+1] & 0xf000) >> 12;
         //int mask = (supracan_vram[i+1] & 0x0300) >> 8;
-		bool sprite_xflip = (supracan_vram[i+1] & 0x0800) ? true : false;
-		bool sprite_yflip = (supracan_vram[i+1] & 0x0400) ? true : false;
+		int sprite_xflip = (supracan_vram[i+1] & 0x0800) >> 11;
+		int sprite_yflip = (supracan_vram[i+1] & 0x0400) >> 10;
         //int xscale = (supracan_vram[i+2] & 0xf000) >> 12;
 		const gfx_element *gfx = machine->gfx[region];
 
-/*
-		printf("%d (unk Y %02x) (unk Y2 %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
-		(supracan_vram[i+0] & 0xe000) >> 12,
-		(supracan_vram[i+0] & 0x1e00) >> 8,
-		(supracan_vram[i+0] & 0x01ff),
-		(supracan_vram[i+1] & 0xf000) >> 12,
-		(supracan_vram[i+1] & 0x0c00) >> 10,
-		(supracan_vram[i+1] & 0x03f0) >> 4,
-		(supracan_vram[i+1] & 0x000f),
-		(supracan_vram[i+2] & 0xf000) >> 12,
-		(supracan_vram[i+2] & 0x0e00) >> 8,
-		(supracan_vram[i+2] & 0x01ff) >> 0,
-		(supracan_vram[i+3] & 0xffff));
-*/
+
 
 
 		// wraparound
 		if (y>=0x180) y-=0x200;
 		if (x>=0x180) x-=0x200;
 
-		if(supracan_vram[i+3] != 0)
+		if((supracan_vram[i+0] & 0x4000))
 		{
+		
+		#if 0
+			printf("%d (unk %02x) (enable %02x) (unk Y2 %02x, %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
+				(supracan_vram[i+0] & 0x8000) >> 15,
+				(supracan_vram[i+0] & 0x4000) >> 14,
+				(supracan_vram[i+0] & 0x2000) >> 13,			
+				(supracan_vram[i+0] & 0x1e00) >> 8,
+				(supracan_vram[i+0] & 0x01ff),
+				(supracan_vram[i+1] & 0xf000) >> 12,
+				(supracan_vram[i+1] & 0x0c00) >> 10,
+				(supracan_vram[i+1] & 0x03f0) >> 4,
+				(supracan_vram[i+1] & 0x000f),
+				(supracan_vram[i+2] & 0xf000) >> 12,
+				(supracan_vram[i+2] & 0x0e00) >> 8,
+				(supracan_vram[i+2] & 0x01ff) >> 0,
+				(supracan_vram[i+3] & 0xffff));
+		#endif
+
+		
 			if (supracan_vram[i+3] &0x8000)
 			{
 				UINT16 data = supracan_vram[i+3];
@@ -540,97 +544,48 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				int xsize = 1 << (supracan_vram[i+1] & 7);
 				int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9) + 1;
-
-				if(sprite_yflip)
+		
+				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
+				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
+	
+				for(int ytile = 0; ytile < ysize; ytile++)
 				{
-					for(int ytile = (ysize - 1); ytile >= 0; ytile--)
+					for(int xtile = 0; xtile< xsize; xtile++)
 					{
-						if(sprite_xflip)
+						UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
+						int tile = (bank * 0x200) + (data & 0x03ff);
+						int palette = (data & 0xf000) >> 12;
+
+						int xpos, ypos;
+						
+						if (!sprite_yflip)
 						{
-							for(int xtile = (xsize - 1); xtile >= 0; xtile--)
-							{
-								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-								int tile = (bank * 0x200) + (data & 0x03ff);
-								int tile_xflip = (data & 0x0800) ? false : true;
-								int tile_yflip = (data & 0x0400) ? false : true;
-								int palette = (data & 0xf000) >> 12;
-								int xpos = x + ((xsize - 1) - xtile)*8;
-								int ypos = y + ((ysize - 1) - ytile)*8;
-
-								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
-								xpos,
-								ypos,
-								0);
-
-							}
+							ypos = y + ytile*8;								
 						}
 						else
 						{
-							for(int xtile = 0; xtile < xsize; xtile++)
-							{
-								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-								int tile = (bank * 0x200) + (data & 0x03ff);
-								int tile_xflip = (data & 0x0800) ? true : false;
-								int tile_yflip = (data & 0x0400) ? false : true;
-								int palette = (data & 0xf000) >> 12;
-
-								int xpos = x + xtile*8;
-								int ypos = y + ((ysize - 1) - ytile)*8;
-
-								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
-								xpos,
-								ypos,
-								0);
-							}
+							ypos = y - (ytile+1)*8;
+							ypos += ysize*8;
 						}
-					}
-				}
-				else
-				{
-					for(int ytile = 0; ytile < ysize; ytile++)
-					{
-						if(sprite_xflip)
+						
+						if (!sprite_xflip)
 						{
-							for(int xtile = (xsize - 1); xtile >= 0; xtile--)
-							{
-								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-								int tile = (bank * 0x200) + (data & 0x03ff);
-								int tile_xflip = (data & 0x0800) ? false : true;
-								int tile_yflip = (data & 0x0400) ? true : false;
-								int palette = (data & 0xf000) >> 12;
-
-								int xpos = x + ((xsize - 1) - xtile)*8;
-								int ypos = y + ytile*8;
-
-								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
-								xpos,
-								ypos,
-								0);
-							}
+							xpos = x + xtile*8;	
 						}
 						else
 						{
-							for(int xtile = 0; xtile < xsize; xtile++)
-							{
-								UINT16 data = supracan_vram[(sprite_offset+ytile*xsize+xtile)&VRAM_MASK];
-								int tile = (bank * 0x200) + (data & 0x03ff);
-								int tile_xflip = (data & 0x0800) ? true : false;
-								int tile_yflip = (data & 0x0400) ? true : false;
-								int palette = (data & 0xf000) >> 12;
-
-								int xpos = x + xtile*8;
-								int ypos = y + ytile*8;
-
-								drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,
-								xpos,
-								ypos,
-								0);
-
-							}
+							xpos = x - (xtile+1)*8;
+							xpos += xsize*8;
 						}
+					
+						int tile_xflip = sprite_xflip ^ ((data & 0x0800)>>11);
+						int tile_yflip = sprite_yflip ^ ((data & 0x0400)>>10);
+						
+						drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
 					}
 				}
 			}
+
 #if 0
             if(xscale == 0) continue;
             UINT32 delta = (1 << 17) / xscale;
@@ -991,7 +946,9 @@ static VIDEO_UPDATE( supracan )
 
 								if (incxx & 0x8000) incxx -= 0x10000;
 
-								supracan_suprnova_draw_roz(screen->machine, bitmap, &clip, state->tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+
+								if (state->vram[state->roz_unk_base0/2 + y]) // incxx = 0, no draw?
+									supracan_suprnova_draw_roz(screen->machine, bitmap, &clip, state->tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
@@ -1581,8 +1538,12 @@ static TIMER_CALLBACK( supracan_video_callback )
 
 
 		break;
-	case 224: //FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it to crash
+		
+	case 224://FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it to crash
 		state->video_regs[0] |= 0x8000;
+		break;
+		
+	case 240: 
         if(state->irq_mask & 1)
         {
             verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");
@@ -1591,7 +1552,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 		break;
     }
 
-    state->video_regs[1] = machine->primary_screen->vpos();
+    state->video_regs[1] = machine->primary_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
 
     timer_adjust_oneshot( state->hbl_timer, machine->primary_screen->time_until_pos( vpos, 320 ), 0 );
     timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ), 0 );
@@ -1684,8 +1645,8 @@ static WRITE16_HANDLER( supracan_video_w )
 
                 rectangle visarea = space->machine->primary_screen->visible_area();
 
-				visarea.min_x = visarea.min_y = 0;
-				visarea.max_y = 240 - 1;
+				visarea.min_x = visarea.min_y = 8;
+				visarea.max_y = 232 - 1;
 				visarea.max_x = ((state->video_flags & 0x100) ? 320 : 256) - 1;
 				space->machine->primary_screen->configure(348, 256, visarea, space->machine->primary_screen->frame_period().attoseconds);
 			}
