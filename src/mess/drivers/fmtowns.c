@@ -1330,9 +1330,16 @@ static void towns_cdrom_play_cdda(running_device* device)
 	cdda_set_cdrom(cdda,mess_cd_get_cdrom_file(device));
 	cdda_start_audio(cdda,state->towns_cd.cdda_current,state->towns_cd.cdda_length);
 	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->towns_cd.cdda_current,state->towns_cd.cdda_length);
+	if(state->towns_cd.command & 0x20)
+	{
+		state->towns_cd.extra_status = 1;
+		towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
+	}
+}
 
-	state->towns_cd.extra_status = 1;
-	towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
+static TIMER_CALLBACK(towns_delay_cdda)
+{
+	towns_cdrom_play_cdda((running_device*)ptr);
 }
 
 static void towns_cdrom_execute_command(running_device* device)
@@ -1374,7 +1381,7 @@ static void towns_cdrom_execute_command(running_device* device)
 				break;
 			case 0x04:  // Play Audio Track
 				logerror("CD: Command 0x04: PLAY CD-DA\n");
-				towns_cdrom_play_cdda(device);
+				timer_set(device->machine,ATTOTIME_IN_MSEC(1),device,0,towns_delay_cdda);
 				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
@@ -1416,8 +1423,8 @@ static void towns_cdrom_execute_command(running_device* device)
 				{
 					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_pause_audio(state->cdda,1);
 				}
+				cdda_pause_audio(state->cdda,1);
 				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			case 0x85:   // Stop CD audio track (difference from 0x84?)
@@ -1425,8 +1432,8 @@ static void towns_cdrom_execute_command(running_device* device)
 				{
 					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_pause_audio(state->cdda,1);
 				}
+				cdda_pause_audio(state->cdda,1);
 				logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			case 0x87:  // Resume CD-DA playback
@@ -1434,8 +1441,8 @@ static void towns_cdrom_execute_command(running_device* device)
 				{
 					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
-					cdda_pause_audio(state->cdda,0);
 				}
+				cdda_pause_audio(state->cdda,0);
 				logerror("CD: Command 0x87: RESUME CD-DA\n");
 				break;
 			default:
