@@ -603,8 +603,20 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 		frame = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
 		break;
 	case 0x40:
-		frame = bcd_2_dec( pce_cd.command_buffer[4] ) + 75 * ( bcd_2_dec( pce_cd.command_buffer[3] ) + 60 * bcd_2_dec( pce_cd.command_buffer[2] ) );
+	{
+		UINT8 m,s,f;
+
+		m = bcd_2_dec( pce_cd.command_buffer[2]);
+		s = bcd_2_dec( pce_cd.command_buffer[3]);
+		f = bcd_2_dec( pce_cd.command_buffer[4]);
+
+		//printf("%d %d %d START\n",m,s,f);
+
+		frame = f + 75 * (s + m * 60);
+		if(frame >= 525) // TODO: seven seconds gap? O_o
+			frame -= 525;
 		break;
+	}
 	case 0x80:
 		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
 		break;
@@ -653,8 +665,20 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		frame = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
 		break;
 	case 0x40:
-		frame = bcd_2_dec( pce_cd.command_buffer[4] ) + 75 * ( bcd_2_dec( pce_cd.command_buffer[3] ) + 60 * bcd_2_dec( pce_cd.command_buffer[2] ) );
+	{
+		UINT8 m,s,f;
+
+		m = bcd_2_dec( pce_cd.command_buffer[2]);
+		s = bcd_2_dec( pce_cd.command_buffer[3]);
+		f = bcd_2_dec( pce_cd.command_buffer[4]);
+
+		//printf("%d %d %d END\n",m,s,f);
+
+		frame = f + 75 * (s + m * 60);
+		if(frame >= 525) // TODO: seven seconds gap? O_o
+			frame -= 525;
 		break;
+	}
 	case 0x80:
 		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
 		break;
