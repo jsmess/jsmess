@@ -1332,7 +1332,7 @@ static void towns_cdrom_play_cdda(running_device* device)
 	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->towns_cd.cdda_current,state->towns_cd.cdda_length);
 
 	state->towns_cd.extra_status = 1;
-	towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+	towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
 }
 
 static void towns_cdrom_execute_command(running_device* device)
@@ -1396,7 +1396,7 @@ static void towns_cdrom_execute_command(running_device* device)
 						towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 						break;
 					}
-					if(cdda_audio_active(state->cdda))
+					if(cdda_audio_active(state->cdda) && !cdda_audio_paused(state->cdda))
 						towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
 					else
 						towns_cd_set_status(device->machine,0x00,0x01,0x00,0x00);
@@ -1411,12 +1411,12 @@ static void towns_cdrom_execute_command(running_device* device)
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
-			case 0x84:   // Stop CD audio track
+			case 0x84:   // Stop CD audio track  -- generates no status output?
 				if(state->towns_cd.command & 0x20)
 				{
 					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_stop_audio(state->cdda);
+					cdda_pause_audio(state->cdda,1);
 				}
 				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
@@ -1425,9 +1425,18 @@ static void towns_cdrom_execute_command(running_device* device)
 				{
 					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_stop_audio(state->cdda);
+					cdda_pause_audio(state->cdda,1);
 				}
 				logerror("CD: Command 0x85: STOP CD-DA\n");
+				break;
+			case 0x87:  // Resume CD-DA playback
+				if(state->towns_cd.command & 0x20)
+				{
+					state->towns_cd.extra_status = 1;
+					towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
+					cdda_pause_audio(state->cdda,0);
+				}
+				logerror("CD: Command 0x87: RESUME CD-DA\n");
 				break;
 			default:
 				state->towns_cd.extra_status = 0;
