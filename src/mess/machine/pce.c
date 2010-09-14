@@ -89,6 +89,7 @@ unsigned char *pce_user_ram;    /* scratch RAM at F8 */
 /* CD Unit RAM */
 UINT8	*pce_cd_ram;			/* 64KB RAM from a CD unit */
 static UINT8	pce_sys3_card;	/* Is a Super CD System 3 card present */
+static UINT8	pce_acard;		/* Is this an Arcade Card? */
 static struct {
 	UINT8	regs[16];
 	UINT8	*bram;
@@ -306,14 +307,15 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	if (!memcmp(ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23))
 	{
 		/* Check if 192KB additional system card ram should be used */
-		if (!memcmp(ROM + 0x29D1, "VER. 3.", 7) || !memcmp(ROM + 0x29C4, "VER. 3.", 7 ))
+		if(!memcmp(ROM + 0x29D1, "VER. 3.", 7)) 		{ pce_sys3_card = 1; } // JP version
+		else if(!memcmp(ROM + 0x29C4, "VER. 3.", 7 ))	{ pce_sys3_card = 3; } // US version
+
+		if(pce_sys3_card)
 		{
-			pce_sys3_card = 1;
 			cartridge_ram = auto_alloc_array(image.device().machine, UINT8, 0x30000);
 			memory_set_bankptr(image.device().machine, "bank4", cartridge_ram);
 			memory_install_write8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w);
 			memory_install_readwrite8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cd_acard_wram_r,pce_cd_acard_wram_w);
-
 		}
 	}
 	return 0;
@@ -356,6 +358,10 @@ MACHINE_RESET( pce )
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
 	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+
+	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
+	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
+	pce_acard = input_port_read(machine, "A_CARD") & 1;
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -1224,7 +1230,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 {
 	pce_cd_update(space->machine);
 
-	if(offset & 0x200 && pce_sys3_card) // emulate Arcade Card
+	if(offset & 0x200 && pce_sys3_card && pce_acard) // route Arcade Card handling ports
 		return pce_cd_acard_w(space,offset,data);
 
 	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
@@ -1409,7 +1415,7 @@ READ8_HANDLER( pce_cd_intf_r )
 
 	pce_cd_update(space->machine);
 
-	if(offset & 0x200 && pce_sys3_card) // Arcade Card handling
+	if(offset & 0x200 && pce_sys3_card && pce_acard) // route Arcade Card handling ports
 		return pce_cd_acard_r(space,offset);
 
 	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
@@ -1421,8 +1427,8 @@ READ8_HANDLER( pce_cd_intf_r )
 			case 0xc1: return 0xaa;
 			case 0xc2: return 0x55;
 			case 0xc3: return 0x00;
-			case 0xc5: return 0x55; // - TODO: JP version wants this inverted?
-			case 0xc6: return 0xaa; // /
+			case 0xc5: return (pce_sys3_card & 2) ? 0x55 : 0xaa;
+			case 0xc6: return (pce_sys3_card & 2) ? 0xaa : 0x55;
 			case 0xc7: return 0x03;
 		}
 	}

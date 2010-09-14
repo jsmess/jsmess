@@ -267,6 +267,12 @@ static INPUT_PORTS_START( pce )
 	PORT_CATEGORY_CLASS(0x10,0x00,"Joystick Type Player 5")
 	PORT_CATEGORY_ITEM(0x00,"2-buttons", 50)
 	PORT_CATEGORY_ITEM(0x10,"6-buttons", 51)
+
+	PORT_START("A_CARD")
+	PORT_CONFNAME( 0x01, 0x01, "Arcade Card" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
 #if 0
 	PORT_START  /* Fake dipswitches for system config */
 	PORT_DIPNAME( 0x01, 0x01, "Console type")
