@@ -1645,7 +1645,8 @@ static WRITE16_HANDLER( supracan_video_w )
 
                 rectangle visarea = space->machine->primary_screen->visible_area();
 
-				visarea.min_x = visarea.min_y = 8;
+				visarea.min_x = 0;
+				visarea.min_y = 8;
 				visarea.max_y = 232 - 1;
 				visarea.max_x = ((state->video_flags & 0x100) ? 320 : 256) - 1;
 				space->machine->primary_screen->configure(348, 256, visarea, space->machine->primary_screen->frame_period().attoseconds);
