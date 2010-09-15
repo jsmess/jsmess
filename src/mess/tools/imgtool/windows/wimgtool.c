@@ -1250,7 +1250,6 @@ static void menu_insert(HWND window)
 	imgtoolerr_t err;
 	char *image_filename = NULL;
 	const char *s1;
-	char *s2;
 	win_open_file_name ofn;
 	wimgtool_info *info;
 	option_resolution *opts = NULL;
@@ -1317,11 +1316,7 @@ static void menu_insert(HWND window)
 	/* append the current directory, if appropriate */
 	if (info->current_directory != NULL)
 	{
-		s2 = (char *) alloca(strlen(info->current_directory) + strlen(image_filename) + 1 + 1);
-		strcpy(s2, info->current_directory);
-		strcat(s2, "\\");
-		strcat(s2, image_filename);
-		image_filename = s2;
+		image_filename = (char *) imgtool_partition_path_concatenate(info->partition, info->current_directory, image_filename);
 	}
 
 	err = imgtool_partition_write_file(info->partition, image_filename, fork, stream, opts, filter);
@@ -1563,10 +1558,7 @@ static void menu_createdir(HWND window)
 
 	if (info->current_directory)
 	{
-		s = (char *) alloca(strlen(info->current_directory) + strlen(utf8_dirname) + 1 + 1);
-		strcpy(s, info->current_directory);
-		strcat(s, "\\");
-		strcat(s, utf8_dirname);
+		s = (char *) imgtool_partition_path_concatenate(info->partition, info->current_directory, utf8_dirname);
 		osd_free(utf8_dirname);
 		utf8_dirname = mame_strdup(s);
 	}
