@@ -597,6 +597,8 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 		return;
 	}
 
+	printf("%02x MODE START\n",pce_cd.command_buffer[9] & 0xC0);
+
 	switch( pce_cd.command_buffer[9] & 0xC0 )
 	{
 	case 0x00:
@@ -610,7 +612,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 		s = bcd_2_dec( pce_cd.command_buffer[3]);
 		f = bcd_2_dec( pce_cd.command_buffer[4]);
 
-		//printf("%d %d %d START\n",m,s,f);
+		printf("%d %d %d START\n",m,s,f);
 
 		frame = f + 75 * (s + m * 60);
 		if(frame >= 525) // TODO: seven seconds gap? O_o
@@ -618,6 +620,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 		break;
 	}
 	case 0x80:
+		printf("%d TRACK START\n", bcd_2_dec ( pce_cd.command_buffer[2] ) - 1);
 		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
 		break;
 	default:
@@ -626,21 +629,23 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 	}
 
 	pce_cd.current_frame = frame;
-	pce_cd.cdda_play_mode = pce_cd.command_buffer[1] & 0x03;
 
-	//printf("Set Start %02x\n",pce_cd.cdda_play_mode);
-	if ( pce_cd.cdda_play_mode )
+	printf("Set Start %02x\n",pce_cd.command_buffer[1] & 0x03);
+	if(pce_cd.command_buffer[1] & 0x03)
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+		pce_cd.end_frame = pce_cd.last_frame; //get the end of the CD
 		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
-		pce_cd.end_mark = 0;
+		pce_cd.cdda_play_mode = (pce_cd.command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
+		pce_cd.end_mark =  (pce_cd.command_buffer[1] & 0x02) ? 1 : 0;
 	}
 	else
 	{
-		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		cdda_stop_audio( machine->device( "cdda" ) );
-		pce_cd.end_frame = pce_cd.last_frame;
+		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+		pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].physframeofs; //get the end of THIS track
+		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 		pce_cd.end_mark = 0;
+		pce_cd.cdda_play_mode = 3;
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -659,6 +664,8 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		return;
 	}
 
+	printf("%02x MODE END\n",pce_cd.command_buffer[9] & 0xC0);
+
 	switch( pce_cd.command_buffer[9] & 0xC0 )
 	{
 	case 0x00:
@@ -672,7 +679,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		s = bcd_2_dec( pce_cd.command_buffer[3]);
 		f = bcd_2_dec( pce_cd.command_buffer[4]);
 
-		//printf("%d %d %d END\n",m,s,f);
+		printf("%d %d %d END\n",m,s,f);
 
 		frame = f + 75 * (s + m * 60);
 		if(frame >= 525) // TODO: seven seconds gap? O_o
