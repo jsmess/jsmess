@@ -150,7 +150,7 @@ Notes:
 #include "machine/abcbus.h"
 #include "machine/e0516.h"
 #include "machine/abc77.h"
-#include "machine/conkort.h"
+#include "machine/abc830.h"
 #include "video/mc6845.h"
 #include "sound/discrete.h"
 
@@ -1181,7 +1181,7 @@ static MACHINE_CONFIG_START( abc800m, abc800_state )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_LUXOR_55_21046_ADD("luxor_55_21046", ABCBUS_TAG)
+	MDRV_ABC830_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1223,7 +1223,7 @@ static MACHINE_CONFIG_START( abc800c, abc800_state )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_LUXOR_55_21046_ADD("luxor_55_21046", ABCBUS_TAG)
+	MDRV_ABC830_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1265,7 +1265,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_LUXOR_55_21046_ADD("luxor_55_21046", ABCBUS_TAG)
+	MDRV_ABC832_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1304,7 +1304,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_LUXOR_55_21046_ADD("luxor_55_21046", ABCBUS_TAG)
+	MDRV_ABC832_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))

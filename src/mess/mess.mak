@@ -1053,7 +1053,7 @@ $(MESSOBJ)/luxor.a:				\
 	$(MESS_MACHINE)/abcbus.o	\
 	$(MESS_MACHINE)/abc77.o		\
 	$(MESS_MACHINE)/abc99.o		\
-	$(MESS_MACHINE)/conkort.o	\
+	$(MESS_MACHINE)/abc830.o	\
 
 $(MESSOBJ)/magnavox.a:			\
 	$(MESS_MACHINE)/odyssey2.o	\

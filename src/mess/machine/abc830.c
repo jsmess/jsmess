@@ -16,7 +16,7 @@ PCB Layout
 |       S                           |
 |   74276   S                       |
 |           S   S                   |
-|   LS32    S   ULA         LS273   |
+|   LS32    S   C140E       LS273   |
 |                                   |
 |                                   |
 |       MB8876          ROM         |
@@ -46,7 +46,7 @@ Notes:
     MB8876  - Mitsubishi MB8876 Floppy Disc Controller (FD1791 compatible)
     TC5514  - Toshiba TC5514AP-2 1Kx4 bit Static RAM
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
-    ULA     - Ferranti ULA 2C140E "copy protection device"
+    C140E   - Ferranti 2C140E "copy protection device"
     N8T97N  - SA N8T97N ?
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
@@ -110,7 +110,7 @@ Notes:
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
-    CON3    - 34-pin header floppy connector (Shugart pinout)
+    CON3    - 34-pin header floppy connector
     SW1     - Disk drive type (SS/DS, SD/DD)
     SW2     - Disk drive model
     SW3     - ABC bus address
@@ -122,35 +122,6 @@ Notes:
     S8      - Disk drive type (0:8", 1:5.25")
     S9      - Location of RDY signal (A:8" P2-6, B:5.25" P2-34)
     LD1     - LED
-
-CON2 Pinout
------------
-
-	1		SIDE SEL
-	2		WRITE PROTECT
-	3		GND
-	4		GND
-	5		GND
-	6		GND
-	7		GND
-	8		GND
-	9		GND
-	10		SEL 0
-	11		GND
-	12		TG43
-	13		TWOSID
-	14		READ DATA
-	15		TRACK 00
-	16		WRITE GATE
-	17		WRITE DATA
-	18		STEP
-	19		DIRECTION
-	20		MOTOR ON
-	21		
-	22		SEL 1
-	23		INDEX PULSE
-	24		READY
-	25		HEAD LOAD
 
 */
 
@@ -209,22 +180,12 @@ CON2 Pinout
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
 	- 2KB RAM option
 	- some SW2 options make controller try to WRITE_TRK
-	- 640KB disks have 7:1 sector interleave (physical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
-	- ABC830 mode double steps the head
-
-		wd17xx_command_w $59 STEP_IN
-		wd17xx_command_w $49 STEP_IN
-		wd17xx_set_drive: $00
-		wd17xx_sector_w $01
-		wd17xx_command_w $88 READ_SEC
-		cmd=03, trk=01, sec=01, dat=0A
-		wd179x: Read Sector callback.
-		track 1 sector 1 not found!
+	- 640KB disks have 7:1 sector interleave (logical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
 
 */
 
 #include "emu.h"
-#include "conkort.h"
+#include "abc830.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80.h"
@@ -283,6 +244,7 @@ struct _fast_t
 	int fdc_irq;			/* FDC interrupt */
 	int dma_irq;			/* DMA interrupt */
 	int busy;				/* busy bit */
+	int force_busy;			/* force busy bit */
 
 	/* devices */
 	running_device *bus;
@@ -300,21 +262,21 @@ struct _fast_t
 INLINE slow_t *get_safe_token_slow(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == LUXOR_55_10828);
+	assert(device->type() == ABC830_PIO);
 	return (slow_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE fast_t *get_safe_token_fast(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == LUXOR_55_21046);
+	assert((device->type() == ABC830) || (device->type() == ABC832) || (device->type() == ABC838));
 	return (fast_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE conkort_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type() == LUXOR_55_10828) || (device->type() == LUXOR_55_21046));
+	assert((device->type() == ABC830_PIO) || (device->type() == ABC830) || (device->type() == ABC832) || (device->type() == ABC838));
 	return (conkort_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
@@ -471,7 +433,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	/* interrupt */
-//	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	conkort->status = data & 0xfe;
 }
@@ -479,7 +441,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 static READ8_DEVICE_HANDLER( slow_fdc_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
-	UINT8 data = 0;
+	UINT8 data = 0xff;
 
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
 	{
@@ -664,7 +626,7 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 		1		DS1
 		2		DS2
 		3		MTRON
-		4		TG43 (8" only)
+		4		pin 2 of 50-pin floppy connector, not used
 		5		SIDE1
 		6
 		7
@@ -721,10 +683,10 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 
 		bit		description
 
-		0		busy
-		1		TWOSID
-		2		SW2
-		3		DSKCHG ?
+		0		3A.8 (busy)
+		1		50-pin floppy connector pin 10, not used
+		2		3A.12 (SW2)
+		3		? GND
 		4		SW1-1
 		5		SW1-2
 		6		SW1-3
@@ -889,21 +851,21 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static READ8_DEVICE_HANDLER( pio_pa_r )
+static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	return conkort->data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio_pa_w )
+static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->data = data;
 }
 
-static READ8_DEVICE_HANDLER( pio_pb_r )
+static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 {
 	/*
 
@@ -915,7 +877,7 @@ static READ8_DEVICE_HANDLER( pio_pb_r )
         3       FDC _DDEN       double density enable
         4       _R/BS           radial/binary drive select
         5       FDC HLT         head load timing
-        6       FDC _HDLD       head load
+        6       FDC _HDLD       head loaded
         7       FDC IRQ         interrupt request
 
     */
@@ -948,7 +910,7 @@ static READ8_DEVICE_HANDLER( pio_pb_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio_pb_w )
+static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 {
 	/*
 
@@ -960,7 +922,7 @@ static WRITE8_DEVICE_HANDLER( pio_pb_w )
         3       FDC _DDEN       double density enable
         4       _R/BS           radial/binary drive select
         5       FDC HLT         head load timing
-        6       FDC _HDLD       head load
+        6       FDC _HDLD       head loaded
         7       FDC IRQ         interrupt request
 
     */
@@ -974,15 +936,15 @@ static WRITE8_DEVICE_HANDLER( pio_pb_w )
 //  wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
-static Z80PIO_INTERFACE( pio_intf )
+static Z80PIO_INTERFACE( conkort_pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt callback */
-	DEVCB_HANDLER(pio_pa_r),						/* port A read callback */
-	DEVCB_HANDLER(pio_pa_w),						/* port A write callback */
-	DEVCB_NULL,										/* port A ready callback */
-	DEVCB_HANDLER(pio_pb_r),						/* port B read callback */
-	DEVCB_HANDLER(pio_pb_w),						/* port B write callback */
-	DEVCB_NULL										/* port B ready callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
+	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
+	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
+	DEVCB_NULL,								/* port A ready callback */
+	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
+	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
+	DEVCB_NULL								/* port B ready callback */
 };
 
 static const z80_daisy_config slow_daisy_chain[] =
@@ -1108,6 +1070,91 @@ static const wd17xx_interface slow_fdc_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
+static FLOPPY_OPTIONS_START( fd2 )
+	FLOPPY_OPTION(fd2, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START( abc830 )
+	FLOPPY_OPTION(abc830, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		INTERLEAVE([7])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START( abc832 )
+	FLOPPY_OPTION(abc832, "dsk", "ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START( abc838 )
+	FLOPPY_OPTION(abc838, "dsk", "ABC 838", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config fd2_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_SSSD,
+    FLOPPY_OPTIONS_NAME(fd2),
+    NULL
+};
+
+static const floppy_config abc830_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_SSDD_40,
+    FLOPPY_OPTIONS_NAME(abc830),
+    NULL
+};
+
+static const floppy_config abc832_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_DSQD,
+    FLOPPY_OPTIONS_NAME(abc832),
+    NULL
+};
+
+static const floppy_config abc838_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_8_DSDD,
+    FLOPPY_OPTIONS_NAME(abc838),
+    NULL
+};
+
 /* FD1793 */
 
 static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
@@ -1127,66 +1174,6 @@ static const wd17xx_interface fast_fdc_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-static const floppy_config abc800_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD, // FIXME
-	FLOPPY_OPTIONS_NAME(abc80),
-	NULL
-};
-/*
-static const floppy_config fd2_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	FLOPPY_OPTIONS_NAME(abc830),
-	NULL
-};
-
-static const floppy_config abc830_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	FLOPPY_OPTIONS_NAME(abc830),
-	NULL
-};
-
-static const floppy_config abc832_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(abc832),
-	NULL
-};
-
-static const floppy_config abc838_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_DS,
-	FLOPPY_OPTIONS_NAME(abc838),
-	NULL
-};
-*/
 /* Machine Driver */
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
@@ -1195,10 +1182,12 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MDRV_CPU_IO_MAP(slow_io_map)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, conkort_pio_intf)
 	MDRV_WD179X_ADD(FD1791_TAG, slow_fdc_intf)
+MACHINE_CONFIG_END
 
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+static MACHINE_CONFIG_DERIVED( abc830_pio, luxor_55_10828 )
+	MDRV_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
@@ -1208,31 +1197,41 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MDRV_WD1793_ADD(SAB1793_TAG, fast_fdc_intf)
+MACHINE_CONFIG_END
 
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+static MACHINE_CONFIG_DERIVED( abc830, luxor_55_21046 )
+	MDRV_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( abc832, luxor_55_21046 )
+	MDRV_FLOPPY_2_DRIVES_ADD(abc832_floppy_config)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( abc838, luxor_55_21046 )
+	MDRV_FLOPPY_2_DRIVES_ADD(abc838_floppy_config)
 MACHINE_CONFIG_END
 
 /* ROMs */
 
 ROM_START( luxor_55_10828 )
 	ROM_REGION( 0x1000, "abc830", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "mpi02.7c",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (5510760-01)
-	ROM_LOAD( "basf6106.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6106
+	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (5510760-01)
+	ROM_LOAD( "basf6106.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6106
 
 	ROM_REGION( 0x1800, "abc832", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "micr1015.7c", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
-	ROM_LOAD( "micr1115.7c", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
-	ROM_LOAD( "basf6118.7c", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
+	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
+	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
+	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
 
 	ROM_REGION( 0x1000, "abc838", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "basf6104.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6104
-	ROM_LOAD( "basf6115.7c", 0x0800, 0x0800, NO_DUMP ) // BASF 6115
+	ROM_LOAD( "basf6104.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6104
+	ROM_LOAD( "basf6115.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6115
 ROM_END
 
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x4000, "conkort", ROMREGION_LOADBYNAME ) // A13 is always high
-	ROM_LOAD( "fast108.6cd", 0x2000, 0x2000, BAD_DUMP CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.6cd", 0x2000, 0x2000, BAD_DUMP CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	ROM_LOAD( "fast108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
 ROM_END
 
@@ -1315,7 +1314,7 @@ static DEVICE_RESET( luxor_55_10828 )
     DEVICE_GET_INFO( luxor_55_10828 )
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( luxor_55_10828 )
+static DEVICE_GET_INFO( luxor_55_10828 )
 {
 	switch (state)
 	{
@@ -1338,6 +1337,24 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( abc830_pio )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( abc830_pio )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(abc830_pio);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 830");							break;
+
+		default:                                        DEVICE_GET_INFO_CALL(luxor_55_10828);						break;
 	}
 }
 
@@ -1415,7 +1432,7 @@ static DEVICE_RESET( luxor_55_21046 )
     DEVICE_GET_INFO( luxor_55_21046 )
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( luxor_55_21046 )
+static DEVICE_GET_INFO( luxor_55_21046 )
 {
 	switch (state)
 	{
@@ -1433,7 +1450,7 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_21046);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-xx");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-41");				break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");								break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -1441,36 +1458,61 @@ DEVICE_GET_INFO( luxor_55_21046 )
 	}
 }
 
-FLOPPY_OPTIONS_START(abc80)
-	FLOPPY_OPTION(abc80, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([8])
-		SECTOR_LENGTH([256])
-		INTERLEAVE([4])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(abc80, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		INTERLEAVE([7])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(abc80, "dsk", "ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		INTERLEAVE([7])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(abc80, "dsk", "ABC 838", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([26])
-		INTERLEAVE([7])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+/*-------------------------------------------------
+    DEVICE_GET_INFO( abc830 )
+-------------------------------------------------*/
 
-DEFINE_LEGACY_DEVICE(LUXOR_55_10828, luxor_55_10828);
-DEFINE_LEGACY_DEVICE(LUXOR_55_21046, luxor_55_21046);
+DEVICE_GET_INFO( abc830 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(abc830);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 830");							break;
+
+		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( abc832 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( abc832 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(abc832);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 832");							break;
+
+		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( abc838 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( abc838 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(abc838);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 838");							break;
+
+		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
+	}
+}
+
+DEFINE_LEGACY_DEVICE(ABC830_PIO, abc830_pio);
+DEFINE_LEGACY_DEVICE(ABC830, abc830);
+DEFINE_LEGACY_DEVICE(ABC832, abc832);
+DEFINE_LEGACY_DEVICE(ABC838, abc838);
