@@ -176,11 +176,9 @@ Notes:
 
     Fast Controller
     ---------------
-	- controller reads a couple of sectors on boot, bails out, and starts to STEP_OUT ad infinitum
 	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
 	- 2KB RAM option
-	- some SW2 options make controller try to WRITE_TRK
-	- 640KB disks have 7:1 sector interleave (logical sector numbering 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
+	- 160KB disks need a 7:1 sector interleave to load (physical sectors: 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
 
 */
 
@@ -620,14 +618,14 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
-		0		DS0
-		1		DS1
-		2		DS2
-		3		MTRON
-		4		pin 2 of 50-pin floppy connector, not used
-		5		SIDE1
+		0		DS0			drive select 0
+		1		DS1			drive select 1
+		2		DS2			drive select 2
+		3		MTRON		motor on
+		4		TG43		track > 43
+		5		SIDE1		side 1 select
 		6
 		7
 
@@ -655,14 +653,14 @@ static WRITE8_DEVICE_HANDLER( fast_8a_w )
 {
 	/*
 
-		bit		description
+		bit		signal							description
 
-		0		FD1793 _MR
-		1		FD1793 _DDEN, FDC9229 DENS
-		2		FDC9229 MINI
-		3		READY signal polarity (0=inverted)
-		4		FDC9229 P2
-		5		FDC9229 P1
+		0		FD1793 _MR						FDC master reset
+		1		FD1793 _DDEN, FDC9229 DENS		density select
+		2		FDC9229 MINI					
+		3		READY signal polarity			(0=inverted)
+		4		FDC9229 P2						
+		5		FDC9229 P1						
 		6
 		7
 
@@ -681,12 +679,12 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
-		0		3A.8 (busy)
-		1		50-pin floppy connector pin 10, not used
-		2		3A.12 (SW2)
-		3		? GND
+		0		busy		controller busy
+		1		_FD2S		double-sided disk
+		2		SW2			
+		3		_DCG ?		disk changed
 		4		SW1-1
 		5		SW1-2
 		6		SW1-3
@@ -708,11 +706,12 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 
 	/* SW2 */
 	UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
-
-	int sw2_1 = BIT(offset, 8) & BIT(sw2, 0);
-	int sw2_2 = BIT(offset, 9) & BIT(sw2, 1);
-	int sw2_3 = BIT(offset, 10) & BIT(sw2, 2);
-	int sw2_4 = BIT(offset, 11) & BIT(sw2, 3);
+	
+	// TTL inputs float high
+	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
+	int sw2_2 = BIT(sw2, 1) ? 1 : BIT(offset, 9);
+	int sw2_3 = BIT(sw2, 2) ? 1 : BIT(offset, 10);
+	int sw2_4 = BIT(sw2, 3) ? 1 : BIT(offset, 11);
 	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
 	
 	data |= sw2_data << 2;
@@ -816,16 +815,16 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x08, "40" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
 
 	PORT_START("luxor_55_21046:SW2")
-	PORT_DIPNAME( 0x0f, 0x0b, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
-	PORT_DIPSETTING(    0x0e, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
-	PORT_DIPSETTING(    0x0d, "BASF 6138 (ABC 850)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
-	PORT_DIPSETTING(    0x0c, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
-	PORT_DIPSETTING(    0x0b, "BASF 6118 (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
-	PORT_DIPSETTING(    0x0a, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
-	PORT_DIPSETTING(    0x07, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x06, "MPI 51 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x01, "BASF 6105 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x00, "BASF 6106 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
+	PORT_DIPNAME( 0x0f, 0x01, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
+	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
+	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
+	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
+	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
+	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x0e, "BASF 6105 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
 	
 	PORT_START("luxor_55_21046:SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
@@ -851,21 +850,21 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
+static READ8_DEVICE_HANDLER( pio_pa_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	return conkort->data;
 }
 
-static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
+static WRITE8_DEVICE_HANDLER( pio_pa_w )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->data = data;
 }
 
-static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
+static READ8_DEVICE_HANDLER( pio_pb_r )
 {
 	/*
 
@@ -910,7 +909,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
+static WRITE8_DEVICE_HANDLER( pio_pb_w )
 {
 	/*
 
@@ -936,15 +935,15 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 //  wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
-static Z80PIO_INTERFACE( conkort_pio_intf )
+static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
-	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
-	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
-	DEVCB_NULL,								/* port A ready callback */
-	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
-	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
-	DEVCB_NULL								/* port B ready callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt callback */
+	DEVCB_HANDLER(pio_pa_r),						/* port A read callback */
+	DEVCB_HANDLER(pio_pa_w),						/* port A write callback */
+	DEVCB_NULL,										/* port A ready callback */
+	DEVCB_HANDLER(pio_pb_r),						/* port B read callback */
+	DEVCB_HANDLER(pio_pb_w),						/* port B write callback */
+	DEVCB_NULL										/* port B ready callback */
 };
 
 static const z80_daisy_config slow_daisy_chain[] =
@@ -1069,7 +1068,7 @@ static const wd17xx_interface slow_fdc_intf =
 	DEVCB_LINE(slow_fd1791_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
-
+/*
 static FLOPPY_OPTIONS_START( fd2 )
 	FLOPPY_OPTION(fd2, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
@@ -1078,7 +1077,7 @@ static FLOPPY_OPTIONS_START( fd2 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
-
+*/
 static FLOPPY_OPTIONS_START( abc830 )
 	FLOPPY_OPTION(abc830, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
@@ -1106,7 +1105,7 @@ static FLOPPY_OPTIONS_START( abc838 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
-
+/*
 static const floppy_config fd2_floppy_config =
 {
     DEVCB_NULL,
@@ -1118,7 +1117,7 @@ static const floppy_config fd2_floppy_config =
     FLOPPY_OPTIONS_NAME(fd2),
     NULL
 };
-
+*/
 static const floppy_config abc830_floppy_config =
 {
     DEVCB_NULL,
@@ -1182,7 +1181,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MDRV_CPU_IO_MAP(slow_io_map)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, conkort_pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
 	MDRV_WD179X_ADD(FD1791_TAG, slow_fdc_intf)
 MACHINE_CONFIG_END
 
