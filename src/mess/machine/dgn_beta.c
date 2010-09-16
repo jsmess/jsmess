@@ -357,7 +357,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 //
 static void SetDefaultTask(running_machine *machine)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	UINT8 *videoram = state->videoram;
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
@@ -1071,6 +1072,7 @@ void dgn_beta_line_interrupt (int data)
 /********************************* Machine/Driver Initialization ****************************************/
 static void dgnbeta_reset(running_machine &machine)
 {
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	running_device *fdc = machine.device(FDC_TAG);
 	running_device *pia_0 = machine.device( PIA_0_TAG );
 	running_device *pia_1 = machine.device( PIA_1_TAG );
@@ -1113,7 +1115,7 @@ static void dgnbeta_reset(running_machine &machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	machine.generic.videoram.u8 = messram_get_ptr(machine.device("messram"));		/* Point video ram at the start of physical ram */
+	state->videoram = messram_get_ptr(machine.device("messram"));		/* Point video ram at the start of physical ram */
 
     dgnbeta_video_reset(&machine);
     wd17xx_reset(fdc);

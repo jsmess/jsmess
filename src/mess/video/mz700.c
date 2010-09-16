@@ -48,7 +48,8 @@ PALETTE_INIT( mz700 )
 
 VIDEO_UPDATE( mz700 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	mz_state *state = screen->machine->driver_data<mz_state>();
+	UINT8 *videoram = state->videoram;
 	int offs;
 	mz_state *mz = screen->machine->driver_data<mz_state>();
 
@@ -83,7 +84,8 @@ VIDEO_START( mz800 )
 
 VIDEO_UPDATE( mz800 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	mz_state *state = screen->machine->driver_data<mz_state>();
+	UINT8 *videoram = state->videoram;
 	mz_state *mz = screen->machine->driver_data<mz_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));

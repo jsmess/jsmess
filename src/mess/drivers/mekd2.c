@@ -47,7 +47,8 @@ static WRITE8_HANDLER(mekd2_cas_w) { }
 
 static WRITE8_HANDLER(mekd2_kbd_w)
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	mekd2_state *state = space->machine->driver_data<mekd2_state>();
+	UINT8 *videoram = state->videoram;
 	pia[offset] = data;
 	switch( offset )
 	{
@@ -197,7 +198,7 @@ static GFXDECODE_START( mekd2 )
 	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 16*2, 2 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mekd2, driver_device )
+static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 614400)        /* 614.4 kHz */
 	MDRV_CPU_PROGRAM_MAP(mekd2_mem)

@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( dgnbeta_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3FFF)	AM_RAMBANK("bank4")
 	AM_RANGE(0x4000, 0x4FFF)	AM_RAMBANK("bank5")
 	AM_RANGE(0x5000, 0x5FFF)	AM_RAMBANK("bank6")
-	AM_RANGE(0x6000, 0x6FFF)	AM_RAMBANK("bank7") AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x6000, 0x6FFF)	AM_RAMBANK("bank7") AM_BASE_MEMBER(dgn_beta_state, videoram)
 	AM_RANGE(0x7000, 0x7FFF)	AM_RAMBANK("bank8")
 	AM_RANGE(0x8000, 0x8FFF)	AM_RAMBANK("bank9")
 	AM_RANGE(0x9000, 0x9FFF)	AM_RAMBANK("bank10")
@@ -316,7 +316,7 @@ static GFXDECODE_START( dgnbeta )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dgnbeta, driver_device )
+static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)

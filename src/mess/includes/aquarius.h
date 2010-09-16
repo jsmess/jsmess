@@ -7,6 +7,16 @@
 #ifndef __AQUARIUS__
 #define __AQUARIUS__
 
+class aquarius_state : public driver_device
+{
+public:
+	aquarius_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/aquarius.c -----------*/
 
 extern UINT8 *aquarius_colorram;

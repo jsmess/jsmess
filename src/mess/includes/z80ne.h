@@ -24,6 +24,16 @@
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
 
+class z80ne_state : public driver_device
+{
+public:
+	z80ne_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/z80ne.c -----------*/
 
 READ8_HANDLER(lx383_r);

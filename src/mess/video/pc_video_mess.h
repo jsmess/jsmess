@@ -12,6 +12,7 @@
 #include "includes/crtc6845.h"
 
 extern size_t pc_videoram_size;
+extern UINT8 *pc_videoram;
 
 typedef void (*pc_video_update_proc)(bitmap_t *bitmap,
 	struct mscrtc6845 *crtc);

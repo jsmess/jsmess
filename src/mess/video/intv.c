@@ -778,7 +778,8 @@ WRITE8_HANDLER( intvkbd_tms9927_w )
 
 VIDEO_UPDATE( intvkbd )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	intv_state *state = screen->machine->driver_data<intv_state>();
+	UINT8 *videoram = state->videoram;
 	int x,y,offs;
 	int current_row;
 //  char c;

@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(concept_memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x020000, 0x021fff) AM_ROM										/* macsbugs ROM (optional) */
 	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)	/* I/O space */
 
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE_GENERIC(videoram)/* AM_RAMBANK(2) */	/* DRAM */
+	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE_MEMBER(concept_state, videoram)/* AM_RAMBANK(2) */	/* DRAM */
 ADDRESS_MAP_END
 
 /* init with simple, fixed, B/W palette */
@@ -119,7 +119,7 @@ static const floppy_config concept_floppy_config =
 };
 
 /* concept machine */
-static MACHINE_CONFIG_START( concept, driver_device )
+static MACHINE_CONFIG_START( concept, concept_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(concept_memmap)

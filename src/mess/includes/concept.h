@@ -14,6 +14,16 @@
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
 
+class concept_state : public driver_device
+{
+public:
+	concept_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in machine/concept.c -----------*/
 
 extern const via6522_interface concept_via6522_intf;

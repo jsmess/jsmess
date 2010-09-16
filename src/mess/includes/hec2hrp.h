@@ -35,6 +35,36 @@
            Adjust the one shot and A/D timing (sn76477)
 */
 
+
+/* Enum status for high memory bank (c000 - ffff)*/
+enum
+{
+	HECTOR_BANK_PROG = 0,       		/* first BANK is program ram*/
+	HECTOR_BANK_VIDEO					/* second BANK is Video ram */
+};
+/* Status for rom memory bank (0000 - 3fff) in MX machine*/
+enum
+{
+	HECTORMX_BANK_PAGE0 = 0,        	/* first BANK is base rom*/
+	HECTORMX_BANK_PAGE1,				/* second BANK is basic rom */
+	HECTORMX_BANK_PAGE2					/* 3 BANK is monitrix / assemblex rom */
+};
+
+class hec2hrp_state : public driver_device
+{
+public:
+	hec2hrp_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
+/*----------- defined in machine/hec2hrp.c -----------*/
+
+/* Sound function*/
+extern sn76477_interface hector_sn76477_interface;
+
 /* Protoype of memory Handler*/
 extern WRITE8_HANDLER( hector_switch_bank_w );
 extern READ8_HANDLER( hector_keyboard_r );
@@ -49,12 +79,13 @@ extern WRITE8_HANDLER( hector_color_b_w );
 extern void hector_init(running_machine *machine);
 extern void hector_reset(running_machine *machine, int hr);
 
-extern READ8_HANDLER( hector_mx_io_port_r);
-extern WRITE8_HANDLER( hector_mx80_io_port_w);
-extern WRITE8_HANDLER( hector_mx40_io_port_w);
+extern READ8_HANDLER( hector_mx_io_port_r );
+extern WRITE8_HANDLER( hector_mx80_io_port_w );
+extern WRITE8_HANDLER( hector_mx40_io_port_w );
 
 
-/* Prototype of video function*/
+/*----------- defined in video/hec2video.c -----------*/
+
 extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 VIDEO_START( hec2hrp );
@@ -71,21 +102,3 @@ extern UINT8 hector_videoram[0x04000];
 
 /* Color status*/
 extern UINT8 hector_color[4];
-
-/* Sound function*/
-extern sn76477_interface hector_sn76477_interface;
-
-
-/* Enum status for high memory bank (c000 - ffff)*/
-enum
-{
-	HECTOR_BANK_PROG = 0,       		/* first BANK is program ram*/
-	HECTOR_BANK_VIDEO					/* second BANK is Video ram */
-};
-/* Status for rom memory bank (0000 - 3fff) in MX machine*/
-enum
-{
-	HECTORMX_BANK_PAGE0 = 0,        	/* first BANK is base rom*/
-	HECTORMX_BANK_PAGE1,				/* second BANK is basic rom */
-	HECTORMX_BANK_PAGE2					/* 3 BANK is monitrix / assemblex rom */
-};

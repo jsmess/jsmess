@@ -152,7 +152,8 @@ VIDEO_START( hec2hrp )
 
 VIDEO_UPDATE( hec2hrp )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	hec2hrp_state *state = screen->machine->driver_data<hec2hrp_state>();
+	UINT8 *videoram = state->videoram;
     if (hector_flag_hr==1)
         {
            if (hector_flag_80c==0)

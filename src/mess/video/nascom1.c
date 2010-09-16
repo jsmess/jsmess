@@ -11,7 +11,8 @@
 
 VIDEO_UPDATE( nascom1 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	nascom1_state *state = screen->machine->driver_data<nascom1_state>();
+	UINT8 *videoram = state->videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)
@@ -35,7 +36,8 @@ VIDEO_UPDATE( nascom1 )
 
 VIDEO_UPDATE( nascom2 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	nascom1_state *state = screen->machine->driver_data<nascom1_state>();
+	UINT8 *videoram = state->videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)

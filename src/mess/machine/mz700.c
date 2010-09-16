@@ -82,23 +82,25 @@ const struct pit8253_config mz800_pit8253_config =
 
 DRIVER_INIT( mz700 )
 {
+	mz_state *state = machine->driver_data<mz_state>();
 	mz_state *mz = machine->driver_data<mz_state>();
 	mz->mz700 = TRUE;
 	mz->mz700_mode = TRUE;
 
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x800);
+	state->videoram = auto_alloc_array(machine, UINT8, 0x800);
 	mz->colorram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 DRIVER_INIT( mz800 )
 {
+	mz_state *state = machine->driver_data<mz_state>();
 	mz_state *mz = machine->driver_data<mz_state>();
 	mz->mz700 = FALSE;
 	mz->mz700_mode = FALSE;
 
 	/* video ram */
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x4000);
-	mz->colorram = machine->generic.videoram.u8 + 0x800;
+	state->videoram = auto_alloc_array(machine, UINT8, 0x4000);
+	mz->colorram = state->videoram + 0x800;
 
 	/* character generator ram */
 	mz->cgram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -147,7 +149,8 @@ static WRITE8_HANDLER( mz700_e008_w )
 
 READ8_HANDLER( mz800_bank_0_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	mz_state *state = space->machine->driver_data<mz_state>();
+	UINT8 *videoram = state->videoram;
 	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
@@ -265,7 +268,8 @@ WRITE8_HANDLER( mz700_bank_2_w )
 
 WRITE8_HANDLER( mz700_bank_3_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	mz_state *state = space->machine->driver_data<mz_state>();
+	UINT8 *videoram = state->videoram;
 	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
@@ -313,7 +317,8 @@ WRITE8_HANDLER( mz700_bank_3_w )
 
 WRITE8_HANDLER( mz700_bank_4_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	mz_state *state = space->machine->driver_data<mz_state>();
+	UINT8 *videoram = state->videoram;
 	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 

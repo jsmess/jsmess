@@ -19,6 +19,16 @@
 #include "machine/6522via.h"
 
 
+class microtan_state : public driver_device
+{
+public:
+	microtan_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/microtan.c -----------*/
 
 extern const via6522_interface microtan_via6522_0;

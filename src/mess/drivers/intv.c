@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */
 	AM_RANGE( 0xb7f8, 0xb7ff) AM_RAM	/* ??? */
-	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) /* Text Display */
+	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(intv_state, videoram) /* Text Display */
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -373,7 +373,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 	timer_set(device->machine, device->machine->device<cpu_device>("keyboard")->cycles_to_attotime(100), NULL, 0, intv_interrupt2_complete);
 }
 
-static MACHINE_CONFIG_START( intv, driver_device )
+static MACHINE_CONFIG_START( intv, intv_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem)

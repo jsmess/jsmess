@@ -117,11 +117,12 @@ DRIVER_INIT(laser)
 
 static void laser_machine_init(running_machine *machine, int bank_mask, int video_mask)
 {
+	vtech2_state *state = machine->driver_data<vtech2_state>();
     int i;
 
 	laser_bank_mask = bank_mask;
     laser_video_bank = video_mask;
-	machine->generic.videoram.u8 = mem + laser_video_bank * 0x04000;
+	state->videoram = mem + laser_video_bank * 0x04000;
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", laser_bank_mask, laser_video_bank, laser_video_bank * 0x04000);
 
 	for (i = 0; i < ARRAY_LENGTH(laser_bank); i++)

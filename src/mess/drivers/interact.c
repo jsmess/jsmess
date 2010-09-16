@@ -61,6 +61,17 @@
 
 #include "includes/hec2hrp.h"
 
+
+class interact_state : public driver_device
+{
+public:
+	interact_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
@@ -77,7 +88,7 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
  /*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(interact_state, videoram)
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xffff) AM_RAM
 
@@ -116,13 +127,14 @@ static MACHINE_START(interact)
 
 static VIDEO_UPDATE( interact )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	interact_state *state = screen->machine->driver_data<interact_state>();
+	UINT8 *videoram = state->videoram;
 	screen->set_visible_area(0, 113, 0, 75);
 	hector_hr( bitmap, videoram,  77, 32);
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact, driver_device )
+static MACHINE_CONFIG_START( interact, interact_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
@@ -163,7 +175,7 @@ static MACHINE_CONFIG_START( interact, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1, driver_device )
+static MACHINE_CONFIG_START( hector1, interact_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)

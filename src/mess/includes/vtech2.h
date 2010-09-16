@@ -8,6 +8,16 @@
 #define VTECH2_H_
 
 
+class vtech2_state : public driver_device
+{
+public:
+	vtech2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/vtech2.c -----------*/
 
 extern int laser_latch;

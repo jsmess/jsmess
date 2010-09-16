@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 size_t pc_videoram_size;
+UINT8 *pc_videoram;
 
 static pc_video_update_proc (*pc_choosevideomode)(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc);
 static struct mscrtc6845 *pc_crtc;
@@ -124,7 +125,7 @@ VIDEO_UPDATE( pc_video )
 
 WRITE8_HANDLER ( pc_video_videoram_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	if (videoram && videoram[offset] != data)
 	{
 		videoram[offset] = data;
@@ -137,7 +138,7 @@ WRITE16_HANDLER( pc_video_videoram16le_w ) { write16le_with_write8_handler(pc_vi
 
 WRITE32_HANDLER( pc_video_videoram32_w )
 {
-	UINT32 *videoram = space->machine->generic.videoram.u32;
+	UINT32 *videoram = (UINT32 *)pc_videoram;
 	COMBINE_DATA(videoram + offset);
 	pc_anythingdirty = 1;
 }

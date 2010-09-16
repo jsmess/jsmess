@@ -68,7 +68,8 @@ void superpet_vh_init (running_machine *machine)
 //  commodore pet discrete video circuit
 VIDEO_UPDATE( pet )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	pet_state *state = screen->machine->driver_data<pet_state>();
+	UINT8 *videoram = state->videoram;
 	int x, y, i;
 
 	for (y=0, i=0; y<25;y++)
@@ -85,7 +86,8 @@ VIDEO_UPDATE( pet )
 
 MC6845_UPDATE_ROW( pet40_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	pet_state *state = device->machine->driver_data<pet_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
@@ -95,7 +97,8 @@ MC6845_UPDATE_ROW( pet40_update_row )
 
 MC6845_UPDATE_ROW( pet80_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	pet_state *state = device->machine->driver_data<pet_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {

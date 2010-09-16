@@ -81,6 +81,17 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9900.h"
 
+
+class ti99_2_state : public driver_device
+{
+public:
+	ti99_2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static int ROM_paged;
 static int state = ASSERT_LINE;
 
@@ -137,7 +148,8 @@ static PALETTE_INIT(ti99_2)
 
 static VIDEO_UPDATE(ti99_2)
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	ti99_2_state *state = screen->machine->driver_data<ti99_2_state>();
+	UINT8 *videoram = state->videoram;
 	int i, sx, sy;
 
 
@@ -187,7 +199,7 @@ static ADDRESS_MAP_START( ti99_2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")	/* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
 	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
-	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_MEMBER(ti99_2_state, videoram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM		    /* system RAM */
 	AM_RANGE(0xf000, 0xffff) AM_NOP		    /* free for expansion (and internal processor RAM) */
 ADDRESS_MAP_END
@@ -352,7 +364,7 @@ static const struct tms9995reset_param ti99_2_processor_config =
 	1           /* enable automatic wait state generation */
 };
 
-static MACHINE_CONFIG_START( ti99_2, driver_device )
+static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(ti99_2_processor_config)

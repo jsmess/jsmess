@@ -124,7 +124,7 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 
 /* colors need fixing in the mda_text_* functions ! */
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -183,7 +183,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -243,7 +243,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -272,7 +272,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -300,7 +300,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -332,7 +332,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -366,7 +366,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -390,7 +390,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -422,7 +422,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -446,7 +446,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	fg = aga.cga_color_select & 0x0F;
 	int i;
@@ -777,7 +777,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 
  READ8_HANDLER( pc_aga_videoram_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	switch (aga.mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000) return videoram[offset-0x8000];
@@ -791,7 +791,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 
 READ8_HANDLER( pc200_videoram_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	switch (aga.mode)
 	{
 		default:

@@ -71,7 +71,8 @@ void cbmb_vh_set_font(int font)
 
 MC6845_UPDATE_ROW( cbm600_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
@@ -85,7 +86,8 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 
 MC6845_UPDATE_ROW( cbm700_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {

@@ -25,6 +25,7 @@ public:
 	int pia0_irq;
 	int pia1_irq;
 	int via_irq;
+	UINT8 *videoram;
 };
 
 /*----------- defined in video/pet.c -----------*/

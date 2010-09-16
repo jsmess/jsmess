@@ -8,6 +8,16 @@
 #define MEKD2_H_
 
 
+class mekd2_state : public driver_device
+{
+public:
+	mekd2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/mekd2.c -----------*/
 
 DRIVER_INIT( mekd2 );

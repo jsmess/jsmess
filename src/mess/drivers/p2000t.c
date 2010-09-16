@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( p2000m_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(p2000t_state, videoram)
 	AM_RANGE(0x6000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -229,7 +229,7 @@ static const saa5050_interface p2000t_saa5050_intf =
 };
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000t, driver_device )
+static MACHINE_CONFIG_START( p2000t, p2000t_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000t_mem)
@@ -261,7 +261,7 @@ MACHINE_CONFIG_END
 
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000m, driver_device )
+static MACHINE_CONFIG_START( p2000m, p2000t_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem)

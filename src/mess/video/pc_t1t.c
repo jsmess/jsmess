@@ -405,7 +405,7 @@ static MC6845_UPDATE_ROW( t1000_update_row )
 
  READ8_HANDLER ( pc_t1t_videoram_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	int data = 0xff;
 	if( videoram )
 		data = videoram[offset];
@@ -739,7 +739,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-		machine->generic.videoram.u8 = &ram[vram];
+		pc_videoram = &ram[vram];
 		pcjr.displayram = &ram[dram];
 		pc_t1t_mode_switch();
 	}

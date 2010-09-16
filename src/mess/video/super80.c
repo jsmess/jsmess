@@ -302,7 +302,8 @@ static UINT16 cursor;
 
 READ8_HANDLER( super80v_low_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	super80_state *state = space->machine->driver_data<super80_state>();
+	UINT8 *videoram = state->videoram;
 	if (super80_shared & 4)
 		return videoram[offset];
 	else
@@ -311,7 +312,8 @@ READ8_HANDLER( super80v_low_r )
 
 WRITE8_HANDLER( super80v_low_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	super80_state *state = space->machine->driver_data<super80_state>();
+	UINT8 *videoram = state->videoram;
 	if (super80_shared & 4)
 		videoram[offset] = data;
 	else
@@ -331,7 +333,8 @@ READ8_HANDLER( super80v_high_r )
 
 WRITE8_HANDLER( super80v_high_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	super80_state *state = space->machine->driver_data<super80_state>();
+	UINT8 *videoram = state->videoram;
 	if (~super80_shared & 4)
 		super80_colorram[offset+0x800] = data;
 	else
@@ -415,7 +418,8 @@ VIDEO_UPDATE( super80v )
 
 MC6845_UPDATE_ROW( super80v_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	super80_state *state = device->machine->driver_data<super80_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);

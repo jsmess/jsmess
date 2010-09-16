@@ -9,6 +9,16 @@
 
 #include "machine/wd17xx.h"
 
+class cgenie_state : public driver_device
+{
+public:
+	cgenie_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/cgenie.c -----------*/
 
 READ8_DEVICE_HANDLER( cgenie_sh_control_port_r );

@@ -124,7 +124,8 @@ static  READ8_HANDLER( channelf_2102B_r )  /* SKR */
 
 static WRITE8_HANDLER( channelf_port_0_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	channelf_state *state = space->machine->driver_data<channelf_state>();
+	UINT8 *videoram = state->videoram;
 	int offs;
 
 	latch[0] = data;
@@ -276,7 +277,7 @@ static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( channelf, driver_device )
+static MACHINE_CONFIG_START( channelf, channelf_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -304,7 +305,7 @@ static MACHINE_CONFIG_START( channelf, driver_device )
 	MDRV_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sabavdpl, driver_device )
+static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -333,7 +334,7 @@ static MACHINE_CONFIG_START( sabavdpl, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( channlf2, driver_device )
+static MACHINE_CONFIG_START( channlf2, channelf_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)
@@ -362,7 +363,7 @@ static MACHINE_CONFIG_START( channlf2, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sabavpl2, driver_device )
+static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map)

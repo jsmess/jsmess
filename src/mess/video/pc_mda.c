@@ -123,8 +123,8 @@ VIDEO_START( pc_mda )
 	mda.chr_gen = memory_region( machine, "gfx1" );
 
 	pc_videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
-	memory_set_bankptr(machine,"bank11", machine->generic.videoram.u8);
+	pc_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	memory_set_bankptr(machine,"bank11", pc_videoram);
 }
 
 
@@ -144,7 +144,7 @@ static VIDEO_UPDATE( mc6845_mda )
 
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -218,7 +218,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -477,8 +477,8 @@ static VIDEO_START( pc_hercules )
 	mda.chr_gen = memory_region( machine, "gfx1" );
 
 	pc_videoram_size = 0x10000;
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_bankptr(machine,"bank11", machine->generic.videoram.u8);
+	pc_videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	memory_set_bankptr(machine,"bank11", pc_videoram);
 }
 
 
@@ -491,7 +491,7 @@ static VIDEO_START( pc_hercules )
 
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	UINT8 *videoram = pc_videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;

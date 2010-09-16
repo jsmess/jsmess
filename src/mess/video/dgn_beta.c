@@ -308,7 +308,8 @@ static void beta_Set_DE(int offset, int data)
 /* Video init */
 void dgnbeta_init_video(running_machine *machine)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	UINT8 *videoram = state->videoram;
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
@@ -391,7 +392,8 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, b
 
 static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	UINT8 *videoram = state->videoram;
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data = memory_region(machine, "gfx1");		// ptr to char rom
 	int Dot;
@@ -539,7 +541,8 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 
 static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *bitmap)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	UINT8 *videoram = state->videoram;
 	int crtcAddr;
 	int Addr;
 	int Red;

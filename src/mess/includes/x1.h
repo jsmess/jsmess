@@ -9,9 +9,6 @@
 
 #include "cpu/z80/z80daisy.h"
 
-extern UINT8 x1_key_irq_flag;
-extern UINT8 x1_key_irq_vector;
-
 // ======================>  x1_keyboard_device_config
 
 class x1_keyboard_device_config :	public device_config,
@@ -50,6 +47,23 @@ private:
 	// internal state
 	const x1_keyboard_device_config &m_config;
 };
+
+class x1_state : public driver_device
+{
+public:
+	x1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
+/*----------- defined in drivers/x1.c -----------*/
+
+extern UINT8 x1_key_irq_flag;
+extern UINT8 x1_key_irq_vector;
+
+/*----------- defined in machine/x1.c -----------*/
 
 extern const device_type X1_KEYBOARD;
 

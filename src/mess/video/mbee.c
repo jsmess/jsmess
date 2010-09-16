@@ -88,7 +88,8 @@ READ8_HANDLER ( mbee_pcg_color_latch_r )
 
 WRITE8_HANDLER ( mbee_videoram_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 }
 
@@ -479,22 +480,25 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *ram = memory_region(machine, "maincpu");
-	machine->generic.videoram.u8 = ram+0x15000;
+	state->videoram = ram+0x15000;
 	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_START( mbeeic )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *ram = memory_region(machine, "maincpu");
-	machine->generic.videoram.u8 = ram+0x15000;
+	state->videoram = ram+0x15000;
 	colorram = ram+0x15800;
 	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_UPDATE( mbee )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	mbee_state *state = screen->machine->driver_data<mbee_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx;
 	UINT16 mem,sy=0,ma=0,x;
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
@@ -551,7 +555,8 @@ VIDEO_UPDATE( mbee )
 
 VIDEO_UPDATE( mbeeic )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	mbee_state *state = screen->machine->driver_data<mbee_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,fg,bg;
 	UINT16 mem,sy=0,ma=0,x,col;
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes

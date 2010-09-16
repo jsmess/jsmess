@@ -1,6 +1,16 @@
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
 
+class super80_state : public driver_device
+{
+public:
+	super80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in drivers/super80.c -----------*/
 
 extern UINT8 *super80_pcgram;

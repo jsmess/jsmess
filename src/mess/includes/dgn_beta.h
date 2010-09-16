@@ -74,6 +74,16 @@ typedef enum
 #define iosize	(0xfEFF-0xfc00)
 
 
+class dgn_beta_state : public driver_device
+{
+public:
+	dgn_beta_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 extern const wd17xx_interface dgnbeta_wd17xx_interface;

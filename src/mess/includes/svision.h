@@ -9,6 +9,16 @@
 
 
 
+class svision_state : public driver_device
+{
+public:
+	svision_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in drivers/svision.c -----------*/
 
 void svision_irq( running_machine *machine );

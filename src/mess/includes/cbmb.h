@@ -29,6 +29,7 @@ public:
 	int p500;
 	int cbm700;
 	int cbm_ntsc;
+	UINT8 *videoram;
 };
 
 /*----------- defined in machine/cbmb.c -----------*/

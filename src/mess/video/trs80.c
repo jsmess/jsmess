@@ -55,7 +55,8 @@ VIDEO_START( trs80 )
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 VIDEO_UPDATE( trs80 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -118,7 +119,8 @@ VIDEO_UPDATE( trs80 )
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 VIDEO_UPDATE( trs80m4 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -214,7 +216,8 @@ VIDEO_UPDATE( trs80m4 )
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 VIDEO_UPDATE( ht1080z )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -274,7 +277,8 @@ VIDEO_UPDATE( ht1080z )
 /* 8-bit video, 64/80 characters per line = lnw80 */
 VIDEO_UPDATE( lnw80 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
@@ -448,7 +452,8 @@ VIDEO_UPDATE( lnw80 )
 /* lores characters are in the character generator. Each character is 8x16. */
 VIDEO_UPDATE( radionic )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -497,14 +502,16 @@ VIDEO_UPDATE( radionic )
 
 READ8_HANDLER( trs80_videoram_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	trs80_state *state = space->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( trs80_videoram_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	trs80_state *state = space->machine->driver_data<trs80_state>();
+	UINT8 *videoram = state->videoram;
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
 	videoram[offset] = data;
 }

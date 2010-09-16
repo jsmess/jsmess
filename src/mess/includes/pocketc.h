@@ -8,6 +8,16 @@
 #define POCKETC_H_
 
 
+class pocketc_state : public driver_device
+{
+public:
+	pocketc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/pocketc.c -----------*/
 
 extern PALETTE_INIT( pocketc );

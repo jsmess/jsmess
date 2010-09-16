@@ -52,8 +52,9 @@ PALETTE_INIT( ssystem3 )
 
 VIDEO_START( ssystem3 )
 {
+	ssystem3_state *state = machine->driver_data<ssystem3_state>();
 	// artwork seams to need this
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
+	state->videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
 }
 
 

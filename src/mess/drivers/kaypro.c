@@ -54,7 +54,7 @@ static READ8_HANDLER( kaypro2x_87) { return 0x7f; }	/* to bypass unemulated HD c
 
 static ADDRESS_MAP_START( kaypro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE_MEMBER(kaypro_state, videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
@@ -219,7 +219,7 @@ static const floppy_config kaypro2x_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( kayproii, driver_device )
+static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
 	MDRV_Z80PIO_ADD( "z80pio_s", 2500000, kaypro4_pio_s_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kaypro2x, driver_device )
+static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_map)

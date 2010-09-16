@@ -28,6 +28,16 @@ struct intv_sprite_type
 	int dirty;
 };
 
+class intv_state : public driver_device
+{
+public:
+	intv_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/stic.c -----------*/
 
 READ16_HANDLER( intv_stic_r );

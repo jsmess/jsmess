@@ -54,7 +54,7 @@
 
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE_MEMBER(microtan_state, videoram)
 	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_address_w)
 	AM_RANGE(0xbc01, 0xbc01) AM_DEVREADWRITE("ay8910.1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xbc02, 0xbc02) AM_DEVWRITE("ay8910.2", ay8910_address_w)
@@ -215,7 +215,7 @@ static const ay8910_interface microtan_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( microtan, driver_device )
+static MACHINE_CONFIG_START( microtan, microtan_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map)

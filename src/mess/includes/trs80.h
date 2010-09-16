@@ -14,6 +14,16 @@
 #define FH 12
 
 
+class trs80_state : public driver_device
+{
+public:
+	trs80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in drivers/trs80.c -----------*/
 
 extern UINT8 trs80_model4;

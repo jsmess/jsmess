@@ -132,6 +132,7 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
+	cgenie_state *state = machine->driver_data<cgenie_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx = memory_region(machine, "gfx2");
 	int i;
@@ -155,7 +156,7 @@ MACHINE_START( cgenie )
 	/* set up RAM */
 	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, cgenie_videoram_w);
-	machine->generic.videoram.u8 = messram_get_ptr(machine->device("messram"));
+	state->videoram = messram_get_ptr(machine->device("messram"));
 	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
@@ -520,13 +521,15 @@ WRITE8_HANDLER( cgenie_motor_w )
 
 int cgenie_videoram_r( running_machine *machine, int offset )
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	cgenie_state *state = machine->driver_data<cgenie_state>();
+	UINT8 *videoram = state->videoram;
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( cgenie_videoram_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	UINT8 *videoram = state->videoram;
 	/* write to video RAM */
 	if( data == videoram[offset] )
 		return; 			   /* no change */

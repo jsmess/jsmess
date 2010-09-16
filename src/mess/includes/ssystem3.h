@@ -8,6 +8,16 @@
 #define SSYSTEM3_H_
 
 
+class ssystem3_state : public driver_device
+{
+public:
+	ssystem3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in drivers/ssystem3.c -----------*/
 
 void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black);

@@ -241,7 +241,8 @@ void cgenie_mode_select(int mode)
 
 static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	cgenie_state *state = machine->driver_data<cgenie_state>();
+	UINT8 *videoram = state->videoram;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
@@ -320,7 +321,8 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 
 static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	cgenie_state *state = machine->driver_data<cgenie_state>();
+	UINT8 *videoram = state->videoram;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 

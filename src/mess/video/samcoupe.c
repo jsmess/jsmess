@@ -28,7 +28,8 @@
 
 static void draw_mode4_line(running_machine *machine, int y, int hpos)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	UINT8 *videoram = state->videoram;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
@@ -53,7 +54,8 @@ static void draw_mode4_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode3_line(running_machine *machine, int y, int hpos)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	UINT8 *videoram = state->videoram;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
@@ -92,7 +94,8 @@ static void draw_mode12_block(samcoupe_state *asic, bitmap_t *bitmap, int vpos, 
 
 static void draw_mode2_line(running_machine *machine, int y, int hpos)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	UINT8 *videoram = state->videoram;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	int cell = (y - SAM_BORDER_TOP) * 32 + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2;
@@ -105,7 +108,8 @@ static void draw_mode2_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode1_line(running_machine *machine, int y, int hpos)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	UINT8 *videoram = state->videoram;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	UINT8 mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];

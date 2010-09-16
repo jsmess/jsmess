@@ -54,6 +54,7 @@ public:
 	emu_timer *mouse_reset;
 	UINT8 mouse_data[9];
 	int mouse_x, mouse_y;
+	UINT8 *videoram;
 };
 
 

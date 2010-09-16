@@ -45,13 +45,15 @@ PALETTE_INIT( mekd2 )
 
 VIDEO_START( mekd2 )
 {
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
+	mekd2_state *state = machine->driver_data<mekd2_state>();
+	state->videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
 }
 
 
 VIDEO_UPDATE( mekd2 )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	mekd2_state *state = screen->machine->driver_data<mekd2_state>();
+	UINT8 *videoram = state->videoram;
 	int width = screen->width();
     int x, y;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };

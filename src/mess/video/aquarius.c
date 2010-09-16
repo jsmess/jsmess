@@ -68,7 +68,8 @@ PALETTE_INIT( aquarius )
 
 WRITE8_HANDLER( aquarius_videoram_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	aquarius_state *state = space->machine->driver_data<aquarius_state>();
+	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(aquarius_tilemap, offset);
 }
@@ -81,7 +82,8 @@ WRITE8_HANDLER( aquarius_colorram_w )
 
 static TILE_GET_INFO(aquarius_gettileinfo)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	aquarius_state *state = machine->driver_data<aquarius_state>();
+	UINT8 *videoram = state->videoram;
 	int bank = 0;
 	int code = videoram[tile_index];
 	int color = aquarius_colorram[tile_index];

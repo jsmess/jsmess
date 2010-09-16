@@ -650,7 +650,8 @@ WRITE8_HANDLER(lx385_ctrl_w)
 
 READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 {
-	UINT8 *videoram = device->machine->generic.videoram.u8;
+	z80ne_state *state = device->machine->driver_data<z80ne_state>();
+	UINT8 *videoram = state->videoram;
 	int d6 = BIT(videoram[offset], 6);
 	int d7 = BIT(videoram[offset], 7);
 

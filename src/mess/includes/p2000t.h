@@ -8,6 +8,16 @@
 #define P2000T_H_
 
 
+class p2000t_state : public driver_device
+{
+public:
+	p2000t_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/p2000t.c -----------*/
 
 extern  READ8_HANDLER( p2000t_port_000f_r );

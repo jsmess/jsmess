@@ -67,6 +67,7 @@ static void samcoupe_install_ext_mem(address_space *space)
 
 void samcoupe_update_memory(address_space *space)
 {
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
 	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(space->machine, "maincpu");
@@ -131,9 +132,9 @@ void samcoupe_update_memory(address_space *space)
 
 	/* video memory location */
 	if (asic->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		space->machine->generic.videoram.u8 = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		state->videoram = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		space->machine->generic.videoram.u8 = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		state->videoram = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 

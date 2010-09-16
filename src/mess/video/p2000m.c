@@ -21,7 +21,8 @@ VIDEO_START( p2000m )
 
 VIDEO_UPDATE( p2000m )
 {
-	UINT8 *videoram = screen->machine->generic.videoram.u8;
+	p2000t_state *state = screen->machine->driver_data<p2000t_state>();
+	UINT8 *videoram = state->videoram;
 	int offs, sx, sy, code, loop;
 
 	for (offs = 0; offs < 80 * 24; offs++)

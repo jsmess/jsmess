@@ -51,7 +51,8 @@ PALETTE_INIT( pocketc )
 
 VIDEO_START( pocketc )
 {
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
+	pocketc_state *state = machine->driver_data<pocketc_state>();
+	state->videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
 }
 
 /* Draw an indicator (DEG, SHIFT, etc) */

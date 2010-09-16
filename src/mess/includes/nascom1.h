@@ -11,6 +11,16 @@
 #include "machine/wd17xx.h"
 
 
+class nascom1_state : public driver_device
+{
+public:
+	nascom1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/nascom1.c -----------*/
 
 extern const wd17xx_interface nascom2_wd17xx_interface;

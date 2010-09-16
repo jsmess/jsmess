@@ -120,7 +120,8 @@ VIDEO_START(concept)
 
 VIDEO_UPDATE(concept)
 {
-	UINT16 *videoram = screen->machine->generic.videoram.u16;
+	concept_state *state = screen->machine->driver_data<concept_state>();
+	UINT16 *videoram = state->videoram;
 	UINT16 *v;
 	int x, y;
 	UINT16 *line;

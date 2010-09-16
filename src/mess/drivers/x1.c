@@ -258,14 +258,16 @@ static UINT8 *x1_colorram;
 
 static VIDEO_START( x1 )
 {
+	x1_state *state = machine->driver_data<x1_state>();
 	x1_colorram = auto_alloc_array(machine, UINT8, 0x1000);
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
+	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
+	x1_state *state = machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	int y,x,res_x,res_y;
 	int screen_mask;
 
@@ -1023,7 +1025,8 @@ static UINT16 check_chr_addr(running_machine *machine)
 
 static READ8_HANDLER( x1_pcg_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	int addr;
 	int calc_pcg_offset;
 	static UINT32 kanji_offset;
@@ -1082,7 +1085,8 @@ static READ8_HANDLER( x1_pcg_r )
 
 static WRITE8_HANDLER( x1_pcg_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	int addr,pcg_offset;
 	UINT8 *PCG_RAM = memory_region(space->machine, "pcg");
 	static UINT16 used_pcg_addr;
@@ -1333,7 +1337,8 @@ static WRITE8_HANDLER( x1_kanji_w )
 
 static READ8_HANDLER( x1_io_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	io_bank_mode = 0; //any read disables the extended mode.
 
 	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(space->machine->device("ctc"), offset-0x0704); }
@@ -1362,7 +1367,8 @@ static READ8_HANDLER( x1_io_r )
 
 static WRITE8_HANDLER( x1_io_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
@@ -1403,7 +1409,8 @@ static WRITE8_HANDLER( x1_io_w )
 
 static READ8_HANDLER( x1turbo_io_r )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	io_bank_mode = 0; //any read disables the extended mode.
 
 	if(offset == 0x0700)							{ return (ym2151_r(space->machine->device("ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
@@ -1441,7 +1448,8 @@ static READ8_HANDLER( x1turbo_io_r )
 
 static WRITE8_HANDLER( x1turbo_io_w )
 {
-	UINT8 *videoram = space->machine->generic.videoram.u8;
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *videoram = state->videoram;
 	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(space->machine->device("ym"), offset-0x0700,data); }
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
@@ -2223,7 +2231,7 @@ static const floppy_config x1_floppy_config =
 	"x1_flop"
 };
 
-static MACHINE_CONFIG_START( x1, driver_device )
+static MACHINE_CONFIG_START( x1, x1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(x1_mem)

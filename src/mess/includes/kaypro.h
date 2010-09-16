@@ -7,6 +7,16 @@
 #include "devices/snapquik.h"
 
 
+class kaypro_state : public driver_device
+{
+public:
+	kaypro_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/kaypro.c -----------*/
 
 extern const z80pio_interface kayproii_pio_g_intf;

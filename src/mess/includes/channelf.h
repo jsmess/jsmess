@@ -9,6 +9,16 @@
 
 
 
+class channelf_state : public driver_device
+{
+public:
+	channelf_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/channelf.c -----------*/
 
 extern UINT8 channelf_val_reg;
