@@ -407,11 +407,25 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if (joystick_port_select <= 4)
 	{
-		/* Note: six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this on real HW. */
-		if (joy_6b_packet[joystick_port_select])	// 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
-			data = ((input_port_read(space->machine, joyname[(joy_type >> (joystick_port_select*2)) & 3][joystick_port_select]) >> 8) & 0x0f);
-		else	// directions + I, II, Run, Select
-			data = input_port_read(space->machine, joyname[(joy_type >> (joystick_port_select*2)) & 3][joystick_port_select]);
+		switch((joy_type >> (joystick_port_select*2)) & 3)
+		{
+			case 0: //2-buttons pad
+				data = input_port_read(space->machine, joyname[0][joystick_port_select]);
+				break;
+			case 2: //6-buttons pad
+				/*
+				Two packets:
+				1st packet: directions + I, II, Run, Select
+				2nd packet: 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
+				Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
+				on real HW.
+				*/
+				data = input_port_read(space->machine, joyname[2][joystick_port_select]) >> (joy_6b_packet[joystick_port_select]*8);
+				break;
+			default:
+				data = 0xff;
+				break;
+		}
 	}
 	else
 		data = 0xff;
