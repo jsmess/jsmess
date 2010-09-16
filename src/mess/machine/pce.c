@@ -388,7 +388,7 @@ WRITE8_HANDLER ( pce_joystick_w )
 
 		for (joy_i = 0; joy_i < 5; joy_i++)
 		{
-			if (BIT(joy_type, joy_i))
+			if (((joy_type >> (joy_i*2)) & 3) == 2)
         		joy_6b_packet[joy_i] ^= 1;
 		}
     }
@@ -396,9 +396,11 @@ WRITE8_HANDLER ( pce_joystick_w )
 
 READ8_HANDLER ( pce_joystick_r )
 {
-	static const char *const joyname[2][5] = {
+	static const char *const joyname[4][5] = {
 		{ "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" },
-		{ "JOY6B_P1", "JOY6B_P2", "JOY6B_P3", "JOY6B_P4", "JOY6B_P5" }
+		{ },
+		{ "JOY6B_P1", "JOY6B_P2", "JOY6B_P3", "JOY6B_P4", "JOY6B_P5" },
+		{ }
 	};
 	UINT8 joy_type = input_port_read(space->machine, "JOY_TYPE");
 	UINT8 ret, data;
@@ -407,9 +409,9 @@ READ8_HANDLER ( pce_joystick_r )
 	{
 		/* Note: six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this on real HW. */
 		if (joy_6b_packet[joystick_port_select])	// 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
-			data = ((input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]) >> 8) & 0x0f);
+			data = ((input_port_read(space->machine, joyname[(joy_type >> (joystick_port_select*2)) & 3][joystick_port_select]) >> 8) & 0x0f);
 		else	// directions + I, II, Run, Select
-			data = input_port_read(space->machine, joyname[BIT(joy_type, joystick_port_select)][joystick_port_select]);
+			data = input_port_read(space->machine, joyname[(joy_type >> (joystick_port_select*2)) & 3][joystick_port_select]);
 	}
 	else
 		data = 0xff;
@@ -1309,13 +1311,13 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		pce_cd_set_adpcm_ram_byte(space->machine, data);
 		break;
 	case 0x0B:	/* ADPCM DMA control */
-		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) )
+		if ( ! ( pce_cd.regs[0x0B] & 0x03 ) && ( data & 0x03 ) )
 		{
 			/* Start CD to ADPCM transfer */
 			timer_adjust_periodic(pce_cd.adpcm_dma_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
 			pce_cd.regs[0x0c] |= 4;
 		}
-		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) )
+		if ( ( pce_cd.regs[0x0B] & 0x03 ) && ! ( data & 0x03 ) )
 		{
 			/* Stop CD to ADPCM transfer (?) */
 			timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
