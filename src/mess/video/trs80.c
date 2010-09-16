@@ -55,6 +55,7 @@ VIDEO_START( trs80 )
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 VIDEO_UPDATE( trs80 )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -75,7 +76,7 @@ VIDEO_UPDATE( trs80 )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = screen->machine->generic.videoram.u8[x];
+				chr = videoram[x];
 
 				if (chr & 0x80)
 				{
@@ -117,6 +118,7 @@ VIDEO_UPDATE( trs80 )
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 VIDEO_UPDATE( trs80m4 )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -147,7 +149,7 @@ VIDEO_UPDATE( trs80m4 )
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
-				chr = screen->machine->generic.videoram.u8[x+start_address];
+				chr = videoram[x+start_address];
 
 				if (((chr & 0xc0) == 0xc0) && (~trs80_mode & 8))
 				{
@@ -212,6 +214,7 @@ VIDEO_UPDATE( trs80m4 )
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 VIDEO_UPDATE( ht1080z )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -232,7 +235,7 @@ VIDEO_UPDATE( ht1080z )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = screen->machine->generic.videoram.u8[x];
+				chr = videoram[x];
 
 				if (chr & 0x80)
 				{
@@ -271,6 +274,7 @@ VIDEO_UPDATE( ht1080z )
 /* 8-bit video, 64/80 characters per line = lnw80 */
 VIDEO_UPDATE( lnw80 )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
@@ -301,7 +305,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = ma; x < ma + 64; x++)
 					{
-						chr = screen->machine->generic.videoram.u8[x];
+						chr = videoram[x];
 
 						if (chr & 0x80)
 						{
@@ -410,12 +414,12 @@ VIDEO_UPDATE( lnw80 )
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = trs80_gfxram[ y | x | ra];
-						fg = (screen->machine->generic.videoram.u8[ 0x3c00 | x | y ] & 0x38) >> 3;
+						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = screen->machine->generic.videoram.u8[ 0x3c00 | x | y ] & 0x07;
+						fg = videoram[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;
@@ -444,6 +448,7 @@ VIDEO_UPDATE( lnw80 )
 /* lores characters are in the character generator. Each character is 8x16. */
 VIDEO_UPDATE( radionic )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
@@ -464,7 +469,7 @@ VIDEO_UPDATE( radionic )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = screen->machine->generic.videoram.u8[x];
+				chr = videoram[x];
 
 				/* get pattern of pixels for that character scanline */
 				gfx = FNT[(chr<<3) | (ra & 7) | (ra & 8) << 8];
@@ -492,14 +497,16 @@ VIDEO_UPDATE( radionic )
 
 READ8_HANDLER( trs80_videoram_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
-	return space->machine->generic.videoram.u8[offset];
+	return videoram[offset];
 }
 
 WRITE8_HANDLER( trs80_videoram_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 }
 
 

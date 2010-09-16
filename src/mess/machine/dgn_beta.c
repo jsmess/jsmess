@@ -357,6 +357,7 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 //
 static void SetDefaultTask(running_machine *machine)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
@@ -387,7 +388,7 @@ static void SetDefaultTask(running_machine *machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	machine->generic.videoram.u8=&messram_get_ptr(machine->device("messram"))[TextVidBasePage*RamPageSize];
+	videoram=&messram_get_ptr(machine->device("messram"))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register

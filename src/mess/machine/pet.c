@@ -751,7 +751,6 @@ DRIVER_INIT( pet80 )
 	pet_common_driver_init(machine);
 	state->cbm8096 = 1;
 	machine->generic.videoram.u8 = &pet_memory[0x8000];
-	machine->generic.videoram_size = 0x800;
 	pet80_vh_init(machine);
 
 }

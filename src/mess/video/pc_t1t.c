@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "pc_t1t.h"
+#include "video/pc_video_mess.h"
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
 #include "devices/messram.h"
@@ -158,7 +159,7 @@ static VIDEO_START( pc_t1t )
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
 
-	machine->generic.videoram_size = 0x8000;
+	pc_videoram_size = 0x8000;
 }
 
 
@@ -170,7 +171,7 @@ static VIDEO_START( pc_pcjr )
 	pcjr.mode_control = 0x08;
 	pcjr.chr_size = 8;
 
-	machine->generic.videoram_size = 0x8000;
+	pc_videoram_size = 0x8000;
 }
 
 static VIDEO_UPDATE( mc6845_t1000 )
@@ -404,9 +405,10 @@ static MC6845_UPDATE_ROW( t1000_update_row )
 
  READ8_HANDLER ( pc_t1t_videoram_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	int data = 0xff;
-	if( space->machine->generic.videoram.u8 )
-		data = space->machine->generic.videoram.u8[offset];
+	if( videoram )
+		data = videoram[offset];
 	return data;
 }
 

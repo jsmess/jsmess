@@ -367,7 +367,7 @@ static PALETTE_INIT( svisionp )
 static VIDEO_UPDATE( svision )
 {
 	int x, y, i, j=XPOS/4+YPOS*0x30;
-	UINT8 *vram= screen->machine->generic.videoram.u8;
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 
 	if (BANK&8)
 	{
@@ -376,7 +376,7 @@ static VIDEO_UPDATE( svision )
 			UINT16 *line = BITMAP_ADDR16(bitmap, y, 3 - (XPOS & 3));
 			for (x=3-(XPOS&3),i=0; x<160+3 && x<XSIZE+3; x+=4,i++)
 			{
-				UINT8 b=vram[j+i];
+				UINT8 b=videoram[j+i];
 				line[3]=((b>>6)&3)+PALETTE_START;
 				line[2]=((b>>4)&3)+PALETTE_START;
 				line[1]=((b>>2)&3)+PALETTE_START;
@@ -398,7 +398,7 @@ static VIDEO_UPDATE( svision )
 static VIDEO_UPDATE( tvlink )
 {
 	int x, y, i, j = XPOS/4+YPOS*0x30;
-	UINT8 *vram = screen->machine->generic.videoram.u8;
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 
 	if (BANK & 8)
 	{
@@ -407,7 +407,7 @@ static VIDEO_UPDATE( tvlink )
 			UINT16 *line = BITMAP_ADDR16(bitmap, y, 3 - (XPOS & 3));
 			for (x = 3 - (XPOS & 3), i = 0; x < 160 + 3 && x < XSIZE + 3; x += 4, i++)
 			{
-				UINT8 b=vram[j+i];
+				UINT8 b=videoram[j+i];
 				line[3]=tvlink.palette[(b>>6)&3];
 				line[2]=tvlink.palette[(b>>4)&3];
 				line[1]=tvlink.palette[(b>>2)&3];

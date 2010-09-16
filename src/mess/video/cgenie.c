@@ -30,11 +30,9 @@ VIDEO_START( cgenie )
 	int width = screen->width();
 	int height = screen->height();
 
-	machine->generic.videoram_size = 0x4000;
-
 	VIDEO_START_CALL(generic_bitmapped);
 
-    dlybitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	dlybitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************
@@ -243,6 +241,7 @@ void cgenie_mode_select(int mode)
 
 static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
@@ -272,14 +271,14 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 			if( graphics )
 			{
 				/* get graphics code */
-				code = machine->generic.videoram.u8[i];
+				code = videoram[i];
 				drawgfx_opaque(bitmap, &r, machine->gfx[1], code, 0,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
 			{
 				/* get character code */
-				code = machine->generic.videoram.u8[i];
+				code = videoram[i];
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
@@ -321,6 +320,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 
 static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
@@ -351,7 +351,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			if( graphics )
 			{
 				/* get graphics code */
-				code = machine->generic.videoram.u8[i];
+				code = videoram[i];
 				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y);
 				drawgfx_opaque(dlybitmap, &r, machine->gfx[1], code, 2,
@@ -360,7 +360,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			else
 			{
 				/* get character code */
-				code = machine->generic.videoram.u8[i];
+				code = videoram[i];
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];

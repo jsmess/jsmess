@@ -22,7 +22,7 @@
 static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* ASG */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE_GENERIC(videoram) /* ASG */
 ADDRESS_MAP_END
 
 

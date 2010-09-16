@@ -520,15 +520,17 @@ WRITE8_HANDLER( cgenie_motor_w )
 
 int cgenie_videoram_r( running_machine *machine, int offset )
 {
-	return machine->generic.videoram.u8[offset];
+	UINT8 *videoram = machine->generic.videoram.u8;
+	return videoram[offset];
 }
 
 WRITE8_HANDLER( cgenie_videoram_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	/* write to video RAM */
-	if( data == space->machine->generic.videoram.u8[offset] )
+	if( data == videoram[offset] )
 		return; 			   /* no change */
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 }
 
  READ8_HANDLER( cgenie_colorram_r )

@@ -277,11 +277,12 @@ static VIDEO_START( jupiter )
 
 static VIDEO_UPDATE( jupiter )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int offs;
 
 	for(offs = 0; offs < 768; offs++)
 	{
-		int code = screen->machine->generic.videoram.u8[offs];
+		int code = videoram[offs];
 		int sx, sy;
 
 		sy = (offs / 32) << 3;

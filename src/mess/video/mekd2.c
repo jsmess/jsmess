@@ -45,13 +45,13 @@ PALETTE_INIT( mekd2 )
 
 VIDEO_START( mekd2 )
 {
-    machine->generic.videoram_size = 6 * 2 + 24;
-    machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
 }
 
 
 VIDEO_UPDATE( mekd2 )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int width = screen->width();
     int x, y;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
@@ -62,7 +62,7 @@ VIDEO_UPDATE( mekd2 )
         int sx = width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
 
         drawgfx_transpen (bitmap, NULL, screen->machine->gfx[0],
-                 screen->machine->generic.videoram.u8[2 * x + 0], screen->machine->generic.videoram.u8[2 * x + 1],
+                 videoram[2 * x + 0], videoram[2 * x + 1],
                  0, 0, sx, sy, 0);
     }
 
@@ -86,7 +86,7 @@ VIDEO_UPDATE( mekd2 )
 
             color = (input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
 
-            screen->machine->generic.videoram.u8[6 * 2 + code] = color;
+            videoram[6 * 2 + code] = color;
             drawgfx_opaque (bitmap, NULL,
                      screen->machine->gfx[1],
                      layout[y][x], color,

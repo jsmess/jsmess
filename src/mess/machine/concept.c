@@ -120,12 +120,13 @@ VIDEO_START(concept)
 
 VIDEO_UPDATE(concept)
 {
+	UINT16 *videoram = screen->machine->generic.videoram.u16;
 	UINT16 *v;
 	int x, y;
 	UINT16 *line;
 	/* resolution is 720*560 */
 
-	v = screen->machine->generic.videoram.u16;
+	v = videoram;
 
 	for (y = 0; y < 560; y++)
 	{

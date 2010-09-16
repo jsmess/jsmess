@@ -308,13 +308,14 @@ static void beta_Set_DE(int offset, int data)
 /* Video init */
 void dgnbeta_init_video(running_machine *machine)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
 
 	GCtrl=0;
 
-	machine->generic.videoram.u8=messram_get_ptr(machine->device("messram"));
+	videoram=messram_get_ptr(machine->device("messram"));
 
 	ClkMax=65000;
 	FlashCount=0;
@@ -390,6 +391,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, b
 
 static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data = memory_region(machine, "gfx1");		// ptr to char rom
 	int Dot;
@@ -417,13 +419,13 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 			Offset=0;
 
 		/* Get the character to display */
-		char_code	= machine->generic.videoram.u8[Offset];
+		char_code	= videoram[Offset];
 
 		/* Extract non-colour attributes, in character set 1, undeline is used */
 		/* We will extract the colours below, when we have decoded inverse */
 		/* to indicate a double height character */
-		UnderLine=(machine->generic.videoram.u8[Offset+1] & 0x40) >> 6;
-		FlashChar=(machine->generic.videoram.u8[Offset+1] & 0x80) >> 7;
+		UnderLine=(videoram[Offset+1] & 0x40) >> 6;
+		FlashChar=(videoram[Offset+1] & 0x80) >> 7;
 
 		// underline is active for character set 0, on character row 9
 		ULActive=(UnderLine && (beta_6845_RA==9) && ~SWChar);
@@ -447,13 +449,13 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 		/* Invert colours if invert is true */
 		if(!Invert)
 		{
-			FgColour	= (machine->generic.videoram.u8[Offset+1] & 0x38) >> 3;
-			BgColour	= (machine->generic.videoram.u8[Offset+1] & 0x07);
+			FgColour	= (videoram[Offset+1] & 0x38) >> 3;
+			BgColour	= (videoram[Offset+1] & 0x07);
 		}
 		else
 		{
-			BgColour	= (machine->generic.videoram.u8[Offset+1] & 0x38) >> 3;
-			FgColour	= (machine->generic.videoram.u8[Offset+1] & 0x07);
+			BgColour	= (videoram[Offset+1] & 0x38) >> 3;
+			FgColour	= (videoram[Offset+1] & 0x07);
 		}
 
 		/* The beta Character ROM has characters of 8x10, each aligned to a 16 byte boundry */
@@ -537,6 +539,7 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 
 static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *bitmap)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int crtcAddr;
 	int Addr;
 	int Red;
@@ -575,8 +578,8 @@ static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *b
 		if(y>MaxY) MaxY=y;
 		if(y<MinY) MinY=y;
 
-		Lo	= machine->generic.videoram.u8[Addr];
-		Hi	= machine->generic.videoram.u8[Addr+1];
+		Lo	= videoram[Addr];
+		Hi	= videoram[Addr+1];
 		Word	= (Hi<<8) | Lo;
 
 		/* If contol is low then we are plotting 4 bit per pixel, 16 colour mode */

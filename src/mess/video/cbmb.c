@@ -71,26 +71,28 @@ void cbmb_vh_set_font(int font)
 
 MC6845_UPDATE_ROW( cbm600_update_row )
 {
+	UINT8 *videoram = device->machine->generic.videoram.u8;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
 			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, 1 );
 		} else {
-			drawgfx_opaque( bitmap, cliprect, device->machine->gfx[cbmb_font], device->machine->generic.videoram.u8[(ma+i )& 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra );
+			drawgfx_opaque( bitmap, cliprect, device->machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra );
 		}
 	}
 }
 
 MC6845_UPDATE_ROW( cbm700_update_row )
 {
+	UINT8 *videoram = device->machine->generic.videoram.u8;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
 			plot_box( bitmap, device->machine->gfx[cbmb_font]->width * i, y, device->machine->gfx[cbmb_font]->width, 1, 1 );
 		} else {
-			drawgfx_opaque( bitmap, cliprect, device->machine->gfx[cbmb_font], device->machine->generic.videoram.u8[(ma+i) & 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra );
+			drawgfx_opaque( bitmap, cliprect, device->machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine->gfx[cbmb_font]->width * i, y-ra );
 		}
 	}
 }

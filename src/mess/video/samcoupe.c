@@ -28,10 +28,11 @@
 
 static void draw_mode4_line(running_machine *machine, int y, int hpos)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
-	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	UINT8 *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
@@ -52,10 +53,11 @@ static void draw_mode4_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode3_line(running_machine *machine, int y, int hpos)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	/* get start address */
-	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	UINT8 *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
@@ -90,22 +92,24 @@ static void draw_mode12_block(samcoupe_state *asic, bitmap_t *bitmap, int vpos, 
 
 static void draw_mode2_line(running_machine *machine, int y, int hpos)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
 	int cell = (y - SAM_BORDER_TOP) * 32 + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2;
 
-	UINT8 mask = machine->generic.videoram.u8[cell];
-	asic->attribute = machine->generic.videoram.u8[cell + 0x2000];
+	UINT8 mask = videoram[cell];
+	asic->attribute = videoram[cell + 0x2000];
 
 	draw_mode12_block(asic, machine->generic.tmpbitmap, y, hpos, mask);
 }
 
 static void draw_mode1_line(running_machine *machine, int y, int hpos)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
 
-	UINT8 mask = machine->generic.videoram.u8[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
-	asic->attribute = machine->generic.videoram.u8[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
+	UINT8 mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
+	asic->attribute = videoram[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 
 	draw_mode12_block(asic, machine->generic.tmpbitmap, y, hpos, mask);
 }

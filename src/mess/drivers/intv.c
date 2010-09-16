@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */
 	AM_RANGE( 0xb7f8, 0xb7ff) AM_RAM	/* ??? */
-	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* Text Display */
+	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) /* Text Display */
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

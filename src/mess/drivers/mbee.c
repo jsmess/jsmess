@@ -95,7 +95,7 @@ static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
 	AM_RANGE(0x8000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_w)
 ADDRESS_MAP_END
 
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START(mbeepc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START(mbeeppc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START(mbee64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE(mbee_videoram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE(mbee_pcg_color_w)
 ADDRESS_MAP_END
 

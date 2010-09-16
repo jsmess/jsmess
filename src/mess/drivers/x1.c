@@ -265,6 +265,7 @@ static VIDEO_START( x1 )
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
+	UINT8 *videoram = machine->generic.videoram.u8;
 	int y,x,res_x,res_y;
 	int screen_mask;
 
@@ -274,7 +275,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = machine->generic.videoram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask];
+			int tile = videoram[(x+(y*40*w)+crtc_start_addr) & screen_mask];
 			int color = x1_colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x1f;
 			int width = (x1_colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x80)>>7;
 			int height = (x1_colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x40)>>6;
@@ -1022,6 +1023,7 @@ static UINT16 check_chr_addr(running_machine *machine)
 
 static READ8_HANDLER( x1_pcg_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	int addr;
 	int calc_pcg_offset;
 	static UINT32 kanji_offset;
@@ -1041,7 +1043,7 @@ static READ8_HANDLER( x1_pcg_r )
 		if(scrn_reg.pcg_mode)
 		{
 			gfx_data = memory_region(space->machine, "kanji");
-			calc_pcg_offset = (space->machine->generic.videoram.u8[check_chr_addr(space->machine)]+(space->machine->generic.videoram.u8[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
+			calc_pcg_offset = (videoram[check_chr_addr(space->machine)]+(videoram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
 
 			kanji_offset = calc_pcg_offset*0x20;
 
@@ -1080,6 +1082,7 @@ static READ8_HANDLER( x1_pcg_r )
 
 static WRITE8_HANDLER( x1_pcg_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	int addr,pcg_offset;
 	UINT8 *PCG_RAM = memory_region(space->machine, "pcg");
 	static UINT16 used_pcg_addr;
@@ -1101,7 +1104,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 	{
 		if(scrn_reg.pcg_mode)
 		{
-			used_pcg_addr = space->machine->generic.videoram.u8[check_pcg_addr(space->machine)]*8;
+			used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
 			pcg_index[addr-1] = (offset & 0xe) >> 1;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
@@ -1330,6 +1333,7 @@ static WRITE8_HANDLER( x1_kanji_w )
 
 static READ8_HANDLER( x1_io_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	io_bank_mode = 0; //any read disables the extended mode.
 
 	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(space->machine->device("ctc"), offset-0x0704); }
@@ -1347,7 +1351,7 @@ static READ8_HANDLER( x1_io_r )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return x1_colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return space->machine->generic.videoram.u8[offset-0x3000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1358,6 +1362,7 @@ static READ8_HANDLER( x1_io_r )
 
 static WRITE8_HANDLER( x1_io_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
@@ -1388,7 +1393,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ x1_colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ space->machine->generic.videoram.u8[offset-0x3000] = pcg_write_addr = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1398,6 +1403,7 @@ static WRITE8_HANDLER( x1_io_w )
 
 static READ8_HANDLER( x1turbo_io_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	io_bank_mode = 0; //any read disables the extended mode.
 
 	if(offset == 0x0700)							{ return (ym2151_r(space->machine->device("ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
@@ -1422,7 +1428,7 @@ static READ8_HANDLER( x1turbo_io_r )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return x1_colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return space->machine->generic.videoram.u8[offset-0x3000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1435,6 +1441,7 @@ static READ8_HANDLER( x1turbo_io_r )
 
 static WRITE8_HANDLER( x1turbo_io_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(space->machine->device("ym"), offset-0x0700,data); }
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
@@ -1466,7 +1473,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ x1_colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ space->machine->generic.videoram.u8[offset-0x3000] = pcg_write_addr = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{

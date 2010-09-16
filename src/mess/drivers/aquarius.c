@@ -231,7 +231,7 @@ static DRIVER_INIT( aquarius )
 
 static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_BASE(&aquarius_colorram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP /* expansion ram */

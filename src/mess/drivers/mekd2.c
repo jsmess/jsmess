@@ -47,39 +47,40 @@ static WRITE8_HANDLER(mekd2_cas_w) { }
 
 static WRITE8_HANDLER(mekd2_kbd_w)
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	pia[offset] = data;
 	switch( offset )
 	{
 	case 2:
 		if( data & 0x20 )
 		{
-			space->machine->generic.videoram.u8[0*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[0*2+1] = 14;
+			videoram[0*2+0] = ~pia[0];
+			videoram[0*2+1] = 14;
 		}
 		if( data & 0x10 )
 		{
-			space->machine->generic.videoram.u8[1*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[1*2+1] = 14;
+			videoram[1*2+0] = ~pia[0];
+			videoram[1*2+1] = 14;
 		}
 		if( data & 0x08 )
 		{
-			space->machine->generic.videoram.u8[2*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[2*2+1] = 14;
+			videoram[2*2+0] = ~pia[0];
+			videoram[2*2+1] = 14;
 		}
 		if( data & 0x04 )
 		{
-			space->machine->generic.videoram.u8[3*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[3*2+1] = 14;
+			videoram[3*2+0] = ~pia[0];
+			videoram[3*2+1] = 14;
 		}
 		if( data & 0x02 )
 		{
-			space->machine->generic.videoram.u8[4*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[4*2+1] = 14;
+			videoram[4*2+0] = ~pia[0];
+			videoram[4*2+1] = 14;
 		}
 		if( data & 0x01 )
 		{
-			space->machine->generic.videoram.u8[5*2+0] = ~pia[0];
-			space->machine->generic.videoram.u8[5*2+1] = 14;
+			videoram[5*2+0] = ~pia[0];
+			videoram[5*2+1] = 14;
 		}
 		break;
 	}

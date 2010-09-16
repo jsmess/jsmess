@@ -778,6 +778,7 @@ WRITE8_HANDLER( intvkbd_tms9927_w )
 
 VIDEO_UPDATE( intvkbd )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int x,y,offs;
 	int current_row;
 //  char c;
@@ -796,7 +797,7 @@ VIDEO_UPDATE( intvkbd )
 				offs = current_row*64+x;
 				drawgfx_transpen(bitmap, NULL,
 					screen->machine->gfx[1],
-					screen->machine->generic.videoram.u8[offs],
+					videoram[offs],
 					7, /* white */
 					0,0,
 					x<<3,y<<3, 0);

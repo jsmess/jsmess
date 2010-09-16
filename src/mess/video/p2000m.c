@@ -21,6 +21,7 @@ VIDEO_START( p2000m )
 
 VIDEO_UPDATE( p2000m )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int offs, sx, sy, code, loop;
 
 	for (offs = 0; offs < 80 * 24; offs++)
@@ -28,12 +29,12 @@ VIDEO_UPDATE( p2000m )
 		sy = (offs / 80) * 20;
 		sx = (offs % 80) * 12;
 
-		if ((frame_count > 25) && (screen->machine->generic.videoram.u8[offs + 2048] & 0x40))
+		if ((frame_count > 25) && (videoram[offs + 2048] & 0x40))
 			code = 32;
 		else
 		{
-			code = screen->machine->generic.videoram.u8[offs];
-			if ((screen->machine->generic.videoram.u8[offs + 2048] & 0x01) && (code & 0x20))
+			code = videoram[offs];
+			if ((videoram[offs + 2048] & 0x01) && (code & 0x20))
 			{
 				code += (code & 0x40) ? 64 : 96;
 			} else {
@@ -43,9 +44,9 @@ VIDEO_UPDATE( p2000m )
 		}
 
 		drawgfxzoom_opaque (bitmap, NULL, screen->machine->gfx[0], code,
-			screen->machine->generic.videoram.u8[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy, 0x20000, 0x20000);
+			videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy, 0x20000, 0x20000);
 
-		if (screen->machine->generic.videoram.u8[offs] & 0x80)
+		if (videoram[offs] & 0x80)
 		{
 			for (loop = 0; loop < 12; loop++)
 			{

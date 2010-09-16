@@ -88,7 +88,8 @@ READ8_HANDLER ( mbee_pcg_color_latch_r )
 
 WRITE8_HANDLER ( mbee_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	UINT8 *videoram = space->machine->generic.videoram.u8;
+	videoram[offset] = data;
 }
 
 WRITE8_HANDLER ( mbee_pcg_w )
@@ -493,6 +494,7 @@ VIDEO_START( mbeeic )
 
 VIDEO_UPDATE( mbee )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx;
 	UINT16 mem,sy=0,ma=0,x;
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
@@ -511,7 +513,7 @@ VIDEO_UPDATE( mbee )
 			{
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
-				chr = screen->machine->generic.videoram.u8[mem];
+				chr = videoram[mem];
 
 				if ((x & 15) == 0)
 				{
@@ -549,6 +551,7 @@ VIDEO_UPDATE( mbee )
 
 VIDEO_UPDATE( mbeeic )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	UINT8 y,ra,chr,gfx,fg,bg;
 	UINT16 mem,sy=0,ma=0,x,col;
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
@@ -568,7 +571,7 @@ VIDEO_UPDATE( mbeeic )
 			{
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
-				chr = screen->machine->generic.videoram.u8[mem];
+				chr = videoram[mem];
 				col = colorram[mem] | colourm;					// read a byte of colour
 
 				if ((x & 15) == 0)

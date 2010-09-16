@@ -41,8 +41,7 @@ PALETTE_INIT( channelf )
 
 VIDEO_START( channelf )
 {
-	machine->generic.videoram_size = 0x2000;
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
 static int recalc_palette_offset(int reg1, int reg2)
@@ -55,17 +54,18 @@ static int recalc_palette_offset(int reg1, int reg2)
 
 VIDEO_UPDATE( channelf )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int x,y,offset, palette_offset;
 	int color;
 	UINT16 pen;
 
 	for(y=0;y<64;y++)
 	{
-		palette_offset = recalc_palette_offset(screen->machine->generic.videoram.u8[y*128+125]&3,screen->machine->generic.videoram.u8[y*128+126]&3);
+		palette_offset = recalc_palette_offset(videoram[y*128+125]&3,videoram[y*128+126]&3);
 		for (x=0;x<128;x++)
 		{
 			offset = y*128+x;
-			color = palette_offset+(screen->machine->generic.videoram.u8[offset]&3);
+			color = palette_offset+(videoram[offset]&3);
 			pen = colormap[color];
 			*BITMAP_ADDR16(bitmap, y, x) = pen;
 		}

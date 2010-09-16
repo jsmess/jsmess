@@ -902,7 +902,6 @@ MACHINE_START( trs80 )
 	trs80_cass = machine->device("cassette");
 	trs80_speaker = machine->device("speaker");
 	trs80_fdc = machine->device("wd179x");
-	machine->generic.videoram_size = 0x800;
 }
 
 MACHINE_RESET( trs80 )

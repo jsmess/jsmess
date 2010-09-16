@@ -302,16 +302,18 @@ static UINT16 cursor;
 
 READ8_HANDLER( super80v_low_r )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if (super80_shared & 4)
-		return space->machine->generic.videoram.u8[offset];
+		return videoram[offset];
 	else
 		return super80_colorram[offset];
 }
 
 WRITE8_HANDLER( super80v_low_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if (super80_shared & 4)
-		space->machine->generic.videoram.u8[offset] = data;
+		videoram[offset] = data;
 	else
 		super80_colorram[offset] = data;
 }
@@ -329,11 +331,12 @@ READ8_HANDLER( super80v_high_r )
 
 WRITE8_HANDLER( super80v_high_w )
 {
+	UINT8 *videoram = space->machine->generic.videoram.u8;
 	if (~super80_shared & 4)
 		super80_colorram[offset+0x800] = data;
 	else
 	{
-		space->machine->generic.videoram.u8[offset+0x800] = data;
+		videoram[offset+0x800] = data;
 
 		if (super80_shared & 0x10)
 			super80_pcgram[0x800+offset] = data;
@@ -412,6 +415,7 @@ VIDEO_UPDATE( super80v )
 
 MC6845_UPDATE_ROW( super80v_update_row )
 {
+	UINT8 *videoram = device->machine->generic.videoram.u8;
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
@@ -421,7 +425,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
-		chr = device->machine->generic.videoram.u8[mem];
+		chr = videoram[mem];
 
 		/* get colour or b&w */
 		fg = 5;						/* green */
