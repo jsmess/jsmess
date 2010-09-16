@@ -1098,6 +1098,7 @@ static READ32_HANDLER( towns_video_404_r )
  *    bit 4 - DMA transfer
  *    bit 1 - status read request
  *    bit 0 - ready
+ *    Note: IRQ bits are only set high if the IRQ bit in the command byte is NOT set.
  *
  *  0x4c2 - Command port (R/W)
  *    On read, returns status byte (4 in total?)
@@ -1134,13 +1135,15 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				if(tstate->towns_cd.command & 0x40)
 				{
-					tstate->towns_cd.status |= 0x80;
-					if(tstate->towns_cd.mpu_irq_enable)
+//					if(tstate->towns_cd.mpu_irq_enable)
 					{
+						tstate->towns_cd.status |= 0x80;
 						pic8259_ir1_w(tstate->pic_slave, 1);
 						logerror("PIC: IRQ9 (CD-ROM) set high\n");
 					}
 				}
+				else
+					tstate->towns_cd.status |= 0x80;
 			}
 			else
 			{
@@ -1154,13 +1157,15 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				if(tstate->towns_cd.command & 0x40)
 				{
-					tstate->towns_cd.status |= 0x40;
-					if(tstate->towns_cd.dma_irq_enable)
+//					if(tstate->towns_cd.dma_irq_enable)
 					{
+						tstate->towns_cd.status |= 0x40;
 						pic8259_ir1_w(tstate->pic_slave, 1);
 						logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
 					}
 				}
+				else
+					tstate->towns_cd.status |= 0x40;
 			}
 			else
 			{
@@ -1288,6 +1293,10 @@ static void towns_cdrom_read(running_device* device)
 		state->towns_cd.lba_last -= 150;
 	}
 
+	// parameter 7 = sector count?
+	if(state->towns_cd.parameter[1] != 0)
+		state->towns_cd.lba_last += state->towns_cd.parameter[1];
+
 	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",state->towns_cd.lba_current,state->towns_cd.lba_last,track);
 
 	if(state->towns_cd.lba_current > state->towns_cd.lba_last)
@@ -1302,8 +1311,16 @@ static void towns_cdrom_read(running_device* device)
 		state->towns_cd.status &= ~0x20;  // not a software transfer
 //      state->towns_cd.buffer_ptr = 0;
 //      timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
-		state->towns_cd.extra_status = 2;
-		towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+		if(state->towns_cd.command & 0x20)
+		{
+			state->towns_cd.extra_status = 2;
+			towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+		}
+		else
+		{
+			state->towns_cd.extra_status = 0;
+			towns_cd_set_status(device->machine,0x22,0x00,0x00,0x00);
+		}
 	}
 }
 
@@ -1371,7 +1388,7 @@ static void towns_cdrom_execute_command(running_device* device)
 				if(state->towns_cd.command & 0x20)
 				{
 					state->towns_cd.extra_status = 0;
-					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+					towns_cd_set_status(device->machine,0x00,0xff,0xff,0xff);
 				}
 				logerror("CD: Command 0x01: unknown\n");
 				break;
