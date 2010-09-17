@@ -123,13 +123,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	asic->clut[(offset >> 8) & 0x0f] = data & 0x7f;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	state->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
@@ -143,59 +143,59 @@ static READ8_HANDLER( samcoupe_status_r )
 	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0xe0;
 
 	/* bit 0-4, interrupt source */
-	data |= asic->status;
+	data |= state->status;
 
 	return data;
 }
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	asic->line_int = data;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	state->line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	return asic->lmpr;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	return state->lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
-	asic->lmpr = data;
+	state->lmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	return asic->hmpr;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	return state->hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
-	asic->hmpr = data;
+	state->hmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	return asic->vmpr;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	return state->vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
-	asic->vmpr = data;
+	state->vmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
@@ -250,9 +250,9 @@ static WRITE8_HANDLER( samcoupe_border_w )
 {
 	running_device *cassette = space->machine->device("cassette");
 	running_device *speaker = space->machine->device("speaker");
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
-	asic->border = data;
+	state->border = data;
 
 	/* bit 3, cassette output */
 	cassette_output(cassette, BIT(data, 3) ? -1.0 : +1.0);
@@ -263,8 +263,8 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	samcoupe_state *asic = space->machine->driver_data<samcoupe_state>();
-	return asic->attribute;
+	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	return state->attribute;
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
@@ -325,27 +325,26 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	samcoupe_state *asic = machine->driver_data<samcoupe_state>();
-
+	samcoupe_state *state = machine->driver_data<samcoupe_state>();
 	/* adjust STATUS register */
-	asic->status |= param;
+	state->status |= param;
 
 	/* clear interrupt */
-	if ((asic->status & 0x1f) == 0x1f)
+	if ((state->status & 0x1f) == 0x1f)
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 }
 
 void samcoupe_irq(running_device *device, UINT8 src)
 {
-	samcoupe_state *asic = device->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = device->machine->driver_data<samcoupe_state>();
 
 	/* assert irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(device->machine, ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 
 	/* adjust STATUS register */
-	asic->status &= ~src;
+	state->status &= ~src;
 }
 
 static INTERRUPT_GEN( samcoupe_frame_interrupt )
