@@ -115,6 +115,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "includes/astrocde.h"
 #include "machine/z80ctc.h"
+#include "machine/nvram.h"
 #include "sound/samples.h"
 #include "sound/astrocde.h"
 #include "sound/ay8910.h"
@@ -583,7 +584,7 @@ static WRITE8_HANDLER( tenpindx_lights_w )
 static ADDRESS_MAP_START( seawolf2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -591,14 +592,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ebases_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacezap_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
@@ -607,7 +608,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
 	AM_RANGE(0xd040, 0xdfff) AM_RAM
@@ -617,10 +618,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robby_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -632,7 +633,7 @@ static ADDRESS_MAP_START( profpac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -643,7 +644,7 @@ static ADDRESS_MAP_START( demndrgn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1270,7 +1271,7 @@ static const z80_daisy_config tenpin_daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( astrocade_base )
+static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
@@ -1289,14 +1290,13 @@ static MACHINE_DRIVER_START( astrocade_base )
 	MDRV_PALETTE_INIT(astrocde)
 	MDRV_VIDEO_START(astrocde)
 	MDRV_VIDEO_UPDATE(astrocde)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_16color_base )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)
@@ -1304,20 +1304,20 @@ static MACHINE_DRIVER_START( astrocade_16color_base )
 	MDRV_PALETTE_INIT(profpac)
 	MDRV_VIDEO_START(profpac)
 	MDRV_VIDEO_UPDATE(profpac)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_mono_sound )
+static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_stereo_sound )
+static MACHINE_CONFIG_FRAGMENT( astrocade_stereo_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1327,7 +1327,7 @@ static MACHINE_DRIVER_START( astrocade_stereo_sound )
 
 	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1337,8 +1337,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( seawolf2 )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1360,34 +1359,31 @@ static MACHINE_DRIVER_START( seawolf2 )
 	MDRV_SOUND_ROUTE(7, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(9, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ebases )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_mono_sound)
+static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ebases_map)
 	MDRV_CPU_IO_MAP(port_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacezap )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_mono_sound)
+static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacezap_map)
 	MDRV_CPU_IO_MAP(port_map_mono_pattern)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wow )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1405,11 +1401,10 @@ static MACHINE_DRIVER_START( wow )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wow_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gorf )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1433,45 +1428,41 @@ static MACHINE_DRIVER_START( gorf )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gorf_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( robby )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(robby_map)
 	MDRV_CPU_IO_MAP(port_map_stereo_pattern)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+	MDRV_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( profpac )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(profpac_map)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( demndrgn )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
+static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(demndrgn_map)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tenpindx )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
+static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1490,7 +1481,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
