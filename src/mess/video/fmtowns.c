@@ -996,6 +996,66 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 		}
 	}
 
+	if(hzoom == 3)
+	{  // x3 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=3)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = (state->towns_gfxvram[off+(layer*0x40000)+1] << 8) | state->towns_gfxvram[off+(layer*0x40000)];
+			if(colour < 0x8000)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+			}
+			off+=2;
+		}
+	}
+
+	if(hzoom == 4)
+	{  // x4 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=4)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = (state->towns_gfxvram[off+(layer*0x40000)+1] << 8) | state->towns_gfxvram[off+(layer*0x40000)];
+			if(colour < 0x8000)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+			}
+			off+=2;
+		}
+	}
+
 	if(hzoom == 5)
 	{  // x5 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=5)
@@ -1031,7 +1091,6 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 			off+=2;
 		}
 	}
-
 }
 
 void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -1108,6 +1167,58 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 3)
+	{  // x3 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=3)
+		{
+			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 4)
+	{  // x4 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=4)
+		{
+			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
 					(state->video.towns_palette_r[colour] << 16)
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
@@ -1247,6 +1358,102 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 3)
+	{  // x3 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=6)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+4) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+5) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			colour = state->towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 4)
+	{  // x4 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=8)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x+4) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+5) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+6) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+7) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			colour = state->towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
 					(state->video.towns_palette_r[colour] << 16)
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
