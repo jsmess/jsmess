@@ -43,6 +43,14 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type NVRAM = nvram_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -99,6 +107,7 @@ void nvram_device_config::static_set_default_value(device_config *device, defaul
 void nvram_device_config::static_set_custom_handler(device_config *device, nvram_init_proto_delegate handler)
 {
 	nvram_device_config *nvram = downcast<nvram_device_config *>(device);
+	nvram->m_default_value = DEFAULT_CUSTOM;
 	nvram->m_custom_handler = handler;
 }
 
@@ -131,15 +140,6 @@ void nvram_device::device_start()
 	// bind our handler
 	if (!m_config.m_custom_handler.isnull())
 		m_custom_handler = nvram_init_delegate(m_config.m_custom_handler, *m_owner);
-
-	// find our shared pointer with the target RAM
-	m_base = memory_get_shared(m_machine, tag(), m_length);
-	if (m_base == NULL)
-		throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
-
-	// if we are region-backed for the default, find it now and make sure it's the right size
-	if (m_region != NULL && m_region->bytes() != m_length)
-		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length);
 }
 
 
@@ -150,6 +150,9 @@ void nvram_device::device_start()
 
 void nvram_device::nvram_default()
 {
+	// make sure we have a valid base pointer
+	determine_final_base();
+
 	// region always wins
 	if (m_region != NULL)
 	{
@@ -195,6 +198,9 @@ void nvram_device::nvram_default()
 
 void nvram_device::nvram_read(mame_file &file)
 {
+	// make sure we have a valid base pointer
+	determine_final_base();
+
 	mame_fread(&file, m_base, m_length);
 }
 
@@ -210,4 +216,23 @@ void nvram_device::nvram_write(mame_file &file)
 }
 
 
-const device_type NVRAM = nvram_device_config::static_alloc_device_config;
+//-------------------------------------------------
+//  determine_final_base - get the final base
+//  pointer by looking up the memory share, unless
+//  a pointer was provided to us
+//-------------------------------------------------
+
+void nvram_device::determine_final_base()
+{
+	// find our shared pointer with the target RAM
+	if (m_base == NULL)
+	{
+		m_base = memory_get_shared(m_machine, tag(), m_length);
+		if (m_base == NULL)
+			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
+	}
+
+	// if we are region-backed for the default, find it now and make sure it's the right size
+	if (m_region != NULL && m_region->bytes() != m_length)
+		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length);
+}

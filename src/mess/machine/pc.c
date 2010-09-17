@@ -1253,7 +1253,6 @@ DRIVER_INIT( ppc512 )
 	pc_videoram_size = 0x10000;
 	pc_videoram = memory_region(machine, "maincpu")+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 DRIVER_INIT( pc1512 )
 {
@@ -1273,7 +1272,6 @@ DRIVER_INIT( pc1512 )
 	memory_install_write16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 
@@ -1305,8 +1303,6 @@ DRIVER_INIT( pc1640 )
 	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 DRIVER_INIT( pc_vga )

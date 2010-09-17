@@ -1341,10 +1341,6 @@ static MACHINE_RESET( nc200 )
 	nc200_uart_interrupt_irq = 0;
 
 	nc_common_open_stream_for_reading(machine);
-	if (file)
-	{
-		mc146818_load_stream(file);
-	}
 	nc_common_restore_memory_from_stream(machine);
 	nc_common_close_stream();
 
@@ -1357,10 +1353,6 @@ static MACHINE_RESET( nc200 )
 static void nc200_machine_stop(running_machine &machine)
 {
 	nc_common_open_stream_for_writing(&machine);
-	if (file)
-	{
-		mc146818_save_stream(file);
-	}
 	nc_common_store_memory_to_stream(&machine);
 	nc_common_close_stream();
 }
@@ -1380,8 +1372,6 @@ static MACHINE_START( nc200 )
 
 	/* serial timer */
 	nc_serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
-
-	mc146818_init(machine, MC146818_STANDARD);
 }
 
 /*
@@ -1510,7 +1500,7 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xd1) AM_READWRITE(mc146818_port_r, mc146818_port_w)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("upd765",upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
@@ -1719,6 +1709,8 @@ static MACHINE_CONFIG_START( nc100, driver_device )
 	MDRV_CARTSLOT_START(nc_pcmcia_card)
 	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
 	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
+	
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

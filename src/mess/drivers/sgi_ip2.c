@@ -120,7 +120,8 @@ static READ16_HANDLER(sgi_ip2_swtch_r)
 
 static READ8_HANDLER(sgi_ip2_clock_ctl_r)
 {
-	UINT8 ret = mc146818_port_r(space, 1);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	UINT8 ret = rtc->read(*space, 1);
 	verboselog(space->machine, 1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -128,12 +129,15 @@ static READ8_HANDLER(sgi_ip2_clock_ctl_r)
 static WRITE8_HANDLER(sgi_ip2_clock_ctl_w)
 {
 	verboselog(space->machine, 1, "sgi_ip2_clock_ctl_w: %02x\n", data);
-	mc146818_port_w(space, 1, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 1, data);
 }
 
 static READ8_HANDLER(sgi_ip2_clock_data_r)
 {
-	UINT8 ret = mc146818_port_r(space, 0);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	UINT8 ret = rtc->read(*space, 0);
+
 	verboselog(space->machine, 1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
@@ -141,7 +145,8 @@ static READ8_HANDLER(sgi_ip2_clock_data_r)
 static WRITE8_HANDLER(sgi_ip2_clock_data_w)
 {
 	verboselog(space->machine, 1, "sgi_ip2_clock_data_w: %02x\n", data);
-	mc146818_port_w(space, 0, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 0, data);
 }
 
 
@@ -437,7 +442,7 @@ static MACHINE_CONFIG_START( sgi_ip2, driver_device )
 
     MDRV_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
     MDRV_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MDRV_NVRAM_HANDLER(mc146818)
+	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -501,8 +506,6 @@ static DRIVER_INIT( sgi_ip2 )
 	memcpy(dst, src, 8);
 
 	machine->device("maincpu")->reset();
-
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 /***************************************************************************

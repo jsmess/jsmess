@@ -1104,8 +1104,7 @@ DRIVER_INIT( bebox )
 	memory_install_readwrite_bank(space_0, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
 	memory_install_readwrite_bank(space_1, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
-
-	mc146818_init(machine, MC146818_STANDARD);
+	
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(machine, &bebox_8042_interface);
 

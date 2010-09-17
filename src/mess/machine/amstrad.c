@@ -2693,19 +2693,20 @@ static void update_psg(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *ay8910 = machine->device("ay");
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
 
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			mc146818_port_w(space, 0,ppi_port_outputs[amstrad_ppi_PortA]);
+			rtc->write(*space, 0,ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			mc146818_port_w(space, 1,ppi_port_outputs[amstrad_ppi_PortA]);
+			rtc->write(*space, 1,ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			ppi_port_inputs[amstrad_ppi_PortA] = mc146818_port_r(space, 1);
+			ppi_port_inputs[amstrad_ppi_PortA] = rtc->read(*space, 1);
 			break;
 		}
 		return;

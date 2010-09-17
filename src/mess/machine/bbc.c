@@ -948,7 +948,8 @@ static void bbcb_IC32_initialise(void)
 static void MC146818_set(address_space *space)
 {
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",MC146818_WR,MC146818_DS,MC146818_AS,MC146818_CE);
-
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	
 	// if chip enabled
 	if (MC146818_CE)
 	{
@@ -957,12 +958,12 @@ static void MC146818_set(address_space *space)
 		{
 			if (MC146818_WR)
 			{
-				via_system_porta=mc146818_port_r(space, 1);
+				via_system_porta=rtc->read(*space, 1);
 				//logerror("read 146818 data %d \n",via_system_porta);
 			}
 			else
 			{
-				mc146818_port_w(space, 1, via_system_porta);
+				rtc->write(*space, 1, via_system_porta);
 				//logerror("write 146818 data %d \n",via_system_porta);
 			}
 		}
@@ -970,7 +971,7 @@ static void MC146818_set(address_space *space)
 		// if address select is set then set the address in the 146818
 		if (MC146818_AS)
 		{
-			mc146818_port_w(space, 0, via_system_porta);
+			rtc->write(*space, 0, via_system_porta);
 			//logerror("write 146818 address %d \n",via_system_porta);
 		}
 	}

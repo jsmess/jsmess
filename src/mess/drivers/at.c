@@ -171,7 +171,7 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(at_kbdc8042_r,            at_kbdc8042_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(mc146818_port_r,          mc146818_port_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffff)
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START(megapc_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	//AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printers */
 	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printers */
 	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printers */
 	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -751,7 +751,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printers */
 	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -825,7 +825,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 
 	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 //  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* printers */

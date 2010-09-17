@@ -225,7 +225,7 @@ static READ8_HANDLER ( orionz80_floppy_rtc_r )
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		return mc146818_port_r(space,offset-0x60);
+		return space->machine->device<mc146818_device>("rtc")->read(*space,offset-0x60);
 	}
 	else
 	{
@@ -237,7 +237,7 @@ static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		mc146818_port_w(space,offset-0x60,data);
+		space->machine->device<mc146818_device>("rtc")->write(*space,offset-0x60,data);
 	}
 	else
 	{
@@ -248,7 +248,6 @@ static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 
 MACHINE_START( orionz80 )
 {
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 	orion_video_mode_mask = 7;
 }
 

@@ -268,13 +268,13 @@ static I8255A_INTERFACE(qx10_i8255_interface)
 static READ8_HANDLER(mc146818_data_r)
 {
 	qx10_state *state = space->machine->driver_data<qx10_state>();
-	return mc146818_port_r(space, state->mc146818_offset);
+	return space->machine->device<mc146818_device>("rtc")->read(*space, state->mc146818_offset);
 };
 
 static WRITE8_HANDLER(mc146818_data_w)
 {
 	qx10_state *state = space->machine->driver_data<qx10_state>();
-	mc146818_port_w(space, state->mc146818_offset, data);
+	space->machine->device<mc146818_device>("rtc")->write(*space, state->mc146818_offset, data);
 };
 
 static WRITE8_HANDLER(mc146818_offset_w)
@@ -459,7 +459,6 @@ static MACHINE_START(qx10)
 
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	mc146818_init(machine, MC146818_STANDARD);
 	compis_init( &i82720_interface );
 
 	// find devices
@@ -535,6 +534,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MDRV_VIDEO_START(compis_gdc)
 	MDRV_VIDEO_UPDATE(compis_gdc)
 
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")

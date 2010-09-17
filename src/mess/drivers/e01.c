@@ -199,22 +199,26 @@ static WRITE8_HANDLER( hdc_irq_enable_w )
 
 static READ8_HANDLER( rtc_address_r )
 {
-	return mc146818_port_r(space, 0);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	return rtc->read(*space, 0);
 }
 
 static WRITE8_HANDLER( rtc_address_w )
 {
-	mc146818_port_w(space, 0, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 0, data);
 }
 
 static READ8_HANDLER( rtc_data_r )
 {
-	return mc146818_port_r(space, 1);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	return rtc->read(*space, 1);
 }
 
 static WRITE8_HANDLER( rtc_data_w )
 {
-	mc146818_port_w(space, 1, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 1, data);
 }
 
 /***************************************************************************
@@ -406,9 +410,6 @@ static MACHINE_START( e01 )
 	memory_configure_bank(machine, "bank4", 0, 1, ram + 0xfd00, 0);
 	memory_set_bank(machine, "bank4", 0);
 
-	/* initialize RTC */
-	mc146818_init(machine, MC146818_STANDARD);
-
 	/* register for state saving */
 	state_save_register_global(machine, state->adlc_ie);
 	state_save_register_global(machine, state->hdc_ie);
@@ -446,7 +447,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
     MDRV_MACHINE_START(e01)
     MDRV_MACHINE_RESET(e01)
 
-	MDRV_NVRAM_HANDLER(mc146818)
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MDRV_TIMER_ADD_PERIODIC("rtc", rtc_irq_hack, HZ(2)) // HACK!
 

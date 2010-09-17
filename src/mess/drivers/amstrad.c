@@ -155,7 +155,6 @@ static const upd765_interface aleste_8272_interface =
 
 static DRIVER_INIT( aleste )
 {
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }
 
 
@@ -1040,7 +1039,7 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_PALETTE_LENGTH(32+64)
 	MDRV_PALETTE_INIT(aleste)
-	MDRV_NVRAM_HANDLER(mc146818)
+	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 	MDRV_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
 	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)

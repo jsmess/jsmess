@@ -923,7 +923,7 @@ static MACHINE_CONFIG_START( bbcm, driver_device )
 	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)

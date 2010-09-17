@@ -252,23 +252,23 @@ WRITE8_HANDLER( rtc_address_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->rtc_address = data;
-
-	mc146818_port_w(space, 0, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 0, data);
 }
 
 READ8_HANDLER( rtc_data_r )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	UINT8 data = 0;
-
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
 	switch(state->rtc_address & 0x3f)
 	{
 		case 0x0c:
-			data = state->irq_flags | mc146818_port_r(space, 1);
+			data = state->irq_flags | rtc->read(*space, 1);
 			state->irq_flags = 0;
 			break;
 		default:
-			data = mc146818_port_r(space, 1);
+			data = rtc->read(*space, 1);
 	}
 
 	return data;
@@ -277,8 +277,8 @@ READ8_HANDLER( rtc_data_r )
 WRITE8_HANDLER( rtc_data_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
-
-	mc146818_port_w(space, 1, data);
+	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	rtc->write(*space, 1, data);
 
 	switch(state->rtc_address & 0x3f)
 	{
@@ -404,15 +404,13 @@ static NVRAM_HANDLER( micronic )
 	{
 		mame_fwrite(file, state->ram, 0x8000);
 		mame_fwrite(file, messram_get_ptr(machine->device("messram")), 224*1024);
-		mc146818_save_stream(file);
 	}
 	else
 	{
 		if (file)
 		{
 			mame_fread(file, state->ram, 0x8000);
-			mame_fread(file, messram_get_ptr(machine->device("messram")), 224*1024);
-			mc146818_load_stream(file);
+			mame_fread(file, messram_get_ptr(machine->device("messram")), 224*1024);			
 
 			/* reload register A and B for restore the periodic irq state */
 			mame_fseek(file, 0x4000a, SEEK_SET);
@@ -462,9 +460,6 @@ static MACHINE_START( micronic )
 	memory_configure_bank(machine, "bank1", 0x02, 0x07, messram_get_ptr(machine->device("messram")), 0x8000);
 
 	state->rtc_periodic_irq = timer_alloc(machine, rtc_periodic_irq, 0);
-
-	mc146818_init(machine, MC146818_IGNORE_CENTURY);
-
 	/* register for state saving */
 //  state_save_register_global(machine, state->);
 }
@@ -513,7 +508,8 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MDRV_RAM_DEFAULT_SIZE("224K")
 
 	MDRV_NVRAM_HANDLER(micronic)
-
+	
+	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 MACHINE_CONFIG_END
 
 /* ROM definition */
