@@ -27,7 +27,6 @@ extern const ins8250_interface bebox_uart_inteface_3;
 MACHINE_START( bebox );
 MACHINE_RESET( bebox );
 DRIVER_INIT( bebox );
-NVRAM_HANDLER( bebox );
 
 READ64_HANDLER( bebox_cpu0_imask_r );
 READ64_HANDLER( bebox_cpu1_imask_r );

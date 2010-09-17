@@ -192,68 +192,63 @@ static const char *pcw16_read_handler_dram[4] =
 /* PCW16 Flash interface */
 /* PCW16 can have two 1mb flash chips */
 
-static NVRAM_HANDLER( pcw16 )
-{
-	nvram_handler_intelflash( machine, 0, file, read_or_write );
-	nvram_handler_intelflash( machine, 1, file, read_or_write );
-}
-
 /* read flash0 */
-static int pcw16_flash0_bank_handler_r(int bank, int offset)
+static int pcw16_flash0_bank_handler_r(running_machine *machine, int bank, int offset)
 {
-	int flash_offset = (pcw16_banks[bank]<<14) | offset;
-
-	return intelflash_read(0, flash_offset);
+	intel_e28f008sa_device *flash = machine->device<intel_e28f008sa_device>("flash0");
+	int flash_offset = (pcw16_banks[bank]<<14) | offset;	
+	return flash->read(flash_offset);
 }
 
 /* read flash1 */
-static int pcw16_flash1_bank_handler_r(int bank, int offset)
+static int pcw16_flash1_bank_handler_r(running_machine *machine, int bank, int offset)
 {
+	intel_e28f008sa_device *flash = machine->device<intel_e28f008sa_device>("flash1");
 	int flash_offset = ((pcw16_banks[bank]&0x03f)<<14) | offset;
 
-	return intelflash_read(1, flash_offset);
+	return flash->read(flash_offset);
 }
 
 /* flash 0 */
 static  READ8_HANDLER(pcw16_flash0_bank_handler0_r)
 {
-	return pcw16_flash0_bank_handler_r(0, offset);
+	return pcw16_flash0_bank_handler_r(space->machine,0, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler1_r)
 {
-	return pcw16_flash0_bank_handler_r(1, offset);
+	return pcw16_flash0_bank_handler_r(space->machine,1, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler2_r)
 {
-	return pcw16_flash0_bank_handler_r(2, offset);
+	return pcw16_flash0_bank_handler_r(space->machine,2, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash0_bank_handler3_r)
 {
-	return pcw16_flash0_bank_handler_r(3, offset);
+	return pcw16_flash0_bank_handler_r(space->machine,3, offset);
 }
 
 /* flash 1 */
 static  READ8_HANDLER(pcw16_flash1_bank_handler0_r)
 {
-	return pcw16_flash1_bank_handler_r(0, offset);
+	return pcw16_flash1_bank_handler_r(space->machine,0, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler1_r)
 {
-	return pcw16_flash1_bank_handler_r(1, offset);
+	return pcw16_flash1_bank_handler_r(space->machine,1, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler2_r)
 {
-	return pcw16_flash1_bank_handler_r(2, offset);
+	return pcw16_flash1_bank_handler_r(space->machine,2, offset);
 }
 
 static  READ8_HANDLER(pcw16_flash1_bank_handler3_r)
 {
-	return pcw16_flash1_bank_handler_r(3, offset);
+	return pcw16_flash1_bank_handler_r(space->machine,3, offset);
 }
 
 static const read8_space_func pcw16_flash0_bank_handlers_r[4] =
@@ -273,64 +268,68 @@ static const read8_space_func pcw16_flash1_bank_handlers_r[4] =
 };
 
 /* write flash0 */
-static void pcw16_flash0_bank_handler_w(int bank, int offset, int data)
+static void pcw16_flash0_bank_handler_w(running_machine *machine, int bank, int offset, int data)
 {
+	intel_e28f008sa_device *flash = machine->device<intel_e28f008sa_device>("flash0");
+
 	int flash_offset = (pcw16_banks[bank]<<14) | offset;
 
-	intelflash_write(0, flash_offset, data);
+	flash->write(flash_offset, data);
 }
 
 /* read flash1 */
-static void pcw16_flash1_bank_handler_w(int bank, int offset, int data)
+static void pcw16_flash1_bank_handler_w(running_machine *machine, int bank, int offset, int data)
 {
+	intel_e28f008sa_device *flash = machine->device<intel_e28f008sa_device>("flash1");
+
 	int flash_offset = ((pcw16_banks[bank]&0x03f)<<14) | offset;
 
-	intelflash_write(1, flash_offset,data);
+	flash->write(flash_offset,data);
 }
 
 /* flash 0 */
 static WRITE8_HANDLER(pcw16_flash0_bank_handler0_w)
 {
-	pcw16_flash0_bank_handler_w(0, offset, data);
+	pcw16_flash0_bank_handler_w(space->machine,0, offset, data);
 }
 
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler1_w)
 {
-	pcw16_flash0_bank_handler_w(1, offset, data);
+	pcw16_flash0_bank_handler_w(space->machine,1, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler2_w)
 {
-	pcw16_flash0_bank_handler_w(2, offset, data);
+	pcw16_flash0_bank_handler_w(space->machine,2, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler3_w)
 {
-	pcw16_flash0_bank_handler_w(3, offset, data);
+	pcw16_flash0_bank_handler_w(space->machine,3, offset, data);
 }
 
 
 /* flash 1 */
 static WRITE8_HANDLER(pcw16_flash1_bank_handler0_w)
 {
-	pcw16_flash1_bank_handler_w(0, offset, data);
+	pcw16_flash1_bank_handler_w(space->machine,0, offset, data);
 }
 
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler1_w)
 {
-	pcw16_flash1_bank_handler_w(1, offset, data);
+	pcw16_flash1_bank_handler_w(space->machine,1, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler2_w)
 {
-	pcw16_flash1_bank_handler_w(2, offset, data);
+	pcw16_flash1_bank_handler_w(space->machine,2, offset, data);
 }
 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler3_w)
 {
-	pcw16_flash1_bank_handler_w(3, offset, data);
+	pcw16_flash1_bank_handler_w(space->machine,3, offset, data);
 }
 
 static const write8_space_func pcw16_flash0_bank_handlers_w[4] =
@@ -431,7 +430,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		{
 			/* nvram */
 			if ((bank_id & 0x040)==0)
-			{
+			{			
 				mem_ptr = (unsigned char *)intelflash_getmemptr(0);
 			}
 			else
@@ -1399,7 +1398,6 @@ static MACHINE_CONFIG_START( pcw16, driver_device )
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( pcw16 )
-	MDRV_NVRAM_HANDLER( pcw16 )
 
 	MDRV_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */
 
@@ -1431,15 +1429,9 @@ static MACHINE_CONFIG_START( pcw16, driver_device )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_INTEL_E28F008SA_ADD("flash0")
+	MDRV_INTEL_E28F008SA_ADD("flash1")
 MACHINE_CONFIG_END
-
-
-static DRIVER_INIT( pcw16 )
-{
-	/* init flashes */
-	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, NULL);
-	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, NULL);
-}
 
 /***************************************************************************
 
@@ -1456,4 +1448,4 @@ ROM_END
 
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	 "Amstrad plc",   "PCW16", GAME_NOT_WORKING )
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    0,	 	"Amstrad plc",   "PCW16", GAME_NOT_WORKING )

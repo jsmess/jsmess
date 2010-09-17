@@ -28,6 +28,7 @@
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/mpc105.h"
+#include "machine/intelfsh.h"
 
 /* Devices */
 #include "devices/flopdrv.h"
@@ -155,7 +156,7 @@ static MACHINE_CONFIG_START( bebox, driver_device )
 	MDRV_SOUND_ADD("ym3812", YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_NVRAM_HANDLER( bebox )
+	MDRV_FUJITSU_29F016A_ADD("flash")
 
 	MDRV_CDROM_ADD( "cdrom" )
 	MDRV_HARDDISK_ADD( "harddisk1" )

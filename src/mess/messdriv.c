@@ -65,7 +65,7 @@ const game_driver * const drivers[] =
 	DRIVER( gbpocket )  /* Nintendo Game Boy Pocket Handheld */
 	DRIVER( gblight )   /* Nintendo Game Boy Light Handheld */
 	DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld */
-	DRIVER( gba )       /* Nintendo Game Boy Advance Handheld */
+//	DRIVER( gba )       /* Nintendo Game Boy Advance Handheld */
 	DRIVER( snes )      /* Nintendo Super Nintendo NTSC */
 	DRIVER( snespal )   /* Nintendo Super Nintendo PAL */
 	DRIVER( snessfx )   /* Nintendo Super Nintendo NTSC w/SuperFX CPU*/
@@ -346,7 +346,7 @@ const game_driver * const drivers[] =
 	DRIVER( pcw9256 )   /* 198? PCW9256  */
 	DRIVER( pcw9512 )   /* 198? PCW9512 (+)  */
 	DRIVER( pcw10 )	 /* 198? PCW10     */
-	DRIVER( pcw16 )	 /* 1995 PCW16     */
+//	DRIVER( pcw16 )	 /* 1995 PCW16     */
 	DRIVER( nc100 )	 /* 1992 NC100     */
 	DRIVER( nc150 )	 /* 1992 NC150     */
 	DRIVER( nc200 )	 /* 1993 NC200     */
@@ -768,7 +768,7 @@ const game_driver * const drivers[] =
 	DRIVER( genmod )	/* 199?? Myarc Geneve 9640    */
 	DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)      */
 
-	DRIVER( avigo )	 /*   */
+//	DRIVER( avigo )	 /*   */
 
 	/* Texas Instruments Calculators */
 	DRIVER( ti73 )	  /* 1990 TI-73    */

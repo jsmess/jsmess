@@ -584,9 +584,9 @@ $(MESSOBJ)/amstrad.a:			\
 	$(MESS_MACHINE)/nc.o		\
 	$(MESS_VIDEO)/pcw.o			\
 	$(MESS_DRIVERS)/pcw.o		\
-	$(MESS_DRIVERS)/pcw16.o		\
 	$(MESS_VIDEO)/pcw16.o		\
 	$(MESS_DRIVERS)/pda600.o	\
+	#$(MESS_DRIVERS)/pcw16.o		\
 
 $(MESSOBJ)/apf.a:				\
 	$(MESS_DRIVERS)/apf.o		\
@@ -1172,8 +1172,8 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
 	$(MESS_DRIVERS)/vboy.o		\
-	$(MESS_DRIVERS)/gba.o		\
-	$(MESS_VIDEO)/gba.o		\
+#	$(MESS_DRIVERS)/gba.o		\
+#	$(MESS_VIDEO)/gba.o		\
 
 $(MESSOBJ)/nokia.a:				\
 	$(MESS_DRIVERS)/mikromik.o	\
@@ -1516,8 +1516,6 @@ $(MESSOBJ)/thomson.a:			\
 	$(MESS_FORMATS)/thom_cas.o	\
 
 $(MESSOBJ)/ti.a:				\
-	$(MESS_VIDEO)/avigo.o		\
-	$(MESS_DRIVERS)/avigo.o		\
 	$(MESS_DRIVERS)/ti85.o		\
 	$(MESS_FORMATS)/ti85_ser.o	\
 	$(MESS_VIDEO)/ti85.o		\
@@ -1551,6 +1549,8 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_VIDEO)/733_asr.o		\
 	$(MESS_DRIVERS)/ti990_10.o	\
 	$(MESS_DRIVERS)/ti99_2.o	\
+#	$(MESS_VIDEO)/avigo.o		\
+#	$(MESS_DRIVERS)/avigo.o		\
 
 $(MESSOBJ)/tiger.a:				\
 	$(MESS_DRIVERS)/gamecom.o	\

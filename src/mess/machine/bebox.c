@@ -815,15 +815,17 @@ const struct pit8253_config bebox_pit8254_config =
 
 static READ8_HANDLER( bebox_flash8_r )
 {
+	fujitsu_29f016a_device *flash = space->machine->device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
-	return intelflash_read(0, offset);
+	return flash->read(offset);
 }
 
 
 static WRITE8_HANDLER( bebox_flash8_w )
 {
+	fujitsu_29f016a_device *flash = space->machine->device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
-	intelflash_write(0, offset, data);
+	flash->write(offset, data);
 }
 
 
@@ -1056,11 +1058,6 @@ static TIMER_CALLBACK( bebox_get_devices ) {
  *
  *************************************/
 
-NVRAM_HANDLER( bebox )
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-}
-
 MACHINE_RESET( bebox )
 {
 	bebox_devices.pic8259_master = NULL;
@@ -1098,7 +1095,6 @@ DRIVER_INIT( bebox )
 
 	/* set up boot and flash ROM */
 	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
-	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
 	memory_install_readwrite_bank(space_0, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
