@@ -84,10 +84,10 @@ static void aim65_printer_cr(void) {
 
 static TIMER_CALLBACK(aim65_printer_timer)
 {
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 
-	via_cb1_w(via_0, printer_level);
-	via_ca1_w(via_0, !printer_level);
+	via_0->write_cb1(printer_level);
+	via_0->write_cb1(!printer_level);
 	printer_level = !printer_level;
 	aim65_printer_inc();
 }
@@ -95,11 +95,12 @@ static TIMER_CALLBACK(aim65_printer_timer)
 
 WRITE8_DEVICE_HANDLER( aim65_printer_on )
 {
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 	if (!data)
 	{
 		aim65_printer_cr();
 		timer_adjust_periodic(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
-		via_cb1_w(device, 0);
+		via_0->write_cb1(0);
 		printer_level = 1;
 	}
 	else

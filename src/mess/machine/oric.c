@@ -282,7 +282,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 
 	data = 0;
 
@@ -302,7 +302,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 		data = input_port_9>>4;
 	}
 
-	via_cb1_w(via_0, data);
+	via_0->write_cb1(data);
 }
 
 static unsigned char previous_portb_data = 0;
@@ -705,7 +705,7 @@ static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
 
 static READ8_HANDLER (oric_jasmin_r)
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
 	running_device *fdc = space->machine->device("wd179x");
 	unsigned char data = 0x0ff;
 
@@ -725,7 +725,7 @@ static READ8_HANDLER (oric_jasmin_r)
 			data = wd17xx_data_r(fdc, 0);
 			break;
 		default:
-			data = via_r(via_0, offset & 0x0f);
+			data = via_0->read(*space,offset & 0x0f);
 			//logerror("unhandled io read: %04x %02x\n", offset, data);
 			break;
 
@@ -736,7 +736,7 @@ static READ8_HANDLER (oric_jasmin_r)
 
 static WRITE8_HANDLER(oric_jasmin_w)
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 	running_device *fdc = space->machine->device("wd179x");
 	switch (offset & 0x0f)
 	{
@@ -780,7 +780,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			break;
 
 		default:
-			via_w(via_0, offset & 0x0f, data);
+			via_0->write(*space,offset & 0x0f, data);
 			break;
 	}
 }
@@ -952,8 +952,8 @@ READ8_HANDLER (oric_microdisc_r)
 
 		default:
 			{
-				running_device *via_0 = space->machine->device("via6522_0");
-				data = via_r(via_0, offset & 0x0f);
+				via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
+				data = via_0->read(*space, offset & 0x0f);
 			}
 			break;
 
@@ -1001,8 +1001,8 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 		default:
 			{
-				running_device *via_0 = space->machine->device("via6522_0");
-				via_w(via_0, offset & 0x0f, data);
+				via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
+				via_0->write(*space, offset & 0x0f, data);
 			}
 			break;
 	}
@@ -1146,7 +1146,7 @@ MACHINE_RESET( oric )
 
 READ8_HANDLER ( oric_IO_r )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
@@ -1179,12 +1179,12 @@ READ8_HANDLER ( oric_IO_r )
 		}
 	}
 	/* it is repeated */
-	return via_r(via_0, offset & 0x0f);
+	return via_0->read(*space, offset & 0x0f);
 }
 
 WRITE8_HANDLER ( oric_IO_w )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
@@ -1217,7 +1217,7 @@ WRITE8_HANDLER ( oric_IO_w )
 		//logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(space->machine->device("maincpu"), STATE_GENPC));
 	}
 
-	via_w(via_0, offset & 0x0f, data);
+	via_0->write(*space, offset & 0x0f, data);
 }
 
 

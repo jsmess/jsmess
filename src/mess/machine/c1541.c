@@ -193,8 +193,8 @@ struct _c1541_t
 
 	/* devices */
 	running_device *cpu;
-	running_device *via0;
-	running_device *via1;
+	via6522_device *via0;
+	via6522_device *via1;
 	running_device *bus;
 	running_device *image;
 
@@ -278,7 +278,7 @@ static TIMER_CALLBACK( bit_tick )
 		int byte_ready = !(byte && c1541->soe);
 
 		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-		via_ca1_w(c1541->via1, byte_ready);
+		c1541->via1->write_ca1(byte_ready);
 
 		c1541->byte = byte;
 	}
@@ -374,7 +374,7 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w )
 	c1541_t *c1541 = get_safe_token(device);
 	int data_out = !c1541->data_out && !(c1541->atna ^ !state);
 
-	via_ca1_w(c1541->via0, !state);
+	c1541->via0->write_ca1(!state);
 
 	cbm_iec_data_w(c1541->bus, device, data_out);
 }
@@ -401,7 +401,7 @@ WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_atn_w )
 	int nrfd = c1541->nrfd_out;
 	int ndac = c1541->ndac_out;
 
-	via_ca1_w(c1541->via0, !state);
+	c1541->via0->write_ca1(!state);
 
 	if (!state ^ c1541->atna)
 	{
@@ -430,8 +430,8 @@ WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_ifc_w )
 
 static ADDRESS_MAP_START( c1540_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1540:c1540", 0x0000)
 ADDRESS_MAP_END
 
@@ -441,8 +441,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541:c1541", 0x0000)
 ADDRESS_MAP_END
 
@@ -452,8 +452,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1541c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541:c1541c", 0x0000)
 ADDRESS_MAP_END
 
@@ -463,8 +463,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1541ii_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541:c1541ii", 0x0000)
 ADDRESS_MAP_END
 
@@ -474,8 +474,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sx1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541:sx1541", 0x0000)
 ADDRESS_MAP_END
 
@@ -485,8 +485,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c2031_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c2031:c2031", 0x0000)
 ADDRESS_MAP_END
 
@@ -496,8 +496,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oc118_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("oc118:oc118", 0x0000)
 ADDRESS_MAP_END
 
@@ -977,8 +977,8 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 
 	c1541->soe = state;
 
-	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-	via_ca1_w(device, byte_ready);
+	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);	
+	c1541->via1->write_ca1(byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
@@ -1214,8 +1214,8 @@ static DEVICE_START( c1541 )
 	c1541->cpu = device->subdevice(M6502_TAG);
 
 	/* find devices */
-	c1541->via0 = device->subdevice(M6522_0_TAG);
-	c1541->via1 = device->subdevice(M6522_1_TAG);
+	c1541->via0 = device->subdevice<via6522_device>(M6522_0_TAG);
+	c1541->via1 = device->subdevice<via6522_device>(M6522_1_TAG);
 	c1541->bus = device->machine->device(config->bus_tag);
 	c1541->image = device->subdevice(FLOPPY_0);
 

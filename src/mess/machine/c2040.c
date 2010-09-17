@@ -111,7 +111,7 @@ struct _c2040_t
 	running_device *riot0;
 	running_device *riot1;
 	running_device *miot;
-	running_device *via;
+	via6522_device *via;
 	running_device *bus;
 
 	/* timers */
@@ -259,8 +259,8 @@ static TIMER_CALLBACK( bit_tick )
 		/* set byte ready flag */
 		c2040->ready = ready;
 
-		via_ca1_w(c2040->via, ready);
-		via_cb1_w(c2040->via, ERROR);
+		c2040->via->write_ca1(ready);
+		c2040->via->write_cb1(ERROR);
 
 		if ((device->type() == C8050) || (device->type() == C8250) || (device->type() == SFD1001))
 		{
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
@@ -475,7 +475,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
@@ -507,7 +507,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c8050_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
@@ -539,7 +539,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfd1001_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
@@ -842,7 +842,7 @@ static WRITE_LINE_DEVICE_HANDLER( mode_sel_w )
 	c2040->mode = state;
 
 	update_gcr_data(c2040);
-	via_cb1_w(device, ERROR);
+	c2040->via->write_cb1(ERROR);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( rw_sel_w )
@@ -853,7 +853,7 @@ static WRITE_LINE_DEVICE_HANDLER( rw_sel_w )
 	c2040->rw = state;
 
 	update_gcr_data(c2040);
-	via_cb1_w(device, ERROR);
+	c2040->via->write_cb1(ERROR);
 }
 
 static const via6522_interface via_intf =
@@ -1511,7 +1511,7 @@ static DEVICE_START( c2040 )
 	c2040->riot0 = device->subdevice(M6532_0_TAG);
 	c2040->riot1 = device->subdevice(M6532_1_TAG);
 	c2040->miot = device->subdevice(M6530_TAG);
-	c2040->via = device->subdevice(M6522_TAG);
+	c2040->via = device->subdevice<via6522_device>(M6522_TAG);
 	c2040->bus = device->machine->device(config->bus_tag);
 	c2040->unit[0].image = device->subdevice(FLOPPY_0);
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);

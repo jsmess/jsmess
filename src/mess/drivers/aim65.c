@@ -31,11 +31,11 @@ ToDo:
 /* Note: RAM is mapped dynamically in machine/aim65.c */
 static ADDRESS_MAP_START( aim65_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via_r, via_w) /* User VIA */
+	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)/* User VIA */
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
 	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0)  AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_r, pia6821_w)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */

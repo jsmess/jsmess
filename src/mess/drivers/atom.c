@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
-	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via_r, via_w)
+	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE_MODERN(R6522_TAG, via6522_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
 
@@ -595,7 +595,7 @@ static const i8271_interface fdc_intf =
 static const centronics_interface atom_centronics_config =
 {
 	FALSE,
-	DEVCB_DEVICE_LINE(R6522_TAG, via_ca1_w),
+	DEVCB_DEVICE_LINE_MEMBER(R6522_TAG, via6522_device,write_ca1),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

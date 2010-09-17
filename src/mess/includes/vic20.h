@@ -1,6 +1,8 @@
 #ifndef __VIC20__
 #define __VIC20__
 
+#include "machine/6522via.h"
+
 #define SCREEN_TAG		"screen"
 #define M6502_TAG		"ue10"
 #define M6522_0_TAG		"uab3"
@@ -24,8 +26,8 @@ public:
 	int key_col;
 
 	/* devices */
-	running_device *via0;
-	running_device *via1;
+	via6522_device *via0;
+	via6522_device *via1;
 	running_device *iec;
 	running_device *cassette;
 	running_device *mos6560;

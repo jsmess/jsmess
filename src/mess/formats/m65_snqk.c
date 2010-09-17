@@ -218,8 +218,8 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 {
     UINT8 *RAM = memory_region(machine, "maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    running_device *via_0 = machine->device("via6522_0");
-    running_device *via_1 = machine->device("via6522_1");
+    via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+    via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
     running_device *ay8910 = machine->device("ay8910.1");
 
     /* check for .DMP file format */
@@ -276,11 +276,11 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 
         /* first set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_w(via_0, i, snapshot_buff[base++]);
+            via_0->write(*space, i, snapshot_buff[base++]);
 
         /* second set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_w(via_1, i, snapshot_buff[base++]);
+            via_1->write(*space, i, snapshot_buff[base++]);
 
         /* microtan IO bff0-bfff */
         for (i = 0; i < 16; i++ )

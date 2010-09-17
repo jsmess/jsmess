@@ -31,9 +31,9 @@ struct _vic1112_t
 	int via1_irq;						/* VIA #1 interrupt request */
 
 	/* devices */
-	running_device *via0;
-	running_device *via1;
-	running_device *bus;
+	via6522_device *via0;
+	via6522_device *via1;
+	via6522_device *bus;
 };
 
 /***************************************************************************
@@ -67,7 +67,7 @@ WRITE_LINE_DEVICE_HANDLER( vic1112_ieee488_srq_w )
 {
 	vic1112_t *vic1112 = get_safe_token(device);
 
-	via_cb1_w(vic1112->bus, state);
+	vic1112->bus->write_cb1(state);
 }
 
 /*-------------------------------------------------
@@ -298,17 +298,17 @@ static DEVICE_START( vic1112 )
 	address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	vic1112->via0 = device->subdevice(M6522_0_TAG);
-	vic1112->via1 = device->subdevice(M6522_1_TAG);
-	vic1112->bus = device->machine->device(config->bus_tag);
+	vic1112->via0 = device->subdevice<via6522_device>(M6522_0_TAG);
+	vic1112->via1 = device->subdevice<via6522_device>(M6522_1_TAG);
+	vic1112->bus = device->machine->device<via6522_device>(config->bus_tag);
 
 	/* set VIA clocks */
 	vic1112->via0->set_unscaled_clock(device->machine->firstcpu->unscaled_clock());
 	vic1112->via1->set_unscaled_clock(device->machine->firstcpu->unscaled_clock());
 
 	/* map VIAs to memory */
-	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9800, 0x980f, 0, 0, via_r, via_w);
-	memory_install_readwrite8_device_handler(program, vic1112->via1, 0x9810, 0x981f, 0, 0, via_r, via_w);
+	program->install_handler(0x9800, 0x980f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via0), write8_delegate_create(via6522_device, write, *vic1112->via0));
+	program->install_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via1), write8_delegate_create(via6522_device, write, *vic1112->via1));
 
 	/* map ROM to memory */
 	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, "vic1112:vic1112"));

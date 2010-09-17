@@ -340,13 +340,13 @@ const via6522_interface microtan_via6522_1 =
 static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image(machine));
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
-		via_cb2_w(via_0, 0);
+		via_0->write_cb2(0);
 	else if (level > +0.07)
-		via_cb2_w(via_0, 1);
+		via_0->write_cb2(1);
 }
 
 READ8_HANDLER( microtan_sound_r )

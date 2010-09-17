@@ -28,12 +28,14 @@ static VIDEO_UPDATE( tk80 )
 
 static ADDRESS_MAP_START(tk80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0000, 0x02ff) AM_ROM
+	AM_RANGE(0x0300, 0x03ff) AM_RAM // EEPROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM // RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tk80_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -301,7 +303,6 @@ static GFXDECODE_START( tk80bs )
 	GFXDECODE_ENTRY( "gfx", 0x0000, tk80bs_charlayout, 0, 1 )
 GFXDECODE_END
 
-#if 0
 static READ8_DEVICE_HANDLER( key_matrix_r )
 {
 	printf("A R\n");
@@ -329,7 +330,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_HANDLER(serial_out_w)			/* Port C write */
 };
-#endif
+
 
 static MACHINE_CONFIG_START( tk80, driver_device )
     /* basic machine hardware */
@@ -349,6 +350,8 @@ static MACHINE_CONFIG_START( tk80, driver_device )
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	
     MDRV_VIDEO_START(tk80)
     MDRV_VIDEO_UPDATE(tk80)
 MACHINE_CONFIG_END

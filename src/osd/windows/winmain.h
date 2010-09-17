@@ -57,6 +57,7 @@
 #define WINOPTION_MULTITHREADING		"multithreading"
 #define WINOPTION_NUMPROCESSORS			"numprocessors"
 #define WINOPTION_PROFILE				"profile"
+#define WINOPTION_BENCH					"bench"
 
 // video options
 #define WINOPTION_VIDEO					"video"
@@ -148,3 +149,4 @@ void CLIB_DECL mame_printf_verbose(const char *text, ...) ATTR_PRINTF(1,2);
 
 // use this to ping the watchdog
 void winmain_watchdog_ping(void);
+void winmain_dump_stack();

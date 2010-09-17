@@ -100,8 +100,8 @@ static ADDRESS_MAP_START( vic20_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x6000, 0x7fff) BLK3
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE(M6560_TAG, mos6560_port_r, mos6560_port_w)
-	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM
 //  AM_RANGE(0x9800, 0x9bff) I/O2
 //  AM_RANGE(0x9c00, 0x9fff) I/O3
@@ -427,7 +427,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 	vic20_state *state = timer.machine->driver_data<vic20_state>();
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 
-	via_ca1_w(state->via1, data);
+	state->via1->write_ca1(data);
 }
 
 /* IEC Serial Bus */
@@ -435,7 +435,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ M6522_0_TAG },
-	{ M6522_1_TAG, DEVCB_DEVICE_LINE(M6522_1_TAG, via_cb1_w) },
+	{ M6522_1_TAG, DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_cb1), },
 	{ C1541_IEC(C1540_TAG) },
 	{ NULL}
 };
@@ -520,8 +520,8 @@ static MACHINE_START( vic20 )
 	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->via0 = machine->device(M6522_0_TAG);
-	state->via1 = machine->device(M6522_1_TAG);
+	state->via0 = machine->device<via6522_device>(M6522_0_TAG);
+	state->via1 = machine->device<via6522_device>(M6522_1_TAG);
 	state->iec = machine->device(IEC_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
 	state->cassette_timer = machine->device<timer_device>(TIMER_C1530_TAG);

@@ -83,8 +83,8 @@ struct _c1571_t
 
 	/* devices */
 	running_device *cpu;
-	running_device *via0;
-	running_device *via1;
+	via6522_device *via0;
+	via6522_device *via1;
 	running_device *cia;
 	running_device *wd1770;
 	running_device *serial_bus;
@@ -195,7 +195,7 @@ static TIMER_CALLBACK( bit_tick )
 		int byte_ready = !(byte && c1571->soe);
 
 		cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
-		via_ca1_w(c1571->via1, byte_ready);
+		c1571->via1->write_ca1(byte_ready);
 
 		c1571->byte = byte;
 	}
@@ -309,7 +309,7 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_atn_w )
 {
 	c1571_t *c1571 = get_safe_token(device);
 
-	via_ca1_w(c1571->via0, !state);
+	c1571->via0->write_ca1(!state);
 	iec_data_w(device);
 }
 
@@ -359,8 +359,8 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_reset_w )
 
 static ADDRESS_MAP_START( c1570_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1570:c1570", 0)
@@ -372,8 +372,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1571:c1571", 0)
@@ -385,8 +385,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
 //  AM_RANGE(0x2000, 0x2005) 5710 FDC
 //  AM_RANGE(0x400c, 0x400e) 5710 CIA
 //  AM_RANGE(0x4010, 0x4017) 5710 CIA
@@ -721,7 +721,7 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 	c1571->soe = state;
 
 	cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
-	via_ca1_w(device, byte_ready);
+	c1571->via1->write_ca1(byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
@@ -823,8 +823,8 @@ FLOPPY_OPTIONS_END
 static WRITE_LINE_DEVICE_HANDLER( wpt_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner());
-
-	via_ca2_w(c1571->via0, !state);
+	
+	c1571->via0->write_ca2(!state);
 }
 
 static const floppy_config c1570_floppy_config =
@@ -950,8 +950,8 @@ static DEVICE_START( c1571 )
 	c1571->cpu = device->subdevice(M6502_TAG);
 
 	/* find devices */
-	c1571->via0 = device->subdevice(M6522_0_TAG);
-	c1571->via1 = device->subdevice(M6522_1_TAG);
+	c1571->via0 = device->subdevice<via6522_device>(M6522_0_TAG);
+	c1571->via1 = device->subdevice<via6522_device>(M6522_1_TAG);
 	c1571->cia = device->subdevice(M6526_TAG);
 	c1571->wd1770 = device->subdevice(WD1770_TAG);
 	c1571->serial_bus = device->machine->device(config->serial_bus_tag);

@@ -263,11 +263,11 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	running_device *via_1 = device->machine->device("via6522_1");
+	via6522_device *via_1 = device->machine->device<via6522_device>("via6522_1");
 
-	via_ca2_w(via_1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
-	via_cb1_w(via_1, device->machine->primary_screen->vblank());
-	via_cb2_w(via_1, device->machine->primary_screen->vblank());
+	via_1->write_ca2((AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
+	via_1->write_cb1(device->machine->primary_screen->vblank());
+	via_1->write_cb2(device->machine->primary_screen->vblank());
 }
 
 
@@ -459,10 +459,9 @@ static void apple3_update_memory(running_machine *machine)
 	{
 		running_device *via_0 = space->machine->device("via6522_0");
 		running_device *via_1 = space->machine->device("via6522_1");
-		memory_install_read8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_r);
-		memory_install_write8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_w);
-		memory_install_read8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_r);
-		memory_install_write8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_w);
+
+        space->install_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
+		space->install_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate_create(via6522_device, read, *via_1), write8_delegate_create(via6522_device, write, *via_1));
 	}
 }
 

@@ -27,7 +27,7 @@ static UINT8 keyboard_line;
 static bool jr100_use_pcg;
 static UINT8 jr100_speaker;
 
-static WRITE8_DEVICE_HANDLER( jr100_via_w )
+static WRITE8_HANDLER( jr100_via_w )
 {
 	static UINT16 t1latch;
 	static UINT8 beep_en;
@@ -39,7 +39,7 @@ static WRITE8_DEVICE_HANDLER( jr100_via_w )
 		beep_en = ((data & 0xe0) == 0xe0);
 
 		if(!beep_en)
-			beep_set_state(device->machine->device("beeper"),0);
+			beep_set_state(space->machine->device("beeper"),0);
 	}
 
 	/* T1L-L */
@@ -58,12 +58,12 @@ static WRITE8_DEVICE_HANDLER( jr100_via_w )
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
 		if(beep_en)
 		{
-			beep_set_state(device->machine->device("beeper"),1);
-			beep_set_frequency(device->machine->device("beeper"),894886.25 / (double)(t1latch) / 2.0);
+			beep_set_state(space->machine->device("beeper"),1);
+			beep_set_frequency(space->machine->device("beeper"),894886.25 / (double)(t1latch) / 2.0);
 		}
 	}
-
-	via_w(device,offset,data);
+	via6522_device *via = space->machine->device<via6522_device>("via");	
+	via->write(*space,offset,data);
 }
 
 static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&jr100_ram)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&jr100_pcg)
 	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)
-	AM_RANGE(0xc800, 0xc80f) AM_DEVREADWRITE("via", via_r, jr100_via_w)
+	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD_MODERN("via", via6522_device, read) AM_WRITE(jr100_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -263,14 +263,14 @@ static TIMER_DEVICE_CALLBACK( sound_tick )
 	speaker_level_w(speaker,jr100_speaker);
 	jr100_speaker = 0;
 
-	running_device *via = timer.machine->device("via");
+	via6522_device *via = timer.machine->device<via6522_device>("via");
 	double level = cassette_input(timer.machine->device("cassette"));
 	if (level > 0.0) {
-		via_ca1_w(via, 0);
-		via_cb1_w(via, 0);
+		via->write_ca1(0);
+		via->write_cb1(0);
 	} else {
-		via_ca1_w(via, 1);
-		via_cb1_w(via, 1);
+		via->write_ca1(1);
+		via->write_cb1(1);
 	}
 
 

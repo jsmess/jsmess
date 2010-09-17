@@ -228,7 +228,7 @@ static UINT32 rbv_toggle = 0;
 static READ16_HANDLER ( mac_rbv_r )
 {
 	int data;
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 	logerror("rbv_r: %x, mask %x\n", offset, mem_mask);
 
@@ -250,14 +250,14 @@ static READ16_HANDLER ( mac_rbv_r )
 	offset >>= 8;
 	offset &= 0x0f;
 
-	data = via_r(via_1, offset);
+	data = via_1->read(*space, offset);
 
 	return (data & 0xff) | (data << 8);
 }
 
 static WRITE16_HANDLER ( mac_rbv_w )
 {
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 	logerror("rbv_w: %x to offset %x, mask %x\n", data, offset, mem_mask);
 
@@ -265,7 +265,7 @@ static WRITE16_HANDLER ( mac_rbv_w )
 	offset &= 0x0f;
 
 	if (ACCESSING_BITS_8_15)
-		via_w(via_1, offset, (data >> 8) & 0xff);
+		via_1->write(*space, offset, (data >> 8) & 0xff);
 }
 
 // LC/LC II "V8" video and friends
@@ -277,7 +277,7 @@ static UINT32 v8_palette[256];
 static READ16_HANDLER ( mac_v8_r )
 {
 	int data, viaoffs;
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 //  printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
@@ -286,11 +286,11 @@ static READ16_HANDLER ( mac_v8_r )
 	switch (offset)
 	{
 		case 0:
-			data = via_r(via_1, viaoffs);
+			data = via_1->read(*space, viaoffs);
 			return (data<<8) | v8_regs[0];
 
 		default:
-			data = via_r(via_1, viaoffs);
+			data = via_1->read(*space, viaoffs);
 			return (data<<8)|data;
 	}
 
@@ -298,7 +298,7 @@ static READ16_HANDLER ( mac_v8_r )
 
 static WRITE16_HANDLER ( mac_v8_w )
 {
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 	int viaoffs;
 
 //  printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
@@ -310,7 +310,7 @@ static WRITE16_HANDLER ( mac_v8_w )
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
 			}
 			else
 			{
@@ -321,7 +321,7 @@ static WRITE16_HANDLER ( mac_v8_w )
 		default:
 			if (ACCESSING_BITS_8_15)
 			{
-				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
 			}
 			break;
 	}
@@ -369,7 +369,7 @@ static UINT32 sonora_palette[256];
 static READ16_HANDLER ( mac_sonora_r )
 {
 	int data, viaoffs;
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 //  printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
@@ -378,11 +378,11 @@ static READ16_HANDLER ( mac_sonora_r )
 	switch (offset)
 	{
 		case 0:
-			data = via_r(via_1, viaoffs);
+			data = via_1->read(*space, viaoffs);
 			return (data<<8) | sonora_regs[0];
 
 		default:
-			data = via_r(via_1, viaoffs);
+			data = via_1->read(*space, viaoffs);
 			return (data<<8)|data;
 	}
 
@@ -390,7 +390,7 @@ static READ16_HANDLER ( mac_sonora_r )
 
 static WRITE16_HANDLER ( mac_sonora_w )
 {
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 	int viaoffs;
 
 //  printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
@@ -402,7 +402,7 @@ static WRITE16_HANDLER ( mac_sonora_w )
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
 			}
 			else
 			{
@@ -413,7 +413,7 @@ static WRITE16_HANDLER ( mac_sonora_w )
 		default:
 			if (ACCESSING_BITS_8_15)
 			{
-				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
 			}
 			break;
 	}

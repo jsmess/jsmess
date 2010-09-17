@@ -216,7 +216,8 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
-	running_device *via_0 = device->machine->device("via6522_0");
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
+	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine, data&1, data&8);
@@ -225,7 +226,7 @@ static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 	d=ssystem3_via_read_b(via_0, 0)&~0x40;
 	if (data&0x80) d|=0x40;
 	//  d&=~0x8f;
-	via_portb_w( via_0, 0, d );
+	via_0->write_portb(*space,0, d );
 }
 
 static const via6522_interface ssystem3_via_config=
@@ -259,7 +260,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
   probably zusatzger??t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
-	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 #if 1
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xf000, 0xffff) AM_ROM

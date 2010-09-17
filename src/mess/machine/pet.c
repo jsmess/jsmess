@@ -456,7 +456,7 @@ static struct {
 
 static WRITE8_HANDLER( cbm8096_io_w )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 	running_device *pia_0 = space->machine->device("pia_0");
 	running_device *pia_1 = space->machine->device("pia_1");
 	running_device *mc6845 = space->machine->device("crtc");
@@ -466,7 +466,7 @@ static WRITE8_HANDLER( cbm8096_io_w )
 	else if (offset < 0x20) ;
 	else if (offset < 0x24) pia6821_w(pia_1, offset & 3, data);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) via_w(via_0, offset & 0xf, data);
+	else if (offset < 0x50) via_0->write(*space, offset & 0xf, data);
 	else if (offset < 0x80) ;
 	else if (offset == 0x80) mc6845_address_w(mc6845, 0, data);
 	else if (offset == 0x81) mc6845_register_w(mc6845, 0, data);
@@ -474,7 +474,7 @@ static WRITE8_HANDLER( cbm8096_io_w )
 
 static READ8_HANDLER( cbm8096_io_r )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 	running_device *pia_0 = space->machine->device("pia_0");
 	running_device *pia_1 = space->machine->device("pia_1");
 	running_device *mc6845 = space->machine->device("crtc");
@@ -485,7 +485,7 @@ static READ8_HANDLER( cbm8096_io_r )
 	else if (offset < 0x20) ;
 	else if (offset < 0x24) data = pia6821_r(pia_1, offset & 3);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) data = via_r(via_0, offset & 0xf);
+	else if (offset < 0x50) data = via_0->read(*space, offset & 0xf);
 	else if (offset < 0x80) ;
 	else if (offset == 0x81) data = mc6845_register_r(mc6845, 0);
 	return data;
@@ -686,10 +686,10 @@ static TIMER_CALLBACK( pet_tape1_timer )
 
 static TIMER_CALLBACK( pet_tape2_timer )
 {
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 //  cassette 2
 	UINT8 data = (cassette_input(machine->device("cassette2")) > +0.0) ? 1 : 0;
-	via_cb1_w(via_0, data);
+	via_0->write_cb1(data);
 }
 
 

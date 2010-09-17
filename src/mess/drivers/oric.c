@@ -69,10 +69,10 @@ The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
-	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x031b) AM_READWRITE( oric_microdisc_r, oric_microdisc_w )
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia",  acia_6551_r, acia_6551_w )
-	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via_r, via_w)
+	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
 	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
@@ -356,7 +356,7 @@ static const cassette_config oric_cassette_config =
 static const centronics_interface oric_centronics_config =
 {
 	FALSE,
-	DEVCB_DEVICE_LINE("via6522_0", via_ca1_w),
+	DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_ca1),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

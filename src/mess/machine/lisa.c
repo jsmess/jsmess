@@ -347,19 +347,20 @@ static struct
 
 INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
 		logerror("Pushing one byte of data to VIA\n");
 
-		via_porta_w(via_0, 0, fifo_data[fifo_head]);	/* output data */
+		via_0->write_porta(*space, 0, fifo_data[fifo_head]);	/* output data */
 		if (fifo_head == mouse_data_offset)
 			mouse_data_offset = -1;	/* we just phased out the mouse data in buffer */
 		fifo_head = (fifo_head+1) & 0x7;
 		fifo_size--;
-		via_ca1_w(via_0, 1);		/* pulse ca1 so that VIA reads it */
-		via_ca1_w(via_0, 0);		/* BTW, I have no idea how a real COPS does it ! */
+		via_0->write_ca1(1);		/* pulse ca1 so that VIA reads it */
+		via_0->write_ca1(0);		/* BTW, I have no idea how a real COPS does it ! */
 	}
 }
 
@@ -535,15 +536,16 @@ static TIMER_CALLBACK(handle_mouse)
 static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
-	running_device *via_0 = machine->device("via6522_0");
-
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	
 	COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
 	COPS_send_data_if_possible(machine);
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (COPS_command | (~ via_r(via_0, VIA_DDRA))) & 0xff;
+	command = (COPS_command | (~ via_0->read(*space, VIA_DDRA))) & 0xff;
 
 	if (command & 0x80)
 		return;	/* NOP */
@@ -827,10 +829,11 @@ static READ8_DEVICE_HANDLER(COPS_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
-	running_device *via_0 = device->machine->device("via6522_0");
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* pull-up */
-	data |= (~ via_r(via_0, VIA_DDRA)) & 0x01;
+	data |= (~ via_0->read(*space,VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
@@ -1179,7 +1182,7 @@ MACHINE_RESET( lisa )
 	init_COPS(machine);
 
 	{
-		running_device *via_0 = machine->device("via6522_0");
+		via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
 	}
 
@@ -1914,8 +1917,8 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 
 static READ16_HANDLER ( lisa_IO_r )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 	int answer=0;
 
 	switch ((offset & 0x7000) >> 12)
@@ -1967,13 +1970,13 @@ static READ16_HANDLER ( lisa_IO_r )
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					return via_r(via_1, (offset >> 2) & 0xf);
+					return via_1->read(*space, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					return via_r(via_0, offset & 0xf);
+					return via_0->read(*space, offset & 0xf);
 				break;
 			}
 		}
@@ -2043,8 +2046,8 @@ static READ16_HANDLER ( lisa_IO_r )
 
 static WRITE16_HANDLER ( lisa_IO_w )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 	switch ((offset & 0x7000) >> 12)
 	{
@@ -2092,12 +2095,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 
 			case 2:	/* paralel port */
 				if (ACCESSING_BITS_0_7)
-					via_w(via_1, (offset >> 2) & 0xf, data & 0xff);
+					via_1->write(*space, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				if (ACCESSING_BITS_0_7)
-					via_w(via_0, offset & 0xf, data & 0xff);
+					via_0->write(*space, offset & 0xf, data & 0xff);
 				break;
 			}
 		}

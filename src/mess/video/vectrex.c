@@ -98,9 +98,9 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		running_device *via_0 = machine->device("via6522_0");
-		via_ca1_w(via_0, 1);
-		via_ca1_w(via_0, 0);
+		via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+		via_0->write_ca1(1);
+		via_0->write_ca1(0);
 	}
 
 	if (vectrex_lightpen_port & 2)
@@ -131,13 +131,13 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 READ8_HANDLER(vectrex_via_r)
 {
-	running_device *via = space->machine->device("via6522_0");
-	return via_r(via, offset);
+	via6522_device *via = space->machine->device<via6522_device>("via6522_0");
+	return via->read(*space, offset);
 }
 
 WRITE8_HANDLER(vectrex_via_w)
 {
-	running_device *via = space->machine->device("via6522_0");
+	via6522_device *via = space->machine->device<via6522_device>("via6522_0");
 	attotime period;
 
 	switch (offset)
@@ -160,7 +160,7 @@ WRITE8_HANDLER(vectrex_via_w)
 								  period);
 		break;
 	}
-	via_w(via, offset, data);
+	via->write(*space, offset, data);
 }
 
 

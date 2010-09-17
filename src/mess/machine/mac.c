@@ -632,7 +632,7 @@ static void keyboard_init(mac_state *mac)
 static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 	mac_state *mac = machine->driver_data<mac_state>();
 
 	if (mac->kbd_comm == TRUE)
@@ -641,10 +641,10 @@ static TIMER_CALLBACK(kbd_clock)
 		{
 			/* Put data on CB2 if we are sending*/
 			if (mac->kbd_receive == FALSE)
-				via_cb2_w(via_0, mac->kbd_shift_reg&0x80?1:0);
+				via_0->write_cb2(mac->kbd_shift_reg&0x80?1:0);
 			mac->kbd_shift_reg <<= 1;
-			via_cb1_w(via_0, 0);
-			via_cb1_w(via_0, 1);
+			via_0->write_cb1(0);
+			via_0->write_cb1(1);
 		}
 		if (mac->kbd_receive == TRUE)
 		{
@@ -1852,14 +1852,14 @@ static void mac_adb_talk(running_machine *machine)
 
 static TIMER_CALLBACK(mac_adb_tick)
 {
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 	mac_state *mac = machine->driver_data<mac_state>();
 
 	// do one clock transition on CB1 to advance the VIA shifter
 	mac->adb_extclock ^= 1;
-	via_cb1_w(via_0, mac->adb_extclock);
+	via_0->write_cb1(mac->adb_extclock);
 	mac->adb_extclock ^= 1;
-	via_cb1_w(via_0, mac->adb_extclock);
+	via_0->write_cb1(mac->adb_extclock);
 
 	mac->adb_timer_ticks--;
 	if (!mac->adb_timer_ticks)
@@ -2635,21 +2635,21 @@ static void mac_via_irq(running_device *device, int state)
 READ16_HANDLER ( mac_via_r )
 {
 	UINT16 data;
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 
 	offset >>= 8;
 	offset &= 0x0f;
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = via_r(via_0, offset);
+	data = via_0->read(*space, offset);
 
 	return (data & 0xff) | (data << 8);
 }
 
 WRITE16_HANDLER ( mac_via_w )
 {
-	running_device *via_0 = space->machine->device("via6522_0");
+	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2658,7 +2658,7 @@ WRITE16_HANDLER ( mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_8_15)
-		via_w(via_0, offset, (data >> 8) & 0xff);
+		via_0->write(*space, offset, (data >> 8) & 0xff);
 }
 
 /* *************************************************************************
@@ -2673,21 +2673,21 @@ static void mac_via2_irq(running_device *device, int state)
 READ16_HANDLER ( mac_via2_r )
 {
 	int data;
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
 
 	if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x\n", offset*2);
-	data = via_r(via_1, offset);
+	data = via_1->read(*space, offset);
 
 	return (data & 0xff) | (data << 8);
 }
 
 WRITE16_HANDLER ( mac_via2_w )
 {
-	running_device *via_1 = space->machine->device("via6522_1");
+	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2696,7 +2696,7 @@ WRITE16_HANDLER ( mac_via2_w )
 		logerror("mac_via2_w: offset=%x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_8_15)
-		via_w(via_1, offset, (data >> 8) & 0xff);
+		via_1->write(*space, offset, (data >> 8) & 0xff);
 }
 
 
@@ -2741,14 +2741,14 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
-	running_device *via_0 = device->machine->device("via6522_0");
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 
 //  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
 //  printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
 	// chain 60.15 Hz to VIA1
-	via_ca1_w(via_0, data>>7);
+	via_0->write_ca1(data>>7);
 }
 
 /* *************************************************************************
@@ -3066,17 +3066,17 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 
 	if ((mac->mac_nubus_irq_state & 0x3f) != 0x3f)
 	{
-		running_device *via_1 = machine->device("via6522_1");
+		via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
 
 		mac->via2_ca1 ^= 1;
-		via_ca1_w(via_1, mac->via2_ca1);
+		via_1->write_ca1(mac->via2_ca1);
 	}
 }
 
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
-	running_device *via_0 = machine->device("via6522_0");
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 	mac_state *mac = machine->driver_data<mac_state>();
 
 	/* handle ADB keyboard/mouse */
@@ -3105,7 +3105,7 @@ static void mac_vblank_irq(running_machine *machine)
 	if (mac->mac_model < MODEL_MAC_II)
 	{
 		ca1_data ^= 1;
-		via_ca1_w(via_0, ca1_data);
+		via_0->write_ca1(ca1_data);
 	}
 
 	if (++irq_count == 60)
@@ -3114,7 +3114,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 		ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
-		via_ca2_w(via_0, ca2_data);
+		via_0->write_ca2(ca2_data);
 
 		rtc_incticks(mac);
 	}
