@@ -1500,7 +1500,7 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_MODERN("mc", mc146818_device, read, write)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("upd765",upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
@@ -1710,8 +1710,6 @@ static MACHINE_CONFIG_START( nc100, driver_device )
 	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
 	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
 	
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1759,6 +1757,8 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MDRV_UPD765A_ADD("upd765", nc200_upd765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
+
+	MDRV_MC146818_ADD( "mc", MC146818_STANDARD )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")

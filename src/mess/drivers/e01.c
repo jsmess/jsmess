@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
 
 	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MDRV_TIMER_ADD_PERIODIC("rtc", rtc_irq_hack, HZ(2)) // HACK!
+	MDRV_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, HZ(2)) // HACK!
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_e01 )
