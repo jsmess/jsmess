@@ -514,6 +514,8 @@ READ8_HANDLER(towns_video_fd90_r)
 	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8 ret = 0;
 	UINT16 xpos;
+
+//    logerror("VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
 		case 0x00:
@@ -543,7 +545,6 @@ READ8_HANDLER(towns_video_fd90_r)
 				ret |= 0x01;
 			return ret;
 	}
-//  logerror("VID: read port %04x\n",offset+0xfd90);
 	return 0x00;
 }
 
@@ -580,7 +581,7 @@ WRITE8_HANDLER(towns_video_fd90_w)
 			state->video.towns_layer_ctrl = data;
 			break;
 	}
-	//logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 READ8_HANDLER(towns_video_ff81_r)
@@ -933,8 +934,7 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
-		if(state->video.towns_crtc_reg[27] & 0x0100)
-			hzoom = 2;
+		hzoom = ((state->video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
 	{
@@ -946,8 +946,7 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
-		if(state->video.towns_crtc_reg[27] & 0x0001)
-			hzoom = 2;
+		hzoom = (state->video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
 	off += line * linesize;
@@ -972,7 +971,8 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 			off+=2;
 		}
 	}
-	else
+
+	if(hzoom == 2)
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
@@ -995,6 +995,43 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 			off+=2;
 		}
 	}
+
+	if(hzoom == 5)
+	{  // x5 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=5)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = (state->towns_gfxvram[off+(layer*0x40000)+1] << 8) | state->towns_gfxvram[off+(layer*0x40000)];
+			if(colour < 0x8000)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+4) =
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+			}
+			off+=2;
+		}
+	}
+
 }
 
 void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -1026,8 +1063,7 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
-		if(state->video.towns_crtc_reg[27] & 0x0100)
-			hzoom = 2;
+		hzoom = ((state->video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
 	{
@@ -1039,8 +1075,7 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
-		if(state->video.towns_crtc_reg[27] & 0x0001)
-			hzoom = 2;
+		hzoom = (state->video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
 	off += line * linesize;
@@ -1060,7 +1095,8 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 			off++;
 		}
 	}
-	else
+
+	if(hzoom == 2)
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
@@ -1072,6 +1108,38 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 5)
+	{  // x5 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=5)
+		{
+			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+4) =
 					(state->video.towns_palette_r[colour] << 16)
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
@@ -1110,8 +1178,7 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
-		if(state->video.towns_crtc_reg[27] & 0x0100)
-			hzoom = 2;
+		hzoom = ((state->video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
 	{
@@ -1123,8 +1190,7 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 			off += scroll;
 		}
 		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
-		if(state->video.towns_crtc_reg[27] & 0x0001)
-			hzoom = 2;
+		hzoom = (state->video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
 	off += line * linesize;
@@ -1152,7 +1218,8 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 			off++;
 		}
 	}
-	else
+
+	if(hzoom == 2)
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=4)
 		{
@@ -1180,6 +1247,66 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+
+	if(hzoom == 5)
+	{  // x5 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=10)
+		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x+5) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+6) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+7) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+8) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+9) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+			}
+			colour = state->towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			if(colour != 0)
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+4) =
 					(state->video.towns_palette_r[colour] << 16)
 					| (state->video.towns_palette_g[colour] << 8)
 					| (state->video.towns_palette_b[colour]);
