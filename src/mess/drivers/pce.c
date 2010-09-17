@@ -66,9 +66,6 @@ Super System Card:
 #include "sound/msm5205.h"
 #include "hash.h"
 
-#define	MAIN_CLOCK		21477270
-#define PCE_CD_CLOCK	9216000
-
 
 static ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")

@@ -100,7 +100,6 @@ static struct {
 	int		adpcm_write_ptr;
 	UINT8	adpcm_write_buf;
 	int		adpcm_length;
-	int		adpcm_clock_count;
 	int		adpcm_clock_divider;
 	UINT32  msm_start_addr;
 	UINT32	msm_end_addr;
@@ -495,40 +494,30 @@ static void pce_cd_msm5205_int(running_device *device)
 	if ( pce_cd.msm_idle )
 		return;
 
-	if ( ! pce_cd.adpcm_clock_count )
+	/* Supply new ADPCM data */
+	msm_data = (pce_cd.msm_nibble) ? (pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0x0f) : ((pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0xf0) >> 4);
+
+	msm5205_data_w(device, msm_data);
+	pce_cd.msm_nibble ^= 1;
+
+	if(pce_cd.msm_nibble == 0)
 	{
-		/* Supply new ADPCM data */
-		msm_data = (pce_cd.msm_nibble) ? (pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0x0f) : ((pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0xf0) >> 4);
+		pce_cd.msm_start_addr++;
 
-		msm5205_data_w(device, msm_data);
-		pce_cd.msm_nibble ^= 1;
-
-		if(pce_cd.msm_nibble == 0)
+		if(pce_cd.msm_start_addr == pce_cd.msm_half_addr)
 		{
-			pce_cd.msm_start_addr++;
+			//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
+			//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE );
+		}
 
-			if(pce_cd.msm_start_addr == pce_cd.msm_half_addr)
-			{
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE );
-			}
-
-			if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
-			{
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
-				//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-				adpcm_stop(device->machine);
-				msm5205_reset_w(device, 1);
-			}
+		if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
+		{
+			//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
+			//pce_cd_set_irq_line( device->machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
+			adpcm_stop(device->machine);
+			msm5205_reset_w(device, 1);
 		}
 	}
-	else
-	{
-		/* Make sure the sample does not change */
-		msm5205_data_w(device, msm_data);
-	}
-
-	pce_cd.adpcm_clock_count = ( pce_cd.adpcm_clock_count + 1 ) % pce_cd.adpcm_clock_divider;
 }
 
 #define	SCSI_STATUS_OK			0x00
@@ -1214,6 +1203,7 @@ static void pce_cd_init( running_machine *machine )
 	pce_cd.adpcm_ram = auto_alloc_array(machine, UINT8, PCE_ADPCM_RAM_SIZE );
 	memset( pce_cd.adpcm_ram, 0, PCE_ADPCM_RAM_SIZE );
 	pce_cd.adpcm_clock_divider = 1;
+	msm5205_change_clock_w(machine->device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 
 	/* Set up cd command buffer */
 	pce_cd.command_buffer = auto_alloc_array(machine, UINT8, PCE_CD_COMMAND_BUFFER_SIZE );
@@ -1389,8 +1379,8 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		}
 		break;
 	case 0x0E:	/* ADPCM playback rate */
-		pce_cd.adpcm_clock_divider = 16 - ( data & 0x0F );
-		pce_cd.adpcm_clock_count = pce_cd.adpcm_clock_divider - 1;
+		pce_cd.adpcm_clock_divider = 0x10 - ( data & 0x0F );
+		msm5205_change_clock_w(space->machine->device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 		break;
 	case 0x0F:	/* ADPCM and CD audio fade timer */
 		break;

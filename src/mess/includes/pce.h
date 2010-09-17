@@ -13,6 +13,9 @@
 
 #define C6280_TAG			"c6280"
 
+#define	MAIN_CLOCK		21477270
+#define PCE_CD_CLOCK	9216000
+
 #define PCE_HEADER_SIZE		512
 
 #define TG_16_JOY_SIG		0x00
