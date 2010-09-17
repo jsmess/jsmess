@@ -151,6 +151,10 @@ static struct {
 	const cdrom_toc*	toc;
 	emu_timer	*data_timer;
 	emu_timer	*adpcm_dma_timer;
+
+	emu_timer	*cdda_fadeout_timer;
+	double	cdda_volume;
+//	emu_timer	*cdda_fadeout_timer;
 } pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
@@ -176,6 +180,7 @@ static int joystick_data_select;        /* which nibble of joystick data we want
 static void pce_cd_init( running_machine *machine );
 static void pce_cd_set_irq_line( running_machine *machine, int num, int state );
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
+static TIMER_CALLBACK( pce_cd_cdda_fadeout_callback );
 
 
 static WRITE8_HANDLER( pce_sf2_banking_w )
@@ -1239,6 +1244,8 @@ static void pce_cd_init( running_machine *machine )
 	timer_adjust_oneshot(pce_cd.data_timer, attotime_never, 0);
 	pce_cd.adpcm_dma_timer = timer_alloc(machine,  pce_cd_adpcm_dma_timer_callback , NULL);
 	timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
+	pce_cd.cdda_fadeout_timer = timer_alloc(machine,  pce_cd_cdda_fadeout_callback , NULL);
+	timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, 0);
 }
 
 WRITE8_HANDLER( pce_cd_bram_w )
@@ -1261,6 +1268,17 @@ static void pce_cd_set_adpcm_ram_byte(running_machine *machine, UINT8 val)
 		pce_cd.adpcm_write_ptr = ((pce_cd.adpcm_write_ptr + 1) & 0xffff);
 		//TODO: length + 1
 	}
+}
+
+static TIMER_CALLBACK( pce_cd_cdda_fadeout_callback )
+{
+	pce_cd.cdda_volume-= 1.0; //TODO: step here could be wrong
+	cdda_set_volume(machine->device("cdda"), pce_cd.cdda_volume);
+
+	if(pce_cd.cdda_volume <= 0)
+		timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, NULL);
+	else
+		timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(param), param);
 }
 
 WRITE8_HANDLER( pce_cd_intf_w )
@@ -1383,11 +1401,24 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		msm5205_change_clock_w(space->machine->device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 		break;
 	case 0x0F:	/* ADPCM and CD audio fade timer */
+		printf("%02x FADE\n",data);
+
+		if(data == 0x0c) //CD-DA short step (2500 msecs) fade out
+		{
+			pce_cd.cdda_volume = 100.0;
+			timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(2500), 2500);
+		}
+
+		if(data == 0x00) //CD-DA fade in (TODO)
+		{
+			pce_cd.cdda_volume = 100.0;
+			cdda_set_volume(space->machine->device("cdda"), 100.0);
+		}
 		break;
 	default:
 		return;
 	}
-	pce_cd.regs[offset] = data;
+	pce_cd.regs[offset & 0xf] = data;
 	pce_cd_update(space->machine);
 }
 
