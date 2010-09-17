@@ -144,6 +144,7 @@ Notes:
 /* Components */
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -511,6 +512,30 @@ static READ8_HANDLER( abc802_pling_r )
 	return 0xff;
 }
 
+/* Keyboard */
+
+static READ8_HANDLER( keyboard_p1_r )
+{
+	return 0xff;
+}
+
+static WRITE8_HANDLER( keyboard_p1_w )
+{
+}
+
+static WRITE8_HANDLER( keyboard_p2_w )
+{
+}
+
+static READ8_HANDLER( keyboard_clock_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( keyboard_bus_w )
+{
+}
+
 /* Memory Maps */
 
 // ABC 800M
@@ -541,6 +566,13 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( keyboard_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_p1_r, keyboard_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_p2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_clock_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(keyboard_bus_w)
 ADDRESS_MAP_END
 
 // ABC 800C
@@ -1157,6 +1189,9 @@ static MACHINE_CONFIG_START( abc800m, abc800_state )
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800m_map)
 	MDRV_CPU_IO_MAP(abc800m_io_map)
+
+	MDRV_CPU_ADD(I8048_TAG, I8048, 4608000)
+	MDRV_CPU_IO_MAP(keyboard_io_map)
 
 	MDRV_MACHINE_START(abc800)
 	MDRV_MACHINE_RESET(abc800)
