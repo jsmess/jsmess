@@ -1,19 +1,26 @@
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
 
+/* Bits in shared variable:
+    d5 cassette LED
+    d4 super80v rom or pcg bankswitch (1=pcg ram, 0=char gen rom)
+    d2 super80v video or colour bankswitch (1=video ram, 0=colour ram)
+    d2 super80 screen off (=2mhz) or on (bursts of 2mhz at 50hz = 1mhz) */
+
+
+
 class super80_state : public driver_device
 {
 public:
 	super80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	UINT8 super80_shared;
 	UINT8 *videoram;
+	UINT8 *pcgram;
+	UINT8 *colorram;
 };
 
-
-/*----------- defined in drivers/super80.c -----------*/
-
-extern UINT8 *super80_pcgram;
 
 /*----------- defined in video/super80.c -----------*/
 
@@ -47,6 +54,5 @@ MACHINE_RESET( super80 );
 DRIVER_INIT( super80 );
 DRIVER_INIT( super80v );
 
-extern UINT8 super80_shared;
 extern const z80pio_interface super80_pio_intf;
 

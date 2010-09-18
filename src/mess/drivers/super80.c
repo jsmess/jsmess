@@ -188,8 +188,6 @@ hardware.
 #include "super80.lh"
 #include "includes/super80.h"
 
-UINT8 *super80_pcgram;
-
 #define MASTER_CLOCK			(XTAL_12MHz)
 #define PIXEL_CLOCK			(MASTER_CLOCK/2)
 #define HTOTAL				(384)
@@ -228,7 +226,7 @@ static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(super80v_low_r, super80v_low_w) AM_BASE(&super80_pcgram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(super80v_low_r, super80v_low_w) AM_BASE_MEMBER(super80_state, pcgram)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(super80v_high_r, super80v_high_w)
 ADDRESS_MAP_END
 
