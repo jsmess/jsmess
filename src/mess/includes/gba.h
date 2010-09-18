@@ -1,6 +1,8 @@
 #ifndef _GBA_H_
 #define _GBA_H_
 
+#include "machine/intelfsh.h"
+
 #define DISPSTAT_VBL			0x0001
 #define DISPSTAT_HBL			0x0002
 #define DISPSTAT_VCNT			0x0004
@@ -183,9 +185,9 @@ public:
 
 	UINT32 gba_sram[0x10000/4];
 	UINT8 gba_eeprom[0x2000];
-	UINT32 gba_flash[0x20000/4];
 	UINT32 flash_size;
 	UINT32 flash_mask;
+	intelfsh8_device *mFlashDev;
 	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits;
 	UINT8 eep_data;
 

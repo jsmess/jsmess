@@ -2115,10 +2115,10 @@ static READ32_HANDLER( flash_r )
 
 	rv = 0;
 	offset &= state->flash_mask;
-	if (mem_mask & 0xff) rv |= intelflash_read(0, offset*4);
-	if (mem_mask & 0xff00) rv |= intelflash_read(0, (offset*4)+1)<<8;
-	if (mem_mask & 0xff0000) rv |= intelflash_read(0, (offset*4)+2)<<16;
-	if (mem_mask & 0xff000000) rv |= intelflash_read(0, (offset*4)+3)<<24;
+	if (mem_mask & 0xff) rv |= state->mFlashDev->read(offset*4);
+	if (mem_mask & 0xff00) rv |= state->mFlashDev->read((offset*4)+1)<<8;
+	if (mem_mask & 0xff0000) rv |= state->mFlashDev->read((offset*4)+2)<<16;
+	if (mem_mask & 0xff000000) rv |= state->mFlashDev->read((offset*4)+3)<<24;
 
 	return rv;
 }
@@ -2131,16 +2131,16 @@ static WRITE32_HANDLER( flash_w )
 	switch (mem_mask)
 	{
 		case 0xff:
-			intelflash_write(0, offset*4, data&0xff);
+			state->mFlashDev->write(offset*4, data&0xff);
 			break;
 		case 0xff00:
-			intelflash_write(0, (offset*4)+1, (data>>8)&0xff);
+			state->mFlashDev->write((offset*4)+1, (data>>8)&0xff);
 			break;
 		case 0xff0000:
-			intelflash_write(0, (offset*4)+2, (data>>16)&0xff);
+			state->mFlashDev->write((offset*4)+2, (data>>16)&0xff);
 			break;
 		case 0xff000000:
-			intelflash_write(0, (offset*4)+3, (data>>24)&0xff);
+			state->mFlashDev->write((offset*4)+3, (data>>24)&0xff);
 			break;
 		default:
 			fatalerror("Unknown mem_mask for GBA flash_w %x\n", mem_mask);
@@ -2344,8 +2344,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
 		{
-			state->nvptr = (UINT8 *)&state->gba_flash;
-			state->nvsize = 0x20000;
+			state->nvptr = NULL;
+			state->nvsize = 0;
 			state->flash_size = 0x20000;
 			state->flash_mask = 0x1ffff/4;
 
@@ -2355,8 +2355,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "FLASH", 5))
 		{
-			state->nvptr = (UINT8 *)&state->gba_flash;
-			state->nvsize = 0x10000;
+			state->nvptr = NULL;
+			state->nvsize = 0;
 			state->flash_size = 0x10000;
 			state->flash_mask = 0xffff/4;
 
@@ -2388,11 +2388,11 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	{
 		if (state->flash_size == 0x10000)
 		{
-			intelflash_init(image.device().machine, 0, FLASH_PANASONIC_MN63F805MNP, &state->gba_flash);
+			state->mFlashDev = image.device().machine->device<intelfsh8_device>("pflash");
 		}
 		else
 		{
-			intelflash_init(image.device().machine, 0, FLASH_SANYO_LE26FV10N1TS, &state->gba_flash);
+			state->mFlashDev = image.device().machine->device<intelfsh8_device>("sflash");
 		}
 	}
 
@@ -2446,6 +2446,9 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
 	MDRV_SOUND_ADD("direct_b_right", DAC, 0)		// GBA direct sound B right
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
+
+	MDRV_PANASONIC_MN63F805MNP_ADD("pflash")
+	MDRV_SANYO_LE26FV10N1TS_ADD("sflash")
 
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("gba,bin")
