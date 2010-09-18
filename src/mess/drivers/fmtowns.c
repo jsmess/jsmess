@@ -1415,11 +1415,6 @@ static void towns_cdrom_execute_command(running_device* device)
 				if(state->towns_cd.command & 0x20)
 				{
 					state->towns_cd.extra_status = 0;
-					if(state->towns_cd.parameter[7] != 0)
-					{
-						towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-						break;
-					}
 					if(cdda_audio_active(state->cdda) && !cdda_audio_paused(state->cdda))
 						towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
 					else
@@ -1811,8 +1806,9 @@ static WRITE8_HANDLER(towns_volume_w)
 		if(data < 8)
 			state->towns_volume_select = data;
 		break;
+	default:
+		logerror("SND: Volume port %i set to %02x\n",offset,data);
 	}
-	logerror("SND: Volume port %i set to %02x\n",offset,data);
 }
 
 // some unknown ports...
