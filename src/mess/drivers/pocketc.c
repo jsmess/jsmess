@@ -715,7 +715,7 @@ static const sc61860_cpu_core config =
 	pc1401_outc
 };
 
-static MACHINE_CONFIG_START( pc1401, driver_device )
+static MACHINE_CONFIG_START( pc1401, pocketc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
