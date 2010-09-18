@@ -1054,6 +1054,7 @@ $(MESSOBJ)/luxor.a:				\
 	$(MESS_MACHINE)/abc77.o		\
 	$(MESS_MACHINE)/abc99.o		\
 	$(MESS_MACHINE)/abc830.o	\
+	$(MESS_DRIVERS)/abc1600.o	\
 
 $(MESSOBJ)/magnavox.a:			\
 	$(MESS_MACHINE)/odyssey2.o	\

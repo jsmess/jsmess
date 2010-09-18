@@ -1,4 +1,4 @@
-0.140
+﻿0.140
 
 New System Drivers Supported:
 -----------------------------
@@ -7,6 +7,8 @@ New System Drivers Supported:
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
+
+
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -28,6 +30,9 @@ Skeleton drivers:
 - mc-CP/M-Computer
 - TIM-011
 - WaveMate Bullet
+- ABC 1600 [Curt Coder]
+
+
 
 System Driver Changes:
 ----------------------

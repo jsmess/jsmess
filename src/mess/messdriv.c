@@ -1235,6 +1235,7 @@ const game_driver * const drivers[] =
 	DRIVER( abc800m )
 	DRIVER( abc800c )
 	DRIVER( abc806 )
+	DRIVER( abc1600 )
 
 	/* Be Incorporated */
 	DRIVER( bebox )	 /* BeBox Dual603-66     */
