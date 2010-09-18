@@ -80,19 +80,10 @@ static unsigned long avigo_ram_bank_h;
 static unsigned long avigo_rom_bank_l;
 static unsigned long avigo_rom_bank_h;
 static unsigned long avigo_ad_control_status;
+static intelfsh8_device *avigo_flashes[3];
 static int avigo_flash_at_0x4000;
 static int avigo_flash_at_0x8000;
 static void *avigo_banked_opbase[4];
-
-static NVRAM_HANDLER( avigo )
-{
-	int i;
-
-	for (i = 0; i < 3; i++)
-	{
-		nvram_handler_intelflash( machine, i, file, read_or_write );
-	}
-}
 
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
@@ -125,38 +116,38 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 /* memory 0x0000-0x03fff */
 static  READ8_HANDLER(avigo_flash_0x0000_read_handler)
 {
-	return intelflash_read(0, offset);
+	return avigo_flashes[0]->read(offset);
 }
 
 /* memory 0x04000-0x07fff */
 static  READ8_HANDLER(avigo_flash_0x4000_read_handler)
 {
-	return intelflash_read(avigo_flash_at_0x4000, (avigo_rom_bank_l<<14) | offset);
+	return avigo_flashes[avigo_flash_at_0x4000]->read((avigo_rom_bank_l<<14) | offset);
 }
 
 /* memory 0x0000-0x03fff */
 static WRITE8_HANDLER(avigo_flash_0x0000_write_handler)
 {
-	intelflash_write(0, offset, data);
+	avigo_flashes[0]->write(offset, data);
 }
 
 /* memory 0x04000-0x07fff */
 static WRITE8_HANDLER(avigo_flash_0x4000_write_handler)
 {
-	intelflash_write(avigo_flash_at_0x4000, (avigo_rom_bank_l<<14) | offset, data);
+	avigo_flashes[avigo_flash_at_0x4000]->write((avigo_rom_bank_l<<14) | offset, data);
 }
 
 /* memory 0x08000-0x0bfff */
 static  READ8_HANDLER(avigo_flash_0x8000_read_handler)
 {
-	return intelflash_read(avigo_flash_at_0x8000, (avigo_ram_bank_l<<14) | offset);
+	return avigo_flashes[avigo_flash_at_0x8000]->read((avigo_ram_bank_l<<14) | offset);
 }
 
 #ifdef UNUSED_FUNCTION
 /* memory 0x08000-0x0bfff */
 static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 {
-	intelflash_write(avigo_flash_at_0x8000, (avigo_rom_bank_l<<14) | offset, data);
+	avigo_flashes[avigo_flash_at_0x8000]->write((avigo_rom_bank_l<<14) | offset, data);
 }
 #endif
 
@@ -310,6 +301,7 @@ static void avigo_refresh_memory(running_machine *machine)
 		case 0x03:
 		{
 			avigo_flash_at_0x4000 = 1;
+			addr = (unsigned char *)memory_region(machine, "flash1");
 		}
 		break;
 
@@ -317,15 +309,16 @@ static void avigo_refresh_memory(running_machine *machine)
 		case 0x05:
 		{
 			avigo_flash_at_0x4000 = 2;
+			addr = (unsigned char *)memory_region(machine, "flash2");
 		}
 		break;
 
 		default:
 			avigo_flash_at_0x4000 = 0;
+			addr = (unsigned char *)memory_region(machine, "flash0");
 			break;
 	}
 
-	addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x4000);
 	addr = addr + (avigo_rom_bank_l<<14);
 	avigo_setbank(machine, 1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
 
@@ -353,7 +346,7 @@ static void avigo_refresh_memory(running_machine *machine)
 			avigo_flash_at_0x8000 = 1;
 
 
-			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
+			addr = (unsigned char *)memory_region(machine, "flash1");
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
@@ -361,7 +354,7 @@ static void avigo_refresh_memory(running_machine *machine)
 		case 0x07:
 			avigo_flash_at_0x8000 = 0;
 
-			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
+			addr = (unsigned char *)memory_region(machine, "flash0");
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
@@ -442,7 +435,7 @@ static MACHINE_RESET( avigo )
 
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(avigo_opbase_handler, *machine));
 
-	addr = (unsigned char *)intelflash_getmemptr(0);
+	addr = (unsigned char *)memory_region(machine, "flash0");
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
 	avigo_setbank(machine, 3, messram_get_ptr(machine->device("messram")), NULL, NULL);
@@ -457,10 +450,10 @@ static MACHINE_START( avigo )
 	/* an interrupt is generated when the pen is pressed to the screen */
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, avigo_dummy_timer_callback);
 
-	/* initialise flash memory */
-	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, memory_region(machine, "maincpu")+0x10000);
-	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, memory_region(machine, "maincpu")+0x110000);
-	intelflash_init(machine, 2, FLASH_INTEL_E28F008SA, NULL);
+	/* keep machine pointers to flash devices */
+	avigo_flashes[0] = machine->device<intelfsh8_device>("flash0");
+	avigo_flashes[1] = machine->device<intelfsh8_device>("flash1");
+	avigo_flashes[2] = machine->device<intelfsh8_device>("flash2");
 }
 
 
@@ -875,7 +868,6 @@ static MACHINE_CONFIG_START( avigo, driver_device )
 
 	MDRV_MACHINE_START( avigo )
 	MDRV_MACHINE_RESET( avigo )
-	MDRV_NVRAM_HANDLER( avigo )
 
 	MDRV_NS16550_ADD( "ns16550", avigo_com_interface )
 
@@ -900,6 +892,11 @@ static MACHINE_CONFIG_START( avigo, driver_device )
 	/* real time clock */
 	MDRV_TC8521_ADD("rtc", avigo_tc8521_interface)
 
+	/* flash ROMs */
+	MDRV_INTEL_E28F008SA_ADD("flash0")
+	MDRV_INTEL_E28F008SA_ADD("flash1")
+	MDRV_INTEL_E28F008SA_ADD("flash2")
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
@@ -914,6 +911,14 @@ MACHINE_CONFIG_END
 ROM_START(avigo)
 	ROM_REGION(0x210000, "maincpu",0)
 	ROM_LOAD("avigo.rom", 0x010000, 0x0150000, CRC(160ee4a6) SHA1(4d09201a3876de16808bd92989f3d8d7182d72b3))
+
+	ROM_REGION(0x100000, "flash0", 0)
+	ROM_COPY("maincpu", 0x10000, 0x00000, 0x100000)
+
+	ROM_REGION(0x100000, "flash1", 0)
+	ROM_COPY("maincpu", 0x110000, 0x00000, 0x40000)
+
+	ROM_REGION(0x100000, "flash2", ROMREGION_ERASE00)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */

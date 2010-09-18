@@ -768,7 +768,7 @@ const game_driver * const drivers[] =
 	DRIVER( genmod )	/* 199?? Myarc Geneve 9640    */
 	DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)      */
 
-//	DRIVER( avigo )	 /*   */
+	DRIVER( avigo )	 /*   */
 
 	/* Texas Instruments Calculators */
 	DRIVER( ti73 )	  /* 1990 TI-73    */
