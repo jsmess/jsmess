@@ -30,13 +30,15 @@ Skeleton drivers:
 - mc-CP/M-Computer
 - TIM-011
 - WaveMate Bullet
-- ABC 1600 [Curt Coder]
+- ABC 1600 [Rune Tapper, Curt Coder]
 
 
 
 System Driver Changes:
 ----------------------
-(none)
+- [ABC800] Added a new revision of the floppy controller ROM. [exon, Curt Coder]
+
+- [ABC800] Added a dump of the keyboard controller ROM. [exon, Curt Coder]
 
 
 
