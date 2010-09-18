@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mbeeic, driver_device )
+static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
