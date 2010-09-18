@@ -635,7 +635,7 @@ static MACHINE_CONFIG_FRAGMENT( super80_cartslot )
 	MDRV_CARTSLOT_LOAD(super80_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80, driver_device )
+static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80_map)
@@ -699,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MDRV_VIDEO_UPDATE(super80m)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80v, driver_device )
+static MACHINE_CONFIG_START( super80v, super80_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map)
