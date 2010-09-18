@@ -723,8 +723,8 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 			pic8259_ir5_w(state->pic_slave, 0);
 			logerror("PIC: IRQ13 (PCM) set low\n");
 			break;
-		default:
-			logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
+//		default:
+			//logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
 	}
 	return ret;
 }
@@ -1773,6 +1773,48 @@ static READ8_HANDLER(towns_scsi_r)
 	return 0x00;
 }
 
+// Volume ports - I/O ports 0x4e0-0x4e3
+// 0x4e3 = channel select
+//         (4 and 5 = CD-DA left and right channels)
+//         (6 = MIC?)
+// 0x4e2 = volume level
+static READ8_HANDLER(towns_volume_r)
+{
+	towns_state* state = space->machine->driver_data<towns_state>();
+
+	switch(offset)
+	{
+	case 2:
+		return(state->towns_volume[state->towns_volume_select]);
+	case 3:
+		return state->towns_volume_select;
+	default:
+		return 0;
+	}
+	return 0;
+}
+
+static WRITE8_HANDLER(towns_volume_w)
+{
+	towns_state* state = space->machine->driver_data<towns_state>();
+
+	switch(offset)
+	{
+	case 2:
+		state->towns_volume[state->towns_volume_select] = data;
+		if(state->towns_volume_select == 4)
+			cdda_set_channel_volume(state->cdda,0,100.0 * (data / 64.0f));
+		if(state->towns_volume_select == 5)
+			cdda_set_channel_volume(state->cdda,1,100.0 * (data / 64.0f));
+		break;
+	case 3:  // select channel
+		if(data < 8)
+			state->towns_volume_select = data;
+		break;
+	}
+	logerror("SND: Volume port %i set to %02x\n",offset,data);
+}
+
 // some unknown ports...
 static READ8_HANDLER(towns_41ff_r)
 {
@@ -1941,7 +1983,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_WRITE(towns_pad_mask_w)
   AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",ym3438_r,ym3438_w,0x00ff00ff)
-  AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
+  AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
   AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
   AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm",rf5c68_w,0xffffffff)
   // CRTC / Video
@@ -2230,6 +2272,7 @@ static MACHINE_RESET( towns )
 	state->towns_mouse_output = MOUSE_START;
 	state->towns_cd.status = 0x01;  // CDROM controller ready
 	state->towns_cd.buffer_ptr = -1;
+	state->towns_volume_select = 0;
 	timer_adjust_periodic(state->towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
 	timer_adjust_periodic(state->towns_kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 }

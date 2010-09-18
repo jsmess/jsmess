@@ -115,6 +115,8 @@ class towns_state : public driver_device
 	UINT8 towns_mouse_output;
 	UINT8 towns_mouse_x;
 	UINT8 towns_mouse_y;
+	UINT8 towns_volume[8];  // volume ports
+	UINT8 towns_volume_select;
 	struct towns_cdrom_controller towns_cd;
 	struct towns_video_controller video;
 	required_shared_ptr<UINT8>	m_nvram;
