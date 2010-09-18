@@ -646,21 +646,32 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 	pce_cd.current_frame = frame;
 
 	printf("Set Start %02x\n",pce_cd.command_buffer[1] & 0x03);
-	if(pce_cd.command_buffer[1] & 0x03)
+
+	if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED )
 	{
-		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-		pce_cd.end_frame = pce_cd.last_frame; //get the end of the CD
-		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
-		pce_cd.cdda_play_mode = (pce_cd.command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
-		pce_cd.end_mark =  (pce_cd.command_buffer[1] & 0x02) ? 1 : 0;
+		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
+		cdda_stop_audio( machine->device( "cdda" ) );
+		pce_cd.end_frame = pce_cd.last_frame;
+		pce_cd.end_mark = 0;
 	}
 	else
 	{
-		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-		pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].physframeofs; //get the end of THIS track
-		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
-		pce_cd.end_mark = 0;
-		pce_cd.cdda_play_mode = 3;
+		if(pce_cd.command_buffer[1] & 0x03)
+		{
+			pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+			pce_cd.end_frame = pce_cd.last_frame; //get the end of the CD
+			cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			pce_cd.cdda_play_mode = (pce_cd.command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
+			pce_cd.end_mark =  (pce_cd.command_buffer[1] & 0x02) ? 1 : 0;
+		}
+		else
+		{
+			pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+			pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].physframeofs; //get the end of THIS track
+			cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			pce_cd.end_mark = 0;
+			pce_cd.cdda_play_mode = 3;
+		}
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -798,7 +809,7 @@ static void pce_cd_nec_get_subq( running_machine *machine )
 	msf_rel = lba_to_msf( frame - cdrom_get_track_start( pce_cd.cd, track ) );
 
 	pce_cd.data_buffer[1] = 0;
-	pce_cd.data_buffer[2] = track+1;					/* track */
+	pce_cd.data_buffer[2] = dec_2_bcd( track+1 );		/* track */
 	pce_cd.data_buffer[3] = 1;							/* index */
 	pce_cd.data_buffer[4] = ( msf_rel >> 16 ) & 0xFF;	/* M (relative) */
 	pce_cd.data_buffer[5] = ( msf_rel >> 8 ) & 0xFF;	/* S (relative) */
