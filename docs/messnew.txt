@@ -40,6 +40,8 @@ System Driver Changes:
 
 - [ABC800] Added a dump of the keyboard controller ROM. [exon, Curt Coder]
 
+- [ABC806] Added enhanced options ROM. [exon, Curt Coder]
+
 
 
 Imgtool Changes:
