@@ -423,7 +423,7 @@ static const floppy_config vtech2_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( laser350, driver_device )
+static MACHINE_CONFIG_START( laser350, vtech2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MDRV_CPU_PROGRAM_MAP(vtech2_mem)
