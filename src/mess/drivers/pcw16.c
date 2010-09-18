@@ -428,15 +428,19 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		}
 		else
 		{
+			intelfsh8_device *flashdev;
+
 			/* nvram */
 			if ((bank_id & 0x040)==0)
 			{			
-				mem_ptr = (unsigned char *)intelflash_getmemptr(0);
+				flashdev = machine->device<intelfsh8_device>("flash0");
 			}
 			else
 			{
-				mem_ptr = (unsigned char *)intelflash_getmemptr(1);
+				flashdev = machine->device<intelfsh8_device>("flash1");
 			}
+
+			mem_ptr = (unsigned char *)flashdev->space()->get_read_ptr(0);
 		}
 
 	}

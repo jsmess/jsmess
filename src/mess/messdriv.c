@@ -346,7 +346,7 @@ const game_driver * const drivers[] =
 	DRIVER( pcw9256 )   /* 198? PCW9256  */
 	DRIVER( pcw9512 )   /* 198? PCW9512 (+)  */
 	DRIVER( pcw10 )	 /* 198? PCW10     */
-//	DRIVER( pcw16 )	 /* 1995 PCW16     */
+	DRIVER( pcw16 )	 /* 1995 PCW16     */
 	DRIVER( nc100 )	 /* 1992 NC100     */
 	DRIVER( nc150 )	 /* 1992 NC150     */
 	DRIVER( nc200 )	 /* 1993 NC200     */
