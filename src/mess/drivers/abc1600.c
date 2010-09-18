@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/abc99.h"
+#include "devices/messram.h"
 
 #define M68008_TAG "m68008"
 
