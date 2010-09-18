@@ -404,7 +404,7 @@ static const floppy_config mbee_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( mbee, driver_device )
+static MACHINE_CONFIG_START( mbee, mbee_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem)
