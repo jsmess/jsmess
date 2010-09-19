@@ -120,15 +120,17 @@ static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
 	return data;
 }
 
-static READ8_DEVICE_HANDLER( aquarium_oki_r )
+static READ8_HANDLER( aquarium_oki_r )
 {
-	return aquarium_snd_bitswap(okim6295_r(device, 0));
+	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+	return aquarium_snd_bitswap(oki->read(*space, offset));
 }
 
-static WRITE8_DEVICE_HANDLER( aquarium_oki_w )
+static WRITE8_HANDLER( aquarium_oki_w )
 {
-	logerror("%s:Writing %04x to the OKI M6295\n", cpuexec_describe_context(device->machine), aquarium_snd_bitswap(data));
-	okim6295_w(device, 0, (aquarium_snd_bitswap(data)));
+	logerror("%s:Writing %04x to the OKI M6295\n", cpuexec_describe_context(space->machine), aquarium_snd_bitswap(data));
+	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+	oki->write(*space, offset, (aquarium_snd_bitswap(data)));
 }
 
 
@@ -161,7 +163,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( snd_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", aquarium_oki_r, aquarium_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
@@ -357,10 +359,7 @@ static MACHINE_RESET( aquarium )
 #endif
 }
 
-static MACHINE_DRIVER_START( aquarium )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aquarium_state)
+static MACHINE_CONFIG_START( aquarium, aquarium_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
@@ -398,7 +397,7 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */

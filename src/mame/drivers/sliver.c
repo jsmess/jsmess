@@ -76,13 +76,11 @@ Notes:
 #define x_offset 0x45
 #define y_offset 0x0d
 
-class sliver_state : public driver_data_t
+class sliver_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sliver_state(machine)); }
-
-	sliver_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	sliver_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 io_offset;
 	UINT16 io_reg[IO_SIZE];
@@ -471,7 +469,7 @@ static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
 	/* ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( oki_setbank )
@@ -570,9 +568,7 @@ static INTERRUPT_GEN( sliver_int )
 	cpu_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( sliver )
-
-	MDRV_DRIVER_DATA( sliver_state )
+static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sliver_map)
@@ -598,7 +594,7 @@ static MACHINE_DRIVER_START( sliver )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( sliver )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

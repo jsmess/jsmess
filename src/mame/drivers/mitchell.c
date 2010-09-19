@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( mstworld_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1105,10 +1105,7 @@ static MACHINE_RESET( mitchell )
 	state->keymatrix = 0;
 }
 
-static MACHINE_DRIVER_START( mgakuen )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mitchell_state)
+static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
@@ -1143,13 +1140,10 @@ static MACHINE_DRIVER_START( mgakuen )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* probably same clock as the other mitchell hardware games */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pang )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mitchell_state)
+static MACHINE_CONFIG_START( pang, mitchell_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1185,7 +1179,7 @@ static MACHINE_DRIVER_START( pang )
 
 	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const gfx_layout blcharlayout =
 {
@@ -1224,8 +1218,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_DRIVER_START( spangbl )
-	MDRV_IMPORT_FROM(pang)
+static MACHINE_CONFIG_DERIVED( spangbl, pang )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spangbl_map)
@@ -1244,12 +1237,9 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mstworld )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mitchell_state)
+static MACHINE_CONFIG_START( mstworld, mitchell_state )
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1285,13 +1275,10 @@ static MACHINE_DRIVER_START( mstworld )
 
 	MDRV_OKIM6295_ADD("oki", 990000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( marukin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mitchell_state)
+static MACHINE_CONFIG_START( marukin, mitchell_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1324,7 +1311,7 @@ static MACHINE_DRIVER_START( marukin )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -1344,10 +1331,7 @@ Vsync is 59.09hz
 
 */
 
-static MACHINE_DRIVER_START( pkladiesbl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mitchell_state)
+static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -1380,7 +1364,7 @@ static MACHINE_DRIVER_START( pkladiesbl )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -59,18 +59,10 @@ Known issues:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
-
-extern UINT8 *tankbatt_bulletsram;
-extern size_t tankbatt_bulletsram_size;
+#include "includes/tankbatt.h"
 
 static int tankbatt_nmi_enable; /* No need to init this - the game will set it on reset */
 static int tankbatt_sound_enable;
-
-extern WRITE8_HANDLER( tankbatt_videoram_w );
-
-extern PALETTE_INIT( tankbatt );
-extern VIDEO_START( tankbatt );
-extern VIDEO_UPDATE( tankbatt );
 
 static WRITE8_HANDLER( tankbatt_led_w )
 {
@@ -170,7 +162,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE(&tankbatt_bulletsram) AM_SIZE(&tankbatt_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_MEMBER(tankbatt_state, videoram)
 	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
@@ -297,7 +289,7 @@ static const samples_interface tankbatt_samples_interface =
 
 
 
-static MACHINE_DRIVER_START( tankbatt )
+static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
@@ -325,7 +317,7 @@ static MACHINE_DRIVER_START( tankbatt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(tankbatt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -25,6 +25,8 @@ Memo:
 #include "includes/nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "includes/pastelg.h"
+#include "machine/nvram.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -34,18 +36,6 @@ Memo:
 #define DAC_WRITE	dac_w
 #endif
 
-
-extern PALETTE_INIT( pastelg );
-extern VIDEO_UPDATE( pastelg );
-extern VIDEO_START( pastelg );
-
-extern WRITE8_HANDLER( pastelg_clut_w );
-extern WRITE8_HANDLER( pastelg_romsel_w );
-extern WRITE8_HANDLER( threeds_romsel_w );
-extern WRITE8_HANDLER( threeds_output_w );
-extern WRITE8_HANDLER( pastelg_blitter_w );
-extern READ8_HANDLER( threeds_rom_readback_r );
-extern int pastelg_blitter_src_addr_r(void);
 
 
 static DRIVER_INIT( pastelg )
@@ -62,7 +52,7 @@ static READ8_HANDLER( pastelg_sndrom_r )
 
 static ADDRESS_MAP_START( pastelg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static READ8_HANDLER( pastelg_irq_ack_r )
@@ -401,7 +391,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( pastelg )
+static MACHINE_CONFIG_START( pastelg, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
@@ -411,7 +401,7 @@ static MACHINE_DRIVER_START( pastelg )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -436,7 +426,7 @@ static MACHINE_DRIVER_START( pastelg )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -461,7 +451,7 @@ Note
 
 */
 
-static MACHINE_DRIVER_START( threeds )
+static MACHINE_CONFIG_START( threeds, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
@@ -470,7 +460,7 @@ static MACHINE_DRIVER_START( threeds )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -495,7 +485,7 @@ static MACHINE_DRIVER_START( threeds )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pastelg )

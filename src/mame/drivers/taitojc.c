@@ -359,8 +359,6 @@ Notes:
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 
-extern UINT32 *f3_shared_ram;
-
 #define POLYGON_FIFO_SIZE		100000
 
 static READ32_HANDLER( taitojc_palette_r )
@@ -1314,9 +1312,7 @@ static const hc11_config taitojc_config =
 };
 
 
-static MACHINE_DRIVER_START( taitojc )
-
-	MDRV_DRIVER_DATA( taitojc_state )
+static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MDRV_CPU_ADD("maincpu", M68040, 25000000)
 	MDRV_CPU_PROGRAM_MAP(taitojc_map)
@@ -1350,8 +1346,8 @@ static MACHINE_DRIVER_START( taitojc )
 	MDRV_VIDEO_UPDATE(taitojc)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( taitojc )
 {

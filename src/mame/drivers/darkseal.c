@@ -19,20 +19,8 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "includes/darkseal.h"
 
-VIDEO_START( darkseal );
-VIDEO_UPDATE( darkseal );
-
-WRITE16_HANDLER( darkseal_pf1_data_w );
-WRITE16_HANDLER( darkseal_pf2_data_w );
-WRITE16_HANDLER( darkseal_pf3_data_w );
-WRITE16_HANDLER( darkseal_pf3b_data_w );
-WRITE16_HANDLER( darkseal_control_0_w );
-WRITE16_HANDLER( darkseal_control_1_w );
-WRITE16_HANDLER( darkseal_palette_24bit_rg_w );
-WRITE16_HANDLER( darkseal_palette_24bit_b_w );
-extern UINT16 *darkseal_pf12_row, *darkseal_pf34_row;
-extern UINT16 *darkseal_pf1_data,*darkseal_pf2_data,*darkseal_pf3_data;
 static UINT16 *darkseal_ram;
 
 /******************************************************************************/
@@ -94,8 +82,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
@@ -239,7 +227,7 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
-static MACHINE_DRIVER_START( darkseal )
+static MACHINE_CONFIG_START( darkseal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */
@@ -281,7 +269,7 @@ static MACHINE_DRIVER_START( darkseal )
 
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

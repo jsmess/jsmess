@@ -669,6 +669,7 @@ Notes:
       Game             Code and revision    Notes
       -----------------------------------------------------------------------
       Crisis Zone      CSZO3 Ver.B          Serialsed ROMs, IC2 not populated
+      Crisis Zone      CSZO2 Ver.A          Serialsed ROMs, IC2 not populated
 
 
 ROM PCB
@@ -1159,6 +1160,7 @@ Notes:
 #include "cpu/h83002/h8.h"
 #include "cpu/sh2/sh2.h"
 #include "sound/c352.h"
+#include "machine/nvram.h"
 
 #define S23_BUSCLOCK	(66664460/2)	// 33 MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal
 #define S23_VSYNC1	(59.8824)
@@ -2241,7 +2243,7 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
-	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
+	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // BACKUP
 
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
 
@@ -2260,7 +2262,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
-	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup
+	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
 	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram) // text layer characters (shown as CGRAM in POST)
@@ -2836,6 +2838,7 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
 	    (!strcmp(machine->gamedrv->name, "crszone")) ||
+	    (!strcmp(machine->gamedrv->name, "crszone2")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2b")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2")))
 	{
@@ -2871,7 +2874,7 @@ static const mips3_config r4650_config =
 	8192				/* data cache size - VERIFIED */
 };
 
-static MACHINE_DRIVER_START( gorgon )
+static MACHINE_CONFIG_START( gorgon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
@@ -2899,7 +2902,7 @@ static MACHINE_DRIVER_START( gorgon )
 
 	MDRV_PALETTE_LENGTH(0x8000)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(namcos23)
 
@@ -2916,9 +2919,9 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( s23 )
+static MACHINE_CONFIG_START( s23, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(r4650_config)
@@ -2947,7 +2950,7 @@ static MACHINE_DRIVER_START( s23 )
 
 	MDRV_GFXDECODE(namcos23)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
@@ -2962,9 +2965,9 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23 )
+static MACHINE_CONFIG_START( ss23, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(r4650_config)
@@ -2989,7 +2992,7 @@ static MACHINE_DRIVER_START( ss23 )
 
 	MDRV_GFXDECODE(namcos23)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
@@ -3004,10 +3007,9 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23io )
-	MDRV_IMPORT_FROM( ss23 )
+static MACHINE_CONFIG_DERIVED( ss23io, ss23 )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_IO_MAP( s23h8iomap )
@@ -3015,10 +3017,9 @@ static MACHINE_DRIVER_START( ss23io )
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23e2 )
-	MDRV_IMPORT_FROM( ss23 )
+static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(S23_BUSCLOCK*6)
@@ -3029,10 +3030,9 @@ static MACHINE_DRIVER_START( ss23e2 )
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gmen )
-	MDRV_IMPORT_FROM( s23 )
+static MACHINE_CONFIG_DERIVED( gmen, s23 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(S23_BUSCLOCK*5)
@@ -3042,7 +3042,7 @@ static MACHINE_DRIVER_START( gmen )
 	MDRV_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MDRV_MACHINE_RESET(gmen)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( rapidrvr )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -3716,6 +3716,58 @@ ROM_START( crszone )
 	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
 ROM_END
 
+ROM_START( crszonea )
+	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
+        ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
+	ROM_CONTINUE( 0x000000, 0x400000 )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+	ROM_LOAD16_BYTE( "csz1mtah.2j",  0x0000000, 0x800000, CRC(66b076ad) SHA1(edd32e0b380f01a9626d32f5eec860f841c8be8a) )
+	ROM_LOAD16_BYTE( "csz1mtal.2h",  0x0000001, 0x800000, CRC(38dc639a) SHA1(aa9b5b35174c1b007a57a4bd7a53bc3f479b5b71) )
+	ROM_LOAD16_BYTE( "csz1mtbh.2m",  0x1000000, 0x800000, CRC(bdec4188) SHA1(a098651fbd8a69a0afc17f4b6c93350926cacd6b) )
+	ROM_LOAD16_BYTE( "csz1mtbl.2f",  0x1000001, 0x800000, CRC(9c8f8d7a) SHA1(f61bcc9763df15428c82931a605ee40334d5ad98) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+	ROM_LOAD( "csz1cgll.4m",  0x0000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.4k",  0x0800000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1cgum.4j",  0x1000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cguu.5f",  0x1800000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15 */
+	ROM_LOAD( "csz1ccrl.7f",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
+	ROM_LOAD( "csz1ccrh.7e",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "csz1pt0h.7a",  0x0000000, 0x400000, CRC(e82f1abb) SHA1(b1c57152cc27835e06e429fd1659fe0973638142) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt0l.7c",  0x0000002, 0x400000, CRC(b0d66afe) SHA1(7cda4eebf1bb1191d17e4b5e616be2fbe4ae9328) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1h.5a",  0x0800000, 0x400000, CRC(e54f80ad) SHA1(3b3fbb3001e630d800b02ec8e653d74878ac5116) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1l.5c",  0x0800002, 0x400000, CRC(527171c8) SHA1(0b2ce3858f40bdedf1543309a6bc28d780415250) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2h.4a",  0x1000000, 0x400000, CRC(e295137a) SHA1(37b18af1b3d9f0e69b45135f89b49a1ceec79127) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2l.4c",  0x1000002, 0x400000, CRC(c87d6dbd) SHA1(686f39073c521d6b21ef8bc1161b41b680697c63) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3h.3a",  0x1800000, 0x400000, CRC(05f65bdf) SHA1(0c349fe5381fe7aeb81f9365a2b44a212f6bd33e) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3l.3c",  0x1800002, 0x400000, CRC(5d077c0f) SHA1(a4fd0167d89bf9417766405726e0334e7c7eaec3) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "csz1wavel.2c", 0x000000, 0x800000, CRC(d0d74132) SHA1(a293d93bca8e12e388a088a592cfa7bcb9a976f7) )
+	ROM_LOAD( "csz1waveh.2a", 0x800000, 0x800000, CRC(de9d14a8) SHA1(e5006861928bb1d29bf80c7304f1a6d044b094fd) )
+
+	ROM_REGION( 0x800000, "dups", 0 )	/* duplicate roms */
+	ROM_LOAD( "csz1cguu.4f",  0x000000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+	ROM_LOAD( "csz1cgum.5j",  0x000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cgll.5m",  0x000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.5k",  0x000000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+ROM_END
+
 /* Games */
 GAME( 1997, rapidrvr, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, rapidrvr2,rapidrvr,gorgon,gorgon, ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
@@ -3731,3 +3783,5 @@ GAME( 1998, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500 GP (5GP3
 GAME( 1999, finfurl2, 0,        gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2j,finfurl2, gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 2000, crszone,  0,      ss23e2,   ss23, ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 2000, crszonea, crszone,ss23e2,   ss23, ss23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+

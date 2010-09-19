@@ -43,6 +43,7 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK			(XTAL_10MHz)
 #define CPU_CLOCK				(MASTER_CLOCK / 4)
@@ -66,6 +67,16 @@ static int question_address;
 static int decryption_key;
 
 static UINT8 *backup_ram;
+
+class merit_state : public driver_device
+{
+public:
+	merit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
+};
+
 
 static MACHINE_START(merit)
 {
@@ -348,7 +359,7 @@ static ADDRESS_MAP_START( casino5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
 	AM_RANGE(0x7001, 0x7fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -362,7 +373,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -374,7 +385,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dodge_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1149,21 +1160,10 @@ static const ay8910_interface merit_ay8912_interface =
 	DEVCB_HANDLER(led2_w), DEVCB_NULL
 };
 
-static NVRAM_HANDLER(dodge)
+void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
-	if (read_or_write)
-	{
-		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	}
-	else if (file)
-	{
-		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	}
-	else
-	{
-		memset(machine->generic.nvram.v, 0x00, machine->generic.nvram_size);
-		machine->generic.nvram.u8[0x1040] = 0xc9; /* ret */
-	}
+	memset(base, 0x00, size);
+	reinterpret_cast<UINT8 *>(base)[0x1040] = 0xc9; /* ret */
 }
 
 static MACHINE_START(casino5)
@@ -1175,7 +1175,7 @@ static MACHINE_START(casino5)
 	memory_set_bank(machine, "bank2", 0);
 }
 
-static MACHINE_DRIVER_START( pitboss )
+static MACHINE_CONFIG_START( pitboss, merit_state )
 	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pitboss_map)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map)
@@ -1200,72 +1200,64 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
 	MDRV_SOUND_CONFIG(merit_ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( casino5 )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( casino5, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(casino5_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(casino5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bigappg )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bigappg_map)
 	MDRV_CPU_IO_MAP(tictac_io_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+	MDRV_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dodge )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dodge_map)
 
-	MDRV_NVRAM_HANDLER(dodge)
-MACHINE_DRIVER_END
+	MDRV_NVRAM_REPLACE_CUSTOM("nvram", merit_state, dodge_nvram_init)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tictac )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( tictac, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tictac_map)
 	MDRV_CPU_IO_MAP(tictac_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( trvwhiz )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( trvwhiz, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trvwhiz_map)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( phrcraze )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( phrcraze, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(phrcraze_map)
 	MDRV_CPU_IO_MAP(phrcraze_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( trvwhziv )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( trvwhziv, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trvwhziv_map)
 	MDRV_CPU_IO_MAP(tictac_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( couple )
-	MDRV_IMPORT_FROM(pitboss)
+static MACHINE_CONFIG_DERIVED( couple, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(couple_map)
@@ -1275,7 +1267,7 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[0])
 	MDRV_DEVICE_MODIFY("ppi8255_1")
 	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[1])
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pitboss )

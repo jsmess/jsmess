@@ -25,13 +25,11 @@
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 
-class dacholer_state : public driver_data_t
+class dacholer_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dacholer_state(machine)); }
-
-	dacholer_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dacholer_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  bgvideoram;
@@ -502,10 +500,7 @@ static PALETTE_INIT( dacholer )
 	}
 }
 
-static MACHINE_DRIVER_START( dacholer )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dacholer_state)
+static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ? */
@@ -552,7 +547,7 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_SOUND_CONFIG(msm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( dacholer )
 	ROM_REGION( 0x10000, "maincpu", 0 )

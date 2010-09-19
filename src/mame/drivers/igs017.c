@@ -1111,7 +1111,7 @@ static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE( input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ ( input_r )
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
@@ -1232,7 +1232,7 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE( irq1_enable_w )
 	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
 	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
-	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	// oki banking through protection (code at $1a350)?
 ADDRESS_MAP_END
 
@@ -1330,7 +1330,7 @@ static ADDRESS_MAP_START( sdmg2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20402a, 0x20402b) AM_WRITE( irq1_enable_w )
 	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
 	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE( sdmg2_magic_w )
 	AM_RANGE(0x300002, 0x300003) AM_READ ( sdmg2_magic_r )
 ADDRESS_MAP_END
@@ -1439,7 +1439,7 @@ static ADDRESS_MAP_START( mgdh_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE( irq1_enable_w )
 	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
 	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
-	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
 
@@ -2027,7 +2027,7 @@ static MACHINE_RESET( iqblocka )
 	input_select = 0;
 }
 
-static MACHINE_DRIVER_START( iqblocka )
+static MACHINE_CONFIG_START( iqblocka, driver_device )
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(iqblocka_map)
 	MDRV_CPU_IO_MAP(iqblocka_io)
@@ -2059,7 +2059,7 @@ static MACHINE_DRIVER_START( iqblocka )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2099,7 +2099,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( mgcs )
+static MACHINE_CONFIG_START( mgcs, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgcs)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2127,7 +2127,7 @@ static MACHINE_DRIVER_START( mgcs )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2144,7 +2144,7 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( sdmg2 )
+static MACHINE_CONFIG_START( sdmg2, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sdmg2)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2172,7 +2172,7 @@ static MACHINE_DRIVER_START( sdmg2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 //mgdh
@@ -2202,7 +2202,7 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( mgdh )
+static MACHINE_CONFIG_START( mgdh, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgdh_map)
 	MDRV_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
@@ -2230,7 +2230,7 @@ static MACHINE_DRIVER_START( mgdh )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

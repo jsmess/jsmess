@@ -67,6 +67,7 @@ Notes:
 #include "sound/2413intf.h"
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
+#include "machine/nvram.h"
 
 #define LOG_BLITTER 0
 
@@ -2007,11 +2008,11 @@ static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8( "ymsnd", ym3812_w, 0x00ff )
 
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( drgnwrld_igs003_w )
@@ -2093,11 +2094,11 @@ static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
 	// no reset
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x700002, 0x700005 ) AM_READ ( lhb_inputs_r )
 	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE( lhb_inputs_w )
@@ -2134,11 +2135,11 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
-	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram ) // extra ram
+	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_SHARE("nvram") // extra ram
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE( xymg_igs003_w )
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ ( xymg_igs003_r )
 	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
@@ -2170,12 +2171,12 @@ static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x519000, 0x5195ff ) AM_READ ( lhb_igs011_prot2_r			)	// read
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( wlcc_igs003_w )
 	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( wlcc_igs003_r )
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
@@ -2209,8 +2210,8 @@ static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE( igs011_prot2_reset_w		)	// reset (55)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
-	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_igs003_w )
 	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( lhb2_igs003_r )
@@ -2320,7 +2321,7 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE( igs012_prot_fake_r )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
@@ -3444,10 +3445,10 @@ static GFXDECODE_START( igs011_hi )
 GFXDECODE_END
 #endif
 
-static MACHINE_DRIVER_START( igs011_base )
+static MACHINE_CONFIG_START( igs011_base, driver_device )
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3467,7 +3468,7 @@ static MACHINE_DRIVER_START( igs011_base )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( drgnwrld_interrupt )
 {
@@ -3479,21 +3480,19 @@ static INTERRUPT_GEN( drgnwrld_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( drgnwrld )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld)
 	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drgnwrld_igs012 )
-	MDRV_IMPORT_FROM(drgnwrld)
+static MACHINE_CONFIG_DERIVED( drgnwrld_igs012, drgnwrld )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld_igs012)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3512,12 +3511,11 @@ static INTERRUPT_GEN( lhb_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( lhb )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3530,26 +3528,23 @@ static INTERRUPT_GEN( wlcc_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( wlcc )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wlcc)
 	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( xymg )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xymg)
 	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( lhb2 )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb2)
 	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
@@ -3558,7 +3553,7 @@ static MACHINE_DRIVER_START( lhb2 )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3583,8 +3578,7 @@ static INTERRUPT_GEN( vbowl_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( vbowl )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vbowl)
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
@@ -3596,7 +3590,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
 	MDRV_SOUND_CONFIG(vbowl_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

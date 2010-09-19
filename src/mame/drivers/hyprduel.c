@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( hyprduel_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff )
-	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_NOP
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("share2")
@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( magerror_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP
 	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3")
@@ -671,10 +671,7 @@ static MACHINE_START( magerror )
 	timer_adjust_periodic(state->magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* tempo? */
 }
 
-static MACHINE_DRIVER_START( hyprduel )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hyprduel_state)
+static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
@@ -714,13 +711,10 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magerror )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hyprduel_state)
+static MACHINE_CONFIG_START( magerror, hyprduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
@@ -759,7 +753,7 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 ROMs Loading

@@ -30,13 +30,11 @@
 
 #define MARIO_PALETTE_LENGTH	(256)
 
-class mario_state : public driver_data_t
+class mario_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mario_state(machine)); }
-
-	mario_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mario_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 
@@ -84,7 +82,7 @@ WRITE8_HANDLER( mario_sh3_w );
 WRITE8_HANDLER( mario_sh_tuneselect_w );
 WRITE8_HANDLER( masao_sh_irqtrigger_w );
 
-MACHINE_DRIVER_EXTERN( mario_audio );
-MACHINE_DRIVER_EXTERN( masao_audio );
+MACHINE_CONFIG_EXTERN( mario_audio );
+MACHINE_CONFIG_EXTERN( masao_audio );
 
 #endif /*MARIO_H_*/

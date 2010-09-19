@@ -367,7 +367,7 @@ static VIDEO_UPDATE( qix )
 static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
@@ -384,7 +384,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
@@ -403,7 +403,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
@@ -446,7 +446,7 @@ static const m6809_config encryption_config =
 };
 
 
-MACHINE_DRIVER_START( qix_video )
+MACHINE_CONFIG_FRAGMENT( qix_video )
 	MDRV_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map)
 	MDRV_CPU_CONFIG(encryption_config)	// for kram3
@@ -459,17 +459,17 @@ MACHINE_DRIVER_START( qix_video )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( zookeep_video )
+MACHINE_CONFIG_FRAGMENT( zookeep_video )
 	MDRV_CPU_MODIFY("videocpu")
 	MDRV_CPU_PROGRAM_MAP(zookeep_video_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( slither_video )
+MACHINE_CONFIG_FRAGMENT( slither_video )
 	MDRV_CPU_MODIFY("videocpu")
 	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 	MDRV_CPU_PROGRAM_MAP(slither_video_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

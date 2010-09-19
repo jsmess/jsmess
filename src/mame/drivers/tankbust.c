@@ -19,24 +19,7 @@ To do:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-VIDEO_START( tankbust );
-VIDEO_UPDATE( tankbust );
-
-extern UINT8 *tankbust_txtram;
-extern UINT8 *tankbust_videoram;
-extern UINT8 *tankbust_colorram;
-
-WRITE8_HANDLER( tankbust_background_videoram_w );
-READ8_HANDLER ( tankbust_background_videoram_r );
-WRITE8_HANDLER( tankbust_background_colorram_w );
-READ8_HANDLER ( tankbust_background_colorram_r );
-WRITE8_HANDLER( tankbust_txtram_w );
-READ8_HANDLER ( tankbust_txtram_r );
-
-WRITE8_HANDLER( tankbust_xscroll_w );
-WRITE8_HANDLER( tankbust_yscroll_w );
+#include "includes/tankbust.h"
 
 
 //port A of ay8910#0
@@ -339,7 +322,7 @@ static MACHINE_RESET( tankbust )
 }
 
 
-static MACHINE_DRIVER_START( tankbust )
+static MACHINE_CONFIG_START( tankbust, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ? */
@@ -380,7 +363,7 @@ static MACHINE_DRIVER_START( tankbust )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

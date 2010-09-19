@@ -84,16 +84,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
-
-VIDEO_START( hexion );
-VIDEO_UPDATE( hexion );
-
-WRITE8_HANDLER( hexion_bankswitch_w );
-READ8_HANDLER( hexion_bankedram_r );
-WRITE8_HANDLER( hexion_bankedram_w );
-WRITE8_HANDLER( hexion_bankctrl_w );
-WRITE8_HANDLER( hexion_gfxrom_select_w );
-
+#include "includes/hexion.h"
 
 
 static WRITE8_HANDLER( coincntr_w )
@@ -124,7 +115,7 @@ static ADDRESS_MAP_START( hexion_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
 	AM_RANGE(0xf000, 0xf00f) AM_WRITENOP	/* 053252? f00e = IRQ ack, f00f = NMI ack */
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
@@ -227,7 +218,7 @@ static INTERRUPT_GEN( hexion_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( hexion )
+static MACHINE_CONFIG_START( hexion, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
@@ -257,7 +248,7 @@ static MACHINE_DRIVER_START( hexion )
 
 	MDRV_SOUND_ADD("konami", K051649, 24000000/16)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

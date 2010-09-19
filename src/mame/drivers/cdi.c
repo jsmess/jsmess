@@ -558,13 +558,11 @@ struct _mcd212_ab_t
     BYTE68K deltaUV[BYTE68K_MAX + 1];
 };
 
-class cdi_state : public driver_data_t
+class cdi_state : public driver_device
 {
 public:
-    static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cdi_state(machine)); }
-
-    cdi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+    cdi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
     UINT16 *planea;
     UINT16 *planeb;
@@ -4640,9 +4638,7 @@ static MACHINE_RESET( cdi )
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( cdi )
-
-    MDRV_DRIVER_DATA( cdi_state )
+static MACHINE_CONFIG_START( cdi, cdi_state )
 
     MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
     MDRV_CPU_PROGRAM_MAP(cdimono1_mem)
@@ -4685,7 +4681,7 @@ static MACHINE_DRIVER_START( cdi )
     MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
     MDRV_MK48T08_ADD( "mk48t08" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************
 *        Rom Load        *

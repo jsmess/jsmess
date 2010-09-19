@@ -70,24 +70,7 @@ C004      76489 #4 trigger
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
 #include "includes/konamipt.h"
-
-extern UINT8 *tp84_bg_videoram;
-extern UINT8 *tp84_bg_colorram;
-extern UINT8 *tp84_fg_videoram;
-extern UINT8 *tp84_fg_colorram;
-extern UINT8 *tp84_spriteram;
-extern UINT8 *tp84_scroll_x;
-extern UINT8 *tp84_scroll_y;
-extern UINT8 *tp84_palette_bank;
-extern UINT8 *tp84_flipscreen_x;
-extern UINT8 *tp84_flipscreen_y;
-
-WRITE8_HANDLER( tp84_spriteram_w );
-READ8_HANDLER( tp84_scanline_r );
-
-PALETTE_INIT( tp84 );
-VIDEO_START( tp84 );
-VIDEO_UPDATE( tp84 );
+#include "includes/tp84.h"
 
 static cpu_device *audiocpu;
 
@@ -291,7 +274,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( tp84 )
+static MACHINE_CONFIG_START( tp84, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
@@ -343,13 +326,12 @@ static MACHINE_DRIVER_START( tp84 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tp84b )
-	MDRV_IMPORT_FROM(tp84)
+static MACHINE_CONFIG_DERIVED( tp84b, tp84 )
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(tp84b_cpu1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

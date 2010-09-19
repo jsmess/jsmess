@@ -81,10 +81,10 @@ static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(pktgaldx_state, spriteram, spriteram_size)
 	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_r, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_r, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8_MODERN("oki1", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8_MODERN("oki2", okim6295_device, read, 0x00ff)
 
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
@@ -127,10 +127,10 @@ static ADDRESS_MAP_START( pktgaldb_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x130000, 0x130fff) AM_RAM // palette on original?
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_r, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_r, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8_MODERN("oki1", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8_MODERN("oki2", okim6295_device, read, 0x00ff)
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
@@ -318,10 +318,7 @@ static MACHINE_START( pktgaldx )
 	state->deco16ic = machine->device("deco_custom");
 }
 
-static MACHINE_DRIVER_START( pktgaldx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pktgaldx_state)
+static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -355,13 +352,10 @@ static MACHINE_DRIVER_START( pktgaldx )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pktgaldb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pktgaldx_state)
+static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -393,7 +387,7 @@ static MACHINE_DRIVER_START( pktgaldb )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pktgaldx )

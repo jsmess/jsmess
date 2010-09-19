@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -351,14 +351,14 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 // but only on the title screen....
 
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_w)
+//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
 //  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
 
 //  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -568,10 +568,7 @@ static MACHINE_RESET( chinagat )
 }
 
 
-static MACHINE_DRIVER_START( chinagat )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( chinagat, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
@@ -610,12 +607,9 @@ static MACHINE_DRIVER_START( chinagat )
 
 	MDRV_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( saiyugoub1 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
@@ -659,12 +653,9 @@ static MACHINE_DRIVER_START( saiyugoub1 )
 	MDRV_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( saiyugoub2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
@@ -708,7 +699,7 @@ static MACHINE_DRIVER_START( saiyugoub2 )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

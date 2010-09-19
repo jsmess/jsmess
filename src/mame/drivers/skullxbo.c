@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_BASE_MEMBER(skullxbo_state, yscroll)
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(skullxbo_state, eeprom, eeprom_size)
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff5000, 0xff5001) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
@@ -253,8 +253,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( skullxbo )
-	MDRV_DRIVER_DATA(skullxbo_state)
+static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -263,7 +262,7 @@ static MACHINE_DRIVER_START( skullxbo )
 
 	MDRV_MACHINE_START(skullxbo)
 	MDRV_MACHINE_RESET(skullxbo)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -280,8 +279,8 @@ static MACHINE_DRIVER_START( skullxbo )
 	MDRV_VIDEO_UPDATE(skullxbo)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
 

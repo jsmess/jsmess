@@ -607,7 +607,7 @@ static ADDRESS_MAP_START( dd2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -974,10 +974,7 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( ddragon )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
@@ -1021,32 +1018,27 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ddragonb )
-	MDRV_IMPORT_FROM(ddragon)
+static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
 	MDRV_CPU_PROGRAM_MAP(sub_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ddragonba )
-	MDRV_IMPORT_FROM(ddragon)
+static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragonba_sub_map)
 	MDRV_CPU_IO_MAP(ddragonba_sub_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ddragon6809 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
@@ -1090,13 +1082,10 @@ static MACHINE_DRIVER_START( ddragon6809 )
 	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ddragon2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
@@ -1135,22 +1124,20 @@ static MACHINE_DRIVER_START( ddragon2 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( darktowr )
-	MDRV_IMPORT_FROM(ddragon)
+static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", M68705,XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( toffy )
-	MDRV_IMPORT_FROM(ddragon)
+static MACHINE_CONFIG_DERIVED( toffy, ddragon )
 
 	/* basic machine hardware */
 	MDRV_DEVICE_REMOVE("sub")
@@ -1158,7 +1145,7 @@ static MACHINE_DRIVER_START( toffy )
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("adpcm1")
 	MDRV_DEVICE_REMOVE("adpcm2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

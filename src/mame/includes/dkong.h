@@ -69,13 +69,11 @@ enum
 #define DK3_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
 #define RS_PALETTE_LENGTH		(256+256+8+1)
 
-class dkong_state : public driver_data_t
+class dkong_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dkong_state(machine)); }
-
-	dkong_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dkong_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *           video_ram;
@@ -212,9 +210,9 @@ VIDEO_UPDATE( spclforc );
 
 WRITE8_HANDLER( dkong_audio_irq_w );
 
-MACHINE_DRIVER_EXTERN( radarscp_audio );
-MACHINE_DRIVER_EXTERN( dkong2b_audio );
-MACHINE_DRIVER_EXTERN( dkongjr_audio );
-MACHINE_DRIVER_EXTERN( dkong3_audio );
-MACHINE_DRIVER_EXTERN( radarscp1_audio );
+MACHINE_CONFIG_EXTERN( radarscp_audio );
+MACHINE_CONFIG_EXTERN( dkong2b_audio );
+MACHINE_CONFIG_EXTERN( dkongjr_audio );
+MACHINE_CONFIG_EXTERN( dkong3_audio );
+MACHINE_CONFIG_EXTERN( radarscp1_audio );
 

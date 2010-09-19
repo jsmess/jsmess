@@ -7,9 +7,8 @@
     This hardware only generates sprites. But they're of various types,
     including some large "floating tilemap" ones.
 
-    Sprites RAM is 0x40000 bytes long. The first 0x2000 bytes hold a list
-    of sprites to display (the list can be made shorter using an end-of-list
-    marker).
+    Sprites RAM is 0x40000 bytes long. The first 0x2000 bytes hold a list of
+    sprites to display (the list can be made shorter using an end-of-list marker).
 
     Each entry in the list (8 bytes) is a multi-sprite (e.g it tells the
     hardware to display up to 32 single-sprites).
@@ -247,7 +246,7 @@ VIDEO_START( gdfs )
     CRT controller, registers that are read
     (vblank etc.?)
 
-                1c0000 (wait for bit .. to become ..)
+            1c0000 (wait for bit .. to become ..)
 
     keithlcy:   bit D, 0 -> 1
 
@@ -257,107 +256,128 @@ VIDEO_START( gdfs )
     meosism:
     srmp7:
     sxyreact:
-    ultrax:     bit F, 0
+    ultrax: bit F, 0
 
     twineag2:
     hypreac2:   bit C, 1 -> 0
-                bit F, 0
+            bit F, 0
 
     janjans1:
     srmp4:
-    survarts:   No checks
+    survarts:   no checks
 
     ryorioh:
     drifto94:   bit D, 0 -> 1
-                bit A, 0
+            bit A, 0
 
 
     CRT controller, registers that are written
-    (resolution, visible area, flipping etc. ?)
+    (resolution, visible area, flipping etc.)
 
+    1c0060-61   ---- ---- ---- ---- ?                           21 or 2b    for all games
+    1c0062-63   fedc ba98 7654 3210     x start visible area
+    1c0064-65   fedc ba98 7654 3210     x end visible area
+    1c0066-67   ---- ---- ---- ----     ?                           1c6     for all games
+    1c0068-69   ---- ---- ---- ----     ?                           1       for all games
+    1c006a-6b   fedc ba98 7654 3210     y start visible area
+    1c006c-6d   fedc ba98 7654 3210     y end visible area
+    1c006e-6f   ---- ---- ---- ----     ?                           106     for all games
+    1c0070-71   ---- ---- ---- ---- ?
+            ---- --98 7654 3210     y global tilemap offset
+    1c0072-73   ---- ---- ---- ----     ?
+    1c0074-75   ---- ---- ---- ----     ?
+            -e-- ---- ---- ---- y sprite inversion
+            ---c ---- ---- ---- x sprite inversion?
+            ---- ba98 ---- ---- ?                           0101 for all games
+            ---- ---- -6-- ---- y tilemap inversion?
+            ---- ---- ---4 ---- x tilemap inversion?
+    1c0076-77   -e-- ---- ---- ----     global/local sprites coordinates
+            ---- ---- -6-- ----     shadow (2bits - 4bits)
+    1c0078-79   ---- ---- ---- ----     ?
+    1c007a-7b   ---- ---- ---- ----     ?
+            ---- -a-- ---- ----     left-right up-down inversion
 
-
-                1c0060-7f:
+            1c0060-7f:
 
     drifto94:   0000 0025 00cd 01c6 - 0001 0013 0101 0106
-                0300 0711 0500 0000 - 0015 5940 0000 0000
-                03ea      5558  (flip)
+            0300 0711 0500 0000 - 0015 5940
+            03ea      5558  (flip)
 
     dynagear:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
-                02fd 0000 0500 0000 - 0015 5940 0000 0000
-                ????      ????  (flip)
+            02fd 0000 0500 0000 - 0015 5940
+            ????      ????  (flip)
 
     eaglshot:   0021 002a 00ca 01c6 - 0001 0016 00f6 0106
-                0301 0000 0500 d000 - 0015 5940 0000 0000
-                ????      ????  (flip)
+            0301 0000 0500 d000 - 0015 5940
+            ????      ????  (flip)
 
     gdfs:       002b 002c 00d5 01c6 - 0001 0012 0102 0106
-                03ec 0711 0500 0000 - 00d5 5950 0000 0000
-                03ec      1557  (flip)
+            03ec 0711 0500 0000 - 00d5 5950
+            03ec      1557  (flip)
 
     hypreact:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-                0301 0000 0500 c000 - 0015 5140 0000 0000
-                03f0      5558  (flip)
+            0301 0000 0500 c000 - 0015 5140
+            03f0      5558  (flip)
 
     hypreac2:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-                0301 0000 05ff c000 - 0015 5140 0000 0000
-                03ea      5558  (flip)
+            0301 0000 05ff c000 - 0015 5140
+            03ea      5558  (flip)
 
     janjans1:   0021 0023 00cb 01c6 - 0001 000f 00fe 0106
-                0300 0000 0500 c000 - 0015 5140 0000 0000
-                same!   (flip)
+            0300 0000 0500 c000 - 0015 5140
+            0300            (flip)
 
     keithlcy:   002b 0025 00cd 01c6 - 0001 0013 0101 0106
-                0300 0711 0500 0000 - 0015 5940 0000 0000
-                03ea      5558  (flip)
+            0300 0711 0500 0000 - 0015 5940
+            03ea      5558  (flip)
 
     meosism:    002b 002c 00d5 01c6 - 0001 0012 00fe 0106
-                0301 0000 0500 c000 - 0015 5140 0000 0000
-                (no flip)
+            0301 0000 0500 c000 - 0015 5140
+            (no flip)
 
     mslider:    0021 0026 00d6 01c6 - 0001 000e 00fe 0106
-                03f1 0711 5550 c080 - 0015 5940 0000 0000
-                0301      0500  (flip)
+            03f1 0711 5550 c080 - 0015 5940
+            0301      0500  (flip)
 
     ryorioh:    0021 0023*00cb 01c6 - 0001 000f 00fe 0106
-                0300 0000 0500 c000 - 0015 5140 0000 0000
-                03ed      5558  (flip) *0025
+            0300 0000 0500 c000 - 0015 5140
+            03ed      5558  (flip) *0025
 
-    srmp4:      002b 002c 00d4 01c6 - 0001 0012 0102 0106
-                0301 0711 0500 0000 - 0015 4940 0000 0000
-                ffe8      5557  (flip)
+    srmp4:  002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            0301 0711 0500 0000 - 0015 4940
+            ffe8      5557  (flip)
 
-    srmp7:      002b 002c 00d4 01c6 - 0001 000e 00fd 0106
-                0000 0000 e500 0000 - 0015 7140 0000 0000
-                02f2      b558  (flip)
+    srmp7:  002b 002c 00d4 01c6 - 0001 000e 00fd 0106
+            0000 0000 e500 0000 - 0015 7140
+            02f2      b558  (flip)
 
     stmblade:   0021 0026 00d6 01c6 - 0001 000e 00fe 0106
-                03f1 0711 5550 c080 - 0015 5940 0000 0000 <- 711 becomes 0 during gameplay
-                0301      0500  (flip)
+            03f1 0711 5550 c080 - 0015 5940         <- 711 becomes 0 during gameplay
+            0301      0500  (flip)
 
     survarts:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
-                0301 0000 0500 0000 - 0015 5140 0000 0000
-                03e9      5558  (flip)
+            0301 0000 0500 0000 - 0015 5140
+            03e9      5558  (flip)
 
     sxyreact:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-                0301 0000 0500 c000 - 0015 5140 0000 0000
-                03ef      5558  (flip)
+            0301 0000 0500 c000 - 0015 5140
+            03ef      5558  (flip)
 
     sxyreac2:   0021 0023 00cb 01c6 - 0001 000e 00fe 0106
-                0301 0000 0500 c000 - 0015 5140 0000 0000
-                ????      ????  (flip)
+            0301 0000 0500 c000 - 0015 5140
+            ????      ????  (flip)
 
     twineag2:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
-                ffec 0000 e500 4000 - 0315 7940 0000 0000
-                ????      ????  (flip)
+            ffec 0000 e500 4000 - 0315 7940
+            ????      ????  (flip)
 
-    ultrax:     002b 002c 00d4 01c6 - 0001 0012 0102 0106
-                ffec 0000 e500 4000 - 0315 7940 0000 0000
-                02fe      b558  (flip)
+    ultrax: 002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            ffec 0000 e500 4000 - 0315 7940
+            02fe      b558  (flip)
 
     vasara &    0021 0024 00cc 01c6 - 0001 000e 00fe 0106
-    vasara2:    03f1 0000 6500 c000 - 0015 5140 0000 0000
-                0301      3558  (flip)
+    vasara2:    03f1 0000 6500 c000 - 0015 5140
+            0301      3558  (flip)
 
 
 ***************************************************************************/
@@ -599,10 +619,10 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int y, y1, sy1, flipy, ynum, ystart, yend, yinc;
 	UINT16 *s3;
 
-	xnum	=		0x20;		// width in tiles (screen-wide)
-	ynum	=		0x8;		// height in tiles (always 64 pixels?)
+	xnum = 0x20;		// width in tiles (screen-wide)
+	ynum = 0x8;			// height in tiles (always 64 pixels?)
 
-	scroll	&=		0x7;		// scroll register index
+	scroll &= 0x7;		// scroll register index
 
 	/* Sign extend the position */
 	sx = 0;
@@ -630,41 +650,38 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	if (clip.max_y > cliprect->max_y)	clip.max_y = cliprect->max_y;
 
 	/* Get the scroll data */
+	x    = ssv_scroll[ scroll * 4 + 0 ];	// x scroll
+	y    = ssv_scroll[ scroll * 4 + 1 ];	// y scroll
+	//     ssv_scroll[ scroll * 4 + 2 ];    // ???
+	mode = ssv_scroll[ scroll * 4 + 3 ];	// layer disabled, shadow, depth etc.
 
-	x		=	ssv_scroll[ scroll * 4 + 0 ];	// x scroll
-	y		=	ssv_scroll[ scroll * 4 + 1 ];	// y scroll
-	//          ssv_scroll[ scroll * 4 + 2 ];   // Priority ?
-	mode	=	ssv_scroll[ scroll * 4 + 3 ];	// shadow, depth etc.
-
-	// Priority ?
-	if ( (ssv_scroll[ scroll * 4 + 2 ] < ssv_scroll[ 0 * 4 + 2 ]) )
+	/* Background layer disabled */
+	if ((mode & 0xe000) == 0)
 		return;
 
-	/* How is the background layer disabled ? */
-	if ((mode & 0x0700) == 0)	return;
+	shadow = (mode & 0x0800);
 
-	shadow	=	(mode & 0x0800);
-
-	/* Decide the actual size of the tilemap. $200 and $400 pixels
-       are the only values actually used AFAIK */
+	/* Decide the actual size of the tilemap */
 	size	=	1 << (8 + ((mode & 0xe000) >> 13));
 	page	=	(x & 0x7fff) / size;
 
-	/* Given a fixed scroll value, the portion of tilemap displayed changes
-       with the sprite postion */
-	x	+=	sx;
-	y	+=	sy;
+	/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
+	x += sx;
+	y += sy;
 
-	/* Tweak the scroll values (game specific) */
-	x	+=	state->tilemap_offsx;
-	y	+=	state->tilemap_offsy;
+	/* Tweak the scroll values */
+	// x += 0;
+	y    += ((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
+
+	// Kludge for eaglshot
+	if ((ssv_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0440) x += -0x10;
+	if ((ssv_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0401) x += -0x20;
 
 	/* Draw the rows */
-
-	x1	=	x;
-	y1	=	y;
-	sx1	=	sx - (x & 0xf);
-	sy1	=	sy - (y & 0xf);
+	x1  = x;
+	y1  = y;
+	sx1 = sx - (x & 0xf);
+	sy1 = sy - (y & 0xf);
 
 	for (sx=sx1,x=x1; sx <= clip.max_x; sx+=0x10,x+=0x10)
 	{
@@ -740,23 +757,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	for ( ; s1 < end1; s1+=4 )
 	{
 		int attr, code, color, num, sprite;
-		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc;
-		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc;
+		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, sprites_offsx;
+		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, sprites_offsy, tilemaps_offsy;
 		int mode,global_depth,global_xnum,global_ynum;
 
-		mode	=		s1[ 0 ];
-		sprite	=		s1[ 1 ];
-		xoffs	=		s1[ 2 ];
-		yoffs	=		s1[ 3 ];
+		mode   = s1[ 0 ];
+		sprite = s1[ 1 ];
+		xoffs  = s1[ 2 ];
+		yoffs  = s1[ 3 ];
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
 
 		/* Single-sprite address */
-		s2		=		&spriteram16[ (sprite & 0x7fff) * 4 ];
+		s2 = &spriteram16[ (sprite & 0x7fff) * 4 ];
+		tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
-           by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+        by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
 		xoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
 		yoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
@@ -800,15 +818,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				scroll	=	s2[ 0 ];	// scroll index
 
-				switch( ssv_scroll[0x7a/2] )
+				if (ssv_scroll[0x76/2] & 0x1000)
+					sy -= 0x20;						// kludge for eaglshot
+				else
 				{
-					case 0x4940:	sy += 0x60;		break;		// srmp4
-					case 0x5940:	sy -= 0x20;		break;		// drifto94, dynagear, eaglshot, keithlcy, mslider, stmblade
-					case 0x5950:	sy += 0xdf;		break;		// gdfs
-					case 0x7940:	sy -= 0x10;		break;		// ultrax, twineag2
+					if (ssv_scroll[0x7a/2] & 0x0800)
+					{
+						if (ssv_scroll[0x7a/2] & 0x1000)	// drifto94, dynagear, keithlcy, mslider, stmblade, gdfs, ultrax, twineag2
+							sy -= tilemaps_offsy;
+						else						// srmp4
+							sy += tilemaps_offsy;
+					}
 				}
 
-				draw_row(machine, bitmap, cliprect, sx, sy, scroll);
+				if ((mode & 0x001f) != 0)
+					draw_row(machine, bitmap, cliprect, sx, sy, scroll);
 			}
 			else
 			{
@@ -856,32 +880,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
-				if (ssv_scroll[0x74/2] == 0x6500)	// vasara
-					sy = 0xe8 - sy;
+				sprites_offsx = -((ssv_scroll[0x7a/2] & 0x0800) >> 8);
 
-				if (ssv_scroll[0x74/2] & 0x8000)		// srmp7, twineag2, ultrax
+				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200)
+								 + ssv_scroll[0x6a/2] + 1) - (((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8);
+
+				if (ssv_scroll[0x74/2] & 0x4000)	// srmp7, twineag2, ultrax, vasara
+				{
+					sy = -sy;
+					if (ssv_scroll[0x74/2] & 0x8000)
+						sy += 0x00;			// srmp7, twineag2, ultrax
+					else
+						sy -= 0x10;			// vasara
+				}
+
+				// sprites can use x and y coordinates relative to a side, the other side or the center
+				// for now we use a kludge
+
+				if (ssv_scroll[0x74/2] & 0x8000)
 				{
 					if (ssv_scroll[0x76/2] & 0x4000) {					// twineag2, ultrax
-						sx	=	state->sprites_offsx + sx - (xnum-1) * 8;
-						sy	=	state->sprites_offsy + sy - (ynum * 8) / 2;
+						sx	=	sprites_offsx + sx - (xnum - 1) * 8;
+						sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 					} else {									// srmp7
-						sx	=	state->sprites_offsx + sx;
-						sy	=	state->sprites_offsy + sy;
+						sx	=	sprites_offsx + sx;
+						sy	=	sprites_offsy - sy;
 					}
 				}
-				else if (ssv_scroll[0x76/2] & 0x1000)	// eaglshot
+				else if (ssv_scroll[0x76/2] & 0x1000)					// eaglshot
 				{
-					sx	=	state->sprites_offsx + sx - (xnum-1) * 8;
-					sy	=	state->sprites_offsy - sy - (ynum * 8) / 2;	// sy is the sprite center
+					sx	=	sprites_offsx + sx - (xnum - 1) * 8;
+					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 				}
-				else
+				else if (ssv_scroll[0x70/2] == 0x02fd)					// dynagear
 				{
-					sx	=	state->sprites_offsx + sx;
-					sy	=	state->sprites_offsy - sy - (ynum-1) * 8;
+					sx	=	sprites_offsx + sx;
+					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
+				}
+				else											// other games
+				{
+					sx	=	sprites_offsx + sx;
+					sy	=	sprites_offsy - sy - (ynum - 1) * 8;
 				}
 
 				/* Sprite code masking */
-				if(xnum == 2 && ynum == 4) // needed by hypreact
+				if (xnum == 2 && ynum == 4) // needed by hypreact
 				{
 					code &= ~7;
 				}
@@ -897,7 +940,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 												color,
 												flipx, flipy,
 												sx + x * 16, sy + y * 8,
-												shadow	);
+												shadow );
 					}
 				}
 
@@ -1120,6 +1163,8 @@ void ssv_enable_video(running_machine *machine, int enable)
 
 VIDEO_UPDATE( ssv )
 {
+	rectangle clip = { 0, 0, 0, 0 };
+
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 
 	if (state->scroll[0x76/2] & 0x0080)
@@ -1138,10 +1183,31 @@ VIDEO_UPDATE( ssv )
 	/* The background color is the first one in the palette */
 	bitmap_fill(bitmap,cliprect, 0);
 
-	if (!state->enable_video)	return 0;
+	// used by twineag2 and ultrax
+	clip.min_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x64/2] * 2 + 2;
+	clip.max_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x62/2] * 2 + 1;
+	clip.min_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6c/2]     + 1;
+	clip.max_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6a/2]        ;
 
-	draw_layer(screen->machine, bitmap, cliprect, 0);	// "background layer"
+//  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
-	draw_sprites(screen->machine, bitmap, cliprect);	// sprites list
+	if (clip.min_x < 0) clip.min_x = 0;
+	if (clip.min_y < 0) clip.min_y = 0;
+	if (clip.max_x > cliprect->max_x) clip.max_x = cliprect->max_x;
+	if (clip.max_y > cliprect->max_y) clip.max_y = cliprect->max_y;
+
+	if (clip.min_x > clip.max_x)
+		clip.min_x = clip.max_x;
+	if (clip.min_y > clip.max_y)
+		clip.min_y = clip.max_y;
+
+	if (!state->enable_video)
+		return 0;
+
+	draw_layer(screen->machine, bitmap, &clip, 0);	// "background layer"
+
+	draw_sprites(screen->machine, bitmap, &clip);	// sprites list
+
+
 	return 0;
 }

@@ -65,13 +65,11 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
-class meijinsn_state : public driver_data_t
+class meijinsn_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, meijinsn_state(machine)); }
-
-	meijinsn_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	meijinsn_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *   shared_ram;
@@ -339,10 +337,7 @@ static MACHINE_RESET( meijinsn )
 }
 
 
-static MACHINE_DRIVER_START( meijinsn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(meijinsn_state)
+static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 9000000 )
@@ -378,7 +373,7 @@ static MACHINE_DRIVER_START( meijinsn )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( meijinsn )

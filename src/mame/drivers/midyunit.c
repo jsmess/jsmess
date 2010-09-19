@@ -171,24 +171,6 @@ static CUSTOM_INPUT( adpcm_irq_state_r )
 
 /*************************************
  *
- *  CMOS read/write
- *
- *************************************/
-
-static NVRAM_HANDLER( midyunit )
-{
-	if (read_or_write)
-		mame_fwrite(file, midyunit_cmos_ram, 0x8000);
-	else if (file)
-		mame_fread(file, midyunit_cmos_ram, 0x8000);
-	else
-		memset(midyunit_cmos_ram, 0, 0x8000);
-}
-
-
-
-/*************************************
- *
  *  Memory maps
  *
  *************************************/
@@ -213,7 +195,7 @@ static ADDRESS_MAP_START( yawdim_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_DEVWRITE("oki", yawdim_oki_bank_w)
-	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1014,7 +996,7 @@ static const tms34010_config yunit_tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( zunit )
+static MACHINE_CONFIG_START( zunit, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
@@ -1022,7 +1004,7 @@ static MACHINE_DRIVER_START( zunit )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midyunit)
-	MDRV_NVRAM_HANDLER(midyunit)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1036,8 +1018,8 @@ static MACHINE_DRIVER_START( zunit )
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(williams_narc_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(williams_narc_sound)
+MACHINE_CONFIG_END
 
 
 
@@ -1047,7 +1029,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( yunit_core )
+static MACHINE_CONFIG_START( yunit_core, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
@@ -1055,7 +1037,7 @@ static MACHINE_DRIVER_START( yunit_core )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midyunit)
-	MDRV_NVRAM_HANDLER(midyunit)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1066,79 +1048,73 @@ static MACHINE_DRIVER_START( yunit_core )
 	MDRV_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
 
 	MDRV_VIDEO_UPDATE(tms340x0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yunit_cvsd_4bit_slow )
+static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_START(midyunit_4bit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
+static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(FAST_MASTER_CLOCK)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_START(midyunit_4bit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yunit_cvsd_6bit_slow )
+static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_VIDEO_START(midyunit_6bit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
+static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(FAST_MASTER_CLOCK)
-	MDRV_IMPORT_FROM(williams_adpcm_sound)
+	MDRV_FRAGMENT_ADD(williams_adpcm_sound)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_VIDEO_START(midyunit_6bit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yunit_adpcm_6bit_faster )
+static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(FASTER_MASTER_CLOCK)
-	MDRV_IMPORT_FROM(williams_adpcm_sound)
+	MDRV_FRAGMENT_ADD(williams_adpcm_sound)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_VIDEO_START(midyunit_6bit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mkyawdim )
+static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(yunit_core)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(yawdim_sound_map)
@@ -1152,7 +1128,7 @@ static MACHINE_DRIVER_START( mkyawdim )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

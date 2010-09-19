@@ -230,15 +230,10 @@
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/8255ppi.h"
-
+#include "machine/nvram.h"
 #include "poker41.lh"
 #include "pulltabs.lh"
-
-/* from video */
-WRITE8_HANDLER( gat_videoram_w );
-PALETTE_INIT( gat );
-VIDEO_START( gat );
-VIDEO_UPDATE( gat );
+#include "includes/gatron.h"
 
 
 /****************************
@@ -344,8 +339,8 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( gat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE_MEMBER(gatron_state, videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_w)							/* PSG */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)										/* lamps */
 ADDRESS_MAP_END
@@ -437,7 +432,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( gat )
+static MACHINE_CONFIG_START( gat, gatron_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */
@@ -445,7 +440,7 @@ static MACHINE_DRIVER_START( gat )
 	MDRV_CPU_IO_MAP(gat_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
@@ -467,7 +462,7 @@ static MACHINE_DRIVER_START( gat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )	/* 2 MHz, guess */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

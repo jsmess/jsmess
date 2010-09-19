@@ -20,6 +20,7 @@ NVRAM   :   Battery for main RAM
 #include "machine/8255ppi.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
                                 Video Hardware
@@ -409,7 +410,7 @@ static READ8_HANDLER( jingbell_magic_r )
 
 static ADDRESS_MAP_START( jingbell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
-	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
@@ -440,7 +441,7 @@ static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( jingbell_magic_r, jingbell_magic_w )	// DSW1-5
 
@@ -630,7 +631,7 @@ static INTERRUPT_GEN( jingbell_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( jingbell )
+static MACHINE_CONFIG_START( jingbell, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(jingbell_map)
@@ -639,7 +640,7 @@ static MACHINE_DRIVER_START( jingbell )
 
 	MDRV_MACHINE_RESET(jingbell)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -662,14 +663,13 @@ static MACHINE_DRIVER_START( jingbell )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gp98 )
-	MDRV_IMPORT_FROM(jingbell)
+static MACHINE_CONFIG_DERIVED( gp98, jingbell )
 	MDRV_GFXDECODE(gp98)
 
 	MDRV_VIDEO_START(gp98)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

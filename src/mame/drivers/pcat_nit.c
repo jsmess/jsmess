@@ -91,6 +91,8 @@ Smitdogg
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
+static UINT8 *banked_nvram;
+
 static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
 	ins8250_receive(machine->device("ns16450_0"), data);
@@ -143,13 +145,11 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	else
 	{
 		// nvram bank
-		memory_unmap_read(space, 0x000d8000, 0x000dffff, 0, 0);
-		memory_unmap_write(space, 0x000d8000, 0x000dffff, 0, 0);
+		memory_unmap_readwrite(space, 0x000d8000, 0x000dffff, 0, 0);
 
-		memory_install_read_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
-		memory_install_write_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
+		memory_install_readwrite_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
 
-		memory_set_bankptr(space->machine, "nvrambank", space->machine->generic.nvram.u8);
+		memory_set_bankptr(space->machine, "nvrambank", banked_nvram);
 
 	}
 }
@@ -216,7 +216,6 @@ static MACHINE_START( streetg2 )
 	cpu_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
-	mc146818_init(machine, MC146818_STANDARD);
 
 	memory_configure_bank(machine, "rombank", 0, 0x80, memory_region(machine, "game_prg"), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
@@ -224,27 +223,27 @@ static MACHINE_START( streetg2 )
 	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }
 
-static MACHINE_DRIVER_START( pcat_nit )
+static MACHINE_CONFIG_START( pcat_nit, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)
 	MDRV_CPU_IO_MAP(pcat_nit_io)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MDRV_MACHINE_START(streetg2)
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-//  MDRV_IMPORT_FROM( at_kbdc8042 )
-	MDRV_IMPORT_FROM( pcat_common )
+//  MDRV_FRAGMENT_ADD( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( pcat_common )
 	MDRV_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************
 *
@@ -380,8 +379,7 @@ ROM_END
 
 static DRIVER_INIT(pcat_nit)
 {
-	machine->generic.nvram_size = 0x2000;
-	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
+	banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }

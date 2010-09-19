@@ -89,6 +89,7 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
@@ -101,7 +102,7 @@
 #include "includes/model2.h"
 
 UINT32 *model2_bufferram, *model2_colorxlat;
-static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
+static UINT32 *model2_workram;
 UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
 UINT32 *model2_paletteram32;
 static UINT32 model2_intreq;
@@ -274,34 +275,6 @@ static void copro_fifoout_push(running_device *device, UINT32 data)
 			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
 			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
-		}
-	}
-}
-
-
-
-static NVRAM_HANDLER( model2 )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, model2_backup1, 0x3fff);
-		if (model2_backup2)
-			mame_fwrite(file, model2_backup2, 0xff);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, model2_backup1, 0x3fff);
-			if (model2_backup2)
-				mame_fread(file, model2_backup2, 0xff);
-		}
-		else
-		{
-			/* Virtua Striker needs the nvram to be defaulted with 1s or the ranking gets un-inited. */
-			memset(model2_backup1, 0xff, 0x4000);
-			if (model2_backup2)
-				memset(model2_backup2, 0xff, 0x100);
 		}
 	}
 }
@@ -1402,7 +1375,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
-	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_BASE( &model2_backup1 ) // Backup sram
+	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
 
 	// "extra" data
@@ -1439,7 +1412,7 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( desert_unk_r )
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ( daytona_unk_r )
-	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_BASE( &model2_backup2 )
+	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2o_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
@@ -2009,7 +1982,7 @@ static const mb86233_cpu_core tgp_config =
 
 
 /* original Model 2 */
-static MACHINE_DRIVER_START( model2o )
+static MACHINE_CONFIG_START( model2o, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2o_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2024,7 +1997,8 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_MACHINE_RESET(model2o)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
+	MDRV_NVRAM_ADD_1FILL("backup2")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2062,10 +2036,10 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* 2A-CRX */
-static MACHINE_DRIVER_START( model2a )
+static MACHINE_CONFIG_START( model2a, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2080,7 +2054,7 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_MACHINE_RESET(model2)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2111,7 +2085,7 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static READ8_HANDLER( driveio_port_r )
 {
@@ -2146,14 +2120,13 @@ static ADDRESS_MAP_START( drive_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( srallyc )
-	MDRV_IMPORT_FROM( model2a )
+static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 
 	MDRV_CPU_ADD("drivecpu", Z80, 16000000/4) //???
 	MDRV_CPU_PROGRAM_MAP(drive_map)
 	MDRV_CPU_IO_MAP(drive_io_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sharc_config sharc_cfg =
 {
@@ -2161,7 +2134,7 @@ static const sharc_config sharc_cfg =
 };
 
 /* 2B-CRX */
-static MACHINE_DRIVER_START( model2b )
+static MACHINE_CONFIG_START( model2b, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2182,7 +2155,7 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_MACHINE_RESET(model2b)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2213,10 +2186,10 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* 2C-CRX */
-static MACHINE_DRIVER_START( model2c )
+static MACHINE_CONFIG_START( model2c, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
@@ -2227,7 +2200,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_MACHINE_RESET(model2c)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2258,7 +2231,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definitions */
 
@@ -2604,10 +2577,10 @@ ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( srallyc ) /* Sega Rally Championship, Model 2A */
+ROM_START( srallyc ) /* Sega Rally Championship Revision C, Model 2A */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD( "epr-17888.12",  0x000000, 0x080000, CRC(3d6808aa) SHA1(33abf9cdcee9583dc600c94e1e29ce260e8c5d32) )
-	ROM_LOAD32_WORD( "epr-17889.13",  0x000002, 0x080000, CRC(f43c7802) SHA1(4b1efb3d5644fed1753da1750bf5c300d3a15d2c) )
+	ROM_LOAD32_WORD( "epr-17888c.12",  0x000000, 0x080000, CRC(3d6808aa) SHA1(33abf9cdcee9583dc600c94e1e29ce260e8c5d32) )
+	ROM_LOAD32_WORD( "epr-17889c.13",  0x000002, 0x080000, CRC(f43c7802) SHA1(4b1efb3d5644fed1753da1750bf5c300d3a15d2c) )
 
 	ROM_REGION32_LE( 0x2400000, "user1", 0 ) // Data
 	ROM_LOAD32_WORD( "mpr-17746.bin", 0x000000, 0x200000, CRC(8fe311f4) SHA1(f4ada8e5c906fc384bed1b96f09cdf313f89e825) )
@@ -2638,7 +2611,53 @@ ROM_START( srallyc ) /* Sega Rally Championship, Model 2A */
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17890.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
+
+	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
+	ROM_LOAD( "mpr-17757.32", 0x000000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
+	ROM_LOAD( "mpr-17886.36", 0x000000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
+	ROM_LOAD( "mpr-17887.37", 0x000000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
+ROM_END
+
+ROM_START( srallycb ) /* Sega Rally Championship Revision B, Model 2A */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD( "epr-17888b.12",  0x000000, 0x080000, CRC(95bce0b9) SHA1(9b293b430db14cfab35466d2f9a1e3f7e2df3143) )
+	ROM_LOAD32_WORD( "epr-17889b.13",  0x000002, 0x080000, CRC(395c425e) SHA1(9868d2b79255120abfdb7f9c0930a607aeef5363) )
+
+	ROM_REGION32_LE( 0x2400000, "user1", 0 ) // Data
+	ROM_LOAD32_WORD( "mpr-17746.bin", 0x000000, 0x200000, CRC(8fe311f4) SHA1(f4ada8e5c906fc384bed1b96f09cdf313f89e825) )
+	ROM_LOAD32_WORD( "mpr-17747.bin", 0x000002, 0x200000, CRC(543593fd) SHA1(5ba63a77e9fc70569af21d50b3171bc8ff4522b8) )
+	ROM_LOAD32_WORD( "mpr-17744.bin", 0x400000, 0x200000, CRC(71fed098) SHA1(1d187cad375121a45348d640edd3cc7dce658d28) )
+	ROM_LOAD32_WORD( "mpr-17745.bin", 0x400002, 0x200000, CRC(8ecca705) SHA1(ed2b3298aad6f4e52dc672a0168183e457564b43) )
+	ROM_LOAD32_WORD( "mpr-17884.bin", 0x800000, 0x200000, CRC(4cfc95e1) SHA1(81d927b8c4f9d0c4c5e29d676b30f30f83751fdc) )
+	ROM_LOAD32_WORD( "mpr-17885.bin", 0x800002, 0x200000, CRC(a08d2467) SHA1(9449ac8f8f9ce8d8e536b05a91e46841fed7f2d0) )
+
+	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
+	ROM_LOAD32_WORD( "mpr-17754.bin", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )
+	ROM_LOAD32_WORD( "mpr-17755.bin", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )
+
+	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
+	ROM_LOAD( "epr-17891.ic12", 0x000000, 0x010000, CRC(9a33b437) SHA1(3e8f210aa5159e78f640126cb5ce7f05f22560f2) )
+
+	ROM_REGION( 0x2000000, "user2", 0 ) // Models
+	ROM_LOAD32_WORD( "mpr-17748.bin", 0x000000, 0x200000, CRC(3148a2b2) SHA1(283cc49bfb6c6381a7ead9273fd097dca5b981b6) )
+	ROM_LOAD32_WORD( "mpr-17750.bin", 0x000002, 0x200000, CRC(232aec29) SHA1(4d470e71df61298282c356814e2d151fda323fb6) )
+	ROM_LOAD32_WORD( "mpr-17749.bin", 0x400000, 0x200000, CRC(0838d184) SHA1(704175c8b29e4c989afcb7be42e7e0e096740eaf) )
+	ROM_LOAD32_WORD( "mpr-17751.bin", 0x400002, 0x200000, CRC(ed87ac62) SHA1(601542149d33ca52a47536b4b0af47bf1fd87eb2) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
+	ROM_LOAD32_WORD( "mpr-17753.bin", 0x000000, 0x200000, CRC(6db0eb36) SHA1(dd5fd3c9592360d3e95623ac2491e6faabe9dbcb) )
+	ROM_LOAD32_WORD( "mpr-17752.bin", 0x000002, 0x200000, CRC(d6aa86ce) SHA1(1d342f87d1af1e5438d1ae818b1b14268e765897) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
@@ -4913,7 +4932,8 @@ GAME( 1994, vcop,            0, model2o, daytona, 0,        ROT0, "Sega", "Virtu
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1995, manxtt,          0, model2a, model2, 0,       ROT0, "Sega", "Manx TT Superbike (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, motoraid,        0, model2a, model2, 0,       ROT0, "Sega", "Motoraid", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, srallyc,         0, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, srallyc,         0, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycb,  srallyc, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2,             0, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Version 2.1)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2b,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2a,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

@@ -80,6 +80,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 #include "includes/irobot.h"
 
 #define MAIN_CLOCK		XTAL_12_096MHz
@@ -93,7 +94,8 @@
 
 static WRITE8_HANDLER( irobot_nvram_w )
 {
-	space->machine->generic.nvram.u8[offset] = data & 0x0f;
+	irobot_state *state = space->machine->driver_data<irobot_state>();
+	state->m_nvram[offset] = data & 0x0f;
 }
 
 
@@ -134,14 +136,14 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1140, 0x1140) AM_WRITE(irobot_statwr_w)
     AM_RANGE(0x1180, 0x1180) AM_WRITE(irobot_out0_w)
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
-    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_BASE_SIZE_GENERIC(nvram)
+    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
     AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
     AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
-    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(irobot_state, videoram)
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
     AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
     AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -287,14 +289,14 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( irobot )
+static MACHINE_CONFIG_START( irobot, irobot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(irobot_map)
 
 	MDRV_MACHINE_RESET(irobot)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -329,7 +331,7 @@ static MACHINE_DRIVER_START( irobot )
 
 	MDRV_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

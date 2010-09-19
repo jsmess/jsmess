@@ -1363,7 +1363,7 @@ static ADDRESS_MAP_START( galaxian_map_base, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
@@ -1398,7 +1398,7 @@ static ADDRESS_MAP_START( mooncrst_map_base, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa000, 0xa002) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
@@ -1430,7 +1430,7 @@ static ADDRESS_MAP_START( dambustr_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
 //  AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0xd800, 0xd8ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xe004, 0xe007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_lfo_freq_w)
@@ -1452,7 +1452,7 @@ static ADDRESS_MAP_START( theend_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
@@ -1471,7 +1471,7 @@ static ADDRESS_MAP_START( scobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -1492,7 +1492,7 @@ static ADDRESS_MAP_START( frogger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb80c, 0xb80c) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_y_w)
@@ -1508,7 +1508,7 @@ static ADDRESS_MAP_START( turtles_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_red_w)
 	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x47c7) AM_WRITE(irq_enable_w)
@@ -1529,7 +1529,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_red_w)
 	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
@@ -1558,7 +1558,7 @@ static ADDRESS_MAP_START( jumpbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_address_w)
@@ -1580,7 +1580,7 @@ static ADDRESS_MAP_START( frogf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07f1) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x07f1) AM_WRITE(irq_enable_w)
@@ -1597,7 +1597,7 @@ static ADDRESS_MAP_START( mshuttle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
@@ -1956,7 +1956,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( galaxian_base )
+static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
@@ -1982,19 +1982,18 @@ static MACHINE_DRIVER_START( galaxian_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( konami_base )
-	MDRV_IMPORT_FROM( galaxian_base )
+static MACHINE_CONFIG_DERIVED( konami_base, galaxian_base )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
+static MACHINE_CONFIG_FRAGMENT( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
 	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
@@ -2011,10 +2010,10 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
+static MACHINE_CONFIG_FRAGMENT( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
 	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
@@ -2037,7 +2036,7 @@ static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2047,21 +2046,18 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( galaxian )
-	MDRV_IMPORT_FROM(galaxian_base)
-	MDRV_IMPORT_FROM(galaxian_audio)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( galaxian, galaxian_base )
+	MDRV_FRAGMENT_ADD(galaxian_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pacmanbl )
-	MDRV_IMPORT_FROM(galaxian)
+static MACHINE_CONFIG_DERIVED( pacmanbl, galaxian )
 
 	/* separate tile/sprite ROMs */
 	MDRV_GFXDECODE(pacmanbl)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tenspot )
-	MDRV_IMPORT_FROM(galaxian)
+static MACHINE_CONFIG_DERIVED( tenspot, galaxian )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", fakechange_interrupt_gen)
@@ -2073,10 +2069,9 @@ static MACHINE_DRIVER_START( tenspot )
 
 	/* separate tile/sprite ROMs */
 	MDRV_GFXDECODE(tenspot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( zigzag )
-	MDRV_IMPORT_FROM(galaxian_base)
+static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 
 	/* separate tile/sprite ROMs */
 	MDRV_GFXDECODE(pacmanbl)
@@ -2089,32 +2084,28 @@ static MACHINE_DRIVER_START( zigzag )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gmgalax )
-	MDRV_IMPORT_FROM(galaxian)
+static MACHINE_CONFIG_DERIVED( gmgalax, galaxian )
 
 	/* banked video hardware */
 	MDRV_GFXDECODE(gmgalax)
 	MDRV_PALETTE_LENGTH(64)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mooncrst )
-
-	MDRV_IMPORT_FROM(galaxian_base)
+static MACHINE_CONFIG_DERIVED( mooncrst, galaxian_base )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
 
-	MDRV_IMPORT_FROM(mooncrst_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(mooncrst_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( jumpbug )
-	MDRV_IMPORT_FROM(galaxian_base)
+static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 
 	MDRV_WATCHDOG_VBLANK_INIT(0)
 
@@ -2125,11 +2116,10 @@ static MACHINE_DRIVER_START( jumpbug )
 	/* sound hardware */
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( checkman )
-	MDRV_IMPORT_FROM(mooncrst)
+static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 1620000)	/* 1.62 MHz */
@@ -2140,11 +2130,10 @@ static MACHINE_DRIVER_START( checkman )
 	/* sound hardware */
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( checkmaj )
-	MDRV_IMPORT_FROM(galaxian_base)
+static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2160,11 +2149,10 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1620000)
 	MDRV_SOUND_CONFIG(checkmaj_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mshuttle )
-	MDRV_IMPORT_FROM(galaxian_base)
+static MACHINE_CONFIG_DERIVED( mshuttle, galaxian_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2179,11 +2167,10 @@ static MACHINE_DRIVER_START( mshuttle )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(cclimber_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kingball )
-	MDRV_IMPORT_FROM(mooncrst)
+static MACHINE_CONFIG_DERIVED( kingball, mooncrst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80,5000000/2)
@@ -2193,62 +2180,56 @@ static MACHINE_DRIVER_START( kingball )
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( frogger )
-	MDRV_IMPORT_FROM(konami_base)
-	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
+static MACHINE_CONFIG_DERIVED( frogger, konami_base )
+	MDRV_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frogger_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( froggrmc )
-	MDRV_IMPORT_FROM(galaxian_base)
-	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
+static MACHINE_CONFIG_DERIVED( froggrmc, galaxian_base )
+	MDRV_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map_base)		/* no discrete sound ! */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( froggers )
-	MDRV_IMPORT_FROM(konami_base)
-	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
+static MACHINE_CONFIG_DERIVED( froggers, konami_base )
+	MDRV_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(theend_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( frogf )
-	MDRV_IMPORT_FROM(konami_base)
-	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
+static MACHINE_CONFIG_DERIVED( frogf, konami_base )
+	MDRV_FRAGMENT_ADD(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frogf_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( turtles )
-	MDRV_IMPORT_FROM(konami_base)
-	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+static MACHINE_CONFIG_DERIVED( turtles, konami_base )
+	MDRV_FRAGMENT_ADD(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(turtles_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( theend )
-	MDRV_IMPORT_FROM(galaxian_base)
-	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+static MACHINE_CONFIG_DERIVED( theend, galaxian_base )
+	MDRV_FRAGMENT_ADD(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2256,12 +2237,11 @@ static MACHINE_DRIVER_START( theend )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", theend_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scramble )
-	MDRV_IMPORT_FROM(galaxian_base)
-	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+static MACHINE_CONFIG_DERIVED( scramble, galaxian_base )
+	MDRV_FRAGMENT_ADD(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2269,11 +2249,10 @@ static MACHINE_DRIVER_START( scramble )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi8255_1_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( explorer )
-	MDRV_IMPORT_FROM(konami_base)
+static MACHINE_CONFIG_DERIVED( explorer, konami_base )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2292,11 +2271,10 @@ static MACHINE_DRIVER_START( explorer )
 	MDRV_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(explorer_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scorpion )
-	MDRV_IMPORT_FROM(theend)
+static MACHINE_CONFIG_DERIVED( scorpion, theend )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", konami_ppi8255_0_intf )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", scorpion_ppi8255_1_intf )
@@ -2308,12 +2286,11 @@ static MACHINE_DRIVER_START( scorpion )
 
 	MDRV_SOUND_ADD("digitalker", DIGITALKER, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sfx )
-	MDRV_IMPORT_FROM(galaxian_base)
-	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
+	MDRV_FRAGMENT_ADD(konami_sound_2x_ay8910)
 
 	MDRV_WATCHDOG_VBLANK_INIT(0)
 
@@ -2337,39 +2314,34 @@ static MACHINE_DRIVER_START( sfx )
 	/* DAC for the sample player */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scobra )
-	MDRV_IMPORT_FROM(konami_base)
-	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+static MACHINE_CONFIG_DERIVED( scobra, konami_base )
+	MDRV_FRAGMENT_ADD(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scobra_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( anteater )
-	MDRV_IMPORT_FROM(scobra)
+static MACHINE_CONFIG_DERIVED( anteater, scobra )
 
 	/* quiet down the sounds */
 	MDRV_SOUND_MODIFY("konami")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( moonwar )
-
-	/* basic machine hardware */
+static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 	/* same as regular type 1, the only difference is that the bullets are less yellow */
-	MDRV_IMPORT_FROM(scobra)
 
 	/* device config overrides */
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", moonwar_ppi8255_0_intf )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", konami_ppi8255_1_intf )
 
 	MDRV_PALETTE_INIT(moonwar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

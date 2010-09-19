@@ -27,27 +27,12 @@ Credits:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "video/tms9927.h"
+#include "includes/thief.h"
 
 #define MASTER_CLOCK	XTAL_20MHz
 
 
 static UINT8 thief_input_select;
-
-READ8_HANDLER( thief_context_ram_r );
-WRITE8_HANDLER( thief_context_ram_w );
-WRITE8_HANDLER( thief_context_bank_w );
-WRITE8_HANDLER( thief_video_control_w );
-WRITE8_HANDLER( thief_color_map_w );
-WRITE8_HANDLER( thief_color_plane_w );
-READ8_HANDLER( thief_videoram_r );
-WRITE8_HANDLER( thief_videoram_w );
-WRITE8_HANDLER( thief_blit_w );
-READ8_HANDLER( thief_coprocessor_r );
-WRITE8_HANDLER( thief_coprocessor_w );
-
-VIDEO_START( thief );
-VIDEO_UPDATE( thief );
-
 
 static INTERRUPT_GEN( thief_interrupt )
 {
@@ -448,7 +433,7 @@ static const tms9927_interface tms9927_intf =
 };
 
 
-static MACHINE_DRIVER_START( sharkatt )
+static MACHINE_CONFIG_START( sharkatt, thief_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
@@ -483,10 +468,10 @@ static MACHINE_DRIVER_START( sharkatt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(sharkatt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( thief )
+static MACHINE_CONFIG_START( thief, thief_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -521,10 +506,10 @@ static MACHINE_DRIVER_START( thief )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(thief_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( natodef )
+static MACHINE_CONFIG_START( natodef, thief_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -559,7 +544,7 @@ static MACHINE_DRIVER_START( natodef )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(natodef_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************/
 

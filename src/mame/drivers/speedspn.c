@@ -23,6 +23,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "includes/speedspn.h"
 
 /*** README INFO **************************************************************
 
@@ -53,17 +54,6 @@ TCH-SS9.u34     "     /               AB2Bh
 
 
 ******************************************************************************/
-
-/* in video */
-extern UINT8 *speedspn_attram;
-
-WRITE8_HANDLER( speedspn_vidram_w );
-WRITE8_HANDLER( speedspn_attram_w );
-READ8_HANDLER( speedspn_vidram_r );
-VIDEO_START(speedspn);
-VIDEO_UPDATE(speedspn);
-WRITE8_HANDLER(speedspn_banked_vidram_change);
-WRITE8_HANDLER(speedspn_global_display_w);
 
 static READ8_HANDLER(speedspn_irq_ack_r)
 {
@@ -145,7 +135,7 @@ static ADDRESS_MAP_START( speedspn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -277,7 +267,7 @@ GFXDECODE_END
 /*** MACHINE DRIVER **********************************************************/
 
 
-static MACHINE_DRIVER_START( speedspn )
+static MACHINE_CONFIG_START( speedspn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
@@ -307,7 +297,7 @@ static MACHINE_DRIVER_START( speedspn )
 
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*** ROM LOADING *************************************************************/
 

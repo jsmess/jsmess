@@ -144,6 +144,7 @@
 #include "includes/tatsumi.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 #include "roundup5.lh"
 
@@ -194,9 +195,9 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_MEMBER(tatsumi_state, videoram)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITENOP // todo
@@ -223,7 +224,7 @@ static ADDRESS_MAP_START( apache3_v20_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x04000, 0x04003) AM_NOP // piu select .. ?
 	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("IN0") // esw
 	AM_RANGE(0x08000, 0x08001) AM_DEVREADWRITE("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0x0a000, 0x0a000) AM_DEVREADWRITE("oki", tatsumi_hack_oki_r, okim6295_w)
+	AM_RANGE(0x0a000, 0x0a000) AM_DEVREAD("oki", tatsumi_hack_oki_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0x0e000, 0x0e007) AM_READWRITE(apache3_adc_r, apache3_adc_w) //adc select
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -237,7 +238,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_MEMBER(tatsumi_state, videoram)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
 	AM_RANGE(0x0d000, 0x0d001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0d400, 0x0d40f) AM_WRITEONLY AM_BASE(&roundup5_unknown0)
@@ -267,7 +268,7 @@ static ADDRESS_MAP_START( roundup5_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_DEVREADWRITE("oki", tatsumi_hack_oki_r, okim6295_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_DEVREAD("oki", tatsumi_hack_oki_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfff9, 0xfff9) AM_READ_PORT("IN1")
 	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
@@ -324,7 +325,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_DEVREADWRITE("oki", tatsumi_hack_oki_r, okim6295_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_DEVREAD("oki", tatsumi_hack_oki_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
 ADDRESS_MAP_END
@@ -855,7 +856,7 @@ static MACHINE_RESET( apache3 )
 }
 
 
-static MACHINE_DRIVER_START( apache3 )
+static MACHINE_CONFIG_START( apache3, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -874,7 +875,7 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_MACHINE_RESET(apache3)
 
 	/* video hardware */
@@ -899,9 +900,9 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( roundup5 )
+static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -941,9 +942,9 @@ static MACHINE_DRIVER_START( roundup5 )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cyclwarr )
+static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -984,9 +985,9 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bigfight )
+static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -1027,7 +1028,7 @@ static MACHINE_DRIVER_START( bigfight )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, OKIM6295_PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

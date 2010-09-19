@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( koftball_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w)
 	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
 	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
-	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP
@@ -202,7 +202,7 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( koftball )
+static MACHINE_CONFIG_START( koftball, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(koftball_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,3)
@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( koftball )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( koftball )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */

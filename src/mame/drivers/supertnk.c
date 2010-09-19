@@ -105,13 +105,11 @@ CRU lines:
    every 8 bytes */
 #define NUM_PENS	(8)
 
-class supertnk_state : public driver_data_t
+class supertnk_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supertnk_state(machine)); }
-
-	supertnk_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	supertnk_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *videoram[3];
 	UINT8 rom_bank;
@@ -422,9 +420,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( supertnk )
-
-	MDRV_DRIVER_DATA( supertnk_state )
+static MACHINE_CONFIG_START( supertnk, supertnk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
@@ -450,7 +446,7 @@ static MACHINE_DRIVER_START( supertnk )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

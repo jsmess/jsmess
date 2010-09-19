@@ -217,6 +217,7 @@ U145        1Brown          PAL14H4CN
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
+#include "machine/nvram.h"
 
 /*************************************
  *
@@ -479,7 +480,7 @@ static PALETTE_INIT( sms )
  *************************************/
 
 static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
 	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
@@ -490,7 +491,7 @@ static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sureshot_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
 	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)
@@ -532,7 +533,7 @@ static MACHINE_RESET( sms )
 	communication_port_status = 0;
 }
 
-static MACHINE_DRIVER_START( sms )
+static MACHINE_CONFIG_START( sms, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sms_map)
 
@@ -547,7 +548,7 @@ static MACHINE_DRIVER_START( sms )
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -568,16 +569,15 @@ static MACHINE_DRIVER_START( sms )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(sureshot)
-	MDRV_IMPORT_FROM(sms)
+static MACHINE_CONFIG_DERIVED( sureshot, sms )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sureshot_map)
 
 	MDRV_MACHINE_START(sureshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

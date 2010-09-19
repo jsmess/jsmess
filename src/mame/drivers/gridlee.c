@@ -82,6 +82,7 @@
 #include "includes/gridlee.h"
 #include "includes/balsente.h"
 #include "sound/samples.h"
+#include "machine/nvram.h"
 
 
 /* constants */
@@ -316,7 +317,7 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE_MEMBER(gridlee_state, videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
 	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
 	AM_RANGE(0x9020, 0x9020) AM_WRITE(gridlee_coin_counter_w)
@@ -331,7 +332,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -433,7 +434,7 @@ static const samples_interface gridlee_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gridlee )
+static MACHINE_CONFIG_START( gridlee, gridlee_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)
@@ -441,7 +442,7 @@ static MACHINE_DRIVER_START( gridlee )
 
     MDRV_MACHINE_START(gridlee)
 	MDRV_MACHINE_RESET(gridlee)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -463,7 +464,7 @@ static MACHINE_DRIVER_START( gridlee )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gridlee_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

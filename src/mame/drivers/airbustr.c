@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(soundcommand_r, soundcommand2_w)
 ADDRESS_MAP_END
 
@@ -630,10 +630,7 @@ static const kaneko_pandora_interface airbustr_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_DRIVER_START( airbustr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(airbustr_state)
+static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
@@ -685,12 +682,11 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_OKIM6295_ADD("oki", 12000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( airbustrb )
-	MDRV_IMPORT_FROM(airbustr)
+static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
 	MDRV_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROMs */

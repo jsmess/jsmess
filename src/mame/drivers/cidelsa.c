@@ -4,6 +4,7 @@
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
 #include "machine/cdp1852.h"
+#include "machine/nvram.h"
 #include "includes/cidelsa.h"
 
 /* CDP1802 Interface */
@@ -231,14 +232,14 @@ static COP400_INTERFACE( draco_cop_intf )
 
 static ADDRESS_MAP_START( destryer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( destryera_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -276,7 +277,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -509,42 +510,39 @@ static MACHINE_RESET( cidelsa )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( destryer )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( destryer, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryer_map)
 	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(cidelsa)
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(destryer_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(destryer_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( destryera )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( destryera, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryera_map)
 	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(cidelsa)
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(destryer_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(destryer_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( altair )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( altair, cidelsa_state )
 
 	/* basic system hardware */
 
@@ -563,18 +561,17 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(altair_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(altair_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( draco )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( draco, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
 	MDRV_CPU_PROGRAM_MAP(draco_map)
 	MDRV_CPU_IO_MAP(draco_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(cidelsa)
@@ -591,8 +588,8 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(draco_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(draco_video)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

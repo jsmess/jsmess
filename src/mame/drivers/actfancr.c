@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -316,10 +316,7 @@ static MACHINE_RESET( triothep )
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( actfancr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(actfancr_state)
+static MACHINE_CONFIG_START( actfancr, actfancr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
@@ -362,12 +359,9 @@ static MACHINE_DRIVER_START( actfancr )
 
 	MDRV_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( triothep )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(actfancr_state)
+static MACHINE_CONFIG_START( triothep, actfancr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
@@ -410,7 +404,7 @@ static MACHINE_DRIVER_START( triothep )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

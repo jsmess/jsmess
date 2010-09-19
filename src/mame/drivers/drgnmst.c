@@ -82,8 +82,8 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 
 	switch (state->oki_control & 0x1f)
 	{
-		case 0x12:	data = (okim6295_r(state->oki_2, 0) & 0x0f); break;
-		case 0x16:	data = (okim6295_r(state->oki_1, 0) & 0x0f); break;
+		case 0x12:	data = (state->oki_2->read(*space, 0) & 0x0f); break;
+		case 0x16:	data = (state->oki_1->read(*space, 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:	data = state->snd_command; break;
 		default:	break;
@@ -172,12 +172,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 		case 0x11:
 //                  logerror("Writing %02x to OKI1", state->oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", state->oki_control, state->snd_command, state->oki0_bank, state->oki1_bank);
-					okim6295_w(state->oki_2, 0, state->oki_command);
+					state->oki_2->write(*space, 0, state->oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0", state->oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", state->oki_control, state->snd_command, state->oki0_bank, state->oki1_bank);
-					okim6295_w(state->oki_1, 0, state->oki_command);
+					state->oki_1->write(*space, 0, state->oki_command);
 					break;
 		default:	break;
 	}
@@ -403,8 +403,7 @@ static MACHINE_RESET( drgnmst )
 	state->oki0_bank = 0;
 }
 
-static MACHINE_DRIVER_START( drgnmst )
-	MDRV_DRIVER_DATA(drgnmst_state)
+static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map)
@@ -441,7 +440,7 @@ static MACHINE_DRIVER_START( drgnmst )
 	MDRV_OKIM6295_ADD("oki2", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( drgnmst )

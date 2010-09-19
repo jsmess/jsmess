@@ -27,14 +27,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
-
-PALETTE_INIT( magmax );
-VIDEO_UPDATE( magmax );
-VIDEO_START( magmax );
-
-extern UINT16 *magmax_vreg;
-extern UINT16 *magmax_scroll_x;
-extern UINT16 *magmax_scroll_y;
+#include "includes/magmax.h"
 
 
 static UINT8 sound_latch = 0;
@@ -213,7 +206,7 @@ static WRITE16_HANDLER( magmax_vreg_w )
 static ADDRESS_MAP_START( magmax_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x018fff) AM_RAM
-	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_MEMBER(magmax_state, videoram)
 	AM_RANGE(0x028000, 0x0281ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x030000, 0x030001) AM_READ_PORT("P1")
 	AM_RANGE(0x030002, 0x030003) AM_READ_PORT("P2")
@@ -355,7 +348,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( magmax )
+static MACHINE_CONFIG_START( magmax, magmax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -397,7 +390,7 @@ static MACHINE_DRIVER_START( magmax )
 
 	MDRV_SOUND_ADD("ay3", AY8910, XTAL_20MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( magmax )

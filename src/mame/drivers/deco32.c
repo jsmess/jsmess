@@ -804,7 +804,7 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8_MODERN("oki3", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
 	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
 	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
@@ -854,7 +854,7 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8_MODERN("oki3", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
@@ -979,8 +979,8 @@ static READ8_HANDLER(deco32_bsmt_status_r)
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
@@ -1009,8 +1009,8 @@ static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)
 ADDRESS_MAP_END
 
@@ -1655,7 +1655,7 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( captaven )
+static MACHINE_CONFIG_START( captaven, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
@@ -1700,9 +1700,9 @@ static MACHINE_DRIVER_START( captaven )
 	MDRV_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fghthist )
+static MACHINE_CONFIG_START( fghthist, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1744,9 +1744,9 @@ static MACHINE_DRIVER_START( fghthist )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fghthsta )
+static MACHINE_CONFIG_START( fghthsta, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1788,9 +1788,9 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dragngun )
+static MACHINE_CONFIG_START( dragngun, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1840,9 +1840,9 @@ static MACHINE_DRIVER_START( dragngun )
 	MDRV_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lockload )
+static MACHINE_CONFIG_START( lockload, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1892,9 +1892,9 @@ static MACHINE_DRIVER_START( lockload )
 	MDRV_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tattass )
+static MACHINE_CONFIG_START( tattass, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
@@ -1928,9 +1928,9 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_SOUND_ADD("bsmt", BSMT2000, 24000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nslasher )
+static MACHINE_CONFIG_START( nslasher, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28322000/4)
@@ -1975,7 +1975,7 @@ static MACHINE_DRIVER_START( nslasher )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

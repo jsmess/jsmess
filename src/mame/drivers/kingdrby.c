@@ -70,6 +70,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
+#include "machine/nvram.h"
 
 #define CLK_1	XTAL_20MHz
 #define CLK_2	XTAL_3_579545MHz
@@ -357,7 +358,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //backup ram
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
@@ -377,7 +378,7 @@ static WRITE8_HANDLER( kingdrbb_lamps_w )
 static ADDRESS_MAP_START( slave_1986_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //backup ram
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 //  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
@@ -901,9 +902,9 @@ static const ym2203_interface cowrace_ym2203_interface =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_HANDLER(sound_cmd_r),									// read A
-		DEVCB_DEVICE_HANDLER("oki", okim6295_r),					// read B
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),			// read B
 		DEVCB_NULL,													// write A
-		DEVCB_DEVICE_HANDLER("oki", okim6295_w)						// write B
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)			// write B
 	},
 	NULL
 };
@@ -965,7 +966,7 @@ static PALETTE_INIT(kingdrbb)
 	}
 }
 
-static MACHINE_DRIVER_START( kingdrby )
+static MACHINE_CONFIG_START( kingdrby, driver_device )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_IO_MAP(master_io_map)
@@ -983,7 +984,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_QUANTUM_PERFECT_CPU("master")
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -1009,10 +1010,9 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_SOUND_ADD("aysnd", AY8910, CLK_1/8)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kingdrbb )
-	MDRV_IMPORT_FROM( kingdrby )
+static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_1986_map)
@@ -1021,10 +1021,9 @@ static MACHINE_DRIVER_START( kingdrbb )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", ppi8255_1986_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cowrace )
-	MDRV_IMPORT_FROM( kingdrbb )
+static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(cowrace_sound_map)
@@ -1039,7 +1038,7 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_SOUND_REPLACE("aysnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(cowrace_ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )

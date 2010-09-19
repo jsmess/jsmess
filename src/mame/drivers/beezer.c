@@ -15,7 +15,7 @@
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
@@ -23,7 +23,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 //  AM_RANGE(0x1000, 0x10ff) AM_READWRITE(beezer_6840_r, beezer_6840_w)
-	AM_RANGE(0x1800, 0x18ff) AM_DEVREADWRITE("via6522_1", via_r, via_w)
+	AM_RANGE(0x1800, 0x18ff) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
 //  AM_RANGE(0x8000, 0x9fff) AM_WRITE(beezer_dac_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -72,7 +72,7 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( beezer )
+static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
@@ -102,7 +102,7 @@ static MACHINE_DRIVER_START( beezer )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, b_via_1_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -17,22 +17,8 @@
 #include "sound/namco.h"
 #include "rendlay.h"
 #include "tceptor2.lh"
-
-PALETTE_INIT( tceptor );
-VIDEO_START( tceptor );
-VIDEO_UPDATE( tceptor );
-VIDEO_EOF( tceptor );
-
-WRITE8_HANDLER( tceptor_tile_ram_w );
-WRITE8_HANDLER( tceptor_tile_attr_w );
-WRITE8_HANDLER( tceptor_bg_ram_w );
-WRITE8_HANDLER( tceptor_bg_scroll_w );
-
-extern UINT8 *tceptor_tile_ram;
-extern UINT8 *tceptor_tile_attr;
-extern UINT8 *tceptor_bg_ram;
-extern UINT16 *tceptor_sprite_ram;
-
+#include "includes/tceptor.h"
+#include "machine/nvram.h"
 
 /*******************************************************************/
 
@@ -243,7 +229,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(mcu_irq_enable_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// Battery Backup
+	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("nvram")	// Battery Backup
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -377,7 +363,7 @@ static MACHINE_RESET( tceptor )
 
 /*******************************************************************/
 
-static MACHINE_DRIVER_START( tceptor )
+static MACHINE_CONFIG_START( tceptor, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)
@@ -401,7 +387,7 @@ static MACHINE_DRIVER_START( tceptor )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_MACHINE_START(tceptor)
 	MDRV_MACHINE_RESET(tceptor)
@@ -453,7 +439,7 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -4,13 +4,11 @@
 
 ***************************************************************************/
 
-class zaxxon_state : public driver_data_t
+class zaxxon_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, zaxxon_state(machine)); }
-
-	zaxxon_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	zaxxon_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *colorram;
 	UINT8 *videoram;
@@ -48,8 +46,8 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w );
 WRITE8_DEVICE_HANDLER( congo_sound_b_w );
 WRITE8_DEVICE_HANDLER( congo_sound_c_w );
 
-MACHINE_DRIVER_EXTERN( zaxxon_samples );
-MACHINE_DRIVER_EXTERN( congo_samples );
+MACHINE_CONFIG_EXTERN( zaxxon_samples );
+MACHINE_CONFIG_EXTERN( congo_samples );
 
 
 /*----------- defined in video/zaxxon.c -----------*/

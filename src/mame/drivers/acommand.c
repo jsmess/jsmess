@@ -293,10 +293,10 @@ static READ16_HANDLER(ac_devices_r)
 			return input_port_read(space->machine, "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return okim6295_r(space->machine->device("oki1"),0);
+			return space->machine->device<okim6295_device>("oki1")->read(*space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return okim6295_r(space->machine->device("oki2"),0);
+			return space->machine->device<okim6295_device>("oki2")->read(*space,0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -385,12 +385,18 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x14/2:
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_w(space->machine->device("oki1"),0,data);
+			{
+				okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
+				oki1->write(*space,0,data);
+			}
 			break;
 		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_w(space->machine->device("oki2"),0,data);
+			{
+				okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+				oki2->write(*space,0,data);
+			}
 			break;
 		case 0x1c/2:
 			/*IRQ mask?*/
@@ -558,7 +564,7 @@ static INTERRUPT_GEN( acommand_irq )
 	}
 }
 
-static MACHINE_DRIVER_START( acommand )
+static MACHINE_CONFIG_START( acommand, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,12000000)
@@ -588,7 +594,7 @@ static MACHINE_DRIVER_START( acommand )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

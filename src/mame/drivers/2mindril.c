@@ -49,13 +49,11 @@ DAC               -26.6860Mhz
 #include "sound/2610intf.h"
 
 
-class _2mindril_state : public driver_data_t
+class _2mindril_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _2mindril_state(machine)); }
-
-	_2mindril_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	_2mindril_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *      map1ram;
@@ -444,8 +442,7 @@ static MACHINE_RESET( drill )
 	state->shutter_sensor = 0;
 }
 
-static MACHINE_DRIVER_START( drill )
-	MDRV_DRIVER_DATA(_2mindril_state)
+static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map)
@@ -474,7 +471,7 @@ static MACHINE_DRIVER_START( drill )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( 2mindril )

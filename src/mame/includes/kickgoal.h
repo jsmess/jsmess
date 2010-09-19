@@ -7,15 +7,13 @@
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class kickgoal_state : public driver_data_t
+class kickgoal_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kickgoal_state(machine)); }
-
-	kickgoal_state(running_machine &machine)
-		: driver_data_t(machine),
-		  adpcm(machine.device<okim6295_device>("oki")),
-		  eeprom(machine.device<eeprom_device>("eeprom")) { }
+	kickgoal_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  adpcm(*this, "oki"),
+		  eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	UINT16 *    fgram;
@@ -36,8 +34,8 @@ public:
 	UINT16      m6295_key_delay;
 
 	/* devices */
-	okim6295_device *adpcm;
-	eeprom_device *eeprom;
+	required_device<okim6295_device> adpcm;
+	required_device<eeprom_device> eeprom;
 };
 
 

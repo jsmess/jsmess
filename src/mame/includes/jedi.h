@@ -14,13 +14,14 @@
 #define JEDI_TMS5220_CLOCK		(JEDI_AUDIO_CPU_OSC / 2 / 9) /* div by 9 is via a binary counter that counts from 7 to 16 */
 
 
-class jedi_state : public driver_data_t
+class jedi_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jedi_state(machine)); }
+	jedi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
 
-	jedi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	required_shared_ptr<UINT8> m_nvram;
 
 	/* machine state */
 	UINT8  a2d_select;
@@ -49,7 +50,7 @@ public:
 
 /*----------- defined in audio/jedi.c -----------*/
 
-MACHINE_DRIVER_EXTERN( jedi_audio );
+MACHINE_CONFIG_EXTERN( jedi_audio );
 
 WRITE8_HANDLER( jedi_audio_reset_w );
 WRITE8_HANDLER( jedi_audio_latch_w );
@@ -59,7 +60,7 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r );
 
 /*----------- defined in video/jedi.c -----------*/
 
-MACHINE_DRIVER_EXTERN( jedi_video );
+MACHINE_CONFIG_EXTERN( jedi_video );
 
 WRITE8_HANDLER( jedi_vscroll_w );
 WRITE8_HANDLER( jedi_hscroll_w );

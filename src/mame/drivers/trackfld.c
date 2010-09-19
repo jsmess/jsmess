@@ -189,6 +189,7 @@ MAIN BOARD:
 #include "sound/msm5205.h"
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -284,7 +285,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -313,7 +314,7 @@ static ADDRESS_MAP_START( yieartf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -340,7 +341,7 @@ static ADDRESS_MAP_START( reaktor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
 	AM_RANGE(0x9c60, 0x9fff) AM_RAM
 	AM_RANGE(0xa800, 0xabff) AM_RAM
-	AM_RANGE(0xac00, 0xafff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xac00, 0xafff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 ADDRESS_MAP_END
@@ -373,7 +374,7 @@ static ADDRESS_MAP_START( mastkin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -399,7 +400,7 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
@@ -993,10 +994,7 @@ static MACHINE_RESET( hyprolyb )
 	state->hyprolyb_vck_ready = 0;
 }
 
-static MACHINE_DRIVER_START( trackfld )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
@@ -1008,7 +1006,7 @@ static MACHINE_DRIVER_START( trackfld )
 
 	MDRV_MACHINE_START(trackfld)
 	MDRV_MACHINE_RESET(trackfld)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1036,13 +1034,10 @@ static MACHINE_DRIVER_START( trackfld )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yieartf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
@@ -1055,7 +1050,7 @@ static MACHINE_DRIVER_START( yieartf )
 
 	MDRV_MACHINE_START(trackfld)
 	MDRV_MACHINE_RESET(trackfld)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1083,12 +1078,11 @@ static MACHINE_DRIVER_START( yieartf )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-static MACHINE_DRIVER_START( hyprolyb )
-	MDRV_IMPORT_FROM(trackfld)
+static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map)
@@ -1105,42 +1099,38 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atlantol )
-	MDRV_IMPORT_FROM(hyprolyb)
+static MACHINE_CONFIG_DERIVED( atlantol, hyprolyb )
 
 	MDRV_VIDEO_START(atlantol)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mastkin )
+static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mastkin_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wizzquiz )
+static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	// right cpu?
 	MDRV_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wizzquiz_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( reaktor )
+static MACHINE_CONFIG_DERIVED( reaktor, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(reaktor_map)
 	MDRV_CPU_IO_MAP(reaktor_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

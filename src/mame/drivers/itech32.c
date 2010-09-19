@@ -351,6 +351,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "includes/itech32.h"
 #include "sound/es5506.h"
@@ -379,9 +380,6 @@ static UINT8 sound_int_state;
 
 static UINT16 *main_rom;
 static UINT16 *main_ram;
-static size_t main_ram_size;
-static UINT32 *nvram;
-static size_t nvram_size;
 
 static offs_t itech020_prot_address;
 
@@ -909,39 +907,16 @@ static READ32_DEVICE_HANDLER( timekeeper_32be_r )
  *
  *************************************/
 
-static NVRAM_HANDLER( itech32 )
+void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
-	int i;
+	// if nvram is the main RAM, don't overwrite exception vectors
+	int start = (base == main_ram) ? 0x80 : 0x00;
+	for (int i = start; i < length; i++)
+		((UINT8 *)base)[i] = mame_rand(machine);
 
-	if (read_or_write)
-		mame_fwrite(file, main_ram, main_ram_size);
-	else if (file)
-		mame_fread(file, main_ram, main_ram_size);
-	else
-	{
-		for (i = 0x80; i < main_ram_size; i++)
-			((UINT8 *)main_ram)[i] = mame_rand(machine);
-
-		/* due to accessing uninitialized RAM, we need this hack */
-		if (is_drivedge)
-			((UINT32 *)main_ram)[0x2ce4/4] = 0x0000001e;
-	}
-}
-
-
-static NVRAM_HANDLER( itech020 )
-{
-	int i;
-
-	if (read_or_write)
-		mame_fwrite(file, nvram, nvram_size);
-	else if (file)
-		mame_fread(file, nvram, nvram_size);
-	else
-	{
-		for (i = 0; i < nvram_size; i++)
-			((UINT8 *)nvram)[i] = mame_rand(machine);
-	}
+	// due to accessing uninitialized RAM, we need this hack
+	if (is_drivedge)
+		((UINT32 *)main_ram)[0x2ce4/4] = 0x0000001e;
 }
 
 
@@ -953,7 +928,7 @@ static NVRAM_HANDLER( itech020 )
 
 /*------ Time Killers memory layout ------*/
 static ADDRESS_MAP_START( timekill_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE(&main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
 	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
 	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
@@ -971,7 +946,7 @@ ADDRESS_MAP_END
 
 /*------ BloodStorm and later games memory layout ------*/
 static ADDRESS_MAP_START( bloodstm_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
@@ -1036,7 +1011,7 @@ static ADDRESS_MAP_START( drivedge_map, ADDRESS_SPACE_PROGRAM, 32 )
 AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
 AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
 	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
 	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
@@ -1073,7 +1048,7 @@ ADDRESS_MAP_END
 
 /*------ 68EC020-based memory layout ------*/
 static ADDRESS_MAP_START( itech020_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE((UINT32 **)&main_ram)
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE(int1_ack32_w)
 	AM_RANGE(0x100000, 0x100003) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180003) AM_READ_PORT("P3")
@@ -1086,7 +1061,7 @@ static ADDRESS_MAP_START( itech020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE((UINT32 **)&itech32_video)
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
 	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
 /* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
 	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
 /* ! */	AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
@@ -1109,7 +1084,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1728,7 +1703,7 @@ static const es5506_interface es5506_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( timekill )
+static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -1739,7 +1714,7 @@ static MACHINE_DRIVER_START( timekill )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(itech32)
-	MDRV_NVRAM_HANDLER(itech32)
+	MDRV_NVRAM_ADD_CUSTOM("nvram", itech32_state, nvram_init)
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -1763,26 +1738,24 @@ static MACHINE_DRIVER_START( timekill )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bloodstm )
+static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(timekill)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( drivedge )
+static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_map)
@@ -1797,13 +1770,12 @@ static MACHINE_DRIVER_START( drivedge )
 
 	MDRV_MACHINE_RESET(drivedge)
 	MDRV_QUANTUM_TIME(HZ(6000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sftm )
+static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(itech020_map)
@@ -1813,20 +1785,17 @@ static MACHINE_DRIVER_START( sftm )
 	MDRV_CPU_PROGRAM_MAP(sound_020_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
 
-	MDRV_NVRAM_HANDLER(itech020)
-
 	/* via */
 	MDRV_DEVICE_REMOVE("via6522_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tourny )
+static MACHINE_CONFIG_DERIVED( tourny, sftm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sftm)
 
 	MDRV_M48T02_ADD( "m48t02"  )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

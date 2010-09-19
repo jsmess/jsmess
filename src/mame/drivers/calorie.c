@@ -83,13 +83,11 @@ Notes:
 #include "sound/ay8910.h"
 
 
-class calorie_state : public driver_data_t
+class calorie_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, calorie_state(machine)); }
-
-	calorie_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	calorie_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  fg_ram;
@@ -431,10 +429,7 @@ static MACHINE_RESET( calorie )
 }
 
 
-static MACHINE_DRIVER_START( calorie )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(calorie_state)
+static MACHINE_CONFIG_START( calorie, calorie_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
@@ -474,7 +469,7 @@ static MACHINE_DRIVER_START( calorie )
 
 	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

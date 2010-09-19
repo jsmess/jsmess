@@ -145,8 +145,6 @@
  *
  *************************************/
 
-extern UINT8 (*sega_decrypt)(offs_t, UINT8);
-
 static UINT8 *mainram;
 
 
@@ -349,7 +347,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE(&mainram)
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_MEMBER(segag80r_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -831,7 +829,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( g80r_base )
+static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
@@ -854,37 +852,34 @@ static MACHINE_DRIVER_START( g80r_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrob )
+static MACHINE_CONFIG_DERIVED( astrob, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 
 	/* sound boards */
-	MDRV_IMPORT_FROM(astrob_sound_board)
-	MDRV_IMPORT_FROM(sega_speech_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(astrob_sound_board)
+	MDRV_FRAGMENT_ADD(sega_speech_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( 005 )
+static MACHINE_CONFIG_DERIVED( 005, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MDRV_IMPORT_FROM(005_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(005_sound_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spaceod )
+static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 
 	/* background board changes */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -894,14 +889,13 @@ static MACHINE_DRIVER_START( spaceod )
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MDRV_IMPORT_FROM(spaceod_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(spaceod_sound_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( monsterb )
+static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
@@ -911,14 +905,13 @@ static MACHINE_DRIVER_START( monsterb )
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MDRV_IMPORT_FROM(monsterb_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(monsterb_sound_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pignewt )
+static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 
 	/* background board changes */
 	MDRV_GFXDECODE(monsterb)
@@ -926,14 +919,13 @@ static MACHINE_DRIVER_START( pignewt )
 
 	/* sound boards */
 	MDRV_MACHINE_RESET(pignewt)
-	MDRV_IMPORT_FROM(sega_universal_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sindbadm )
+static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(g80r_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(sindbadm_portmap)
 	MDRV_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
@@ -956,7 +948,7 @@ static MACHINE_DRIVER_START( sindbadm )
 
 	MDRV_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

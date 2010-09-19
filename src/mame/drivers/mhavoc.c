@@ -190,6 +190,7 @@
 #include "video/vector.h"
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 #include "includes/mhavoc.h"
 
 /*************************************
@@ -271,7 +272,7 @@ static ADDRESS_MAP_START( gamma_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w)	/* DSW at 8S, IRQ Acknowledge*/
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w)			/* Coin Counters    */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w)			/* Alpha Comm. Write Port */
-	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* EEROM */
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_SHARE("nvram")	/* EEROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* Program ROM (16K)    */
 ADDRESS_MAP_END
 
@@ -301,7 +302,7 @@ static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x10b4, 0x10b4) AM_WRITE(mhavoc_rom_banksel_w)
 	AM_RANGE(0x10b8, 0x10b8) AM_WRITE(mhavoc_ram_banksel_w)
 	AM_RANGE(0x10e0, 0x10ff) AM_WRITEONLY AM_BASE(&avgdvg_colorram)	/* ColorRAM */
-	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* EEROM */
+	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_SHARE("nvram")	/* EEROM */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")						/* Paged Program ROM (32K) */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("alpha", 0x4000) /* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
@@ -471,7 +472,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( mhavoc )
+static MACHINE_CONFIG_START( mhavoc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */
@@ -482,7 +483,7 @@ static MACHINE_DRIVER_START( mhavoc )
 
 	MDRV_MACHINE_START(mhavoc)
 	MDRV_MACHINE_RESET(mhavoc)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_TIMER_ADD_PERIODIC("5k_timer", mhavoc_cpu_irq_clock, HZ(MHAVOC_CLOCK_5K))
 
@@ -510,21 +511,19 @@ static MACHINE_DRIVER_START( mhavoc )
 
 	MDRV_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mhavocrv )
-	MDRV_IMPORT_FROM( mhavoc )
+static MACHINE_CONFIG_DERIVED( mhavocrv, mhavoc )
 
 	MDRV_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alphaone )
+static MACHINE_CONFIG_DERIVED( alphaone, mhavoc )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mhavoc)
 	MDRV_CPU_MODIFY("alpha")
 	MDRV_CPU_PROGRAM_MAP(alphaone_map)
 	MDRV_DEVICE_REMOVE("gamma")
@@ -541,7 +540,7 @@ static MACHINE_DRIVER_START( alphaone )
 
 	MDRV_DEVICE_REMOVE("pokey3")
 	MDRV_DEVICE_REMOVE("pokey4")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

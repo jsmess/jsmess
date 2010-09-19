@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x006e, 0x006f) AM_WRITE(subs_invert2_w)
 	AM_RANGE(0x0090, 0x009f) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(subs_state, videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -175,7 +175,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( subs )
+static MACHINE_CONFIG_START( subs, subs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( subs )
 	MDRV_SOUND_CONFIG_DISCRETE(subs)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

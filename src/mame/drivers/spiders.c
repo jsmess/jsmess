@@ -195,6 +195,7 @@
 #include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "includes/spiders.h"
+#include "machine/nvram.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK	(11200000)
@@ -588,7 +589,7 @@ static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia6821_r, pia6821_w)
@@ -705,7 +706,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( spiders )
+static MACHINE_CONFIG_START( spiders, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2800000)
@@ -716,7 +717,7 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_CPU_PROGRAM_MAP(spiders_audio_map)
 
 	MDRV_MACHINE_START(spiders)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spiders)
@@ -737,9 +738,9 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_TTL74123_ADD("ic60", ic60_intf)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(spiders_audio)
+	MDRV_FRAGMENT_ADD(spiders_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

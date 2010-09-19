@@ -5,13 +5,11 @@
 #include "sound/dac.h"
 #include "includes/konamipt.h"
 
-class mogura_state : public driver_data_t
+class mogura_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mogura_state(machine)); }
-
-	mogura_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mogura_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *   tileram;
@@ -201,10 +199,7 @@ static MACHINE_START( mogura )
 	state->dac2 = machine->device("dac2");
 }
 
-static MACHINE_DRIVER_START( mogura )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mogura_state)
+static MACHINE_CONFIG_START( mogura, mogura_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
@@ -238,7 +233,7 @@ static MACHINE_DRIVER_START( mogura )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mogura )
 	ROM_REGION( 0x10000, "maincpu", 0 )

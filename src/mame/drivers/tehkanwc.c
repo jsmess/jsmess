@@ -93,24 +93,7 @@ TO DO :
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "gridiron.lh"
-
-extern UINT8 *tehkanwc_videoram;
-extern UINT8 *tehkanwc_colorram;
-extern UINT8 *tehkanwc_videoram2;
-
-extern WRITE8_HANDLER( tehkanwc_videoram_w );
-extern WRITE8_HANDLER( tehkanwc_colorram_w );
-extern WRITE8_HANDLER( tehkanwc_videoram2_w );
-extern WRITE8_HANDLER( tehkanwc_scroll_x_w );
-extern WRITE8_HANDLER( tehkanwc_scroll_y_w );
-extern WRITE8_HANDLER( tehkanwc_flipscreen_x_w );
-extern WRITE8_HANDLER( tehkanwc_flipscreen_y_w );
-extern WRITE8_HANDLER( gridiron_led0_w );
-extern WRITE8_HANDLER( gridiron_led1_w );
-
-extern VIDEO_START( tehkanwc );
-extern VIDEO_UPDATE( tehkanwc );
-
+#include "includes/tehkanwc.h"
 
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
@@ -657,7 +640,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8KHz               */
 };
 
-static MACHINE_DRIVER_START( tehkanwc )
+static MACHINE_CONFIG_START( tehkanwc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/4)	/* 18.432000 / 4 */
@@ -703,7 +686,7 @@ static MACHINE_DRIVER_START( tehkanwc )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( teedoff )

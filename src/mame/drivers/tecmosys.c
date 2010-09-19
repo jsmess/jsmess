@@ -546,7 +546,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
@@ -876,7 +876,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 };
 
 
-static MACHINE_DRIVER_START( deroon )
+static MACHINE_CONFIG_START( deroon, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -921,7 +921,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16900000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( deroon )

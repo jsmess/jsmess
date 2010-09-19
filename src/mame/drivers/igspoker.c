@@ -922,7 +922,7 @@ static ADDRESS_MAP_START( number10_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE( igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
-	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )
@@ -944,7 +944,7 @@ static ADDRESS_MAP_START( cpokerpk_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE( igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
-	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )
@@ -1556,7 +1556,7 @@ static GFXDECODE_START( cpokerpk )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( igspoker )
+static MACHINE_CONFIG_START( igspoker, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 3579545)
@@ -1585,29 +1585,21 @@ static MACHINE_DRIVER_START( igspoker )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( csk227it )
+static MACHINE_CONFIG_DERIVED( csk227it, igspoker )
 
-	MDRV_IMPORT_FROM(igspoker)
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( csk234it, igspoker )
 
-static MACHINE_DRIVER_START( csk234it )
+MACHINE_CONFIG_END
 
-	MDRV_IMPORT_FROM(igspoker)
+static MACHINE_CONFIG_DERIVED( igs_ncs, igspoker )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( igs_ncs )
-
-	MDRV_IMPORT_FROM(igspoker)
-
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( number10 )
-
-	MDRV_IMPORT_FROM(igspoker)
+static MACHINE_CONFIG_DERIVED( number10, igspoker )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(number10_io_map)
 
@@ -1617,22 +1609,18 @@ static MACHINE_DRIVER_START( number10 )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cpokerpk )
-
-	MDRV_IMPORT_FROM(number10)
+static MACHINE_CONFIG_DERIVED( cpokerpk, number10 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(cpokerpk_io_map)
 	MDRV_GFXDECODE(cpokerpk)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pktetris )
+static MACHINE_CONFIG_DERIVED( pktetris, igspoker )
 
-	MDRV_IMPORT_FROM(igspoker)
-
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

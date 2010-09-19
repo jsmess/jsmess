@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot	)	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE(tetrisp2_vram_rot_w)	// Rotation (mirror)
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )	// Sound
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )	// Sound
 
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size	)	// NVRAM
 
@@ -1106,7 +1106,7 @@ static DRIVER_INIT( rockn3 )
 }
 
 
-static MACHINE_DRIVER_START( tetrisp2 )
+static MACHINE_CONFIG_START( tetrisp2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1136,10 +1136,10 @@ static MACHINE_DRIVER_START( tetrisp2 )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( nndmseal )
+static MACHINE_CONFIG_START( nndmseal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -1167,10 +1167,10 @@ static MACHINE_DRIVER_START( nndmseal )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_2MHz, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rockn )
+static MACHINE_CONFIG_START( rockn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1199,10 +1199,10 @@ static MACHINE_DRIVER_START( rockn )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rockn2 )
+static MACHINE_CONFIG_START( rockn2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1231,10 +1231,10 @@ static MACHINE_DRIVER_START( rockn2 )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rocknms )
+static MACHINE_CONFIG_START( rocknms, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1277,7 +1277,7 @@ static MACHINE_DRIVER_START( rocknms )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

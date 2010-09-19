@@ -117,6 +117,7 @@ HT-01B
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "includes/thepit.h"
 
 
 #define MASTER_CLOCK		(18432000)
@@ -133,25 +134,6 @@ HT-01B
 #define VBEND				(16)
 #define VBSTART				(224+16)
 
-
-
-
-extern UINT8 *thepit_videoram;
-extern UINT8 *thepit_colorram;
-extern UINT8 *thepit_attributesram;
-extern UINT8 *thepit_spriteram;
-extern size_t thepit_spriteram_size;
-
-PALETTE_INIT( thepit );
-PALETTE_INIT( suprmous );
-VIDEO_START( thepit );
-VIDEO_UPDATE( thepit );
-WRITE8_HANDLER( thepit_videoram_w );
-WRITE8_HANDLER( thepit_colorram_w );
-WRITE8_HANDLER( thepit_flip_screen_x_w );
-WRITE8_HANDLER( thepit_flip_screen_y_w );
-READ8_HANDLER( thepit_input_port_0_r );
-WRITE8_HANDLER( intrepid_graphics_bank_w );
 
 static READ8_HANDLER( thepit_colorram_r )
 {
@@ -648,7 +630,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( thepit )
+static MACHINE_CONFIG_START( thepit, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -681,30 +663,28 @@ static MACHINE_DRIVER_START( thepit )
 
 	MDRV_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( intrepid )
+static MACHINE_CONFIG_DERIVED( intrepid, thepit )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(thepit)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(intrepid_main_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(intrepid)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( suprmous )
+static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(intrepid)
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(suprmous)
 	MDRV_GFXDECODE(suprmous)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

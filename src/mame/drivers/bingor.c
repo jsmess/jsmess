@@ -602,7 +602,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( bingor )
+static MACHINE_CONFIG_START( bingor, driver_device )
 	MDRV_CPU_ADD("maincpu", I80186, 14000000 ) //?? Mhz
 	MDRV_CPU_PROGRAM_MAP(bingor_map)
 	MDRV_CPU_IO_MAP(bingor_io)
@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( bingor )
 
 
 	MDRV_GFXDECODE(bingor)
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -632,7 +632,7 @@ static MACHINE_DRIVER_START( bingor )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("saa", SAA1099, 6000000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // I doubt we need to load the eeproms
 

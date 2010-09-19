@@ -463,7 +463,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data, 4))
-			okim6295_w(state->oki, 0, state->porta);
+			state->oki->write(*space, 0, state->porta);
 	}
 
 	state->portb = data;
@@ -513,14 +513,14 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data, 4))
-			okim6295_w(state->oki, 0, state->porta);
+			state->oki->write(*space, 0, state->porta);
 	}
 
 	if (BIT(state->portb, 3) && !BIT(data, 3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data, 4))
-			state->porta = okim6295_r(state->oki, 0);
+			state->porta = state->oki->read(*space, 0);
 	}
 
 	state->portb = data;
@@ -1360,7 +1360,7 @@ static ADDRESS_MAP_START( gakusai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP										// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)					// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)			// Sound
+	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)			// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE("eeprom", gakusai_eeprom_r, gakusai_eeprom_w)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
 ADDRESS_MAP_END
@@ -1398,7 +1398,7 @@ static ADDRESS_MAP_START( gakusai2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP										// ? 5
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)					// Sound bank
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)			// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)			// Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE("eeprom", gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 ADDRESS_MAP_END
@@ -1466,7 +1466,7 @@ static ADDRESS_MAP_START( dokyusp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP										// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)					// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)		// Sound
+	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)		// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE("eeprom", dokyusp_eeprom_reset_w)				// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE("eeprom", dokyusp_eeprom_r, dokyusp_eeprom_bit_w)	// EEPROM
 ADDRESS_MAP_END
@@ -1508,7 +1508,7 @@ static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP										// ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)					// Samples Bank
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)					//
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)		// Sound
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)		// Sound
 ADDRESS_MAP_END
 
 
@@ -1801,7 +1801,7 @@ static ADDRESS_MAP_START( mouja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE_MEMBER(metro_state, videoregs)			// Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0xffff)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xffff)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)							// Banked ROM
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE_MEMBER(metro_state, blitter_regs)	// Tiles Blitter
@@ -1861,7 +1861,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x430000, 0x433fff) AM_RAM
 	AM_RANGE(0x470000, 0x47dfff) AM_RAM
 
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x580000, 0x580003) AM_DEVWRITE8("ymsnd", ym2413_w, 0xff00)
 
 	AM_RANGE(0x700000, 0x71ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -3609,10 +3609,7 @@ static const UPD7810_CONFIG metro_cpu_config =
 	metro_io_callback
 };
 
-static MACHINE_DRIVER_START( balcube )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( balcube, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3643,13 +3640,10 @@ static MACHINE_DRIVER_START( balcube )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( daitoa )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( daitoa, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3680,13 +3674,10 @@ static MACHINE_DRIVER_START( daitoa )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( msgogo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( msgogo, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3717,13 +3708,10 @@ static MACHINE_DRIVER_START( msgogo )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bangball )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( bangball, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3754,13 +3742,10 @@ static MACHINE_DRIVER_START( bangball )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( batlbubl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( batlbubl, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3791,12 +3776,9 @@ static MACHINE_DRIVER_START( batlbubl )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( daitorid )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( daitorid, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -3836,13 +3818,10 @@ static MACHINE_DRIVER_START( daitorid )
 	MDRV_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dharma )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( dharma, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -3881,13 +3860,10 @@ static MACHINE_DRIVER_START( dharma )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( karatour )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( karatour, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -3926,13 +3902,10 @@ static MACHINE_DRIVER_START( karatour )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( 3kokushi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( 3kokushi, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -3971,13 +3944,10 @@ static MACHINE_DRIVER_START( 3kokushi )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lastfort )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( lastfort, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4016,12 +3986,9 @@ static MACHINE_DRIVER_START( lastfort )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lastforg )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4060,12 +4027,9 @@ static MACHINE_DRIVER_START( lastforg )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dokyusei )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( dokyusei, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4099,12 +4063,9 @@ static MACHINE_DRIVER_START( dokyusei )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dokyusp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( dokyusp, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4139,13 +4100,10 @@ static MACHINE_DRIVER_START( dokyusp )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gakusai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( gakusai, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4180,13 +4138,10 @@ static MACHINE_DRIVER_START( gakusai )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gakusai2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( gakusai2, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4221,13 +4176,10 @@ static MACHINE_DRIVER_START( gakusai2 )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pangpoms )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( pangpoms, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4266,13 +4218,10 @@ static MACHINE_DRIVER_START( pangpoms )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( poitto )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( poitto, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4311,13 +4260,10 @@ static MACHINE_DRIVER_START( poitto )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pururun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( pururun, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4358,13 +4304,10 @@ static MACHINE_DRIVER_START( pururun )
 	MDRV_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( skyalert )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( skyalert, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4403,13 +4346,10 @@ static MACHINE_DRIVER_START( skyalert )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( toride2g )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( toride2g, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -4448,13 +4388,10 @@ static MACHINE_DRIVER_START( toride2g )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mouja )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( mouja, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ??? */
@@ -4487,7 +4424,7 @@ static MACHINE_DRIVER_START( mouja )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const k053936_interface blzntrnd_k053936_intf =
@@ -4495,10 +4432,7 @@ static const k053936_interface blzntrnd_k053936_intf =
 	0, -69, -21
 };
 
-static MACHINE_DRIVER_START( blzntrnd )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( blzntrnd, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4537,7 +4471,7 @@ static MACHINE_DRIVER_START( blzntrnd )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* like blzntrnd but new vidstart / gfxdecode for the different bg tilemap */
 
@@ -4546,10 +4480,7 @@ static const k053936_interface gstrik2_k053936_intf =
 	0, -69, -19
 };
 
-static MACHINE_DRIVER_START( gstrik2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( gstrik2, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -4588,7 +4519,7 @@ static MACHINE_DRIVER_START( gstrik2 )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static INTERRUPT_GEN( puzzlet_interrupt )
@@ -4624,10 +4555,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( puzzlet )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( puzzlet, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
@@ -4662,7 +4590,7 @@ static MACHINE_DRIVER_START( puzzlet )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

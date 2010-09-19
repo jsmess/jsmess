@@ -29,6 +29,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
+#include "includes/nbmj8900.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -39,19 +40,6 @@ TODO:
 #endif
 
 
-
-extern VIDEO_UPDATE( nbmj8900 );
-extern VIDEO_START( nbmj8900_2layer );
-
-extern READ8_HANDLER( nbmj8900_palette_type1_r );
-extern WRITE8_HANDLER( nbmj8900_palette_type1_w );
-extern WRITE8_HANDLER( nbmj8900_blitter_w );
-extern WRITE8_HANDLER( nbmj8900_scrolly_w );
-extern WRITE8_HANDLER( nbmj8900_vramsel_w );
-extern WRITE8_HANDLER( nbmj8900_romsel_w );
-extern WRITE8_HANDLER( nbmj8900_clutsel_w );
-extern READ8_HANDLER( nbmj8900_clut_r );
-extern WRITE8_HANDLER( nbmj8900_clut_w );
 
 
 static DRIVER_INIT( ohpaipee )
@@ -328,7 +316,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( ohpaipee )
+static MACHINE_CONFIG_START( ohpaipee, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
@@ -358,16 +346,15 @@ static MACHINE_DRIVER_START( ohpaipee )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( togenkyo )
+static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ohpaipee)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(togenkyo_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

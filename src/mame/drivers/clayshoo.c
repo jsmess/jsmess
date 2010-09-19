@@ -17,13 +17,11 @@
 #include "machine/8255ppi.h"
 
 
-class clayshoo_state : public driver_data_t
+class clayshoo_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, clayshoo_state(machine)); }
-
-	clayshoo_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	clayshoo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *   videoram;
@@ -323,10 +321,7 @@ static MACHINE_RESET( clayshoo )
 	state->analog_port_val = 0;
 }
 
-static MACHINE_DRIVER_START( clayshoo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(clayshoo_state)
+static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
@@ -349,7 +344,7 @@ static MACHINE_DRIVER_START( clayshoo )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

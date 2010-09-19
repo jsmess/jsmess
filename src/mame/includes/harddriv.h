@@ -4,34 +4,40 @@
 
 **************************************************************************/
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/dsp32/dsp32.h"
 #include "machine/atarigen.h"
 
 class harddriv_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
+	harddriv_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config),
+		  maincpu(*this, "maincpu"),
+		  gsp(*this, "gsp"),
+		  msp(*this, "msp"),
+		  adsp(*this, "adsp"),
+		  soundcpu(*this, "soundcpu"),
+		  sounddsp(*this, "sounddsp"),
+		  jsacpu(*this, "jsacpu"),
+		  dsp32(*this, "dsp32"),
+		  ds4cpu1(*this, "ds4cpu1"),
+		  ds4cpu2(*this, "ds4cpu2"),
+		  duart_timer(*this, "duart_timer") { }
 
-	harddriv_state(running_machine &machine)
-		: atarigen_state(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  gsp(machine.device<cpu_device>("gsp")),
-		  msp(machine.device<cpu_device>("msp")),
-		  adsp(machine.device<cpu_device>("adsp")),
-		  soundcpu(machine.device<cpu_device>("soundcpu")),
-		  sounddsp(machine.device<cpu_device>("sounddsp")),
-		  jsacpu(machine.device<cpu_device>("jsa")),
-		  dsp32(machine.device<cpu_device>("dsp32")),
-		  duart_timer(machine.device<timer_device>("duart_timer")) { }
-
-	cpu_device *			maincpu;
-	cpu_device *			gsp;
-	cpu_device *			msp;
-	cpu_device *			adsp;
-	cpu_device *			soundcpu;
-	cpu_device *			sounddsp;
-	cpu_device *			jsacpu;
-	cpu_device *			dsp32;
+	required_device<cpu_device> maincpu;
+	required_device<tms34010_device> gsp;
+	optional_device<cpu_device> msp;
+	required_device<adsp21xx_device> adsp;
+	optional_device<cpu_device> soundcpu;
+	optional_device<cpu_device> sounddsp;
+	optional_device<cpu_device> jsacpu;
+	optional_device<cpu_device> dsp32;
+	optional_device<adsp2105_device> ds4cpu1;
+	optional_device<adsp2105_device> ds4cpu2;
 
 	UINT8					hd34010_host_access;
 	UINT8					dsk_pio_access;
@@ -85,7 +91,7 @@ public:
 	UINT8					duart_read_data[16];
 	UINT8					duart_write_data[16];
 	UINT8					duart_output_port;
-	timer_device *			duart_timer;
+	optional_device<timer_device> duart_timer;
 
 	UINT8					last_gsp_shiftreg;
 

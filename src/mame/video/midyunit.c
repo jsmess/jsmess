@@ -74,6 +74,8 @@ static VIDEO_START( common )
 	local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 	pen_map = auto_alloc_array(machine, pen_t, 65536);
 
+	machine->device<nvram_device>("nvram")->set_base(midyunit_cmos_ram, 0x2000 * 4);
+
 	/* reset all the globals */
 	midyunit_cmos_page = 0;
 	autoerase_enable = 0;

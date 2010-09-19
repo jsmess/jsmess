@@ -501,6 +501,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "video/tms34061.h"
 #include "video/tlc34076.h"
@@ -532,9 +533,6 @@ static UINT8 sound_data;
 
 static UINT8 pia_porta_data;
 static UINT8 pia_portb_data;
-
-static UINT8 *main_ram;
-static size_t main_ram_size;
 
 static const rectangle *visarea;
 
@@ -861,27 +859,6 @@ static WRITE16_HANDLER( palette16_w )
 
 /*************************************
  *
- *  NVRAM read/write
- *
- *************************************/
-
-static NVRAM_HANDLER( itech8 )
-{
-	int i;
-
-	if (read_or_write)
-		mame_fwrite(file, main_ram, main_ram_size);
-	else if (file)
-		mame_fread(file, main_ram, main_ram_size);
-	else
-		for (i = 0; i < main_ram_size; i++)
-			main_ram[i] = mame_rand(machine);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -897,7 +874,7 @@ static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x11c0, 0x11df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -913,7 +890,7 @@ static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x01c0, 0x01df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -929,7 +906,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -937,7 +914,7 @@ ADDRESS_MAP_END
 /*------ Ninja Clowns layout ------*/
 static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((UINT16 **)&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE((UINT16 **)&itech8_grom_bank)
@@ -963,7 +940,7 @@ static ADDRESS_MAP_START( sound2203_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -984,7 +961,7 @@ static ADDRESS_MAP_START( sound3812_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -996,8 +973,8 @@ static ADDRESS_MAP_START( sound3812_external_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1714,7 +1691,7 @@ static const ym3812_interface ym3812_config =
 
 /************* core pieces ******************/
 
-static MACHINE_DRIVER_START( itech8_core_lo )
+static MACHINE_CONFIG_START( itech8_core_lo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
@@ -1722,7 +1699,7 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
 
 	MDRV_MACHINE_RESET(itech8)
-	MDRV_NVRAM_HANDLER(itech8)
+	MDRV_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -1742,19 +1719,18 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_core_hi )
+static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tmshi_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym2203 )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1770,10 +1746,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym2608b )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1783,10 +1759,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym2608b )
 	MDRV_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
 	MDRV_SOUND_CONFIG(ym2608b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym3812 )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1801,10 +1777,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1817,29 +1793,27 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /************* full drivers ******************/
 
-static MACHINE_DRIVER_START( wfortune )
+static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( grmatch )
+static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2608b)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2608b)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1848,40 +1822,37 @@ static MACHINE_DRIVER_START( grmatch )
 
 	/* palette updater */
 	MDRV_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratab_hi )
+static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratab_lo )
+static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_hi )
+static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1892,14 +1863,13 @@ static MACHINE_DRIVER_START( slikshot_hi )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_lo )
+static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1910,62 +1880,57 @@ static MACHINE_DRIVER_START( slikshot_lo )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_lo_noz80 )
+static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sstrike )
+static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(slikshot_lo)
 	MDRV_MACHINE_START(sstrike)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hstennis_hi )
+static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hstennis_lo )
+static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rimrockn )
+static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MDRV_CPU_PROGRAM_MAP(tmshi_map)
@@ -1975,14 +1940,13 @@ static MACHINE_DRIVER_START( rimrockn )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ninclown )
+static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MDRV_CPU_PROGRAM_MAP(ninclown_map)
@@ -1992,14 +1956,13 @@ static MACHINE_DRIVER_START( ninclown )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gtg2 )
+static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gtg2_map)
@@ -2008,7 +1971,7 @@ static MACHINE_DRIVER_START( gtg2 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -47,15 +47,13 @@ Notes:
 #define MASTER_CLOCK	XTAL_16MHz
 
 
-class k3_state : public driver_data_t
+class k3_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
-
-	k3_state(running_machine &machine)
-		: driver_data_t(machine),
-		  oki1(machine.device<okim6295_device>("oki1")),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+	k3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  oki1(*this, "oki1"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *  spriteram_1;
@@ -67,8 +65,8 @@ public:
 	tilemap_t  *bg_tilemap;
 
 	/* devices */
-	okim6295_device *oki1;
-	okim6295_device *oki2;
+	required_device<okim6295_device> oki1;
+	required_device<okim6295_device> oki2;
 };
 
 
@@ -162,8 +160,8 @@ static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM	// not used?
 ADDRESS_MAP_END
 
@@ -251,10 +249,7 @@ static MACHINE_START( 1945kiii )
 {
 }
 
-static MACHINE_DRIVER_START( k3 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(k3_state)
+static MACHINE_CONFIG_START( k3, k3_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(k3_map)
@@ -282,7 +277,7 @@ static MACHINE_DRIVER_START( k3 )
 
 	MDRV_OKIM6295_ADD("oki2", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH) /* dividers? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

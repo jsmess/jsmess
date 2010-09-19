@@ -220,7 +220,7 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x05, "1 Coin / 20 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin / 25 Credits" )
 	PORT_DIPSETTING(    0x07, "1 Coin / 50 Credits" )
-	PORT_DIPNAME( 0x38, 0x00, "Key In" ) PORT_DIPLOCATION("SW4:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, "Key In Credit" ) PORT_DIPLOCATION("SW4:4,5,6")
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
 	PORT_DIPSETTING(    0x20, "1 Coin / 20 Credits" )
 	PORT_DIPSETTING(    0x10, "1 Coin / 40 Credits" )
@@ -255,7 +255,7 @@ static MACHINE_RESET( d9final )
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }
 
-static MACHINE_DRIVER_START( d9final )
+static MACHINE_CONFIG_START( d9final, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(d9final_map)
@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( d9final )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( d9final )

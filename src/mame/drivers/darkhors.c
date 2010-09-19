@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( darkhors_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
 	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
-	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0xff000000)
+	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff000000)
 	AM_RANGE(0x580200, 0x580203) AM_READNOP
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
@@ -621,7 +621,7 @@ static INTERRUPT_GEN( darkhors )
 	}
 }
 
-static MACHINE_DRIVER_START( darkhors )
+static MACHINE_CONFIG_START( darkhors, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -647,7 +647,7 @@ static MACHINE_DRIVER_START( darkhors )
 
 	MDRV_OKIM6295_ADD("oki", 528000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -671,7 +671,7 @@ static VIDEO_UPDATE(jclub2)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( jclub2 )
+static MACHINE_CONFIG_START( jclub2, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jclub2_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( jclub2 )
 
 	MDRV_VIDEO_START(jclub2)
 	MDRV_VIDEO_UPDATE(jclub2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -727,7 +727,7 @@ static VIDEO_UPDATE(jclub2o)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( jclub2o )
+static MACHINE_CONFIG_START( jclub2o, driver_device )
 	MDRV_CPU_ADD("st0016",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
 	MDRV_CPU_IO_MAP(st0016_io)
@@ -759,7 +759,7 @@ static MACHINE_DRIVER_START( jclub2o )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

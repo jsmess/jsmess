@@ -53,6 +53,7 @@
 #include "includes/atetris.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 
 
 #define MASTER_CLOCK		XTAL_14_31818MHz
@@ -183,8 +184,9 @@ static WRITE8_HANDLER( coincount_w )
 
 static WRITE8_HANDLER( nvram_w )
 {
+	atetris_state *state = space->machine->driver_data<atetris_state>();
 	if (nvram_write_enable)
-		space->machine->generic.nvram.u8[offset] = data;
+		state->m_nvram[offset] = data;
 	nvram_write_enable = 0;
 }
 
@@ -205,9 +207,9 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)
@@ -222,9 +224,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atetrisb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76496_w)
@@ -338,7 +340,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atetris )
+static MACHINE_CONFIG_START( atetris, atetris_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
@@ -346,7 +348,7 @@ static MACHINE_DRIVER_START( atetris )
 
 	MDRV_MACHINE_START(atetris)
 	MDRV_MACHINE_RESET(atetris)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_GFXDECODE(atetris)
@@ -371,10 +373,10 @@ static MACHINE_DRIVER_START( atetris )
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( atetrisb2 )
+static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
@@ -382,7 +384,7 @@ static MACHINE_DRIVER_START( atetrisb2 )
 
 	MDRV_MACHINE_START(atetris)
 	MDRV_MACHINE_RESET(atetris)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_GFXDECODE(atetris)
@@ -408,7 +410,7 @@ static MACHINE_DRIVER_START( atetrisb2 )
 
 	MDRV_SOUND_ADD("sn3", SN76496, BOOTLEG_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -23,6 +23,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 static READ8_HANDLER( io_read_missing_dips )
 {
@@ -89,7 +90,7 @@ INPUT_PORTS_END
 /* A 3.6V battery traces directly to U19, rendering it nvram */
 static ADDRESS_MAP_START( kingpin_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingpin_io_map, ADDRESS_SPACE_IO, 8 )
@@ -138,7 +139,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static MACHINE_DRIVER_START( kingpin )
+static MACHINE_CONFIG_START( kingpin, driver_device )
 /*  MAIN CPU */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map)
@@ -151,14 +152,14 @@ static MACHINE_DRIVER_START( kingpin )
 	/*MDRV_CPU_IO_MAP(sound_io_map)*/
 
 /*  VIDEO */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 /* Sound chip is a AY-3-8912 */
 /*
@@ -168,7 +169,7 @@ static MACHINE_DRIVER_START( kingpin )
     MDRV_SOUND_CONFIG(ay8912_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( kingpin )
 {

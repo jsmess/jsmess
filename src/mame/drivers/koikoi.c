@@ -45,13 +45,11 @@ to prevent disabling inputs.
 
 static const int input_tab[]= { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
 
-class koikoi_state : public driver_data_t
+class koikoi_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, koikoi_state(machine)); }
-
-	koikoi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	koikoi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -357,10 +355,7 @@ static MACHINE_RESET( koikoi )
 		state->ioram[i] = 0;
 }
 
-static MACHINE_DRIVER_START( koikoi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(koikoi_state)
+static MACHINE_CONFIG_START( koikoi, koikoi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
@@ -392,7 +387,7 @@ static MACHINE_DRIVER_START( koikoi )
 	MDRV_SOUND_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

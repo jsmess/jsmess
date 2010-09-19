@@ -145,7 +145,7 @@ static TIMER_CALLBACK( clear_screen_done_callback )
 	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	/* indicate that the we are done clearing the screen */
-	via_ca1_w(state->via_0, 0);
+	state->via_0->write_ca1(0);
 }
 
 
@@ -195,7 +195,7 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 		case 3:
 			/* indicate that the we are busy */
 			{
-				via_ca1_w(driver_state->via_0, 1);
+				driver_state->via_0->write_ca1(1);
 			}
 
 			memset(driver_state->videoram, driver_state->video_data & 0x0f, driver_state->videoram_size);
@@ -269,7 +269,7 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	/* !VBLANK is connected to CA1 */
-	via_ca1_w(state->via_0, param);
+	state->via_0->write_ca1(param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, machine->primary_screen->time_until_pos(VBSTART), 0);
@@ -337,7 +337,7 @@ static VIDEO_RESET( gameplan )
  *
  *************************************/
 
-MACHINE_DRIVER_START( gameplan_video )
+MACHINE_CONFIG_FRAGMENT( gameplan_video )
 	MDRV_VIDEO_START(gameplan)
 	MDRV_VIDEO_RESET(gameplan)
 
@@ -347,17 +347,16 @@ MACHINE_DRIVER_START( gameplan_video )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( leprechn_video )
+MACHINE_CONFIG_FRAGMENT( leprechn_video )
 	MDRV_VIDEO_START(leprechn)
 	MDRV_VIDEO_UPDATE(leprechn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( trvquest_video )
-	MDRV_IMPORT_FROM(gameplan_video)
+MACHINE_CONFIG_DERIVED( trvquest_video, gameplan_video )
 	MDRV_VIDEO_START(trvquest)
 	MDRV_VIDEO_UPDATE(gameplan)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

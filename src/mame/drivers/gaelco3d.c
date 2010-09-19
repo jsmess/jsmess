@@ -171,7 +171,7 @@ static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 static dmadac_sound_device *dmadac[SOUND_CHANNELS];
 
-static void adsp_tx_callback(cpu_device &device, int port, INT32 data);
+static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
 
 
 /*************************************
@@ -599,7 +599,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 }
 
 
-static void adsp_tx_callback(cpu_device &device, int port, INT32 data)
+static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -846,7 +846,7 @@ static INPUT_PORTS_START( speedup )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(analog_bit_r, (void *)3)
 
 	PORT_START("IN3")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )		// verified
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )		// verified
 	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )		// verified
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -953,7 +953,7 @@ static const tms32031_config tms_config =
 };
 
 
-static MACHINE_DRIVER_START( gaelco3d )
+static MACHINE_CONFIG_START( gaelco3d, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)
@@ -965,7 +965,7 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_CPU_PROGRAM_MAP(tms_map)
 
 	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
 
@@ -1006,11 +1006,10 @@ static MACHINE_DRIVER_START( gaelco3d )
 
 	MDRV_SOUND_ADD("dac4", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gaelco3d2 )
-	MDRV_IMPORT_FROM(gaelco3d)
+static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68EC020, 25000000)
@@ -1021,7 +1020,7 @@ static MACHINE_DRIVER_START( gaelco3d2 )
 	MDRV_CPU_CLOCK(50000000)
 
 	MDRV_MACHINE_RESET(gaelco3d2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

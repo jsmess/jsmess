@@ -12,19 +12,18 @@ TODO:
 #include "cpu/z180/z180.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
 
-class spoker_state : public driver_data_t
+class spoker_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spoker_state(machine)); }
-
-	spoker_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	spoker_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8   *bg_tile_ram;
 	tilemap_t *bg_tilemap;
@@ -214,7 +213,7 @@ static READ8_HANDLER( spoker_magic_r )
 
 static ADDRESS_MAP_START( spoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
-	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spoker_portmap, ADDRESS_SPACE_IO, 8 )
@@ -238,7 +237,7 @@ static ADDRESS_MAP_START( spoker_portmap, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( spoker_magic_r, spoker_magic_w )	// DSW1-5
 
@@ -386,9 +385,7 @@ static INTERRUPT_GEN( spoker_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( spoker )
-
-	MDRV_DRIVER_DATA( spoker_state )
+static MACHINE_CONFIG_START( spoker, spoker_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
@@ -398,7 +395,7 @@ static MACHINE_DRIVER_START( spoker )
 
 	MDRV_MACHINE_RESET(spoker)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -421,7 +418,7 @@ static MACHINE_DRIVER_START( spoker )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( spk116it )

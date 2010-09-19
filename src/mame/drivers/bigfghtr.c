@@ -117,13 +117,11 @@ Notes:
 #include "sound/3812intf.h"
 
 
-class bigfghtr_state : public driver_data_t
+class bigfghtr_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bigfghtr_state(machine)); }
-
-	bigfghtr_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	bigfghtr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* video-related */
 	UINT16 *      text_videoram;
@@ -559,8 +557,7 @@ static MACHINE_RESET( bigfghtr )
 }
 
 
-static MACHINE_DRIVER_START( bigfghtr )
-	MDRV_DRIVER_DATA(bigfghtr_state)
+static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(mainmem)
@@ -602,7 +599,7 @@ static MACHINE_DRIVER_START( bigfghtr )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( skyrobo )

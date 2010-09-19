@@ -53,13 +53,11 @@
 #include "sound/ay8910.h"
 
 
-class mole_state : public driver_data_t
+class mole_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mole_state(machine)); }
-
-	mole_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mole_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *     tileram;
@@ -200,7 +198,7 @@ static ADDRESS_MAP_START( mole_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
 	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w)
 	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
 	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
@@ -316,10 +314,7 @@ static MACHINE_RESET( mole )
 	state->tile_bank = 0;
 }
 
-static MACHINE_DRIVER_START( mole )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mole_state)
+static MACHINE_CONFIG_START( mole, mole_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000) // ???
@@ -349,7 +344,7 @@ static MACHINE_DRIVER_START( mole )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

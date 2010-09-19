@@ -14,6 +14,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
+
+
+class wink_state : public driver_device
+{
+public:
+	wink_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
 
 static tilemap_t *bg_tilemap;
 static UINT8 sound_flag;
@@ -22,7 +34,9 @@ static UINT8 tile_bank = 0;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	wink_state *state = machine->driver_data<wink_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
 	code |= 0x200 * tile_bank;
 
 	// the 2 parts of the screen use different tile banking
@@ -47,7 +61,9 @@ static VIDEO_UPDATE( wink )
 
 static WRITE8_HANDLER( bgram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	wink_state *state = space->machine->driver_data<wink_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -88,8 +104,8 @@ static WRITE8_HANDLER( sound_irq_w )
 static ADDRESS_MAP_START( wink_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE_MEMBER(wink_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -311,7 +327,7 @@ static MACHINE_RESET( wink )
 	sound_flag = 0;
 }
 
-static MACHINE_DRIVER_START( wink )
+static MACHINE_CONFIG_START( wink, wink_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(wink_map)
@@ -323,7 +339,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_CPU_IO_MAP(wink_sound_io)
 	MDRV_CPU_PERIODIC_INT(wink_sound, 15625)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_MACHINE_RESET(wink)
 
 	/* video hardware */
@@ -345,7 +361,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_SOUND_ADD("aysnd", AY8912, 12000000 / 8)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

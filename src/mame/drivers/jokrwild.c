@@ -94,6 +94,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
+#include "machine/nvram.h"
 
 
 /*************************
@@ -454,14 +455,14 @@ static const mc6845_interface mc6845_intf =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( jokrwild )
+static MACHINE_CONFIG_START( jokrwild, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(jokrwild_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", pia0_intf)
 	MDRV_PIA6821_ADD("pia1", pia1_intf)
@@ -482,7 +483,7 @@ static MACHINE_DRIVER_START( jokrwild )
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

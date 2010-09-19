@@ -8,16 +8,8 @@ Ping Pong (c) 1985 Konami
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
-
-extern UINT8 *pingpong_videoram;
-extern UINT8 *pingpong_colorram;
-
-extern WRITE8_HANDLER( pingpong_videoram_w );
-extern WRITE8_HANDLER( pingpong_colorram_w );
-
-extern PALETTE_INIT( pingpong );
-extern VIDEO_START( pingpong );
-extern VIDEO_UPDATE( pingpong );
+#include "machine/nvram.h"
+#include "includes/pingpong.h"
 
 static int intenable;
 
@@ -114,7 +106,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
@@ -457,7 +449,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( pingpong )
+static MACHINE_CONFIG_START( pingpong, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
@@ -484,17 +476,16 @@ static MACHINE_DRIVER_START( pingpong )
 
 	MDRV_SOUND_ADD("snsnd", SN76496, 18432000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* too fast! */
-static MACHINE_DRIVER_START( merlinmm )
-	MDRV_IMPORT_FROM( pingpong )
+static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(merlinmm_map)
 	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+	MDRV_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

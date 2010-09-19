@@ -389,8 +389,8 @@ static ADDRESS_MAP_START( tharrier_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_r,soundlatch2_w)
-	AM_RANGE(0xf400, 0xf400) AM_DEVREADWRITE("oki1", okim6295_r,okim6295_w)
-	AM_RANGE(0xf500, 0xf500) AM_DEVREADWRITE("oki2", okim6295_r,okim6295_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0xf500, 0xf500) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tharrier_oki6295_bankswitch_0_w)
 	AM_RANGE(0xf700, 0xf700) AM_WRITE(tharrier_oki6295_bankswitch_1_w)
 ADDRESS_MAP_END
@@ -941,7 +941,7 @@ static ADDRESS_MAP_START( ssmissin_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ssmissin_soundbank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_r,okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1079,8 +1079,8 @@ static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xc800, 0xc800) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0xc808, 0xc808) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0xc808, 0xc808) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 //  AM_RANGE(0xc810, 0xc817) AM_WRITE(okibank_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(raphero_sound_rombank_w)
@@ -1100,8 +1100,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( macross2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
@@ -1112,8 +1112,8 @@ static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
-	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)
-	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
@@ -3528,7 +3528,7 @@ static const nmk112_interface nmk16_nmk112_intf =
 	"oki1", "oki2", 0
 };
 
-static MACHINE_DRIVER_START( tharrier )
+static MACHINE_CONFIG_START( tharrier, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
@@ -3572,9 +3572,9 @@ static MACHINE_DRIVER_START( tharrier )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( manybloc )
+static MACHINE_CONFIG_START( manybloc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
@@ -3616,9 +3616,9 @@ static MACHINE_DRIVER_START( manybloc )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mustang )
+static MACHINE_CONFIG_START( mustang, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3659,9 +3659,9 @@ static MACHINE_DRIVER_START( mustang )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mustangb )
+static MACHINE_CONFIG_START( mustangb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3691,12 +3691,12 @@ static MACHINE_DRIVER_START( mustangb )
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
-static MACHINE_DRIVER_START( bioship )
+static MACHINE_CONFIG_START( bioship, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
@@ -3736,9 +3736,9 @@ static MACHINE_DRIVER_START( bioship )
 
 	MDRV_OKIM6295_ADD("oki2", BIOSHIP_CRYSTAL2 / 3 , OKIM6295_PIN7_HIGH) /* 4.0 Mhz, Pin 7 High (verified) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vandyke )
+static MACHINE_CONFIG_START( vandyke, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
@@ -3778,9 +3778,9 @@ static MACHINE_DRIVER_START( vandyke )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_12MHz/3, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vandykeb )
+static MACHINE_CONFIG_START( vandykeb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3813,9 +3813,9 @@ static MACHINE_DRIVER_START( vandykeb )
 
 	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( acrobatm )
+static MACHINE_CONFIG_START( acrobatm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
@@ -3855,10 +3855,10 @@ static MACHINE_DRIVER_START( acrobatm )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tdragonb )	/* bootleg using Raiden sound hardware */
+static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -3888,9 +3888,9 @@ static MACHINE_DRIVER_START( tdragonb )	/* bootleg using Raiden sound hardware *
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tdragon )
+static MACHINE_CONFIG_START( tdragon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -3932,9 +3932,9 @@ static MACHINE_DRIVER_START( tdragon )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ssmissin )
+static MACHINE_CONFIG_START( ssmissin, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
@@ -3967,9 +3967,9 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( strahl )
+static MACHINE_CONFIG_START( strahl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
@@ -4009,9 +4009,9 @@ static MACHINE_DRIVER_START( strahl )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hachamf )
+static MACHINE_CONFIG_START( hachamf, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4052,9 +4052,9 @@ static MACHINE_DRIVER_START( hachamf )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( macross )
+static MACHINE_CONFIG_START( macross, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4094,9 +4094,9 @@ static MACHINE_DRIVER_START( macross )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( blkheart )
+static MACHINE_CONFIG_START( blkheart, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4136,9 +4136,9 @@ static MACHINE_DRIVER_START( blkheart )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gunnail )
+static MACHINE_CONFIG_START( gunnail, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
@@ -4178,9 +4178,9 @@ static MACHINE_DRIVER_START( gunnail )
 
 	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( macross2 )
+static MACHINE_CONFIG_START( macross2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4221,9 +4221,9 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tdragon2 )
+static MACHINE_CONFIG_START( tdragon2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
@@ -4264,9 +4264,9 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raphero )
+static MACHINE_CONFIG_START( raphero, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
@@ -4306,9 +4306,9 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bjtwin )
+static MACHINE_CONFIG_START( bjtwin, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
@@ -4341,7 +4341,7 @@ static MACHINE_DRIVER_START( bjtwin )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static UINT8 decode_byte(UINT8 src, const UINT8 *bitp)
@@ -4691,7 +4691,7 @@ static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)					// From Main CPU
 	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)		// M6295
+	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)		// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firehawk_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4699,8 +4699,8 @@ static ADDRESS_MAP_START( firehawk_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_r)
 	AM_RANGE(0xfff2, 0xfff2) AM_DEVWRITE("oki2", spec2k_oki1_banking_w )
-	AM_RANGE(0xfff8, 0xfff8) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
-	AM_RANGE(0xfffa, 0xfffa) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0xfff8, 0xfff8) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
+	AM_RANGE(0xfffa, 0xfffa) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_RAM // not used, only tested
 ADDRESS_MAP_END
 
@@ -4719,7 +4719,7 @@ static ADDRESS_MAP_START( twinactn_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki1", twinactn_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)		// From Main CPU
 ADDRESS_MAP_END
 
@@ -4814,7 +4814,7 @@ static const ym2151_interface afega_ym2151_intf =
 };
 
 
-static MACHINE_DRIVER_START( stagger1 )
+static MACHINE_CONFIG_START( stagger1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
@@ -4850,55 +4850,52 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_OKIM6295_ADD("oki1", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( redhawki )
+static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stagger1)
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(redhawki)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( redhawkb )
+static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stagger1)
 	/* video hardware */
 	MDRV_GFXDECODE(redhawkb)
 	MDRV_VIDEO_UPDATE(redhawkb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grdnstrm )
+static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stagger1)
 
 	/* video hardware */
 	MDRV_GFXDECODE(grdnstrm)
 	MDRV_VIDEO_START(firehawk)
 	MDRV_VIDEO_UPDATE(firehawk)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grdnstrmk )
+static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stagger1)
 
 	/* video hardware */
 	MDRV_GFXDECODE(grdnstrm)
 	MDRV_VIDEO_START(grdnstrm)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( popspops )
+static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(grdnstrm)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(bubl2000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( firehawk )
+static MACHINE_CONFIG_START( firehawk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -4931,9 +4928,9 @@ static MACHINE_DRIVER_START( firehawk )
 
 	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( twinactn )
+static MACHINE_CONFIG_START( twinactn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -4965,7 +4962,7 @@ static MACHINE_DRIVER_START( twinactn )
 
 	MDRV_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

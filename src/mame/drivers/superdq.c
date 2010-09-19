@@ -27,13 +27,11 @@
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 
-class superdq_state : public driver_data_t
+class superdq_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, superdq_state(machine)); }
-
-	superdq_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	superdq_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *laserdisc;
 	UINT8 ld_in_latch;
@@ -324,9 +322,7 @@ static MACHINE_START( superdq )
 }
 
 
-static MACHINE_DRIVER_START( superdq )
-
-	MDRV_DRIVER_DATA( superdq_state )
+static MACHINE_CONFIG_START( superdq, superdq_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
@@ -355,10 +351,10 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

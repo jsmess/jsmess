@@ -114,32 +114,9 @@ DIP locations verified for:
 #include "cpu/m6502/m6502.h"
 #include "sound/vlm5030.h"
 #include "sound/nes_apu.h"
-
+#include "machine/nvram.h"
 #include "rendlay.h"
-
-extern UINT8 *punchout_bg_top_videoram;
-extern UINT8 *punchout_bg_bot_videoram;
-extern UINT8 *armwrest_fg_videoram;
-extern UINT8 *punchout_spr1_videoram;
-extern UINT8 *punchout_spr2_videoram;
-extern UINT8 *punchout_spr1_ctrlram;
-extern UINT8 *punchout_spr2_ctrlram;
-extern UINT8 *punchout_palettebank;
-WRITE8_HANDLER( punchout_bg_top_videoram_w );
-WRITE8_HANDLER( punchout_bg_bot_videoram_w );
-WRITE8_HANDLER( armwrest_fg_videoram_w );
-WRITE8_HANDLER( punchout_spr1_videoram_w );
-WRITE8_HANDLER( punchout_spr2_videoram_w );
-VIDEO_START( punchout );
-VIDEO_START( armwrest );
-VIDEO_UPDATE( punchout );
-VIDEO_UPDATE( armwrest );
-
-DRIVER_INIT( punchout );
-DRIVER_INIT( spnchout );
-DRIVER_INIT( spnchotj );
-DRIVER_INIT( armwrest );
-
+#include "includes/punchout.h"
 
 
 static CUSTOM_INPUT( punchout_vlm5030_busy_r )
@@ -338,7 +315,7 @@ static WRITE8_HANDLER( spunchout_exp_w )
 
 static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE(&punchout_bg_top_videoram)
 	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
@@ -352,7 +329,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE(&armwrest_fg_videoram)
 	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
@@ -946,7 +923,7 @@ static MACHINE_RESET( punchout )
 }
 
 
-static MACHINE_DRIVER_START( punchout )
+static MACHINE_CONFIG_START( punchout, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
@@ -959,7 +936,7 @@ static MACHINE_DRIVER_START( punchout )
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(punchout)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_GFXDECODE(punchout)
@@ -992,13 +969,12 @@ static MACHINE_DRIVER_START( punchout )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( armwrest )
+static MACHINE_CONFIG_DERIVED( armwrest, punchout )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(punchout)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(armwrest_map)
@@ -1008,7 +984,7 @@ static MACHINE_DRIVER_START( armwrest )
 
 	MDRV_VIDEO_START(armwrest)
 	MDRV_VIDEO_UPDATE(armwrest)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

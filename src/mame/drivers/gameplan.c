@@ -217,9 +217,9 @@ static const riot6532_interface r6532_interface =
 
 static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_0", via_r, via_w)	/* VIA 1 */
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_1", via_r, via_w)	/* VIA 2 */
-	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* VIA 3 */
+	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/* VIA 1 */
+	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/* VIA 2 */
+	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)	/* VIA 3 */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -987,9 +987,6 @@ static MACHINE_START( gameplan )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 	state->riot = machine->device("riot");
-	state->via_0 = machine->device("via6522_0");
-	state->via_1 = machine->device("via6522_1");
-	state->via_2 = machine->device("via6522_2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->current_port);
@@ -1010,9 +1007,7 @@ static MACHINE_RESET( gameplan )
 	state->video_data = 0;
 }
 
-static MACHINE_DRIVER_START( gameplan )
-
-	MDRV_DRIVER_DATA(gameplan_state)
+static MACHINE_CONFIG_START( gameplan, gameplan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
@@ -1027,7 +1022,7 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_MACHINE_RESET(gameplan)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(gameplan_video)
+	MDRV_FRAGMENT_ADD(gameplan_video)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1040,12 +1035,10 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_VIA6522_ADD("via6522_0", 0, gameplan_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
 	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( leprechn )
-
-	MDRV_IMPORT_FROM(gameplan)
+static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 
@@ -1054,12 +1047,12 @@ static MACHINE_DRIVER_START( leprechn )
 	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(leprechn_video)
+	MDRV_FRAGMENT_ADD(leprechn_video)
 
 	/* via */
 	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

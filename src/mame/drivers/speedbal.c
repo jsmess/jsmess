@@ -54,15 +54,8 @@ c1  ??
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/3812intf.h"
-
-
-extern UINT8 *speedbal_background_videoram;
-extern UINT8 *speedbal_foreground_videoram;
-
-VIDEO_START( speedbal );
-VIDEO_UPDATE( speedbal );
-WRITE8_HANDLER( speedbal_foreground_videoram_w );
-WRITE8_HANDLER( speedbal_background_videoram_w );
+#include "includes/speedbal.h"
+#include "machine/nvram.h"
 
 static WRITE8_HANDLER( speedbal_coincounter_w )
 {
@@ -78,7 +71,7 @@ static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE(&speedbal_background_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE(&speedbal_foreground_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
@@ -225,7 +218,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( speedbal )
+static MACHINE_CONFIG_START( speedbal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
@@ -238,7 +231,7 @@ static MACHINE_DRIVER_START( speedbal )
 	MDRV_CPU_IO_MAP(sound_cpu_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -259,7 +252,7 @@ static MACHINE_DRIVER_START( speedbal )
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3600000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

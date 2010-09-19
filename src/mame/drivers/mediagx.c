@@ -86,13 +86,11 @@ struct _speedup_entry
 	UINT32			pc;
 };
 
-class mediagx_state : public driver_data_t
+class mediagx_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mediagx_state(machine)); }
-
-	mediagx_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mediagx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT32 *cga_ram;
 	UINT32 *bios_ram;
@@ -914,7 +912,7 @@ static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
@@ -1100,9 +1098,7 @@ static const struct pit8253_config mediagx_pit8254_config =
 };
 
 
-static MACHINE_DRIVER_START(mediagx)
-
-	MDRV_DRIVER_DATA(mediagx_state)
+static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MEDIAGX, 166000000)
@@ -1129,7 +1125,7 @@ static MACHINE_DRIVER_START(mediagx)
 
 	MDRV_TIMER_ADD("sound_timer", sound_timer_callback)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1152,7 +1148,7 @@ static MACHINE_DRIVER_START(mediagx)
 
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)
 {
@@ -1199,7 +1195,6 @@ static void init_mediagx(running_machine *machine)
 	state->frame_width = state->frame_height = 1;
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
-	mc146818_init(machine, MC146818_STANDARD);
 
 	kbdc8042_init(machine, &at8042);
 }

@@ -21,17 +21,7 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-
-/* video/vigilant.c */
-VIDEO_START( vigilant );
-VIDEO_RESET( vigilant );
-WRITE8_HANDLER( vigilant_paletteram_w );
-WRITE8_HANDLER( vigilant_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_color_w );
-VIDEO_UPDATE( vigilant );
-VIDEO_UPDATE( kikcubic );
-
+#include "includes/vigilant.h"
 
 static WRITE8_HANDLER( vigilant_bank_select_w )
 {
@@ -76,7 +66,7 @@ static ADDRESS_MAP_START( vigilant_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -97,7 +87,7 @@ static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -523,7 +513,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_DRIVER_START( vigilant )
+static MACHINE_CONFIG_START( vigilant, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
@@ -565,9 +555,9 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( buccanrs )
+static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5688800)		   /* 5.688800 MHz */
@@ -625,9 +615,9 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kikcubic )
+static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
@@ -669,7 +659,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -715,6 +705,46 @@ ROM_START( vigilant )
 	ROM_LOAD( "pal16l8.4m", 0x0200, 0x0104, CRC(6c628a26) SHA1(65a45e762ce218e4552c30302c1ac4272c099fb5) )
 	ROM_LOAD( "pal16l8.1b", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
+
+
+
+ROM_START( vigilant1 )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_LOAD( "vg_a-8h-c.rom",  0x00000, 0x10000, CRC(0f77aa7e) SHA1(fcf156ba7d164808e65b7e9a695a2639a19cfc2e) )
+	ROM_LOAD( "vg_a-8l-a.rom",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
+	/* 0x20000-0x2ffff empty */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
+	ROM_LOAD( "g05_c02.bin",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
+	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
+	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
+	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
+	ROM_LOAD( "l07_c11.bin",  0x30000, 0x10000, CRC(4598be4a) SHA1(6b68ec94bdee0e58133a8d3891054ef44a8ff0e5) )
+	ROM_LOAD( "t07_c16.bin",  0x40000, 0x10000, CRC(f5425e42) SHA1(c401263b6a266d3e9cd23133f1d823fb4b095e3d) )
+	ROM_LOAD( "p07_c14.bin",  0x50000, 0x10000, CRC(cb50a17c) SHA1(eb15704f715b6475ae7096f8d82f1b20f8277c71) )
+	ROM_LOAD( "v07_c17.bin",  0x60000, 0x10000, CRC(959ba3c7) SHA1(dcd2a885ae7b61210cbd55a38ccbe91c73d071b0) )
+	ROM_LOAD( "s07_c15.bin",  0x70000, 0x10000, CRC(7f2e91c5) SHA1(27dcc9b696834897c36c0b7a1c6202d93f41ad8d) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "d01_c05.bin",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
+	ROM_LOAD( "e01_c06.bin",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
+	ROM_LOAD( "f01_c07.bin",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8.8r", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8.4m", 0x0200, 0x0104, CRC(6c628a26) SHA1(65a45e762ce218e4552c30302c1ac4272c099fb5) )
+	ROM_LOAD( "pal16l8.1b", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
 
 ROM_START( vigilantu )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
@@ -922,7 +952,8 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant, 0,        vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant, 0,        vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World, set 1)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant1,vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World, set 2)", GAME_NO_COCKTAIL )
 GAME( 1988, vigilantu,vigilant, vigilant, vigilant, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
 GAME( 1988, vigilantj,vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )	/* English title is Kickle Cubicle */

@@ -17,13 +17,11 @@
 #define QIX_CHARACTER_CLOCK		(20000000/2/16)
 
 
-class qix_state : public driver_data_t
+class qix_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, qix_state(machine)); }
-
-	qix_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	qix_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* machine state */
 	UINT8 *_68705_port_out;
@@ -82,9 +80,9 @@ WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed );
 
 /*----------- defined in video/qix.c -----------*/
 
-MACHINE_DRIVER_EXTERN( qix_video );
-MACHINE_DRIVER_EXTERN( zookeep_video );
-MACHINE_DRIVER_EXTERN( slither_video );
+MACHINE_CONFIG_EXTERN( qix_video );
+MACHINE_CONFIG_EXTERN( zookeep_video );
+MACHINE_CONFIG_EXTERN( slither_video );
 
 WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
 WRITE8_HANDLER( qix_palettebank_w );
@@ -92,5 +90,5 @@ WRITE8_HANDLER( qix_palettebank_w );
 
 /*----------- defined in audio/qix.c -----------*/
 
-MACHINE_DRIVER_EXTERN( qix_audio );
-MACHINE_DRIVER_EXTERN( slither_audio );
+MACHINE_CONFIG_EXTERN( qix_audio );
+MACHINE_CONFIG_EXTERN( slither_audio );

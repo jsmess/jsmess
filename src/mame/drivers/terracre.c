@@ -87,21 +87,11 @@ AT-2
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "includes/terracre.h"
 
 static const UINT16 *mpProtData;
 static UINT8 mAmazonProtCmd;
 static UINT8 mAmazonProtReg[6];
-
-extern UINT16 *amazon_videoram;
-
-PALETTE_INIT( amazon );
-WRITE16_HANDLER( amazon_background_w );
-WRITE16_HANDLER( amazon_foreground_w );
-WRITE16_HANDLER( amazon_scrolly_w );
-WRITE16_HANDLER( amazon_scrollx_w );
-WRITE16_HANDLER( amazon_flipscreen_w );
-VIDEO_START( amazon );
-VIDEO_UPDATE( amazon );
 
 static const UINT16 mAmazonProtData[] =
 {
@@ -221,7 +211,7 @@ static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x026002, 0x026003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x026004, 0x026005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x02600c, 0x02600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -237,7 +227,7 @@ static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x046002, 0x046003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x046004, 0x046005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x04600c, 0x04600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, videoram)
 	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
@@ -539,7 +529,7 @@ static GFXDECODE_START( terracre )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 1*16+16*16, 256 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( amazon )
+static MACHINE_CONFIG_START( amazon, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(amazon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -576,9 +566,9 @@ static MACHINE_DRIVER_START( amazon )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ym3526 )
+static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -613,9 +603,9 @@ static MACHINE_DRIVER_START( ym3526 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ym2203 )
+static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -659,7 +649,7 @@ static MACHINE_DRIVER_START( ym2203 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( terracre )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128K for 68000 code */

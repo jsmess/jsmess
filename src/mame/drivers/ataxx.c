@@ -28,6 +28,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 #include "sound/2151intf.h"
@@ -47,8 +48,7 @@
 static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xdfff) AM_WRITE(ataxx_battery_ram_w)
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(ataxx_battery_ram_w) AM_SHARE("battery")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -310,7 +310,7 @@ static const eeprom_interface eeprom_intf =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( ataxx )
+static MACHINE_CONFIG_START( ataxx, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, 6000000)
@@ -329,29 +329,28 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_MACHINE_RESET(ataxx)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_HANDLER(leland)
+	MDRV_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(ataxx_video)
+	MDRV_FRAGMENT_ADD(ataxx_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("leland", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wsf )
+static MACHINE_CONFIG_DERIVED( wsf, ataxx )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ataxx)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

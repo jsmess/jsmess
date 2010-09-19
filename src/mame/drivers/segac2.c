@@ -68,6 +68,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
@@ -131,7 +132,7 @@ static MACHINE_START( segac2 )
 
 static MACHINE_RESET( segac2 )
 {
-	megadrive_ram = machine->generic.nvram.u16;
+	megadrive_ram = reinterpret_cast<UINT16 *>(memory_get_shared(*machine, "nvram"));
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);
@@ -629,7 +630,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -1360,7 +1361,7 @@ static VIDEO_UPDATE(segac2_new)
 }
 
 
-static MACHINE_DRIVER_START( segac )
+static MACHINE_CONFIG_START( segac, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1368,9 +1369,9 @@ static MACHINE_DRIVER_START( segac )
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)
-	MDRV_NVRAM_HANDLER(generic_randfill)
+	MDRV_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MDRV_IMPORT_FROM(megadriv_timers)
+	MDRV_FRAGMENT_ADD(megadriv_timers)
 
 	/* video hardware */
 	//MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
@@ -1398,18 +1399,17 @@ static MACHINE_DRIVER_START( segac )
 
 	MDRV_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( segac2 )
+static MACHINE_CONFIG_DERIVED( segac2, segac )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( segac )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("upd", UPD7759, XL1_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

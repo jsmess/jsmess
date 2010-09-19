@@ -13,22 +13,10 @@ TODO:
 
 #include "emu.h"
 #include "deprecat.h"
-#include "video/system1.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/sn76496.h"
-
-extern UINT8 *suprloco_videoram;
-extern UINT8 *suprloco_scrollram;
-
-PALETTE_INIT( suprloco );
-VIDEO_START( suprloco );
-VIDEO_UPDATE( suprloco );
-WRITE8_HANDLER( suprloco_videoram_w );
-WRITE8_HANDLER( suprloco_scrollram_w );
-WRITE8_HANDLER( suprloco_control_w );
-READ8_HANDLER( suprloco_control_r );
-
+#include "includes/suprloco.h"
 
 static WRITE8_HANDLER( suprloco_soundport_w )
 {
@@ -164,7 +152,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( suprloco )
+static MACHINE_CONFIG_START( suprloco, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
@@ -198,7 +186,7 @@ static MACHINE_DRIVER_START( suprloco )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

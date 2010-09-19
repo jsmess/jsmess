@@ -44,14 +44,10 @@ $305.b invincibility
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
-
-
-VIDEO_START( galastrm );
-VIDEO_UPDATE( galastrm );
+#include "includes/galastrm.h"
 
 static UINT16 coin_word, frame_counter=0;
 static UINT32 *galastrm_ram;
-extern INT16  galastrm_tc0610_ctrl_reg[2][8];
 
 /*********************************************************************/
 
@@ -201,7 +197,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Freeze input */
+//  PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* Freeze input */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -316,7 +312,7 @@ static const tc0480scp_interface galastrm_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_DRIVER_START( galastrm )
+static MACHINE_CONFIG_START( galastrm, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(galastrm_map)
@@ -342,8 +338,8 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

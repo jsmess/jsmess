@@ -13,12 +13,22 @@
 #define GOTTLIEB_VIDEO_VBLANK	240
 
 
+class gottlieb_state : public driver_device
+{
+public:
+	gottlieb_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in audio/gottlieb.c -----------*/
 
 WRITE8_HANDLER( gottlieb_sh_w );
 
-MACHINE_DRIVER_EXTERN( gottlieb_soundrev1 );
-MACHINE_DRIVER_EXTERN( gottlieb_soundrev2 );
+MACHINE_CONFIG_EXTERN( gottlieb_soundrev1 );
+MACHINE_CONFIG_EXTERN( gottlieb_soundrev2 );
 
 INPUT_PORTS_EXTERN( gottlieb1_sound );
 INPUT_PORTS_EXTERN( gottlieb2_sound );

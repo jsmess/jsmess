@@ -69,6 +69,7 @@ U.S.A. Trivia              New Sports                 General Facts
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/ticket.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 
 static UINT8 drawctrl[3];
@@ -367,7 +368,7 @@ static WRITE8_HANDLER( signature2_w )
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
@@ -389,7 +390,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
@@ -404,7 +405,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
@@ -420,7 +421,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
@@ -437,7 +438,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amuse1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_3_1_w)
@@ -453,7 +454,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( findout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
@@ -474,7 +475,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizvid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
@@ -492,7 +493,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suprpokr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature2_w)
@@ -504,7 +505,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( geimulti_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
@@ -517,7 +518,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtauth_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5600, 0x5600) AM_READ(signature_r)
@@ -1046,7 +1047,7 @@ static const ppi8255_interface findout_ppi8255_intf[2] =
 	}
 };
 
-static MACHINE_DRIVER_START( getrivia )
+static MACHINE_CONFIG_START( getrivia, driver_device )
 	MDRV_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(getrivia_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -1062,7 +1063,7 @@ static MACHINE_DRIVER_START( getrivia )
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(gei)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
@@ -1076,31 +1077,28 @@ static MACHINE_DRIVER_START( getrivia )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( findout )
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( findout, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(findout_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", findout_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", findout_ppi8255_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quizvid )
-	MDRV_IMPORT_FROM(findout)
+static MACHINE_CONFIG_DERIVED( quizvid, findout )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quizvid_map)
 
 	MDRV_PALETTE_INIT(quizvid)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gselect )
+static MACHINE_CONFIG_DERIVED( gselect, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_DEVICE_REMOVE("ticket")
 
@@ -1109,12 +1107,11 @@ static MACHINE_DRIVER_START( gselect )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jokpokera )
+static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_DEVICE_REMOVE("ticket")
 
@@ -1122,57 +1119,47 @@ static MACHINE_DRIVER_START( jokpokera )
 	MDRV_CPU_PROGRAM_MAP(gselect_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( amuse )
+static MACHINE_CONFIG_DERIVED( amuse, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(amuse_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gepoker )
+static MACHINE_CONFIG_DERIVED( gepoker, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gepoker_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( amuse1 )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( amuse1, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(amuse1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( suprpokr )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( suprpokr, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(suprpokr_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( geimulti )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( geimulti, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(geimulti_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sprtauth )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sprtauth_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************
 Rom board is UVM-1A

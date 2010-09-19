@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "sound/s2636.h"
+#include "includes/zac2650.h"
 
 UINT8 *zac2650_s2636_0_ram;
 static bitmap_t *spritebitmap;
@@ -24,7 +25,9 @@ static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( tinvader_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	zac2650_state *state = space->machine->driver_data<zac2650_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -132,7 +135,9 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	zac2650_state *state = machine->driver_data<zac2650_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

@@ -7,18 +7,16 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-class cninja_state : public driver_data_t
+class cninja_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cninja_state(machine)); }
-
-	cninja_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  audiocpu(machine.device<cpu_device>("audiocpu")),
-		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
-		  raster_irq_timer(machine.device<timer_device>("raster_timer")),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+	cninja_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  audiocpu(*this, "audiocpu"),
+		  deco16ic(*this, "deco_custom"),
+		  raster_irq_timer(*this, "raster_timer"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *   ram;
@@ -31,11 +29,11 @@ public:
 	int        scanline, irq_mask;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	deco16ic_device *deco16ic;
-	timer_device *raster_irq_timer;
-	okim6295_device *oki2;
+	required_device<cpu_device> maincpu;
+	required_device<cpu_device> audiocpu;
+	required_device<deco16ic_device> deco16ic;
+	optional_device<timer_device> raster_irq_timer;
+	optional_device<okim6295_device> oki2;
 };
 
 /*----------- defined in video/cninja.c -----------*/

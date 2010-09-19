@@ -302,8 +302,8 @@ static ADDRESS_MAP_START( cpu2_port_am, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -582,8 +582,7 @@ static MACHINE_RESET( djboy )
 	state->z80_to_beast_full = 0;
 }
 
-static MACHINE_DRIVER_START( djboy )
-	MDRV_DRIVER_DATA(djboy_state)
+static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am)
@@ -634,7 +633,7 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_OKIM6295_ADD("oki2", 12000000 / 8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( djboy )

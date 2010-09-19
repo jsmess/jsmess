@@ -1,12 +1,10 @@
 
-class segas1x_state : public driver_data_t
+class segas1x_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, segas1x_state(machine)); }
-
-	segas1x_state(running_machine &machine)
-		: driver_data_t(machine),
-		  interrupt_timer(machine.device<timer_device>("int_timer")) { }
+	segas1x_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  interrupt_timer(*this, "int_timer") { }
 
 	/* memory pointers */
 //  UINT16 *  workram;  // this is used in the nvram handler, hence it cannot be added here
@@ -94,7 +92,7 @@ public:
 	running_device *n7751;
 	running_device *ppi8255_1;
 	running_device *ppi8255_2;
-	timer_device *interrupt_timer;
+	optional_device<timer_device> interrupt_timer;
 	running_device *_315_5248_1;
 	running_device *_315_5250_1;
 	running_device *_315_5250_2;

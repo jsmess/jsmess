@@ -45,13 +45,11 @@ PROMs : NEC B406 (1kx4) x2
 #include "sound/ay8910.h"
 
 
-class sbowling_state : public driver_data_t
+class sbowling_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
-
-	sbowling_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	sbowling_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	int bgmap;
 	UINT8 *videoram;
@@ -179,7 +177,7 @@ static WRITE8_HANDLER (system_w)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, space->machine->generic.videoram.u8[offs]);
+			sbw_videoram_w(space, offs, state->videoram[offs]);
 	}
 	state->sbw_system = data;
 }
@@ -370,9 +368,7 @@ static PALETTE_INIT( sbowling )
 	}
 }
 
-static MACHINE_DRIVER_START( sbowling )
-
-	MDRV_DRIVER_DATA( sbowling_state )
+static MACHINE_CONFIG_START( sbowling, sbowling_state )
 
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -397,7 +393,7 @@ static MACHINE_DRIVER_START( sbowling )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_19_968MHz/16)	/* ? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( sbowling )
 	ROM_REGION( 0x10000, "maincpu", 0 )

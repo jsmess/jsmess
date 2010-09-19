@@ -290,6 +290,7 @@
 #include "machine/z80sio.h"
 #include "audio/mcr.h"
 #include "sound/samples.h"
+#include "machine/nvram.h"
 #include "includes/mcr.h"
 
 
@@ -617,11 +618,11 @@ static WRITE8_HANDLER( demoderb_op4_w )
 static ADDRESS_MAP_START( cpu_90009_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf1ff) AM_MIRROR(0x0200) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_WRITE(paletteram_xxxxRRRRBBBBGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_WRITE(paletteram_xxxxRRRRBBBBGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -646,9 +647,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu_90010_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe1ff) AM_MIRROR(0x1600) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe800, 0xefff) AM_MIRROR(0x1000) AM_RAM_WRITE(mcr_90010_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xe800, 0xefff) AM_MIRROR(0x1000) AM_RAM_WRITE(mcr_90010_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -673,9 +674,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu_91490_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xe9ff) AM_MIRROR(0x0200) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr_91490_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr_91490_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 	AM_RANGE(0xf800, 0xf87f) AM_MIRROR(0x0780) AM_WRITE(mcr_91490_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -1566,7 +1567,7 @@ static const samples_interface journey_samples_interface =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_90009 )
+static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
@@ -1580,7 +1581,7 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
 	MDRV_MACHINE_RESET(mcr)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1599,13 +1600,12 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_VIDEO_UPDATE(mcr)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(mcr_ssio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(mcr_ssio)
+MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_90010 )
-	MDRV_IMPORT_FROM(mcr_90009)
+static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1614,12 +1614,11 @@ static MACHINE_DRIVER_START( mcr_90010 )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(64)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-static MACHINE_DRIVER_START( mcr_91475 )
-	MDRV_IMPORT_FROM(mcr_90010)
+static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(128)
@@ -1629,12 +1628,11 @@ static MACHINE_DRIVER_START( mcr_91475 )
 	MDRV_SOUND_CONFIG(journey_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_91490 )
-	MDRV_IMPORT_FROM(mcr_90010)
+static MACHINE_CONFIG_DERIVED( mcr_91490, mcr_90010 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1644,23 +1642,21 @@ static MACHINE_DRIVER_START( mcr_91490 )
 
 	MDRV_DEVICE_MODIFY("ctc")
 	MDRV_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-static MACHINE_DRIVER_START( mcr_91490_snt )
+static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490)
-	MDRV_IMPORT_FROM(squawk_n_talk)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(squawk_n_talk)
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-static MACHINE_DRIVER_START( mcr_91490_ipu )
+static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490_snt)
 	MDRV_MACHINE_START(nflfoot)
 
 	MDRV_CPU_ADD("ipu", Z80, 7372800/2)
@@ -1673,16 +1669,15 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
 	MDRV_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
 	MDRV_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Chip Squeak sound board */
-static MACHINE_DRIVER_START( mcr_91490_tcs )
+static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490)
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+MACHINE_CONFIG_END
 
 
 

@@ -15,18 +15,7 @@
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-
-extern UINT8 *srumbler_backgroundram,*srumbler_foregroundram;
-
-WRITE8_HANDLER( srumbler_background_w );
-WRITE8_HANDLER( srumbler_foreground_w );
-WRITE8_HANDLER( srumbler_scroll_w );
-WRITE8_HANDLER( srumbler_4009_w );
-
-VIDEO_START( srumbler );
-VIDEO_UPDATE( srumbler );
-VIDEO_EOF( srumbler );
-
+#include "includes/srumbler.h"
 
 
 static WRITE8_HANDLER( srumbler_bankswitch_w )
@@ -242,7 +231,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( srumbler )
+static MACHINE_CONFIG_START( srumbler, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
@@ -286,7 +275,7 @@ static MACHINE_DRIVER_START( srumbler )
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

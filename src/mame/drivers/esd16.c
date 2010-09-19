@@ -250,7 +250,7 @@ static READ8_HANDLER( esd16_sound_command_r )
 static ADDRESS_MAP_START( multchmp_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w)	// YM3812
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	// M6295
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// M6295
 	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r)	// From Main CPU
 	AM_RANGE(0x04, 0x04) AM_WRITENOP	// ? $00, $30
 	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w)	// ROM Bank
@@ -536,10 +536,7 @@ static MACHINE_RESET( esd16 )
 	state->tilemap0_color = 0;
 }
 
-static MACHINE_DRIVER_START( multchmp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(esd16_state)
+static MACHINE_CONFIG_START( multchmp, esd16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 16000000)
@@ -576,12 +573,11 @@ static MACHINE_DRIVER_START( multchmp )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hedpanic )
+static MACHINE_CONFIG_DERIVED( hedpanic, multchmp )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(multchmp)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hedpanic_map)
@@ -593,43 +589,39 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_GFXDECODE(hedpanic)
 	MDRV_VIDEO_UPDATE(hedpanic)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mchampdx )
+static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mchampdx_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tangtang )
+static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tangtang_map)
 
 	MDRV_GFXDECODE(tangtang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( swatpolc )
+static MACHINE_CONFIG_DERIVED( swatpolc, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_GFXDECODE(tangtang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hedpanio )
+static MACHINE_CONFIG_DERIVED( hedpanio, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_VIDEO_UPDATE(hedpanio)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

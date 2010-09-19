@@ -17,21 +17,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
-
-extern UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
-
-/* from video/skykid.c */
-VIDEO_START( skykid );
-READ8_HANDLER( skykid_videoram_r );
-WRITE8_HANDLER( skykid_videoram_w );
-READ8_HANDLER( skykid_textram_r );
-WRITE8_HANDLER( skykid_textram_w );
-WRITE8_HANDLER( skykid_scroll_x_w );
-WRITE8_HANDLER( skykid_scroll_y_w );
-WRITE8_HANDLER( skykid_flipscreen_priority_w );
-VIDEO_UPDATE( skykid );
-PALETTE_INIT( skykid );
-
+#include "includes/skykid.h"
 
 static UINT8 inputport_selected;
 
@@ -439,7 +425,7 @@ static const namco_interface namco_config =
 
 
 
-static MACHINE_DRIVER_START( skykid )
+static MACHINE_CONFIG_START( skykid, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
@@ -476,7 +462,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( skykid )

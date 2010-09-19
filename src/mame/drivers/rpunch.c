@@ -110,31 +110,16 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
-
+#include "includes/rpunch.h"
 
 
 #define MASTER_CLOCK		16000000
 
 
-/* video driver data & functions */
-VIDEO_START( rpunch );
-VIDEO_UPDATE( rpunch );
-
-extern UINT16 *rpunch_bitmapram;
-extern size_t rpunch_bitmapram_size;
-extern int rpunch_sprite_palette;
-
 static UINT8 sound_data;
 static UINT8 sound_busy;
 static UINT8 ym2151_irq;
 static UINT8 upd_rom_bank;
-
-WRITE16_HANDLER( rpunch_videoram_w );
-WRITE16_HANDLER( rpunch_videoreg_w );
-WRITE16_HANDLER( rpunch_scrollreg_w );
-WRITE16_HANDLER( rpunch_ins_w );
-WRITE16_HANDLER( rpunch_crtc_data_w );
-WRITE16_HANDLER( rpunch_crtc_register_w );
 
 
 
@@ -245,7 +230,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_BASE(&rpunch_bitmapram) AM_SIZE(&rpunch_bitmapram_size)
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_MEMBER(rpunch_state, videoram)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(rpunch_crtc_data_w)
@@ -479,7 +464,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( rpunch )
+static MACHINE_CONFIG_START( rpunch, rpunch_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -513,7 +498,7 @@ static MACHINE_DRIVER_START( rpunch )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

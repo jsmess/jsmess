@@ -163,15 +163,12 @@ OSC3: 48.384MHz
 #include "cpu/i960/i960.h"
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
+#include "machine/nvram.h"
 #include "namcofl.lh"
+#include "includes/namcofl.h"
 
 
 static emu_timer *raster_interrupt_timer;
-
-VIDEO_START( namcofl );
-VIDEO_UPDATE( namcofl );
-
-extern WRITE32_HANDLER(namcofl_spritebank_w);
 
 static UINT32 *namcofl_workram;
 static UINT16 *namcofl_shareram;
@@ -240,7 +237,7 @@ static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x10000000, 0x100fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)	/* data */
-	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) /* nvram */
+	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_SHARE("nvram") /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
@@ -590,7 +587,7 @@ static MACHINE_RESET( namcofl )
 }
 
 
-static MACHINE_DRIVER_START( namcofl )
+static MACHINE_CONFIG_START( namcofl, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 20000000)	// i80960KA-20 == 20 MHz part
 	MDRV_CPU_PROGRAM_MAP(namcofl_mem)
 
@@ -601,7 +598,7 @@ static MACHINE_DRIVER_START( namcofl )
 
 	MDRV_MACHINE_START(namcofl)
 	MDRV_MACHINE_RESET(namcofl)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -622,7 +619,7 @@ static MACHINE_DRIVER_START( namcofl )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( speedrcr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program

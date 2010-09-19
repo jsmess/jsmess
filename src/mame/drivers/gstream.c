@@ -123,17 +123,16 @@ RAM4 is HMC HM6264LP-70
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
-class gstream_state : public driver_data_t
+class gstream_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
-
-	gstream_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  oki_1(machine.device<okim6295_device>("oki1")),
-		  oki_2(machine.device<okim6295_device>("oki2")) { }
+	gstream_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  oki_1(*this, "oki1"),
+		  oki_2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT32 *  vram;
@@ -150,9 +149,9 @@ public:
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
-	cpu_device *maincpu;
-	okim6295_device *oki_1;
-	okim6295_device *oki_2;
+	required_device<e132xt_device> maincpu;
+	required_device<okim6295_device> oki_1;
+	required_device<okim6295_device> oki_2;
 };
 
 
@@ -271,7 +270,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
 	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup RAM
+	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
@@ -351,8 +350,8 @@ static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
 	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)	// oki banking
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)	// ??
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff)	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff)	// music and samples
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )
@@ -548,10 +547,7 @@ static MACHINE_RESET( gstream )
 	state->oki_bank_1 = 0;
 }
 
-static MACHINE_DRIVER_START( gstream )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gstream_state)
+static MACHINE_CONFIG_START( gstream, gstream_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E132XT, 16000000*4)	/* 4x internal multiplier */
@@ -562,7 +558,7 @@ static MACHINE_DRIVER_START( gstream )
 	MDRV_MACHINE_START(gstream)
 	MDRV_MACHINE_RESET(gstream)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -585,7 +581,7 @@ static MACHINE_DRIVER_START( gstream )
 
 	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( gstream )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */

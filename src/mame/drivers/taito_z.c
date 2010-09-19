@@ -1000,16 +1000,16 @@ static INTERRUPT_GEN( dblaxle_cpub_interrupt )
                               EEPROM
 ******************************************************************/
 
-static const UINT8 spacegun_default_eeprom[128]=
+static const UINT16 spacegun_default_eeprom[64]=
 {
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0xcc,0xcb,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
+	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
+	0x0080,0x0080,0x0080,0x0080,0x0001,0x4000,0x0000,0xf000,
+	0x0001,0x4285,0x0000,0xf1e3,0x0001,0x4000,0x0000,0xf000,
+	0x0001,0x4285,0x0000,0xf1e3,0xcccb,0xffff,0xffff,0xffff,
+	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,
+	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,
+	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
 static const eeprom_interface spacegun_eeprom_intf =
@@ -3012,10 +3012,7 @@ static MACHINE_RESET( taitoz )
 
 /* Contcirc vis area seems narrower than the other games... */
 
-static MACHINE_DRIVER_START( contcirc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( contcirc, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3077,13 +3074,10 @@ static MACHINE_DRIVER_START( contcirc )
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( chasehq )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( chasehq, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3143,13 +3137,10 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( enforce )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( enforce, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3212,13 +3203,10 @@ static MACHINE_DRIVER_START( enforce )
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bshark )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( bshark, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3275,13 +3263,10 @@ static MACHINE_DRIVER_START( bshark )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sci )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( sci, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3341,13 +3326,10 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( nightstr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( nightstr, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3409,13 +3391,10 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( aquajack )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( aquajack, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -3476,13 +3455,10 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacegun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( spacegun, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
@@ -3539,13 +3515,10 @@ static MACHINE_DRIVER_START( spacegun )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dblaxle )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
@@ -3605,13 +3578,10 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( racingb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoz_state)
+static MACHINE_CONFIG_START( racingb, taitoz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
@@ -3671,7 +3641,7 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
 	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE_MEMBER(f1gp_state, fgregs)
-	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
 	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
@@ -467,10 +467,7 @@ static MACHINE_RESET( f1gp )
 	state->scroll[1] = 0;
 }
 
-static MACHINE_DRIVER_START( f1gp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(f1gp_state)
+static MACHINE_CONFIG_START( f1gp, f1gp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
@@ -514,13 +511,10 @@ static MACHINE_DRIVER_START( f1gp )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gpb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(f1gp_state)
+static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,10000000)	/* 10 MHz ??? */
@@ -556,13 +550,12 @@ static MACHINE_DRIVER_START( f1gpb )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gp2 )
+static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(f1gp)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(f1gp2_cpu1_map)
 
@@ -576,7 +569,7 @@ static MACHINE_DRIVER_START( f1gp2 )
 
 	MDRV_VIDEO_START(f1gp2)
 	MDRV_VIDEO_UPDATE(f1gp2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -46,13 +46,11 @@ Notes:
 #define SOUND_CLOCK      XTAL_45MHz
 
 
-class mwarr_state : public driver_data_t
+class mwarr_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mwarr_state(machine)); }
-
-	mwarr_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mwarr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
@@ -191,8 +189,8 @@ static ADDRESS_MAP_START( mwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE_MEMBER(mwarr_state, mwarr_ram)
-	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -534,10 +532,7 @@ static MACHINE_RESET( mwarr )
 	state->which = 0;
 }
 
-static MACHINE_DRIVER_START( mwarr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mwarr_state)
+static MACHINE_CONFIG_START( mwarr, mwarr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -569,7 +564,7 @@ static MACHINE_DRIVER_START( mwarr )
 
 	MDRV_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

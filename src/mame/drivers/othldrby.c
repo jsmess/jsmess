@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( othldrby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSW2")
@@ -237,10 +237,7 @@ static MACHINE_RESET( othldrby )
 	memset(state->vreg, 0, ARRAY_LENGTH(state->vreg));
 }
 
-static MACHINE_DRIVER_START( othldrby )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(othldrby_state)
+static MACHINE_CONFIG_START( othldrby, othldrby_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -270,7 +267,7 @@ static MACHINE_DRIVER_START( othldrby )
 
 	MDRV_OKIM6295_ADD("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

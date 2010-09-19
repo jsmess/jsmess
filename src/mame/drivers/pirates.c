@@ -91,17 +91,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *pirates_tx_tileram, *pirates_spriteram;
-extern UINT16 *pirates_fg_tileram,  *pirates_bg_tileram;
-extern UINT16 *pirates_scroll;
-
-VIDEO_START(pirates);
-WRITE16_HANDLER( pirates_tx_tileram_w );
-WRITE16_HANDLER( pirates_fg_tileram_w );
-WRITE16_HANDLER( pirates_bg_tileram_w );
-VIDEO_UPDATE(pirates);
-
+#include "includes/pirates.h"
 
 
 static const eeprom_interface eeprom_intf =
@@ -189,7 +179,7 @@ static ADDRESS_MAP_START( pirates_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(pirates_bg_tileram_w) AM_BASE(&pirates_bg_tileram)
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -270,7 +260,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_DRIVER_START( pirates )
+static MACHINE_CONFIG_START( pirates, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MDRV_CPU_PROGRAM_MAP(pirates_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -296,7 +286,7 @@ static MACHINE_DRIVER_START( pirates )
 
 	MDRV_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

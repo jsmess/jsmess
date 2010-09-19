@@ -86,13 +86,11 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
 
-class pachifev_state : public driver_data_t
+class pachifev_state : public driver_device
 {
 public:
-    static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
-
-    pachifev_state(running_machine &machine)
-		: driver_data_t(machine) { }
+    pachifev_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
  /* controls related */
 
@@ -361,9 +359,7 @@ static const struct tms9995reset_param pachifev_processor_config =
     1,0,0
 };
 
-static MACHINE_DRIVER_START( pachifev )
-
-    MDRV_DRIVER_DATA(pachifev_state)
+static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", TMS9995, XTAL_12MHz)
@@ -377,7 +373,7 @@ static MACHINE_DRIVER_START( pachifev )
 
     /* video hardware */
 
-    MDRV_IMPORT_FROM(tms9928a)
+    MDRV_FRAGMENT_ADD(tms9928a)
     MDRV_SCREEN_MODIFY("screen")
     MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -393,7 +389,7 @@ static MACHINE_DRIVER_START( pachifev )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
     MDRV_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pachifev )
     ROM_REGION( 0x10000, "maincpu", 0 )

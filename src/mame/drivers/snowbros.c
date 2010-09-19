@@ -124,8 +124,8 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	running_device *adpcm = device->machine->device("oki");
-	int status = okim6295_r(adpcm,0);
+	okim6295_device *adpcm = device->machine->device<okim6295_device>("oki");
+	int status = adpcm->read_status();
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -133,8 +133,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_w(adpcm,0,0x80|sb3_music);
-			okim6295_w(adpcm,0,0x00|0x82);
+			adpcm->write_command(0x80|sb3_music);
+			adpcm->write_command(0x00|0x82);
 		}
 
 	}
@@ -142,7 +142,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_w(adpcm,0,0x40);		/* Stop playing music */
+			adpcm->write_command(0x40);		/* Stop playing music */
 		}
 	}
 
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( hyperpac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki",okim6295_r,okim6295_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -426,24 +426,24 @@ static void sb3_play_music(running_machine *machine, int data)
 	}
 }
 
-static void sb3_play_sound (running_device *device, int data)
+static void sb3_play_sound (okim6295_device *oki, int data)
 {
-	int status = okim6295_r(device,0);
+	int status = oki->read_status();
 
 	if ((status&0x01)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x12);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x22);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x42);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x42);
 	}
 
 
@@ -451,10 +451,11 @@ static void sb3_play_sound (running_device *device, int data)
 
 static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 {
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		okim6295_w(device,0,0x78);		/* Stop sounds */
+		oki->write_command(0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -462,7 +463,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(device, data);
+			sb3_play_sound(oki, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -472,7 +473,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(device, data-0x30);
+			sb3_play_sound(oki, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)
@@ -1445,7 +1446,7 @@ static const kaneko_pandora_interface snowbros_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_DRIVER_START( snowbros )
+static MACHINE_CONFIG_START( snowbros, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
@@ -1478,12 +1479,12 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wintbob )
+static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
 	MDRV_CPU_PROGRAM_MAP(wintbob_map)
@@ -1494,13 +1495,12 @@ static MACHINE_DRIVER_START( wintbob )
 	MDRV_GFXDECODE(wb)
 	MDRV_VIDEO_UPDATE(wintbob)
 	MDRV_VIDEO_EOF(0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( semicom )
+static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_map)
@@ -1519,25 +1519,23 @@ static MACHINE_DRIVER_START( semicom )
 
 	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( semicom_mcu )
+static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(semicom)
 
 	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
 	MDRV_CPU_PROGRAM_MAP(protection_map)
 	MDRV_CPU_IO_MAP(protection_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( semiprot )
-	MDRV_IMPORT_FROM(semicom)
+static MACHINE_CONFIG_DERIVED( semiprot, semicom )
 	MDRV_MACHINE_RESET ( semiprot )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -1559,7 +1557,7 @@ CPU : 1 X MC68000P12
 See included pics
 */
 
-static MACHINE_DRIVER_START( honeydol )
+static MACHINE_CONFIG_START( honeydol, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -1595,9 +1593,9 @@ static MACHINE_DRIVER_START( honeydol )
 
 	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( twinadv )
+static MACHINE_CONFIG_START( twinadv, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
@@ -1628,7 +1626,7 @@ static MACHINE_DRIVER_START( twinadv )
 	/* sound hardware */
 	MDRV_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*
@@ -1649,8 +1647,7 @@ Intel P8752 (mcu)
 
 */
 
-static MACHINE_DRIVER_START( finalttr )
-	MDRV_IMPORT_FROM(semicom)
+static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)
@@ -1668,16 +1665,16 @@ static MACHINE_DRIVER_START( finalttr )
 
 	MDRV_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( _4in1 )
+static MACHINE_CONFIG_DERIVED( _4in1, semicom )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(semicom)
 	MDRV_GFXDECODE(snowbros)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( snowbro3 )
+static MACHINE_CONFIG_START( snowbro3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
@@ -1702,7 +1699,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 
 	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

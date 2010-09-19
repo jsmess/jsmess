@@ -149,6 +149,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
 /***********************************
@@ -253,7 +254,7 @@ static PALETTE_INIT( miniboy7 )
 ***********************************/
 
 static ADDRESS_MAP_START( miniboy7_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* battery backed RAM? */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM	AM_SHARE("nvram") /* battery backed RAM? */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
@@ -428,14 +429,14 @@ static const ay8910_interface miniboy7_ay8910_intf =
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_DRIVER_START( miniboy7 )
+static MACHINE_CONFIG_START( miniboy7, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(miniboy7_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_PIA6821_ADD("pia0", miniboy7_pia0_intf)
 
 	/* video hardware */
@@ -461,7 +462,7 @@ static MACHINE_DRIVER_START( miniboy7 )
 	MDRV_SOUND_CONFIG(miniboy7_ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***********************************

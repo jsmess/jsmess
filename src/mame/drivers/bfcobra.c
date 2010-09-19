@@ -79,6 +79,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/upd7759.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 /*
     Defines
@@ -1432,7 +1433,7 @@ static WRITE8_DEVICE_HANDLER( upd_w )
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM		// W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM		// W 'F'
 	AM_RANGE(0x2600, 0x2600) AM_READWRITE(meter_r, meter_w)
@@ -1729,7 +1730,7 @@ static INTERRUPT_GEN( vblank_gen )
 	update_irqs(device->machine);
 }
 
-static MACHINE_DRIVER_START( bfcobra )
+static MACHINE_CONFIG_START( bfcobra, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MDRV_CPU_PROGRAM_MAP(z80_prog_map)
 	MDRV_CPU_IO_MAP(z80_io_map)
@@ -1739,7 +1740,7 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_CPU_PROGRAM_MAP(m6809_prog_map)
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_RESET(bfcobra)
 
@@ -1767,7 +1768,7 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_ACIA6850_ADD("acia6850_0", z80_acia_if)
 	MDRV_ACIA6850_ADD("acia6850_1", m6809_acia_if)
 	MDRV_ACIA6850_ADD("acia6850_2", data_acia_if)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

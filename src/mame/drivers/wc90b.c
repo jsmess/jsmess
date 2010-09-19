@@ -86,7 +86,7 @@ Noted added by ClawGrip 28-Mar-2008:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
+#include "includes/wc90b.h"
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
@@ -94,22 +94,6 @@ Noted added by ClawGrip 28-Mar-2008:
 #define SOUND_CLOCK XTAL_20MHz/4
 #define YM2203_CLOCK XTAL_20MHz/16
 #define MSM5205_CLOCK XTAL_384kHz
-
-extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
-
-extern UINT8 *wc90b_scroll1x;
-extern UINT8 *wc90b_scroll2x;
-
-extern UINT8 *wc90b_scroll1y;
-extern UINT8 *wc90b_scroll2y;
-
-extern UINT8 *wc90b_scroll_x_lo;
-
-VIDEO_START( wc90b );
-WRITE8_HANDLER( wc90b_bgvideoram_w );
-WRITE8_HANDLER( wc90b_fgvideoram_w );
-WRITE8_HANDLER( wc90b_txvideoram_w );
-VIDEO_UPDATE( wc90b );
 
 static int msm5205next;
 
@@ -376,7 +360,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S96_4B	/* 4KHz 4-bit */
 };
 
-static MACHINE_DRIVER_START( wc90b )
+static MACHINE_CONFIG_START( wc90b, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -415,7 +399,7 @@ static MACHINE_DRIVER_START( wc90b )
 	MDRV_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( wc90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

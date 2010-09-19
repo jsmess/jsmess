@@ -441,7 +441,7 @@ static GFXDECODE_START( gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-static MACHINE_DRIVER_START( gpworld )
+static MACHINE_CONFIG_START( gpworld, driver_device )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
@@ -463,10 +463,10 @@ static MACHINE_DRIVER_START( gpworld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( gpworld )

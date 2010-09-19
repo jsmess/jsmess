@@ -28,6 +28,16 @@
 
 #define GAL_AUDIO	"discrete"
 
+class galaxian_state : public driver_device
+{
+public:
+	galaxian_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/galaxian.c -----------*/
 
 extern UINT8 galaxian_frogger_adjust;
@@ -128,8 +138,8 @@ void tenspot_set_game_bank(running_machine *machine, int bank, int from_game);
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-MACHINE_DRIVER_EXTERN( mooncrst_audio );
-MACHINE_DRIVER_EXTERN( galaxian_audio );
+MACHINE_CONFIG_EXTERN( mooncrst_audio );
+MACHINE_CONFIG_EXTERN( galaxian_audio );
 
 WRITE8_DEVICE_HANDLER( galaxian_sound_w );
 WRITE8_DEVICE_HANDLER( galaxian_pitch_w );

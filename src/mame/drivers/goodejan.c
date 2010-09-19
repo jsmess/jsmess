@@ -60,9 +60,6 @@ Notes:
 #define GOODEJAN_MHZ2 16000000
 #define GOODEJAN_MHZ3 12000000
 
-extern UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
-extern UINT16 *seibucrtc_vregs;
-extern UINT16 seibucrtc_sc0bank;
 static UINT16 goodejan_mux_data;
 
 static WRITE16_HANDLER( goodejan_gfxbank_w )
@@ -325,7 +322,7 @@ static INTERRUPT_GEN( goodejan_irq )
 /* vector 0x00c is just a reti */
 }
 
-static MACHINE_DRIVER_START( goodejan )
+static MACHINE_CONFIG_START( goodejan, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
@@ -353,13 +350,12 @@ static MACHINE_DRIVER_START( goodejan )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( totmejan )
-	MDRV_IMPORT_FROM( goodejan )
+static MACHINE_CONFIG_DERIVED( totmejan, goodejan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(totmejan_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( totmejan )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */

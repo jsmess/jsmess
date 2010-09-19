@@ -325,7 +325,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ymsnd", ym3812_w )
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READNOP
@@ -339,8 +339,8 @@ static ADDRESS_MAP_START( aliencha_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// writes 03 then 07 at end of NMI
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("ymf", ymf278b_r)
 	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE("ymf", ymf278b_w)
-	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE( "oki",  okim6295_r, okim6295_w )
-	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
+	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -650,7 +650,7 @@ static const ym3812_interface lordgun_ym3812_interface =
 	soundirq
 };
 
-static MACHINE_DRIVER_START( lordgun )
+static MACHINE_CONFIG_START( lordgun, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(lordgun_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( lordgun )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right!
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const ymf278b_interface ymf278b_config =
@@ -694,7 +694,7 @@ static const ymf278b_interface ymf278b_config =
 	soundirq
 };
 
-static MACHINE_DRIVER_START( aliencha )
+static MACHINE_CONFIG_START( aliencha, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(aliencha_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( aliencha )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

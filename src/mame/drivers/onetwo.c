@@ -46,13 +46,11 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 
 #define MASTER_CLOCK        XTAL_4MHz
 
-class onetwo_state : public driver_data_t
+class onetwo_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, onetwo_state(machine)); }
-
-	onetwo_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	onetwo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  fgram;
@@ -190,7 +188,7 @@ static ADDRESS_MAP_START( sound_cpu_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_write_port_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
 ADDRESS_MAP_END
 
@@ -353,10 +351,7 @@ static MACHINE_START( onetwo )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( onetwo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(onetwo_state)
+static MACHINE_CONFIG_START( onetwo, onetwo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
@@ -393,7 +388,7 @@ static MACHINE_DRIVER_START( onetwo )
 
 	MDRV_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -187,22 +187,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-
-/*Video functions*/
-extern UINT8 *gladiatr_videoram, *gladiatr_colorram,*gladiatr_textram;
-WRITE8_HANDLER( gladiatr_videoram_w );
-WRITE8_HANDLER( gladiatr_colorram_w );
-WRITE8_HANDLER( gladiatr_textram_w );
-WRITE8_HANDLER( gladiatr_paletteram_w );
-WRITE8_HANDLER( ppking_video_registers_w );
-WRITE8_HANDLER( gladiatr_video_registers_w );
-WRITE8_HANDLER( gladiatr_spritebuffer_w );
-WRITE8_HANDLER( gladiatr_spritebank_w );
-VIDEO_START( ppking );
-VIDEO_UPDATE( ppking );
-VIDEO_START( gladiatr );
-VIDEO_UPDATE( gladiatr );
+#include "machine/nvram.h"
+#include "includes/gladiatr.h"
 
 
 /*Rom bankswitching*/
@@ -392,7 +378,7 @@ static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* battery backed RAM */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
 
@@ -430,7 +416,7 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* battery backed RAM */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -674,7 +660,7 @@ static const msm5205_interface msm5205_config =
 
 
 
-static MACHINE_DRIVER_START( ppking )
+static MACHINE_CONFIG_START( ppking, gladiatr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -693,7 +679,7 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(ppking)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -722,9 +708,9 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gladiatr )
+static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -742,7 +728,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(gladiator)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -771,7 +757,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1010,10 +996,11 @@ static DRIVER_INIT( gladiatr )
 
 static READ8_HANDLER(f6a3_r)
 {
+	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
 	if(cpu_get_previouspc(space->cpu)==0x8e)
-		space->machine->generic.nvram.u8[0x6a3]=1;
+		state->m_nvram[0x6a3]=1;
 
-	return space->machine->generic.nvram.u8[0x6a3];
+	return state->m_nvram[0x6a3];
 }
 
 static DRIVER_INIT(ppking)

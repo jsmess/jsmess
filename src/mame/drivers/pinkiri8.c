@@ -484,7 +484,7 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
 	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w ) //correct?
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write) //correct?
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
 	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
 	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs
@@ -1107,7 +1107,7 @@ static GFXDECODE_START( pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pinkiri8 )
+static MACHINE_CONFIG_START( pinkiri8, driver_device )
 	MDRV_CPU_ADD("maincpu",Z180,16000000)
 	MDRV_CPU_PROGRAM_MAP(pinkiri8_map)
 	MDRV_CPU_IO_MAP(pinkiri8_io)
@@ -1132,7 +1132,7 @@ static MACHINE_DRIVER_START( pinkiri8 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -44,6 +44,17 @@
 #include "dlair.lh"
 
 
+class dlair_state : public driver_device
+{
+public:
+	dlair_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
+
 
 /*************************************
  *
@@ -161,13 +172,15 @@ static PALETTE_INIT( dleuro )
 
 static VIDEO_UPDATE( dleuro )
 {
+	dlair_state *state = screen->machine->driver_data<dlair_state>();
+	UINT8 *videoram = state->videoram;
 	int x, y;
 
 	/* redraw the overlay */
 	for (y = 0; y < 32; y++)
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 *base = &screen->machine->generic.videoram.u8[y * 64 + x * 2 + 1];
+			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
 			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
@@ -209,7 +222,7 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	beep_sound_device *beep = device->machine->device<beep_sound_device>("beep");
+	beep_device *beep = device->machine->device<beep_device>("beep");
 	if (beep != NULL)
 	{
 		z80ctc_device *ctc = device->machine->device<z80ctc_device>("ctc");
@@ -378,7 +391,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(dlair_state, videoram)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1
@@ -669,7 +682,7 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( dlair_base )
+static MACHINE_CONFIG_START( dlair_base, dlair_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -690,25 +703,23 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dlair_pr7820 )
-	MDRV_IMPORT_FROM(dlair_base)
+static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dlair_ldv1000 )
-	MDRV_IMPORT_FROM(dlair_base)
+static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dleuro )
+static MACHINE_CONFIG_START( dleuro, dlair_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
@@ -743,10 +754,10 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

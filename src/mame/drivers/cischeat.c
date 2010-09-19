@@ -514,8 +514,8 @@ static ADDRESS_MAP_START( scudhamm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)											// Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)											// Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)							// Buttons
-	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// Sound
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
+	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)				// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)				//
 	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)											// ?
 	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r) AM_WRITENOP							// A / D
 	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r)									// Motor Position
@@ -599,8 +599,8 @@ static ADDRESS_MAP_START( armchmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100008, 0x100009) AM_READWRITE(armchmp2_buttons_r, armchmp2_leds_w)						// Leds + Coin Counters + Buttons + Sensors
 	AM_RANGE(0x10000c, 0x10000d) AM_READ(armchmp2_analog_r) AM_WRITENOP							// A / D
 	AM_RANGE(0x100010, 0x100011) AM_READWRITE(armchmp2_motor_status_r, armchmp2_motor_command_w)		// Motor Limit Switches?
-	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff	)			// Sound
-	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff	)			//
+	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff	)			// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff	)			//
 ADDRESS_MAP_END
 
 
@@ -707,8 +707,8 @@ static ADDRESS_MAP_START( bigrun_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r, bigrun_soundbank_w)	// From Main CPU
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)							// To Main CPU
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM													// RAM
 ADDRESS_MAP_END
 
@@ -730,8 +730,8 @@ static ADDRESS_MAP_START( cischeat_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(soundlatch2_word_w)							// To Main CPU
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r)								// From Main CPU
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM													// RAM
 ADDRESS_MAP_END
 
@@ -746,8 +746,8 @@ static ADDRESS_MAP_START( f1gpstar_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040008, 0x040009) AM_DEVWRITE("oki2", cischeat_soundbank_w)				// Sample Banking   (cischeat: 40004)
 	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r, soundlatch2_word_w)	// From Main CPU    (cischeat: 60004)
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM													// RAM              (cischeat: f0000-fffff)
 ADDRESS_MAP_END
 
@@ -763,8 +763,8 @@ static ADDRESS_MAP_START( f1gpstr2_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000e, 0x04000f) AM_WRITENOP											// ? 0              (f1gpstar: no)
 	AM_RANGE(0x060004, 0x060005) AM_READWRITE(soundlatch_word_r, soundlatch2_word_w)		// From Main CPU    (f1gpstar: 60000)
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -898,7 +898,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW301:6,5,4") PORT_CONDITION("IN4", 0x0003, PORTCOND_NOTEQUALS, 0x0003)
+	PORT_DIPNAME( 0x1c00, 0x1c00, "Set Coin B" ) PORT_DIPLOCATION("SW301:6,5,4") PORT_CONDITION("IN4", 0x0003, PORTCOND_NOTEQUALS, 0x0003)
 	PORT_DIPSETTING(      0x1c00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW301:3,2,1")
@@ -1565,7 +1565,7 @@ static INTERRUPT_GEN( cischeat_interrupt )
 
 
 
-static MACHINE_DRIVER_START( bigrun )
+static MACHINE_CONFIG_START( bigrun, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M68000, 10000000)
@@ -1614,13 +1614,12 @@ static MACHINE_DRIVER_START( bigrun )
 
 	MDRV_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cischeat )
+static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(cischeat_map)
 
@@ -1642,13 +1641,12 @@ static MACHINE_DRIVER_START( cischeat )
 
 	MDRV_VIDEO_START(cischeat)
 	MDRV_VIDEO_UPDATE(cischeat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gpstar )
+static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_CLOCK(12000000)
 	MDRV_CPU_PROGRAM_MAP(f1gpstar_map)
@@ -1670,13 +1668,12 @@ static MACHINE_DRIVER_START( f1gpstar )
 
 	MDRV_VIDEO_START(f1gpstar)
 	MDRV_VIDEO_UPDATE(f1gpstar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gpstr2 )
+static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(f1gpstar)
 
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_map)
@@ -1687,7 +1684,7 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************
@@ -1713,7 +1710,7 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 }
 
 
-static MACHINE_DRIVER_START( scudhamm )
+static MACHINE_CONFIG_START( scudhamm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
@@ -1746,7 +1743,7 @@ static MACHINE_DRIVER_START( scudhamm )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************
@@ -1764,15 +1761,14 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 	}
 }
 
-static MACHINE_DRIVER_START( armchmp2 )
+static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scudhamm)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(armchmp2_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

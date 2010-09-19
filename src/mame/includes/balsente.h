@@ -26,23 +26,19 @@
 #define POLY17_ADD	0x18000
 
 
-class balsente_state : public driver_data_t
+class balsente_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
-
-	balsente_state(running_machine &machine)
-		: driver_data_t(machine),
-		  scanline_timer(machine.device<timer_device>("scan_timer")),
-		  counter_0_timer(machine.device<timer_device>("8253_0_timer"))
-	{
-		astring temp;
-		for (int i = 0; i < ARRAY_LENGTH(cem_device); i++)
-		{
-			cem_device[i] = machine.device<cem3394_sound_device>(temp.format("cem%d", i+1));
-			assert(cem_device[i] != NULL);
-		}
-	}
+	balsente_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  scanline_timer(*this, "scan_timer"),
+		  counter_0_timer(*this, "8253_0_timer"),
+		  m_cem1(*this, "cem1"),
+		  m_cem2(*this, "cem2"),
+		  m_cem3(*this, "cem3"),
+		  m_cem4(*this, "cem4"),
+		  m_cem5(*this, "cem5"),
+		  m_cem6(*this, "cem6") { }
 
 	/* global data */
 	UINT8 shooter;
@@ -66,12 +62,12 @@ public:
 		UINT8 writebyte;
 	} counter[3];
 
-	timer_device *scanline_timer;
+	required_device<timer_device> scanline_timer;
 
 	/* manually clocked counter 0 states */
 	UINT8 counter_control;
 	UINT8 counter_0_ff;
-	timer_device *counter_0_timer;
+	required_device<timer_device> counter_0_timer;
 	UINT8 counter_0_timer_active;
 
 	/* random number generator states */
@@ -102,7 +98,13 @@ public:
 
 	/* noise generator states */
 	UINT32 noise_position[6];
-	cem3394_sound_device *cem_device[6];
+	required_device<cem3394_device> m_cem1;
+	required_device<cem3394_device> m_cem2;
+	required_device<cem3394_device> m_cem3;
+	required_device<cem3394_device> m_cem4;
+	required_device<cem3394_device> m_cem5;
+	required_device<cem3394_device> m_cem6;
+	cem3394_device *cem_device[6];
 
 	/* game-specific states */
 	UINT8 nstocker_bits;

@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( wrally_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)								/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	/* OKI6295 status/data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	/* OKI6295 status/data register */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP												/* Sound muting */
@@ -245,7 +245,7 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( wrally )
+static MACHINE_CONFIG_START( wrally, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_map)
@@ -277,7 +277,7 @@ static MACHINE_DRIVER_START( wrally )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)					/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( wrally )

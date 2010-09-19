@@ -8,17 +8,15 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-class simpl156_state : public driver_data_t
+class simpl156_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, simpl156_state(machine)); }
-
-	simpl156_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
-		  eeprom(machine.device<eeprom_device>("eeprom")),
-		  okimusic(machine.device<okim6295_device>("okimusic")) { }
+	simpl156_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  deco16ic(*this, "deco_custom"),
+		  eeprom(*this, "eeprom"),
+		  okimusic(*this, "okimusic") { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -27,10 +25,10 @@ public:
 	UINT32 *  systemram;
 
 	/* devices */
-	cpu_device *maincpu;
-	deco16ic_device *deco16ic;
-	eeprom_device *eeprom;
-	okim6295_device *okimusic;
+	required_device<cpu_device> maincpu;
+	required_device<deco16ic_device> deco16ic;
+	required_device<eeprom_device> eeprom;
+	required_device<okim6295_device> okimusic;
 };
 
 

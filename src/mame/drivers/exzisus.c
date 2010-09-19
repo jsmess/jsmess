@@ -37,6 +37,7 @@ TODO:
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
+#include "includes/exzisus.h"
 
 
 /***************************************************************************
@@ -47,25 +48,6 @@ TODO:
 
 static UINT8 *exzisus_sharedram_ab;
 static UINT8 *exzisus_sharedram_ac;
-
-extern UINT8 *exzisus_videoram0;
-extern UINT8 *exzisus_videoram1;
-extern UINT8 *exzisus_objectram0;
-extern UINT8 *exzisus_objectram1;
-extern size_t  exzisus_objectram_size0;
-extern size_t  exzisus_objectram_size1;
-
-READ8_HANDLER ( exzisus_videoram_0_r );
-READ8_HANDLER ( exzisus_videoram_1_r );
-READ8_HANDLER ( exzisus_objectram_0_r );
-READ8_HANDLER ( exzisus_objectram_1_r );
-WRITE8_HANDLER( exzisus_videoram_0_w );
-WRITE8_HANDLER( exzisus_videoram_1_w );
-WRITE8_HANDLER( exzisus_objectram_0_w );
-WRITE8_HANDLER( exzisus_objectram_1_w );
-
-VIDEO_UPDATE( exzisus );
-
 
 /***************************************************************************
 
@@ -298,7 +280,7 @@ static const tc0140syt_interface exzisus_tc0140syt_intf =
 };
 
 /* All clocks are unconfirmed */
-static MACHINE_DRIVER_START( exzisus )
+static MACHINE_CONFIG_START( exzisus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpua", Z80, 6000000)
@@ -341,7 +323,7 @@ static MACHINE_DRIVER_START( exzisus )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", exzisus_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

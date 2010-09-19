@@ -225,16 +225,11 @@ struct scroll_info
 };
 
 
-class wheelfir_state : public driver_data_t
+class wheelfir_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine)
-	{
-		return auto_alloc_clear(&machine, wheelfir_state(machine));
-	}
-
-	wheelfir_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *maincpu;
 	running_device *subcpu;
@@ -809,8 +804,7 @@ static MACHINE_START( wheelfir )
 }
 
 
-static MACHINE_DRIVER_START( wheelfir )
-	MDRV_DRIVER_DATA(wheelfir_state)
+static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_main)
@@ -850,7 +844,7 @@ static MACHINE_DRIVER_START( wheelfir )
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( wheelfir )

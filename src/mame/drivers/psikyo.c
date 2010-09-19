@@ -330,30 +330,33 @@ static ADDRESS_MAP_START( psikyo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
-static READ32_DEVICE_HANDLER( s1945bl_oki_r )
+static READ32_HANDLER( s1945bl_oki_r )
 {
-	UINT8 dat = okim6295_r(device, 0);
+	UINT8 dat = space->machine->device<okim6295_device>("oki")->read(*space, 0);
 	return dat << 24;
 }
 
-static WRITE32_DEVICE_HANDLER( s1945bl_oki_w )
+static WRITE32_HANDLER( s1945bl_oki_w )
 {
 	if (ACCESSING_BITS_24_31)
-		okim6295_w(device, 0, data >> 24);
+	{
+		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		oki->write(*space, 0, data >> 24);
+	}
 
 	if (ACCESSING_BITS_16_23)
 	{
 		// not at all sure about this, it seems to write 0 too often
 		UINT8 bank = (data & 0x00ff0000) >> 16;
 		if (bank < 4)
-			memory_set_bank(device->machine, "okibank", bank);
+			memory_set_bank(space->machine, "okibank", bank);
 	}
 
 	if (ACCESSING_BITS_8_15)
-		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n", data & 0x00ff0000, mem_mask);
+		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n", data & 0x0000ff00, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
-		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x00ff0000, mem_mask);
+		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
 static ADDRESS_MAP_START( s1945bl_oki_map, 0, 8 )
@@ -374,7 +377,7 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 
-	AM_RANGE(0xC00018, 0xC0001b) AM_DEVREADWRITE("oki", s1945bl_oki_r, s1945bl_oki_w)
+	AM_RANGE(0xC00018, 0xC0001b) AM_READWRITE(s1945bl_oki_r, s1945bl_oki_w)
 
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 
@@ -1057,10 +1060,7 @@ static const ym2610_interface sngkace_ym2610_interface =
 	sound_irq
 };
 
-static MACHINE_DRIVER_START( sngkace )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( sngkace )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1112,10 +1112,7 @@ static const ym2610_interface gunbird_ym2610_interface =
 	sound_irq	/* irq */
 };
 
-static MACHINE_DRIVER_START( gunbird )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1153,12 +1150,9 @@ static MACHINE_DRIVER_START( gunbird )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1189,7 +1183,7 @@ static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotec
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1209,10 +1203,7 @@ static const ymf278b_interface ymf278b_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( s1945 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1250,7 +1241,7 @@ static MACHINE_DRIVER_START( s1945 )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

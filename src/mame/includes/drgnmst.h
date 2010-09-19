@@ -1,15 +1,13 @@
 
 #include "sound/okim6295.h"
 
-class drgnmst_state : public driver_data_t
+class drgnmst_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drgnmst_state(machine)); }
-
-	drgnmst_state(running_machine &machine)
-		: driver_data_t(machine),
-		  oki_1(machine.device<okim6295_device>("oki1")),
-		  oki_2(machine.device<okim6295_device>("oki2")) { }
+	drgnmst_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  oki_1(*this, "oki1"),
+		  oki_2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *    vidregs;
@@ -35,8 +33,8 @@ public:
 	UINT8       oki1_bank;
 
 	/* devices */
-	okim6295_device *oki_1;
-	okim6295_device *oki_2;
+	required_device<okim6295_device> oki_1;
+	required_device<okim6295_device> oki_2;
 };
 
 

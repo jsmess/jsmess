@@ -27,6 +27,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 /* it uses the same palette layout as in naughtyb */
 PALETTE_INIT( naughtyb );
@@ -118,7 +119,7 @@ static WRITE8_HANDLER( b800_w )
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITENOP
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
@@ -237,13 +238,13 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( ettrivia )
+static MACHINE_CONFIG_START( ettrivia, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", ettrivia_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -273,7 +274,7 @@ static MACHINE_DRIVER_START( ettrivia )
 	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8912_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( promutrv )
 	ROM_REGION( 0x10000, "maincpu", 0 )

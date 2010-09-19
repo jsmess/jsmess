@@ -82,6 +82,7 @@ TODO:
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "sound/2413intf.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
 
 /***************************************************************************
@@ -471,34 +472,34 @@ static WRITE8_HANDLER( yarunara_layer_half2_w )
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnoridur_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcnpshnt_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0x80ff ) AM_WRITE(nanajign_palette_w)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjdialq2_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
-	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -506,7 +507,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yarunara_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w)	// Palette or RTC
 ADDRESS_MAP_END
@@ -514,7 +515,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jantouki_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -641,7 +642,7 @@ static READ8_HANDLER( hjingi_keyboard_1_r )
 
 static ADDRESS_MAP_START( hjingi_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
-	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
@@ -1529,7 +1530,7 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(tenkai_8000_r, tenkai_8000_w)
 	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD("aysnd", ay8910_r)		// AY8910
 	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE("aysnd", ay8910_data_w)	//
@@ -1701,7 +1702,7 @@ static WRITE8_HANDLER( gekisha_8000_w )
 
 static ADDRESS_MAP_START( gekisha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
 ADDRESS_MAP_END
 
@@ -4332,10 +4333,7 @@ static const msm5205_interface hanamai_msm5205_interface =
 
 
 
-static MACHINE_DRIVER_START( hanamai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4346,7 +4344,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4378,7 +4376,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -4393,10 +4391,7 @@ static const ay8910_interface hnoridur_ay8910_interface =
 	DEVCB_INPUT_PORT("DSW0")		/* Port A Read: DSW */
 };
 
-static MACHINE_DRIVER_START( hnoridur )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4407,7 +4402,7 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_MACHINE_START(hnoridur)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4435,17 +4430,14 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Hana Jingi
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( hjingi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hjingi, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
@@ -4456,7 +4448,7 @@ static MACHINE_DRIVER_START( hjingi )
 	MDRV_MACHINE_START(hnoridur)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4484,7 +4476,7 @@ static MACHINE_DRIVER_START( hjingi )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4504,10 +4496,7 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 	sprtmtch_sound_callback,	/* IRQ handler */
 };
 
-static MACHINE_DRIVER_START( sprtmtch )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
@@ -4518,7 +4507,7 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4543,17 +4532,14 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Friday
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mjfriday )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( mjfriday, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
@@ -4564,7 +4550,7 @@ static MACHINE_DRIVER_START( mjfriday )
 	MDRV_MACHINE_START(hanamai)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4585,20 +4571,19 @@ static MACHINE_DRIVER_START( mjfriday )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 24000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Dial Q2
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mjdialq2 )
+static MACHINE_CONFIG_DERIVED( mjdialq2, mjfriday )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mjfriday )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4622,16 +4607,15 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 	sprtmtch_update_irq(device->machine);
 }
 
-static MACHINE_DRIVER_START( yarunara )
+static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
 	MDRV_CPU_IO_MAP(yarunara_io_map)
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_REPLACE_0FILL("nvram")
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4639,35 +4623,31 @@ static MACHINE_DRIVER_START( yarunara )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mcnpshnt )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( mcnpshnt, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MDRV_CPU_IO_MAP(mcnpshnt_io_map)
 
 	MDRV_VIDEO_START(mcnpshnt)	// different priorities
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             7jigen
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( nanajign )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( nanajign, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MDRV_CPU_IO_MAP(nanajign_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4707,10 +4687,7 @@ static MACHINE_START( jantouki )
 	MACHINE_START_CALL(dynax);
 }
 
-static MACHINE_DRIVER_START( jantouki )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4726,7 +4703,7 @@ static MACHINE_DRIVER_START( jantouki )
 	MDRV_MACHINE_START(jantouki)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(512)
@@ -4769,7 +4746,7 @@ static MACHINE_DRIVER_START( jantouki )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4796,16 +4773,14 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
-static MACHINE_DRIVER_START( mjelctrn )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MDRV_CPU_IO_MAP(mjelctrn_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4838,14 +4813,12 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( neruton )
-
-	MDRV_IMPORT_FROM( mjelctrn )
+static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(neruton)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                     Mahjong X-Tal 7
@@ -4865,13 +4838,11 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
 }
 
-static MACHINE_DRIVER_START( majxtal7 )
-
-	MDRV_IMPORT_FROM( neruton )
+static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4887,10 +4858,7 @@ static const ay8910_interface htengoku_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(htengoku_dsw_w)		// W
 };
 
-static MACHINE_DRIVER_START( htengoku )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( htengoku, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000 / 4)
@@ -4902,7 +4870,7 @@ static MACHINE_DRIVER_START( htengoku )
 	MDRV_MACHINE_START(htengoku)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -4930,7 +4898,7 @@ static MACHINE_DRIVER_START( htengoku )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4968,10 +4936,7 @@ static MACHINE_START( tenkai )
 	state_save_register_postload(machine, tenkai_bank_postload, NULL);
 }
 
-static MACHINE_DRIVER_START( tenkai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( tenkai, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
@@ -4982,7 +4947,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_MACHINE_START(tenkai)
 	MDRV_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5009,13 +4974,12 @@ static MACHINE_DRIVER_START( tenkai )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( majrjhdx )
-	MDRV_IMPORT_FROM( tenkai )
+static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Mahjong Gekisha
@@ -5042,10 +5006,7 @@ static MACHINE_RESET( gekisha )
 	gekisha_set_rombank(machine, 0);
 }
 
-static MACHINE_DRIVER_START( gekisha )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( gekisha, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )	// ?
@@ -5056,7 +5017,7 @@ static MACHINE_DRIVER_START( gekisha )
 	MDRV_MACHINE_START(gekisha)
 	MDRV_MACHINE_RESET(gekisha)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5080,7 +5041,7 @@ static MACHINE_DRIVER_START( gekisha )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_24MHz / 8)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

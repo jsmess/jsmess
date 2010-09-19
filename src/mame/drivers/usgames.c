@@ -27,16 +27,8 @@ Sound: AY-3-8912
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
-
-/* video */
-WRITE8_HANDLER( usgames_videoram_w );
-WRITE8_HANDLER( usgames_charram_w );
-VIDEO_START(usgames);
-PALETTE_INIT(usgames);
-VIDEO_UPDATE(usgames);
-
-
-extern UINT8 *usgames_videoram,*usgames_charram;
+#include "includes/usgames.h"
+#include "machine/nvram.h"
 
 
 static WRITE8_HANDLER( usgames_rombank_w )
@@ -69,7 +61,7 @@ static WRITE8_HANDLER( lamps2_w )
 
 
 static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
@@ -88,7 +80,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")
@@ -237,14 +229,14 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_DRIVER_START( usg32 )
+static MACHINE_CONFIG_START( usg32, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(usgames_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,5*60) /* ?? */
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -268,13 +260,12 @@ static MACHINE_DRIVER_START( usg32 )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( usg185 )
-	MDRV_IMPORT_FROM(usg32)
+static MACHINE_CONFIG_DERIVED( usg185, usg32 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(usg185_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

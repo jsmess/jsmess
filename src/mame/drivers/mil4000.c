@@ -87,6 +87,7 @@ Changes (2008-12-10, Roberto Fresca):
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "mil4000.lh"
 
 
@@ -263,10 +264,10 @@ static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x708006, 0x708007) AM_READ_PORT("IN2")
 	AM_RANGE(0x708008, 0x708009) AM_WRITE(output_w)
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
-	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 2x CY62256L-70 (U7 & U8).
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
 
@@ -343,13 +344,13 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( mil4000 )
+static MACHINE_CONFIG_START( mil4000, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )	// ?
 	MDRV_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -366,7 +367,7 @@ static MACHINE_DRIVER_START( mil4000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

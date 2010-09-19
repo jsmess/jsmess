@@ -280,7 +280,9 @@ static WRITE16_HANDLER(raiden2_foreground_w)
 
 static WRITE16_HANDLER(raiden2_text_w)
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	raiden2_state *state = space->machine->driver_data<raiden2_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(text_layer, offset);
 }
 
@@ -320,7 +322,9 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = machine->generic.videoram.u16[tile_index];
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	UINT16 *videoram = state->videoram;
+	int tile = videoram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -845,7 +849,7 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
     AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
@@ -953,7 +957,7 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
     AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
@@ -1184,7 +1188,7 @@ GFXDECODE_END
 
 /* MACHINE DRIVERS */
 
-static MACHINE_DRIVER_START( raiden2 )
+static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -1223,19 +1227,17 @@ static MACHINE_DRIVER_START( raiden2 )
 /* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
 /* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( nzerotea )
-
-	MDRV_IMPORT_FROM(raiden2)
+static MACHINE_CONFIG_DERIVED( nzerotea, raiden2 )
 
 	/* basic machine hardware */
 	MDRV_DEVICE_MODIFY("maincpu") // also change it to a v33!
 	MDRV_CPU_PROGRAM_MAP(nzerotea_mem)
 	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM LOADING */
 
@@ -2155,7 +2157,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
 	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
 
-	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff) // single OKI chip on this version
+	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
@@ -2164,7 +2166,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
 	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -2275,7 +2277,7 @@ static MACHINE_RESET( rdx_v33 )
 	common_reset();
 }
 
-static MACHINE_DRIVER_START( rdx_v33 )
+static MACHINE_CONFIG_START( rdx_v33, raiden2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -2305,7 +2307,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

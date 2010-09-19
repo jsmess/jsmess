@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "includes/holeland.h"
 
 
@@ -30,7 +31,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crzrally_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_MEMBER(holeland_state, colorram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE_MEMBER(holeland_state, videoram, videoram_size)
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(holeland_state, spriteram, spriteram_size)
@@ -273,10 +274,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 
 
-static MACHINE_DRIVER_START( holeland )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(holeland_state)
+static MACHINE_CONFIG_START( holeland, holeland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
@@ -309,7 +307,7 @@ static MACHINE_DRIVER_START( holeland )
 	MDRV_SOUND_ADD("ay2", AY8910, 1818182)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -345,10 +343,7 @@ Notes:
 
 */
 
-static MACHINE_DRIVER_START( crzrally )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(holeland_state)
+static MACHINE_CONFIG_START( crzrally, holeland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
@@ -356,7 +351,7 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -383,7 +378,7 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_SOUND_ADD("ay2", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

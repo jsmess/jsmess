@@ -199,11 +199,11 @@ static READ8_HANDLER( spotty_sound_r )
 	if(spotty_sound_cmd == 0xf7)
 		return soundlatch_r(space,0);
 	else
-		return okim6295_r(space->machine->device("oki"),0);
+		return space->machine->device<okim6295_device>("oki")->read(*space,0);
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE("oki", okim6295_w) //? sound latch and ?
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write) //? sound latch and ?
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 
@@ -640,7 +640,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_DRIVER_START( limenko )
+static MACHINE_CONFIG_START( limenko, driver_device )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map)
 	MDRV_CPU_IO_MAP(limenko_io_map)
@@ -663,9 +663,9 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spotty )
+static MACHINE_CONFIG_START( spotty, driver_device )
 	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map)
 	MDRV_CPU_IO_MAP(spotty_io_map)
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( spotty )
 
 	MDRV_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************************************

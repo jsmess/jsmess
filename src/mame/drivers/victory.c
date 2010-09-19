@@ -98,6 +98,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/exidy.h"
 #include "includes/victory.h"
+#include "machine/nvram.h"
 
 
 
@@ -131,7 +132,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&victory_videoram)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE(&victory_charram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_READWRITE(victory_sound_response_r, victory_sound_command_w)
 	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_READ(victory_sound_status_r)
 ADDRESS_MAP_END
@@ -207,7 +208,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( victory )
+static MACHINE_CONFIG_START( victory, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
@@ -215,7 +216,7 @@ static MACHINE_DRIVER_START( victory )
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", victory_vblank_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE)
@@ -231,9 +232,9 @@ static MACHINE_DRIVER_START( victory )
 	MDRV_VIDEO_UPDATE(victory)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(victory_audio)
+	MDRV_FRAGMENT_ADD(victory_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

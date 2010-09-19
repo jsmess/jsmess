@@ -43,20 +43,7 @@ c001      YM2203 #2 write
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *vulgus_fgvideoram;
-extern UINT8 *vulgus_bgvideoram;
-extern UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
-
-WRITE8_HANDLER( vulgus_fgvideoram_w );
-WRITE8_HANDLER( vulgus_bgvideoram_w );
-WRITE8_HANDLER( vulgus_c804_w );
-WRITE8_HANDLER( vulgus_palette_bank_w );
-VIDEO_START( vulgus );
-PALETTE_INIT( vulgus );
-VIDEO_UPDATE( vulgus );
-
+#include "includes/vulgus.h"
 
 
 static INTERRUPT_GEN( vulgus_interrupt )
@@ -230,7 +217,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( vulgus )
+static MACHINE_CONFIG_START( vulgus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
@@ -264,7 +251,7 @@ static MACHINE_DRIVER_START( vulgus )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

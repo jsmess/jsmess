@@ -7,10 +7,10 @@ static int scanline=0;
 
 INTERRUPT_GEN( beezer_interrupt )
 {
-	running_device *via_0 = device->machine->device("via6522_0");
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 
 	scanline = (scanline + 1) % 0x80;
-	via_ca2_w(via_0, (scanline & 0x10) ? 1 : 0);
+	via_0->write_ca2((scanline & 0x10) ? 1 : 0);
 	if ((scanline & 0x78) == 0x78)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
@@ -19,13 +19,15 @@ INTERRUPT_GEN( beezer_interrupt )
 
 VIDEO_UPDATE( beezer )
 {
+	beezer_state *state = screen->machine->driver_data<beezer_state>();
+	UINT8 *videoram = state->videoram;
 	int x,y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y+=2)
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y+1, x) = screen->machine->generic.videoram.u8[0x80*y+x] & 0x0f;
-			*BITMAP_ADDR16(bitmap, y,   x) = screen->machine->generic.videoram.u8[0x80*y+x] >> 4;
+			*BITMAP_ADDR16(bitmap, y+1, x) = videoram[0x80*y+x] & 0x0f;
+			*BITMAP_ADDR16(bitmap, y,   x) = videoram[0x80*y+x] >> 4;
 		}
 
 	return 0;

@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( ohmygod_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(ohmygod_ctrl_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
@@ -317,10 +317,7 @@ static MACHINE_RESET( ohmygod )
 	state->scrolly = 0;
 }
 
-static MACHINE_DRIVER_START( ohmygod )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ohmygod_state)
+static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -351,7 +348,7 @@ static MACHINE_DRIVER_START( ohmygod )
 
 	MDRV_OKIM6295_ADD("oki", 14000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

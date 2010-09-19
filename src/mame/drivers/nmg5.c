@@ -226,13 +226,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/3812intf.h"
 
 
-class nmg5_state : public driver_data_t
+class nmg5_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nmg5_state(machine)); }
-
-	nmg5_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	nmg5_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *    fg_videoram;
@@ -385,7 +383,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nmg5 )
@@ -1032,10 +1030,7 @@ static MACHINE_RESET( nmg5 )
 	state->input_data = 0;
 }
 
-static MACHINE_DRIVER_START( nmg5 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nmg5_state)
+static MACHINE_CONFIG_START( nmg5, nmg5_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -1072,23 +1067,23 @@ static MACHINE_DRIVER_START( nmg5 )
 
 	MDRV_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( garogun )
+static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pclubys )
+static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_map)
@@ -1097,25 +1092,25 @@ static MACHINE_DRIVER_START( pclubys )
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
 
 	MDRV_GFXDECODE(pclubys)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( searchp2 )
+static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(55) // !
 
 	MDRV_GFXDECODE(pclubys)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( 7ordi )
+static MACHINE_CONFIG_DERIVED( 7ordi, nmg5 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

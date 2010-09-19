@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( sandscrp_soundport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)	// ROM Bank
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		// PORTA/B read
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_w)		// OKIM6295
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_MODERN("oki", okim6295_device, write)		// OKIM6295
 	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)	//
 	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)		//
 	AM_RANGE(0x08, 0x08) AM_READ(sandscrp_latchstatus_r)	//
@@ -438,7 +438,7 @@ static const kaneko_pandora_interface sandscrp_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_DRIVER_START( sandscrp )
+static MACHINE_CONFIG_START( sandscrp, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
@@ -481,7 +481,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	MDRV_SOUND_CONFIG(ym2203_intf_sandscrp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -17,17 +17,15 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-class mosaicf2_state : public driver_data_t
+class mosaicf2_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaicf2_state(machine)); }
-
-	mosaicf2_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")) { }
+	mosaicf2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	cpu_device *	maincpu;
+	required_device<e132xn_device>	maincpu;
 	UINT32 *  videoram;
 };
 
@@ -74,12 +72,12 @@ static READ32_HANDLER( f32_input_port_1_r )
 
 
 static ADDRESS_MAP_START( mosaicf2_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8("oki", okim6295_r, 0x000000ff)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8_MODERN("oki", okim6295_device, read, 0x000000ff)
 	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
 	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
 	AM_RANGE(0x5400, 0x5403) AM_READ_PORT("EEPROMIN")
-	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8("oki", okim6295_w, 0x000000ff)
+	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0x000000ff)
 	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8("ymsnd", ym2151_data_port_w, 0x000000ff)
 	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x000000ff)
 	AM_RANGE(0x7000, 0x7003) AM_WRITE_PORT("EEPROMCLK")
@@ -131,10 +129,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( mosaicf2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mosaicf2_state)
+static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
@@ -167,7 +162,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_OKIM6295_ADD("oki", 1789772.5, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

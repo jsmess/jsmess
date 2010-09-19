@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarisy1_state, alpha)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(atarisy1_state, eeprom, eeprom_size)
+	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf60000, 0xf60003) AM_READ(port4_r)
@@ -484,7 +484,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x1810, 0x1810) AM_READWRITE(atarigen_6502_sound_r, atarigen_6502_sound_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
@@ -740,8 +740,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarisy1 )
-	MDRV_DRIVER_DATA(atarisy1_state)
+static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -753,7 +752,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 
 	MDRV_MACHINE_START(atarisy1)
 	MDRV_MACHINE_RESET(atarisy1)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	MDRV_TIMER_ADD("joystick_timer", delayed_joystick_int)
 	MDRV_TIMER_ADD("scan_timer", atarisy1_int3_callback)
@@ -792,7 +791,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

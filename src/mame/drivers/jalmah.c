@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
 /**/AM_RANGE(0x080020, 0x08003f) AM_RAM_WRITE(jalmah_scroll_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
@@ -933,7 +933,7 @@ static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
 /**/AM_RANGE(0x08001c, 0x08001d) AM_RAM_WRITE(urashima_bank_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_BASE(&sc0_vram)
@@ -1302,7 +1302,7 @@ static MACHINE_RESET ( jalmah )
 	}
 }
 
-static MACHINE_DRIVER_START( jalmah )
+static MACHINE_CONFIG_START( jalmah, driver_device )
 	MDRV_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
@@ -1329,10 +1329,9 @@ static MACHINE_DRIVER_START( jalmah )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( urashima )
-	MDRV_IMPORT_FROM(jalmah)
+static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(urashima)
@@ -1341,7 +1340,7 @@ static MACHINE_DRIVER_START( urashima )
 
 	MDRV_VIDEO_START(urashima)
 	MDRV_VIDEO_UPDATE(urashima)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( eolith16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
 	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ_PORT("SYSTEM")
@@ -157,7 +157,7 @@ static PALETTE_INIT( eolith16 )
 
 
 
-static MACHINE_DRIVER_START( eolith16 )
+static MACHINE_CONFIG_START( eolith16, driver_device )
 	MDRV_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( eolith16 )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

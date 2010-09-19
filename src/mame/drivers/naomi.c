@@ -934,7 +934,7 @@ or I/O, one for a communication module, one for a cooling fan and one for the se
 
 
 
-Atomiswave cart PCB layout and game usage (revision 0.3 19/7/2009 5:55pm)
+Atomiswave cart PCB layout and game usage (revision 0.4 13/9/2010 6:12pm)
 -----------------------------------------
 
 Type 1 ROM Board:
@@ -970,6 +970,7 @@ Notes:
                -----------------------------------------------
                Sports Shooting USA                   AX0101F01
                Dolphin Blue                          AX0401F01
+               Maximum Speed                         AX0501F01
                Demolish Fist                         AX0601F01
                Guilt Gear Isuka                      AX1201F01
                Knights Of Valour Seven Spirits       AX1301F01
@@ -1006,6 +1007,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                -----------------------------------------------------------------------
                Sports Shooting USA                   AX0101M01 to AX0104M01    4
                Dolphin Blue                          AX0401M01 to AX0405M01    5
+               Maximum Speed                         AX0501M01 to AX0505M01    5
                Demolish Fist                         AX0601M01 to AX0607M01    7
                Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
                Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
@@ -1123,7 +1125,6 @@ Notes:
                Force Five
                Guilty Gear X Version 1.5 *
                Kenju
-               Maximum Speed *
                Metal Slug 6 *
                Premier Eleven
                Sushi Bar
@@ -1226,7 +1227,6 @@ Notes:
       CN3 - Gun connection for player 2 pump switch
       CN4 - Gun connection for player 1 trigger and optical
       CN5 - Gun connection for player 1 pump switch
-
 */
 
 #include "emu.h"
@@ -1242,6 +1242,8 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
+static macronix_29l001mc_device *awflash;
+
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -1300,13 +1302,6 @@ jvseeprom_default_game[] =
 	{ "tetkiwam", { 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43, 0x31, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43,	0x31, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
 	{ "keyboard", { 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xF0, 0x4A, 0x0C, 0x0C, 0xF0, 0x4A, 0x0C, 0x0C, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 };
-
-static NVRAM_HANDLER( aw_nvram )
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-
-	// TODO: save AW NVRAM at 00200000
-}
 
 static NVRAM_HANDLER( naomi_eeproms )
 {
@@ -1516,8 +1511,8 @@ ADDRESS_MAP_END
 
 static READ64_HANDLER( aw_flash_r )
 {
-	return (UINT64)intelflash_read(0, offset*8) | (UINT64)intelflash_read(0, (offset*8)+1)<<8 | (UINT64)intelflash_read(0, (offset*8)+2)<<16 | (UINT64)intelflash_read(0, (offset*8)+3)<<24 |
-	       (UINT64)intelflash_read(0, (offset*8)+4)<<32 | (UINT64)intelflash_read(0, (offset*8)+5)<<40 | (UINT64)intelflash_read(0, (offset*8)+6)<<48 | (UINT64)intelflash_read(0, (offset*8)+7)<<56;
+	return (UINT64)awflash->read(offset*8) | (UINT64)awflash->read((offset*8)+1)<<8 | (UINT64)awflash->read((offset*8)+2)<<16 | (UINT64)awflash->read((offset*8)+3)<<24 |
+	       (UINT64)awflash->read((offset*8)+4)<<32 | (UINT64)awflash->read((offset*8)+5)<<40 | (UINT64)awflash->read((offset*8)+6)<<48 | (UINT64)awflash->read((offset*8)+7)<<56;
 }
 
 static WRITE64_HANDLER( aw_flash_w )
@@ -1536,7 +1531,7 @@ static WRITE64_HANDLER( aw_flash_w )
 
 	data >>= (i*8);
 
-	intelflash_write(0, addr, data);
+	awflash->write(addr, data);
 }
 
 INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
@@ -1601,8 +1596,8 @@ static WRITE64_HANDLER( aw_modem_w )
 
 static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
-	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
@@ -1915,7 +1910,7 @@ static MACHINE_RESET( naomi )
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static MACHINE_DRIVER_START( naomi_base )
+static MACHINE_CONFIG_START( naomi_base, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
@@ -1951,25 +1946,23 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 1
  */
 
-static MACHINE_DRIVER_START( naomi )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
 	MDRV_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 1 GD-Rom
  */
 
-static MACHINE_DRIVER_START( naomigd )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
 	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 2
@@ -1987,14 +1980,13 @@ MACHINE_DRIVER_END
  * Atomiswave
  */
 
-static MACHINE_DRIVER_START( aw )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( aw, naomi_base )
 //  MDRV_DEVICE_REMOVE("main_eeprom")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
-	MDRV_NVRAM_HANDLER(aw_nvram)
+	MDRV_MACRONIX_29L001MC_ADD("awflash")
 	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
@@ -2267,7 +2259,7 @@ ROM_START( naomi2 )
 ROM_END
 
 ROM_START( awbios )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -6437,11 +6429,11 @@ static const UINT32 kov7sprt_key = 0xf0000;
 static const UINT32 ggisuka_key  = 0x8b10a;
 static const UINT32 vfurlong_key = 0xa547a;
 static const UINT32 salmankt_key = 0x34b74;
-
+static const UINT32 maxspeed_key = 0x28dd6;
 
 static DRIVER_INIT( atomiswave )
 {
-	UINT64 *ROM = (UINT64 *)memory_region(machine, "maincpu");
+	UINT64 *ROM = (UINT64 *)memory_region(machine, "awflash");
 #if 0
 	UINT8 *dcdata = (UINT8 *)memory_region(machine, "user1");
 	FILE *f;
@@ -6453,7 +6445,7 @@ static DRIVER_INIT( atomiswave )
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
 
-	intelflash_init(machine, 0, FLASH_MACRONIX_29L001MC, memory_region(machine, "maincpu"));
+	awflash = machine->device<macronix_29l001mc_device>("awflash");
 }
 
 #define AW_DRIVER_INIT(DRIVER)	\
@@ -6483,9 +6475,10 @@ AW_DRIVER_INIT(kov7sprt)
 AW_DRIVER_INIT(ggisuka)
 AW_DRIVER_INIT(vfurlong)
 AW_DRIVER_INIT(salmankt)
+AW_DRIVER_INIT(maxspeed)
 
 ROM_START( fotns )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6500,7 +6493,7 @@ ROM_START( fotns )
 ROM_END
 
 ROM_START( rangrmsn )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6513,7 +6506,7 @@ ROM_START( rangrmsn )
 ROM_END
 
 ROM_START( sprtshot )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6525,7 +6518,7 @@ ROM_START( sprtshot )
 ROM_END
 
 ROM_START( xtrmhunt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6539,7 +6532,7 @@ ROM_START( xtrmhunt )
 ROM_END
 
 ROM_START( xtrmhnt2 )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6558,7 +6551,7 @@ ROM_START( xtrmhnt2 )
 ROM_END
 
 ROM_START( dolphin )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6571,7 +6564,7 @@ ROM_START( dolphin )
 ROM_END
 
 ROM_START( demofist )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6586,7 +6579,7 @@ ROM_START( demofist )
 ROM_END
 
 ROM_START( rumblef )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6601,7 +6594,7 @@ ROM_START( rumblef )
 ROM_END
 
 ROM_START( ngbc )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6609,7 +6602,7 @@ ROM_START( ngbc )
 ROM_END
 
 ROM_START( kofnw )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6623,7 +6616,7 @@ ROM_START( kofnw )
 ROM_END
 
 ROM_START( kofnwj )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6638,7 +6631,7 @@ ROM_START( kofnwj )
 ROM_END
 
 ROM_START( kov7sprt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6653,7 +6646,7 @@ ROM_START( kov7sprt )
 ROM_END
 
 ROM_START( ggisuka )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
@@ -6668,8 +6661,21 @@ ROM_START( ggisuka )
         ROM_LOAD( "ax1208m01.ic17", 0x7000000, 0x1000000, CRC(38bda476) SHA1(0234a6f5fbaf5e958b3ba0db311dff157f80addc) )
 ROM_END
 
+ROM_START( maxspeed )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax0501p01.ic18", 0x0000000, 0x0800000, CRC(e1651867) SHA1(49caf82f4b111da312b14bb0a9c31e3732b4b24e) )
+        ROM_LOAD( "ax0501m01.ic11", 0x0800000, 0x1000000, CRC(4a847a59) SHA1(7808bcd357b85861082b426dbe34a20ae7016f6a) )
+        ROM_LOAD( "ax0502m01.ic12", 0x1000000, 0x1000000, CRC(2580237f) SHA1(2e92c940f95edae33d6a7e8a071544a9083a0fd6) )
+        ROM_LOAD( "ax0503m01.ic13", 0x2000000, 0x1000000, CRC(e5a3766b) SHA1(1fe6e072adad27ac43c0bff04e3c448678aabc18) )
+        ROM_LOAD( "ax0504m01.ic14", 0x3000000, 0x1000000, CRC(7955b55a) SHA1(927f58d6961e702c2a8afce79bac5e5cff3dfed6) )
+        ROM_LOAD( "ax0505m01.ic15", 0x4000000, 0x1000000, CRC(e8ccc660) SHA1(a5f414f200a0d41e958430d0fc2d4e1fda1cc67c) )
+ROM_END
+
 ROM_START( vfurlong )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
@@ -6684,7 +6690,7 @@ ROM_START( vfurlong )
 ROM_END
 
 ROM_START( salmankt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
@@ -6699,8 +6705,9 @@ ROM_START( salmankt )
 ROM_END
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,        aw,    aw,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
+GAME( 2002, maxspeed, awbios,   aw,    aw,    maxspeed, ROT0, "Sammy",                           "Maximum Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, sprtshot, awbios,   aw,    aw,    sprtshot, ROT0, "Sammy USA",                       "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   aw,    aw,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, dolphin,  awbios,   aw,    aw,    dolphin,  ROT0, "Sammy",                           "Dolphin Blue", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

@@ -12,6 +12,7 @@
 #include "cpu/se3208/se3208.h"
 #include "video/vrender0.h"
 #include "machine/ds1302.h"
+#include "machine/nvram.h"
 #include "sound/vrender0.h"
 
 
@@ -51,14 +52,14 @@ static const vr0_interface vr0_config =
 };
 
 
-static MACHINE_DRIVER_START( ddz )
+static MACHINE_CONFIG_START( ddz, driver_device )
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(ddz_mem)
 	MDRV_CPU_VBLANK_INT("screen", ddz_interrupt)
 
 	//MDRV_MACHINE_RESET(ddz)
 
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -79,7 +80,7 @@ static MACHINE_DRIVER_START( ddz )
 	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

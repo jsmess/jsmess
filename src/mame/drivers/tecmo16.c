@@ -28,32 +28,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-
-extern UINT16 *tecmo16_videoram;
-extern UINT16 *tecmo16_colorram;
-extern UINT16 *tecmo16_videoram2;
-extern UINT16 *tecmo16_colorram2;
-extern UINT16 *tecmo16_charram;
-
-WRITE16_HANDLER( tecmo16_videoram_w );
-WRITE16_HANDLER( tecmo16_colorram_w );
-WRITE16_HANDLER( tecmo16_videoram2_w );
-WRITE16_HANDLER( tecmo16_colorram2_w );
-WRITE16_HANDLER( tecmo16_charram_w );
-WRITE16_HANDLER( tecmo16_flipscreen_w );
-
-WRITE16_HANDLER( tecmo16_scroll_x_w );
-WRITE16_HANDLER( tecmo16_scroll_y_w );
-WRITE16_HANDLER( tecmo16_scroll2_x_w );
-WRITE16_HANDLER( tecmo16_scroll2_y_w );
-WRITE16_HANDLER( tecmo16_scroll_char_x_w );
-WRITE16_HANDLER( tecmo16_scroll_char_y_w );
-
-VIDEO_START( fstarfrc );
-VIDEO_START( ginkun );
-VIDEO_START( riot );
-VIDEO_UPDATE( tecmo16 );
+#include "includes/tecmo16.h"
 
 /******************************************************************************/
 
@@ -119,7 +94,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
@@ -398,7 +373,7 @@ static const ym2151_interface ym2151_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( fstarfrc )
+static MACHINE_CONFIG_START( fstarfrc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
@@ -435,22 +410,21 @@ static MACHINE_DRIVER_START( fstarfrc )
 	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ginkun )
-	MDRV_IMPORT_FROM(fstarfrc)
+static MACHINE_CONFIG_DERIVED( ginkun, fstarfrc )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ginkun_map)
 
 	MDRV_VIDEO_START(ginkun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( riot )
+static MACHINE_CONFIG_DERIVED( riot, ginkun )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ginkun)
 	MDRV_VIDEO_START(riot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

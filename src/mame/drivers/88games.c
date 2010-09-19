@@ -10,6 +10,7 @@
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 #include "includes/88games.h"
 
 
@@ -138,7 +139,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(_88games_state, banked_rom) /* banked ROM + palette RAM */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(_88games_state, ram)
 	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
@@ -375,10 +376,7 @@ static const k051316_interface _88games_k051316_intf =
 	_88games_zoom_callback
 };
 
-static MACHINE_DRIVER_START( 88games )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(_88games_state)
+static MACHINE_CONFIG_START( 88games, _88games_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
@@ -391,7 +389,7 @@ static MACHINE_DRIVER_START( 88games )
 	MDRV_MACHINE_START(88games)
 	MDRV_MACHINE_RESET(88games)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -422,7 +420,7 @@ static MACHINE_DRIVER_START( 88games )
 
 	MDRV_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

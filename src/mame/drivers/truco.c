@@ -18,12 +18,9 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
+#include "includes/truco.h"
 
 static UINT8 *battery_ram;
-
-/* from video */
-VIDEO_UPDATE( truco );
-PALETTE_INIT( truco );
 
 
 /***************************************************************************/
@@ -31,7 +28,7 @@ PALETTE_INIT( truco );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM										/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_GENERIC(videoram)					/* video ram */
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_MEMBER(truco_state, videoram)					/* video ram */
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&battery_ram)				/* battery backed ram */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1") AM_WRITENOP				/* controls (and irq ack?) */
 	AM_RANGE(0x8001, 0x8001) AM_NOP				/* unknown */
@@ -135,7 +132,7 @@ static INTERRUPT_GEN( truco_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( truco )
+static MACHINE_CONFIG_START( truco, truco_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 750000)        /* ?? guess */
@@ -163,7 +160,7 @@ static MACHINE_DRIVER_START( truco )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -162,23 +162,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
-
-extern UINT8 *wiz_videoram2;
-extern UINT8 *wiz_colorram2;
-extern UINT8 *wiz_attributesram;
-extern UINT8 *wiz_attributesram2;
-extern UINT8 *wiz_sprite_bank;
-
-WRITE8_HANDLER( wiz_char_bank_select_w );
-WRITE8_HANDLER( wiz_palettebank_w );
-WRITE8_HANDLER( wiz_bgcolor_w );
-WRITE8_HANDLER( wiz_flipx_w );
-WRITE8_HANDLER( wiz_flipy_w );
-VIDEO_START( wiz );
-PALETTE_INIT( wiz );
-VIDEO_UPDATE( wiz );
-VIDEO_UPDATE( stinger );
-VIDEO_UPDATE( kungfut );
+#include "includes/wiz.h"
 
 #define STINGER_SHOT_EN1	NODE_01
 #define STINGER_SHOT_EN2	NODE_02
@@ -238,7 +222,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd83f) AM_BASE(&wiz_attributesram2)
 	AM_RANGE(0xd840, 0xd85f) AM_BASE_GENERIC(spriteram2) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* Fallthrough */
+	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe83f) AM_BASE(&wiz_attributesram)
 	AM_RANGE(0xe840, 0xe85f) AM_BASE_GENERIC(spriteram)
@@ -695,7 +679,7 @@ static MACHINE_RESET( wiz )
 	dsc0 = dsc1 = 1;
 }
 
-static MACHINE_DRIVER_START( wiz )
+static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */
@@ -734,13 +718,12 @@ static MACHINE_DRIVER_START( wiz )
 
 	MDRV_SOUND_ADD("8910.3", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stinger )
+static MACHINE_CONFIG_DERIVED( stinger, wiz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(wiz)
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(stinger_sound_map)
@@ -761,31 +744,29 @@ static MACHINE_DRIVER_START( stinger )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(stinger)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scion )
+static MACHINE_CONFIG_DERIVED( scion, stinger )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stinger)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kungfut )
+static MACHINE_CONFIG_DERIVED( kungfut, wiz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(wiz)
 
 	/* video hardware */
 	MDRV_GFXDECODE(stinger)
 	MDRV_VIDEO_UPDATE(kungfut)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1,16 +1,21 @@
-class metalmx_state : public driver_data_t
+#include "cpu/adsp2100/adsp2100.h"
+
+class metalmx_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metalmx_state(machine)); }
+	metalmx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  gsp(*this, "gsp"),
+		  adsp(*this, "adsp"),
+		  dsp32c_1(*this, "dsp32c_1"),
+		  dsp32c_2(*this, "dsp32c_2") { }
 
-	metalmx_state(running_machine &machine)
-		: driver_data_t(machine) { }
-
-	running_device *maincpu;
-	running_device *gsp;
-	running_device *adsp;
-	running_device *dsp32c_1;
-	running_device *dsp32c_2;
+	required_device<m68ec020_device> maincpu;
+	required_device<tms34020_device> gsp;
+	required_device<adsp2105_device> adsp;
+	required_device<dsp32c_device> dsp32c_1;
+	required_device<dsp32c_device> dsp32c_2;
 
 	UINT16				*gsp_dram;
 	UINT16				*gsp_vram;

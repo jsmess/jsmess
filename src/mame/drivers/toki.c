@@ -41,21 +41,7 @@ for now. Even at 12 this slowdown still happens a little.
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
-
-extern UINT16 *toki_background1_videoram16;
-extern UINT16 *toki_background2_videoram16;
-extern UINT16 *toki_scrollram16;
-
-VIDEO_START( toki );
-VIDEO_EOF( toki );
-VIDEO_EOF( tokib );
-VIDEO_UPDATE( toki );
-VIDEO_UPDATE( tokib );
-WRITE16_HANDLER( toki_background1_videoram16_w );
-WRITE16_HANDLER( toki_background2_videoram16_w );
-WRITE16_HANDLER( toki_control_w );
-WRITE16_HANDLER( toki_foreground_videoram16_w );
-
+#include "includes/toki.h"
 
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
@@ -111,7 +97,7 @@ static ADDRESS_MAP_START( toki_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, videoram)
 	AM_RANGE(0x080000, 0x08000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
@@ -126,7 +112,7 @@ static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, videoram)
 	AM_RANGE(0x071000, 0x071001) AM_WRITENOP	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
@@ -427,7 +413,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
+static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)	/* verified on pcb */
@@ -456,10 +442,10 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* verifed on pcb */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tokib )
+static MACHINE_CONFIG_START( tokib, toki_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
@@ -494,7 +480,7 @@ static MACHINE_DRIVER_START( tokib )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

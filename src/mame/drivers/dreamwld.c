@@ -90,13 +90,11 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 #define MASTER_CLOCK 32000000
 
-class dreamwld_state : public driver_data_t
+class dreamwld_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dreamwld_state(machine)); }
-
-	dreamwld_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dreamwld_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT32 *  bg_videoram;
@@ -316,10 +314,10 @@ static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
 	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0xff000000) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0xff000000) // sfx
 
 	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0xff000000) // sfx
+	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0xff000000) // sfx
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
@@ -420,10 +418,7 @@ static MACHINE_RESET( dreamwld )
 	state->protindex = 0;
 }
 
-static MACHINE_DRIVER_START( dreamwld )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dreamwld_state)
+static MACHINE_CONFIG_START( dreamwld, dreamwld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
@@ -456,7 +451,7 @@ static MACHINE_DRIVER_START( dreamwld )
 	MDRV_OKIM6295_ADD("oki2", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

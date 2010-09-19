@@ -106,6 +106,7 @@
 #include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "audio/mcr.h"
+#include "machine/nvram.h"
 #include "includes/mcr.h"
 
 #include "turbotag.lh"
@@ -477,11 +478,11 @@ static READ8_HANDLER( turbotag_kludge_r )
 static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM		/* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
 
@@ -511,9 +512,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -1073,7 +1074,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR3 system with no sound */
-static MACHINE_DRIVER_START( mcr3_base )
+static MACHINE_CONFIG_START( mcr3_base, mcr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1085,7 +1086,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
 	MDRV_MACHINE_RESET(mcr)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1102,17 +1103,16 @@ static MACHINE_DRIVER_START( mcr3_base )
 
 	MDRV_VIDEO_START(mcr)
 	MDRV_VIDEO_UPDATE(mcr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************/
 
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_DRIVER_START( mcrmono )
+static MACHINE_CONFIG_DERIVED( mcrmono, mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr3_base)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcrmono_map)
@@ -1121,36 +1121,33 @@ static MACHINE_DRIVER_START( mcrmono )
 	/* video hardware */
 	MDRV_VIDEO_START(mcrmono)
 	MDRV_VIDEO_UPDATE(mcr3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
-static MACHINE_DRIVER_START( mono_tcs )
+static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrmono)
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+MACHINE_CONFIG_END
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-static MACHINE_DRIVER_START( mono_sg )
+static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrmono)
-	MDRV_IMPORT_FROM(sounds_good)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sounds_good)
+MACHINE_CONFIG_END
 
 
 /*************************************/
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_DRIVER_START( mcrscroll )
+static MACHINE_CONFIG_DERIVED( mcrscroll, mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr3_base)
-	MDRV_IMPORT_FROM(mcr_ssio)
+	MDRV_FRAGMENT_ADD(mcr_ssio)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spyhunt_map)
@@ -1166,16 +1163,15 @@ static MACHINE_DRIVER_START( mcrscroll )
 	MDRV_PALETTE_INIT(spyhunt)
 	MDRV_VIDEO_START(spyhunt)
 	MDRV_VIDEO_UPDATE(spyhunt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Spy Hunter = scrolling system with an SSIO and a chip squeak deluxe */
-static MACHINE_DRIVER_START( mcrsc_csd )
+static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrscroll)
-	MDRV_IMPORT_FROM(chip_squeak_deluxe_stereo)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(chip_squeak_deluxe_stereo)
+MACHINE_CONFIG_END
 
 
 

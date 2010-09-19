@@ -193,6 +193,7 @@ TODO :
 #include "cpu/z80/z80.h"
 #include "sound/es8712.h"
 #include "sound/2203intf.h"
+#include "machine/nvram.h"
 
 #define UNBANKED_SIZE 0x800
 
@@ -451,7 +452,7 @@ static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
@@ -756,7 +757,7 @@ static INTERRUPT_GEN( witch_sub_interrupt )
 	cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( witch )
+static MACHINE_CONFIG_START( witch, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main)
@@ -767,7 +768,7 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_CPU_PROGRAM_MAP(map_sub)
 	MDRV_CPU_VBLANK_INT("screen", witch_sub_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -797,7 +798,7 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )

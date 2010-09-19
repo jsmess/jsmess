@@ -36,6 +36,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "machine/nvram.h"
 #include "includes/hnayayoi.h"
 
 
@@ -91,7 +92,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_reset_inv_w )
 
 static ADDRESS_MAP_START( hnayayoi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -117,7 +118,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnfubuki_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xfeff) AM_ROM
 	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ymsnd", ym2203_w)
 	AM_RANGE(0xff02, 0xff03) AM_DEVREAD("ymsnd", ym2203_r)
@@ -139,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -553,10 +554,7 @@ static MACHINE_RESET( hnayayoi )
 }
 
 
-static MACHINE_DRIVER_START( hnayayoi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hnayayoi_state)
+static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
@@ -568,7 +566,7 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_MACHINE_START(hnayayoi)
 	MDRV_MACHINE_RESET(hnayayoi)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -597,22 +595,20 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hnfubuki )
-	MDRV_IMPORT_FROM(hnayayoi)
+static MACHINE_CONFIG_DERIVED( hnfubuki, hnayayoi )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hnfubuki_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( untoucha )
-	MDRV_IMPORT_FROM(hnayayoi)
+static MACHINE_CONFIG_DERIVED( untoucha, hnayayoi )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(untoucha_map)
 	MDRV_CPU_IO_MAP(untoucha_io_map)
 
 	MDRV_VIDEO_START(untoucha)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

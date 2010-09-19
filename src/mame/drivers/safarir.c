@@ -50,13 +50,11 @@ modified by Hau
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
 
-class safarir_state : public driver_data_t
+class safarir_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, safarir_state(machine)); }
-
-	safarir_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	safarir_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *ram_1, *ram_2;
 	size_t ram_size;
@@ -296,12 +294,12 @@ static const samples_interface safarir_samples_interface =
 };
 
 
-static MACHINE_DRIVER_START( safarir_audio )
+static MACHINE_CONFIG_FRAGMENT( safarir_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(safarir_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -397,9 +395,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( safarir )
-
-	MDRV_DRIVER_DATA( safarir_state )
+static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, 18000000/8)	/* 2.25 MHz ? */
@@ -421,8 +417,8 @@ static MACHINE_DRIVER_START( safarir )
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(safarir_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(safarir_audio)
+MACHINE_CONFIG_END
 
 
 

@@ -12,20 +12,9 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "includes/quizdna.h"
 
 #define MCLK 16000000
-
-VIDEO_START( quizdna );
-VIDEO_UPDATE( quizdna );
-
-WRITE8_HANDLER( quizdna_fg_ram_w );
-WRITE8_HANDLER( quizdna_bg_ram_w );
-WRITE8_HANDLER( quizdna_bg_yscroll_w );
-WRITE8_HANDLER( quizdna_bg_xscroll_w );
-WRITE8_HANDLER( quizdna_screen_ctrl_w );
-
-WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );
-
 
 static WRITE8_HANDLER( quizdna_rombank_w )
 {
@@ -75,7 +64,7 @@ static ADDRESS_MAP_START( quizdna_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gakupara_io_map, ADDRESS_SPACE_IO, 8 )
@@ -90,7 +79,7 @@ static ADDRESS_MAP_START( gakupara_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekiretu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -105,7 +94,7 @@ static ADDRESS_MAP_START( gekiretu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -452,7 +441,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_DRIVER_START( quizdna )
+static MACHINE_CONFIG_START( quizdna, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -486,28 +475,26 @@ static MACHINE_DRIVER_START( quizdna )
 
 	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gakupara )
+static MACHINE_CONFIG_DERIVED( gakupara, quizdna )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(gakupara_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gekiretu )
+static MACHINE_CONFIG_DERIVED( gekiretu, quizdna )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gekiretu_map)
 	MDRV_CPU_IO_MAP(gekiretu_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************************************************************/

@@ -7,29 +7,7 @@ Atari Wolf Pack (prototype) driver
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/s14001a.h"
-
-extern int wolfpack_collision;
-
-extern UINT8* wolfpack_alpha_num_ram;
-
-PALETTE_INIT( wolfpack );
-VIDEO_UPDATE( wolfpack );
-VIDEO_START( wolfpack );
-VIDEO_EOF( wolfpack );
-
-WRITE8_HANDLER( wolfpack_video_invert_w );
-WRITE8_HANDLER( wolfpack_ship_reflect_w );
-WRITE8_HANDLER( wolfpack_pt_pos_select_w );
-WRITE8_HANDLER( wolfpack_pt_horz_w );
-WRITE8_HANDLER( wolfpack_pt_pic_w );
-WRITE8_HANDLER( wolfpack_ship_h_w );
-WRITE8_HANDLER( wolfpack_torpedo_pic_w );
-WRITE8_HANDLER( wolfpack_ship_size_w );
-WRITE8_HANDLER( wolfpack_ship_h_precess_w );
-WRITE8_HANDLER( wolfpack_ship_pic_w );
-WRITE8_HANDLER( wolfpack_torpedo_h_w );
-WRITE8_HANDLER( wolfpack_torpedo_v_w );
-
+#include "includes/wolfpack.h"
 
 static TIMER_CALLBACK( periodic_callback )
 {
@@ -306,7 +284,7 @@ static GFXDECODE_START( wolfpack )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START(wolfpack)
+static MACHINE_CONFIG_START( wolfpack, driver_device )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
@@ -333,7 +311,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	/* sound hardware */
 	MDRV_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( wolfpack )

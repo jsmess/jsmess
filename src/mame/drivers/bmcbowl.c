@@ -211,18 +211,6 @@ static WRITE16_HANDLER( scroll_w )
 }
 
 
-static READ16_HANDLER(bmcbowl_via_r)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	return via_r(via_0, offset);
-}
-
-static WRITE16_HANDLER(bmcbowl_via_w)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	via_w(via_0, offset, data);
-}
-
 static READ8_DEVICE_HANDLER(via_b_in)
 {
 	return input_port_read(device->machine, "IN3");
@@ -333,7 +321,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x091000, 0x091001) AM_WRITENOP
 	AM_RANGE(0x091800, 0x091801) AM_WRITE(scroll_w)
 
-	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(bmcbowl_via_r, bmcbowl_via_w)
+	AM_RANGE(0x092000, 0x09201f) AM_DEVREADWRITE8_MODERN("via6522_0", via6522_device, read, write, 0x00ff)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITENOP  // related to music
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xff00)
@@ -346,7 +334,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&bmcbowl_vid2)
 
-	AM_RANGE(0x28c000, 0x28c001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x28c000, 0x28c001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 
 	/* protection device*/
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP
@@ -402,7 +390,7 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x00, "DSW2 4" )
+	PORT_DIPNAME( 0x40, 0x00, "DSW2 2" )
 	PORT_DIPSETTING(    0x040, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "DSW2 1" )
@@ -492,7 +480,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( bmcbowl )
+static MACHINE_CONFIG_START( bmcbowl, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
@@ -526,7 +514,7 @@ static MACHINE_DRIVER_START( bmcbowl )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1000000, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( bmcbowl )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */

@@ -256,7 +256,7 @@ static const s2636_interface s2636_2_config =
 	"s2636snd_2"
 };
 
-static MACHINE_DRIVER_START( galaxia )
+static MACHINE_CONFIG_START( galaxia, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mem_map)
@@ -282,23 +282,22 @@ static MACHINE_DRIVER_START( galaxia )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("s2636snd_0", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("s2636snd_1", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd_1", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("s2636snd_2", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd_2", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( astrowar )
-	MDRV_IMPORT_FROM( galaxia )
+static MACHINE_CONFIG_DERIVED( astrowar, galaxia )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astrowar_mem)
 	MDRV_CPU_IO_MAP(astrowar_io)
 	MDRV_GFXDECODE(astrowar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( galaxia )
 	ROM_REGION( 0x10000, "maincpu", 0 )

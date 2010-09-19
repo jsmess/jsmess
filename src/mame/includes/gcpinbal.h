@@ -2,16 +2,14 @@
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 
-class gcpinbal_state : public driver_data_t
+class gcpinbal_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gcpinbal_state(machine)); }
-
-	gcpinbal_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  oki(machine.device<okim6295_device>("oki")),
-		  msm(machine.device<msm5205_sound_device>("msm")) { }
+	gcpinbal_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  oki(*this, "oki"),
+		  msm(*this, "msm") { }
 
 	/* memory pointers */
 	UINT16 *    tilemapram;
@@ -34,9 +32,9 @@ public:
 	UINT8       adpcm_trigger, adpcm_data;
 
 	/* devices */
-	cpu_device *maincpu;
-	okim6295_device *oki;
-	msm5205_sound_device *msm;
+	required_device<cpu_device> maincpu;
+	required_device<okim6295_device> oki;
+	required_device<msm5205_device> msm;
 };
 
 

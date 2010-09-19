@@ -100,6 +100,7 @@
 
 #include "emu.h"
 #include "includes/beathead.h"
+#include "machine/nvram.h"
 
 
 
@@ -235,7 +236,7 @@ WRITE32_MEMBER( beathead_state::eeprom_data_w )
 	if (m_eeprom_enabled)
 	{
 		mem_mask &= 0x000000ff;
-		COMBINE_DATA(m_machine.generic.nvram.u32 + offset);
+		COMBINE_DATA(m_nvram + offset);
 		m_eeprom_enabled = 0;
 	}
 }
@@ -313,7 +314,7 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(m_ram_base)
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
-	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
 	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
@@ -383,6 +384,10 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+        PORT_MODIFY("JSAIII")
+// coin 1+2 import from JSAIII not used - set to unused
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 
@@ -393,14 +398,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( beathead )
-	MDRV_DRIVER_DATA(beathead_state)
+static MACHINE_CONFIG_START( beathead, beathead_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 
@@ -415,8 +419,8 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_PALETTE_LENGTH(32768)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_iii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_iii_mono)
+MACHINE_CONFIG_END
 
 
 
@@ -499,8 +503,8 @@ static DRIVER_INIT( beathead )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */
-	state->m_speedup_data = state->m_maincpu.space(AS_PROGRAM)->install_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate_create(beathead_state, speedup_r, *state));
-	state->m_movie_speedup_data = state->m_maincpu.space(AS_PROGRAM)->install_handler(0x00000804, 0x00000807, 0, 0, read32_delegate_create(beathead_state, movie_speedup_r, *state));
+	state->m_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate_create(beathead_state, speedup_r, *state));
+	state->m_movie_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_handler(0x00000804, 0x00000807, 0, 0, read32_delegate_create(beathead_state, movie_speedup_r, *state));
 }
 
 

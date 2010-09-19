@@ -63,14 +63,13 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
-class supdrapo_state : public driver_data_t
+class supdrapo_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supdrapo_state(machine)); }
-
-	supdrapo_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	supdrapo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *char_bank;
 	UINT8 *col_line;
@@ -259,7 +258,7 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITE(debug8004_w)
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW2")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW1")
-	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
 	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -431,9 +430,7 @@ static const ay8910_interface ay8910_config =
                            Machine Driver
 **********************************************************************/
 
-static MACHINE_DRIVER_START( supdrapo )
-
-	MDRV_DRIVER_DATA( supdrapo_state )
+static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(sdpoker_mem)
@@ -442,7 +439,7 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_MACHINE_START(supdrapo)
 	MDRV_MACHINE_RESET(supdrapo)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -464,7 +461,7 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_SOUND_ADD("aysnd", AY8910, SND_CLOCK)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*********************************************************************

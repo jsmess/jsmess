@@ -684,7 +684,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
 	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
 //  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
@@ -713,7 +713,7 @@ static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
 	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
@@ -917,7 +917,7 @@ static MACHINE_RESET( filetto )
 	filetto_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
-static MACHINE_DRIVER_START( filetto )
+static MACHINE_CONFIG_START( filetto, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(filetto_io)
@@ -934,6 +934,8 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MDRV_GFXDECODE(filetto)
 
@@ -960,9 +962,9 @@ static MACHINE_DRIVER_START( filetto )
 //  PC "buzzer" sound
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tetriskr )
+static MACHINE_CONFIG_START( tetriskr, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, 14318180/3)
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(tetriskr_io)
@@ -979,6 +981,8 @@ static MACHINE_DRIVER_START( tetriskr )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MDRV_GFXDECODE(tetriskr)
 
@@ -1002,7 +1006,7 @@ static MACHINE_DRIVER_START( tetriskr )
 //  PC "buzzer" sound
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( filetto )
 	ROM_REGION( 0x100000, "maincpu", 0 )

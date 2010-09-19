@@ -162,6 +162,7 @@ Stephh's log (2007.11.28) :
 
 #include "emu.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "video/mc6845.h"
@@ -172,6 +173,19 @@ Stephh's log (2007.11.28) :
 #include "pe_bjack.lh"
 #include "pe_keno.lh"
 #include "pe_slots.lh"
+
+
+class peplus_state : public driver_device
+{
+public:
+	peplus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  cmos_ram(*this, "cmos") { }
+
+	UINT8 *videoram;
+	required_shared_ptr<UINT8> cmos_ram;
+};
+
 
 #define MASTER_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
@@ -186,7 +200,6 @@ static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instea
 
 /* Pointers to External RAM */
 static UINT8 *program_ram;
-static UINT8 *cmos_ram;
 static UINT8 *s3000_ram;
 static UINT8 *s5000_ram;
 static UINT8 *s7000_ram;
@@ -214,7 +227,6 @@ static UINT8 coin_out_state = 0;
 static int sda_dir = 0;
 
 /* Static Variables */
-#define CMOS_NVRAM_SIZE     0x2000
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
 /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
@@ -257,30 +269,6 @@ static void peplus_load_superdata(running_machine *machine, const char *bank_nam
     memcpy(sb000_ram, &super_data[0xb000], 0x1000);
     memcpy(sd000_ram, &super_data[0xd000], 0x1000);
     memcpy(sf000_ram, &super_data[0xf000], 0x1000);
-}
-
-
-/*****************
-* NVRAM Handlers *
-******************/
-
-static NVRAM_HANDLER( peplus )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, cmos_ram, CMOS_NVRAM_SIZE);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, cmos_ram, CMOS_NVRAM_SIZE);
-		}
-		else
-		{
-			memset(cmos_ram, 0, CMOS_NVRAM_SIZE);
-		}
-	}
 }
 
 
@@ -357,7 +345,9 @@ static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
-	device->machine->generic.videoram.u8[vid_address] = data;
+	peplus_state *state = device->machine->driver_data<peplus_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[vid_address] = data;
 	palette_ram[vid_address] = io_port[1];
 	palette_ram2[vid_address] = io_port[3];
 
@@ -379,6 +369,7 @@ static WRITE8_HANDLER( peplus_duart_w )
 
 static WRITE8_HANDLER( peplus_cmos_w )
 {
+	peplus_state *state = space->machine->driver_data<peplus_state>();
 	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
@@ -388,7 +379,7 @@ static WRITE8_HANDLER( peplus_cmos_w )
 		peplus_load_superdata(space->machine, bank_name);
 	}
 
-	cmos_ram[offset] = data;
+	state->cmos_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s3000_w )
@@ -486,7 +477,8 @@ static READ8_HANDLER( peplus_duart_r )
 
 static READ8_HANDLER( peplus_cmos_r )
 {
-	return cmos_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->cmos_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s3000_r )
@@ -644,9 +636,11 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	peplus_state *state = machine->driver_data<peplus_state>();
+	UINT8 *videoram = state->videoram;
 	int pr = palette_ram[tile_index];
 	int pr2 = palette_ram2[tile_index];
-	int vr = machine->generic.videoram.u8[tile_index];
+	int vr = videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
@@ -733,7 +727,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE("crtc", peplus_crtc_mode_w)
@@ -755,7 +749,7 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
 
     // Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_MEMBER(peplus_state, videoram)
 
     // Superboard Data
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
@@ -1021,14 +1015,14 @@ static MACHINE_RESET( peplus )
 *     Machine Driver     *
 *************************/
 
-static MACHINE_DRIVER_START( peplus )
+static MACHINE_CONFIG_START( peplus, peplus_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map)
 	MDRV_CPU_IO_MAP(peplus_iomap)
 
 	MDRV_MACHINE_RESET(peplus)
-	MDRV_NVRAM_HANDLER(peplus)
+	MDRV_NVRAM_ADD_0FILL("cmos")
 
 	// video hardware
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1052,7 +1046,7 @@ static MACHINE_DRIVER_START( peplus )
 
 	MDRV_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************

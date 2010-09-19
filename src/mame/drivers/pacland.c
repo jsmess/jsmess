@@ -176,20 +176,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
-
-
-extern UINT8 *pacland_videoram,*pacland_videoram2,*pacland_spriteram;
-
-WRITE8_HANDLER( pacland_videoram_w );
-WRITE8_HANDLER( pacland_videoram2_w );
-WRITE8_HANDLER( pacland_scroll0_w );
-WRITE8_HANDLER( pacland_scroll1_w );
-WRITE8_HANDLER( pacland_bankswitch_w );
-
-PALETTE_INIT( pacland );
-VIDEO_START( pacland );
-VIDEO_UPDATE( pacland );
-
+#include "includes/pacland.h"
 
 static WRITE8_HANDLER( pacland_subreset_w )
 {
@@ -411,7 +398,7 @@ static const namco_interface namco_config =
 
 
 
-static MACHINE_DRIVER_START( pacland )
+static MACHINE_CONFIG_START( pacland, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)	/* 1.536 MHz */
@@ -446,7 +433,7 @@ static MACHINE_DRIVER_START( pacland )
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2/1024)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

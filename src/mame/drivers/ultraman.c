@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
 //  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)		/* M6295 */
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)		/* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
 ADDRESS_MAP_END
 
@@ -216,10 +216,7 @@ static MACHINE_RESET( ultraman )
 	state->bank2 = -1;
 }
 
-static MACHINE_DRIVER_START( ultraman )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ultraman_state)
+static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz? */
@@ -265,7 +262,7 @@ static MACHINE_DRIVER_START( ultraman )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

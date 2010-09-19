@@ -67,20 +67,6 @@ static UINT16 semicom_prot_data[2];
 static UINT16 finalgdr_backupram_bank;
 static UINT8 *finalgdr_backupram;
 
-static READ16_DEVICE_HANDLER( oki_r )
-{
-	if(offset)
-		return okim6295_r(device, 0);
-	else
-		return 0;
-}
-
-static WRITE16_DEVICE_HANDLER( oki_w )
-{
-	if(offset)
-		okim6295_w(device, 0, data);
-}
-
 static READ16_DEVICE_HANDLER( eeprom_r )
 {
 	if(offset)
@@ -244,7 +230,7 @@ static ADDRESS_MAP_START( common_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vamphalf_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x1c0, 0x1c3) AM_DEVREAD("eeprom", eeprom_r)
@@ -267,7 +253,7 @@ static ADDRESS_MAP_START( coolmini_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x308, 0x30b) AM_DEVWRITE("eeprom", eeprom_w)
-	AM_RANGE(0x4c0, 0x4c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x546, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_DEVREAD("eeprom", eeprom_r)
@@ -277,7 +263,7 @@ static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x020, 0x023) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x100, 0x103) AM_DEVREAD("eeprom", eeprom_r)
@@ -299,7 +285,7 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
 	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4400, 0x4403) AM_DEVREAD("eeprom", eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
@@ -316,7 +302,7 @@ static ADDRESS_MAP_START( mrkicker_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
-//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
+//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
 
 //  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_backupram_bank_w)
 //  AM_RANGE(0xxxxx, 0xxxxx) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
@@ -335,7 +321,7 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280, 0x283) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x2c0, 0x2c3) AM_DEVREAD("eeprom", eeprom_r)
-	AM_RANGE(0x440, 0x443) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -346,7 +332,7 @@ static ADDRESS_MAP_START( mrdig_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x180, 0x183) AM_DEVREAD("eeprom", eeprom_r)
-	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -363,8 +349,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0480, 0x0483) AM_DEVWRITE("eeprom", eeprom32_w)
-	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_r, okim6295_w, 0x0000ff00)
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8_MODERN("oki_2", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8_MODERN("oki_1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x0680, 0x0683) AM_DEVWRITE("oki_2", aoh_oki_bank_w)
 ADDRESS_MAP_END
@@ -673,7 +659,7 @@ static ADDRESS_MAP_START( qs1000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x007f) AM_RAM	// RAM?  wavetable registers?  not sure.
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( common )
+static MACHINE_CONFIG_START( common, driver_device )
 	MDRV_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -692,9 +678,9 @@ static MACHINE_DRIVER_START( common )
 	MDRV_GFXDECODE(vamphalf)
 
 	MDRV_VIDEO_UPDATE(common)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sound_ym_oki )
+static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 28000000/8)
@@ -704,9 +690,9 @@ static MACHINE_DRIVER_START( sound_ym_oki )
 	MDRV_OKIM6295_ADD("oki", 28000000/16 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sound_suplup )
+static MACHINE_CONFIG_FRAGMENT( sound_suplup )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 14318180/4)
@@ -716,59 +702,53 @@ static MACHINE_DRIVER_START( sound_suplup )
 	MDRV_OKIM6295_ADD("oki", 1789772.5 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sound_qs1000 )
+static MACHINE_CONFIG_FRAGMENT( sound_qs1000 )
 	MDRV_CPU_ADD("audiocpu", I8052, 24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map)
 	MDRV_CPU_IO_MAP( qs1000_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vamphalf )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( vamphalf, common )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(vamphalf_io)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( misncrft )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( misncrft, common )
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_IO_MAP(misncrft_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_IMPORT_FROM(sound_qs1000)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_qs1000)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coolmini )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( coolmini, common )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(coolmini_io)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( suplup )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( suplup, common )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(suplup_io)
 
-	MDRV_IMPORT_FROM(sound_suplup)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_suplup)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jmpbreak )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( jmpbreak, common )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(jmpbreak_io)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mrdig )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( mrdig, common )
 
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map)
@@ -776,21 +756,19 @@ static MACHINE_DRIVER_START( mrdig )
 	MDRV_CPU_IO_MAP(mrdig_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wyvernwg )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( wyvernwg, common )
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(wyvernwg_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_IMPORT_FROM(sound_qs1000)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_qs1000)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( finalgdr )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( finalgdr, common )
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(finalgdr_io)
@@ -798,21 +776,20 @@ static MACHINE_DRIVER_START( finalgdr )
 
 	MDRV_NVRAM_HANDLER(finalgdr)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mrkicker )
-	MDRV_IMPORT_FROM(common)
+static MACHINE_CONFIG_DERIVED( mrkicker, common )
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(mrkicker_io)
 
 	MDRV_NVRAM_HANDLER(finalgdr)
 
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sound_ym_oki)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( aoh )
+static MACHINE_CONFIG_START( aoh, driver_device )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(aoh_map)
 	MDRV_CPU_IO_MAP(aoh_io)
@@ -847,7 +824,7 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_OKIM6295_ADD("oki_2", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

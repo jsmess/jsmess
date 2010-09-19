@@ -31,25 +31,7 @@
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
-
-VIDEO_START(gaiapols);
-VIDEO_START(dadandrn);
-VIDEO_START(viostorm);
-VIDEO_START(metamrph);
-VIDEO_START(martchmp);
-VIDEO_START(mystwarr);
-VIDEO_UPDATE(dadandrn);
-VIDEO_UPDATE(mystwarr);
-VIDEO_UPDATE(metamrph);
-VIDEO_UPDATE(martchmp);
-
-WRITE16_HANDLER(ddd_053936_enable_w);
-WRITE16_HANDLER(ddd_053936_clip_w);
-READ16_HANDLER(gai_053936_tilerom_0_r);
-READ16_HANDLER(ddd_053936_tilerom_0_r);
-READ16_HANDLER(ddd_053936_tilerom_1_r);
-READ16_HANDLER(gai_053936_tilerom_2_r);
-READ16_HANDLER(ddd_053936_tilerom_2_r);
+#include "includes/mystwarr.h"
 
 static UINT16 *gx_workram;
 
@@ -957,7 +939,7 @@ static MACHINE_RESET(gaiapols)
 	for (i=5; i<=7; i++) k054539_set_gain(k054539_1, i, 2.0);
 }
 
-static MACHINE_DRIVER_START( mystwarr )
+static MACHINE_CONFIG_START( mystwarr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz (confirmed) */
@@ -1003,10 +985,9 @@ static MACHINE_DRIVER_START( mystwarr )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)	/* stereo channels are inverted */
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( viostorm )
-	MDRV_IMPORT_FROM(mystwarr)
+static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MDRV_MACHINE_RESET(viostorm)
 
@@ -1023,10 +1004,9 @@ static MACHINE_DRIVER_START( viostorm )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( metamrph )
-	MDRV_IMPORT_FROM(mystwarr)
+static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MDRV_MACHINE_RESET(metamrph)
 
@@ -1043,10 +1023,9 @@ static MACHINE_DRIVER_START( metamrph )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 17, 17+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dadandrn )
-	MDRV_IMPORT_FROM(mystwarr)
+static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 
 	MDRV_MACHINE_RESET(dadandrn)
 
@@ -1065,10 +1044,9 @@ static MACHINE_DRIVER_START( dadandrn )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 17, 17+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gaiapols )
-	MDRV_IMPORT_FROM(mystwarr)
+static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MDRV_MACHINE_RESET(gaiapols)
 
@@ -1091,10 +1069,9 @@ static MACHINE_DRIVER_START( gaiapols )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+376-1, 16, 16+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( martchmp )
-	MDRV_IMPORT_FROM(mystwarr)
+static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
 	MDRV_MACHINE_RESET(martchmp)
 
@@ -1113,7 +1090,7 @@ static MACHINE_DRIVER_START( martchmp )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

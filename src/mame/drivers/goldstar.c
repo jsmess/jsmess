@@ -114,25 +114,10 @@
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "machine/8255ppi.h"
+#include "machine/nvram.h"
 #include "includes/goldstar.h"
 
 #include "lucky8.lh"
-
-
-static NVRAM_HANDLER( goldstar )
-{
-	goldstar_state *state = machine->driver_data<goldstar_state>();
-
-	if (read_or_write)
-		mame_fwrite(file,state->nvram,state->nvram_size);
-	else
-	{
-		if (file)
-			mame_fread(file,state->nvram,state->nvram_size);
-		else
-			memset(state->nvram,0xff,state->nvram_size);
-	}
-}
 
 
 static WRITE8_HANDLER( protection_w )
@@ -154,7 +139,7 @@ static READ8_HANDLER( protection_r )
 
 static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE( goldstar_fg_vidram_w ) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE( goldstar_fg_atrram_w ) AM_BASE_MEMBER(goldstar_state,fg_atrram)
@@ -178,7 +163,7 @@ static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_WRITE(paletteram_BBGGGRRR_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -197,7 +182,7 @@ static WRITE8_HANDLER( ncb3_port81_w )
 
 static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
@@ -270,7 +255,7 @@ static WRITE8_HANDLER( cm_outport1_w )
 static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -292,7 +277,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
 
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -312,11 +297,12 @@ static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Inputs */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
@@ -345,7 +331,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amcoe2_portmap, ADDRESS_SPACE_IO, 8 )
@@ -376,7 +362,7 @@ static WRITE8_HANDLER( lucky8_outport_w )
 
 static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -421,7 +407,7 @@ static WRITE8_HANDLER( magical_outb860_w )
 static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -483,7 +469,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -504,7 +490,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcat3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -541,7 +527,7 @@ static ADDRESS_MAP_START( unkch_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_BASE_MEMBER(goldstar_state,reel1_scroll)
 	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_MEMBER(goldstar_state,reel2_scroll)
@@ -2530,7 +2516,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )			PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coin" )			PORT_DIPLOCATION("DSW4:1,2,3")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
@@ -2686,7 +2672,7 @@ static INPUT_PORTS_START( lucky8a )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )			PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coin" )			PORT_DIPLOCATION("DSW4:1,2,3")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
@@ -2842,7 +2828,7 @@ static INPUT_PORTS_START( ns8lines )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )			PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coin" )			PORT_DIPLOCATION("DSW4:1,2,3")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
@@ -2997,7 +2983,7 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x00, "As Hopper Line" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )			PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coin" )			PORT_DIPLOCATION("DSW4:1,2,3")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
@@ -3226,7 +3212,7 @@ static INPUT_PORTS_START( magical )
 	PORT_DIPSETTING(    0x02, "30" )
 	PORT_DIPSETTING(    0x01, "40" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x38, 0x00, "Key In" ) PORT_DIPLOCATION("DSW1:4,5,6") // aka 'Coin B'
+	PORT_DIPNAME( 0x38, 0x00, "Key In Coin" ) PORT_DIPLOCATION("DSW1:4,5,6") // aka 'Coin B'
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x20, "20" )
@@ -3395,7 +3381,7 @@ static INPUT_PORTS_START( schery97 )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -3575,7 +3561,7 @@ static INPUT_PORTS_START( nfb96 )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -3747,7 +3733,7 @@ static INPUT_PORTS_START( nfb96tx )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW2:5")	/* unknown */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Ticket In" )					PORT_DIPLOCATION("DSW2:6")	/* OK */
+	PORT_DIPNAME( 0x20, 0x20, "Ticket In Value" )					PORT_DIPLOCATION("DSW2:6")	/* OK */
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x20, "500" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW2:7")	/* unknown */
@@ -3917,7 +3903,7 @@ static INPUT_PORTS_START( roypok96 )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -4057,7 +4043,7 @@ static INPUT_PORTS_START( roypok96a )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -4197,7 +4183,7 @@ static INPUT_PORTS_START( pokonl97 )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -4360,7 +4346,7 @@ static INPUT_PORTS_START( match98 )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -4500,7 +4486,7 @@ static INPUT_PORTS_START( nfb96bl )
 	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPNAME( 0x60, 0x00, "Note In Value" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x40, "500" )
@@ -5510,9 +5496,7 @@ static const ay8910_interface ladylinr_ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( goldstar )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( goldstar, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5530,7 +5514,7 @@ static MACHINE_DRIVER_START( goldstar )
 
 	MDRV_GFXDECODE(goldstar)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5544,12 +5528,10 @@ static MACHINE_DRIVER_START( goldstar )
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( goldstbl )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5567,7 +5549,7 @@ static MACHINE_DRIVER_START( goldstbl )
 
 	MDRV_GFXDECODE(bl)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5580,12 +5562,10 @@ static MACHINE_DRIVER_START( goldstbl )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( moonlght )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( moonlght, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5603,7 +5583,7 @@ static MACHINE_DRIVER_START( moonlght )
 
 	MDRV_GFXDECODE(ml)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5616,7 +5596,7 @@ static MACHINE_DRIVER_START( moonlght )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static PALETTE_INIT(cm)
@@ -5680,9 +5660,7 @@ static PALETTE_INIT(lucky8)
 }
 
 
-static MACHINE_DRIVER_START( chrygld )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( chrygld, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5706,7 +5684,7 @@ static MACHINE_DRIVER_START( chrygld )
 	MDRV_GFXDECODE(chry10)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5720,13 +5698,11 @@ static MACHINE_DRIVER_START( chrygld )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( cb3c )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cb3c, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5750,7 +5726,7 @@ static MACHINE_DRIVER_START( cb3c )
 	MDRV_GFXDECODE(cb3c)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5764,12 +5740,10 @@ static MACHINE_DRIVER_START( cb3c )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ncb3 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( ncb3, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5794,7 +5768,7 @@ static MACHINE_DRIVER_START( ncb3 )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5808,12 +5782,10 @@ static MACHINE_DRIVER_START( ncb3 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cm )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cm, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5836,7 +5808,7 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_GFXDECODE(cmbitmap)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5846,19 +5818,15 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cmasterc )
-
-	MDRV_IMPORT_FROM(cm)
+static MACHINE_CONFIG_DERIVED( cmasterc, cm )
 	MDRV_GFXDECODE(cmasterc)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_DRIVER_START( cmnobmp )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5881,7 +5849,7 @@ static MACHINE_DRIVER_START( cmnobmp )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5891,12 +5859,10 @@ static MACHINE_DRIVER_START( cmnobmp )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
-static MACHINE_DRIVER_START( cmast91 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cmast91, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5919,7 +5885,7 @@ static MACHINE_DRIVER_START( cmast91 )
 	MDRV_GFXDECODE(cmast91)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cmast91)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(cmast91)
@@ -5929,7 +5895,7 @@ static MACHINE_DRIVER_START( cmast91 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( lucky8_irq )
 {
@@ -5939,9 +5905,7 @@ static INTERRUPT_GEN( lucky8_irq )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( lucky8 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( lucky8, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5965,7 +5929,7 @@ static MACHINE_DRIVER_START( lucky8 )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5980,7 +5944,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static PALETTE_INIT(magical)
 {
@@ -5999,9 +5963,7 @@ static PALETTE_INIT(magical)
 	}
 }
 
-static MACHINE_DRIVER_START( magical )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( magical, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6025,7 +5987,7 @@ static MACHINE_DRIVER_START( magical )
 
 	MDRV_GFXDECODE(magical)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(magical)
 	MDRV_VIDEO_UPDATE(magical)
@@ -6039,12 +6001,10 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kkojnoli )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( kkojnoli, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6079,12 +6039,10 @@ static MACHINE_DRIVER_START( kkojnoli )
 	MDRV_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ladylinr )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6107,7 +6065,7 @@ static MACHINE_DRIVER_START( ladylinr )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6121,12 +6079,10 @@ static MACHINE_DRIVER_START( ladylinr )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ladylinr_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wcat3 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( wcat3, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6150,7 +6106,7 @@ static MACHINE_DRIVER_START( wcat3 )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6165,13 +6121,11 @@ static MACHINE_DRIVER_START( wcat3 )
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-static MACHINE_DRIVER_START( amcoe1 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6194,7 +6148,7 @@ static MACHINE_DRIVER_START( amcoe1 )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6207,13 +6161,11 @@ static MACHINE_DRIVER_START( amcoe1 )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-static MACHINE_DRIVER_START( amcoe1a )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6236,7 +6188,7 @@ static MACHINE_DRIVER_START( amcoe1a )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(amcoe1a)
@@ -6249,13 +6201,11 @@ static MACHINE_DRIVER_START( amcoe1a )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-static MACHINE_DRIVER_START( amcoe2 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6278,7 +6228,7 @@ static MACHINE_DRIVER_START( amcoe2 )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6288,11 +6238,9 @@ static MACHINE_DRIVER_START( amcoe2 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nfm )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( nfm, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6315,7 +6263,7 @@ static MACHINE_DRIVER_START( nfm )
 	MDRV_GFXDECODE(nfm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6325,11 +6273,9 @@ static MACHINE_DRIVER_START( nfm )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( unkch )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( unkch, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6360,19 +6306,15 @@ static MACHINE_DRIVER_START( unkch )
 //  MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 //  MDRV_SOUND_CONFIG(ay8910_config)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cherrys )
-
-	MDRV_IMPORT_FROM(ncb3)
+static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
 	MDRV_GFXDECODE(cherrys)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // hw unknown
-static MACHINE_DRIVER_START( pkrmast )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6395,7 +6337,7 @@ static MACHINE_DRIVER_START( pkrmast )
 	MDRV_GFXDECODE(pkrmast)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6405,7 +6347,7 @@ static MACHINE_DRIVER_START( pkrmast )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -7072,6 +7014,7 @@ ROM_START( cmezspin )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+
 ROM_START( cmasterc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "msii841.u81",  0x3000,  0x1000, CRC(977db602) SHA1(0fd3d6781b654ac6befdc9278f84ca708d5d448c) )
@@ -7278,6 +7221,42 @@ ROM_START( cmasterf )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
 	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+
+ROM_START( tonypok )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tonypok.rom",  0x0000,  0x1000, CRC(c7047fcb) SHA1(a224e5a3c0fcd1d588ab264c4d0c624159834488) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "pok_u16.7", 0x00000,  0x8000, CRC(d7511644) SHA1(2aedd80b279f6e1231bacfce913e06070c74fff7) )
+	ROM_LOAD( "pok_u11.6", 0x08000,  0x8000, CRC(6ff4d0f9) SHA1(3faccac9562c9269f392655d045a10569f335ccc) )
+	ROM_LOAD( "pok_u4.5",  0x10000,  0x8000, CRC(7c641db2) SHA1(b90d4c5efc388fe8938ed3180b3c36a20ecdc15b) )
+
+	// the remainder of the roms are from Cherry Master - this was a conversion kit
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "u15.4",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "u10.3",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "u14.2",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "u9.1",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -9922,6 +9901,15 @@ static DRIVER_INIT( unkch4 )
 	ROM[0x9a6f] = 0x00;
 }
 
+static DRIVER_INIT( tonypok )
+{
+	// the ppi doesn't seem to work properly, so just install the inputs directly
+	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_install_read_port(io, 0x04, 0x04, 0, 0, "IN0" );
+	memory_install_read_port(io, 0x05, 0x05, 0, 0, "IN1" );
+	memory_install_read_port(io, 0x06, 0x06, 0, 0, "IN2" );
+
+}
 
 
 /*********************************************
@@ -9961,6 +9949,8 @@ GAME(  1991, cmasterd,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",  
 GAME(  1991, cmastere,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0 )
 GAME(  1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0 )
 
+
+GAME(  1991, tonypok,   0,        cm,       cmv801,   tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",   0 )
 GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?

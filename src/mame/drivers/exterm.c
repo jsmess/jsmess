@@ -65,6 +65,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "machine/nvram.h"
 #include "includes/exterm.h"
 
 
@@ -298,7 +299,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE(sound_latch_w)
 	AM_RANGE(0x015c0000, 0x015fffff) AM_MIRROR(0xfc000000) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03000000, 0x03ffffff) AM_MIRROR(0xfc000000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -446,7 +447,7 @@ static const tms34010_config slave_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( exterm )
+static MACHINE_CONFIG_START( exterm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
@@ -465,7 +466,7 @@ static MACHINE_DRIVER_START( exterm )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD("snd_nmi_timer", master_sound_nmi_callback)
 
@@ -487,7 +488,7 @@ static MACHINE_DRIVER_START( exterm )
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

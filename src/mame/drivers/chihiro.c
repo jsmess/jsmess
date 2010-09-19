@@ -294,10 +294,11 @@ INPUT_PORTS_END
 static MACHINE_START( chihiro )
 {
 	smbus_register_device(0x45,smbus_cx25871);
-	debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
 }
 
-static MACHINE_DRIVER_START( chihiro_base )
+static MACHINE_CONFIG_START( chihiro_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
@@ -326,12 +327,11 @@ static MACHINE_DRIVER_START( chihiro_base )
 	MDRV_MACHINE_START(chihiro)
 
 	MDRV_PALETTE_LENGTH(65536)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( chihirogd )
-	MDRV_IMPORT_FROM(chihiro_base)
+static MACHINE_CONFIG_DERIVED( chihirogd, chihiro_base )
 	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */

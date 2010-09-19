@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/nvram.h"
 
 
 /***************************************************************************
@@ -364,13 +365,13 @@ static INTERRUPT_GEN( igs_majhong_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( igs_majhong )
+static MACHINE_CONFIG_START( igs_majhong, driver_device )
 	MDRV_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MDRV_CPU_PROGRAM_MAP(igs_majhong_map)
 
 	MDRV_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(igs_m027)
 
@@ -389,7 +390,7 @@ static MACHINE_DRIVER_START( igs_majhong )
 
 	/* sound hardware */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

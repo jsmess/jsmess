@@ -60,6 +60,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
+#include "machine/nvram.h"
 #include "deprecat.h"
 
 #define VDP_MEM             0x40000
@@ -128,7 +129,7 @@ static READ8_HANDLER( mux_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -237,7 +238,7 @@ static const ay8910_interface ay8910_config =
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_DRIVER_START( big10 )
+static MACHINE_CONFIG_START( big10, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
@@ -247,7 +248,7 @@ static MACHINE_DRIVER_START( big10 )
 
 	MDRV_MACHINE_RESET(big10)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -268,7 +269,7 @@ static MACHINE_DRIVER_START( big10 )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************

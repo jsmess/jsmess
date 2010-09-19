@@ -28,6 +28,7 @@
 #include "machine/68681.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 #include "includes/micro3d.h"
 
 
@@ -196,7 +197,7 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x143fff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(micro3d_state, shared_ram)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(host_drmath_int_w)
 	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("INPUTS_C_D")
@@ -312,8 +313,7 @@ static const duart68681_config micro3d_duart68681_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( micro3d )
-	MDRV_DRIVER_DATA(micro3d_state)
+static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(hostmem)
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
 
 	MDRV_MACHINE_RESET(micro3d)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_QUANTUM_TIME(HZ(3000))
 
 	MDRV_PALETTE_LENGTH(4096)
@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_SOUND_ADD("noise_2", MICRO3D, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

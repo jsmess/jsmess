@@ -42,15 +42,14 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "galaxi.lh"
 
-class galaxi_state : public driver_data_t
+class galaxi_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, galaxi_state(machine)); }
-
-	galaxi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	galaxi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  bg1_ram;
@@ -286,9 +285,9 @@ static ADDRESS_MAP_START( galaxi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(galaxi_500002_w)
 	AM_RANGE(0x500004, 0x500005) AM_WRITE(galaxi_500004_w)
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// 2x DS1230Y (non volatile SRAM)
+	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")	// 2x DS1230Y (non volatile SRAM)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -392,10 +391,7 @@ static MACHINE_RESET( galaxi )
 	state->out[2] = 0;
 }
 
-static MACHINE_DRIVER_START( galaxi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(galaxi_state)
+static MACHINE_CONFIG_START( galaxi, galaxi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// ?
@@ -404,7 +400,7 @@ static MACHINE_DRIVER_START( galaxi )
 
 	MDRV_MACHINE_START(galaxi)
 	MDRV_MACHINE_RESET(galaxi)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -425,19 +421,19 @@ static MACHINE_DRIVER_START( galaxi )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magjoker )
+static MACHINE_CONFIG_DERIVED( magjoker, galaxi )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxi)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("oki")
 
 	/* ADPCM samples are recorded with extremely low volume */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 4.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

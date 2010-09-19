@@ -68,6 +68,7 @@
 #include "sound/s2636.h"
 #include "video/s2636.h"
 #include "video/saa5050.h"
+#include "machine/nvram.h"
 #include "includes/malzak.h"
 
 
@@ -130,7 +131,7 @@ static ADDRESS_MAP_START( malzak2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
@@ -394,10 +395,7 @@ static MACHINE_RESET( malzak )
 	state->malzak_y = 0;
 }
 
-static MACHINE_DRIVER_START( malzak )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(malzak_state)
+static MACHINE_CONFIG_START( malzak, malzak_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)
@@ -436,21 +434,20 @@ static MACHINE_DRIVER_START( malzak )
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("s2636snd_0", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("s2636snd_1", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd_1", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( malzak2 )
-	MDRV_IMPORT_FROM( malzak )
+static MACHINE_CONFIG_DERIVED( malzak2, malzak )
 
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(malzak2_map)
 
-	MDRV_NVRAM_HANDLER( generic_0fill )
-MACHINE_DRIVER_END
+	MDRV_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 ROM_START( malzak )
 	ROM_REGION( 0x8000, "maincpu", 0 )

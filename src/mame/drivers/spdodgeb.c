@@ -27,17 +27,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-extern UINT8 *spdodgeb_videoram;
-
-PALETTE_INIT( spdodgeb );
-VIDEO_START( spdodgeb );
-VIDEO_UPDATE( spdodgeb );
-INTERRUPT_GEN( spdodgeb_interrupt );
-WRITE8_HANDLER( spdodgeb_scrollx_lo_w );
-WRITE8_HANDLER( spdodgeb_ctrl_w );
-WRITE8_HANDLER( spdodgeb_videoram_w );
-
+#include "includes/spdodgeb.h"
 
 /* private globals */
 static int toggle=0;//, soundcode = 0;
@@ -431,7 +421,7 @@ static MACHINE_RESET( spdodgeb )
 	last_dash[0] = last_dash[1] = 0;
 }
 
-static MACHINE_DRIVER_START( spdodgeb )
+static MACHINE_CONFIG_START( spdodgeb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
@@ -475,7 +465,7 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

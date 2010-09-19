@@ -25,14 +25,8 @@ GP1 HDD data contents:
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
-
-VIDEO_START( qdrmfgp );
-VIDEO_START( qdrmfgp2 );
-VIDEO_UPDATE( qdrmfgp );
-
-extern void qdrmfgp_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-extern void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-
+#include "machine/nvram.h"
+#include "includes/qdrmfgp.h"
 
 static UINT8 *sndram;
 static UINT16 *workram;
@@ -84,7 +78,8 @@ static WRITE16_HANDLER( gp_control_w )
 
 	if (control & 0x0100)
 	{
-		int vol = space->machine->generic.nvram.u16[0x10] & 0xff;
+		qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
+		int vol = state->m_nvram[0x10] & 0xff;
 		if (vol)
 		{
 			running_device *k054539 = space->machine->device("konami");
@@ -114,7 +109,8 @@ static WRITE16_HANDLER( gp2_control_w )
 
 	if (control & 0x0100)
 	{
-		int vol = space->machine->generic.nvram.u16[0x8] & 0xff;
+		qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
+		int vol = state->m_nvram[0x8] & 0xff;
 		if (vol)
 		{
 			running_device *k054539 = space->machine->device("konami");
@@ -343,7 +339,7 @@ static void gp2_ide_interrupt(running_device *device, int state)
 static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram)										/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE("k053252", k053252_word_r, k053252_word_w)					/* ccu */
@@ -366,7 +362,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE(&workram)										/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE("k053252", k053252_word_r, k053252_word_w)					/* ccu */
@@ -641,7 +637,7 @@ static MACHINE_RESET( qdrmfgp )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( qdrmfgp )
+static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
@@ -650,7 +646,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
@@ -677,9 +673,9 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( qdrmfgp2 )
+static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
@@ -688,7 +684,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 
 	MDRV_MACHINE_START(qdrmfgp2)
 	MDRV_MACHINE_RESET(qdrmfgp)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt)
 
@@ -714,7 +710,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

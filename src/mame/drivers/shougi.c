@@ -87,13 +87,11 @@ PROM  : Type MB7051
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 
-class shougi_state : public driver_data_t
+class shougi_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, shougi_state(machine)); }
-
-	shougi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	shougi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
 	int nmi_enabled;
@@ -392,9 +390,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( shougi )
-
-	MDRV_DRIVER_DATA( shougi_state )
+static MACHINE_CONFIG_START( shougi, shougi_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -430,7 +426,7 @@ static MACHINE_DRIVER_START( shougi )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

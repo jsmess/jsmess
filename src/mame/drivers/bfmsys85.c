@@ -65,6 +65,7 @@ ___________________________________________________________________________
 #include "machine/roc10937.h"  // vfd
 #include "machine/steppers.h" // stepper motor
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 #define VFD_RESET  0x20
 #define VFD_CLOCK1 0x80
@@ -401,7 +402,7 @@ static MACHINE_START( bfm_sys85 )
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //8k RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)			// reel 3+4 latch
 	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)			// reel 1+2 latch
 	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)			// vfd latch
@@ -433,7 +434,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_DRIVER_START( bfmsys85 )
+static MACHINE_CONFIG_START( bfmsys85, driver_device )
 	MDRV_MACHINE_START(bfm_sys85)						// main system85 board initialisation
 	MDRV_MACHINE_RESET(bfm_sys85)
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
@@ -446,10 +447,10 @@ static MACHINE_DRIVER_START( bfmsys85 )
 	MDRV_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
+	MDRV_NVRAM_ADD_0FILL("nvram")						// load/save nv RAM
 
 	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////
 

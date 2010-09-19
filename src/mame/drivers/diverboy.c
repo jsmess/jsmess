@@ -53,13 +53,11 @@
 
 
 
-class diverboy_state : public driver_data_t
+class diverboy_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, diverboy_state(machine)); }
-
-	diverboy_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	diverboy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram;
@@ -162,7 +160,7 @@ static ADDRESS_MAP_START( snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", okibank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -251,8 +249,7 @@ static MACHINE_START( diverboy )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( diverboy )
-	MDRV_DRIVER_DATA(diverboy_state)
+static MACHINE_CONFIG_START( diverboy, diverboy_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_map)
@@ -281,7 +278,7 @@ static MACHINE_DRIVER_START( diverboy )
 
 	MDRV_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

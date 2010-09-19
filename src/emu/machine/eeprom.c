@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    eeprom.h
+    eeprom.c
 
     Serial eeproms.
 
@@ -78,10 +78,10 @@ eeprom_device_config::eeprom_device_config(const machine_config &mconfig, const 
 	: device_config(mconfig, static_alloc_device_config, "EEPROM", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_default_data(NULL),
 	  m_default_data_size(0),
 	  m_default_value(0)
 {
+	m_default_data.u8 = NULL;
 }
 
 
@@ -132,19 +132,17 @@ void eeprom_device_config::static_set_interface(device_config *device, const eep
 void eeprom_device_config::static_set_default_data(device_config *device, const UINT8 *data, UINT32 size)
 {
 	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
-if (eeprom->m_data_bits != 8) mame_printf_debug("16-bit EEPROM set with 8-bit data\n");
-//  assert(eeprom->m_data_bits == 8);
-	eeprom->m_default_data = data;
+	assert(eeprom->m_data_bits == 8);
+	eeprom->m_default_data.u8 = const_cast<UINT8 *>(data);
 	eeprom->m_default_data_size = size;
 }
 
 void eeprom_device_config::static_set_default_data(device_config *device, const UINT16 *data, UINT32 size)
 {
 	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
-if (eeprom->m_data_bits != 16) mame_printf_debug("8-bit EEPROM set with 16-bit data\n");
-//  assert(eeprom->m_data_bits == 16);
-	eeprom->m_default_data = reinterpret_cast<const UINT8 *>(data);
-	eeprom->m_default_data_size = size;
+	assert(eeprom->m_data_bits == 16);
+	eeprom->m_default_data.u16 = const_cast<UINT16 *>(data);
+	eeprom->m_default_data_size = size / 2;
 }
 
 
@@ -266,9 +264,12 @@ void eeprom_device::nvram_default()
 			m_addrspace[0]->write_word(offs * 2, default_value);
 
 	/* handle hard-coded data from the driver */
-	if (m_config.m_default_data != NULL)
+	if (m_config.m_default_data.u8 != NULL)
 		for (offs_t offs = 0; offs < m_config.m_default_data_size; offs++)
-			m_addrspace[0]->write_byte(offs, m_config.m_default_data[offs]);
+			if (m_config.m_data_bits == 8)
+				m_addrspace[0]->write_byte(offs, m_config.m_default_data.u8[offs]);
+			else
+				m_addrspace[0]->write_word(offs * 2, m_config.m_default_data.u16[offs]);
 
 	/* populate from a memory region if present */
 	if (m_region != NULL)

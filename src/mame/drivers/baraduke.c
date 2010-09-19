@@ -108,22 +108,7 @@ DIP locations verified for:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
-
-extern UINT8 *baraduke_textram, *baraduke_videoram, *baraduke_spriteram;
-
-/* from video/baraduke.c */
-VIDEO_START( baraduke );
-VIDEO_UPDATE( baraduke );
-VIDEO_EOF( baraduke );
-READ8_HANDLER( baraduke_videoram_r );
-WRITE8_HANDLER( baraduke_videoram_w );
-READ8_HANDLER( baraduke_textram_r );
-WRITE8_HANDLER( baraduke_textram_w );
-WRITE8_HANDLER( baraduke_scroll0_w );
-WRITE8_HANDLER( baraduke_scroll1_w );
-READ8_HANDLER( baraduke_spriteram_r );
-WRITE8_HANDLER( baraduke_spriteram_w );
-PALETTE_INIT( baraduke );
+#include "includes/baraduke.h"
 
 static int inputport_selected;
 
@@ -390,7 +375,7 @@ static const namco_interface namco_config =
 
 
 
-static MACHINE_DRIVER_START( baraduke )
+static MACHINE_CONFIG_START( baraduke, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
@@ -425,7 +410,7 @@ static MACHINE_DRIVER_START( baraduke )
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -26,7 +26,7 @@ static ADDRESS_MAP_START( news_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x91ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xc003, 0xc003) AM_WRITE(news_bgpic_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -127,10 +127,7 @@ static MACHINE_RESET( news )
 	state->bgpic = 0;
 }
 
-static MACHINE_DRIVER_START( news )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(news_state)
+static MACHINE_CONFIG_START( news, news_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
@@ -159,7 +156,7 @@ static MACHINE_DRIVER_START( news )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

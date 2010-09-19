@@ -20,13 +20,11 @@
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 
-class laserbas_state : public driver_data_t
+class laserbas_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbas_state(machine)); }
-
-	laserbas_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	laserbas_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* video-related */
 	UINT8    *vram1;
@@ -173,8 +171,7 @@ static MACHINE_RESET( laserbas )
 	state->count = 0;
 }
 
-static MACHINE_DRIVER_START( laserbas )
-	MDRV_DRIVER_DATA(laserbas_state)
+static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(laserbas_memory)
@@ -194,7 +191,7 @@ static MACHINE_DRIVER_START( laserbas )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_VIDEO_START(laserbas)
 	MDRV_VIDEO_UPDATE(laserbas)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Amstar LaserBase 1981 (Hoei)

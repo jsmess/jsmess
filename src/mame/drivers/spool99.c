@@ -94,13 +94,11 @@ Note
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class spool99_state : public driver_data_t
+class spool99_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
-
-	spool99_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	spool99_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *main;
 	tilemap_t *sc0_tilemap;
@@ -178,7 +176,7 @@ static READ8_HANDLER( spool99_io_r )
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return eeprom_read_bit(space->machine->device("eeprom"));
-			case 0xaff8: return okim6295_r(space->machine->device("oki"),0);
+			case 0xaff8: return space->machine->device<okim6295_device>("oki")->read(*space,0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -212,7 +210,7 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
 	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
@@ -236,7 +234,7 @@ static READ8_HANDLER( vcarn_io_r )
 			case 0xa725: return input_port_read(space->machine,"HOLD3");
 			case 0xa726: return input_port_read(space->machine,"HOLD4");
 			case 0xa727: return input_port_read(space->machine,"HOLD2");
-			case 0xa780: return okim6295_r(space->machine->device("oki"),0);
+			case 0xa780: return space->machine->device<okim6295_device>("oki")->read(*space,0);
 			case 0xa7a0: return input_port_read(space->machine,"HOLD1");
 			case 0xa7a1: return input_port_read(space->machine,"HOLD5");
 			case 0xa7a2: return input_port_read(space->machine,"START");
@@ -258,7 +256,7 @@ static ADDRESS_MAP_START( vcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE("eeprom", eeprom_clockline_w )
 	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
@@ -335,9 +333,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( spool99 )
-
-	MDRV_DRIVER_DATA( spool99_state )
+static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/8)
 	MDRV_CPU_PROGRAM_MAP(spool99_map)
@@ -364,18 +360,16 @@ static MACHINE_DRIVER_START( spool99 )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vcarn )
-
-	MDRV_IMPORT_FROM( spool99)
+static MACHINE_CONFIG_DERIVED( vcarn, spool99 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vcarn_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1) //512x240, raw guess
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( spool99 )

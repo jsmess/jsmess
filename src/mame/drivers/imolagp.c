@@ -83,13 +83,11 @@ Known issues:
 #define HLE_COM
 
 
-class imolagp_state : public driver_data_t
+class imolagp_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, imolagp_state(machine)); }
-
-	imolagp_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	imolagp_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *slave_workram; // used only ifdef HLE_COM
 
@@ -552,8 +550,7 @@ static MACHINE_RESET( imolagp )
 #endif
 }
 
-static MACHINE_DRIVER_START( imolagp )
-	MDRV_DRIVER_DATA(imolagp_state)
+static MACHINE_CONFIG_START( imolagp, imolagp_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(imolagp_master)
@@ -585,7 +582,7 @@ static MACHINE_DRIVER_START( imolagp )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( imolagp )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code */

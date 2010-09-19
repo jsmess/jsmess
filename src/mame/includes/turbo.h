@@ -22,13 +22,11 @@ struct i8279_state
 };
 
 
-class turbo_state : public driver_data_t
+class turbo_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, turbo_state(machine)); }
-
-	turbo_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	turbo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *		videoram;
@@ -71,9 +69,9 @@ public:
 
 /*----------- defined in audio/turbo.c -----------*/
 
-MACHINE_DRIVER_EXTERN( turbo_samples );
-MACHINE_DRIVER_EXTERN( subroc3d_samples );
-MACHINE_DRIVER_EXTERN( buckrog_samples );
+MACHINE_CONFIG_EXTERN( turbo_samples );
+MACHINE_CONFIG_EXTERN( subroc3d_samples );
+MACHINE_CONFIG_EXTERN( buckrog_samples );
 
 WRITE8_DEVICE_HANDLER( turbo_sound_a_w );
 WRITE8_DEVICE_HANDLER( turbo_sound_b_w );

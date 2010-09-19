@@ -7,6 +7,7 @@ Atari Sprint 4 driver
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "audio/sprint4.h"
+#include "includes/sprint4.h"
 
 #define MASTER_CLOCK    12096000
 
@@ -16,15 +17,6 @@ Atari Sprint 4 driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-PALETTE_INIT( sprint4 );
-
-VIDEO_EOF( sprint4 );
-VIDEO_START( sprint4 );
-VIDEO_UPDATE( sprint4 );
-
-extern int sprint4_collision[4];
-
-WRITE8_HANDLER( sprint4_video_ram_w );
 
 static int da_latch;
 
@@ -143,7 +135,9 @@ static MACHINE_RESET( sprint4 )
 
 static READ8_HANDLER( sprint4_wram_r )
 {
-	return space->machine->generic.videoram.u8[0x380 + offset];
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	return videoram[0x380 + offset];
 }
 
 
@@ -169,7 +163,9 @@ static READ8_HANDLER( sprint4_options_r )
 
 static WRITE8_HANDLER( sprint4_wram_w )
 {
-	space->machine->generic.videoram.u8[0x380 + offset] = data;
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[0x380 + offset] = data;
 }
 
 
@@ -242,7 +238,7 @@ static ADDRESS_MAP_START( sprint4_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(sprint4_wram_r, sprint4_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_MEMBER(sprint4_state, videoram)
 
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(sprint4_analog_r)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(sprint4_coin_r)
@@ -402,7 +398,7 @@ static GFXDECODE_START( sprint4 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( sprint4 )
+static MACHINE_CONFIG_START( sprint4, sprint4_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
@@ -431,7 +427,7 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sprint4 )

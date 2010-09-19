@@ -26,6 +26,7 @@
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
 #include "machine/6526cia.h"
+#include "machine/nvram.h"
 
 
 static running_device *laserdisc;
@@ -263,7 +264,7 @@ static ADDRESS_MAP_START( main_map_r1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -276,7 +277,7 @@ static ADDRESS_MAP_START( main_map_r2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -289,7 +290,7 @@ static ADDRESS_MAP_START( main_map_picmatic, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -403,7 +404,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL								/* port B */
 };
 
-static MACHINE_DRIVER_START( alg_r1 )
+static MACHINE_CONFIG_START( alg_r1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -411,7 +412,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)
@@ -437,26 +438,24 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alg_r2 )
-	MDRV_IMPORT_FROM(alg_r1)
+static MACHINE_CONFIG_DERIVED( alg_r2, alg_r1 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(main_map_r2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( picmatic )
-	MDRV_IMPORT_FROM(alg_r1)
+static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_REPLACE("maincpu", M68000, AMIGA_68000_PAL_CLOCK)
@@ -466,7 +465,7 @@ static MACHINE_DRIVER_START( picmatic )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(512*2, 312)
 	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

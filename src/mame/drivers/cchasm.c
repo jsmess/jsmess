@@ -99,7 +99,7 @@ static INPUT_PORTS_START( cchasm )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Frequency" )
 	PORT_DIPSETTING(    0x00, "Once" )
 	PORT_DIPSETTING(    0x10, "Every" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
@@ -153,7 +153,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cchasm )
+static MACHINE_CONFIG_START( cchasm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
@@ -194,7 +194,7 @@ static MACHINE_DRIVER_START( cchasm )
 
 	/* 6840 PTM */
 	MDRV_PTM6840_ADD("6840ptm", cchasm_6840_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

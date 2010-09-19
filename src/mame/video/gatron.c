@@ -18,18 +18,23 @@
 
 
 #include "emu.h"
+#include "includes/gatron.h"
 
 static tilemap_t *bg_tilemap;
 
 
 WRITE8_HANDLER( gat_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	gatron_state *state = space->machine->driver_data<gatron_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	gatron_state *state = machine->driver_data<gatron_state>();
+	UINT8 *videoram = state->videoram;
 /*  - bits -
     7654 3210
     xxxx xxxx   tiles code.
@@ -37,7 +42,7 @@ static TILE_GET_INFO( get_bg_tile_info )
     only one color code
 */
 
-	int code = machine->generic.videoram.u8[tile_index];
+	int code = videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

@@ -52,17 +52,7 @@ Games by Nihon Game/Culture Brain:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-/* from video/shangkid.c */
-extern UINT8 *shangkid_videoreg;
-extern int shangkid_gfx_type;
-
-VIDEO_START( shangkid );
-VIDEO_UPDATE( shangkid );
-WRITE8_HANDLER( shangkid_videoram_w );
-
-PALETTE_INIT( dynamski );
-VIDEO_UPDATE( dynamski );
+#include "includes/shangkid.h"
 
 /***************************************************************************************/
 
@@ -257,7 +247,7 @@ static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
@@ -278,7 +268,7 @@ static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
@@ -373,7 +363,7 @@ static const ay8910_interface shangkid_ay8910_interface =
 };
 
 
-static MACHINE_DRIVER_START( chinhero )
+static MACHINE_CONFIG_START( chinhero, shangkid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
@@ -417,13 +407,12 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_SOUND_CONFIG(chinhero_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shangkid )
+static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chinhero)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shangkid_main_map)
 
@@ -441,13 +430,13 @@ static MACHINE_DRIVER_START( shangkid )
 
 	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(shangkid_ay8910_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 static ADDRESS_MAP_START( dynamski_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_GENERIC(videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(shangkid_state, videoram) /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
@@ -466,7 +455,7 @@ static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( dynamski )
+static MACHINE_CONFIG_START( dynamski, shangkid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */
@@ -493,7 +482,7 @@ static MACHINE_DRIVER_START( dynamski )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************************/
 

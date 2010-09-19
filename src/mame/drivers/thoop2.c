@@ -16,16 +16,7 @@ pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump a
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *thoop2_vregs;
-extern UINT16 *thoop2_videoram;
-extern UINT16 *thoop2_spriteram;
-
-/* from video/thoop2.c */
-WRITE16_HANDLER( thoop2_vram_w );
-VIDEO_START( thoop2 );
-VIDEO_UPDATE( thoop2 );
-
+#include "includes/thoop2.h"
 
 static const gfx_layout thoop2_tilelayout =
 {
@@ -106,7 +97,7 @@ static ADDRESS_MAP_START( thoop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)					/* OKI6295 data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 data register */
 	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
 	AM_RANGE(0xfeff00, 0xfeff01) AM_READ(DS5002FP_R)
 	AM_RANGE(0xfeff02, 0xfeff03) AM_WRITENOP  /* pf: 0xfeff02 and 0xfeff03 need to remain zero always */
@@ -195,7 +186,7 @@ static INPUT_PORTS_START( thoop2 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( thoop2 )
+static MACHINE_CONFIG_START( thoop2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
@@ -221,7 +212,7 @@ static MACHINE_DRIVER_START( thoop2 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( thoop2 )

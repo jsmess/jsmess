@@ -13,6 +13,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 static int chsuper_tilexor;
 
@@ -94,10 +95,10 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 static ADDRESS_MAP_START( chsuper_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
@@ -189,7 +190,7 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( chsuper )
+static MACHINE_CONFIG_START( chsuper, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
@@ -205,7 +206,7 @@ static MACHINE_DRIVER_START( chsuper )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 
-	MDRV_NVRAM_HANDLER( generic_0fill )
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(chsuper)
 	MDRV_PALETTE_LENGTH(0x100)
@@ -218,7 +219,7 @@ static MACHINE_DRIVER_START( chsuper )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*  ROM Regions definition

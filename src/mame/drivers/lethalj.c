@@ -210,9 +210,9 @@ static WRITE16_HANDLER( cclownz_control_w )
 
 static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8_MODERN("oki3", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
 	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
@@ -591,7 +591,7 @@ static const tms34010_config tms_config_lethalj =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gameroom )
+static MACHINE_CONFIG_START( gameroom, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -622,18 +622,17 @@ static MACHINE_DRIVER_START( gameroom )
 
 	MDRV_OKIM6295_ADD("oki3", SOUND_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.26)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lethalj )
-	MDRV_IMPORT_FROM( gameroom )
+static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(tms_config_lethalj)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

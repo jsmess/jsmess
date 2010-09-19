@@ -93,7 +93,7 @@ static READ16_HANDLER( ioc_r )
 
 		case 0x50:
 		case 0x51:
-			return okim6295_r(state->oki, 0) << 8;
+			return state->oki->read(*space, 0) << 8;
 
 	}
 
@@ -146,7 +146,7 @@ static WRITE16_HANDLER( ioc_w )
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			okim6295_w(state->oki, 0, data >> 8);
+			state->oki->write(*space, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
@@ -433,10 +433,7 @@ static MACHINE_RESET( gcpinbal )
 	state->msm_bank = 0;
 }
 
-static MACHINE_DRIVER_START( gcpinbal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gcpinbal_state)
+static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16 MHz ? */
@@ -469,7 +466,7 @@ static MACHINE_DRIVER_START( gcpinbal )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

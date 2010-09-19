@@ -76,13 +76,11 @@ Notes:
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 
-class pasha2_state : public driver_data_t
+class pasha2_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pasha2_state(machine)); }
-
-	pasha2_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	pasha2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *     bitmap0;
@@ -185,20 +183,6 @@ static WRITE16_HANDLER( bitmap_1_w )
 	COMBINE_DATA(&state->bitmap1[offset + state->vbuffer * 0x20000 / 2]);
 }
 
-static READ16_DEVICE_HANDLER( oki_r )
-{
-	if (offset)
-		return okim6295_r(device, 0);
-	else
-		return 0;
-}
-
-static WRITE16_DEVICE_HANDLER( oki_w )
-{
-	if (offset)
-		okim6295_w(device, 0, data);
-}
-
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
 {
 	if (offset)
@@ -245,8 +229,8 @@ static ADDRESS_MAP_START( pasha2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x80, 0x83) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa0, 0xa3) AM_WRITENOP //soundlatch?
 	AM_RANGE(0xc0, 0xc3) AM_WRITE(pasha2_misc_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("oki1", oki_r, oki_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("oki2", oki_r, oki_w)
+	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xe8, 0xeb) AM_DEVWRITE("oki1", oki_bank_w)
 	AM_RANGE(0xec, 0xef) AM_DEVWRITE("oki2", oki_bank_w)
 ADDRESS_MAP_END
@@ -413,10 +397,7 @@ static MACHINE_RESET( pasha2 )
 	state->vbuffer = 0;
 }
 
-static MACHINE_DRIVER_START( pasha2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pasha2_state)
+static MACHINE_CONFIG_START( pasha2, pasha2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E116XT, 20000000*4)		/* 4x internal multiplier */
@@ -451,7 +432,7 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//and ATMEL DREAM SAM9773
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pasha2 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */

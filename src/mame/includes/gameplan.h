@@ -21,13 +21,14 @@ driver by Chris Moore
 #define LEPRECHAUN_MAIN_CPU_CLOCK        (LEPRECHAUN_MAIN_MASTER_CLOCK / 4)
 
 
-class gameplan_state : public driver_data_t
+class gameplan_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gameplan_state(machine)); }
-
-	gameplan_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	gameplan_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  via_0(*this, "via6522_0"),
+		  via_1(*this, "via6522_1"),
+		  via_2(*this, "via6522_2") { }
 
 	/* machine state */
 	UINT8   current_port;
@@ -46,9 +47,9 @@ public:
 	running_device *maincpu;
 	running_device *audiocpu;
 	running_device *riot;
-	running_device *via_0;
-	running_device *via_1;
-	running_device *via_2;
+	required_device<via6522_device> via_0;
+	required_device<via6522_device> via_1;
+	required_device<via6522_device> via_2;
 };
 
 
@@ -58,6 +59,6 @@ extern const via6522_interface gameplan_via_0_interface;
 extern const via6522_interface leprechn_via_0_interface;
 extern const via6522_interface trvquest_via_0_interface;
 
-MACHINE_DRIVER_EXTERN( gameplan_video );
-MACHINE_DRIVER_EXTERN( leprechn_video );
-MACHINE_DRIVER_EXTERN( trvquest_video );
+MACHINE_CONFIG_EXTERN( gameplan_video );
+MACHINE_CONFIG_EXTERN( leprechn_video );
+MACHINE_CONFIG_EXTERN( trvquest_video );

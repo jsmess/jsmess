@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( feversoc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
 	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -234,7 +234,7 @@ static INTERRUPT_GEN( feversoc_irq )
 	cputag_set_input_line(device->machine, "maincpu", 8, HOLD_LINE );
 }
 
-static MACHINE_DRIVER_START( feversoc )
+static MACHINE_CONFIG_START( feversoc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( feversoc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

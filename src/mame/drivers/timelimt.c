@@ -13,20 +13,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-/* from video */
-extern VIDEO_START( timelimt );
-extern PALETTE_INIT( timelimt );
-extern VIDEO_UPDATE( timelimt );
-
-extern WRITE8_HANDLER( timelimt_videoram_w );
-extern WRITE8_HANDLER( timelimt_bg_videoram_w );
-extern WRITE8_HANDLER( timelimt_scroll_y_w );
-extern WRITE8_HANDLER( timelimt_scroll_x_msb_w );
-extern WRITE8_HANDLER( timelimt_scroll_x_lsb_w );
-
-extern UINT8 *timelimt_bg_videoram;
-extern size_t timelimt_bg_videoram_size;
+#include "includes/timelimt.h"
 
 /***************************************************************************/
 
@@ -58,7 +45,7 @@ static WRITE8_HANDLER( sound_reset_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* video ram */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE_MEMBER(timelimt_state, videoram)	/* video ram */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_BASE(&timelimt_bg_videoram) AM_SIZE(&timelimt_bg_videoram_size)/* background ram */
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
@@ -241,7 +228,7 @@ static INTERRUPT_GEN( timelimt_irq ) {
 
 /***************************************************************************/
 
-static MACHINE_DRIVER_START( timelimt )
+static MACHINE_CONFIG_START( timelimt, timelimt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.000 MHz */
@@ -283,16 +270,16 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( progress )
+static MACHINE_CONFIG_DERIVED( progress, timelimt )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(timelimt)
 
 	MDRV_GFXDECODE(progress)
 	MDRV_PALETTE_LENGTH(96)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

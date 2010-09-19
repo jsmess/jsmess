@@ -124,25 +124,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/sp0256.h"
-
-extern UINT8 *tecfri_videoram;
-extern UINT8 *tecfri_colorram;
-extern UINT8 *tecfri_videoram2;
-extern UINT8 *tecfri_colorram2;
-
-WRITE8_HANDLER( tecfri_videoram_w );
-WRITE8_HANDLER( tecfri_colorram_w );
-WRITE8_HANDLER( tecfri_videoram2_w );
-WRITE8_HANDLER( tecfri_colorram2_w );
-WRITE8_HANDLER( tecfri_scroll_bg_w );
-WRITE8_HANDLER( sauro_scroll_fg_w );
-WRITE8_HANDLER( sauro_palette_bank_w );
-
-VIDEO_START( sauro );
-VIDEO_START( trckydoc );
-
-VIDEO_UPDATE( sauro );
-VIDEO_UPDATE( trckydoc );
+#include "includes/sauro.h"
+#include "machine/nvram.h"
 
 
 static WRITE8_HANDLER( sauro_sound_command_w )
@@ -182,12 +165,12 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 
 static ADDRESS_MAP_START( sauro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_BASE(&tecfri_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE(&tecfri_colorram2)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(sauro_state, spriteram, spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, colorram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_BASE_MEMBER(sauro_state, videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE_MEMBER(sauro_state, colorram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_io_map, ADDRESS_SPACE_IO, 8 )
@@ -228,10 +211,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trckydoc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE_MEMBER(sauro_state, spriteram, spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, colorram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
@@ -388,12 +371,13 @@ static INTERRUPT_GEN( sauro_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( tecfri )
+static MACHINE_CONFIG_START( tecfri, sauro_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -412,10 +396,9 @@ static MACHINE_DRIVER_START( tecfri )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_20MHz/8)       /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( trckydoc )
-	MDRV_IMPORT_FROM(tecfri)
+static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trckydoc_map)
@@ -425,10 +408,9 @@ static MACHINE_DRIVER_START( trckydoc )
 	MDRV_VIDEO_START(trckydoc)
 	MDRV_VIDEO_UPDATE(trckydoc)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sauro )
-	MDRV_IMPORT_FROM(tecfri)
+static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sauro_map)
@@ -446,7 +428,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_SOUND_ADD("speech", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(sauro_sp256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

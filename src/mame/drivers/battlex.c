@@ -132,7 +132,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW2")	/* IN3 */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -210,10 +210,7 @@ static MACHINE_RESET( battlex )
 	state->scroll_msb = 0;
 }
 
-static MACHINE_DRIVER_START( battlex )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(battlex_state)
+static MACHINE_CONFIG_START( battlex, battlex_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
@@ -241,7 +238,7 @@ static MACHINE_DRIVER_START( battlex )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

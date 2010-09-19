@@ -36,6 +36,7 @@ Memo:
 #include "includes/ojankohs.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "machine/nvram.h"
 
 
 static WRITE8_HANDLER( ojankohs_rombank_w )
@@ -201,7 +202,7 @@ static ADDRESS_MAP_START( ojankohs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -211,14 +212,14 @@ static ADDRESS_MAP_START( ojankoy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ojankoc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
@@ -856,10 +857,7 @@ static MACHINE_RESET( ojankohs )
 	state->screen_refresh = 0;
 }
 
-static MACHINE_DRIVER_START( ojankohs )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -869,7 +867,7 @@ static MACHINE_DRIVER_START( ojankohs )
 
 	MDRV_MACHINE_START(ojankohs)
 	MDRV_MACHINE_RESET(ojankohs)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -895,12 +893,9 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ojankoy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -910,7 +905,7 @@ static MACHINE_DRIVER_START( ojankoy )
 
 	MDRV_MACHINE_START(ojankoy)
 	MDRV_MACHINE_RESET(ojankohs)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -937,12 +932,9 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ccasino )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -952,7 +944,7 @@ static MACHINE_DRIVER_START( ccasino )
 
 	MDRV_MACHINE_START(ojankohs)
 	MDRV_MACHINE_RESET(ojankohs)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -978,12 +970,9 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ojankoc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
@@ -993,7 +982,7 @@ static MACHINE_DRIVER_START( ojankoc )
 
 	MDRV_MACHINE_START(ojankoc)
 	MDRV_MACHINE_RESET(ojankohs)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1018,7 +1007,7 @@ static MACHINE_DRIVER_START( ojankoc )
 	MDRV_SOUND_ADD("msm", MSM5205, 8000000/22)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ojankohs )

@@ -11,13 +11,11 @@ similar hardware.
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-class drtomy_state : public driver_data_t
+class drtomy_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drtomy_state(machine)); }
-
-	drtomy_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	drtomy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram;
@@ -172,7 +170,7 @@ static ADDRESS_MAP_START( drtomy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE("oki", drtomy_okibank_w) /* OKI banking */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff) /* OKI 6295*/
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
@@ -292,10 +290,7 @@ static MACHINE_RESET( drtomy )
 	state->oki_bank = 0;
 }
 
-static MACHINE_DRIVER_START( drtomy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(drtomy_state)
+static MACHINE_CONFIG_START( drtomy, drtomy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* ? MHz */
@@ -324,7 +319,7 @@ static MACHINE_DRIVER_START( drtomy )
 
 	MDRV_OKIM6295_ADD("oki", 26000000/16, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( drtomy )

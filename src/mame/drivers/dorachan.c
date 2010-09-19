@@ -16,13 +16,11 @@ Todo:
 #define NUM_PENS	(8)
 
 
-class dorachan_state : public driver_data_t
+class dorachan_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dorachan_state(machine)); }
-
-	dorachan_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dorachan_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -240,10 +238,7 @@ static MACHINE_RESET( dorachan )
 	state->flip_screen = 0;
 }
 
-static MACHINE_DRIVER_START( dorachan )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dorachan_state)
+static MACHINE_CONFIG_START( dorachan, dorachan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
@@ -263,7 +258,7 @@ static MACHINE_DRIVER_START( dorachan )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

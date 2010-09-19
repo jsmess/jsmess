@@ -26,7 +26,8 @@ Memo:
 #include "includes/nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
+#include "includes/hyhoo.h"
+#include "machine/nvram.h"
 
 #define	SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
@@ -34,14 +35,6 @@ Memo:
 #else
 #define DAC_WRITE	dac_w
 #endif
-
-
-VIDEO_UPDATE( hyhoo );
-VIDEO_START( hyhoo );
-
-extern UINT8 *hyhoo_clut;
-WRITE8_HANDLER( hyhoo_blitter_w );
-WRITE8_HANDLER( hyhoo_romsel_w );
 
 
 static DRIVER_INIT( hyhoo )
@@ -57,7 +50,7 @@ static DRIVER_INIT( hyhoo2 )
 
 static ADDRESS_MAP_START( hyhoo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
@@ -252,7 +245,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( hyhoo )
+static MACHINE_CONFIG_START( hyhoo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz ?? */
@@ -261,7 +254,7 @@ static MACHINE_DRIVER_START( hyhoo )
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -283,7 +276,7 @@ static MACHINE_DRIVER_START( hyhoo )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( hyhoo )

@@ -24,6 +24,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
 #include "audio/dcs.h"
+#include "machine/nvram.h"
 #include "includes/midtunit.h"
 
 
@@ -42,7 +43,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
 	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
-	AM_RANGE(0x01400000, 0x0141ffff) AM_READWRITE(midtunit_cmos_r, midtunit_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x01400000, 0x0141ffff) AM_READWRITE(midtunit_cmos_r, midtunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE(midtunit_cmos_enable_w)
 	AM_RANGE(0x01600000, 0x0160003f) AM_READ(midtunit_input_r)
 	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_WRITE(midtunit_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -600,7 +601,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tunit_core )
+static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
@@ -608,7 +609,7 @@ static MACHINE_DRIVER_START( tunit_core )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midtunit)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
@@ -619,23 +620,21 @@ static MACHINE_DRIVER_START( tunit_core )
 
 	MDRV_VIDEO_START(midtunit)
 	MDRV_VIDEO_UPDATE(tms340x0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tunit_adpcm )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tunit_core)
-	MDRV_IMPORT_FROM(williams_adpcm_sound)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( tunit_dcs )
+static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tunit_core)
-	MDRV_IMPORT_FROM(dcs_audio_2k)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(williams_adpcm_sound)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
+
+	/* basic machine hardware */
+	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+MACHINE_CONFIG_END
 
 
 

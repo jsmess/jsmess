@@ -193,16 +193,12 @@ Board contains only 29 ROMs and not much else.
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
+#include "includes/undrfire.h"
 
 #include "cbombers.lh"
 
-VIDEO_START( undrfire );
-VIDEO_UPDATE( undrfire );
-VIDEO_UPDATE( cbombers );
-
 static UINT16 coin_word;
 static UINT16 port_sel = 0;
-extern UINT16 undrfire_rotate_ctrl[8];
 static int frame_counter=0;
 
 static UINT32 *undrfire_ram;	/* will be read in video for gun target calcs */
@@ -718,7 +714,7 @@ static const tc0480scp_interface undrfire_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_DRIVER_START( undrfire )
+static MACHINE_CONFIG_START( undrfire, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -745,11 +741,11 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cbombers )
+static MACHINE_CONFIG_START( cbombers, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -782,8 +778,8 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

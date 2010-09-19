@@ -28,6 +28,7 @@ To Do:
 #include "sound/ymz280b.h"
 #include "machine/eeprom.h"
 #include "machine/ticket.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
 
@@ -332,7 +333,7 @@ static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0xd001, 0xd021 ) AM_RAM
 	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
 
-	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram")	// battery
 
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
@@ -461,13 +462,13 @@ static INTERRUPT_GEN( gegege_vblank_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_DRIVER_START( gegege )
+static MACHINE_CONFIG_START( gegege, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_27MHz / 4)	// ?
 	MDRV_CPU_PROGRAM_MAP(gegege_mem_map)
 	MDRV_CPU_IO_MAP(gegege_io_map)
 	MDRV_CPU_VBLANK_INT("screen", gegege_vblank_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -490,7 +491,7 @@ static MACHINE_DRIVER_START( gegege )
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_27MHz / 2)	// ?
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

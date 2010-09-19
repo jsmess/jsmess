@@ -39,6 +39,7 @@ Notes:
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "includes/gameplan.h"
+#include "machine/nvram.h"
 
 static READ8_HANDLER( trvquest_question_r )
 {
@@ -58,11 +59,11 @@ static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // cmos ram
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via_r, via_w)
-	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE("via6522_2", via_r, via_w)
-	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
+	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)
+	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x3830, 0x3831) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
@@ -187,9 +188,6 @@ static MACHINE_START( trvquest )
 	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	state->maincpu = machine->device("maincpu");
-	state->via_0 = machine->device("via6522_0");
-	state->via_1 = machine->device("via6522_1");
-	state->via_2 = machine->device("via6522_2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->video_x);
@@ -211,24 +209,22 @@ static MACHINE_RESET( trvquest )
 static INTERRUPT_GEN( trvquest_interrupt )
 {
 	gameplan_state *state = device->machine->driver_data<gameplan_state>();
-	via_ca1_w(state->via_2, 1);
-	via_ca1_w(state->via_2, 0);
+	state->via_2->write_ca1(1);
+	state->via_2->write_ca1(0);
 }
 
-static MACHINE_DRIVER_START( trvquest )
-
-	MDRV_DRIVER_DATA(gameplan_state)
+static MACHINE_CONFIG_START( trvquest, gameplan_state )
 
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_MACHINE_START(trvquest)
 	MDRV_MACHINE_RESET(trvquest)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(trvquest_video)
+	MDRV_FRAGMENT_ADD(trvquest_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -243,7 +239,7 @@ static MACHINE_DRIVER_START( trvquest )
 	MDRV_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
 	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( trvquest )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -113,13 +113,11 @@ Few words about protection:
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 
-class ddealer_state : public driver_data_t
+class ddealer_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddealer_state(machine)); }
-
-	ddealer_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	ddealer_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  mcu_shared_ram;
@@ -615,8 +613,7 @@ static INTERRUPT_GEN( ddealer_interrupt )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( ddealer )
-	MDRV_DRIVER_DATA(ddealer_state)
+static MACHINE_CONFIG_START( ddealer, ddealer_state )
 
 	MDRV_CPU_ADD("maincpu" , M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ddealer)
@@ -647,7 +644,7 @@ static MACHINE_DRIVER_START( ddealer )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ymsnd", YM2203, 6000000 / 4)//guess
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

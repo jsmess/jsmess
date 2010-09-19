@@ -8,18 +8,16 @@
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
 
-class metro_state : public driver_data_t
+class metro_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metro_state(machine)); }
-
-	metro_state(running_machine &machine)
-		: driver_data_t(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  audiocpu(machine.device<cpu_device>("audiocpu")),
-		  oki(machine.device<okim6295_device>("oki")),
-		  ymsnd(machine.device("ymsnd")),
-		  k053936(machine.device<k053936_device>("k053936")) { }
+	metro_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  maincpu(*this, "maincpu"),
+		  audiocpu(*this, "audiocpu"),
+		  oki(*this, "oki"),
+		  ymsnd(*this, "ymsnd"),
+		  k053936(*this, "k053936") { }
 
 	/* memory pointers */
 	UINT16 *    vram_0;
@@ -82,11 +80,11 @@ public:
 	tilemap_t *vmetal_mid2tilemap;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	okim6295_device *oki;
-	device_t *ymsnd;
-	k053936_device *k053936;
+	required_device<cpu_device> maincpu;
+	optional_device<cpu_device> audiocpu;
+	optional_device<okim6295_device> oki;
+	optional_device<device_t> ymsnd;
+	optional_device<k053936_device> k053936;
 };
 
 

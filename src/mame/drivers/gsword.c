@@ -147,23 +147,7 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 #include "machine/tait8741.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-
-
-extern WRITE8_HANDLER( gsword_charbank_w );
-extern WRITE8_HANDLER( gsword_videoctrl_w );
-extern WRITE8_HANDLER( gsword_videoram_w );
-extern WRITE8_HANDLER( gsword_scroll_w );
-
-extern PALETTE_INIT( josvolly );
-extern PALETTE_INIT( gsword );
-extern VIDEO_START( gsword );
-extern VIDEO_UPDATE( gsword );
-
-extern size_t gsword_spritexy_size;
-
-extern UINT8 *gsword_spritexy_ram;
-extern UINT8 *gsword_spritetile_ram;
-extern UINT8 *gsword_spriteattrib_ram;
+#include "includes/gsword.h"
 
 static int coins;
 static int fake8910_0,fake8910_1;
@@ -374,7 +358,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM , 8 )
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
 	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE(&gsword_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_MEMBER(gsword_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -692,7 +676,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_SEX_4B	/* vclk input mode    */
 };
 
-static MACHINE_DRIVER_START( gsword )
+static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
@@ -745,9 +729,9 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( josvolly )
+static MACHINE_CONFIG_START( josvolly, gsword_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
@@ -793,7 +777,7 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -35,13 +35,7 @@ EEPROM chip: 93C46
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/saa1099.h"
-
-
-extern WRITE16_HANDLER(xorworld_videoram16_w);
-
-extern PALETTE_INIT( xorworld );
-extern VIDEO_START( xorworld );
-extern VIDEO_UPDATE( xorworld );
+#include "includes/xorworld.h"
 
 
 /****************************************************************
@@ -83,7 +77,7 @@ static ADDRESS_MAP_START( xorworld_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE("eeprom", eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE("eeprom", eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE("eeprom", eeprom_data_w)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_MEMBER(xorworld_state, videoram)
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITENOP
 	AM_RANGE(0xffc882, 0xffc883) AM_WRITENOP
@@ -179,7 +173,7 @@ static INTERRUPT_GEN( xorworld_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( xorworld )
+static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	// 10 MHz
 	MDRV_CPU_PROGRAM_MAP(xorworld_map)
@@ -209,7 +203,7 @@ static MACHINE_DRIVER_START( xorworld )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("saa", SAA1099, 8000000 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( xorworld )

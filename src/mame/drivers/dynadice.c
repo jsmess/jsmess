@@ -35,15 +35,14 @@ dy_6.bin (near Z80)
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
-class dynadice_state : public driver_data_t
+class dynadice_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dynadice_state(machine)); }
-
-	dynadice_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dynadice_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -95,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 static ADDRESS_MAP_START( dynadice_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE_MEMBER(dynadice_state, videoram)
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_io_map, ADDRESS_SPACE_IO, 8 )
@@ -235,10 +234,7 @@ static MACHINE_RESET( dynadice )
 	state->ay_data = 0;
 }
 
-static MACHINE_DRIVER_START( dynadice )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynadice_state)
+static MACHINE_CONFIG_START( dynadice, dynadice_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,18432000/8)
@@ -252,7 +248,7 @@ static MACHINE_DRIVER_START( dynadice )
 	MDRV_MACHINE_START(dynadice)
 	MDRV_MACHINE_RESET(dynadice)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -273,7 +269,7 @@ static MACHINE_DRIVER_START( dynadice )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( dynadice )
 	ROM_REGION( 0x10000, "maincpu", 0 )

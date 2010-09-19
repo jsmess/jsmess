@@ -76,16 +76,8 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *lvcards_videoram;
-extern UINT8 *lvcards_colorram;
-extern WRITE8_HANDLER( lvcards_videoram_w );
-extern WRITE8_HANDLER( lvcards_colorram_w );
-
-extern PALETTE_INIT( lvcards );
-extern PALETTE_INIT( ponttehk );
-extern VIDEO_START( lvcards );
-extern VIDEO_UPDATE( lvcards );
+#include "machine/nvram.h"
+#include "includes/lvcards.h"
 
 static UINT8 payout;
 static UINT8 pulse;
@@ -158,7 +150,7 @@ static READ8_HANDLER( payout_r )
 
 static ADDRESS_MAP_START( ponttehk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE(&lvcards_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE(&lvcards_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -168,7 +160,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lvcards_map, ADDRESS_SPACE_PROGRAM, 8  )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE(&lvcards_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE(&lvcards_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -185,7 +177,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lvpoker_map, ADDRESS_SPACE_PROGRAM, 8  )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE(&lvcards_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE(&lvcards_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -470,7 +462,7 @@ static const ay8910_interface lcay8910_interface =
 };
 
 
-static MACHINE_DRIVER_START( lvcards )
+static MACHINE_CONFIG_START( lvcards, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 
@@ -500,31 +492,29 @@ static MACHINE_DRIVER_START( lvcards )
 	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(lcay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lvpoker )
-	MDRV_IMPORT_FROM( lvcards )
+static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
 
 	// basic machine hardware
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lvpoker_map)
 	MDRV_MACHINE_START(lvpoker)
 	MDRV_MACHINE_RESET(lvpoker)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ponttehk )
-	MDRV_IMPORT_FROM( lvcards )
+static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 
 	// basic machine hardware
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ponttehk_map)
 	MDRV_MACHINE_RESET(lvpoker)
 
 	// video hardware
 	MDRV_PALETTE_INIT(ponttehk)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( lvpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )

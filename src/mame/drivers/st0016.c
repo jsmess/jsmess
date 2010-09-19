@@ -73,8 +73,6 @@ WRITE8_HANDLER(st0016_rom_bank_w)
 	st0016_rom_bank=data;
 }
 
-READ8_HANDLER(st0016_dma_r);
-
 static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
@@ -432,7 +430,7 @@ static const st0016_interface st0016_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( st0016 )
+static MACHINE_CONFIG_START( st0016, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
@@ -460,16 +458,15 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mayjinsn )
-	MDRV_IMPORT_FROM(st0016)
+static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(st0016_m2_io)
 	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem)
 	MDRV_QUANTUM_TIME(HZ(60))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

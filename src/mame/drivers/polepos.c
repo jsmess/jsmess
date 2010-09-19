@@ -228,6 +228,7 @@ Todo:
 #include "audio/namco54.h"
 #include "includes/polepos.h"
 #include "sound/tms5220.h"
+#include "machine/nvram.h"
 
 #include "polepos.lh"
 #include "topracer.lh"
@@ -478,7 +479,7 @@ static MACHINE_RESET( polepos )
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* Battery Backup */
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")	/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w)				/* Road Memory */
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
@@ -863,7 +864,7 @@ static const namco_interface namco_config =
  * Machine driver
  *********************************************************************/
 
-static MACHINE_DRIVER_START( polepos )
+static MACHINE_CONFIG_START( polepos, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -891,7 +892,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -930,7 +931,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
    - they probably simulate some of the logic */
@@ -949,7 +950,7 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 };
 
 
-static MACHINE_DRIVER_START( topracern )
+static MACHINE_CONFIG_START( topracern, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -974,7 +975,7 @@ static MACHINE_DRIVER_START( topracern )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1004,7 +1005,7 @@ static MACHINE_DRIVER_START( topracern )
 	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static ADDRESS_MAP_START( sound_z80_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1016,8 +1017,7 @@ static ADDRESS_MAP_START( sound_z80_bootleg_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( polepos2bi )
-	MDRV_IMPORT_FROM(topracern)
+static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 
 	MDRV_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8)	/*? MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( polepos2bi )
 	MDRV_SOUND_ADD("tms", TMS5220, 600000)	/* ? Mhz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

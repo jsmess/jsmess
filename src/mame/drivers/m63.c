@@ -121,13 +121,11 @@ Dip locations verified for:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
-class m63_state : public driver_data_t
+class m63_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m63_state(machine)); }
-
-	m63_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	m63_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *  videoram;
 	UINT8 *  colorram;
@@ -732,10 +730,7 @@ static MACHINE_RESET( m63 )
 	state->p2 = 0;
 }
 
-static MACHINE_DRIVER_START( m63 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(m63_state)
+static MACHINE_CONFIG_START( m63, m63_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
@@ -773,18 +768,14 @@ static MACHINE_DRIVER_START( m63 )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) /* ????? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atomboy )
-	MDRV_IMPORT_FROM(m63)
+static MACHINE_CONFIG_DERIVED( atomboy, m63 )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fghtbskt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(m63_state)
+static MACHINE_CONFIG_START( fghtbskt, m63_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */
@@ -823,7 +814,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(fghtbskt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

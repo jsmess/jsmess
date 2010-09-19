@@ -26,19 +26,7 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "sound/c6280.h"
-
-VIDEO_UPDATE( battlera );
-VIDEO_START( battlera );
-INTERRUPT_GEN( battlera_interrupt );
-
-READ8_HANDLER( HuC6270_register_r );
-WRITE8_HANDLER( HuC6270_register_w );
-//READ8_HANDLER( HuC6270_data_r );
-WRITE8_HANDLER( HuC6270_data_w );
-WRITE8_HANDLER( battlera_palette_w );
-
-READ8_HANDLER( HuC6270_debug_r );
-WRITE8_HANDLER( HuC6270_debug_w );
+#include "includes/battlera.h"
 
 static int control_port_select;
 
@@ -241,7 +229,7 @@ static const c6280_interface c6280_config =
 	"audiocpu"
 };
 
-static MACHINE_DRIVER_START( battlera )
+static MACHINE_CONFIG_START( battlera, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280,21477200/3)
@@ -281,7 +269,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_CONFIG(c6280_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

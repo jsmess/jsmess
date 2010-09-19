@@ -365,19 +365,8 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
 #include "snookr10.lh"
-
-
-/* from video */
-extern UINT8 *snookr10_videoram;
-extern UINT8 *snookr10_colorram;
-
-WRITE8_HANDLER( snookr10_videoram_w );
-WRITE8_HANDLER( snookr10_colorram_w );
-PALETTE_INIT( snookr10 );
-PALETTE_INIT( apple10 );
-VIDEO_START( snookr10 );
-VIDEO_START( apple10 );
-VIDEO_UPDATE( snookr10 );
+#include "includes/snookr10.h"
+#include "machine/nvram.h"
 
 static int outportl, outporth;
 static int bit0, bit1, bit2, bit3, bit4, bit5;
@@ -508,8 +497,8 @@ static WRITE8_HANDLER( output_port_1_w )
 *************************/
 
 static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")		/* IN2 */
@@ -523,8 +512,8 @@ static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenballs_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")		/* IN2 */
@@ -698,14 +687,14 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( snookr10 )
+static MACHINE_CONFIG_START( snookr10, driver_device )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
 	MDRV_CPU_PROGRAM_MAP(snookr10_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
 
@@ -728,28 +717,26 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)	/* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple10 )
+static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snookr10)
 	MDRV_CPU_MODIFY("maincpu")
 
     /* video hardware */
 	MDRV_PALETTE_INIT(apple10)
 	MDRV_VIDEO_START(apple10)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tenballs )
+static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snookr10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tenballs_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

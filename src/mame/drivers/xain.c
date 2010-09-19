@@ -141,6 +141,7 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
+#include "includes/xain.h"
 
 #define MASTER_CLOCK		XTAL_12MHz
 #define CPU_CLOCK			MASTER_CLOCK / 8
@@ -148,19 +149,6 @@ Updates by Bryan McPhail, 12/12/2004:
 #define PIXEL_CLOCK			MASTER_CLOCK / 2
 
 static int vblank;
-
-VIDEO_UPDATE( xain );
-VIDEO_START( xain );
-WRITE8_HANDLER( xain_scrollxP0_w );
-WRITE8_HANDLER( xain_scrollyP0_w );
-WRITE8_HANDLER( xain_scrollxP1_w );
-WRITE8_HANDLER( xain_scrollyP1_w );
-WRITE8_HANDLER( xain_charram_w );
-WRITE8_HANDLER( xain_bgram0_w );
-WRITE8_HANDLER( xain_bgram1_w );
-WRITE8_HANDLER( xain_flipscreen_w );
-
-extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
 /* MCU */
 static int from_main;
@@ -595,7 +583,7 @@ static MACHINE_START( xsleena )
 	memory_set_bank(machine, "bank2", 0);
 }
 
-static MACHINE_DRIVER_START( xsleena )
+static MACHINE_CONFIG_START( xsleena, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)
@@ -641,13 +629,12 @@ static MACHINE_DRIVER_START( xsleena )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( xsleenab )
-	MDRV_IMPORT_FROM(xsleena)
+static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

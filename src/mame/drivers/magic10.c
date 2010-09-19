@@ -78,6 +78,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "sgsafari.lh"
 
 static tilemap_t *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
@@ -263,12 +264,12 @@ static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSW")
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x40000a, 0x40000b) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x40000a, 0x40000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
 	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE(&magic10_vregs)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
@@ -279,12 +280,12 @@ static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
 	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
@@ -295,7 +296,7 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
 	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
@@ -305,7 +306,7 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x50001f) AM_READNOP
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 ADDRESS_MAP_END
 
@@ -314,7 +315,7 @@ static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w)	// copro comm
 	AM_RANGE(0x500006, 0x500011) AM_RAM
@@ -324,7 +325,7 @@ static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500018, 0x500019) AM_READ_PORT("DSW1")
 	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x70000a, 0x70000b) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x70000a, 0x70000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(&magic10_vregs)
 ADDRESS_MAP_END
 
@@ -333,11 +334,11 @@ static ADDRESS_MAP_START( sgsafari_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
 	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
@@ -645,13 +646,13 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_DRIVER_START( magic10 )
+static MACHINE_CONFIG_START( magic10, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(magic10_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -670,49 +671,49 @@ static MACHINE_DRIVER_START( magic10 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magic10a )
+static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic10a_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magic102 )
+static MACHINE_CONFIG_DERIVED( magic102, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic102_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hotslot )
+static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hotslot_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 32*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sgsafari )
+static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sgsafari_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)	/* L1 interrupts */
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************

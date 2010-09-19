@@ -59,9 +59,15 @@
         since they match 4 of 6 bitplanes. The PROM at U71 is also marked for Fantasy Fortune,
         so maybe is the correct one for this game.
 
-        The mc146818 driver is buggy - reported problem to Firewave and issues will be addressed.
-        In this driver, the wrong day of the month is shown, wrong hours are shown.
-        rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data.
+        1/9/10 - Frasher
+        Cashcade workaround for topgear
+
+        The mc146818 emulation has issues and is not working correctly.
+
+        - day of week is incorrect
+        - day of month is incorrect ( code is using day instead of mday ).
+        - hours are not showing up correct in PM and 12 hour mode
+        - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
 
         TODO:
         1.Create layouts for each game  ( each game is currently using the generic aristmk4.lay for now ).
@@ -69,16 +75,22 @@
 
         2.Extend the driver to use the keno keyboard input for keno games.
 
-        3.Some with cashcade jackpot systems such as topgear do not work yet. Eforest does not work.
+        3.Eforest does not work.
 
-        5.Add note acceptor support
+        4.Add note acceptor support
 
-        6.Robot test
+        5.Robot test
 
-***********************************************************************************************************************************************/
+        6.Provide complete cashcade emulation
+
+        7.Look into cashbox photo-optic fault issues ( reproduced in robo test )
+
+        8.Look into what the hopper probe signal is for.
+
+
+ ***********************************************************************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz
-
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -92,6 +104,7 @@
 #include "state.h"
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
+#include "machine/nvram.h"
 
 
 int rtc_address_strobe = 0;
@@ -99,7 +112,7 @@ int rtc_data_strobe = 0;
 
 running_device *samples;
 UINT8 *shapeRomPtr;     // pointer to tile_gfx shape roms
-UINT8 shapeRom[0xC000]; // shaperom restore array.
+UINT8 shapeRom[0xc000]; // shaperom restore array.
 
 static UINT8 *mkiv_vram;
 static UINT8 *nvram;    // backup
@@ -111,6 +124,10 @@ static UINT8 cgdrsw;
 static UINT8 ripple;
 static int hopper_motor;
 static int inscrd;
+
+/* Partial Caschcade protocol */
+static int cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf0};
+static int cashcade_c = 0;
 
 static VIDEO_START(aristmk4)
 {
@@ -232,7 +249,7 @@ static READ8_HANDLER(u3_p2)
     if (u3_p0_w&0x20) // DOPTE on
     {
         if (u3_p3_ret&0x02) // door closed
-    	        u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
+			u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
 	}
 
     if (inscrd==0)
@@ -273,22 +290,23 @@ PORTB - MECHANICAL METERS
 
 static READ8_HANDLER(mkiv_pia_ina)
 {
-    return mc146818_port_r(space,1);
+    return space->machine->device<mc146818_device>("rtc")->read(*space,1);
 }
 
 //output a
 
 static WRITE8_HANDLER(mkiv_pia_outa)
 {
+	mc146818_device *mc = space->machine->device<mc146818_device>("rtc");
     if(rtc_data_strobe)
     {
-        mc146818_port_w(space,1,data);
+        mc->write(*space,1,data);
         //logerror("rtc protocol write data: %02X\n",data);
 
     }
     else
     {
-        mc146818_port_w(space,0,data);
+        mc->write(*space,0,data);
         //logerror("rtc protocol write address: %02X\n",data);
 
     }
@@ -618,8 +636,6 @@ static WRITE8_DEVICE_HANDLER(pbltlp_out)
     output_set_lamp_value(17, (data >> 7) & 1); // light tower
 
     //logerror("Lights port B: %02X\n",data);
-
-
 }
 
 static WRITE8_HANDLER(mlamps)
@@ -640,13 +656,30 @@ static WRITE8_DEVICE_HANDLER(zn434_w)
 }
 
 
+static READ8_HANDLER(cashcade_r)
+{
+	/* work around for cashcade games */
+	return cashcade_p[(cashcade_c++)%15];
+}
+
+static WRITE8_HANDLER(mk4_printer_w)
+{
+	//logerror("Printer: %c %d\n",data,data);
+}
+
+static READ8_HANDLER(mk4_printer_r)
+{
+	return 0;
+}
+
 static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
 	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
@@ -655,8 +688,8 @@ static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
 	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
-	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via_r,via_w)
-	AM_RANGE(0x5200, 0x5200) AM_READ_PORT("5200")
+	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
+	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
@@ -731,12 +764,6 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	/************************************************************************************************************
-
-    5300
-
-    ************************************************************************************************************/
-
     PORT_START("5300")
 	PORT_DIPNAME( 0x01, 0x00, "5300-1")
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:1")
@@ -760,7 +787,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "5300-8")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:8")
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:8") // mechanical meter
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("500d")
@@ -1140,7 +1167,6 @@ static PALETTE_INIT( aristmk4 )
 
 static DRIVER_INIT( aristmk4 )
 {
-    mc146818_init(machine, MC146818_IGNORE_CENTURY);
 	shapeRomPtr = (UINT8 *)memory_region(machine, "tile_gfx");
     memcpy(shapeRom,shapeRomPtr,sizeof(shapeRom)); // back up
 }
@@ -1156,7 +1182,7 @@ static MACHINE_START( aristmk4 )
 static MACHINE_RESET( aristmk4 )
 {
     /* mark 4 has a link on the motherboard to switch between 1.5Mhz and 3Mhz clock speed */
-    switch(input_port_read(machine, "LK13"))  // cpu speed cotrol.. 3mhz or 1.5mhz
+    switch(input_port_read(machine, "LK13"))  // cpu speed control... 3mhz or 1.5mhz
     {
         case  0x00:
             machine->device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 Mhz
@@ -1169,16 +1195,15 @@ static MACHINE_RESET( aristmk4 )
 }
 
 
-static MACHINE_DRIVER_START( aristmk4 )
+static MACHINE_CONFIG_START( aristmk4, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz (goldenc needs a bit faster for some reason)
 	MDRV_CPU_PROGRAM_MAP(aristmk4_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_MACHINE_START(aristmk4)
-	MDRV_NVRAM_HANDLER( mc146818 )
     MDRV_MACHINE_RESET(aristmk4 )
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1199,6 +1224,7 @@ static MACHINE_DRIVER_START( aristmk4 )
 	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MDRV_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
     MDRV_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
+    MDRV_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
     MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1216,7 +1242,7 @@ static MACHINE_DRIVER_START( aristmk4 )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )
 

@@ -29,22 +29,7 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-extern UINT8 *tagteam_videoram;
-extern UINT8 *tagteam_colorram;
-
-extern WRITE8_HANDLER( tagteam_videoram_w );
-extern WRITE8_HANDLER( tagteam_colorram_w );
-extern READ8_HANDLER( tagteam_mirrorvideoram_r );
-extern WRITE8_HANDLER( tagteam_mirrorvideoram_w );
-extern READ8_HANDLER( tagteam_mirrorcolorram_r );
-extern WRITE8_HANDLER( tagteam_mirrorcolorram_w );
-extern WRITE8_HANDLER( tagteam_control_w );
-extern WRITE8_HANDLER( tagteam_flipscreen_w );
-
-extern PALETTE_INIT( tagteam );
-extern VIDEO_START( tagteam );
-extern VIDEO_UPDATE( tagteam );
+#include "includes/tagteam.h"
 
 static WRITE8_HANDLER( sound_command_w )
 {
@@ -226,7 +211,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( tagteam )
+static MACHINE_CONFIG_START( tagteam, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ?? */
@@ -263,7 +248,7 @@ static MACHINE_DRIVER_START( tagteam )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

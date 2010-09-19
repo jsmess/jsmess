@@ -77,10 +77,9 @@ Updates:
 #include "sound/k054539.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
-
-static UINT16 cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 static READ16_HANDLER( k052109_word_noA12_r )
 {
@@ -573,13 +572,13 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 static READ16_HANDLER( cuebrick_nv_r )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
-	return cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
+	return state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
 }
 
 static WRITE16_HANDLER( cuebrick_nv_w )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
-       COMBINE_DATA(&cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
+       COMBINE_DATA(&state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 static WRITE16_HANDLER( cuebrick_nvbank_w )
@@ -600,7 +599,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
@@ -1107,7 +1106,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0xc00404, 0xc00405) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00406, 0xc00407) AM_READ(sunsetbl_eeprom_r)
-	AM_RANGE(0xc00600, 0xc00601) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xc00600, 0xc00601) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x75d288, 0x75d289) AM_READNOP	// read repeatedly in some test menus (PC=181f2)
 ADDRESS_MAP_END
 
@@ -2274,10 +2273,7 @@ static MACHINE_RESET( common )
 }
 
 
-static MACHINE_DRIVER_START( cuebrick )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz */
@@ -2298,7 +2294,7 @@ static MACHINE_DRIVER_START( cuebrick )
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(cuebrick)
 	MDRV_VIDEO_UPDATE(mia)
@@ -2313,13 +2309,10 @@ static MACHINE_DRIVER_START( cuebrick )
 	MDRV_SOUND_CONFIG(ym2151_interface_cbj)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mia )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( mia, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2361,7 +2354,7 @@ static MACHINE_DRIVER_START( mia )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_RESET( tmnt )
@@ -2373,10 +2366,7 @@ static MACHINE_RESET( tmnt )
 	upd7759_reset_w(state->upd, 1);
 }
 
-static MACHINE_DRIVER_START( tmnt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( tmnt, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2425,13 +2415,10 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(tmnt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( punkshot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( punkshot, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2472,13 +2459,10 @@ static MACHINE_DRIVER_START( punkshot )
 
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lgtnfght )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2520,13 +2504,10 @@ static MACHINE_DRIVER_START( lgtnfght )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( blswhstl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -2573,7 +2554,7 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)	/* fixed inverted stereo channels */
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2593,10 +2574,7 @@ static GFXDECODE_START( glfgreat )
 	GFXDECODE_ENTRY( "gfx3", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( glfgreat )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
@@ -2637,7 +2615,7 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void sound_nmi( running_device *device )
@@ -2660,10 +2638,7 @@ static MACHINE_START( prmrsocr )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_DRIVER_START( prmrsocr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
@@ -2707,13 +2682,10 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tmnt2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2762,13 +2734,10 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ssriders )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( ssriders, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2813,13 +2782,10 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sunsetbl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -2855,12 +2821,9 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( thndrx2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2905,7 +2868,7 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -4321,8 +4284,8 @@ static DRIVER_INIT( tmnt )
 
 static DRIVER_INIT( cuebrick )
 {
-	machine->generic.nvram.u8 = (UINT8 *)cuebrick_nvram;
-	machine->generic.nvram_size = 0x400 * 0x20;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
+	machine->device<nvram_device>("nvram")->set_base(state->m_cuebrick_nvram, sizeof(state->m_cuebrick_nvram));
 }
 
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )

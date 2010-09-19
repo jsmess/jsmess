@@ -384,7 +384,7 @@ static WRITE8_HANDLER( audio_io_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_READWRITE(sound_busy_r, atarigen_sound_reset_w)
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(badlands_state, eeprom, eeprom_size)
+	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
@@ -503,8 +503,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( badlands )
-	MDRV_DRIVER_DATA(badlands_state)
+static MACHINE_CONFIG_START( badlands, badlands_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -516,7 +515,7 @@ static MACHINE_DRIVER_START( badlands )
 
 	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlands)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -538,7 +537,7 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -653,7 +652,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe4006, 0xfe4007) AM_READ(badlandsb_unk_r )
 
 
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(badlands_state, eeprom, eeprom_size)
+	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(atarigen_video_int_ack_w)
 
@@ -713,8 +712,7 @@ static MACHINE_RESET( badlandsb )
 //  memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
 }
 
-static MACHINE_DRIVER_START( badlandsb )
-	MDRV_DRIVER_DATA(badlands_state)
+static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 2800000/2)
@@ -726,7 +724,7 @@ static MACHINE_DRIVER_START( badlandsb )
 
 	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlandsb)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -748,7 +746,7 @@ static MACHINE_DRIVER_START( badlandsb )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 2800000/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1,11 +1,9 @@
 
-class tmnt_state : public driver_data_t
+class tmnt_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmnt_state(machine)); }
-
-	tmnt_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	tmnt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	INT16 *    sampledata;
@@ -33,6 +31,7 @@ public:
 	int        tmnt_soundlatch;
 	int        cuebrick_snd_irqlatch, cuebrick_nvram_bank;
 	int        toggle, last;
+	UINT16	   m_cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 	/* devices */
 	running_device *maincpu;

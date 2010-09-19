@@ -331,8 +331,8 @@ static ADDRESS_MAP_START( galpani2_mem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780002, 0x780003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x780004, 0x780005) AM_READ_PORT("SPECIAL")
 	AM_RANGE(0x780006, 0x780007) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff	)	// 2 x OKIM6295
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff	)	//
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff	)	// 2 x OKIM6295
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff	)	//
 	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE8("oki1", galpani2_oki1_bank_w, 0x00ff			)	//
 	AM_RANGE(0xcc0000, 0xcc0001) AM_DEVWRITE8("oki2", galpani2_oki2_bank_w, 0x00ff			)	//
 ADDRESS_MAP_END
@@ -473,7 +473,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
+//  PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT     )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -574,7 +574,7 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 	}
 }
 
-static MACHINE_DRIVER_START( galpani2 )
+static MACHINE_CONFIG_START( galpani2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -612,7 +612,7 @@ static MACHINE_DRIVER_START( galpani2 )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

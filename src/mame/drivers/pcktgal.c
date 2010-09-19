@@ -17,13 +17,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-extern WRITE8_HANDLER( pcktgal_videoram_w );
-extern WRITE8_HANDLER( pcktgal_flipscreen_w );
-
-extern PALETTE_INIT( pcktgal );
-extern VIDEO_START( pcktgal );
-extern VIDEO_UPDATE( pcktgal );
+#include "includes/pcktgal.h"
 
 /***************************************************************************/
 
@@ -78,7 +72,7 @@ static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 
 static ADDRESS_MAP_START( pcktgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pcktgal_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pcktgal_videoram_w) AM_BASE_MEMBER(pcktgal_state, videoram)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(pcktgal_flipscreen_w)
@@ -221,7 +215,7 @@ static const msm5205_interface msm5205_config =
 
 /***************************************************************************/
 
-static MACHINE_DRIVER_START( pcktgal )
+static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)
@@ -260,13 +254,12 @@ static MACHINE_DRIVER_START( pcktgal )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bootleg )
-	MDRV_IMPORT_FROM(pcktgal)
+static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
 	MDRV_GFXDECODE(bootleg)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

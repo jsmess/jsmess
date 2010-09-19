@@ -30,16 +30,15 @@ $c088-$c095 player tiles
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
 #include "video/resnet.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
-class jangou_state : public driver_data_t
+class jangou_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jangou_state(machine)); }
-
-	jangou_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	jangou_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* video-related */
 	UINT8        *blit_buffer;
@@ -483,7 +482,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* MK48Z02B-15 ZEROPOWER RAM */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")	/* MK48Z02B-15 ZEROPOWER RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_io, ADDRESS_SPACE_IO, 8 )
@@ -979,10 +978,7 @@ static MACHINE_RESET( jngolady )
 }
 
 /* Note: All frequencies and dividers are unverified */
-static MACHINE_DRIVER_START( jangou )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(jangou_state)
+static MACHINE_CONFIG_START( jangou, jangou_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
@@ -1023,11 +1019,11 @@ static MACHINE_DRIVER_START( jangou )
 
 	MDRV_SOUND_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jngolady )
+static MACHINE_CONFIG_DERIVED( jngolady, jangou )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jangou)
 
 	MDRV_CPU_MODIFY("cpu0")
 	MDRV_CPU_PROGRAM_MAP(jngolady_cpu0_map)
@@ -1049,11 +1045,11 @@ static MACHINE_DRIVER_START( jngolady )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cntrygrl )
+static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jangou)
 
 	MDRV_CPU_MODIFY("cpu0")
 	MDRV_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
@@ -1067,11 +1063,11 @@ static MACHINE_DRIVER_START( cntrygrl )
 	/* sound hardware */
 	MDRV_SOUND_START(0)
 	MDRV_DEVICE_REMOVE("cvsd")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( roylcrdn )
+static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jangou)
 
 	MDRV_CPU_MODIFY("cpu0")
 	MDRV_CPU_PROGRAM_MAP(roylcrdn_cpu0_map )
@@ -1079,7 +1075,7 @@ static MACHINE_DRIVER_START( roylcrdn )
 
 	MDRV_DEVICE_REMOVE("cpu1")
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(common)
 	MDRV_MACHINE_RESET(common)
@@ -1087,7 +1083,7 @@ static MACHINE_DRIVER_START( roylcrdn )
 	/* sound hardware */
 	MDRV_SOUND_START(0)
 	MDRV_DEVICE_REMOVE("cvsd")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

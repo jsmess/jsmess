@@ -9,17 +9,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "machine/nvram.h"
 
 #define MCLK 10000000
 
 
-class mayumi_state : public driver_data_t
+class mayumi_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mayumi_state(machine)); }
-
-	mayumi_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mayumi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *    videoram;
@@ -139,7 +138,7 @@ static READ8_HANDLER( key_matrix_r )
 static ADDRESS_MAP_START( mayumi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE_MEMBER(mayumi_state, videoram)
 ADDRESS_MAP_END
 
@@ -368,10 +367,7 @@ static MACHINE_RESET( mayumi )
 	state->input_sel = 0;
 }
 
-static MACHINE_DRIVER_START( mayumi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mayumi_state)
+static MACHINE_CONFIG_START( mayumi, mayumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
@@ -407,9 +403,9 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

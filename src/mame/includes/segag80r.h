@@ -4,6 +4,16 @@
 
 *************************************************************************/
 
+class segag80r_state : public driver_device
+{
+public:
+	segag80r_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/segag80.c -----------*/
 
 extern UINT8 (*sega_decrypt)(offs_t, UINT8);
@@ -13,10 +23,10 @@ void sega_security(int chip);
 
 /*----------- defined in audio/segag80r.c -----------*/
 
-MACHINE_DRIVER_EXTERN( astrob_sound_board );
-MACHINE_DRIVER_EXTERN( 005_sound_board );
-MACHINE_DRIVER_EXTERN( spaceod_sound_board );
-MACHINE_DRIVER_EXTERN( monsterb_sound_board );
+MACHINE_CONFIG_EXTERN( astrob_sound_board );
+MACHINE_CONFIG_EXTERN( 005_sound_board );
+MACHINE_CONFIG_EXTERN( spaceod_sound_board );
+MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
 WRITE8_HANDLER( astrob_sound_w );
 

@@ -102,12 +102,8 @@
 #include "includes/decoprot.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
+#include "includes/deco_mlc.h"
 
-VIDEO_START( mlc );
-VIDEO_UPDATE( mlc );
-VIDEO_EOF( mlc );
-
-extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
 static timer_device *raster_irq_timer;
 static int mainCpuIsArm;
@@ -382,7 +378,7 @@ static MACHINE_RESET( mlc )
 	raster_irq_timer = machine->device<timer_device>("int_timer");
 }
 
-static MACHINE_DRIVER_START( avengrgs )
+static MACHINE_CONFIG_START( avengrgs, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -413,9 +409,9 @@ static MACHINE_DRIVER_START( avengrgs )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mlc )
+static MACHINE_CONFIG_START( mlc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -446,17 +442,15 @@ static MACHINE_DRIVER_START( mlc )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mlc_6bpp )
-	MDRV_IMPORT_FROM(mlc)
+static MACHINE_CONFIG_DERIVED( mlc_6bpp, mlc )
 	MDRV_GFXDECODE(6bpp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mlc_5bpp )
-	MDRV_IMPORT_FROM(mlc)
+static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
 	MDRV_GFXDECODE(5bpp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

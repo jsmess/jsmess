@@ -4,19 +4,18 @@
 
 *************************************************************************/
 
-class ccastles_state : public driver_data_t
+class ccastles_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ccastles_state(machine)); }
-
-	ccastles_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	ccastles_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  nvram_stage(*this, "nvram") { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
-//  UINT8 *  nvram_stage;   // currently this uses generic nvram handlers
-//  UINT8 *  nvram;     // currently this uses generic nvram handlers
+	required_shared_ptr<UINT8> nvram_stage;
+	UINT8    nvram[0x100];
 
 	/* video-related */
 	const UINT8 *syncprom;

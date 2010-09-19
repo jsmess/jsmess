@@ -17,13 +17,11 @@
  *
  *************************************/
 
-class skeetsht_state : public driver_data_t
+class skeetsht_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, skeetsht_state(machine)); }
-
-	skeetsht_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	skeetsht_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 *tms_vram;
 	UINT8 porta_latch;
@@ -247,9 +245,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( skeetsht )
-
-	MDRV_DRIVER_DATA( skeetsht_state )
+static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 
 	MDRV_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -275,7 +271,7 @@ static MACHINE_DRIVER_START( skeetsht )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000) // ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

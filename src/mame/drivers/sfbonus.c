@@ -1159,7 +1159,7 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("SWITCH4")
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("SWITCH5")
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
 
@@ -1246,7 +1246,7 @@ static NVRAM_HANDLER( sfbonus )
 }
 
 
-static MACHINE_DRIVER_START( sfbonus )
+static MACHINE_CONFIG_START( sfbonus, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
 	MDRV_CPU_IO_MAP(sfbonus_io)
@@ -1276,7 +1276,7 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Skill Fruit Bonus */

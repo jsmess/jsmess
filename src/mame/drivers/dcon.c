@@ -16,20 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
-
-WRITE16_HANDLER( dcon_gfxbank_w );
-WRITE16_HANDLER( dcon_background_w );
-WRITE16_HANDLER( dcon_foreground_w );
-WRITE16_HANDLER( dcon_midground_w );
-WRITE16_HANDLER( dcon_text_w );
-WRITE16_HANDLER( dcon_control_w );
-READ16_HANDLER( dcon_control_r );
-
-VIDEO_START( dcon );
-VIDEO_UPDATE( dcon );
-VIDEO_UPDATE( sdgndmps );
-
-extern UINT16 *dcon_back_data,*dcon_fore_data,*dcon_mid_data,*dcon_scroll_ram,*dcon_textram;
+#include "includes/dcon.h"
 
 /***************************************************************************/
 
@@ -256,7 +243,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( dcon )
+static MACHINE_CONFIG_START( dcon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -283,9 +270,9 @@ static MACHINE_DRIVER_START( dcon )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sdgndmps )
+static MACHINE_CONFIG_START( sdgndmps, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -312,7 +299,7 @@ static MACHINE_DRIVER_START( sdgndmps )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

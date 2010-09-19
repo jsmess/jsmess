@@ -61,13 +61,11 @@ Code disassembling
 #include "machine/8255ppi.h"
 
 
-class albazg_state : public driver_data_t
+class albazg_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, albazg_state(machine)); }
-
-	albazg_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	albazg_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  cus_ram;
@@ -395,10 +393,7 @@ static MACHINE_RESET( yumefuda )
 	state->prot_lock = 0;
 }
 
-static MACHINE_DRIVER_START( yumefuda )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(albazg_state)
+static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
@@ -437,7 +432,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************************/
 

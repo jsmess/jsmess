@@ -277,8 +277,8 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-
 #include "wecleman.lh"
+#include "includes/wecleman.h"
 
 /* Variables only used here: */
 static UINT16 *blitter_regs;
@@ -288,25 +288,6 @@ static int spr_color_offs;
 
 /* Variables that video has acces to: */
 int wecleman_selected_ip, wecleman_irqctrl;
-
-/* Variables defined in video: */
-extern UINT16 *wecleman_videostatus;
-extern UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
-extern size_t wecleman_roadram_size;
-
-/* Functions defined in video: */
-WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w );
-WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w );
-WRITE16_HANDLER( wecleman_videostatus_w );
-WRITE16_HANDLER( wecleman_pageram_w );
-WRITE16_HANDLER( wecleman_txtram_w );
-VIDEO_UPDATE( wecleman );
-VIDEO_START( wecleman );
-VIDEO_UPDATE( hotchase );
-VIDEO_START( hotchase );
-
-extern void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
 
 /***************************************************************************
                             Common Routines
@@ -1052,7 +1033,7 @@ static MACHINE_RESET( wecleman )
 	k007232_set_bank( machine->device("konami"), 0, 1 );
 }
 
-static MACHINE_DRIVER_START( wecleman )
+static MACHINE_CONFIG_START( wecleman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
@@ -1095,7 +1076,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1123,7 +1104,7 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
-static MACHINE_DRIVER_START( hotchase )
+static MACHINE_CONFIG_START( hotchase, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
@@ -1172,7 +1153,7 @@ static MACHINE_DRIVER_START( hotchase )
 	MDRV_SOUND_ADD("konami3", K007232, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

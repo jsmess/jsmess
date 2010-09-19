@@ -161,9 +161,9 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE_MEMBER(silkroad_state,vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff0000)
 	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)
-	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff0000)
 	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE("oki1", silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
 	AM_RANGE(0xc0010c, 0xc00123) AM_WRITEONLY AM_BASE_MEMBER(silkroad_state,regs)
@@ -278,9 +278,7 @@ static GFXDECODE_START( silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( silkroad )
-
-	MDRV_DRIVER_DATA( silkroad_state )
+static MACHINE_CONFIG_START( silkroad, silkroad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -315,7 +313,7 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

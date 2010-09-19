@@ -42,15 +42,7 @@ Dip locations and factory settings verified with US manual
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-extern UINT16 *deadang_video_data, *deadang_scroll_ram;
-
-extern WRITE16_HANDLER( deadang_foreground_w );
-extern WRITE16_HANDLER( deadang_text_w );
-extern WRITE16_HANDLER( deadang_bank_w );
-
-extern VIDEO_START( deadang );
-extern VIDEO_UPDATE( deadang );
+#include "includes/deadang.h"
 
 /* Read/Write Handlers */
 
@@ -72,7 +64,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
 	AM_RANGE(0x06000, 0x0600f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
-	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_BASE_MEMBER(deadang_state, videoram)
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
@@ -225,7 +217,7 @@ static INTERRUPT_GEN( deadang_interrupt )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( deadang )
+static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
@@ -259,7 +251,7 @@ static MACHINE_DRIVER_START( deadang )
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

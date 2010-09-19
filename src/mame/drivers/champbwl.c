@@ -153,6 +153,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/x1_010.h"
+#include "machine/nvram.h"
 #include "includes/tnzs.h"
 
 
@@ -194,7 +195,7 @@ static WRITE8_HANDLER( champbwl_objctrl_w )
 static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
@@ -354,17 +355,14 @@ static MACHINE_RESET( champbwl )
 
 }
 
-static MACHINE_DRIVER_START( champbwl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tnzs_state)
+static MACHINE_CONFIG_START( champbwl, tnzs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(champbwl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(champbwl)
 	MDRV_MACHINE_RESET(champbwl)
@@ -391,7 +389,7 @@ static MACHINE_DRIVER_START( champbwl )
 	MDRV_SOUND_CONFIG(champbwl_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( champbwl )
 	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */

@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( namcona2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
@@ -1004,7 +1004,7 @@ static const c140_interface C140_interface_typeA =
 };
 
 /* cropped at sides */
-static MACHINE_DRIVER_START( namcona1 )
+static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)
@@ -1042,29 +1042,27 @@ static MACHINE_DRIVER_START( namcona1 )
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* full-width */
-static MACHINE_DRIVER_START( namcona1w )
+static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(namcona1)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( namcona2 )
+static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(namcona1)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(namcona2_main_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void init_namcona1( running_machine *machine, int gametype )

@@ -12,18 +12,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-
-/* Video emulation definitions */
-VIDEO_START( stadhero );
-VIDEO_UPDATE( stadhero );
-
-extern UINT16 *stadhero_pf1_data;
-extern UINT16 *stadhero_pf2_control_0;
-extern UINT16 *stadhero_pf2_control_1;
-
-WRITE16_HANDLER( stadhero_pf1_data_w );
-READ16_HANDLER( stadhero_pf2_data_r );
-WRITE16_HANDLER( stadhero_pf2_data_w );
+#include "includes/stadhero.h"
 
 /******************************************************************************/
 
@@ -83,7 +72,7 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -219,7 +208,7 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( stadhero )
+static MACHINE_CONFIG_START( stadhero, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -258,7 +247,7 @@ static MACHINE_DRIVER_START( stadhero )
 
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

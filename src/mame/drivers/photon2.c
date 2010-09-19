@@ -296,7 +296,7 @@ static MACHINE_RESET( photon2 )
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 }
 
-static MACHINE_DRIVER_START( photon2 )
+static MACHINE_CONFIG_START( photon2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem)
@@ -322,10 +322,10 @@ static MACHINE_DRIVER_START( photon2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( photoply_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_RAM//DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
@@ -475,7 +475,6 @@ static MACHINE_START( photoply )
 	photoply_devices.dma8237_2 = machine->device( "dma8237_2" );
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
-	mc146818_init(machine, MC146818_STANDARD);
 }
 
 static const gfx_layout CGA_charlayout =
@@ -495,7 +494,7 @@ static GFXDECODE_START( photoply )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( photoply )
+static MACHINE_CONFIG_START( photoply, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 75000000)	/* I486DX4, 75 or 100 Mhz */
 	MDRV_CPU_PROGRAM_MAP(photoply_map)
@@ -512,9 +511,9 @@ static MACHINE_DRIVER_START( photoply )
 	MDRV_GFXDECODE( photoply )
 
 	MDRV_MACHINE_START(photoply)
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-//  MDRV_IMPORT_FROM( at_kbdc8042 )
+//  MDRV_FRAGMENT_ADD( at_kbdc8042 )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
 	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
@@ -527,7 +526,7 @@ static MACHINE_DRIVER_START( photoply )
 
 	MDRV_VIDEO_START(photoply)
 	MDRV_VIDEO_UPDATE(photoply)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(photoply)

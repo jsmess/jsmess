@@ -14,13 +14,11 @@
 
 #define MCLK 16000000
 
-class cultures_state : public driver_data_t
+class cultures_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cultures_state(machine)); }
-
-	cultures_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	cultures_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *   bg0_videoram;
@@ -200,7 +198,7 @@ static ADDRESS_MAP_START( cultures_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(cpu_bankswitch_w)
 	AM_RANGE(0x90, 0x90) AM_WRITE(misc_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(bg_bank_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("SW1_A")
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("SW1_B")
 	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("SW2_A")
@@ -386,10 +384,7 @@ static MACHINE_RESET( cultures )
 	state->bg2_bank = 0;
 }
 
-static MACHINE_DRIVER_START( cultures )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cultures_state)
+static MACHINE_CONFIG_START( cultures, cultures_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -419,7 +414,7 @@ static MACHINE_DRIVER_START( cultures )
 
 	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

@@ -79,6 +79,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "machine/laserdsc.h"
 #include "video/tms9928a.h"
 #include "sound/discrete.h"
+#include "machine/nvram.h"
 
 #define CLIFF_ENABLE_SND_1	NODE_01
 #define CLIFF_ENABLE_SND_2	NODE_02
@@ -230,7 +231,7 @@ static MACHINE_RESET( cliffhgr )
 
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM		/* ROM */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* NVRAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
 	AM_RANGE(0xe800, 0xefff) AM_RAM		/* RAM */
 ADDRESS_MAP_END
 
@@ -684,7 +685,7 @@ DISCRETE_SOUND_EXTERN( cliffhgr );
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cliffhgr )
+static MACHINE_CONFIG_START( cliffhgr, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem)
@@ -694,14 +695,14 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_MACHINE_START(cliffhgr)
 	MDRV_MACHINE_RESET(cliffhgr)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(tms9928a, 15+32*8+15, 27+24*8+24, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(15-12, 15+32*8+12-1, 27-9, 27+24*8+9-1)
 
 	/* start with the TMS9928a video configuration */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 
 	/* override video rendering and raw screen info */
 	MDRV_DEVICE_REMOVE("screen")
@@ -710,14 +711,14 @@ static MACHINE_DRIVER_START( cliffhgr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(cliffhgr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

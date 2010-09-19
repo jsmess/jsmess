@@ -449,6 +449,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/namcoic.h"
+#include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/c140.h"
 
@@ -1605,7 +1606,7 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-static MACHINE_DRIVER_START( default )
+static MACHINE_CONFIG_START( default, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1627,7 +1628,7 @@ static MACHINE_DRIVER_START( default )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1653,27 +1654,24 @@ static MACHINE_DRIVER_START( default )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* adjusted machine driver start */
-static MACHINE_DRIVER_START( default2 )
-	MDRV_IMPORT_FROM(default)
+static MACHINE_CONFIG_DERIVED( default2, default )
 
 	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 /* end */
 
-static MACHINE_DRIVER_START( assaultp )
-	MDRV_IMPORT_FROM(default2)
+static MACHINE_CONFIG_DERIVED( assaultp, default2 )
 
 	MDRV_QUANTUM_TIME(HZ(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( default3 )
-	MDRV_IMPORT_FROM(default)
+static MACHINE_CONFIG_DERIVED( default3, default )
 
 	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
@@ -1683,9 +1681,9 @@ static MACHINE_DRIVER_START( default3 )
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gollygho )
+static MACHINE_CONFIG_START( gollygho, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1707,7 +1705,7 @@ static MACHINE_DRIVER_START( gollygho )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1733,9 +1731,9 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( finallap )
+static MACHINE_CONFIG_START( finallap, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1757,7 +1755,7 @@ static MACHINE_DRIVER_START( finallap )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1783,9 +1781,9 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sgunner )
+static MACHINE_CONFIG_START( sgunner, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1807,7 +1805,7 @@ static MACHINE_DRIVER_START( sgunner )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1833,9 +1831,9 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( luckywld )
+static MACHINE_CONFIG_START( luckywld, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1857,7 +1855,7 @@ static MACHINE_DRIVER_START( luckywld )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1883,9 +1881,9 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( metlhawk )
+static MACHINE_CONFIG_START( metlhawk, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1907,7 +1905,7 @@ static MACHINE_DRIVER_START( metlhawk )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1933,7 +1931,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_SOUND_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************************************/

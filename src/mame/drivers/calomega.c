@@ -648,22 +648,14 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "includes/calomega.h"
 
 
 /* UART */
 static UINT8 tx_line;
 static UINT8 rx_line;
-
-
-/* from video */
-extern UINT8 *calomega_videoram;
-extern UINT8 *calomega_colorram;
-WRITE8_HANDLER( calomega_videoram_w );
-WRITE8_HANDLER( calomega_colorram_w );
-PALETTE_INIT( calomega );
-VIDEO_START( calomega );
-VIDEO_UPDATE( calomega );
 
 
 /**************************************************
@@ -847,7 +839,7 @@ static WRITE8_DEVICE_HANDLER( lamps_905_w )
 
 static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -862,7 +854,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -875,7 +867,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -887,7 +879,7 @@ static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys906_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -2744,13 +2736,13 @@ static const mc6845_interface mc6845_intf =
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_DRIVER_START( sys903 )
+static MACHINE_CONFIG_START( sys903, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", sys903_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", sys903_pia1_intf)
@@ -2780,12 +2772,12 @@ static MACHINE_DRIVER_START( sys903 )
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia6850_0", acia6850_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( s903mod )
+static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(s903mod_map)
@@ -2796,12 +2788,12 @@ static MACHINE_DRIVER_START( s903mod )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sys905 )
+static MACHINE_CONFIG_DERIVED( sys905, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sys905_map)
@@ -2815,12 +2807,12 @@ static MACHINE_DRIVER_START( sys905 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sys906 )
+static MACHINE_CONFIG_DERIVED( sys906, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(sys906_map)
@@ -2836,7 +2828,7 @@ static MACHINE_DRIVER_START( sys906 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************************

@@ -25,6 +25,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/laserdsc.h"
+#include "machine/nvram.h"
 
 /* From daphne */
 #define PCB_CLOCK (18432000)
@@ -142,7 +143,7 @@ static WRITE8_HANDLER(nmi_line_w)
 /* PROGRAM MAPS */
 static ADDRESS_MAP_START( z80_0_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
-	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE(&tile_ram)
 	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE(&tile_control_ram)
 ADDRESS_MAP_END
@@ -277,7 +278,7 @@ static MACHINE_START( esh )
 
 
 /* DRIVER */
-static MACHINE_DRIVER_START( esh )
+static MACHINE_CONFIG_START( esh, driver_device )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
@@ -285,7 +286,7 @@ static MACHINE_DRIVER_START( esh )
 	MDRV_CPU_IO_MAP(z80_0_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_callback_esh)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(esh)
 
@@ -303,10 +304,10 @@ static MACHINE_DRIVER_START( esh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( esh )

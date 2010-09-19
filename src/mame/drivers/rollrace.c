@@ -11,20 +11,8 @@ Issues:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *rollrace_videoram;
-extern UINT8 *rollrace_colorram;
-VIDEO_UPDATE( rollrace );
-PALETTE_INIT( wiz );
-
-WRITE8_HANDLER( rollrace_charbank_w );
-WRITE8_HANDLER( rollrace_backgroundpage_w);
-WRITE8_HANDLER( rollrace_backgroundcolor_w);
-WRITE8_HANDLER( rollrace_bkgpen_w );
-WRITE8_HANDLER( rollrace_flipy_w );
-WRITE8_HANDLER( rollrace_spritebank_w );
-WRITE8_HANDLER( rollrace_flipx_w );
+#include "includes/wiz.h"
+#include "includes/rollrace.h"
 
 static READ8_HANDLER( ra_fake_d800_r )
 {
@@ -209,7 +197,7 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( rollrace )
+static MACHINE_CONFIG_START( rollrace, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
@@ -245,16 +233,15 @@ static MACHINE_DRIVER_START( rollrace )
 
 	MDRV_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rollace2 )
+static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(rollrace)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

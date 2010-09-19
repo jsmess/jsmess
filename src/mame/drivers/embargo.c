@@ -8,13 +8,11 @@
 #include "cpu/s2650/s2650.h"
 
 
-class embargo_state : public driver_data_t
+class embargo_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, embargo_state(machine)); }
-
-	embargo_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	embargo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -254,10 +252,7 @@ static MACHINE_RESET( embargo )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( embargo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(embargo_state)
+static MACHINE_CONFIG_START( embargo, embargo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 625000)
@@ -276,7 +271,7 @@ static MACHINE_DRIVER_START( embargo )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

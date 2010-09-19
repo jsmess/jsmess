@@ -71,13 +71,11 @@ Dumped 06/15/2000
 #include "deprecat.h"
 #include "sound/nile.h"
 
-class srmp6_state : public driver_data_t
+class srmp6_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp6_state(machine)); }
-
-	srmp6_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	srmp6_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16* tileram;
 	UINT16* dmaram;
@@ -665,9 +663,7 @@ static INTERRUPT_GEN(srmp6_interrupt)
 		cpu_set_input_line(device,4,HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( srmp6 )
-
-	MDRV_DRIVER_DATA( srmp6_state )
+static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6)
@@ -692,7 +688,7 @@ static MACHINE_DRIVER_START( srmp6 )
 	MDRV_SOUND_ADD("nile", NILE, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

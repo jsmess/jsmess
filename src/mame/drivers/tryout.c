@@ -23,18 +23,7 @@ $208 strikes count
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-
-extern UINT8 *tryout_gfx_control;
-
-extern READ8_HANDLER( tryout_vram_r );
-extern WRITE8_HANDLER( tryout_videoram_w );
-extern WRITE8_HANDLER( tryout_vram_w );
-extern WRITE8_HANDLER( tryout_vram_bankswitch_w );
-extern WRITE8_HANDLER( tryout_flipscreen_w );
-
-extern PALETTE_INIT( tryout );
-extern VIDEO_START( tryout );
-extern VIDEO_UPDATE( tryout );
+#include "includes/tryout.h"
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {
@@ -65,7 +54,7 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE_MEMBER(tryout_state, videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE_GENERIC(spriteram)
@@ -196,7 +185,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( NULL,	 0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( tryout )
+static MACHINE_CONFIG_START( tryout, tryout_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
@@ -225,7 +214,7 @@ static MACHINE_DRIVER_START( tryout )
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( tryout )
 	ROM_REGION( 0x14000, "maincpu", 0 )

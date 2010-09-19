@@ -34,25 +34,7 @@ TODO:
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
-
-/* Variables that video has access to */
-
-/* Variables defined in video */
-extern UINT16 *powerins_vram_0, *powerins_vctrl_0;
-extern UINT16 *powerins_vram_1, *powerins_vctrl_1;
-
-/* Functions defined in video */
-
-WRITE16_HANDLER( powerins_flipscreen_w );
-WRITE16_HANDLER( powerins_tilebank_w );
-
-WRITE16_HANDLER( powerins_paletteram16_w );
-
-WRITE16_HANDLER( powerins_vram_0_w );
-WRITE16_HANDLER( powerins_vram_1_w );
-
-VIDEO_START( powerins );
-VIDEO_UPDATE( powerins );
+#include "includes/powerins.h"
 
 
 /***************************************************************************
@@ -121,7 +103,7 @@ static ADDRESS_MAP_START( powerina_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP													// Sound Latch, NOPed since there is no sound cpu
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)		// (used by powerina)
+	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)		// (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
@@ -141,8 +123,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( powerins_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
@@ -150,8 +132,8 @@ static ADDRESS_MAP_START( powerinb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(powerinb_fake_ym2203_r) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
@@ -357,7 +339,7 @@ static const nmk112_interface powerins_nmk112_intf =
 };
 
 
-static MACHINE_DRIVER_START( powerins )
+static MACHINE_CONFIG_START( powerins, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
@@ -398,12 +380,11 @@ static MACHINE_DRIVER_START( powerins )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_NMK112_ADD("nmk112", powerins_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( powerina )
+static MACHINE_CONFIG_DERIVED( powerina, powerins )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(powerins)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(powerina_map)
@@ -418,12 +399,11 @@ static MACHINE_DRIVER_START( powerina )
 
 	MDRV_DEVICE_REMOVE("oki2")
 	MDRV_DEVICE_REMOVE("ym2203")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( powerinb )
+static MACHINE_CONFIG_DERIVED( powerinb, powerins )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(powerins)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -433,7 +413,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
 	MDRV_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(xybots_state, playfield)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(xybots_state, eeprom, eeprom_size)
+	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
@@ -191,8 +191,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( xybots )
-	MDRV_DRIVER_DATA(xybots_state)
+static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -201,7 +200,7 @@ static MACHINE_DRIVER_START( xybots )
 
 	MDRV_MACHINE_START(xybots)
 	MDRV_MACHINE_RESET(xybots)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -218,8 +217,8 @@ static MACHINE_DRIVER_START( xybots )
 	MDRV_VIDEO_UPDATE(xybots)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo_swapped)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo_swapped)
+MACHINE_CONFIG_END
 
 
 

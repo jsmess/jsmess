@@ -110,20 +110,7 @@ DIP locations verified for:
 #include "audio/seibu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-
-
-extern UINT16 *bloodbro_bgvideoram, *bloodbro_fgvideoram;
-extern UINT16 *bloodbro_txvideoram;
-extern UINT16 *bloodbro_scroll;
-
-WRITE16_HANDLER( bloodbro_bgvideoram_w );
-WRITE16_HANDLER( bloodbro_fgvideoram_w );
-WRITE16_HANDLER( bloodbro_txvideoram_w );
-
-extern VIDEO_UPDATE( bloodbro );
-extern VIDEO_UPDATE( weststry );
-extern VIDEO_UPDATE( skysmash );
-extern VIDEO_START( bloodbro );
+#include "includes/bloodbro.h"
 
 
 /* Memory Maps */
@@ -433,7 +420,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( bloodbro )
+static MACHINE_CONFIG_START( bloodbro, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map)
@@ -460,10 +447,9 @@ static MACHINE_DRIVER_START( bloodbro )
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( weststry )
-	MDRV_IMPORT_FROM(bloodbro)
+static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(weststry_map)
@@ -473,16 +459,15 @@ static MACHINE_DRIVER_START( weststry )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_UPDATE(weststry)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( skysmash )
-	MDRV_IMPORT_FROM(bloodbro)
+static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_VIDEO_UPDATE(skysmash)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

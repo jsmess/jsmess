@@ -41,18 +41,9 @@
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-
-WRITE16_HANDLER( raiden_background_w );
-WRITE16_HANDLER( raiden_foreground_w );
-WRITE16_HANDLER( raiden_text_w );
-VIDEO_START( raiden );
-VIDEO_START( raidena );
-WRITE16_HANDLER( raiden_control_w );
-WRITE16_HANDLER( raidena_control_w );
-VIDEO_UPDATE( raiden );
+#include "includes/raiden.h"
 
 static UINT16 *raiden_shared_ram;
-extern UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 /******************************************************************************/
 
@@ -63,7 +54,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_BASE(&raiden_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
@@ -86,7 +77,7 @@ static ADDRESS_MAP_START( alt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE(&raiden_shared_ram)
 	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raidena_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
@@ -104,7 +95,7 @@ static ADDRESS_MAP_START( raidenu_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raidena_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -258,7 +249,7 @@ static VIDEO_EOF( raiden )
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
-static MACHINE_DRIVER_START( raiden )
+static MACHINE_CONFIG_START( raiden, raiden_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
@@ -294,19 +285,16 @@ static MACHINE_DRIVER_START( raiden )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raidena )
-
-	MDRV_IMPORT_FROM( raiden )
+static MACHINE_CONFIG_DERIVED( raidena, raiden )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alt_main_map)
 
 	MDRV_VIDEO_START(raidena)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raidenu )
-	MDRV_IMPORT_FROM( raiden )
+static MACHINE_CONFIG_DERIVED( raidenu, raiden )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raidenu_main_map)
@@ -315,7 +303,7 @@ static MACHINE_DRIVER_START( raidenu )
 	MDRV_CPU_PROGRAM_MAP(raidenu_sub_map)
 
 	MDRV_VIDEO_START(raidena)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************/

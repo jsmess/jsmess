@@ -132,6 +132,7 @@ Find lamps/reels after UPD changes.
 #include "machine/68681.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 
 
 /*************************************
@@ -641,7 +642,7 @@ static WRITE16_HANDLER( vsync_int_ctrl )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( "ymsnd", ym2413_w, 0xff00 )
@@ -989,7 +990,7 @@ static INTERRUPT_GEN( vsync_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( maygayv1 )
+static MACHINE_CONFIG_START( maygayv1, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)
@@ -1004,7 +1005,7 @@ static MACHINE_DRIVER_START( maygayv1 )
 	MDRV_MACHINE_START(maygayv1)
 	MDRV_MACHINE_RESET(maygayv1)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* TODO: Use real video timings */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1029,7 +1030,7 @@ static MACHINE_DRIVER_START( maygayv1 )
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

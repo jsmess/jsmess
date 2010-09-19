@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( slyspy_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
 	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( midres_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -1142,7 +1142,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_DRIVER_START( automat )
+static MACHINE_CONFIG_START( automat, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1183,10 +1183,10 @@ static MACHINE_DRIVER_START( automat )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000/2)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hbarrel )
+static MACHINE_CONFIG_START( hbarrel, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1228,9 +1228,9 @@ static MACHINE_DRIVER_START( hbarrel )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( baddudes )
+static MACHINE_CONFIG_START( baddudes, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1269,9 +1269,9 @@ static MACHINE_DRIVER_START( baddudes )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( birdtry )
+static MACHINE_CONFIG_START( birdtry, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1310,9 +1310,9 @@ static MACHINE_DRIVER_START( birdtry )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( robocop )
+static MACHINE_CONFIG_START( robocop, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1356,9 +1356,9 @@ static MACHINE_DRIVER_START( robocop )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( robocopb )
+static MACHINE_CONFIG_START( robocopb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1397,9 +1397,9 @@ static MACHINE_DRIVER_START( robocopb )
 
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hippodrm )
+static MACHINE_CONFIG_START( hippodrm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1443,9 +1443,9 @@ static MACHINE_DRIVER_START( hippodrm )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( slyspy )
+static MACHINE_CONFIG_START( slyspy, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1484,9 +1484,9 @@ static MACHINE_DRIVER_START( slyspy )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( secretab )
+static MACHINE_CONFIG_START( secretab, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1526,9 +1526,9 @@ static MACHINE_DRIVER_START( secretab )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( midres )
+static MACHINE_CONFIG_START( midres, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1567,10 +1567,9 @@ static MACHINE_DRIVER_START( midres )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* verified on pcb (1mhz crystal) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( midresb )
-	MDRV_IMPORT_FROM(midres)
+static MACHINE_CONFIG_DERIVED( midresb, midres )
 
 	MDRV_CPU_REPLACE("audiocpu", M6502, 1500000 )
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1578,7 +1577,7 @@ static MACHINE_DRIVER_START( midresb )
 	MDRV_SOUND_MODIFY("ym2")
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

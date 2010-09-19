@@ -20,29 +20,7 @@ XTAL        :   18.432 MHz
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/wiping.h"
-
-/* Variables & functions defined in video: */
-
-extern UINT8 *clshroad_vram_0, *clshroad_vram_1;
-extern UINT8 *clshroad_vregs;
-
-WRITE8_HANDLER( clshroad_vram_0_w );
-WRITE8_HANDLER( clshroad_vram_1_w );
-WRITE8_HANDLER( clshroad_flipscreen_w );
-
-PALETTE_INIT( firebatl );
-PALETTE_INIT( clshroad );
-VIDEO_START( firebatl );
-VIDEO_START( clshroad );
-VIDEO_UPDATE( clshroad );
-
-extern UINT8 *wiping_soundregs;
-
-DEVICE_GET_INFO( wiping_sound );
-
-WRITE8_HANDLER( wiping_sound_w );
-
-
+#include "includes/clshroad.h"
 
 static MACHINE_RESET( clshroad )
 {
@@ -248,7 +226,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( firebatl )
+static MACHINE_CONFIG_START( firebatl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
@@ -281,9 +259,9 @@ static MACHINE_DRIVER_START( firebatl )
 
 	MDRV_SOUND_ADD("custom", WIPING, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( clshroad )
+static MACHINE_CONFIG_START( clshroad, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
@@ -316,7 +294,7 @@ static MACHINE_DRIVER_START( clshroad )
 
 	MDRV_SOUND_ADD("custom", WIPING, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

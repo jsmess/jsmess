@@ -128,6 +128,30 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #include "emu.h"
 #include "gp9001.h"
 
+/*
+ Single VDP mixing priority note:
+
+ Initial thoughts were that 16 levels of priority exist for both sprites and tilemaps, ie GP9001_PRIMASK 0xf
+ However the end of level scene rendered on the first VDP in Batsugun strongly suggests otherwise.
+
+ Sprites  have 'priority' bits of 0x0600 (level 0x6) set
+ Tilemaps have 'priority' bits of 0x7000 (level 0x7) set
+
+ If a mask of 0xf is used then the tilemaps render above the sprites, which causes the V bonus items near the
+ counters to be invisible (in addition to the English character quote text)
+
+ using a mask of 0xe causes both priority levels to be equal, allowing the sprites to render above the tilemap.
+
+ The alternative option of allowing sprites to render a priority level higher than tilemaps breaks at least the
+ 'Welcome to..' screen in Batrider after selecting your character.
+
+ It is unknown if the current solution breaks anything.  The majority of titles don't make extensive use of the
+ priority system.
+
+*/
+#define GP9001_PRIMASK (0x000e)
+
+
 static WRITE16_DEVICE_HANDLER( gp9001_bg_tilemap_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
@@ -392,12 +416,12 @@ void gp9001vdp_device::device_reset()
 }
 
 
-void gp9001_voffs_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void gp9001_voffs_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&vdp->gp9001_voffs);
 }
 
-int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
+static int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
@@ -405,14 +429,14 @@ int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
 }
 
 
-void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
 	vdp->space()->write_word(offs*2, data, mem_mask);
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
+static WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 
@@ -420,25 +444,25 @@ WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
 }
 
 
-READ16_DEVICE_HANDLER( gp9001_devvideoram16_r )
+static READ16_DEVICE_HANDLER( gp9001_devvideoram16_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 	return gp9001_videoram16_r(vdp, offset);
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
+static WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 	gp9001_videoram16_w(vdp, offset, data, mem_mask);
 }
 
 
-READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
+static READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
 {
 	return ((device->machine->primary_screen->vpos() + 15) % 262) >= 245;
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
+static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 
@@ -572,7 +596,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						running_device *ym = vdp->machine->device("ymsnd");
 
-						if (ym && ym->type() == SOUND_YM3812)
+						if (ym && ym->type() == YM3812)
 						{
 							cputag_set_input_line(vdp->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 							devtag_reset(vdp->machine, "ymsnd");
@@ -654,7 +678,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 #endif
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
+static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
 	gp9001_scroll_reg_data_w(vdp, offset, data, mem_mask);
@@ -1034,9 +1058,10 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 		int attrib, sprite, color, priority, flipx, flipy, sx, sy;
 		int sprite_sizex, sprite_sizey, dim_x, dim_y, sx_base, sy_base;
 		int bank, sprite_num;
+		UINT16 primask = (GP9001_PRIMASK << 8);
 
 		attrib = source[offs];
-		priority = primap[((attrib & 0x0f00)>>8)]+1;
+		priority = primap[((attrib & primask)>>8)]+1;
 
 		if ((attrib & 0x8000))
 		{
@@ -1231,7 +1256,7 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine* machine, bitm
 			int realx = (x+scrollx)&0x1ff;
 
 			UINT16 pixdat = srcptr[realx];
-			UINT8 pixpri = ((pixdat & 0xf000)>>12);
+			UINT8 pixpri = ((pixdat & (GP9001_PRIMASK<<12))>>12);
 
 			if (pri_enable[pixpri])
 			{

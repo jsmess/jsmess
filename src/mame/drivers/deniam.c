@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("oki", deniam16b_oki_rom_bank_w)
 ADDRESS_MAP_END
 
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( deniam16c_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, spriteram, spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
@@ -267,10 +267,7 @@ static MACHINE_RESET( deniam )
 	machine->device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
-static MACHINE_DRIVER_START( deniam16b )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deniam_state)
+static MACHINE_CONFIG_START( deniam16b, deniam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
@@ -308,12 +305,9 @@ static MACHINE_DRIVER_START( deniam16b )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( deniam16c )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deniam_state)
+static MACHINE_CONFIG_START( deniam16c, deniam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
@@ -347,7 +341,7 @@ static MACHINE_DRIVER_START( deniam16c )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

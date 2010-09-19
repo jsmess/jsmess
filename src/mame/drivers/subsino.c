@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE( "oki", okim6295_w )
+	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -787,7 +787,7 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -819,7 +819,7 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0900b, 0x0900b ) AM_RAM //protection
 
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
@@ -918,7 +918,7 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 //  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -967,7 +967,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -2217,7 +2217,7 @@ GFXDECODE_END
 *                             Machine Drivers                              *
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( victor21 )
+static MACHINE_CONFIG_START( victor21, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(victor21_map)
@@ -2247,19 +2247,18 @@ static MACHINE_DRIVER_START( victor21 )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
-static MACHINE_DRIVER_START( victor5 )
+static MACHINE_CONFIG_DERIVED( victor5, victor21 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( victor21 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(victor5_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( crsbingo )
+static MACHINE_CONFIG_START( crsbingo, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
 	MDRV_CPU_PROGRAM_MAP(crsbingo_map)
@@ -2286,10 +2285,10 @@ static MACHINE_DRIVER_START( crsbingo )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)	/* Unknown clock */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( srider )
+static MACHINE_CONFIG_START( srider, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(srider_map)
@@ -2319,18 +2318,17 @@ static MACHINE_DRIVER_START( srider )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sharkpy )
-	MDRV_IMPORT_FROM(srider)
+static MACHINE_CONFIG_DERIVED( sharkpy, srider )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tisub )
+static MACHINE_CONFIG_START( tisub, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
 	MDRV_CPU_PROGRAM_MAP(tisub_map)
@@ -2357,9 +2355,9 @@ static MACHINE_DRIVER_START( tisub )
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)	/* Unknown clock */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( stisub )
+static MACHINE_CONFIG_START( stisub, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(stisub_map)
@@ -2386,7 +2384,7 @@ static MACHINE_DRIVER_START( stisub )
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -246,6 +246,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "emu.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/nvram.h"
 
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
@@ -1750,7 +1751,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
 
 
 static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
@@ -1770,7 +1771,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
@@ -1793,7 +1794,7 @@ static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
@@ -1821,7 +1822,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dutch_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 //  AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
@@ -1856,7 +1857,7 @@ static const ay8910_interface ay8910_config =
 
 
 /* machine driver for MOD 2 board */
-static MACHINE_DRIVER_START( mpu4mod2 )
+static MACHINE_CONFIG_START( mpu4mod2, driver_device )
 
 	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)
@@ -1880,13 +1881,12 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_DEFAULT_LAYOUT(layout_mpu4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mod4yam )
-	MDRV_IMPORT_FROM( mpu4mod2 )
+static MACHINE_CONFIG_DERIVED( mod4yam, mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -1895,10 +1895,9 @@ static MACHINE_DRIVER_START( mod4yam )
 	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mod4oki )
-	MDRV_IMPORT_FROM( mpu4mod2 )
+static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
 
 	MDRV_PIA6821_ADD("pia_gamebd", pia_gameboard_intf)
@@ -1909,14 +1908,13 @@ static MACHINE_DRIVER_START( mod4oki )
 	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mpu4dutch )
-	MDRV_IMPORT_FROM( mod4oki )
+static MACHINE_CONFIG_DERIVED( mpu4dutch, mod4oki )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dutch_memmap)				// setup read and write memorymap
 	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT (connect4)
 {

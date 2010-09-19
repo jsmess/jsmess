@@ -150,13 +150,11 @@ Dumped by Chack'n
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100
 
-class ssingles_state : public driver_data_t
+class ssingles_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ssingles_state(machine)); }
-
-	ssingles_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	ssingles_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
 	UINT8 *colorram;
@@ -411,9 +409,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( ssingles )
-
-	MDRV_DRIVER_DATA( ssingles_state )
+static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map)
@@ -440,13 +436,12 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atamanot )
-	MDRV_IMPORT_FROM( ssingles )
+static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(atamanot_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( ssingles )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */

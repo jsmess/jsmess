@@ -51,13 +51,11 @@ ToDo:
 #include "sound/2203intf.h"
 
 
-class chanbara_state : public driver_data_t
+class chanbara_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chanbara_state(machine)); }
-
-	chanbara_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	chanbara_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -384,10 +382,7 @@ static MACHINE_RESET( chanbara )
 	state->scrollhi = 0;
 }
 
-static MACHINE_DRIVER_START( chanbara )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(chanbara_state)
+static MACHINE_CONFIG_START( chanbara, chanbara_state )
 
 	MDRV_CPU_ADD("maincpu", M6809, 12000000/8)
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -415,7 +410,7 @@ static MACHINE_DRIVER_START( chanbara )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000/8)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( chanbara )

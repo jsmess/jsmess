@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
@@ -390,7 +390,7 @@ static VIDEO_EOF( wwfwfest )
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_DRIVER_START( wwfwfest )
+static MACHINE_CONFIG_START( wwfwfest, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)	/* 24 crystal, 12 rated chip */
@@ -424,12 +424,11 @@ static MACHINE_DRIVER_START( wwfwfest )
 
 	MDRV_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wwfwfstb )
-	MDRV_IMPORT_FROM(wwfwfest)
+static MACHINE_CONFIG_DERIVED( wwfwfstb, wwfwfest )
 	MDRV_VIDEO_START(wwfwfstb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************************************
  Rom Loaders / Game Drivers

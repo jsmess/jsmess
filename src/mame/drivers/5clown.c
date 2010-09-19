@@ -446,6 +446,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 
@@ -695,7 +696,7 @@ static WRITE8_HANDLER( snd_a02_w )
 *************************/
 
 static ADDRESS_MAP_START( fclown_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -773,8 +774,8 @@ static ADDRESS_MAP_START( fcaudio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w)
 	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w)
-	AM_RANGE(0x0c04, 0x0c04) AM_DEVWRITE("oki6295", okim6295_w)
-	AM_RANGE(0x0c06, 0x0c06) AM_DEVREAD("oki6295", okim6295_r)
+	AM_RANGE(0x0c04, 0x0c04) AM_DEVWRITE_MODERN("oki6295", okim6295_device, write)
+	AM_RANGE(0x0c06, 0x0c06) AM_DEVREAD_MODERN("oki6295", okim6295_device, read)
 	AM_RANGE(0x0e06, 0x0e06) AM_READ(snd_e06_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* ROM space */
 ADDRESS_MAP_END
@@ -1027,7 +1028,7 @@ static const ay8910_interface ay8910_config =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( fclown )
+static MACHINE_CONFIG_START( fclown, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)	/* guess, seems ok */
@@ -1037,7 +1038,7 @@ static MACHINE_DRIVER_START( fclown )
 	MDRV_CPU_ADD("audiocpu", M6502, MASTER_CLOCK/8)	/* guess, seems ok */
 	MDRV_CPU_PROGRAM_MAP(fcaudio_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", fclown_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", fclown_pia1_intf)
@@ -1069,7 +1070,7 @@ static MACHINE_DRIVER_START( fclown )
 	MDRV_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, OKIM6295_PIN7_LOW)	/* guess, seems ok; pin7 guessed, seems ok */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

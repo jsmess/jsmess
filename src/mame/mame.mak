@@ -224,6 +224,7 @@ SOUNDS += CDP1864
 SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
+#SOUNDS += ASC
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -892,7 +893,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
 	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(AUDIO)/mcr.o $(VIDEO)/mcr.o \
 	$(DRIVERS)/mcr3.o $(VIDEO)/mcr3.o \
-	$(DRIVERS)/mcr68.o $(VIDEO)/mcr68.o \
+	$(DRIVERS)/mcr68.o $(MACHINE)/mcr68.o $(VIDEO)/mcr68.o \
 	$(DRIVERS)/midtunit.o $(MACHINE)/midtunit.o $(VIDEO)/midtunit.o \
 	$(DRIVERS)/midvunit.o $(VIDEO)/midvunit.o \
 	$(DRIVERS)/midwunit.o $(MACHINE)/midwunit.o \
@@ -1143,7 +1144,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segamsys.o $(DRIVERS)/segae.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
-	$(DRIVERS)/ssgbl.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
 	$(DRIVERS)/stv.o $(DRIVERS)/stvinit.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o \
@@ -1538,8 +1538,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gei.o \
-	$(DRIVERS)/good.o \
+	$(DRIVERS)/goldngam.o \
 	$(DRIVERS)/goldnpkr.o \
+	$(DRIVERS)/good.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
@@ -1560,6 +1561,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jokrwild.o \
 	$(DRIVERS)/jongkyo.o \
+	$(DRIVERS)/jubilee.o \
 	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \

@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(vindictr_state, eeprom, eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
@@ -193,8 +193,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( vindictr )
-	MDRV_DRIVER_DATA(vindictr_state)
+static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -202,7 +201,7 @@ static MACHINE_DRIVER_START( vindictr )
 
 	MDRV_MACHINE_START(vindictr)
 	MDRV_MACHINE_RESET(vindictr)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -219,8 +218,8 @@ static MACHINE_DRIVER_START( vindictr )
 	MDRV_VIDEO_UPDATE(vindictr)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo_pokey)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo_pokey)
+MACHINE_CONFIG_END
 
 
 

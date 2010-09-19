@@ -203,6 +203,7 @@ the entire size of the screen.
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 #include "includes/bbusters.h"
+#include "machine/nvram.h"
 
 
 /******************************************************************************/
@@ -351,7 +352,7 @@ static ADDRESS_MAP_START( bbusters_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP */
 	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(three_gun_output_w)
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
-	AM_RANGE(0x0f8000, 0x0f80ff) AM_READ(eprom_r) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, eprom_data) /* Eeprom */
+	AM_RANGE(0x0f8000, 0x0f80ff) AM_READ(eprom_r) AM_WRITEONLY AM_SHARE("eeprom") /* Eeprom */
 ADDRESS_MAP_END
 
 /*******************************************************************************/
@@ -663,45 +664,6 @@ static const ym2610_interface ym2610_config =
 
 /******************************************************************************/
 
-// default eeprom with reasonable calibration for MAME
-static const unsigned char bbusters_default_eeprom[128] =
-{
-	                                    /*y*/                   /*y*/
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00, 0x00, 0x00, 0xEE, 0x00,
-	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
-	                                    /*y*/                   /*y*/
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
-	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
-	                                    /*y*/                   /*y*/
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
-	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
-
-
-	0x42, 0x00, 0x45, 0x00, 0x41, 0x00, 0x53, 0x00,	0x54, 0x00, 0x20, 0x00,
-	0x42, 0x00, 0x55, 0x00, 0x53, 0x00, 0x54, 0x00, 0x45, 0x00, 0x52, 0x00,
-	0x53, 0x00, 0x20, 0x00, 0x54, 0x00, 0x4D, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
-
-
-static NVRAM_HANDLER( bbusters )
-{
-	bbusters_state *state = machine->driver_data<bbusters_state>();
-
-	if( read_or_write )
-	{
-		mame_fwrite (file, state->eprom_data, 0x80);
-	}
-	else
-	{
-		if (file)
-			mame_fread (file, state->eprom_data, 0x80);
-		else
-			memcpy(state->eprom_data, bbusters_default_eeprom, 0x80);
-	}
-}
-
 static VIDEO_EOF( bbuster )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -716,9 +678,7 @@ static VIDEO_EOF( mechatt )
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
-static MACHINE_DRIVER_START( bbusters )
-
-	MDRV_DRIVER_DATA( bbusters_state )
+static MACHINE_CONFIG_START( bbusters, bbusters_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -729,7 +689,7 @@ static MACHINE_DRIVER_START( bbusters )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 
-	MDRV_NVRAM_HANDLER(bbusters)
+	MDRV_NVRAM_ADD_0FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -755,11 +715,9 @@ static MACHINE_DRIVER_START( bbusters )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mechatt )
-
-	MDRV_DRIVER_DATA( bbusters_state )
+static MACHINE_CONFIG_START( mechatt, bbusters_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -794,7 +752,7 @@ static MACHINE_DRIVER_START( mechatt )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 
@@ -841,6 +799,9 @@ ROM_START( bbusters )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "bbusters-eeprom.bin", 0x00, 0x100, CRC(a52ebd66) SHA1(de04db6f1510700c61bf152799452a80220ae87c) )
 ROM_END
 
 ROM_START( bbustersu )
@@ -886,6 +847,9 @@ ROM_START( bbustersu )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "bbusters-eeprom.bin", 0x00, 0x100, CRC(a52ebd66) SHA1(de04db6f1510700c61bf152799452a80220ae87c) )
 ROM_END
 
 

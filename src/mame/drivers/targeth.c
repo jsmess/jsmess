@@ -12,16 +12,7 @@ The DS5002FP has 32KB undumped gameplay code making the game unplayable :_(
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *targeth_vregs;
-extern UINT16 *targeth_videoram;
-extern UINT16 *targeth_spriteram;
-
-/* from video/targeth.c */
-WRITE16_HANDLER( targeth_vram_w );
-VIDEO_START( targeth );
-VIDEO_UPDATE( targeth );
-
+#include "includes/targeth.h"
 
 static const gfx_layout tilelayout16_0x080000 =
 {
@@ -85,7 +76,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("SYSTEM")				/* Coins, Start & Fire buttons */
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")			/* Service & Guns Reload? */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)	/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	/* OKI6295 status register */
 	AM_RANGE(0x700010, 0x70001b) AM_WRITENOP						/* ??? Guns reload related? */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(targeth_coin_counter_w)	/* Coin counters */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM								/* Work RAM (partially shared with DS5002FP) */
@@ -176,7 +167,7 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( targeth )
+static MACHINE_CONFIG_START( targeth, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
@@ -202,7 +193,7 @@ static MACHINE_DRIVER_START( targeth )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( targeth )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */

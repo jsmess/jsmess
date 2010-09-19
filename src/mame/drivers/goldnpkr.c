@@ -622,6 +622,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
+#include "machine/nvram.h"
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
@@ -896,7 +897,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 
 static ADDRESS_MAP_START( goldnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -908,7 +909,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pottnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -920,7 +921,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( witchcrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -946,7 +947,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( genie_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -2287,14 +2288,14 @@ DISCRETE_SOUND_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_DRIVER_START( goldnpkr_base )
+static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(goldnpkr_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
@@ -2314,24 +2315,20 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_START(goldnpkr)
 	MDRV_VIDEO_UPDATE(goldnpkr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( goldnpkr )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pottnpkr )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2344,12 +2341,10 @@ static MACHINE_DRIVER_START( pottnpkr )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(pottnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( witchcrd )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2365,12 +2360,10 @@ static MACHINE_DRIVER_START( witchcrd )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( genie )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2386,7 +2379,7 @@ static MACHINE_DRIVER_START( genie )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*********************************************

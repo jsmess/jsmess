@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 16 )
 //  AM_RANGE(0x7f48, 0x7f48) AM_WRITE(output_w)
 	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8( gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8( gunpey_blitter_w, 0xffff )
@@ -313,7 +313,7 @@ static INTERRUPT_GEN( gunpey_interrupt )
 }
 
 /***************************************************************************************/
-static MACHINE_DRIVER_START( gunpey )
+static MACHINE_CONFIG_START( gunpey, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 57242400 / 4)
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( gunpey )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************************/

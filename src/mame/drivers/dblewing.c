@@ -25,13 +25,11 @@ Protection TODO:
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-class dblewing_state : public driver_data_t
+class dblewing_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dblewing_state(machine)); }
-
-	dblewing_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	dblewing_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -445,10 +443,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_status_port_r,ym2151_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
@@ -732,10 +730,7 @@ static MACHINE_RESET( dblewing )
 	state->sound_irq = 0;
 }
 
-static MACHINE_DRIVER_START( dblewing )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dblewing_state)
+static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
@@ -775,7 +770,7 @@ static MACHINE_DRIVER_START( dblewing )
 
 	MDRV_OKIM6295_ADD("oki", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

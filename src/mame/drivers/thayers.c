@@ -755,7 +755,7 @@ static COP400_INTERFACE( thayers_cop_intf )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( thayers )
+static MACHINE_CONFIG_START( thayers, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(thayers_map)
@@ -779,10 +779,10 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	// SSI 263 @ 2MHz
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

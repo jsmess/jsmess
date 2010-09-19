@@ -55,13 +55,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
-
-READ32_HANDLER(eolith_vram_r);
-WRITE32_HANDLER(eolith_vram_w);
-VIDEO_START(eolith);
-VIDEO_UPDATE(eolith);
-
-extern int eolith_buffer;
+#include "includes/eolith.h"
 
 static int coin_counter_bit = 0;
 
@@ -337,7 +331,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( eolith45 )
+static MACHINE_CONFIG_START( eolith45, driver_device )
 	MDRV_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
@@ -361,19 +355,17 @@ static MACHINE_DRIVER_START( eolith45 )
 	MDRV_VIDEO_UPDATE(eolith)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( eolith50 )
-	MDRV_IMPORT_FROM(eolith45)
+static MACHINE_CONFIG_DERIVED( eolith50, eolith45 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(50000000)		 /* 50 MHz */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ironfort )
-	MDRV_IMPORT_FROM(eolith45)
+static MACHINE_CONFIG_DERIVED( ironfort, eolith45 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

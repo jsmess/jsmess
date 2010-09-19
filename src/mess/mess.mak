@@ -1342,6 +1342,7 @@ $(MESSOBJ)/sega.a:				\
 	$(MESS_MACHINE)/sms.o		\
 	$(MESS_DRIVERS)/sms.o		\
 	$(MAME_DRIVERS)/megadriv.o  \
+	$(MAME_DRIVERS)/megadrvb.o  \
 	$(MESS_DRIVERS)/sg1000.o	\
 	$(MESS_DRIVERS)/dc.o		\
 	$(MAME_MACHINE)/dc.o		\
