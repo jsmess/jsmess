@@ -3089,6 +3089,12 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 
 	if ((mac->mac_nubus_irq_state & 0x3f) != 0x3f)
 	{
+		// HACK: sometimes we miss an ack (possible misbehavior in the VIA?)
+		if (via_1->read_ca1() == 0)
+		{
+			via_1->write_ca1(1);
+		}
+
 		via_1->write_ca1(0);
 	}
 	else

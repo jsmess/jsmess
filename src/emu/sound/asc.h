@@ -143,6 +143,8 @@ protected:
 	UINT32	m_phase[4], m_incr[4];
 
 	int	m_fifo_a_rdptr, m_fifo_b_rdptr;
+	int	m_fifo_a_wrptr, m_fifo_b_wrptr;
+	int	m_fifo_a_wrhalf[2], m_fifo_b_wrhalf[2];
 };
 
 

@@ -141,8 +141,11 @@ void asc_device::device_reset()
 	memset(m_fifo_b, 0, sizeof(m_fifo_b));
 	memset(m_phase, 0, sizeof(m_phase));
 	memset(m_incr, 0, sizeof(m_incr));
+	memset(m_fifo_a_wrhalf, 0, sizeof(m_fifo_a_wrhalf));
+	memset(m_fifo_b_wrhalf, 0, sizeof(m_fifo_b_wrhalf));
 
 	m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
+	m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
 }
 
 //-------------------------------------------------
@@ -158,7 +161,7 @@ STREAM_UPDATE( asc_device::static_stream_generate )
 void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
-	int i, ch;
+	int i, ch, halt = 0;
 	static UINT32 wtoffs[2] = { 0, 0x200 };
 
 	outL = outputs[0];
@@ -174,14 +177,34 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 			break;
 
 		case 1:	// FIFO mode
+			if ((m_fifo_a_rdptr == 0) && (!m_fifo_a_wrhalf[0]))
+			{
+			   halt = 1;		
+			}
+			else if ((m_fifo_a_rdptr == 0x200) && (!m_fifo_a_wrhalf[1]))
+			{
+			   halt = 1;		
+			}
+
 			for (i = 0; i < samples; i++)
 			{
 				INT8 smpll, smplr;
 
+				if (m_fifo_a_rdptr < 0x200)
+				{
+					m_fifo_a_wrhalf[0] = 0;
+					m_fifo_b_wrhalf[0] = 0;
+				}
+				else
+				{
+					m_fifo_a_wrhalf[1] = 0;
+					m_fifo_b_wrhalf[1] = 0;
+				}
+
 				smpll = (INT8)m_fifo_a[m_fifo_a_rdptr++]^0x80;
 				smplr = (INT8)m_fifo_b[m_fifo_b_rdptr++]^0x80;
 				
-				if (m_fifo_a_rdptr == 0x200)
+				if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
 				{
 					m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
 					if (m_irq_cb)
@@ -190,7 +213,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 					}
 				}
 
-				if (m_fifo_b_rdptr == 0x200)
+				if ((m_fifo_b_rdptr == 0x200) || (m_fifo_b_rdptr == 0x400))
 				{
 					m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
 					if (m_irq_cb)
@@ -204,6 +227,11 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 				outL[i] = smpll * 64;
 				outR[i] = smplr * 64;
+			}
+
+			if (halt)
+			{
+				m_regs[R_MODE-0x800] = 0;
 			}
 			break;
 
@@ -248,6 +276,8 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 UINT8 asc_device::read(UINT16 offset)
 {
 	UINT8 rv;
+
+//	printf("ASC: read at %x\n", offset);
 
 	// not sure what actually happens when the CPU reads the FIFO...
 	if (offset < 0x400)
@@ -379,30 +409,68 @@ UINT8 asc_device::read(UINT16 offset)
 
 void asc_device::write(UINT16 offset, UINT8 data)
 {
+//	printf("ASC: write %02x to %x\n", data, offset);
+
 	if (offset < 0x400)
 	{
-		m_fifo_a[offset] = data;
-
-		if (offset == 0x200)
+		if (m_regs[R_MODE-0x800] == 1)
 		{
-			m_regs[R_FIFOSTAT-0x800] |= 2;	// fifo A half-full
-			if ((m_irq_cb) && ((m_regs[R_MODE-0x800] & 3) == 1))
+			if (m_fifo_a_wrptr < 0x400)
 			{
-				m_irq_cb(this, 1);
+				m_fifo_a_wrhalf[0] = 1;
 			}
+			else
+			{
+				m_fifo_a_wrhalf[1] = 1;
+			}
+
+			m_fifo_a[m_fifo_a_wrptr++] = data;
+
+			if ((m_fifo_a_wrptr == 0x200) || (m_fifo_a_wrptr == 0x400))
+			{
+				m_regs[R_FIFOSTAT-0x800] |= 2;	// fifo A half-full
+				if (m_irq_cb)
+				{
+					m_irq_cb(this, 1);
+				}
+			}
+
+			m_fifo_a_wrptr &= 0x3ff;
+		}
+		else
+		{
+			m_fifo_a[offset] = data;
 		}
 	}
 	else if (offset < 0x800)
 	{
-		m_fifo_b[offset-0x400] = data;
-
-		if (offset == 0x200)
+		if (m_regs[R_MODE-0x800] == 1)
 		{
-			m_regs[R_FIFOSTAT-0x800] |= 8;	// fifo B half-full
-			if ((m_irq_cb) && ((m_regs[R_MODE-0x800] & 3) == 1))
+			if (m_fifo_b_wrptr < 0x400)
 			{
-				m_irq_cb(this, 1);
+				m_fifo_b_wrhalf[0] = 1;
 			}
+			else
+			{
+				m_fifo_b_wrhalf[1] = 1;
+			}
+
+			m_fifo_b[m_fifo_b_wrptr++] = data;
+
+			if ((m_fifo_a_wrptr == 0x200) || (m_fifo_a_wrptr == 0x400))
+			{
+				m_regs[R_FIFOSTAT-0x800] |= 8;	// fifo B half-full
+				if (m_irq_cb)
+				{
+					m_irq_cb(this, 1);
+				}
+			}
+
+			m_fifo_b_wrptr &= 0x3ff;
+		}
+		else
+		{
+			m_fifo_b[offset-0x400] = data;
 		}
 	}
 	else
@@ -414,6 +482,9 @@ void asc_device::write(UINT16 offset, UINT8 data)
 		{
 			case R_MODE:
 				data &= 3;	// only bits 0 and 1 can be written
+
+				memset(m_fifo_a_wrhalf, 0, sizeof(m_fifo_a_wrhalf));
+				memset(m_fifo_b_wrhalf, 0, sizeof(m_fifo_b_wrhalf));
 				break;
 
 			case R_WTCONTROL:
