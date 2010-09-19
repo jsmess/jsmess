@@ -76,6 +76,7 @@
 #include "includes/mac.h"
 #include "debug/debugcpu.h"
 #include "devices/messram.h"
+#include "debugger.h"
 
 #define ADB_IS_BITBANG	(mac->mac_model >= MODEL_MAC_SE && mac->mac_model <= MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICX) || (mac->mac_model == MODEL_MAC_SE30)
 #define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IISI)
@@ -294,7 +295,22 @@ static void set_via_interrupt(running_machine *machine, int value)
 static void set_via2_interrupt(running_machine *machine, int value)
 {
 	via2_interrupt = value;
+
 	mac_field_interrupts(machine);
+}
+
+void mac_asc_irq(running_device *device, int state)
+{
+	mac_state *mac = device->machine->driver_data<mac_state>();
+
+	if (mac->mac_model >= MODEL_MAC_II)
+	{
+		via6522_device *via2 = device->machine->device<via6522_device>("via6522_1");
+
+		via2->write_cb1(state^1);
+	}
+
+	// todo: portable/pb100 hook up ASC IRQ differently 
 }
 
 WRITE16_HANDLER ( mac_autovector_w )
@@ -2678,9 +2694,10 @@ READ16_HANDLER ( mac_via2_r )
 	offset >>= 8;
 	offset &= 0x0f;
 
-	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x\n", offset*2);
 	data = via_1->read(*space, offset);
+
+	if (LOG_VIA)
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space->machine->device("maincpu")));
 
 	return (data & 0xff) | (data << 8);
 }
@@ -2693,7 +2710,7 @@ WRITE16_HANDLER ( mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x\n", offset, data);
+		logerror("mac_via2_w: offset=%x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(space->machine->device("maincpu")));
 
 	if (ACCESSING_BITS_8_15)
 		via_1->write(*space, offset, (data >> 8) & 0xff);
@@ -2795,6 +2812,12 @@ MACHINE_RESET(mac)
 	{
 		mac_set_sound_buffer(machine->device("custom"), 0);
 	}
+	else	// prime CB1 for ASC and slot interrupts
+	{	
+		via6522_device *via2 = machine->device<via6522_device>("via6522_1");
+		via2->write_ca1(1);
+		via2->write_cb1(1);
+	}
 
 	if (has_adb(mac))
 	{
@@ -2815,7 +2838,6 @@ MACHINE_RESET(mac)
 	}
 
 	scsi_interrupt = 0;
-	mac->via2_ca1 = 0;
 	mac->mac_nubus_irq_state = 0xff;
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
@@ -3052,6 +3074,7 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 {
 	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
 	mac_state *mac = machine->driver_data<mac_state>();
+	via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
 
 	slot -= 9;
 
@@ -3066,10 +3089,11 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 
 	if ((mac->mac_nubus_irq_state & 0x3f) != 0x3f)
 	{
-		via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
-
-		mac->via2_ca1 ^= 1;
-		via_1->write_ca1(mac->via2_ca1);
+		via_1->write_ca1(0);
+	}
+	else
+	{
+		via_1->write_ca1(1);
 	}
 }
 

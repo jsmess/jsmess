@@ -242,7 +242,7 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
-
+SOUNDS += ASC
 
 #-------------------------------------------------
 # this is the list of driver libraries that

@@ -148,6 +148,8 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 
 void mac_scsi_irq(running_machine *machine, int state);
 
+void mac_asc_irq(running_device *device, int state);
+
 /*----------- defined in video/mac.c -----------*/
 
 extern UINT32 *mac_se30_vram;
@@ -194,7 +196,6 @@ public:
 	UINT32 mac_via2_vbl;
 	UINT32 mac_se30_vbl_enable;
 	UINT8 mac_nubus_irq_state;
-	UINT8 via2_ca1;
 
 	/* used to store the reply to most keyboard commands */
 	int keyboard_reply;

@@ -47,116 +47,21 @@
 #include "devices/harddriv.h"
 #include "formats/ap_dsk35.h"
 #include "devices/messram.h"
-#include "sound/dmadac.h"
+#include "sound/asc.h"
 
-/*
-    Apple Sound Chip
+#define C7M	(7833600)
+#define C15M	(C7M*2)
+#define C32M	(C15M*2)
 
-    Base is normally IOBase + 0x14000
-    First 0x800 bytes is buffer RAM
-
-    Verified to be only 8 bits wide by Apple documentation.
-
-    Registers:
-    0x800: VERSION
-    0x801: MODE (1=FIFO mode, 2=wavetable mode)
-    0x802: CONTROL (bit 0=analog or PWM output, 1=stereo/mono, 7=processing time exceeded)
-    0x803: FIFO MODE (bit 7=clear FIFO, bit 1="non-ROM companding", bit 0="ROM companding")
-    0x804: FIFO IRQ STATUS (bit 0=ch A 1/2 full, 1=ch A full, 2=ch B 1/2 full, 3=ch B full)
-    0x805: WAVETABLE CONTROL (bits 0-3 wavetables 0-3 start)
-    0x806: VOLUME (bits 2-4 = 3 bit internal ASC volume, bits 5-7 = volume control sent to Sony sound chip)
-    0x807: CLOCK RATE (0 = Mac 22257 Hz, 1 = undefined, 2 = 22050 Hz, 3 = 44100 Hz)
-    0x80a: PLAY REC A
-    0x80f: TEST (bits 6-7 = digital test, bits 4-5 = analog test)
-    0x810: WAVETABLE 0 PHASE (big-endian, only 24 bits valid)
-    0x814: WAVETABLE 0 INCREMENT (big-endian, only 24 bits valid)
-    0x818: WAVETABLE 1 PHASE
-    0x81C: WAVETABLE 1 INCREMENT
-    0x820: WAVETABLE 2 PHASE
-    0x824: WAVETABLE 2 INCREMENT
-    0x828: WAVETABLE 3 PHASE
-    0x82C: WAVETABLE 3 INCREMENT
-
-    Should become it's own device.
-*/
-
+// ASC trampolines
 static READ8_HANDLER(mac_asc_r)
 {
-	mac_state *mac = space->machine->driver_data<mac_state>();
-
-	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(space->machine->device("maincpu")));
-
-	switch (offset)
-	{
-		case 0x800:	// VERSION
-			// LC/LCII return 0xe8 (V8 ASIC ASC emulation)
-			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
-		    	{
-				return 0xe8;
-			}
-
-			// LCIII returns 0xbc (Sonora ASIC ASC emulation)
-			if (mac->mac_model == MODEL_MAC_LC_III)
-			{
-				return 0xbc;
-			}
-
-			return 0;	// original ASC
-
-		case 0x804:
-			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
-		    	{
-				return 3;
-			}
-			break;
-
-		default:
-			break;
-	}
-
-	return mac->mac_asc_regs[offset];
+	return space->machine->device<asc_device>("asc")->read(offset);
 }
 
 static WRITE8_HANDLER(mac_asc_w)
 {
-	static dmadac_sound_device *dacs[2];
-	INT32 i;
-	mac_state *mac = space->machine->driver_data<mac_state>();
-
-	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(space->machine->device("maincpu")));
-
-	mac->mac_asc_regs[offset] = data;
-
-	switch (offset)
-	{
-		case 0x801:	// CONTROL
-			dacs[0] = space->machine->device<dmadac_sound_device>("ascal");
-			dacs[1] = space->machine->device<dmadac_sound_device>("ascar");
-
-			if (data == 2)	// boot ROM uses this mode
-			{
-				dmadac_set_frequency(&dacs[0], 1, 22255*2);
-				dmadac_set_frequency(&dacs[1], 1, 22255*2);
-				dmadac_enable(&dacs[0], 1, 1);
-				dmadac_enable(&dacs[1], 1, 1);
-			}
-			else if (data == 0) // stop
-			{
-				dmadac_enable(&dacs[0], 1, 0);
-				dmadac_enable(&dacs[1], 1, 0);
-			}
-			break;
-
-		case 0x7ff:
-			for (i = 0; i < 0x200; i++)
-			{
-				mac->xfersamples[i] = (INT16)mac->mac_asc_regs[i]<<8;
-			}
-
-			dmadac_transfer(&dacs[0], 1, 1, 1, 0x200, mac->xfersamples);
-			dmadac_transfer(&dacs[1], 1, 1, 1, 0x200, mac->xfersamples);
-			break;
-	}
+	space->machine->device<asc_device>("asc")->write(offset, data);
 }
 
 static READ32_HANDLER(mac_swim_r)
@@ -784,14 +689,11 @@ static MACHINE_CONFIG_DERIVED( macprtb, macplus )
 	MDRV_RAM_DEFAULT_SIZE("2M")
 	MDRV_RAM_EXTRA_OPTIONS("2M,4M,6M,8M")
 
-	MDRV_SOUND_ADD("ascal", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("ascar", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_DEVICE_REMOVE("custom")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macii, mac_state )
@@ -820,14 +722,9 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ascal", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascar", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MDRV_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
@@ -868,6 +765,10 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
 	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
+
+	MDRV_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc2, maclc )
@@ -891,6 +792,10 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")
+
+	MDRV_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciix, macii )
@@ -930,14 +835,9 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ascal", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascar", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MDRV_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
@@ -972,6 +872,10 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 
 	MDRV_VIDEO_START(maclc)
 	MDRV_VIDEO_UPDATE(maclc)
+
+	MDRV_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, mac_asc_irq)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciici, macii )
@@ -1031,14 +935,6 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ascal", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascar", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
@@ -1475,5 +1371,5 @@ COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,   macprtb,  "Apple Com
 COMP( 1991, macclas2, 0,	0,	macclas2, macadb,   macclassic2,      "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
 COMP( 1991, maclc2,   0,	0,	maclc2,   macadb,   maclc2,	          "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,	0,	maclc3,   macadb,   maclc3,	          "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
-COMP( 1994, pmac6100, 0,	0,	pwrmac,   macadb,   macpm6100,	      "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING )
+COMP( 1994, pmac6100, 0,	0,	pwrmac,   macadb,   macpm6100,	      "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING | GAME_NO_SOUND )
 
