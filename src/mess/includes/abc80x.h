@@ -55,6 +55,11 @@ public:
 	UINT8 hrs;					/* HR picture start scanline */
 	UINT8 fgctl;				/* HR foreground control */
 
+	/* keyboard state */
+	int kb_row;
+	int kb_txd;
+	int kb_clk;
+
 	/* sound state */
 	int pling;					/* pling */
 
