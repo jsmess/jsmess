@@ -569,4 +569,4 @@ COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     "Ritas d
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,   	zx,     "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,   	zx,     "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING | GAME_UNOFFICIAL )

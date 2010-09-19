@@ -16,9 +16,6 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 super80_shared;
-	UINT8 *videoram;
-	UINT8 *pcgram;
-	UINT8 *colorram;
 };
 
 

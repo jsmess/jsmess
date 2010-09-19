@@ -239,10 +239,6 @@ DRIVER_INIT( super80 )
 
 DRIVER_INIT( super80v )
 {
-	super80_state *state = machine->driver_data<super80_state>();
-	state->pcgram = memory_region(machine, "maincpu")+0xf000;
-	state->videoram = memory_region(machine, "maincpu")+0x18000;
-	state->colorram = memory_region(machine, "maincpu")+0x1C000;
 	driver_init_common(machine);
 }
 

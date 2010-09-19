@@ -303,21 +303,18 @@ static running_device *mc6845;
 static UINT8 framecnt=0;
 static UINT8 speed,flash;
 static UINT16 cursor;
+static UINT8 *videoram;
+static UINT8 *colorram;
+static UINT8 *pcgram;
 
 READ8_HANDLER( super80v_low_r )
 {
 	super80_state *state = space->machine->driver_data<super80_state>();
 
 	if (state->super80_shared & 4)
-	{
-		UINT8 *videoram = state->videoram;
 		return videoram[offset];
-	}
 	else
-	{
-		UINT8 *colorram = state->colorram;
 		return colorram[offset];
-	}
 }
 
 WRITE8_HANDLER( super80v_low_w )
@@ -325,15 +322,9 @@ WRITE8_HANDLER( super80v_low_w )
 	super80_state *state = space->machine->driver_data<super80_state>();
 	
 	if (state->super80_shared & 4)
-	{
-		UINT8 *videoram = state->videoram;
 		videoram[offset] = data;
-	}
 	else
-	{
-		UINT8 *colorram = state->colorram;
 		colorram[offset] = data;
-	}
 }
 
 READ8_HANDLER( super80v_high_r )
@@ -341,18 +332,12 @@ READ8_HANDLER( super80v_high_r )
 	super80_state *state = space->machine->driver_data<super80_state>();
 
 	if (~state->super80_shared & 4)
-	{
-		UINT8 *colorram = state->colorram;
-		return colorram[0x800+offset];
-	}
+		return colorram[0x800 | offset];
 	else
-	{
-		UINT8 *pcgram = state->pcgram;
-		if (state->super80_shared & 0x10)
-			return pcgram[0x800+offset];
-		else
-			return pcgram[offset];
-	}
+	if (state->super80_shared & 0x10)
+		return pcgram[0x800 | offset];
+	else
+		return pcgram[offset];
 }
 
 WRITE8_HANDLER( super80v_high_w )
@@ -360,20 +345,13 @@ WRITE8_HANDLER( super80v_high_w )
 	super80_state *state = space->machine->driver_data<super80_state>();
 
 	if (~state->super80_shared & 4)
-	{
-		UINT8 *colorram = state->colorram;
-		colorram[offset+0x800] = data;
-	}
+		colorram[0x800 | offset] = data;
 	else
 	{
-		UINT8 *videoram = state->videoram;
-		videoram[offset+0x800] = data;
+		videoram[0x800 | offset] = data;
 
 		if (state->super80_shared & 0x10)
-		{
-			UINT8 *pcgram = state->pcgram;
-			pcgram[0x800+offset] = data;
-		}
+			pcgram[0x800 | offset] = data;
 	}
 }
 
@@ -434,6 +412,9 @@ VIDEO_START( super80v )
 {
 	mc6845 = machine->device("crtc");
 	FNT = memory_region(machine, "gfx1");
+	pcgram = memory_region(machine, "maincpu")+0xf000;
+	videoram = memory_region(machine, "videoram");
+	colorram = memory_region(machine, "colorram");
 }
 
 VIDEO_UPDATE( super80v )
@@ -451,9 +432,6 @@ VIDEO_UPDATE( super80v )
 MC6845_UPDATE_ROW( super80v_update_row )
 {
 	super80_state *state = device->machine->driver_data<super80_state>();
-	UINT8 *videoram = state->videoram;
-	UINT8 *pcgram = state->pcgram;
-	UINT8 *colorram = state->colorram;
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
