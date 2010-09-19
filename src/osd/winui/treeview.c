@@ -924,7 +924,7 @@ void CreateCPUFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	const device_config_execute_interface *device;
+	const device_config_execute_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)
@@ -984,7 +984,7 @@ void CreateSoundFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	const device_config_sound_interface *device;
+	const device_config_sound_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)
