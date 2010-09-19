@@ -231,7 +231,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 			if (halt)
 			{
-				m_regs[R_MODE-0x800] = 0;
+//				m_regs[R_MODE-0x800] = 0;
 			}
 			break;
 
@@ -485,6 +485,9 @@ void asc_device::write(UINT16 offset, UINT8 data)
 
 				memset(m_fifo_a_wrhalf, 0, sizeof(m_fifo_a_wrhalf));
 				memset(m_fifo_b_wrhalf, 0, sizeof(m_fifo_b_wrhalf));
+
+				m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
+				m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
 				break;
 
 			case R_WTCONTROL:
