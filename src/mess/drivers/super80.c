@@ -815,7 +815,7 @@ ROM_START( super80m )
 ROM_END
 
 ROM_START( super80r )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "super80r", "MCE (original)")
 	ROMX_LOAD("super80r.u26", 0xc000, 0x1000, CRC(01bb6406) SHA1(8e275ecf5141b93f86e45ff8a735b965ea3e8d44), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "super80s", "MCE (upgraded)")
@@ -829,7 +829,7 @@ ROM_START( super80r )
 ROM_END
 
 ROM_START( super80v )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("s80-v37v.u26",  0xc000, 0x1000, CRC(01e0c0dd) SHA1(ef66af9c44c651c65a21d5bda939ffa100078c08) )
 	ROM_LOAD("s80-v37.u33",   0xd000, 0x1000, CRC(812ad777) SHA1(04f355bea3470a7d9ea23bb2811f6af7d81dc400) )
 	ROM_LOAD("s80-v37.u42",   0xe000, 0x1000, CRC(e02e736e) SHA1(57b0264c805da99234ab5e8e028fca456851a4f9) )
