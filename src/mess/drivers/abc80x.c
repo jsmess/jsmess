@@ -2,8 +2,8 @@
 
 Luxor ABC 800M
 
----------------
 Main PCB Layout
+---------------
 
 55 10970-02 (video board)
 
@@ -86,42 +86,40 @@ Notes:
     All IC's shown.
 
     8048        - National Semiconductor INS8048 MCU "8048-132"
-    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix amplifier latch
-    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix driver with 4 to 12 decoder/demultiplexer
+    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
+    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
     XTAL        - Luxor part number 48-300-06
     CN1         - keyboard data connector
 
 
-    XR 22-908-03(B): capacitive readout latch
+XR22-008-03 Pinout
+------------------
+            _____   _____
+    D0   1 |*    \_/     | 20  Vcc
+    D1   2 |             | 19  _CLR
+    D2   3 |             | 18  Q0
+    D3   4 |             | 17  Q1
+   HYS   5 |  22-008-03  | 16  Q2
+    D4   6 |             | 15  Q3
+    D5   7 |             | 14  Q4
+    D6   8 |             | 13  Q5
+    D7   9 |             | 12  Q6
+   GND  10 |_____________| 11  Q7
 
-               +---,_,---+
-        D0  -> |  1   20 | --  VCC
-        D1  -> |  2   19 | <-  /OE (is this what causes it to latch? on which edge?)
-        D2  -> |  3   18 | ->  Q0
-        D3  -> |  4   17 | ->  Q1
-       TST? ?> |  5   16 | ->  Q2
-        D4  -> |  6   15 | ->  Q3
-        D5  -> |  7   14 | ->  Q4
-        D6  -> |  8   13 | ->  Q5
-        D7  -> |  9   12 | ->  Q6
-        GND -- | 10   11 | ->  Q7
-               +---------+
 
-
-    XR 22-950-3B: row driver
-
-               +---,_,---+
-         Y8 <- |  1   20 | --  VCC
-         Y9 <- |  2   19 | ->  Y7
-        Y10 <- |  3   18 | ->  Y6
-        Y11 <- |  4   17 | ->  Y5
-       /RST -> |  5   16 | ->  Y4
-       A    -> |  6   15 | ->  Y3
-       B    -> |  7   14 | ->  Y2
-       C    -> |  8   13 | ->  Y1
-       D    -> |  9   12 | ->  Y0
-       GND  -- | 10   11 | <-  OE
-               +---------+
+XR22-050-3B Pinout
+------------------
+            _____   _____
+    Y8   1 |*    \_/     | 20  Vcc
+    Y9   2 |             | 19  Y7
+   Y10   3 |             | 18  Y6
+   Y11   4 |             | 17  Y5
+  _STB   5 |  22-050-3B  | 16  Y4
+    A0   6 |             | 15  Y3
+    A1   7 |             | 14  Y2
+    A2   8 |             | 13  Y1
+    A3   9 |             | 12  Y0
+   GND  10 |_____________| 11  OE?
 
 */
 
@@ -514,26 +512,76 @@ static READ8_HANDLER( abc802_pling_r )
 
 /* Keyboard */
 
-static READ8_HANDLER( keyboard_p1_r )
+#ifdef UNUSED_FUNCTION
+static READ_LINE_DEVICE_HANDLER( keyboard_txd_r )
 {
-	return 0xff;
+	abc800_state *state = device->machine->driver_data<abc800_state>();
+
+	return state->kb_txd;
 }
 
-static WRITE8_HANDLER( keyboard_p1_w )
+static WRITE_LINE_DEVICE_HANDLER( keyboard_rxd_w )
 {
+	cpu_set_input_line(device, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+#endif
+
+static READ8_HANDLER( keyboard_col_r )
+{
+	abc800_state *state = space->machine->driver_data<abc800_state>();
+
+	static const char *const ABC800_KEYNAMES[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
+	UINT8 data = 0xff;
+
+	if (state->kb_row < 12)
+	{
+		//data = input_port_read(space->machine, ABC800_KEYNAMES[state->kb_row]);
+	}
+
+	return data;
 }
 
-static WRITE8_HANDLER( keyboard_p2_w )
+static WRITE8_HANDLER( keyboard_row_w )
 {
+	/*
+
+		bit		description
+
+		0		A0
+		1		A1
+		2		A2
+		3		A3
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	abc800_state *state = space->machine->driver_data<abc800_state>();
+
+	if (data == 0xff) return;
+	
+	/* keyboard row */
+	state->kb_row = data & 0x0f;
 }
 
-static READ8_HANDLER( keyboard_clock_r )
+static WRITE8_HANDLER( keyboard_ctrl_w )
 {
-	return 0;
-}
+	/*
 
-static WRITE8_HANDLER( keyboard_bus_w )
-{
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
 }
 
 /* Memory Maps */
@@ -569,10 +617,9 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( keyboard_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_p1_r, keyboard_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_clock_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(keyboard_bus_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_col_r, keyboard_row_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_ctrl_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READNOP
 ADDRESS_MAP_END
 
 // ABC 800C
@@ -758,8 +805,7 @@ static INPUT_PORTS_START( fake_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( abc800 )
-//  PORT_INCLUDE(abc77)
+INPUT_PORTS_START( abc800 )
 	PORT_INCLUDE(fake_keyboard)
 
 	PORT_START("SB")
@@ -769,20 +815,18 @@ static INPUT_PORTS_START( abc800 )
 	PORT_DIPSETTING(    0x50, "Synchronous" )
 	PORT_DIPSETTING(    0x8b, "ABC NET" )
 
-	PORT_START("FLOPPY")
-	PORT_CONFNAME( 0x07, 0x00, "Floppy Drive" )
-	PORT_CONFSETTING(    0x00, "ABC 830 (160KB)" )
-	PORT_CONFSETTING(    0x01, "ABC 832/834 (640KB)" )
-	PORT_CONFSETTING(    0x02, "ABC 838 (1MB)" )
-	PORT_CONFSETTING(    0x03, "ABC 850 (640KB/HDD 10MB)" )
-	PORT_CONFSETTING(    0x04, "ABC 852 (640KB/HDD 20MB)" )
-	PORT_CONFSETTING(    0x05, "ABC 856 (640KB/HDD 64MB)" )
-
 	PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
-	PORT_INCLUDE(abc800)
+	PORT_INCLUDE(fake_keyboard)
+
+	PORT_START("SB")
+	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
+	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
+	PORT_DIPSETTING(    0x50, "Synchronous" )
+	PORT_DIPSETTING(    0x8b, "ABC NET" )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x00, "Clear Screen Time Out" )
@@ -797,10 +841,21 @@ static INPUT_PORTS_START( abc802 )
 	PORT_CONFNAME( 0x08, 0x08, "Frame Frequency" )
 	PORT_CONFSETTING(    0x00, "60 Hz" )
 	PORT_CONFSETTING(    0x08, "50 Hz" )
+
+	PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
-	PORT_INCLUDE(abc800)
+	PORT_INCLUDE(fake_keyboard)
+
+	PORT_START("SB")
+	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
+	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
+	PORT_DIPSETTING(    0x50, "Synchronous" )
+	PORT_DIPSETTING(    0x8b, "ABC NET" )
+
+	PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 /* ABC 77 */
@@ -941,8 +996,8 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
-	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
+	DEVCB_NULL,//DEVCB_LINE(keyboard_txd_r),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE(I8048_TAG, keyboard_rxd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1061,9 +1116,17 @@ static MACHINE_START( abc800 )
 	state->abc77 = machine->device(ABC77_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
 
+	/* initialize values */
+	state->kb_txd = 1;
+
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
+	state_save_register_global(machine, state->kb_row);
+	state_save_register_global(machine, state->kb_txd);
+	state_save_register_global(machine, state->kb_clk);
 	state_save_register_global(machine, state->pling);
+	state_save_register_global(machine, state->z80sio_rxcb);
+	state_save_register_global(machine, state->z80sio_txcb);
 }
 
 static MACHINE_RESET( abc800 )
@@ -1210,7 +1273,6 @@ static MACHINE_CONFIG_START( abc800m, abc800_state )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
@@ -1252,7 +1314,6 @@ static MACHINE_CONFIG_START( abc800c, abc800_state )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
