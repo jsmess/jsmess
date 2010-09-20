@@ -1028,6 +1028,9 @@ static void pce_cd_update( running_machine *machine )
 			pce_cd.scsi_MSG = pce_cd.scsi_REQ = pce_cd.scsi_ATN = 0;
 			pce_cd.cd_motor_on = 0;
 			pce_cd.selected = 0;
+			pce_cd.cdda_status = PCE_CD_CDDA_OFF;
+			cdda_stop_audio( machine->device( "cdda" ) );
+			timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0); // stop ADPCM DMA here
 		}
 		pce_cd.scsi_last_RST = pce_cd.scsi_RST;
 	}
@@ -1371,6 +1374,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		pce_cd.scsi_SEL = 1;
 		pce_cd_update(space->machine);
 		pce_cd.scsi_SEL = 0;
+		timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0); // stop ADPCM DMA here
 		break;
 	case 0x01:	/* CDC command / status / data */
 		break;
@@ -1407,16 +1411,11 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		pce_cd_set_adpcm_ram_byte(space->machine, data);
 		break;
 	case 0x0B:	/* ADPCM DMA control */
-		if ( ! ( pce_cd.regs[0x0B] & 0x03 ) && ( data & 0x03 ) )
+		if ( data & 0x03 )
 		{
 			/* Start CD to ADPCM transfer */
 			timer_adjust_periodic(pce_cd.adpcm_dma_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
 			pce_cd.regs[0x0c] |= 4;
-		}
-		if ( ( pce_cd.regs[0x0B] & 0x03 ) && ! ( data & 0x03 ) )
-		{
-			/* Stop CD to ADPCM transfer (?) */
-			timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
 		}
 		break;
 	case 0x0C:	/* ADPCM status */
