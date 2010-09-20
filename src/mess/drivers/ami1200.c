@@ -132,21 +132,21 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cubocd32_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE((UINT32**)&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cubocd32_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
-	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cubocd32_state, chip_ram, chip_ram_size)
+	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", amiga_akiko32_r, amiga_akiko32_w)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE((UINT32**)&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cubocd32_state, custom_regs)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
@@ -437,7 +437,7 @@ static const mos6526_interface cd32_cia_1_intf =
 	DEVCB_NULL									/* port B */
 };
 
-static MACHINE_CONFIG_START( a1200n, driver_device )
+static MACHINE_CONFIG_START( a1200n, cubocd32_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
@@ -505,7 +505,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static MACHINE_CONFIG_START( cd32, driver_device )
+static MACHINE_CONFIG_START( cd32, cubocd32_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
@@ -543,6 +543,8 @@ static MACHINE_CONFIG_START( cd32, driver_device )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_1_intf)
+	
+	MDRV_DEVICE_ADD("akiko", AKIKO, 0)
 MACHINE_CONFIG_END
 
 
@@ -588,6 +590,7 @@ static UINT16 a1200_read_dskbytr(running_machine *machine)
 
 static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 {
+	cubocd32_state *state = machine->driver_data<cubocd32_state>();
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
@@ -598,6 +601,7 @@ static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 
 static DRIVER_INIT( a1200 )
 {
+	cubocd32_state *state = machine->driver_data<cubocd32_state>();
 	static const amiga_machine_interface cubocd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -615,7 +619,7 @@ static DRIVER_INIT( a1200 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize keyboard */
@@ -624,6 +628,7 @@ static DRIVER_INIT( a1200 )
 
 static DRIVER_INIT( cd32 )
 {
+	cubocd32_state *state = machine->driver_data<cubocd32_state>();
 	static const amiga_machine_interface cubocd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -641,11 +646,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
-
-	/* intialize akiko */
-	amiga_akiko_init(machine);
 }
 
 /***************************************************************************************************/

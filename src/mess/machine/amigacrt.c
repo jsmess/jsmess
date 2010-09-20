@@ -88,6 +88,7 @@ static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 
 static void amiga_ar1_nmi( running_machine *machine )
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	/* get the cart's built-in ram */
 	UINT16 *ar_ram = (UINT16 *)cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_write_ptr(0x9fc000);
 
@@ -107,6 +108,7 @@ static void amiga_ar1_nmi( running_machine *machine )
 
 static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 {
+	amiga_state *state = space->machine->driver_data<amiga_state>();
 	int pc = cpu_get_pc(space->cpu);
 
 	/* see if we're inside the AR1 rom */
@@ -122,7 +124,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		}
 	}
 
-	amiga_chip_ram_w( offset * 2, data );
+	(*state->chip_ram_w)(state,  offset * 2, data );
 }
 
 static void amiga_ar1_check_overlay( running_machine *machine )
@@ -216,6 +218,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
+	amiga_state *state = space->machine->driver_data<amiga_state>();
 	UINT16 *mem = (UINT16 *)memory_region( space->machine, "user2" );
 
 	if ( ACCESSING_BITS_0_7 )
@@ -225,7 +228,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 
 		if ( offset == 0x03 ) /* disable cart oberlay on chip mem */
 		{
-			UINT32 mirror_mask = amiga_chip_ram_size;
+			UINT32 mirror_mask = state->chip_ram_size;
 
 			memory_set_bank(space->machine, "bank1", 0);
 
@@ -235,7 +238,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write_bank(space, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, "bank1");
+			memory_install_write_bank(space, 0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -244,17 +247,19 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 
 static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 {
+	amiga_state *state = space->machine->driver_data<amiga_state>();
 	if ( offset == (0x08/2) )
 	{
 		if ( amiga_ar23_mode & 1 )
 			amiga_ar23_freeze(space->machine);
 	}
 
-	amiga_chip_ram_w( offset * 2, data );
+	(*state->chip_ram_w)(state,  offset * 2, data );
 }
 
 static void amiga_ar23_freeze( running_machine *machine )
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int pc = cpu_get_pc(machine->device("maincpu"));
 
 	/* only freeze if we're not inside the cart's ROM */
@@ -275,7 +280,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 		memory_set_bank(machine, "bank1", 2);
 
 		/* writes go to chipram */
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
+		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
 
 		/* trigger NMI irq */
 		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
@@ -338,6 +343,7 @@ static void amiga_ar23_check_overlay( running_machine *machine )
 
 static void amiga_ar23_init( running_machine *machine, int ar3 )
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	UINT32 mirror = 0x20000, size = 0x1ffff;
 	void *ar_ram;
 
@@ -377,7 +383,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
 	memory_set_bankptr(machine, "bank3", ar_ram);
 
-	memory_configure_bank(machine, "bank1", 0, 2, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 2, memory_region(machine, "user1"), 0);
 	memory_configure_bank(machine, "bank1", 2, 2, memory_region(machine, "user2"), 0);
 

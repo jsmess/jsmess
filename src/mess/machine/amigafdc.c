@@ -224,6 +224,7 @@ static void check_extended_image( running_device *device, int id )
 
 static int fdc_get_curpos( running_device *device, int drive )
 {
+	amiga_state *state = device->machine->driver_data<amiga_state>();
 	double elapsed;
 	int speed;
 	int	bytes;
@@ -246,6 +247,7 @@ static int fdc_get_curpos( running_device *device, int drive )
 
 UINT16 amiga_fdc_get_byte (running_device *device)
 {
+	amiga_state *state = device->machine->driver_data<amiga_state>();
 	int pos;
 	int i, drive = -1;
 	UINT16 ret;
@@ -285,6 +287,7 @@ UINT16 amiga_fdc_get_byte (running_device *device)
 
 static TIMER_CALLBACK(fdc_sync_proc)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int drive = param;
 	UINT16			sync = CUSTOM_REG(REG_DSRSYNC);
 	int				cur_pos;
@@ -339,6 +342,7 @@ bail:
 
 static TIMER_CALLBACK(fdc_dma_proc)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int drive = param;
 	amiga_fdc_t *fdc = get_safe_token((running_device*)ptr);
 
@@ -389,7 +393,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 
 			cur_pos %= ( fdc->fdc_status[drive].tracklen );
 
-			amiga_chip_ram_w(offset, dat);
+			(*state->chip_ram_w)(state, offset, dat);
 
 			offset += 2;
 		}
@@ -422,6 +426,7 @@ bail:
 }
 
 void amiga_fdc_setup_dma( running_device *device ) {
+	amiga_state *state = device->machine->driver_data<amiga_state>();
 	int i, cur_pos, drive = -1, len_words = 0;
 	int time = 0;
 	amiga_fdc_t *fdc = get_safe_token(device);
@@ -657,6 +662,7 @@ static void setup_fdc_buffer( running_device *device,int drive )
 
 static TIMER_CALLBACK(fdc_rev_proc)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int drive = param;
 	int time;
 	running_device *cia;

@@ -65,7 +65,7 @@ static INPUT_CHANGED( kbd_update )
 	/* Special case Page UP, which we will use as Action Replay button */
 	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
-		const amiga_machine_interface *amiga_intf = amiga_get_interface();
+		const amiga_machine_interface *amiga_intf = amiga_get_interface(field->port->machine);
 
 		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
