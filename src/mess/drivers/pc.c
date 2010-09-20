@@ -2093,6 +2093,8 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

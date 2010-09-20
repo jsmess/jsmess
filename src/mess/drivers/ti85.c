@@ -493,7 +493,7 @@ public:
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT8>	m_nvram;
+	optional_shared_ptr<UINT8>	m_nvram;
 };
 
 /* machine definition */
@@ -578,6 +578,7 @@ static MACHINE_CONFIG_DERIVED( ti86, ti85 )
 	MDRV_MACHINE_START( ti86 )
 	MDRV_MACHINE_RESET( ti85 )
 
+	MDRV_DEVICE_REMOVE("nvram")
 	MDRV_NVRAM_HANDLER( ti86 )
 MACHINE_CONFIG_END
 
