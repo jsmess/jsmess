@@ -1069,6 +1069,8 @@ MACHINE_RESET( bebox )
 
 	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
 	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
+
+	memcpy(machine->device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),memory_region(machine, "user1"),0x200000);
 }
 
 static void bebox_exit(running_machine &machine)
