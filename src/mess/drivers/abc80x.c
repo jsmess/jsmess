@@ -535,7 +535,7 @@ static READ8_HANDLER( keyboard_col_r )
 
 	if (state->kb_row < 12)
 	{
-		//data = input_port_read(space->machine, ABC800_KEYNAMES[state->kb_row]);
+		data = input_port_read(space->machine, ABC800_KEYNAMES[state->kb_row]);
 	}
 
 	return data;
