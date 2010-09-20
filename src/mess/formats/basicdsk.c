@@ -299,7 +299,9 @@ static void basicdsk_default_geometry(const struct FloppyFormat *format, struct 
 	err = option_resolution_getdefault(format->param_guidelines, PARAM_FIRST_SECTOR_ID,	&geometry->first_sector_id);
 	assert(!err);
 	err = option_resolution_getdefault(format->param_guidelines, PARAM_INTERLEAVE,		&geometry->interleave);
-	assert(!err);
+	if (err!=0) {
+		geometry->interleave = 1;
+	}
 	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTOR_LENGTH,	&sector_length);
 	assert(!err);
 	geometry->sector_length = sector_length;
