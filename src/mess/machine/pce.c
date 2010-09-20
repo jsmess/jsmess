@@ -592,6 +592,7 @@ static void pce_cd_read_6( running_machine *machine )
 
 	if ( frame_count == 0 )
 	{
+		popmessage("Read Sector frame count == 0, contact MESSdev");
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
 	}
 	else
