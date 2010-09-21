@@ -927,6 +927,8 @@ static void pce_cd_handle_data_output( running_machine *machine )
 		if ( pce_cd.command_buffer[0] != pce_cd_commands[i].command_byte )
 		{
 			logerror("Unrecognized command: %02X\n", pce_cd.command_buffer[0] );
+			if(pce_cd.command_buffer[0] == 0x03)
+				popmessage("CD command 0x03 issued (Request Sense), contact MESSdev");
 		}
 		assert( pce_cd.command_buffer[0] == pce_cd_commands[i].command_byte );
 
