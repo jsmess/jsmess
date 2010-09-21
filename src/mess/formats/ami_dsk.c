@@ -22,24 +22,12 @@
 static FLOPPY_IDENTIFY( amiga_dsk_identify )
 {
 	UINT64 size;
-	UINT8 header[4];
 
 	*vote = 100;
-
-	/* get first 4 bytes */
-	floppy_image_read(floppy, &header, 0, sizeof(header));
 
 	/* first check the size of the image */
 	size = floppy_image_size(floppy);
 	if ((size != 901120) && (size != 1802240))
-		*vote = 0;
-
-	/* then check the first sector for the magic string */
-	if (memcmp(header, "DOS", 3))
-		*vote = 0;
-
-	/* then check the disk type */
-	if (header[3] > 5)
 		*vote = 0;
 
 	return FLOPPY_ERROR_SUCCESS;
