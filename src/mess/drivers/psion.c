@@ -5,10 +5,9 @@
         Driver by Sandro Ronco
 
         TODO:
-        - implement Datapack read/write interface
-        - add save state and NVRAM
+        - add save state
         - dump CGROM of the HD44780
-        - move HD44780 implementation in a device
+		- emulate other devices in slot C(Comms Link, printer)
 
         Note:
         - 4 lines display has an custom LCD controller derived from an HD66780
@@ -29,11 +28,16 @@
 
 struct datapack
 {
+	device_image_interface *image;
 	UINT8 id;
 	UINT8 len;
 	UINT16 counter;
 	UINT8 page;
+	UINT8 segment;
+	UINT8 control_lines;
 	UINT8* data;
+
+	bool write_flag;
 };
 
 static struct _psion
@@ -43,6 +47,7 @@ static struct _psion
 	UINT8 *sys_register;
 	UINT8 tcsr_value;
 	UINT8 stby_pwr;
+	UINT8 pulse;
 
 	/* RAM/ROM banks */
 	UINT8 *ram;
@@ -54,12 +59,161 @@ static struct _psion
 	UINT8 rom_bank_count;
 
 	UINT8 port2_ddr;
+	UINT8 port2;
 	UINT8 port6_ddr;
 	UINT8 port6;
 
 	struct datapack pack1;
 	struct datapack pack2;
 } psion;
+
+/***********************************************
+
+    Datapack
+
+***********************************************/
+
+UINT8 datapack_update(datapack *pack, UINT8 data)
+{
+	assert(pack != NULL);
+
+	if (pack->len == 0 || (pack->control_lines & 0x80))
+		return 0;
+
+	UINT32 pack_addr = pack->counter + ((pack->id & 0x04) ? 0x100 * pack->page : 0);
+
+	// if the datapack is 128k or more is treated as segmented
+	if (pack->len >= 0x10)
+		pack_addr += (pack->segment * 0x4000);
+
+	if (pack_addr < pack->len * 0x2000)
+	{
+		if ((pack->control_lines&0x08) && !(pack->control_lines & 0x02))
+		{
+			//write latched data
+			pack->data[pack_addr] = data;
+			pack->write_flag = true;
+		}
+		else if ((pack->control_lines&0x08) && (pack->control_lines & 0x02))
+		{
+			//write datapack segment
+			if (pack->len <= 0x10)
+				pack->segment = data & 0x07;
+			else if (pack->len <= 0x20)
+				pack->segment = data & 0x0f;
+			else if (pack->len <= 0x40)
+				pack->segment = data & 0x1f;
+			else if (pack->len <= 0x80)
+				pack->segment = data & 0x3f;
+			else
+				pack->segment = data;
+		}
+		else if (!(pack->control_lines&0x08) && !(pack->control_lines & 0x02))
+		{
+			//latch data
+			data = pack->data[pack_addr];
+		}
+		else if (!(pack->control_lines&0x08) && (pack->control_lines & 0x02))
+		{
+			//read datapack ID
+			if (pack->id & 0x02)
+				data = pack->data[0];
+			else
+				data = 1;
+		}
+	}
+
+	return data;
+}
+
+void datapack_control_lines_w(datapack *pack, UINT8 data)
+{
+	assert(pack != NULL);
+
+	if ((pack->control_lines & 0x01) != (data & 0x01))
+	{
+		pack->counter++;
+
+		if (pack->counter >= ((pack->id & 0x04) ? 0x100 : (pack->len * 0x2000)))
+			pack->counter = 0;
+	}
+
+	if ((pack->control_lines & 0x04) && !(data & 0x04))
+	{
+		pack->page++;
+
+		if (pack->page >= (pack->len * 0x2000) / 0x100)
+			pack->page = 0;
+	}
+
+	if (data & 0x02)
+	{
+		pack->counter = 0;
+		pack->page = 0;
+	}
+
+	pack->control_lines = data;
+}
+
+UINT8 datapack_control_lines_r(datapack *pack)
+{
+	assert(pack != NULL);
+
+	return pack->control_lines;
+}
+
+int datapack_load(device_image_interface &image, datapack &pack)
+{
+	running_machine *machine = image.device().machine;
+	char opk_head[6];
+	UINT8 pack_id, pack_len;
+
+	image.fread(opk_head, 6);
+	image.fread(&pack_id, 1);
+	image.fread(&pack_len, 1);
+
+	if(strcmp(opk_head, "OPK") || pack_len * 0x2000 < image.length() - 6)
+		return IMAGE_INIT_FAIL;
+
+	pack.image = &image;
+	pack.write_flag = false;
+	pack.id = pack_id;
+	pack.len = pack_len;
+	image.fseek(6, SEEK_SET);
+	pack.data = auto_alloc_array(machine, UINT8, pack.len * 0x2000);
+	memset(pack.data, 0xff, pack.len * 0x2000);
+	image.fread(pack.data, image.length() - 6);
+
+	/* load battery */
+	UINT8 *opk = auto_alloc_array(machine, UINT8, pack.len * 0x2000 + 6);
+	image.battery_load(opk, pack.len * 0x2000 + 6, 0xff);
+	if(!strncmp((char*)opk, "OPK", 3))
+		memcpy(pack.data, opk + 6, pack.len * 0x2000);
+
+	return IMAGE_INIT_PASS;
+}
+
+void datapack_unload(device_image_interface &image, datapack &pack)
+{
+	running_machine *machine = image.device().machine;
+
+	// save battery only if a write-access occurs
+	if (pack.len > 0 && pack.write_flag)
+	{
+		UINT8 opk_magic[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
+		UINT8 *opk = auto_alloc_array(machine, UINT8, pack.len * 0x2000 + 6);
+
+		memcpy(opk, opk_magic, 6);
+		memcpy(opk + 6, pack.data, pack.len * 0x2000);
+
+		pack.image->battery_save(opk, pack.len * 0x2000 + 6);
+
+		auto_free(machine, opk);
+	}
+
+	auto_free(machine, pack.data);
+	pack.len = 0;
+}
 
 /***********************************************
 
@@ -120,26 +274,6 @@ struct datapack *get_active_slot(running_machine *machine, UINT8 data)
 	return NULL;
 }
 
-void datapack_w(running_machine *machine, UINT8 data)
-{
-	//TODO
-}
-
-UINT8 datapack_r(running_machine *machine)
-{
-	struct datapack *pack = get_active_slot(machine, psion.port6);
-
-	if (pack != NULL && pack->len > 0 && !(psion.port6 & 0x80))
-	{
-		UINT32 pack_addr = pack->counter + ((pack->id & 0x04) ? 0x100 * pack->page : 0);
-
-		if (pack_addr < pack->len * 0x2000)
-			return pack->data[pack_addr];
-	}
-
-	return 0;
-}
-
 WRITE8_HANDLER( hd63701_int_reg_w )
 {
 	switch (offset)
@@ -149,7 +283,15 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 		break;
 	case 0x03:
 		/* datapack i/o data bus */
-		datapack_w(space->machine, data);
+		if (psion.port2_ddr == 0xff)
+		{
+			datapack *pack = get_active_slot(space->machine, psion.port6);
+
+			if (pack)
+				psion.port2 = datapack_update(pack, data);
+			else
+				psion.port2 = data;
+		}
 		break;
 	case 0x08:
 		psion.tcsr_value = data;
@@ -172,36 +314,15 @@ WRITE8_HANDLER( hd63701_int_reg_w )
         ---- --x- reset line
         ---- ---x clock line
         */
-		if (psion.port6_ddr == 0xff)
 		{
-			struct datapack *pack = get_active_slot(space->machine, data);
+			psion.port6 = (data & psion.port6_ddr) | (psion.port6 & ~psion.port6_ddr);
+			datapack *pack = get_active_slot(space->machine, psion.port6);
 
 			if (pack != NULL)
 			{
-				if ((psion.port6 & 0x01) != (data & 0x01))
-				{
-					pack->counter++;
-
-					if (pack->counter >= ((pack->id & 0x04) ? 0x100 : (pack->len * 0x2000)))
-						pack->counter = 0;
-				}
-
-				if ((psion.port6 & 0x04) && !(data & 0x04))
-				{
-					pack->page++;
-
-					if (pack->page >= (pack->len * 0x2000) / 0x100)
-						pack->page = 0;
-				}
-
-				if (psion.port6 & 0x02)
-				{
-					pack->counter = 0;
-					pack->page = 0;
-				}
+				datapack_control_lines_w(pack, psion.port6);
+				datapack_update(pack, psion.port2);
 			}
-
-			psion.port6 = data;
 		}
 		break;
 	}
@@ -215,19 +336,39 @@ READ8_HANDLER( hd63701_int_reg_r )
 	{
 	case 0x03:
 		/* datapack i/o data bus */
-		return datapack_r(space->machine);
+		if (psion.port2_ddr == 0)
+		{
+			datapack *pack = get_active_slot(space->machine, psion.port6);
+
+			if (pack)
+				psion.port2 = datapack_update(pack, psion.port2);
+			else
+				psion.port2 = 0;
+
+			return psion.port2;
+		}
+		else
+			return 0;
 	case 0x14:
 		return (hd63701_internal_registers_r(space, offset)&0x7f) | (psion.stby_pwr<<7);
 	case 0x15:
 		/*
         x--- ---- ON key active high
         -xxx xx-- keys matrix active low
-        ---- --x- ??
+        ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (psion.kb_counter == 0x7ff)<<1;
+		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (psion.kb_counter == 0x7ff)<<1 | psion.pulse<<1;
 	case 0x17:
-		return psion.port6;
+		/* datapack control lines */
+		{
+			datapack *pack = get_active_slot(space->machine, psion.port6);
+
+			if (pack)
+				return datapack_control_lines_r(pack);
+			else
+				return psion.port6;
+		}
 	case 0x08:
 		hd63701_internal_registers_w(space, offset, psion.tcsr_value);
 	default:
@@ -250,10 +391,10 @@ void io_rw(address_space* space, UINT16 offset)
 		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
-		//Pulse enable
+		psion.pulse = 1;
 		break;
 	case 0x140:
-		//Pulse disable
+		psion.pulse = 0;
 		break;
 	case 0x200:
 		psion.kb_counter = 0;
@@ -448,29 +589,6 @@ INPUT_PORTS_START( psion )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D [)]") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-int datapack_load(device_image_interface &image, struct datapack &pack)
-{
-	running_machine *machine = image.device().machine;
-	char opk_head[6];
-	UINT8 pack_id, pack_len;
-
-	image.fread(opk_head, 6);
-	image.fread(&pack_id, 1);
-	image.fread(&pack_len, 1);
-
-	if(strcmp(opk_head, "OPK") || pack_len * 0x2000 < image.length() - 6)
-		return IMAGE_INIT_FAIL;
-
-	pack.id = pack_id;
-	pack.len = pack_len;
-	image.fseek(6, SEEK_SET);
-	pack.data = auto_alloc_array(machine, UINT8, pack.len * 0x2000);
-	memset(pack.data, 0xff, pack.len * 0x2000);
-	image.fread(pack.data, image.length() - 6);
-
-	return IMAGE_INIT_PASS;
-}
-
 static DEVICE_IMAGE_LOAD( psion_pack1 )
 {
 	return datapack_load(image, psion.pack1);
@@ -478,8 +596,7 @@ static DEVICE_IMAGE_LOAD( psion_pack1 )
 
 static DEVICE_IMAGE_UNLOAD( psion_pack1 )
 {
-	auto_free(image.device().machine, psion.pack1.data);
-	memset(&psion.pack1, 0, sizeof(psion.pack1));
+	datapack_unload(image, psion.pack1);
 }
 
 static DEVICE_IMAGE_LOAD( psion_pack2 )
@@ -489,8 +606,7 @@ static DEVICE_IMAGE_LOAD( psion_pack2 )
 
 static DEVICE_IMAGE_UNLOAD( psion_pack2 )
 {
-	auto_free(image.device().machine, psion.pack2.data);
-	memset(&psion.pack2, 0, sizeof(psion.pack2));
+	datapack_unload(image, psion.pack2);
 }
 
 static NVRAM_HANDLER( psion )
@@ -558,6 +674,7 @@ static MACHINE_RESET(psion)
 	psion.kb_counter=0;
 	psion.ram_bank=0;
 	psion.rom_bank=0;
+	psion.pulse=0;
 
 	if (psion.rom_bank_count || psion.ram_bank_count)
 		update_bank(machine);
