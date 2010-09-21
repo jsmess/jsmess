@@ -6,6 +6,16 @@
 
 **********************************************************************/
 
+class hp48_state : public driver_device
+{
+public:
+	hp48_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /***************************************************************************
     MACROS
 ***************************************************************************/

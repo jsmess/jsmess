@@ -7,9 +7,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "timer.h"
-#include "state.h"
-
 #include "devices/xmodem.h"
 #include "devices/kermit.h"
 #include "cpu/saturn/saturn.h"
@@ -838,7 +835,7 @@ ROM_END
 
 
 /* These ROMS are common to the S and SX models.
-   The only difference is that, the S beeing later, it was only shipped with revisions
+   The only difference is that, the S being later, it was only shipped with revisions
    E and later.
 
    (Note that G/GX revisions start at K, after the S/S revisions ends...)
@@ -942,7 +939,7 @@ static const char layout_hp48s [] = "hp48s";
 /*************************** driver ********************************/
 
 
-static MACHINE_CONFIG_START( hp48_common, driver_device )
+static MACHINE_CONFIG_START( hp48_common, hp48_state )
 	MDRV_MACHINE_RESET ( hp48 )
 
 	/* cpu */
