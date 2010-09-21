@@ -40,7 +40,7 @@ PCB Layout
 Notes:
     All IC's shown.
 
-    ROM     - Hitachi HN462716 2Kx8 EPROM "MPT02"
+    ROM     - Hitachi HN462716 2Kx8 EPROM "MPI02"
     Z80     - Sharp LH0080A Z80A CPU
     Z80PIO  - SGS Z8420AB1 Z80A PIO
     MB8876  - Mitsubishi MB8876 Floppy Disc Controller (FD1791 compatible)
@@ -1084,7 +1084,6 @@ static FLOPPY_OPTIONS_START( abc830 )
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
-		INTERLEAVE([7])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
@@ -1390,23 +1389,10 @@ static DEVICE_START( luxor_55_21046 )
 	state_save_register_device_item(device, 0, conkort->busy);
 
 	/* patch out sector skew table */
-/*	UINT8 *rom = device->subregion("conkort")->base();
-	rom[0x2dd3] = 0;
-	rom[0x2dd4] = 1;
-	rom[0x2dd5] = 2;
-	rom[0x2dd6] = 3;
-	rom[0x2dd7] = 4;
-	rom[0x2dd8] = 5;
-	rom[0x2dd9] = 6;
-	rom[0x2dda] = 7;
-	rom[0x2ddb] = 8;
-	rom[0x2ddc] = 9;
-	rom[0x2ddd] = 10;
-	rom[0x2dde] = 11;
-	rom[0x2ddf] = 12;
-	rom[0x2de0] = 13;
-	rom[0x2de1] = 14;
-	rom[0x2de1] = 15;*/
+	UINT8 *rom = device->subregion("conkort")->base();
+
+	for (int i = 0; i < 16; i++)
+		rom[0x2dd3 + i] = i + 1;
 }
 
 /*-------------------------------------------------
