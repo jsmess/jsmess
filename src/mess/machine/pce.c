@@ -880,6 +880,11 @@ static void pce_cd_nec_get_dir_info( running_machine *machine )
 	pce_cd.scsi_CD = 0;
 }
 
+static void pce_cd_end_of_list( running_machine *machine )
+{
+	pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+}
+
 static void pce_cd_handle_data_output( running_machine *machine )
 {
 	static const struct {
@@ -894,7 +899,7 @@ static void pce_cd_handle_data_output( running_machine *machine )
 		{ 0xDA,10, pce_cd_nec_pause },						/* NEC PAUSE */
 		{ 0xDD,10, pce_cd_nec_get_subq },					/* NEC GET SUBCHANNEL Q */
 		{ 0xDE,10, pce_cd_nec_get_dir_info },				/* NEC GET DIR INFO */
-		{ 0xFF, 0, NULL }									/* end of list marker */
+		{ 0xFF, 1, pce_cd_end_of_list }						/* end of list marker */
 	};
 
 	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK )
