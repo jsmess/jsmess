@@ -41,6 +41,8 @@ System Driver Changes:
 
 - [ABC800] Added a dump of the keyboard controller ROM. [exon, Curt Coder]
 
+- [ABC800] Emulated the built-in keyboard. [Curt Coder, exon]
+
 - [ABC806] Added enhanced options ROM. [exon, Curt Coder]
 
 

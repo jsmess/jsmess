@@ -59,6 +59,7 @@ public:
 	int kb_row;
 	int kb_txd;
 	int kb_clk;
+	int kb_stb;
 
 	/* sound state */
 	int pling;					/* pling */
