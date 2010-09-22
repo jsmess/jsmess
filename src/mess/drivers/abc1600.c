@@ -35,7 +35,7 @@ static MACHINE_CONFIG_START( abc1600, driver_device )
 	/* sound hardware */
 
 	/* devices */
-	MDRV_ABC99_ADD
+	MDRV_ABC99_ADD(ABC99_TAG)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
