@@ -1383,6 +1383,9 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		pce_cd_update(space->machine);
 		pce_cd.scsi_SEL = 0;
 		timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0); // stop ADPCM DMA here
+		/* any write here clears CD transfer irqs */
+		pce_cd.regs[0x03] &= ~0x70;
+		cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE );
 		break;
 	case 0x01:	/* CDC command / status / data */
 		break;
