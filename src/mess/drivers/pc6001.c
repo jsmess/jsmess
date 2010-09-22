@@ -10,8 +10,8 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
-    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6600 doesn't even use the same thing;
-    - PC-6600: mon r-0 type games doesn't seem to work at all on this version?
+    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't even use the same thing;
+    - PC-6601: mon r-0 type games doesn't seem to work at all on this version?
     - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes the memory map to behave like the older versions)
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
@@ -1278,16 +1278,16 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* disk device placeholder (TODO: identify & hook-up this) */
-static READ8_HANDLER( pc6600_fdc_r )
+static READ8_HANDLER( pc6601_fdc_r )
 {
 	return mame_rand(space->machine);
 }
 
-static WRITE8_HANDLER( pc6600_fdc_w )
+static WRITE8_HANDLER( pc6601_fdc_w )
 {
 }
 
-static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pc6601_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
@@ -1310,7 +1310,7 @@ static ADDRESS_MAP_START( pc6600_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6600_fdc_r,pc6600_fdc_w) // disk device
+	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
 
@@ -1524,7 +1524,7 @@ static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc8, 0xc8) AM_WRITE(pc6001sr_mode_w)
 	AM_RANGE(0xc9, 0xc9) AM_WRITE(pc6001sr_vram_bank_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6600_fdc_r,pc6600_fdc_w) // disk device
+	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
 
@@ -2224,12 +2224,12 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc6600, pc6001m2 )
+static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
-	MDRV_CPU_IO_MAP(pc6600_io)
+	MDRV_CPU_IO_MAP(pc6601_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
 MACHINE_CONFIG_END
 
@@ -2311,7 +2311,7 @@ ROM_START( pc6001mk2 )
 	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
-ROM_START( pc6600 )	/* Variant of pc6001m2 */
+ROM_START( pc6601 )	/* Variant of pc6001m2 */
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.66", 0x10000, 0x8000, CRC(c0b01772) SHA1(9240bb6b97fe06f5f07b5d65541c4d2f8758cc2a) )
 	ROM_LOAD( "voicerom.66", 0x18000, 0x4000, CRC(91d078c1) SHA1(6a93bd7723ef67f461394530a9feee57c8caf7b7) )
@@ -2365,5 +2365,5 @@ ROM_END
 COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    GAME_NOT_WORKING )
 COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      GAME_NOT_WORKING ) // This version is also known as the NEC Trek
 COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   GAME_NOT_WORKING )
-COMP( 1983, pc6600,   pc6001,  0,     pc6600,   pc6001,   0,      "Nippon Electronic Company",   "PC-6600 (Japan)",       GAME_NOT_WORKING )
+COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001,   0,      "Nippon Electronic Company",   "PC-6601 (Japan)",       GAME_NOT_WORKING )
 COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", GAME_NOT_WORKING )
