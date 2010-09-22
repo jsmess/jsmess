@@ -4,6 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Tomy Pyuuta [anondumper]
 - Elektronika KR-03 [Miodrag Milanovic]
+- Microbee PC85 Swedish version [Robbbert]
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
@@ -52,7 +53,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.139u2.  This incorporates all features of the
+- The core is based on MAME 0.139u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed Z80-SIO and DMA to allow trs80m2 to boot CP/M and TRSDOS. [Curt Coder]
