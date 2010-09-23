@@ -518,7 +518,6 @@ static MACHINE_START( abc80 )
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( abc80, abc80_state )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
 	MDRV_CPU_PROGRAM_MAP(abc80_map)
@@ -578,49 +577,11 @@ ROM_START( abc80 )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
-	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x400, "keyboard", 0 ) // probably Keytronic 8048
+	ROM_LOAD( "keyboard.rom", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
-
-	ROM_REGION( 0x80, "hsync", 0 )
-	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0080, NO_DUMP ) // "64 40029-01" 82S129 256x4 horizontal sync
-
-	ROM_REGION( 0x100, "vsync", 0 )
-	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0100, NO_DUMP ) // "64 40030-01" 82S131 512x4 vertical sync
-
-	ROM_REGION( 0x80, "attr", 0 )
-	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0080, NO_DUMP ) // "64 40056-01" 82S129 256x4 attribute
-
-	ROM_REGION( 0x100, "line", 0 )
-	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0100, NO_DUMP ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
-
-	ROM_REGION( 0x80, "mmu", 0 )
-	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // "64 40057-01" 82S129 256x4 address decoder
-ROM_END
-
-ROM_START( abc80h )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "za3508.a2", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9) )
-	ROM_LOAD( "za3509.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1) )
-	ROM_LOAD( "za3506.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b) )
-	ROM_LOAD( "za3507.a5", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710) )
-	ROM_SYSTEM_BIOS( 0, "default", "No DOS" )
-	ROM_SYSTEM_BIOS( 1, "abcdos", "ABC-DOS" ) // Scandia Metric FD2
-	ROMX_LOAD("abcdos",    0x6000, 0x1000, CRC(2cb2192f) SHA1(a6b3a9587714f8db807c05bee6c71c0684363744), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "abcdosdd", "ABC-DOS DD" ) // ABC 830
-	ROMX_LOAD("abcdosdd",  0x6000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "ufd20", "UFD-DOS v.20" ) // ABC 830
-	ROMX_LOAD("ufddos20",  0x6000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(4) )
-	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
-	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
-
-	ROM_REGION( 0x10000, "keyboard", 0 )
-	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
 
 	ROM_REGION( 0x80, "hsync", 0 )
 	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0080, NO_DUMP ) // "64 40029-01" 82S129 256x4 horizontal sync
@@ -642,4 +603,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME                    FLAGS */
 COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )
