@@ -877,7 +877,7 @@ INPUT_PORTS_START( abc800 )
 	PORT_DIPSETTING(    0x50, "Synchronous" )
 	PORT_DIPSETTING(    0x8b, "ABC NET" )
 
-	PORT_INCLUDE(luxor_55_21046)
+	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fake_keyboard )
@@ -986,7 +986,7 @@ static INPUT_PORTS_START( abc802 )
 	PORT_DIPSETTING(    0x00, "60 Hz" )
 	PORT_DIPSETTING(    0x08, "50 Hz" )
 
-	PORT_INCLUDE(luxor_55_21046)
+	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
@@ -999,7 +999,7 @@ static INPUT_PORTS_START( abc806 )
 	PORT_DIPSETTING(    0x50, "Synchronous" )
 	PORT_DIPSETTING(    0x8b, "ABC NET" )
 
-	PORT_INCLUDE(luxor_55_21046)
+	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 /* ABC 77 */
@@ -1477,7 +1477,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	/* ABC bus */
 	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
+	MDRV_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))

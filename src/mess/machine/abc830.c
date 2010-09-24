@@ -174,12 +174,6 @@ Notes:
 	- ABC80 ERR 48 on boot
 	- side select makes controller go crazy and try to WRITE_TRK
 
-    Fast Controller
-    ---------------
-	- Z80 DMA reset command is broken (it keeps resetting A/B port addresses)
-	- 2KB RAM option
-	- 160KB disks need a 7:1 sector interleave to load (physical sectors: 1,8,F,6,D,4,B,2,9,10,7,E,5,C,3,A)
-
 */
 
 #include "emu.h"
@@ -243,6 +237,9 @@ struct _fast_t
 	int dma_irq;			/* DMA interrupt */
 	int busy;				/* busy bit */
 	int force_busy;			/* force busy bit */
+	UINT8 sw1;				/* DS/DD */
+	UINT8 sw2;				/* drive type */
+	UINT8 sw3;				/* ABC bus address */
 
 	/* devices */
 	running_device *bus;
@@ -387,27 +384,27 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
-	/* drive selection */
+	// drive selection
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
 //  if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 	conkort->sel0 = BIT(data, 0);
 	conkort->sel1 = BIT(data, 1);
 
-	/* motor enable */
+	// motor enable
 	int mtron = BIT(data, 3);
 	floppy_mon_w(conkort->image0, mtron);
 	floppy_mon_w(conkort->image1, mtron);
 	floppy_drive_set_ready_state(conkort->image0, !mtron, 1);
 	floppy_drive_set_ready_state(conkort->image1, !mtron, 1);
 
-	/* disk side selection */
+	// side selection
 	//wd17xx_set_side(device, BIT(data, 4));
 
-	/* wait enable */
+	// wait enable
 	conkort->wait_enable = BIT(data, 6);
 
-	/* FDC master reset */
+	// FDC master reset
 	wd17xx_mr_w(device, BIT(data, 7));
 }
 
@@ -430,8 +427,8 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
-	/* interrupt */
-	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	// interrupt
+//	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	conkort->status = data & 0xfe;
 }
@@ -443,7 +440,7 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
 	{
-		/* TODO: this is really connected to the Z80 WAIT line */
+		// TODO: this is really connected to the Z80 WAIT line
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
@@ -455,7 +452,7 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 	case 3: data = wd17xx_data_r(device, 0); break;
 	}
 
-	/* FD1791 has inverted data lines */
+	// FD1791 has inverted data lines
 	return data ^ 0xff;
 }
 
@@ -466,11 +463,11 @@ static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
 	{
 		logerror("WAIT\n");
-		/* TODO: this is really connected to the Z80 WAIT line */
+		// TODO: this is really connected to the Z80 WAIT line
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
-	/* FD1791 has inverted data lines */
+	// FD1791 has inverted data lines
 	data ^= 0xff;
 
 	switch (offset & 0x03)
@@ -488,7 +485,8 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_cs_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	conkort->cs = (data == input_port_read(device->machine, "luxor_55_21046:SW3"));
+//	conkort->cs = (data == input_port_read(device->machine, "luxor_55_21046:SW3"));
+	conkort->cs = (data == conkort->sw3);
 }
 
 READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
@@ -633,19 +631,19 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
-	/* drive select */
+	// drive select
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
 	//if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 
-	/* motor enable */
+	// motor enable
 	int mtron = BIT(data, 3);
 	floppy_mon_w(conkort->image0, !mtron);
 	floppy_mon_w(conkort->image1, !mtron);
 	floppy_drive_set_ready_state(conkort->image0, mtron, 1);
 	floppy_drive_set_ready_state(conkort->image1, mtron, 1);
 
-	/* side select */
+	// side select
 	wd17xx_set_side(device, BIT(data, 5));
 }
 
@@ -668,10 +666,10 @@ static WRITE8_DEVICE_HANDLER( fast_8a_w )
 
 	*/
 
-	/* master reset */
+	// FDC master reset
 	wd17xx_mr_w(device, BIT(data, 0));
 
-	/* density select */
+	// density select
 	wd17xx_dden_w(device, BIT(data, 1));
 }
 
@@ -696,18 +694,20 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 
 	UINT8 data = 0;
 
-	/* busy */
+	// busy
 	data |= conkort->busy;
 
-	/* SW1 */
-	UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
+	// SW1
+//	UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
+	UINT8 sw1 = conkort->sw1;
 
 	data |= sw1 << 4;
 
-	/* SW2 */
-	UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
+	// SW2
+//	UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
+	UINT8 sw2 = conkort->sw2;
 	
-	// TTL inputs float high
+	// TTL inputs float high so DIP switch in off position equals 1
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
 	int sw2_2 = BIT(sw2, 1) ? 1 : BIT(offset, 9);
 	int sw2_3 = BIT(sw2, 2) ? 1 : BIT(offset, 10);
@@ -778,8 +778,8 @@ INPUT_PORTS_START( luxor_55_10828 )
 
 	PORT_START("luxor_55_10828:S1")
 	PORT_DIPNAME( 0x01, 0x01, "Card Address" ) PORT_DIPLOCATION("S1:1")
-	PORT_DIPSETTING(    0x00, "44" )
-	PORT_DIPSETTING(    0x01, "45" )
+	PORT_DIPSETTING(    0x00, "44 (ABC 832/834/850)" )
+	PORT_DIPSETTING(    0x01, "45 (ABC 830)" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( luxor_55_21046 )
@@ -885,25 +885,25 @@ static READ8_DEVICE_HANDLER( pio_pb_r )
 
 	UINT8 data = 0x04;
 
-	/* single/double sided drive */
+	// single/double sided drive
 	UINT8 sw1 = input_port_read(device->machine, "luxor_55_10828:SW1") & 0x0f;
 	int ds0 = conkort->sel0 ? BIT(sw1, 0) : 1;
 	int ds1 = conkort->sel1 ? BIT(sw1, 1) : 1;
 	data |= !(ds0 & ds1);
 
-	/* single/double density drive */
+	// single/double density drive
 	int dd0 = conkort->sel0 ? BIT(sw1, 2) : 1;
 	int dd1 = conkort->sel1 ? BIT(sw1, 3) : 1;
 	data |= !(dd0 & dd1) << 1;
 
-	/* radial/binary drive select */
+	// radial/binary drive select
 	data |= 0x10;
 
-	/* head load */
+	// head load
 //  data |= wd17xx_hdld_r(device) << 6;
 	data |= 0x40;
 
-	/* FDC interrupt request */
+	// FDC interrupt request
 	data |= conkort->fdc_irq << 7;
 
 	return data;
@@ -928,10 +928,10 @@ static WRITE8_DEVICE_HANDLER( pio_pb_w )
 
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
-	/* double density enable */
+	// double density enable
 	wd17xx_dden_w(conkort->fd1791, BIT(data, 3));
 
-	/* head load timing */
+	// head load timing
 //  wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
@@ -980,8 +980,8 @@ static const z80_daisy_config slow_daisy_chain[] =
     CF  load
     87  enable DMA
 
-    ??
-    --
+    WRITE TO DISK
+    -------------
     C3 14 28 95 7B 02 8A CF 05 AF CF 87
 
     C3  reset
@@ -1015,6 +1015,7 @@ static WRITE_LINE_DEVICE_HANDLER( z80dma_int_w )
 
 	conkort->dma_irq = state;
 
+	// FDC and DMA interrupts are wire-ORed to the Z80
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
 }
 
@@ -1043,7 +1044,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 WAIT line */
+		// TODO: this is really connected to the Z80 WAIT line
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
@@ -1056,7 +1057,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 WAIT line */
+		// TODO: this is really connected to the Z80 WAIT line
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
@@ -1068,8 +1069,10 @@ static const wd17xx_interface slow_fdc_intf =
 	DEVCB_LINE(slow_fd1791_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
-/*
+
 static FLOPPY_OPTIONS_START( fd2 )
+	// NOTE: FD2 cannot be used with the Luxor controller card,
+	// it has a proprietary one. This is just for reference.
 	FLOPPY_OPTION(fd2, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
@@ -1077,34 +1080,7 @@ static FLOPPY_OPTIONS_START( fd2 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
-*/
-static FLOPPY_OPTIONS_START( abc830 )
-	FLOPPY_OPTION(abc830, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
 
-static FLOPPY_OPTIONS_START( abc832 )
-	FLOPPY_OPTION(abc832, "dsk", "ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static FLOPPY_OPTIONS_START( abc838 )
-	FLOPPY_OPTION(abc838, "dsk", "ABC 838", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-/*
 static const floppy_config fd2_floppy_config =
 {
     DEVCB_NULL,
@@ -1116,7 +1092,22 @@ static const floppy_config fd2_floppy_config =
     FLOPPY_OPTIONS_NAME(fd2),
     NULL
 };
-*/
+
+static FLOPPY_OPTIONS_START( abc830 )
+	// NOTE: Real ABC 830 (160KB) disks use a 7:1 sector interleave.
+	//
+	// The controller ROM is patched to remove the interleaving so
+	// you can use disk images with logical sector layout instead.
+	//
+	// Specify INTERLEAVE([7]) below if you prefer the physical layout.
+	FLOPPY_OPTION(abc830, "dsk", "Luxor ABC 830", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
 static const floppy_config abc830_floppy_config =
 {
     DEVCB_NULL,
@@ -1129,6 +1120,15 @@ static const floppy_config abc830_floppy_config =
     NULL
 };
 
+static FLOPPY_OPTIONS_START( abc832 )
+	FLOPPY_OPTION(abc832, "dsk", "Luxor ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
 static const floppy_config abc832_floppy_config =
 {
     DEVCB_NULL,
@@ -1140,6 +1140,15 @@ static const floppy_config abc832_floppy_config =
     FLOPPY_OPTIONS_NAME(abc832),
     NULL
 };
+
+static FLOPPY_OPTIONS_START( abc838 )
+	FLOPPY_OPTION(abc838, "dsk", "Luxor ABC 838", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static const floppy_config abc838_floppy_config =
 {
@@ -1161,6 +1170,7 @@ static WRITE_LINE_DEVICE_HANDLER( fast_fd1793_intrq_w )
 
 	conkort->fdc_irq = state;
 
+	// FDC and DMA interrupts are wire-ORed to the Z80
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, conkort->fdc_irq | conkort->dma_irq);
 }
 
@@ -1258,17 +1268,17 @@ static DEVICE_START( luxor_55_10828 )
 	slow_t *conkort = get_safe_token_slow(device);
 	const conkort_config *config = get_safe_config(device);
 
-	/* find our CPU */
+	// find our CPU 
 	conkort->cpu = device->subdevice(Z80_TAG);
 
-	/* find devices */
+	// find devices
 	conkort->bus = device->machine->device(config->bus_tag);
 	conkort->z80pio = device->subdevice(Z80PIO_TAG);
 	conkort->fd1791 = device->subdevice(FD1791_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
-	/* register for state saving */
+	// register for state saving
 	state_save_register_device_item(device, 0, conkort->cs);
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
@@ -1278,12 +1288,12 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->sel0);
 	state_save_register_device_item(device, 0, conkort->sel1);
 
-	/* patch out protection checks */
+	// patch out protection checks
 	UINT8 *rom = device->subregion("abc830")->base();
+	rom[0x00fa] = 0xff;
+	rom[0x0336] = 0xff;
 	rom[0x0718] = 0xff;
 	rom[0x072c] = 0xff;
-	rom[0x0336] = 0xff;
-	rom[0x00fa] = 0xff;
 	rom[0x0771] = 0xff;
 	rom[0x0788] = 0xff;
 }
@@ -1358,21 +1368,27 @@ static DEVICE_START( luxor_55_21046 )
 	fast_t *conkort = get_safe_token_fast(device);
 	const conkort_config *config = get_safe_config(device);
 
-	/* find our CPU */
+	// find our CPU
 	conkort->cpu = device->subdevice(Z80_TAG);
 
-	/* find devices */
+	// find devices
 	conkort->bus = device->machine->device(config->bus_tag);
 	conkort->z80dma = device->subdevice(Z80DMA_TAG);
 	conkort->wd1793 = device->subdevice(SAB1793_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
+	// set initial values
 	conkort->dma_irq = 0;
 	conkort->fdc_irq = 0;
 	conkort->busy = 0;
 
-	/* register for state saving */
+	// inherit DIP switch settings
+	conkort->sw1 = config->sw1;
+	conkort->sw2 = config->sw2;
+	conkort->sw3 = config->address;
+
+	// register for state saving
 	state_save_register_device_item(device, 0, conkort->cs);
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data_in);
@@ -1381,7 +1397,7 @@ static DEVICE_START( luxor_55_21046 )
 	state_save_register_device_item(device, 0, conkort->dma_irq);
 	state_save_register_device_item(device, 0, conkort->busy);
 
-	/* patch out sector skew table */
+	// patch out sector skew table
 	UINT8 *rom = device->subregion("conkort")->base();
 
 	for (int i = 0; i < 16; i++)

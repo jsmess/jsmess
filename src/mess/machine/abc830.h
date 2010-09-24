@@ -48,6 +48,13 @@ DECLARE_LEGACY_DEVICE(ABC838, abc838);
     MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
     MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
 
+#define MDRV_ABC834_ADD(_tag, _bus_tag) \
+	MDRV_DEVICE_ADD(_tag, ABC832, 0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, DRIVE_TEAC_FD55F) \
+    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
+
 #define MDRV_ABC838_ADD(_tag, _bus_tag, _drive) \
 	MDRV_DEVICE_ADD(_tag, ABC838, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
