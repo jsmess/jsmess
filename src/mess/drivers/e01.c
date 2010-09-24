@@ -138,16 +138,10 @@ static WRITE8_DEVICE_HANDLER( floppy_w )
     */
 
 	/* floppy 1 select */
-	if (!BIT(data, 0))
-	{
-		wd17xx_set_drive(device, 0);
-	}
+	if (!BIT(data, 0)) wd17xx_set_drive(device, 0);
 
 	/* floppy 2 select */
-	if (!BIT(data, 1))
-	{
-		wd17xx_set_drive(device, 1);
-	}
+	if (!BIT(data, 1)) wd17xx_set_drive(device, 1);
 
 	/* floppy side select */
 	wd17xx_set_side(device, BIT(data, 2));
@@ -199,25 +193,25 @@ static WRITE8_HANDLER( hdc_irq_enable_w )
 
 static READ8_HANDLER( rtc_address_r )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
 	return rtc->read(*space, 0);
 }
 
 static WRITE8_HANDLER( rtc_address_w )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
 	rtc->write(*space, 0, data);
 }
 
 static READ8_HANDLER( rtc_data_r )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
 	return rtc->read(*space, 1);
 }
 
 static WRITE8_HANDLER( rtc_data_w )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
 	rtc->write(*space, 1, data);
 }
 
@@ -354,7 +348,7 @@ static const floppy_config e01_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_3_5_DSDD, // NEC FD1036 A
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };
@@ -439,7 +433,6 @@ static MACHINE_RESET( e01 )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( e01, e01_state )
-
     /* basic machine hardware */
 	MDRV_CPU_ADD(R65C102_TAG, M65C02, 1000000) // Rockwell R65C102P3
     MDRV_CPU_PROGRAM_MAP(e01_mem)
@@ -447,7 +440,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
     MDRV_MACHINE_START(e01)
     MDRV_MACHINE_RESET(e01)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MDRV_MC146818_ADD(HD146818_TAG, MC146818_STANDARD)
 
 	MDRV_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, HZ(2)) // HACK!
 
