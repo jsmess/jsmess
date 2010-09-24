@@ -99,7 +99,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="crzracer.bin" size="16384" crc="d3d9e415" sha1="aade318f130cfeedb90ad963c351e9b344a5b133" offset="0" />
+				<rom name="crzracer.bin" size="16384" crc="6e9b98c7" sha1="1896464c91dd7549b2b3059fde1ff987c13ad11a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="crawlers.bin" size="8192" crc="6969757d" sha1="e28e32206a3961cd8b9522ec4edf83e2177f3457" offset="0" />
+				<rom name="crawlers.bin" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="deepsix.bin" size="8192" crc="6b8a878f" sha1="f127f6641f8187ada313ebb5a6b87cd61d27f019" offset="0" />
+				<rom name="deepsix.bin" size="8192" crc="f3c61b7d" sha1="efac38c955ef4c605a43a6f720e094c0fbd11cd9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -140,6 +140,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="hyperspc">
+	<!-- Stock No: 8102 -->
+		<description>Hyperspace</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="hyperspc.bin" size="8192" crc="87bc1c05" sha1="4ff240e6d583c67565a4c857a40e05fe4e826a3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jungler">
 	<!-- Stock No: 8202, (Japanese 015E)-->
 		<description>Jungler</description>
@@ -147,7 +159,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="jungler.bin" size="8192" crc="38dce126" sha1="335c509de78bf0bec25ceeef6a65ce1bdb24a62c" offset="0" />
+				<rom name="jungler.bin" size="8192" crc="ad635119" sha1="461cdca0b6e478c11dd598ccf2cbbbd5a6fe8125" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +171,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="lmotion.bin" size="8192" crc="ede5ed83" sha1="6913d4040687485672b03891151b0db9a6bfcd2b" offset="0" />
+				<rom name="lmotion.bin" size="8192" crc="1f652f42" sha1="fa2e6129d29f9d38f1102da3678659d845daec5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +219,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="pooyan.bin" size="8192" crc="96f805e4" sha1="40867a075d5d6c2bbcc293200af288b7494a41b5" offset="0" />
+				<rom name="pooyan.bin" size="8192" crc="05396699" sha1="f16f92591ac19b61707b61892d2abcedb47b0897" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +231,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scramble.bin" size="8192" crc="bd708ab4" sha1="9029d16c123e6d35a5f3ed4fbc9eefae8948215f" offset="0" />
+				<rom name="scramble.bin" size="8192" crc="cc9901d1" sha1="66b573a80b47a3fb62dbfb0abe512e80b2336735" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +255,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tterror.bin" size="8192" crc="40f82fb3" sha1="d75bf8507e5ccc5fb42da149b0bed3a810415a4f" offset="0" />
+				<rom name="tterror.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +267,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="trafjam.bin" size="8192" crc="81f529f9" sha1="3d2fad00cd15ee8e72a005f41fc9f96e362324d2" offset="0" />
+				<rom name="trafjam.bin" size="8192" crc="c0c78141" sha1="2ba074955a1507ca9f6cde8987695f495e81aeab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
