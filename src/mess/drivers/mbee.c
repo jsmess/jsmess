@@ -698,19 +698,19 @@ ROM_END
 
 ROM_START( mbeepc85s )
 	ROM_REGION(0x30000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas524as.rom",          0x8000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
-	ROM_LOAD("bas524bs.rom",          0xa000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
+	ROM_LOAD("bas524a.rom",          0x8000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
+	ROM_LOAD("bas524b.rom",          0xa000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
 	ROM_LOAD("charroms.bin",          0x11000, 0x1000, CRC(1bcbf083) SHA1(6438649b8b5fc20dd772ec7195e69a5bbe016b09) )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
-	ROM_LOAD_OPTIONAL("telco321.rom", 0x18000, 0x2000, CRC(00f8fde1) SHA1(eb881bbab90c85fd6e29540decd25e884c67f738) )
+	ROM_LOAD_OPTIONAL("telco321s.rom", 0x18000, 0x2000, CRC(00f8fde1) SHA1(eb881bbab90c85fd6e29540decd25e884c67f738) )
 
 	/* PAK roms - These are not optional and will only work in the correct slots. */
 	ROM_LOAD("wbee20-s.rom",          0x20000, 0x2000, CRC(6a0fe57f) SHA1(a101b588b1872e19382b9e9ea50fabb0fd060aa6) ) // 0
-	ROM_LOAD("db-s.rom",              0x22000, 0x2000, CRC(e2094771) SHA1(62d7fb66c91d2bd24523bc84e4f005cf2c4480bb) ) // 2
-	ROM_LOAD("kalk-s.rom",            0x24000, 0x2000, CRC(08dd71ee) SHA1(c9d506d8bb56f602c3481b253d4cac226f545d98) ) // 3
-	ROM_LOAD("bg-s.rom",              0x26000, 0x2000, CRC(5aa4813e) SHA1(a8638e9046bfb9d5a98c878322295ce408bd879d) ) // 1
-	ROM_LOAD("videotex-s.rom",        0x28000, 0x2000, CRC(67592b3f) SHA1(7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec) ) // 6
+	ROM_LOAD("db-s.rom",              0x22000, 0x2000, CRC(e2094771) SHA1(62d7fb66c91d2bd24523bc84e4f005cf2c4480bb) ) // 1
+	ROM_LOAD("kalk-s.rom",            0x24000, 0x2000, CRC(08dd71ee) SHA1(c9d506d8bb56f602c3481b253d4cac226f545d98) ) // 2
+	ROM_LOAD("bg-s.rom",              0x26000, 0x2000, CRC(5aa4813e) SHA1(a8638e9046bfb9d5a98c878322295ce408bd879d) ) // 3
+	ROM_LOAD("videotex-s.rom",        0x28000, 0x2000, CRC(67592b3f) SHA1(7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec) ) // 4
 	ROM_LOAD("shell-s.rom",           0x2a000, 0x2000, CRC(bdf1768f) SHA1(4385351d07288cf94947ac63131eeed98572caa1) ) // 5
 
 	ROM_REGION( 0x0040, "proms", 0 )
@@ -733,7 +733,6 @@ ROM_START( mbeeppc )
 	ROM_LOAD_OPTIONAL("graphics.rom", 0x26000, 0x4000, CRC(9e9d327c) SHA1(aebf60ed153004380b9f271f2212376910a6cef9) ) // 3
 	ROM_LOAD_OPTIONAL("vtex235.rom",  0x28000, 0x2000, CRC(8c30ecb2) SHA1(cf068462d7def885bdb5d3a265851b88c727c0d7) ) // 4
 	ROM_LOAD("ppcshell.rom",          0x2a000, 0x2000, CRC(1e793555) SHA1(ddeaa081ec4408e80e3fb192865d87daa035c701) ) // 5
-	ROM_LOAD_OPTIONAL("ozlogo.rom",   0x2c000, 0x2000, CRC(47c3ef69) SHA1(8274d27c323ca4a6cc9e7d24946ae9c0531c3112) ) // 6
 	ROM_LOAD("bas529a.rom",           0x30000, 0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
