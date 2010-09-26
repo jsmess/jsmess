@@ -22,7 +22,7 @@ public:
 	mbee_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
+	UINT8 dummy;
 };
 
 
@@ -52,6 +52,18 @@ READ8_HANDLER ( m6545_status_r );
 WRITE8_HANDLER ( m6545_index_w );
 READ8_HANDLER ( m6545_data_r );
 WRITE8_HANDLER ( m6545_data_w );
+READ8_HANDLER( mbee_low_r );
+READ8_HANDLER( mbee_high_r );
+READ8_HANDLER( mbeeic_high_r );
+WRITE8_HANDLER( mbeeic_high_w );
+WRITE8_HANDLER( mbee_low_w );
+WRITE8_HANDLER( mbee_high_w );
+READ8_HANDLER( mbeeic_08_r );
+WRITE8_HANDLER( mbeeic_08_w );
+READ8_HANDLER( mbee_0b_r );
+WRITE8_HANDLER( mbee_0b_w );
+READ8_HANDLER( mbeeic_0a_r );
+WRITE8_HANDLER( mbeeic_0a_w );
 READ8_HANDLER ( mbee_color_bank_r );
 WRITE8_HANDLER ( mbee_color_bank_w );
 READ8_HANDLER ( mbee_video_bank_r );
