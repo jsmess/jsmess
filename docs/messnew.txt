@@ -48,7 +48,7 @@ System Driver Changes:
 
 - [ABC806] Added enhanced options ROM. [exon, Curt Coder]
 
-
+- [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
 Imgtool Changes:
 ----------------

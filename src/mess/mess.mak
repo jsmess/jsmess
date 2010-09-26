@@ -991,6 +991,7 @@ $(MESSOBJ)/hp.a:				\
 $(MESSOBJ)/hec2hrp.a:			\
 	$(MESS_DRIVERS)/hec2hrp.o	\
 	$(MESS_VIDEO)/hec2video.o	\
+	$(MESS_MACHINE)/hecdisk2.o  \
 	$(MESS_MACHINE)/hec2hrp.o   \
 
 $(MESSOBJ)/interact.a:			\

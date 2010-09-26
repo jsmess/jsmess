@@ -25,6 +25,8 @@
                => add device MX80c and bank switching for the ROM
        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                => add the port mapping for keyboard
+       28/09/2010 add the DISK II support by yo_fr      (jj.stac@aliceadsl.fr)
+               => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
 
       don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
       (and thank's to Daniel!)
@@ -40,6 +42,10 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "deprecat.h"
+#include "machine/upd765.h"	/* for floppy disc controller */
+#include "formats/basicdsk.h"
+
+#include "formats/hect_tap.h"
 #include "includes/hec2hrp.h"
 
 
@@ -71,6 +77,13 @@ static int oldstate1000;        /* Edge state cassette*/
 static UINT8 pot0 = 0x40, pot1 = 0x40;  /* State for joy resistor*/
 static UINT8 actions;					/* joy button off*/
 
+// Etat des ports Hector (8255)
+
+UINT8 hector_port_a=0;
+UINT8 hector_port_b=0;
+UINT8 hector_port_c_h=0;
+UINT8 hector_port_c_l=0;
+UINT8 hector_port_cmd=0;
 static TIMER_CALLBACK( Callback_CK )
 {
 /* To generate the CK signal (K7)*/
@@ -322,12 +335,91 @@ static running_device *cassette_device_image(running_machine *machine)
  Port Handling
 ********************************************************************************/
 
-READ8_HANDLER( hector_mx_io_port_r)
+/*******************  Lecture PIO 8255 *******************/
+READ8_HANDLER( hector_io_8255_r)
 {
-   return 0;  // printer ok
+
+/* 8255 in mode 0 */
+UINT8 data =0;
+UINT8 data_l=0;
+UINT8 data_h=0;
+//hector_port_cmd = 0x8a; // FORCAGE **********************************************************************************************
+if ((offset & 0x3) == 0x0) /* Port A */
+	data = hector_port_a; 
+if ((offset & 0x3) == 0x1) /* Port B */
+	data = hector_port_b;
+if ((offset & 0x3) == 0x2) /* Port C */
+	{
+       data_l = (hector_port_c_l & 0x0f);
+       data_h = (hector_port_c_h & 0xf0);
+       
+	   if (BIT(hector_port_cmd, 0))	/* Quartet inf en entree ?*/
+                data_l = (hector_port_c_l & 0x0f); /*no change*/
+
+	   if (BIT(hector_port_cmd, 3))				/* Quartet sup en entree ?*/
+	   {
+           hector_port_c_h = (hector_port_c_h & 0x0c0);	/* Raz de l'etat des bits 4 et 5*/
+           
+		   if (disk2_data_w_ready != 0x00) 
+                hector_port_c_h = hector_port_c_h + 0x010;	// PC4 (donnee dispo en provenance du Disk II)
+
+           if (disk2_data_r_ready != 0x00) 
+				hector_port_c_h = hector_port_c_h + 0x020;	// PC5 (donnee pas encore lue par Disk II)
+          
+           data_h =  hector_port_c_h;			
+	   }
+	data= data_l + data_h;
+	}
+return data;  // Retour de la valeur !
 }
+/*******************  Ecriture PIO 8255 *******************/
+WRITE8_HANDLER( hector_io_8255_w) 
+{
+/* 8255 in mode 0 */
+if ((offset & 0x3) == 0x0) /* Port A => to printer or Disk II*/
+	hector_port_a = data;
+   //ex :	printer_output(devtag_get_device(space->machine, "printer"), data);
+
+   if ((offset & 0x3) == 0x1) /* Port B */
+	hector_port_b = data;
+
+
+if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
+	{
+	   if (!BIT(hector_port_cmd, 0))	 /* cmd -> Quartet inf en sortie ?*/
+	   {
+		   hector_port_c_l = data & 0x0f;
+
+		   // Utilisation des bit du port C : PC1 // PC2
+		   if BIT(hector_port_c_l, 1)		// PC1 (bit X1)= true
+		   {   
+               // Lecture effectuee => RAZ memoire donnee disk2_data_write dispo	
+			   hector_port_b = disk2_data_write; // Mep sur port B si 2eme 74374 existant !
+			   disk2_data_w_ready = 0x00;
+		   }
+		   if BIT(hector_port_c_l, 2)		// PC2 (bit X2)= true
+		   {
+				disk2_data_read = hector_port_a; /* mise en place de l'info presente sur le port A */
+				disk2_data_r_ready = 0xff;		 /* memorisation de l'info */
+		   }
+
+	   }
+	   if (!BIT(hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/ 
+			hector_port_c_h = (data & 0xf0);
+	}
+
+if ((offset & 0x3) == 0x3) /* Port commande */
+{
+    hector_port_cmd = data; // 8a sur MX40!
+  //  printf("Port de commande = %x",data);
+}
+} /* End of 8255 managing */
+
+
+/*******************  Ecriture PIO specifique machine MX40 *******************/
 WRITE8_HANDLER( hector_mx40_io_port_w)
 {
+/* Bank switching on several address */
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
 		printer_output(space->machine->device("printer"), data);
    if ((offset &0x0ff) == 0x40) /* Port page 0*/
@@ -343,6 +435,7 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
       hector_flag_80c=0;/* No 80c in 40c !*/
 }
 
+/*******************  Ecriture PIO specifique machine MX80 *******************/
 WRITE8_HANDLER( hector_mx80_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
@@ -633,6 +726,11 @@ void hector_reset(running_machine *machine, int hr)
 	hector_flag_hr = hr;
 	flag_clk = 0;
 	write_cassette = 0;
+	//const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	//upd765_reset_w(fdc, 1);
+
+	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_RESET, PULSE_LINE);
+
 }
 
 void hector_init(running_machine *machine)
