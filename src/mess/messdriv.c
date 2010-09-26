@@ -436,17 +436,46 @@ const game_driver * const drivers[] =
 	DRIVER( a130xe )	/* 1986 Atari 130 XE    */
 	DRIVER( a800xe )	/* 1986 Atari 800 XE    */
 	DRIVER( xegs )	  /* 1987 Atari XE Game System  */
-	DRIVER( atarist )   /* Atari ST  */
+	DRIVER( st )   /* Atari ST  */
+	DRIVER( st_uk )
+	DRIVER( st_de )
+	DRIVER( st_es )
+	DRIVER( st_nl )
+	DRIVER( st_fr )
+	DRIVER( st_se )
+	DRIVER( st_sg )
 	DRIVER( megast )	/* Atari Mega ST    */
+	DRIVER( megast_uk )
+	DRIVER( megast_de )
+	DRIVER( megast_fr )
+	DRIVER( megast_se )
+	DRIVER( megast_sg )
 //  DRIVER( stacy )  /* Atari STacy   */
-	DRIVER( atariste )  /* Atari STe    */
+	DRIVER( ste )  /* Atari STe    */
+	DRIVER( ste_uk )
+	DRIVER( ste_de )
+	DRIVER( ste_es )
+	DRIVER( ste_fr )
+	DRIVER( ste_it )
+	DRIVER( ste_se )
+	DRIVER( ste_sg )
 	DRIVER( stbook )	/* Atari STBook  */
 	DRIVER( megaste )   /* Atari Mega STe      */
+	DRIVER( megaste_uk )
+	DRIVER( megaste_de )
+	DRIVER( megaste_es )
+	DRIVER( megaste_fr )
+	DRIVER( megaste_it )
+	DRIVER( megaste_se )
 //  DRIVER( stpad )  /* Atari STPad (prototype)   */
-//  DRIVER( tt030 )  /* Atari TT030   */
+	DRIVER( tt030 )  /* Atari TT030   */
+	DRIVER( tt030_uk )
+	DRIVER( tt030_de )
+	DRIVER( tt030_fr )
+	DRIVER( tt030_pl )
 //  DRIVER( fx1 )      /* Atari FX-1 (prototype)       */
-//  DRIVER( falcon )    /* Atari Falcon030    */
-//  DRIVER( falcon40 )  /* Atari Falcon040 (prototype)    */
+	DRIVER( falcon )    /* Atari Falcon030    */
+	DRIVER( falcon40 )  /* Atari Falcon040 (prototype)    */
 
 	/* Commodore */
 	DRIVER( kim1 )	  /* Commodore (MOS) KIM-1 1975    */

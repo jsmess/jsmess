@@ -32,6 +32,9 @@ Skeleton drivers:
 - TIM-011
 - WaveMate Bullet
 - ABC 1600 [Rune Tapper, Curt Coder]
+- Atari TT030
+- Atari Falcon
+- Atari Falcon040
 
 
 
@@ -47,6 +50,8 @@ System Driver Changes:
   sector dumps work currently (td0 not supported). [Curt Coder, exon]
 
 - [ABC806] Added enhanced options ROM. [exon, Curt Coder]
+
+- [ATARIST] Added several language variants. [Curt Coder]
 
 - [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
