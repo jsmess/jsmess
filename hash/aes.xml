@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Based of MAME 0.139 Neo Geo driver -->
+<!-- Based of MAME 0.139u3 Neo Geo driver -->
 
 <softwarelist name="aes" description="SNK Neo Geo AES cartridges">
 <!-- ID 001 -->
@@ -632,6 +632,34 @@
 		</part>
 	</software>
 
+<!-- ID 037 -->
+	<software name="crsword">
+		<description>Crossed Swords</description>
+		<year>1991</year>
+		<publisher>Alpha Denshi</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="037-p1.bin" size="524288" crc="e7f2553c" sha1="8469ecb900477feed05ae3311fe9515019bbec2a" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="037-s1.bin" size="131072" crc="74651f27" sha1="bff7ff2429d2be82c1647abac2ee45b339b3b310" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="037-m1.bin" size="131072" crc="9504b2c6" sha1="9ce8e681b9df6eacd0d23a36bad836bd5074233d" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1048576">
+				<rom name="037-v1.bin" size="1048576" crc="61fedf65" sha1="98f31d1e23bf7c1f7844e67f14707a704134042e" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="037-c1.bin" size="1048576" crc="09df6892" sha1="df2579dcf9c9dc88d461212cb74de106be2983c1" offset="000000" loadflag="load16_byte" />
+				<rom name="037-c2.bin" size="1048576" crc="ac122a78" sha1="7bfa4d29b7d7d9443f64d81caeafa74fe05c606e" offset="000001" loadflag="load16_byte" />
+				<rom name="037-c3.bin" size="1048576" crc="9d7ed1ca" sha1="2bbd25dc3a3f825d0af79a418f06a23a1bf03cc0" offset="200000" loadflag="load16_byte" />
+				<rom name="037-c4.bin" size="1048576" crc="4a24395d" sha1="943f911f40985db901eaef4c28dfcda299fca73e" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 038 -->
 	<software name="trally">
 		<description>Thrash Rally</description>
@@ -931,7 +959,7 @@
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
-			<dataarea name="maincpu" size="2097152">
+			<dataarea name="maincpu" size="1048576">
                 <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
@@ -964,7 +992,7 @@
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
-			<dataarea name="maincpu" size="2097152">
+			<dataarea name="maincpu" size="1048576">
                 <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="000000" />
                 <!-- patch ROM -->
                 <rom name="056-ep1.bin" size="524288" crc="75d6301c" sha1="e72d15fba55f96be7b4fa29e705a7b78f56edf7d" offset="000000" />
