@@ -155,13 +155,13 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( mbee_reset )
 {
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "boot", 0);
 }
 
 MACHINE_RESET( mbee )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
-	memory_set_bank(machine, "bank1", 1);
+	memory_set_bank(machine, "boot", 1);
 	mbee_z80pio = machine->device("z80pio");
 	mbee_speaker = machine->device("speaker");
 	mbee_cassette = machine->device("cassette");

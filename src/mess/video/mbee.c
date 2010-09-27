@@ -146,7 +146,7 @@ READ8_HANDLER ( mbeeic_0a_r )
 WRITE8_HANDLER ( mbeeic_0a_w )
 {
 	mbee_0a = data;
-	memory_set_bank(space->machine, "bank4", data & 7);
+	memory_set_bank(space->machine, "pak", data & 7);
 }
 
 
@@ -237,26 +237,26 @@ READ8_HANDLER ( mbee_color_bank_r )
 WRITE8_HANDLER ( mbee_color_bank_w )
 {
 	m6545_color_bank = data;
-	memory_set_bank(space->machine, "bank4", data & 7);
+	memory_set_bank(space->machine, "pak", data & 7);
 }
 
 WRITE8_HANDLER ( mbee_0a_w )
 {
 	m6545_color_bank = data;
-	memory_set_bank(space->machine, "bank4", (data&15) >> 1);
+	memory_set_bank(space->machine, "pak", (data&15) >> 1);
 }
 
 READ8_HANDLER ( mbee_netrom_bank_r )
 {
 /* Read of port 0A - set Telcom rom to first half */
-	memory_set_bank(space->machine, "bank5", 0);
+	memory_set_bank(space->machine, "telcom", 0);
 	return m6545_color_bank;
 }
 
 READ8_HANDLER ( mbee_bank_netrom_r )
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
-	memory_set_bank(space->machine, "bank5", 1);
+	memory_set_bank(space->machine, "telcom", 1);
 	return m6545_color_bank;
 }
 
@@ -566,7 +566,7 @@ VIDEO_START( mbeeic )
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
 	videoram = memory_region(machine, "videoram");
-	colorram = ram+0x15800;
+	colorram = memory_region(machine, "colorram");
 	mbee_pcgram = ram+0x11000;
 }
 
@@ -633,7 +633,7 @@ VIDEO_UPDATE( mbeeic )
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
 	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
 	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
-	UINT16 colourm = (mbee_pcg_color_latch & 0x0e) << 7;
+	UINT16 colourm = (mbee_08 & 0x0e) << 7;
 
 	framecnt++;
 

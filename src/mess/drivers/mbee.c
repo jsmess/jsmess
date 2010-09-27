@@ -93,7 +93,7 @@ size_t mbee_size;
 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -102,48 +102,48 @@ static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeppc_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank6")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank5")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee64_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
@@ -524,50 +524,50 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( mbee )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
 	mbee_size = 0x4000;
 }
 
 static DRIVER_INIT( mbeeic )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0x8000);
-	memory_configure_bank(machine, "bank4", 0, 8, &RAM[0x20000], 0x2000);
-	memory_set_bank(machine, "bank4", 0);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x20000], 0x2000);
+	memory_set_bank(machine, "pak", 0);
 	mbee_size = 0x8000;
 }
 
 static DRIVER_INIT( mbeepc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0x8000);
-	memory_configure_bank(machine, "bank4", 0, 8, &RAM[0x20000], 0x2000);
-	memory_configure_bank(machine, "bank5", 0, 2, &RAM[0x18000], 0x1000);
-	memory_set_bank(machine, "bank4", 0);
-	memory_set_bank(machine, "bank5", 0);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x20000], 0x2000);
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x18000], 0x1000);
+	memory_set_bank(machine, "pak", 0);
+	memory_set_bank(machine, "telcom", 0);
 	mbee_size = 0x8000;
 }
 
 static DRIVER_INIT( mbeepc85 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0x8000);
-	memory_configure_bank(machine, "bank4", 0, 8, &RAM[0x20000], 0x2000);
-	memory_configure_bank(machine, "bank5", 0, 2, &RAM[0x18000], 0x1000);
-	memory_set_bank(machine, "bank4", 5);
-	memory_set_bank(machine, "bank5", 0);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x20000], 0x2000);
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x18000], 0x1000);
+	memory_set_bank(machine, "pak", 5);
+	memory_set_bank(machine, "telcom", 0);
 	mbee_size = 0x8000;
 }
 
 static DRIVER_INIT( mbeeppc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0x30000);
-	memory_configure_bank(machine, "bank4", 0, 8, &RAM[0x20000], 0x2000);
-	memory_configure_bank(machine, "bank5", 0, 2, &RAM[0x18000], 0x1000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x30000);
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x20000], 0x2000);
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x18000], 0x1000);
 	memory_configure_bank(machine, "bank6", 0, 2, &RAM[0x30000], 0x2000);
-	memory_set_bank(machine, "bank4", 5);
-	memory_set_bank(machine, "bank5", 0);
+	memory_set_bank(machine, "pak", 5);
+	memory_set_bank(machine, "telcom", 0);
 	memory_set_bank(machine, "bank6", 0);
 	mbee_size = 0x8000;
 }
@@ -575,14 +575,14 @@ static DRIVER_INIT( mbeeppc )
 static DRIVER_INIT( mbee56 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0xe000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
 	mbee_size = 0xe000;
 }
 
 static DRIVER_INIT( mbee64 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000],  0xe000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
 	mbee_size = 0xe000;
 }
 
@@ -629,6 +629,7 @@ ROM_START( mbeeic )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbeepc )
@@ -650,6 +651,7 @@ ROM_START( mbeepc )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbeepc85 )
@@ -674,6 +676,7 @@ ROM_START( mbeepc85 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbeepc85s )
@@ -698,6 +701,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbeeppc )
@@ -722,6 +726,7 @@ ROM_START( mbeeppc )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x1000, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbee56 )
@@ -735,6 +740,7 @@ ROM_START( mbee56 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mbee64 )
@@ -748,6 +754,7 @@ ROM_START( mbee64 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
 /***************************************************************************
