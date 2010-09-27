@@ -61,6 +61,8 @@ struct towns_video_controller
 	UINT8 towns_video_reg[2];
 	UINT8 towns_sprite_sel;  // selected sprite register
 	UINT8 towns_sprite_reg[8];
+	UINT8 towns_sprite_flag;  // sprite drawing flag
+	UINT8 towns_sprite_page;  // VRAM page (not layer) sprites are drawn to
 	UINT8 towns_tvram_enable;
 	UINT16 towns_kanji_offset;
 	UINT8 towns_kanji_code_h;
@@ -70,6 +72,7 @@ struct towns_video_controller
 	UINT8 towns_display_page_sel;
 	UINT8 towns_vblank_flag;
 	UINT8 towns_layer_ctrl;
+	emu_timer* sprite_timer;
 };
 
 class towns_state : public driver_device

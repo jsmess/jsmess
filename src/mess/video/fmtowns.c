@@ -102,6 +102,8 @@
 
 //static UINT32 pshift;  // for debugging
 
+void draw_sprites(running_machine* machine, const rectangle* rect);
+
 void towns_crtc_refresh_mode(running_machine* machine)
 {
 	towns_state* state = machine->driver_data<towns_state>();
@@ -415,7 +417,8 @@ READ8_HANDLER(towns_video_440_r)
 				state->video.towns_dpmd_flag = 0;
 				ret |= 0x80;
 			}
-			ret |= (state->video.towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...
+			ret |= (state->video.towns_sprite_flag ? 0x02 : 0x00);  // Sprite drawing flag
+			ret |= state->video.towns_sprite_page & 0x01;
 			return ret;
 		case 0x10:
 			return state->video.towns_sprite_sel;
@@ -720,7 +723,6 @@ void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, U
 	int xdir,ydir;
 	int width = (state->video.towns_crtc_reg[12] - state->video.towns_crtc_reg[11]) / (((state->video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (state->video.towns_crtc_reg[16] - state->video.towns_crtc_reg[15]) / (((state->video.towns_crtc_reg[27] & 0xf000) >> 12)+1);
-	UINT32 vram_start = (state->video.towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 
 	if(xflip)
 	{
@@ -756,17 +758,19 @@ void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, U
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			voffset = 0;
+			if(state->video.towns_sprite_page != 0)
+				voffset = 0x20000;
+			else
+				voffset = 0x00000;
 			pixel = (state->towns_txtvram[poffset] & 0xf0) >> 4;
 			col = state->towns_txtvram[coffset+(pixel*2)] | (state->towns_txtvram[coffset+(pixel*2)+1] << 8);
-			voffset += (state->video.towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			voffset += (state->video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x3ffff;
-			//voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				state->towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
-				state->towns_gfxvram[voffset+vram_start] = col & 0x00ff;
+				state->towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 			}
 			if(xflip)
 				voffset+=2;
@@ -777,8 +781,8 @@ void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, U
 			voffset &= 0x3ffff;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				state->towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
-				state->towns_gfxvram[voffset+vram_start] = col & 0x00ff;
+				state->towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 			}
 			poffset++;
 			poffset &= 0x1ffff;
@@ -831,15 +835,18 @@ void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			voffset = (state->video.towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			if(state->video.towns_sprite_page != 0)
+				voffset = 0x20000;
+			else
+				voffset = 0x00000;
 			col = state->towns_txtvram[poffset] | (state->towns_txtvram[poffset+1] << 8);
-			voffset += (state->video.towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			voffset += (state->video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
-			voffset &= 0x7ffff;
+			voffset &= 0x3ffff;
 			if(xpos < width && ypos < height && col < 0x8000)
 			{
-				state->towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
-				state->towns_gfxvram[voffset] = col & 0x00ff;
+				state->towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 			}
 			poffset+=2;
 			poffset &= 0x1ffff;
@@ -861,10 +868,10 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 		return;
 
 	// clears VRAM for each frame?
-	if(state->video.towns_sprite_reg[6] & 0x10)
-		memset(state->towns_gfxvram+0x60000,0x80,0x20000);
-	else
+	if(state->video.towns_sprite_page == 0)
 		memset(state->towns_gfxvram+0x40000,0x80,0x20000);
+	else
+		memset(state->towns_gfxvram+0x60000,0x80,0x20000);
 
 	for(n=sprite_limit;n<1024;n++)
 	{
@@ -903,6 +910,14 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 				render_sprite_16(machine,(poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 	}
+
+	if(state->video.towns_sprite_page == 0)  // flip VRAM page
+		state->video.towns_sprite_page = 1;
+	else
+		state->video.towns_sprite_page = 0;
+
+	state->video.towns_sprite_flag = 1;  // we are now drawing
+	timer_adjust_oneshot(state->video.sprite_timer,machine->device<cpu_device>("maincpu")->cycles_to_attotime(16 * (1025-sprite_limit)),0);
 }
 
 void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -922,6 +937,10 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
+
+//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//		off = 0x20000;
+
 	if(layer != 0)
 	{
 		if(!(state->video.towns_video_reg[0] & 0x10))
@@ -1105,6 +1124,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
+
+//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//		off = 0x20000;
+
 	if(layer == 0)
 		linesize = state->video.towns_crtc_reg[20] * 8;
 	else
@@ -1272,6 +1295,10 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
+
+//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//		off = 0x20000;
+
 	if(layer == 0)
 		linesize = state->video.towns_crtc_reg[20] * 4;
 	else
@@ -1735,6 +1762,17 @@ void draw_text_layer(running_machine* machine)
 	}
 }
 
+static TIMER_CALLBACK( towns_sprite_done )
+{
+	// sprite drawing is complete, lower flag
+	towns_state* state = machine->driver_data<towns_state>();
+	state->video.towns_sprite_flag = 0;
+	if(state->video.towns_sprite_page != 0)
+		state->video.towns_crtc_reg[21] |= 0x8000;
+	else
+		state->video.towns_crtc_reg[21] &= ~0x8000;
+}
+
 static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
@@ -1755,7 +1793,7 @@ INTERRUPT_GEN( towns_vsync_irq )
 	timer_set(device->machine,device->machine->primary_screen->time_until_vblank_end(),(void*)dev,0,towns_vblank_end);
 	if(state->video.towns_tvram_enable)
 		draw_text_layer(dev->machine);
-	if(state->video.towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
+	if(state->video.towns_sprite_reg[1] & 0x80)
 		draw_sprites(dev->machine,&state->video.towns_crtc_layerscr[1]);
 }
 
@@ -1764,6 +1802,8 @@ VIDEO_START( towns )
 	towns_state* state = machine->driver_data<towns_state>();
 
 	state->video.towns_vram_wplane = 0x00;
+	state->video.towns_sprite_page = 0;
+	state->video.sprite_timer = timer_alloc(machine,towns_sprite_done,NULL);
 }
 
 VIDEO_UPDATE( towns )
@@ -1809,15 +1849,15 @@ VIDEO_UPDATE( towns )
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%04x %i %i %i | %04x %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x\nReg28=%04x",
-		towns_crtc_reg[0],towns_crtc_reg[1],towns_crtc_reg[2],towns_crtc_reg[3],
-		towns_crtc_reg[4],towns_crtc_reg[5],towns_crtc_reg[6],towns_crtc_reg[7],
-		towns_crtc_reg[8],
-		towns_crtc_reg[9],towns_crtc_reg[10],towns_crtc_reg[11],towns_crtc_reg[12],
-		towns_crtc_reg[13],towns_crtc_reg[14],towns_crtc_reg[15],towns_crtc_reg[16],
-		towns_crtc_reg[17],towns_crtc_reg[18],towns_crtc_reg[19],towns_crtc_reg[20],
-		towns_crtc_reg[21],towns_crtc_reg[22],towns_crtc_reg[23],towns_crtc_reg[24],
-		towns_crtc_reg[27],towns_video_reg[0],towns_video_reg[1],towns_tvram_enable,towns_sprite_reg[1] & 0x80,
-		towns_crtc_reg[28]);
+		state->video.towns_crtc_reg[0],state->video.towns_crtc_reg[1],state->video.towns_crtc_reg[2],state->video.towns_crtc_reg[3],
+		state->video.towns_crtc_reg[4],state->video.towns_crtc_reg[5],state->video.towns_crtc_reg[6],state->video.towns_crtc_reg[7],
+		state->video.towns_crtc_reg[8],
+		state->video.towns_crtc_reg[9],state->video.towns_crtc_reg[10],state->video.towns_crtc_reg[11],state->video.towns_crtc_reg[12],
+		state->video.towns_crtc_reg[13],state->video.towns_crtc_reg[14],state->video.towns_crtc_reg[15],state->video.towns_crtc_reg[16],
+		state->video.towns_crtc_reg[17],state->video.towns_crtc_reg[18],state->video.towns_crtc_reg[19],state->video.towns_crtc_reg[20],
+		state->video.towns_crtc_reg[21],state->video.towns_crtc_reg[22],state->video.towns_crtc_reg[23],state->video.towns_crtc_reg[24],
+		state->video.towns_crtc_reg[27],state->video.towns_video_reg[0],state->video.towns_video_reg[1],state->video.towns_tvram_enable,state->video.towns_sprite_reg[1] & 0x80,
+		state->video.towns_crtc_reg[28]);
 #endif
 
     return 0;
