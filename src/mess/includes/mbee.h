@@ -46,7 +46,6 @@ QUICKLOAD_LOAD( mbee );
 
 /*----------- defined in video/mbee.c -----------*/
 
-extern UINT8 *mbee_pcgram;
 
 READ8_HANDLER ( m6545_status_r );
 WRITE8_HANDLER ( m6545_index_w );
@@ -64,20 +63,10 @@ READ8_HANDLER( mbee_0b_r );
 WRITE8_HANDLER( mbee_0b_w );
 READ8_HANDLER( mbeeic_0a_r );
 WRITE8_HANDLER( mbeeic_0a_w );
-READ8_HANDLER ( mbee_color_bank_r );
-WRITE8_HANDLER ( mbee_color_bank_w );
-READ8_HANDLER ( mbee_video_bank_r );
-WRITE8_HANDLER ( mbee_video_bank_w );
-READ8_HANDLER ( mbee_netrom_bank_r );
-READ8_HANDLER ( mbee_bank_netrom_r );
-READ8_HANDLER ( mbee_pcg_color_latch_r );
-WRITE8_HANDLER ( mbee_pcg_color_latch_w );
-WRITE8_HANDLER ( mbee_0a_w );
-WRITE8_HANDLER ( mbee_1c_w );
-
-WRITE8_HANDLER ( mbee_videoram_w );
-WRITE8_HANDLER ( mbee_pcg_color_w );
-WRITE8_HANDLER ( mbee_pcg_w );
+READ8_HANDLER ( mbeepc_telcom_low_r );
+READ8_HANDLER ( mbeepc_telcom_high_r );
+WRITE8_HANDLER ( mbeeppc_0a_w );
+WRITE8_HANDLER ( mbeeppc_1c_w );
 
 VIDEO_START( mbee );
 VIDEO_UPDATE( mbee );

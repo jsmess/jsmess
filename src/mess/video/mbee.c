@@ -61,12 +61,9 @@ typedef struct {		 // CRTC 6545
 
 static CRTC6545 crt;
 static UINT8 framecnt = 0;
-static UINT8 m6545_color_bank = 0;
-static UINT8 m6545_video_bank = 0;
-static UINT8 mbee_pcg_color_latch = 0;
 static int mbee_wait_time = 0;
 
-UINT8 *mbee_pcgram;
+static UINT8 *gfxram;
 static UINT8 *colorram;
 static UINT8 *videoram;
 static UINT8 mbee_08;
@@ -79,10 +76,7 @@ static void mc6845_screen_configure(running_machine *machine);
 READ8_HANDLER( mbee_low_r )
 {
 	if (mbee_0b & 1)
-	{
-		UINT8 * RAM = memory_region(space->machine, "maincpu")+0x11000;
-		return RAM[offset];
-	}
+		return gfxram[offset];
 	else
 		return videoram[offset];
 }
@@ -94,12 +88,12 @@ WRITE8_HANDLER( mbee_low_w )
 
 READ8_HANDLER( mbee_high_r )
 {
-	return mbee_pcgram[0x800 | offset];
+	return gfxram[0x800 | offset];
 }
 
 WRITE8_HANDLER( mbee_high_w )
 {
-	mbee_pcgram[0x800 | offset] = data;
+	gfxram[0x800 | offset] = data;
 }
 
 READ8_HANDLER ( mbee_0b_r )
@@ -127,7 +121,7 @@ READ8_HANDLER( mbeeic_high_r )
 	if (mbee_08 & 0x40)
 		return colorram[offset];
 	else
-		return mbee_pcgram[0x800 | offset];
+		return gfxram[0x800 | offset];
 }
 
 WRITE8_HANDLER ( mbeeic_high_w )
@@ -135,7 +129,7 @@ WRITE8_HANDLER ( mbeeic_high_w )
 	if ((mbee_08 & 0x40) && (~mbee_0b & 1))
 		colorram[offset] = data;
 	else
-		mbee_pcgram[0x0800 | offset] = data;
+		gfxram[0x0800 | offset] = data;
 }
 
 READ8_HANDLER ( mbeeic_0a_r )
@@ -150,38 +144,6 @@ WRITE8_HANDLER ( mbeeic_0a_w )
 }
 
 
-
-WRITE8_HANDLER ( mbee_pcg_color_latch_w )
-{
-	mbee_pcg_color_latch = data;
-	if (data & 0x40)
-		memory_set_bank(space->machine, "bank3", 1);
-	else
-		memory_set_bank(space->machine, "bank3", 0);
-}
-
-READ8_HANDLER ( mbee_pcg_color_latch_r )
-{
-	return mbee_pcg_color_latch;
-}
-
-WRITE8_HANDLER ( mbee_videoram_w )
-{
-	videoram[offset] = data;
-}
-
-WRITE8_HANDLER ( mbee_pcg_w )
-{
-	mbee_pcgram[0x0800 | offset] = data;
-}
-
-WRITE8_HANDLER ( mbee_pcg_color_w )
-{
-	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
-		mbee_pcgram[0x0800 | offset] = data;
-	else
-		colorram[offset] = data;
-}
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -229,38 +191,29 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 	}
 }
 
-READ8_HANDLER ( mbee_color_bank_r )
-{
-	return m6545_color_bank;
-}
 
-WRITE8_HANDLER ( mbee_color_bank_w )
-{
-	m6545_color_bank = data;
-	memory_set_bank(space->machine, "pak", data & 7);
-}
 
-WRITE8_HANDLER ( mbee_0a_w )
+WRITE8_HANDLER ( mbeeppc_0a_w )
 {
-	m6545_color_bank = data;
+	mbee_0a = data;
 	memory_set_bank(space->machine, "pak", (data&15) >> 1);
 }
 
-READ8_HANDLER ( mbee_netrom_bank_r )
+READ8_HANDLER ( mbeepc_telcom_low_r )
 {
 /* Read of port 0A - set Telcom rom to first half */
 	memory_set_bank(space->machine, "telcom", 0);
-	return m6545_color_bank;
+	return mbee_0a;
 }
 
-READ8_HANDLER ( mbee_bank_netrom_r )
+READ8_HANDLER ( mbeepc_telcom_high_r )
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
 	memory_set_bank(space->machine, "telcom", 1);
-	return m6545_color_bank;
+	return mbee_0a;
 }
 
-WRITE8_HANDLER( mbee_1c_w )
+WRITE8_HANDLER( mbeeppc_1c_w )
 {
 /*  d7 extended graphics - not emulated
     d5 bankswitch basic rom
@@ -270,19 +223,6 @@ WRITE8_HANDLER( mbee_1c_w )
 	memory_set_bank(space->machine, "bank6", (data & 0x20) ? 1 : 0);
 }
 
-READ8_HANDLER ( mbee_video_bank_r )
-{
-	return m6545_video_bank;
-}
-
-WRITE8_HANDLER ( mbee_video_bank_w )
-{
-	m6545_video_bank = data;
-	if (data & 1)
-		memory_set_bank(space->machine, "bank2", 0);
-	else
-		memory_set_bank(space->machine, "bank2", 1);
-}
 
 static void m6545_update_strobe(running_machine *machine, int param)
 {
@@ -463,8 +403,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		if( crt.screen_address_hi == data )
 			break;
 		crt.screen_address_hi = data;
-		addr = 0x17000+((data & 32) << 6);
-		memcpy(mbee_pcgram, memory_region(space->machine, "maincpu")+addr, 0x800);
+		memcpy(gfxram, memory_region(space->machine, "gfx") + ((data & 32) << 6), 0x800);
 		break;
 	case 13:
 		crt.screen_address_lo = data;
@@ -557,17 +496,15 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
-	UINT8 *ram = memory_region(machine, "maincpu");
 	videoram = memory_region(machine, "videoram");
-	mbee_pcgram = ram+0x11000;
+	gfxram = memory_region(machine, "gfx")+0x1000;
 }
 
 VIDEO_START( mbeeic )
 {
-	UINT8 *ram = memory_region(machine, "maincpu");
 	videoram = memory_region(machine, "videoram");
 	colorram = memory_region(machine, "colorram");
-	mbee_pcgram = ram+0x11000;
+	gfxram = memory_region(machine, "gfx")+0x1000;
 }
 
 VIDEO_UPDATE( mbee )
@@ -608,7 +545,7 @@ VIDEO_UPDATE( mbee )
 						inv ^= mc6845_cursor[ra];			// cursor scan row
 
 				/* get pattern of pixels for that character scanline */
-				gfx = mbee_pcgram[(chr<<4) | ra] ^ inv;
+				gfx = gfxram[(chr<<4) | ra] ^ inv;
 
 				/* Display a scanline of a character (8 pixels) */
 				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
@@ -666,7 +603,7 @@ VIDEO_UPDATE( mbeeic )
 						inv ^= mc6845_cursor[ra];			// cursor scan row
 
 				/* get pattern of pixels for that character scanline */
-				gfx = mbee_pcgram[(chr<<4) | ra] ^ inv;
+				gfx = gfxram[(chr<<4) | ra] ^ inv;
 				fg = (col & 0x001f) | 64;					// map to foreground palette
 				bg = (col & 0x07e0) >> 5;					// and background palette
 
