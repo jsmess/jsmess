@@ -639,7 +639,8 @@ const game_driver * const drivers[] =
 	/* AT */
 	DRIVER( ibm5170 )   /* 1984 IBM PC/AT 5170, original 6 MHz model    */
 	DRIVER( ibm5170a )  /* 1985 IBM PC/AT 5170, enhanced 8 MHz model    */
-	DRIVER( i8530286 )  /* 1988 IBM PS2 Model 30 286 (VGA)    */
+	DRIVER( i8530286 )  /* 1988 IBM PS/2 Model 30-286 (VGA)    */
+	DRIVER( i8555081 )  /* 1988 IBM PS/2 Model 55SX (VGA)    */
 	DRIVER( at )	/* 1987 AMI Bios and Diagnostics    */
 	DRIVER( atvga )	 /* 19?? AT VGA   */
 	DRIVER( neat )	  /* 1989 New Enhanced AT chipset, AMI BIOS    */

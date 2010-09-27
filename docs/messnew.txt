@@ -35,6 +35,7 @@ Skeleton drivers:
 - Atari TT030
 - Atari Falcon
 - Atari Falcon040
+- IBM PS/2 Model 55SX [Joseba Epalza]
 
 
 
