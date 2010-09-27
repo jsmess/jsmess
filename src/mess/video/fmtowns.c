@@ -917,7 +917,7 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 		state->video.towns_sprite_page = 0;
 
 	state->video.towns_sprite_flag = 1;  // we are now drawing
-	timer_adjust_oneshot(state->video.sprite_timer,machine->device<cpu_device>("maincpu")->cycles_to_attotime(16 * (1025-sprite_limit)),0);
+	timer_adjust_oneshot(state->video.sprite_timer,machine->device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)),0);
 }
 
 void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
