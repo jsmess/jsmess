@@ -71,37 +71,101 @@ static READ32_HANDLER(mac_swim_r)
 
 // IIci/IIsi RAM-Based Video (RBV)
 
-// 512x384x1 framebuffer at fb008000?
-// 640x480x1 framebuffer at fee00000?
-
-static UINT32 *rbv_vram;
-
-static UINT32 rbv_colors[3], rbv_count, rbv_clutoffs;
+static UINT8 rbv_regs[256], rbv_ier, rbv_ifr;
+static UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
 static UINT32 rbv_palette[256];
+
+static VIDEO_START( macrbv )
+{
+	memset(rbv_regs, 0, sizeof(rbv_regs));
+
+	rbv_count = 0;
+	rbv_clutoffs = 0;
+	rbv_immed10wr = 0;
+
+	rbv_regs[2] = 0xff;
+}
 
 static VIDEO_UPDATE( macrbv )
 {
 	UINT32 *scanline;
 	int x, y;
-	UINT8 *vram8 = (UINT8 *)rbv_vram;
-	UINT8 pixels;
 
-	for (y = 0; y < 480; y++)
+	rbv_regs[2] &= ~0x40;	// set vblank signal
+
+	if ((rbv_regs[0x12] & 0x40) && (rbv_ier & 0x2))
 	{
-		scanline = BITMAP_ADDR32(bitmap, y, 0);
-		for (x = 0; x < 640; x+=8)
-		{
-			pixels = vram8[(y * 1024) + ((x/8)^3)];
+		rbv_ifr |= 0x82;
+		mac_set_via2_interrupt(screen->machine, 1);
+	}
 
-			*scanline++ = rbv_palette[(pixels>>7)^1];
-			*scanline++ = rbv_palette[((pixels>>6)&1)^1];
-			*scanline++ = rbv_palette[((pixels>>5)&1)^1];
-			*scanline++ = rbv_palette[((pixels>>4)&1)^1];
-			*scanline++ = rbv_palette[((pixels>>3)&1)^1];
-			*scanline++ = rbv_palette[((pixels>>2)&1)^1];
-			*scanline++ = rbv_palette[((pixels>>1)&1)^1];
-			*scanline++ = rbv_palette[(pixels&1)^1];
+	switch (rbv_regs[0x10] & 7)
+	{
+		case 0:	// 1bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram"));
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 640; x+=8)
+				{
+					pixels = vram8[(y * 80) + ((x/8)^3)];
+
+					*scanline++ = rbv_palette[0xfe|(pixels>>7)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>6)&1)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>5)&1)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>4)&1)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>3)&1)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>2)&1)];
+					*scanline++ = rbv_palette[0xfe|((pixels>>1)&1)];
+					*scanline++ = rbv_palette[0xfe|(pixels&1)];
+				}
+			}
 		}
+		break;
+
+		case 1:	// 2bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 640/4; x++)
+				{
+					pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = rbv_palette[0xfc|((pixels>>6)&3)];
+					*scanline++ = rbv_palette[0xfc|((pixels>>4)&3)];
+					*scanline++ = rbv_palette[0xfc|((pixels>>2)&3)];
+					*scanline++ = rbv_palette[0xfc|(pixels&3)];
+				}
+			}
+		}
+		break;
+
+		case 2: // 4bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 640/2; x++)
+				{
+					pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = rbv_palette[0xf0|(pixels>>4)];
+					*scanline++ = rbv_palette[0xf0|(pixels&0xf)];
+				}
+			}
+		}
+		break;
 	}
 
 	return 0;
@@ -120,57 +184,150 @@ static WRITE32_HANDLER( rbv_ramdac_w )
 
 		if (rbv_count == 3)
 		{
-			rbv_count = 0;
 			palette_set_color(space->machine, rbv_clutoffs, MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]));
 			rbv_palette[rbv_clutoffs] = MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]);
 			rbv_clutoffs++;
+			rbv_count = 0;
 		}
 	}
 }
 
-
-static UINT32 rbv_toggle = 0;
-static READ16_HANDLER ( mac_rbv_r )
+static READ8_HANDLER ( mac_rbv_r )
 {
-	int data;
-	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
+	int data = 0;
+	
+	if (offset < 0x100)
+	{	
+		data = rbv_regs[offset];
 
-	logerror("rbv_r: %x, mask %x\n", offset, mem_mask);
+		if (offset == 0x02)
+		{
+			if (!space->machine->primary_screen->vblank())
+			{
+				data |= 0x40;
+			}
+		}
 
-	if (offset == 1)
+		if (offset == 0x10)
+		{
+			if (!rbv_immed10wr)
+			{
+				data &= ~0x38;
+				data |= (6<<3);	// 13" RGB monitor at 640x480
+			}
+			else
+			{
+				rbv_immed10wr = 0;
+			}
+		}
+
+		// bit 7 of these registers always reads as 0 on RBV
+		if ((offset == 0x12) || (offset == 0x13))
+		{
+			data &= ~0x80;
+		}
+	}
+	else
 	{
-		rbv_toggle ^= 0x4040;
-		return rbv_toggle;
+		offset >>= 9;
+
+		switch (offset)
+		{
+			case 13:	// IFR
+				return rbv_ifr;
+				break;
+
+			case 14:	// IER
+				return rbv_ier;
+				break;
+
+			default:
+				logerror("rbv_r: Unknown extended RBV VIA register %d access\n", offset);
+				break;
+		}
 	}
 
-	if (offset == 0x0010)
-	{
-		logerror("RBV: Read monitor type (PC=%x)\n", cpu_get_pc(space->cpu));
+//	if (offset != 2) printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(space->cpu));
 
-		data = (6<<3) | 3;	// 13" RGB, 8 bits per pixel
-
-		return (data & 0xff) | (data << 8);
-	}
-
-	offset >>= 8;
-	offset &= 0x0f;
-
-	data = via_1->read(*space, offset);
-
-	return (data & 0xff) | (data << 8);
+	return data;
 }
 
-static WRITE16_HANDLER ( mac_rbv_w )
+static WRITE8_HANDLER ( mac_rbv_w )
 {
-	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
+	if (offset < 0x100)
+	{
+//		if ((offset != 3) && (offset != 0x12)) printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
+		switch (offset)
+		{
+			case 0x03:
+				mac_set_via2_interrupt(space->machine, 0);
+				rbv_regs[offset] = data;
+				break;
 
-	logerror("rbv_w: %x to offset %x, mask %x\n", data, offset, mem_mask);
+			case 0x10:
+				rbv_immed10wr = 1;
+				rbv_regs[offset] = data;
+				break;
 
-	offset >>= 8;
-	offset &= 0x0f;
+			case 0x12:
+				if (data & 0x80)	// 1 bits write 1s
+				{
+					rbv_regs[offset] |= data & 0x7f;
+				}
+				else			// 1 bits write 0s
+				{
+					rbv_regs[offset] &= ~(data & 0x7f);
+				}
+				break;
 
-	if (ACCESSING_BITS_8_15)
-		via_1->write(*space, offset, (data >> 8) & 0xff);
+			case 0x13:
+				if (data & 0x80)	// 1 bits write 1s
+				{
+					rbv_regs[offset] |= data & 0x7f;
+
+					if (data == 0xff) rbv_regs[offset] = 0x1f;	// I don't know why this is special, but the IIci ROM's POST demands it
+				}
+				else			// 1 bits write 0s
+				{
+					rbv_regs[offset] &= ~(data & 0x7f);
+				}
+				break;
+
+			default:
+				rbv_regs[offset] = data;
+				break;
+		}
+	}
+	else
+	{
+		offset >>= 9;
+
+		switch (offset)
+		{
+			case 13:	// IFR
+//				printf("rbv_w: %02x to IFR\n", data);
+				rbv_ifr = data;
+				mac_set_via2_interrupt(space->machine, 0);
+				break;
+
+			case 14:	// IER
+				if (data & 0x80)	// 1 bits write 1s
+				{
+					rbv_ier |= data & 0x7f;
+				}
+				else	    // 1 bits write 0s
+				{
+					rbv_ier &= ~(data & 0x7f);
+				}
+
+//				printf("rbv_w: %02x to IER => %02x\n", data, rbv_ier);
+				break;
+
+			default:
+				logerror("rbv_w: Unknown extended RBV VIA register %d access\n", offset);
+				break;
+		}
+	}
 }
 
 // LC/LC II "V8" video and friends
@@ -473,14 +630,10 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50014000, 0x50015fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READ(mac_swim_r) AM_WRITENOP AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50024000, 0x50024007) AM_WRITE( rbv_ramdac_w ) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-
-	// mirror video declaration ROM
-	AM_RANGE(0xfee00000, 0xfee7ffff) AM_RAM AM_BASE(&rbv_vram)
-//  AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("bootrom", 0x78000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
@@ -880,13 +1033,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciici, macii )
 
-	MDRV_CPU_REPLACE("maincpu", M68030, 7833600*2)
+	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(maciici_map)
 
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(maclc)
+	MDRV_VIDEO_START(macrbv)
 	MDRV_VIDEO_UPDATE(macrbv)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
@@ -1366,7 +1522,7 @@ COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macadb,   maciicx,	  "Apple Compute
 COMP( 1989, maciici,  0,	0,	maciici,  macadb,   maciici,	      "Apple Computer", "Macintosh IIci",  GAME_NOT_WORKING )
 COMP( 1990, macclasc, 0,	0,	macse,    macadb,   macclassic,	      "Apple Computer", "Macintosh Classic",  GAME_NOT_WORKING )
 COMP( 1990, maclc,    0,	0,	maclc,    macadb,   maclc,	          "Apple Computer", "Macintosh LC",  GAME_NOT_WORKING )
-COMP( 1990, maciisi,  0,	0,	maciisi,  macadb,   maciici,	      "Apple Computer", "Macintosh IIsi",  GAME_NOT_WORKING )
+COMP( 1990, maciisi,  0,	0,	maciisi,  macadb,   maciisi,	      "Apple Computer", "Macintosh IIsi",  0 )
 COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,   macprtb,  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,	0,	macclas2, macadb,   macclassic2,      "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
 COMP( 1991, maclc2,   0,	0,	maclc2,   macadb,   maclc2,	          "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )

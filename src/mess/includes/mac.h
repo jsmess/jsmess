@@ -150,6 +150,8 @@ void mac_scsi_irq(running_machine *machine, int state);
 
 void mac_asc_irq(running_device *device, int state);
 
+void mac_set_via2_interrupt(running_machine *machine, int value);
+
 /*----------- defined in video/mac.c -----------*/
 
 extern UINT32 *mac_se30_vram;
@@ -259,6 +261,9 @@ public:
 	// Apple Sound Chip
 	UINT8 mac_asc_regs[0x2000];
 	INT16 xfersamples[0x800];
+
+	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
+	emu_timer *mac6015_timer;
 };
 
 #endif /* MAC_H_ */

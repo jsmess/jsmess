@@ -78,7 +78,7 @@
 #include "devices/messram.h"
 #include "debugger.h"
 
-#define ADB_IS_BITBANG	(mac->mac_model >= MODEL_MAC_SE && mac->mac_model <= MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICX) || (mac->mac_model == MODEL_MAC_SE30)
+#define ADB_IS_BITBANG	((mac->mac_model == MODEL_MAC_SE || mac->mac_model == MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_SE30))
 #define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IISI)
 #define ADB_IS_PM	(mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 
@@ -113,6 +113,7 @@
 
 static TIMER_CALLBACK(mac_scanline_tick);
 static TIMER_CALLBACK(mac_adb_tick);
+static TIMER_CALLBACK(mac_6015_tick);
 static emu_timer *mac_scanline_timer, *mac_adb_timer;
 static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
@@ -292,7 +293,7 @@ static void set_via_interrupt(running_machine *machine, int value)
 }
 
 
-static void set_via2_interrupt(running_machine *machine, int value)
+void mac_set_via2_interrupt(running_machine *machine, int value)
 {
 	via2_interrupt = value;
 
@@ -2683,7 +2684,7 @@ WRITE16_HANDLER ( mac_via_w )
 
 static void mac_via2_irq(running_device *device, int state)
 {
-	set_via2_interrupt(device->machine, state);
+	mac_set_via2_interrupt(device->machine, state);
 }
 
 READ16_HANDLER ( mac_via2_r )
@@ -2696,7 +2697,7 @@ READ16_HANDLER ( mac_via2_r )
 
 	data = via_1->read(*space, offset);
 
-	if (LOG_VIA)
+//	if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space->machine->device("maincpu")));
 
 	return (data & 0xff) | (data << 8);
@@ -2709,7 +2710,7 @@ WRITE16_HANDLER ( mac_via2_w )
 	offset >>= 8;
 	offset &= 0x0f;
 
-	if (LOG_VIA)
+//	if (LOG_VIA)
 		logerror("mac_via2_w: offset=%x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(space->machine->device("maincpu")));
 
 	if (ACCESSING_BITS_8_15)
@@ -2723,11 +2724,6 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a)
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
 	result |= mac->mac_nubus_irq_state;
-
-	if ((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI))
-	{
-		result &= ~0x40;	// RBV wants this clear to boot
-	}
 
 	return result;
 }
@@ -2762,10 +2758,19 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 
 //  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
-//  printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
+	logerror("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
 	// chain 60.15 Hz to VIA1
 	via_0->write_ca1(data>>7);
+}
+
+// This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
+static TIMER_CALLBACK(mac_6015_tick)
+{
+	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+
+	via_0->write_ca1(0);
+	via_0->write_ca1(1);
 }
 
 /* *************************************************************************
@@ -2782,12 +2787,24 @@ MACHINE_START( mac )
 	}
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
+
+	mac->mac6015_timer = timer_alloc(machine, mac_6015_tick, NULL);
+	timer_adjust_oneshot(mac->mac6015_timer, attotime_never, 0);
 }
 MACHINE_RESET(mac)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
 	mac_model_t model_save;
 	emu_timer *timer_save;
+
+	// stop 60.15 Hz timer
+	timer_adjust_oneshot(mac->mac6015_timer, attotime_never, 0);
+
+	// start 60.15 Hz timer for IIci/IIsi (and eventually others)
+	if ((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI))
+	{
+		timer_adjust_periodic(mac->mac6015_timer, ATTOTIME_IN_HZ(60.15), 0, ATTOTIME_IN_HZ(60.15));
+	}
 
 	// clear mac state struct
 	model_save = mac->mac_model;
@@ -2826,7 +2843,7 @@ MACHINE_RESET(mac)
 
 	if (mac->mac_model >= MODEL_MAC_PLUS)
 	{
-		ncr5380_scan_devices(machine->device("ncr5380"));
+//		ncr5380_scan_devices(machine->device("ncr5380"));
 	}
 
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
@@ -3025,12 +3042,6 @@ DRIVER_INIT(maciix)
 
 DRIVER_INIT(maciici)
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "bootrom");
-
-	ROM[0x4569c/4] = 0x4ed64e71;	// jmp (a6) / nop (skip FPU test)
-	ROM[0x446b4/4] = 0x4e714e71;	// nop nop - disable ROM checksum
-	ROM[0x446b8/4] = 0x4e714ed6;	// nop jmp (a6) - disable ROM checksum
-
 	mac_driver_init(machine, MODEL_MAC_IICI);
 }
 

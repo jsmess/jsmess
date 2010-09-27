@@ -15,8 +15,7 @@
  * This implementation is tied closely to the drivers found in the Mac Plus ROM and the routines in Mac
  * System 6 and 7 that it patches out the ROM traps with.  While attempts have been made to
  * have the behavior work according to the manual and not the specific Apple driver code,
- * there are almost certainly areas where that is true.  In particular, IRQs are not implemented
- * as they are unused on the Mac Plus.
+ * there are almost certainly areas where that is true.
  *
  */
 
@@ -170,6 +169,8 @@ void ncr5380_device::device_reset()
 	m_d_ptr = 0;
 	m_d_limit = 0;
 	m_last_id = 0;
+
+	ncr5380_scan_devices();
 }
 
 //-------------------------------------------------
