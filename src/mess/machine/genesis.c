@@ -1334,7 +1334,7 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
 
 	ROM16 = (UINT16 *) memory_region(image.device().machine, "maincpu");
-	for (i = 0x100; i < length; i += 2)
+	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
 	auto_free(image.device().machine, temp_copy);
