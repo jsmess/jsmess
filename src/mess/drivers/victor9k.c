@@ -867,7 +867,7 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
 	data |= !(floppy_drive_get_flag_state(state->floppy[0].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 4;
 
 	/* drive 1 ready */
-	data |= !(floppy_drive_get_flag_state(state->floppy[0].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 3;
+	data |= !(floppy_drive_get_flag_state(state->floppy[1].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 3;
 
 	/* single/double sided */
 	data |= floppy_twosid_r(state->floppy[state->drive].image) << 5;
@@ -997,7 +997,6 @@ static MACHINE_START( victor9k )
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( victor9k, victor9k_state )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MDRV_CPU_PROGRAM_MAP(victor9k_mem)
