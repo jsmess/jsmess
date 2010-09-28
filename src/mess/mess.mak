@@ -398,6 +398,7 @@ DRVLIBS = \
 	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/vidbrain.a \
 	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
@@ -1610,6 +1611,10 @@ $(MESSOBJ)/veb.a:				\
 	$(MESS_DRIVERS)/sc1.o		\
 	$(MESS_DRIVERS)/sc2.o		\
 
+$(MESSOBJ)/vidbrain.a:			\
+	$(MESS_DRIVERS)/vidbrain.o	\
+	$(MESS_VIDEO)/vidbrain.o	\
+
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\
 	$(MESS_VIDEO)/v1050.o		\
@@ -1705,7 +1710,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/unistar.o	\
 	$(MESS_DRIVERS)/vector4.o	\
-	$(MESS_DRIVERS)/vidbrain.o	\
 	$(MESS_DRIVERS)/vii.o		\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/z80dev.o	\

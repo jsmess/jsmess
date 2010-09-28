@@ -5,6 +5,7 @@
     http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
     http://www.seanriddle.com/vbinfo.html
     http://www.seanriddle.com/videobrain.html
+	http://www.google.com/patents?q=4232374
 
     07/04/2009 Skeleton driver.
 
@@ -14,9 +15,7 @@
 
     TODO:
 
-    - SMI 3853
-    - colors
-    - low resolution mode
+	- use machine/f3853.h
     - discrete sound
     - joystick scan timer 555
     - reset on cartridge eject
@@ -36,64 +35,6 @@
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    vlsi_r - video VLSI read
--------------------------------------------------*/
-
-static READ8_HANDLER( vlsi_r )
-{
-	switch (offset)
-	{
-	case 0xfa:
-		return 0xff;
-
-	case 0xfb:
-		// alternate this between 0xf5 and 0x34 to make Checkers boot
-		return 0xff;
-	}
-
-	return 0;
-}
-
-/*-------------------------------------------------
-    vlsi_w - video VLSI write
--------------------------------------------------*/
-
-static WRITE8_HANDLER( vlsi_w )
-{
-	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
-
-	switch (offset)
-	{
-	case 0xf5:
-		state->bg_color = data;
-		break;
-
-	case 0xf7:
-		/*
-
-            bit     description
-
-            0
-            1
-            2
-            3
-            4       keyboard column 8
-            5
-            6
-            7
-
-        */
-
-		state->uv201_31 = BIT(data, 4);
-		break;
-	}
-
-	state->vlsi[offset] = data;
-
-	logerror("VLSI %02x = %02x\n", offset, data);
-}
 
 /*-------------------------------------------------
     keyboard_w - keyboard column write
@@ -154,7 +95,7 @@ static READ8_HANDLER( keyboard_r )
 	if (BIT(state->keylatch, 5)) data |= input_port_read(space->machine, "IO05");
 	if (BIT(state->keylatch, 6)) data |= input_port_read(space->machine, "IO06");
 	if (BIT(state->keylatch, 7)) data |= input_port_read(space->machine, "IO07");
-	if (state->uv201_31)		 data |= input_port_read(space->machine, "UV201-31");
+	if (!BIT(state->cmd, 4)) data |= input_port_read(space->machine, "UV201-31");
 
 	return data;
 }
@@ -184,7 +125,7 @@ static WRITE8_HANDLER( sound_w )
 
 	/* sound clock */
 	int sound_clk = BIT(data, 7);
-
+	
 	if (!state->sound_clk && sound_clk)
 	{
 		state->sound_q[0] = BIT(state->keylatch, 0);
@@ -200,6 +141,68 @@ static WRITE8_HANDLER( sound_w )
 	state->joy_enable = BIT(data, 7);
 }
 
+/*-------------------------------------------------
+    vidbrain_interrupt_check - check interrupts
+-------------------------------------------------*/
+
+void vidbrain_interrupt_check(running_machine *machine)
+{
+	vidbrain_state *state = machine->driver_data<vidbrain_state>();
+
+	int interrupt = CLEAR_LINE;
+
+	switch (state->int_enable)
+	{
+	case 1:
+		if (state->ext_int_latch) interrupt = ASSERT_LINE;
+		break;
+
+	case 3:
+		if (state->timer_int_latch) interrupt = ASSERT_LINE;
+		break;
+	}
+
+	cputag_set_input_line(machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, interrupt);
+}
+
+/*-------------------------------------------------
+    f3853_w - F3853 SMI write
+-------------------------------------------------*/
+
+static WRITE8_HANDLER( f3853_w )
+{
+	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
+
+	switch (offset)
+	{
+	case 0:
+		// interrupt vector address high
+		state->vector = (data << 8) | (state->vector & 0xff);
+		logerror("F3853 Interrupt Vector %04x\n", state->vector);
+		break;
+
+	case 1:
+		// interrupt vector address low
+		state->vector = (state->vector & 0xff00) | data;
+		logerror("F3853 Interrupt Vector %04x\n", state->vector);
+		break;
+
+	case 2:
+		// interrupt control
+		state->int_enable = data & 0x03;
+		logerror("F3853 Interrupt Control %u\n", state->int_enable);
+		vidbrain_interrupt_check(space->machine);
+
+		if (state->int_enable == 0x03) fatalerror("F3853 Timer not supported!");
+		break;
+
+	case 3:
+		// timer 8-bit polynomial counter
+		fatalerror("F3853 Timer not supported!");
+		break;
+	}
+}
+
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -210,9 +213,9 @@ static WRITE8_HANDLER( sound_w )
 
 static ADDRESS_MAP_START( vidbrain_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xc000) AM_ROM
-	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(vlsi_r, vlsi_w)
-	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM AM_BASE_MEMBER(vidbrain_state, video_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM
+	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(vidbrain_vlsi_r, vidbrain_vlsi_w)
+	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0xe000) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0xc000) AM_ROM
 ADDRESS_MAP_END
 
@@ -223,6 +226,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vidbrain_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
+	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
+//	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_r, f3853_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -328,97 +333,6 @@ static INPUT_PORTS_START( vidbrain )
 INPUT_PORTS_END
 
 /***************************************************************************
-    VIDEO
-***************************************************************************/
-
-/*-------------------------------------------------
-    PALETTE_INIT( vidbrain )
--------------------------------------------------*/
-
-static PALETTE_INIT( vidbrain )
-{
-	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00 ); //
-	palette_set_color_rgb(machine,  1, 0xff, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine,  2, 0x00, 0xff, 0x00 ); //
-	palette_set_color_rgb(machine,  3, 0xff, 0xff, 0x00 ); //
-	palette_set_color_rgb(machine,  4, 0x00, 0x00, 0xff ); // blue
-	palette_set_color_rgb(machine,  5, 0xff, 0x00, 0xff ); //
-	palette_set_color_rgb(machine,  6, 0x00, 0xff, 0xff ); //
-	palette_set_color_rgb(machine,  7, 0xff, 0xff, 0xff ); //
-
-	palette_set_color_rgb(machine,  8, 0x00, 0x00, 0x00 ); //
-	palette_set_color_rgb(machine,  9, 0x80, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine, 10, 0x00, 0x80, 0x00 ); //
-	palette_set_color_rgb(machine, 11, 0x80, 0x80, 0x00 ); //
-	palette_set_color_rgb(machine, 12, 0x00, 0x00, 0x80 ); // blue
-	palette_set_color_rgb(machine, 13, 0x80, 0x00, 0x80 ); //
-	palette_set_color_rgb(machine, 14, 0x00, 0x80, 0x80 ); //
-	palette_set_color_rgb(machine, 15, 0x80, 0x80, 0x80 ); //
-}
-
-/*-------------------------------------------------
-    VIDEO_START( vidbrain )
--------------------------------------------------*/
-
-static VIDEO_START( vidbrain )
-{
-}
-
-/*-------------------------------------------------
-    VIDEO_UPDATE( vidbrain )
--------------------------------------------------*/
-
-static VIDEO_UPDATE( vidbrain )
-{
-	vidbrain_state *state = screen->machine->driver_data<vidbrain_state>();
-
-	UINT16 addr = 0x2f;
-
-	for (int y = 0; y < 49; y++)
-	{
-		int row = y / 7;
-
-		for (int sx = 0; sx < 16; sx++)
-		{
-			UINT8 data = state->video_ram[addr++];
-
-			for (int x = 0; x < 8; x++)
-			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7) ? (state->vlsi[0x10+row] >> 5) : state->bg_color;
-				data <<= 1;
-			}
-		}
-	}
-
-    return 0;
-}
-
-/*-------------------------------------------------
-    gfx_layout vidbrain_charlayout
--------------------------------------------------*/
-
-static const gfx_layout vidbrain_charlayout =
-{
-	8, 7,					/* 8 x 7 characters */
-	59,						/* 59 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*7					/* every char takes 7 bytes */
-};
-
-/*-------------------------------------------------
-    GFXDECODE( vidbrain )
--------------------------------------------------*/
-
-static GFXDECODE_START( vidbrain )
-	GFXDECODE_ENTRY( F3850_TAG, 0x2010, vidbrain_charlayout, 0, 1 )
-GFXDECODE_END
-
-/***************************************************************************
     SOUND
 ***************************************************************************/
 
@@ -436,6 +350,22 @@ DISCRETE_SOUND_END
     DEVICE CONFIGURATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    f3853_interface smi_intf
+-------------------------------------------------*/
+/*
+static void f3853_int_req_w(running_device *device, UINT16 addr, int level)
+{
+	cpu_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
+
+	cputag_set_input_line(device->machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
+}
+
+static const f3853_interface smi_intf =
+{
+	f3853_int_req_w
+};
+*/
 /*-------------------------------------------------
     cassette_config vidbrain_cassette_config
 -------------------------------------------------*/
@@ -476,6 +406,26 @@ static DEVICE_IMAGE_LOAD( vidbrain_cart )
     MACHINE INITIALIZATION
 ***************************************************************************/
 
+static IRQ_CALLBACK( vidbrain_int_ack )
+{
+	vidbrain_state *state = device->machine->driver_data<vidbrain_state>();
+
+	switch (state->int_enable)
+	{
+	case 1:
+		state->ext_int_latch = 0;
+		break;
+
+	case 3:
+		state->timer_int_latch = 0;
+		break;
+	}
+
+	vidbrain_interrupt_check(device->machine);
+
+	return state->vector;
+}
+
 /*-------------------------------------------------
     MACHINE_START( vidbrain )
 -------------------------------------------------*/
@@ -484,14 +434,19 @@ static MACHINE_START( vidbrain )
 {
 	vidbrain_state *state = machine->driver_data<vidbrain_state>();
 
+	/* register IRQ callback */
+	cpu_set_irq_callback(machine->device(F3850_TAG), vidbrain_int_ack);
+
 	/* find devices */
 	state->discrete = machine->device(DISCRETE_TAG);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->vector);
+	state_save_register_global(machine, state->int_enable);
+	state_save_register_global(machine, state->ext_int_latch);
+	state_save_register_global(machine, state->timer_int_latch);
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->joy_enable);
-	state_save_register_global(machine, state->uv201_31);
-	state_save_register_global(machine, state->bg_color);
 	state_save_register_global(machine, state->sound_clk);
 	state_save_register_global_array(machine, state->sound_q);
 }
@@ -501,11 +456,10 @@ static MACHINE_START( vidbrain )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( vidbrain, driver_device )
+    MACHINE_CONFIG( vidbrain )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
-
     /* basic machine hardware */
     MDRV_CPU_ADD(F3850_TAG, F8, XTAL_14_31818MHz/8)
     MDRV_CPU_PROGRAM_MAP(vidbrain_mem)
@@ -513,19 +467,8 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 
     MDRV_MACHINE_START(vidbrain)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(128, 49)
-    MDRV_SCREEN_VISIBLE_AREA(0, 128-1, 0, 49-1)
-	MDRV_GFXDECODE(vidbrain)
-    MDRV_PALETTE_LENGTH(16)
-    MDRV_PALETTE_INIT(vidbrain)
-
-    MDRV_VIDEO_START(vidbrain)
-    MDRV_VIDEO_UPDATE(vidbrain)
+	/* video hardware */
+	MDRV_FRAGMENT_ADD(vidbrain_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -535,6 +478,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
+//	MDRV_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_config)
 
 	/* cartridge */
@@ -544,7 +488,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MDRV_CARTSLOT_LOAD(vidbrain_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","vidbrain")
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
