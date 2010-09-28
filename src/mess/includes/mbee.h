@@ -66,13 +66,20 @@ WRITE8_HANDLER( mbeeic_0a_w );
 READ8_HANDLER ( mbeepc_telcom_low_r );
 READ8_HANDLER ( mbeepc_telcom_high_r );
 WRITE8_HANDLER ( mbeeppc_0a_w );
+READ8_HANDLER ( mbeeppc_1c_r );
 WRITE8_HANDLER ( mbeeppc_1c_w );
+READ8_HANDLER( mbeeppc_low_r );
+READ8_HANDLER( mbeeppc_high_r );
+WRITE8_HANDLER( mbeeppc_high_w );
+WRITE8_HANDLER( mbeeppc_low_w );
+
 
 VIDEO_START( mbee );
 VIDEO_UPDATE( mbee );
-
 VIDEO_START( mbeeic );
 VIDEO_UPDATE( mbeeic );
+VIDEO_START( mbeeppc );
+VIDEO_UPDATE( mbeeppc );
 PALETTE_INIT( mbeeic );
 
 #endif /* MBEE_H_ */

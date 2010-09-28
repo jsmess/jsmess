@@ -134,12 +134,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeeppc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank6")
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("basic")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbeeppc_low_r, mbeeppc_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeppc_high_r, mbeeppc_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -204,14 +204,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeppc_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe00) AM_READWRITE(mbeepc_telcom_low_r, mbeeppc_0a_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeppc_0a_w)
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_WRITE(mbeeppc_1c_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe00) AM_READWRITE(mbeepc_telcom_high_r, mbeeppc_0a_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbeeppc_1c_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_high_r, mbeeppc_0a_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
@@ -499,13 +499,15 @@ static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
 	MDRV_CPU_IO_MAP(mbeepc85_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeeppc, mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MDRV_CPU_IO_MAP(mbeeppc_io)
+	MDRV_VIDEO_START(mbeeppc)
+	MDRV_VIDEO_UPDATE(mbeeppc)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee56, mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
 	MDRV_CPU_IO_MAP(mbee56_io)
@@ -513,7 +515,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeepc85 )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee64, mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbee64, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
 	MDRV_CPU_IO_MAP(mbee64_io)
@@ -575,8 +577,11 @@ static DRIVER_INIT( mbeepc85 )
 static DRIVER_INIT( mbeeppc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x30000);
-	memory_configure_bank(machine, "bank6", 0, 2, &RAM[0x30000], 0x2000);
+	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
+
+	RAM = memory_region(machine, "basicrom");
+	memory_configure_bank(machine, "basic", 0, 2, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
 	RAM = memory_region(machine, "telcomrom");
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
@@ -586,7 +591,7 @@ static DRIVER_INIT( mbeeppc )
 
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
-	memory_set_bank(machine, "bank6", 0);
+	memory_set_bank(machine, "basic", 0);
 	mbee_size = 0x8000;
 }
 
@@ -745,9 +750,11 @@ ROM_START( mbeepc85s )
 ROM_END
 
 ROM_START( mbeeppc )
-	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF )
+	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("bas529b.rom",           0xa000,  0x2000, CRC(a1bd986b) SHA1(5d79f210c9042db5aefc85a0bdf45210cb9e9899) )
-	ROM_LOAD("bas529a.rom",           0x30000, 0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
+
+	ROM_REGION(0x4000, "basicrom", 0)
+	ROM_LOAD("bas529a.rom",           0x0000,  0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
 	ROM_REGION(0x2000, "telcomrom", 0)
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
@@ -762,7 +769,7 @@ ROM_START( mbeeppc )
 	ROM_LOAD_OPTIONAL("vtex235.rom",  0x8000,  0x2000, CRC(8c30ecb2) SHA1(cf068462d7def885bdb5d3a265851b88c727c0d7) ) // 4
 	ROM_LOAD("ppcshell.rom",          0xa000,  0x2000, CRC(1e793555) SHA1(ddeaa081ec4408e80e3fb192865d87daa035c701) ) // 5
 
-	ROM_REGION(0x2000, "gfx", 0)
+	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x0000, 0x1000 )
 
@@ -770,8 +777,9 @@ ROM_START( mbeeppc )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 
-	ROM_REGION( 0x1000, "videoram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( mbee56 )

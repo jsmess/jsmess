@@ -66,12 +66,15 @@ static int mbee_wait_time = 0;
 static UINT8 *gfxram;
 static UINT8 *colorram;
 static UINT8 *videoram;
+static UINT8 *attribram;
 static UINT8 mbee_08;
 static UINT8 mbee_0a;
 static UINT8 mbee_0b;
+static UINT8 mbee_1c;
 static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
 static void mc6845_screen_configure(running_machine *machine);
+
 
 READ8_HANDLER( mbee_low_r )
 {
@@ -143,6 +146,76 @@ WRITE8_HANDLER ( mbeeic_0a_w )
 	memory_set_bank(space->machine, "pak", data & 7);
 }
 
+WRITE8_HANDLER ( mbeeppc_0a_w )
+{
+	mbee_0a = data;
+	memory_set_bank(space->machine, "pak", (data&15) >> 1);
+}
+
+READ8_HANDLER ( mbeepc_telcom_low_r )
+{
+/* Read of port 0A - set Telcom rom to first half */
+	memory_set_bank(space->machine, "telcom", 0);
+	return mbee_0a;
+}
+
+READ8_HANDLER ( mbeepc_telcom_high_r )
+{
+/* Read of port 10A - set Telcom rom to 2nd half */
+	memory_set_bank(space->machine, "telcom", 1);
+	return mbee_0a;
+}
+
+READ8_HANDLER ( mbeeppc_1c_r )
+{
+	return mbee_1c;
+}
+
+WRITE8_HANDLER( mbeeppc_1c_w )
+{
+/*  d7 extended graphics - not emulated
+    d5 bankswitch basic rom
+    d4 select attribute ram
+    d3..d0 select videoram bank */
+
+	mbee_1c = data;
+	memory_set_bank(space->machine, "basic", (data & 0x20) ? 1 : 0);
+}
+
+READ8_HANDLER( mbeeppc_low_r )
+{
+	if (mbee_1c & 16)
+		return attribram[offset];
+	else
+	if (mbee_0b & 1)
+		return gfxram[offset];
+	else
+		return videoram[offset];
+}
+
+WRITE8_HANDLER( mbeeppc_low_w )
+{
+	if (mbee_1c & 16)
+		attribram[offset] = data;
+	else
+		videoram[offset] = data;
+}
+
+READ8_HANDLER( mbeeppc_high_r )
+{
+	if (mbee_08 & 0x40)
+		return colorram[offset];
+	else
+		return gfxram[(((mbee_1c & 15) + 1) << 11) | offset];
+}
+
+WRITE8_HANDLER ( mbeeppc_high_w )
+{
+	if ((mbee_08 & 0x40) && (~mbee_0b & 1))
+		colorram[offset] = data;
+	else
+		gfxram[(((mbee_1c & 15) + 1) << 11) | offset] = data;
+}
 
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
@@ -193,35 +266,7 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 
 
 
-WRITE8_HANDLER ( mbeeppc_0a_w )
-{
-	mbee_0a = data;
-	memory_set_bank(space->machine, "pak", (data&15) >> 1);
-}
 
-READ8_HANDLER ( mbeepc_telcom_low_r )
-{
-/* Read of port 0A - set Telcom rom to first half */
-	memory_set_bank(space->machine, "telcom", 0);
-	return mbee_0a;
-}
-
-READ8_HANDLER ( mbeepc_telcom_high_r )
-{
-/* Read of port 10A - set Telcom rom to 2nd half */
-	memory_set_bank(space->machine, "telcom", 1);
-	return mbee_0a;
-}
-
-WRITE8_HANDLER( mbeeppc_1c_w )
-{
-/*  d7 extended graphics - not emulated
-    d5 bankswitch basic rom
-    d4 select attribute ram - not emulated
-    d3..d0 select videoram bank - not emulated */
-
-	memory_set_bank(space->machine, "bank6", (data & 0x20) ? 1 : 0);
-}
 
 
 static void m6545_update_strobe(running_machine *machine, int param)
@@ -507,6 +552,14 @@ VIDEO_START( mbeeic )
 	gfxram = memory_region(machine, "gfx")+0x1000;
 }
 
+VIDEO_START( mbeeppc )
+{
+	videoram = memory_region(machine, "videoram");
+	colorram = memory_region(machine, "colorram");
+	gfxram = memory_region(machine, "gfx")+0x1000;
+	attribram = memory_region(machine, "attrib");
+}
+
 VIDEO_UPDATE( mbee )
 {
 	UINT8 y,ra,chr,gfx;
@@ -622,6 +675,71 @@ VIDEO_UPDATE( mbeeic )
 	}
 	return 0;
 }
+
+/* Need to find how the colour works on this model */
+VIDEO_UPDATE( mbeeppc )
+{
+	UINT8 y,ra,gfx,fg,bg;
+	UINT16 mem,sy=0,ma=0,x,col,chr;
+	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
+	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
+	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
+	UINT16 colourm = (mbee_08 & 0x0e) << 7;
+
+	framecnt++;
+
+	for (y = 0; y < crt.vertical_displayed; y++)						// for each row of chars
+	{
+		for (ra = 0; ra < (crt.scan_lines&15)+1; ra++)					// for each scanline - RA4 is used as an update strobe for the keyboard
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + crt.horizontal_displayed; x++)			// for each character
+			{
+				UINT8 inv=0;
+				mem = (x + screen_home) & 0x7ff;
+				chr = videoram[mem];
+				col = colorram[mem] | colourm;					// read a byte of colour
+
+				if (chr & 0x80)
+					chr += (attribram[mem] << 7);				// bump chr to its particular pcg definition
+
+				if ((x & 15) == 0)
+				{
+					if (mbee_wait_time)
+						mbee_wait_time--;
+					else
+						m6545_update_strobe(screen->machine, x);
+				}
+
+				/* process cursor */
+				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
+					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+					(mem == cursor))					// displaying at cursor position?
+						inv ^= mc6845_cursor[ra];			// cursor scan row
+
+				/* get pattern of pixels for that character scanline */
+				gfx = gfxram[(chr<<4) | ra] ^ inv;
+				fg = (col & 0x001f) | 64;					// map to foreground palette
+				bg = (col & 0x07e0) >> 5;					// and background palette
+
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? fg : bg; p++;
+				*p = ( gfx & 0x40 ) ? fg : bg; p++;
+				*p = ( gfx & 0x20 ) ? fg : bg; p++;
+				*p = ( gfx & 0x10 ) ? fg : bg; p++;
+				*p = ( gfx & 0x08 ) ? fg : bg; p++;
+				*p = ( gfx & 0x04 ) ? fg : bg; p++;
+				*p = ( gfx & 0x02 ) ? fg : bg; p++;
+				*p = ( gfx & 0x01 ) ? fg : bg; p++;
+			}
+		}
+		ma+=crt.horizontal_displayed;
+	}
+	return 0;
+}
+
 
 PALETTE_INIT( mbeeic )
 {
