@@ -2,63 +2,221 @@
 
         Schachcomputer SC2
 
+        Node:
+         The HW is very similar to Fidelity Chess Challenger series (see fidelz80.c)
+
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80pio.h"
+#include "sound/beep.h"
+#include "sc2.lh"
+
+class sc2_state : public driver_device
+{
+public:
+	sc2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 kp_matrix;
+	UINT8 led_7seg_data[4];
+	UINT8 led_selected;
+	UINT8 digit_data;
+	UINT8 beep_state;
+
+	device_t *beep;
+};
+
+static READ8_HANDLER ( sc2_beep )
+{
+	sc2_state *state = space->machine->driver_data<sc2_state>();
+
+	if (!space->debugger_access())
+	{
+		state->beep_state = ~state->beep_state;
+
+		beep_set_state(state->beep, state->beep_state);
+	}
+
+	return 0xff;
+}
 
 static ADDRESS_MAP_START(sc2_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x1000, 0x1fff ) AM_RAM
+	AM_RANGE( 0x1000, 0x13ff ) AM_RAM
 	AM_RANGE( 0x2000, 0x33ff ) AM_ROM
-	AM_RANGE( 0x3400, 0x3fff ) AM_RAM
+	AM_RANGE( 0x3c00, 0x3c00 ) AM_READ(sc2_beep)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc2_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xfc) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( sc2 )
+	PORT_START("LINE1")
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_UNUSED
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
+
+	PORT_START("LINE2")
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4)
+
+	PORT_START("LINE3")
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8)
+
+	PORT_START("LINE4")
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
+static MACHINE_START(sc2)
+{
+	sc2_state *state = machine->driver_data<sc2_state>();
+
+	state->beep = machine->device("beep");
+}
 
 static MACHINE_RESET(sc2)
 {
+	sc2_state *state = machine->driver_data<sc2_state>();
+
+	state->kp_matrix = 0;
+	state->led_selected = 0;
+	state->digit_data = 0;
+	state->beep_state = 0;
+	memset(state->led_7seg_data, 0, ARRAY_LENGTH(state->led_7seg_data));
 }
 
-static VIDEO_START( sc2 )
+static void sc2_update_display(running_machine *machine)
 {
+	sc2_state *state = machine->driver_data<sc2_state>();
+	UINT8 digit_data = BITSWAP8( state->digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+
+	if (!(state->led_selected&0x01))
+	{
+		output_set_digit_value(0, digit_data);
+		state->led_7seg_data[0] = digit_data;
+
+		output_set_led_value(0, (state->digit_data & 0x80) ? 1 : 0);
+	}
+	if (!(state->led_selected&0x02))
+	{
+		output_set_digit_value(1, digit_data);
+		state->led_7seg_data[1] = digit_data;
+
+		output_set_led_value(1, (state->digit_data & 0x80) ? 1 : 0);
+	}
+	if (!(state->led_selected&0x04))
+	{
+		output_set_digit_value(2, digit_data);
+		state->led_7seg_data[2] = digit_data;
+	}
+	if (!(state->led_selected&0x08))
+	{
+		output_set_digit_value(3, digit_data);
+		state->led_7seg_data[3] = digit_data;
+	}
 }
 
-static VIDEO_UPDATE( sc2 )
+static READ8_DEVICE_HANDLER( pio_port_a_r )
 {
-    return 0;
+	sc2_state *state = device->machine->driver_data<sc2_state>();
+
+	return state->digit_data;
 }
 
-static MACHINE_CONFIG_START( sc2, driver_device )
+static READ8_DEVICE_HANDLER( pio_port_b_r )
+{
+	sc2_state *state = device->machine->driver_data<sc2_state>();
+
+	UINT8 data = state->led_selected & 0x0f;
+
+	if ((state->kp_matrix&0x01))
+	{
+		data |= input_port_read(device->machine, "LINE1");
+	}
+	if ((state->kp_matrix&0x02))
+	{
+		data |= input_port_read(device->machine, "LINE2");
+	}
+	if ((state->kp_matrix&0x04))
+	{
+		data |= input_port_read(device->machine, "LINE3");
+	}
+	if ((state->kp_matrix&0x08))
+	{
+		data |= input_port_read(device->machine, "LINE4");
+	}
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER( pio_port_a_w )
+{
+	sc2_state *state = device->machine->driver_data<sc2_state>();
+
+	state->digit_data = data;
+}
+
+static WRITE8_DEVICE_HANDLER( pio_port_b_w )
+{
+	sc2_state *state = device->machine->driver_data<sc2_state>();
+
+	if (data != 0xf1 && data != 0xf2 && data != 0xf4 && data != 0xf8)
+	{
+		state->led_selected = data;
+		sc2_update_display(device->machine);
+	}
+	else
+		state->kp_matrix = data;
+};
+
+static Z80PIO_INTERFACE( pio_intf )
+{
+	DEVCB_NULL,						/* callback when change interrupt status */
+	DEVCB_HANDLER(pio_port_a_r),	/* port A read callback */
+	DEVCB_HANDLER(pio_port_a_w),	/* port A write callback */
+	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_HANDLER(pio_port_b_r),	/* port B read callback */
+	DEVCB_HANDLER(pio_port_b_w),	/* port B write callback */
+	DEVCB_NULL						/* portB ready active callback */
+};
+
+static MACHINE_CONFIG_START( sc2, sc2_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(sc2_mem)
     MDRV_CPU_IO_MAP(sc2_io)
 
+    MDRV_MACHINE_START(sc2)
     MDRV_MACHINE_RESET(sc2)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_DEFAULT_LAYOUT(layout_sc2)
 
-    MDRV_VIDEO_START(sc2)
-    MDRV_VIDEO_UPDATE(sc2)
+	/* devices */
+	MDRV_Z80PIO_ADD("z80pio", XTAL_4MHz, pio_intf)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO( "mono" )
+	MDRV_SOUND_ADD( "beep", BEEP, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -78,5 +236,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, sc2,  0,       0,	sc2,	sc2,	 0, 			 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, sc2,  0,       0,	sc2,	sc2,	 0, 			 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
