@@ -143,23 +143,24 @@ public:
     I8255 Device
 ******************************************************************************/
 
-void update_display(running_machine *machine)
+static void update_display(running_machine *machine)
 {
 	fidelz80_state *state = machine->driver_data<fidelz80_state>();
 	UINT8 digit_data = BITSWAP8( state->digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
-
-	output_set_led_value(0, (state->led_data & 0x08) ? 1 : 0);
-	output_set_led_value(1, (state->led_data & 0x04) ? 1 : 0);
 
 	if (state->led_selected&0x04)
 	{
 		output_set_digit_value(0, digit_data);
 		state->led_7seg_data[0] = digit_data;
+
+		output_set_led_value(1, state->led_selected & 0x01);
 	}
 	if (state->led_selected&0x08)
 	{
 		output_set_digit_value(1, digit_data);
 		state->led_7seg_data[1] = digit_data;
+
+		output_set_led_value(0, state->led_selected & 0x01);
 	}
 	if (state->led_selected&0x10)
 	{
