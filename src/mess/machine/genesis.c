@@ -4,6 +4,31 @@
 
   Machine file to handle emulation of the Sega Mega Drive & Genesis.
 
+	i2c games mapping table:
+
+	game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
+	----------------------------------|------------|------------|------------|----------------|-----------|
+	NBA Jam                           | 0x200001-0 | 0x200001-0*| 0x200000-1*| 0x00ff (24C02) |   0x03    | x
+    NBA Jam TE                        | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | x
+    NFL Quarterback Club              | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | x
+    NFL Quarterback Club 96           | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x07ff (24C16) |   0x07    | x
+    College Slam                      | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    |
+    Frank Thomas Big Hurt Baseball    | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    |
+    NHLPA Hockey 93                   | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    |
+    Rings of Power                    | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    |
+    Evander Holyfield's Boxing        | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |
+    Greatest Heavyweights of the Ring | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |
+    Wonder Boy V                      | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |
+    Sports Talk Baseball              | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |
+    Megaman - the Wily Wars           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | **
+    Micro Machines 2                  | 0x300000-0 | 0x380001-7 | 0x300000-1 | 0x03ff (24C08) |   0x0f    |
+    Micro Machines Military           | 0x300000-0 | 0x380001-7 | 0x300000-1 | 0x03ff (24C08) |   0x0f    |
+    Micro Machines 96                 | 0x300000-0 | 0x380001-7 | 0x300000-1 | 0x07ff (24C16) |   0x0f    |
+    Brian Lara Cricket 96             | 0x300000-0 | 0x380001-7 | 0x300000-1 | 0x1fff (24C64) |   0x??*   |
+    ----------------------------------|------------|------------|------------|----------------|-----------|
+
+	* Notes: check these
+	** original Rockman Mega World (J) set uses normal backup RAM
 
     2008-09: Moved here cart code and custom mapper handlers. Hopefully,
         it will make painless the future merging with HazeMD
@@ -34,28 +59,32 @@
 enum t_cart_type
 {
 	STANDARD = 0,
+	NBA_JAM,				/* NBA Jam */
+	NBA_JAM_TE,				/* NBA Jam TE / NFL Quarterback Club */
+	NFL_QB_96,				/* NFL Quarterback Club '96 */
+
 	SSF2,					/* Super Street Fighter 2 */
-	LIONK3,				/* Lion King 3 */
+	LIONK3,					/* Lion King 3 */
 	SKINGKONG,				/* Super King Kong 99 */
-	SDK99,				/* Super Donkey Kong 99 */
+	SDK99,					/* Super Donkey Kong 99 */
 	REDCLIFF,				/* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
 	REDCL_EN,				/* The encoded version... */
-	RADICA,				/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
-	KOF99,				/* King of Fighters '99 */
+	RADICA,					/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
+	KOF99,					/* King of Fighters '99 */
 	SOULBLAD,				/* Soul Blade */
 	MJLOVER,				/* Mahjong Lover */
 	SQUIRRELK,				/* Squirrel King */
-	SMOUSE,				/* Smart Mouse */
+	SMOUSE,					/* Smart Mouse */
 	SMB,					/* Super Mario Bros. */
 	SMB2,					/* Super Mario Bros. 2 */
-	KAIJU,				/* Pokemon Stadium */
+	KAIJU,					/* Pokemon Stadium */
 	CHINFIGHT3,				/* Chinese Fighters 3 */
-	LIONK2,				/* Lion King 2 */
+	LIONK2,					/* Lion King 2 */
 	BUGSLIFE,				/* A Bug's Life */
-	ELFWOR,				/* Elf Wor */
+	ELFWOR,					/* Elf Wor */
 	ROCKMANX3,				/* Rockman X3 */
 	SBUBBOB,				/* Super Bubble Bobble */
-	KOF98,				/* King of Fighters '98 */
+	KOF98,					/* King of Fighters '98 */
 	REALTEC,				/* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	SUP19IN1,				/* Super 19 in 1 */
 	SUP15IN1				/* Super 15 in 1 */
@@ -1128,6 +1157,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			soulb_sig[]		= { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 			s19in1_sig[]	= { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 };
 
+		//printf("%08x\n",genesis_last_loaded_image_length);
+
 		switch (genesis_last_loaded_image_length)
 		{
 			case 0x80000:
@@ -1190,6 +1221,10 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 				if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
 					cart_type = SUP15IN1;
+
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326", 11)) // NBA Jam
+					cart_type = NBA_JAM;
+
 				break;
 
 			case 0x200005:
@@ -1203,6 +1238,13 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 				if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
 					cart_type = KOF99;
+
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
+					cart_type = NBA_JAM_TE;
+
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81276", 10)) // NFL Quarterback Club
+					cart_type = NBA_JAM_TE;
+
 				break;
 
 			case 0x400000:
@@ -1215,6 +1257,9 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 				if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
 					cart_type = SUP19IN1;
+
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81586", 10)) // NFL Quarterback Club 96
+					cart_type = NFL_QB_96;
 				break;
 
 			case 0x500000:
