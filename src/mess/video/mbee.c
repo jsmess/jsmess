@@ -149,7 +149,7 @@ WRITE8_HANDLER ( mbeeic_0a_w )
 WRITE8_HANDLER ( mbeeppc_0a_w )
 {
 	mbee_0a = data;
-	memory_set_bank(space->machine, "pak", (data&15) >> 1);
+	memory_set_bank(space->machine, "pak", data & 15);
 }
 
 READ8_HANDLER ( mbeepc_telcom_low_r )

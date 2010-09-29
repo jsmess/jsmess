@@ -63,9 +63,11 @@
 
     TODO:
     - Printer is working, but with improper code. This needs to be fixed.
-    - Other models to be added (64k, 128k, 256k, 512k, PPC85, Teleterm)
+    - Other models to be added (64k, 128k, 256k, 512k, Teleterm)
     - Roms for mbeepc to be checked (I think they are correct)
     - Fix Paste (it loses most of the characters)
+    - Fix Premium model
+    - Get details on the many other models not currently emulated
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
@@ -587,7 +589,7 @@ static DRIVER_INIT( mbeeppc )
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memory_region(machine, "pakrom");
-	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
@@ -764,8 +766,10 @@ ROM_START( mbeeppc )
 	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
 	ROM_LOAD("wbee13.rom",            0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD_OPTIONAL("cmdhelp.rom",  0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
-	ROM_LOAD_OPTIONAL("busycalc.rom", 0x4000,  0x4000, CRC(f2897427) SHA1(b4c351bdac72d89589980be6d654f9b931bcba6b) ) // 2
-	ROM_LOAD_OPTIONAL("graphics.rom", 0x6000,  0x4000, CRC(9e9d327c) SHA1(aebf60ed153004380b9f271f2212376910a6cef9) ) // 3
+	ROM_LOAD_OPTIONAL("busycalc.rom", 0x4000,  0x2000, CRC(f2897427) SHA1(b4c351bdac72d89589980be6d654f9b931bcba6b) ) // 2
+	ROM_CONTINUE( 0x14000, 0x2000 )
+	ROM_LOAD_OPTIONAL("graphics.rom", 0x6000,  0x2000, CRC(9e9d327c) SHA1(aebf60ed153004380b9f271f2212376910a6cef9) ) // 3
+	ROM_CONTINUE( 0x16000, 0x2000 )
 	ROM_LOAD_OPTIONAL("vtex235.rom",  0x8000,  0x2000, CRC(8c30ecb2) SHA1(cf068462d7def885bdb5d3a265851b88c727c0d7) ) // 4
 	ROM_LOAD("ppcshell.rom",          0xa000,  0x2000, CRC(1e793555) SHA1(ddeaa081ec4408e80e3fb192865d87daa035c701) ) // 5
 
