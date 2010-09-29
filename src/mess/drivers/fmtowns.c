@@ -1941,7 +1941,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-  //AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
+  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
@@ -2439,6 +2439,7 @@ static MACHINE_CONFIG_DERIVED( marty, towns )
 	MDRV_CPU_REPLACE("maincpu",I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(marty_mem)
 	MDRV_CPU_IO_MAP(towns_io)
+	MDRV_CPU_VBLANK_INT("screen", towns_vsync_irq)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
