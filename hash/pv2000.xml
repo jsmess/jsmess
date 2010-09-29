@@ -45,6 +45,28 @@
 		</part>
 	</software>
 
+	<software name="pooyan">
+		<description>Pooyan</description>
+		<year>1982</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pooyan.bin" size="16384" crc="3c16027b" sha1="a0bdf3160b61342cdc1611d866aa8c4b39da4506" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrpackn">
+		<description>Mr. Packn</description>
+		<year>1982</year>
+		<publisher>Casio / Konami</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mrpackn.bin" size="8192" crc="ee0d3948" sha1="fd311a46b87ddd6263c4f12e88178d9e2150ea5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rakugaki">
 		<description>Rakugaki Special</description>
 		<year>1983</year>
@@ -63,6 +85,17 @@
 		<part name="cart" interface="pv2000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="rocnrope.bin" size="8192" crc="f8c9c2d9" sha1="2744e448f9537fbca1e65cbd3646678100777de3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skicmmnd">
+		<description>Ski Command</description>
+		<year>198?</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="skicmmnd.bin" size="16384" crc="07bf1f44" sha1="5608311721d486b0cffccdfef40d51443a283490" offset="0" />
 			</dataarea>
 		</part>
 	</software>
