@@ -334,10 +334,6 @@ static INPUT_PORTS_START( mbee )
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_BIT( 0x6, 0x6, IPT_UNUSED )
-//  PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
-//  PORT_CONFSETTING(    0x08, DEF_STR(On))
-//  PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
 static const z80_daisy_config mbee_daisy_chain[] =
@@ -350,7 +346,7 @@ static const z80_daisy_config mbee_daisy_chain[] =
 static const gfx_layout mbee_charlayout =
 {
 	8,16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
+	RGN_FRAC(1,1),
 	1,					/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	/* x offsets */
@@ -360,13 +356,12 @@ static const gfx_layout mbee_charlayout =
 	8*16					/* every char takes 16 bytes */
 };
 
-/* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
 static GFXDECODE_START( mbee )
-	GFXDECODE_ENTRY( "gfx", 0x1000, mbee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( mbeeic )
-	GFXDECODE_ENTRY( "gfx", 0x1000, mbee_charlayout, 0, 48 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 48 )
 GFXDECODE_END
 
 static FLOPPY_OPTIONS_START(mbee)
