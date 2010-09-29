@@ -10,6 +10,7 @@
 	----------------------------------|------------|------------|------------|----------------|-----------|
 	NBA Jam                           | 0x200001-0 | 0x200001-0*| 0x200000-1*| 0x00ff (24C02) |   0x03    | x
     NBA Jam TE                        | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | x
+    NBA Jam TE (32x)                  | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |
     NFL Quarterback Club              | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | x
     NFL Quarterback Club 96           | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x07ff (24C16) |   0x07    | x
     College Slam                      | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    |
@@ -609,7 +610,7 @@ static void alloc_sram(running_machine *machine)
 {
 	genesis_sram = auto_alloc_array(machine, UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
-	image->battery_load(genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0x00);
+	image->battery_load(genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0xff); // Dino Dini's Soccer needs backup RAM to be 1fill
 	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 }
 
