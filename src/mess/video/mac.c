@@ -147,7 +147,7 @@ VIDEO_UPDATE( mac_cb264 )
 					scanline = BITMAP_ADDR32(bitmap, y, 0);
 					for (x = 0; x < 640/8; x++)
 					{
-						pixels = vram8[(y * 1024) + (x^3)];
+						pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 						*scanline++ = cb264_palette[pixels&0x80];
 						*scanline++ = cb264_palette[(pixels<<1)&0x80];
@@ -172,7 +172,7 @@ VIDEO_UPDATE( mac_cb264 )
 					scanline = BITMAP_ADDR32(bitmap, y, 0);
 					for (x = 0; x < 640/4; x++)
 					{
-						pixels = vram8[(y * 1024) + (x^3)];
+						pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 						*scanline++ = cb264_palette[pixels&0xc0];
 						*scanline++ = cb264_palette[(pixels<<2)&0xc0];
@@ -194,7 +194,7 @@ VIDEO_UPDATE( mac_cb264 )
 
 					for (x = 0; x < 640/2; x++)
 					{
-						pixels = vram8[(y * 1024) + (x^3)];
+						pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
 
 						*scanline++ = cb264_palette[pixels&0xf0];
 						*scanline++ = cb264_palette[(pixels<<4)&0xf0];
@@ -214,7 +214,7 @@ VIDEO_UPDATE( mac_cb264 )
 
 					for (x = 0; x < 640; x++)
 					{
-						pixels = vram8[(y * 1024) + (x^3)];
+						pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
 						*scanline++ = cb264_palette[pixels];
 					}
 				}
