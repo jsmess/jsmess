@@ -1166,6 +1166,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)];
 			if(colour != 0)
 			{
@@ -1182,6 +1186,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
@@ -1202,6 +1210,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	{  // x3 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=3)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
@@ -1226,6 +1238,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	{  // x4 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=4)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
@@ -1254,6 +1270,10 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	{  // x5 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=5)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
@@ -1337,6 +1357,10 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 	{
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
+			if(state->video.towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
 			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
