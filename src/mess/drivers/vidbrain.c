@@ -128,11 +128,8 @@ static WRITE8_HANDLER( sound_w )
 	
 	if (!state->sound_clk && sound_clk)
 	{
-		state->sound_q[0] = BIT(state->keylatch, 0);
-		state->sound_q[1] = BIT(state->keylatch, 1);
-
-		discrete_sound_w(state->discrete, NODE_01, state->sound_q[0]);
-		discrete_sound_w(state->discrete, NODE_02, state->sound_q[1]);
+		discrete_sound_w(state->discrete, NODE_01, BIT(state->keylatch, 0));
+		discrete_sound_w(state->discrete, NODE_02, BIT(state->keylatch, 1));
 	}
 
 	state->sound_clk = sound_clk;
@@ -448,7 +445,6 @@ static MACHINE_START( vidbrain )
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->joy_enable);
 	state_save_register_global(machine, state->sound_clk);
-	state_save_register_global_array(machine, state->sound_q);
 }
 
 /***************************************************************************

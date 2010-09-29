@@ -1,12 +1,11 @@
 /*
 
     TODO:
-
+	
 	- X order
 	- freeze (light pen)
 	- screen size
 	- scanline based update
-	- partial updates to allow mid-screen zoom change
 
 */
 
@@ -66,6 +65,9 @@ READ8_HANDLER( vidbrain_vlsi_r )
 	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	UINT8 data = 0xff;
+	int vpos = state->screen->vpos();
+
+	if (vpos >= 262) vpos -= 262;
 
 	switch (offset)
 	{
@@ -95,12 +97,12 @@ READ8_HANDLER( vidbrain_vlsi_r )
 
 		*/
 
-		data = (state->field << 7) | (BIT(state->screen->vpos(), 8) << 1) | BIT(state->freeze_y, 8);
+		data = (state->field << 7) | (BIT(vpos, 8) << 1) | BIT(state->freeze_y, 8);
 		if (LOG) logerror("Y-Freeze High %02x\n", data);
 		break;
 
 	case REGISTER_CURRENT_Y_LOW:
-		data = state->screen->vpos() & 0xff;
+		data = vpos & 0xff;
 		if (LOG) logerror("Current-Y Low %02x\n", data);
 		break;
 
@@ -126,8 +128,24 @@ static void set_y_interrupt(vidbrain_state *state)
 }
 
 /*-------------------------------------------------
+    do_partial_update - update screen
+-------------------------------------------------*/
+
+static void do_partial_update(vidbrain_state *state)
+{
+	int vpos = state->screen->vpos();
+	
+	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
+	
+	state->screen->update_partial(vpos);
+}
+
+/*-------------------------------------------------
     vidbrain_vlsi_w - video VLSI write
 -------------------------------------------------*/
+
+#define IS_CHANGED(_bit) \
+	((state->cmd & _bit) != (data & _bit))
 
 WRITE8_HANDLER( vidbrain_vlsi_w )
 {
@@ -163,6 +181,7 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 
 		if (LOG) logerror("Final Modifier %02x\n", data);
 
+		do_partial_update(state);
 		state->fmod = data & 0x1f;
 		break;
 
@@ -184,6 +203,7 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 
 		if (LOG) logerror("Background %02x\n", data);
 
+		do_partial_update(state);
 		state->bg = data & 0x1f;
 		break;
 
@@ -205,9 +225,14 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 
 		if (LOG) logerror("Command %02x\n", data);
 		
-		if (BIT(state->cmd, 7) != BIT(data, 7))
+		if (IS_CHANGED(COMMAND_YINT_H_O))
 		{
 			set_y_interrupt(state);
+		}
+
+		if (IS_CHANGED(COMMAND_A_B) || IS_CHANGED(COMMAND_Y_ZM) || IS_CHANGED(COMMAND_X_ZM))
+		{
+			do_partial_update(state);
 		}
 
 		state->cmd = data;
@@ -276,7 +301,14 @@ static VIDEO_START( vidbrain )
     VIDEO_UPDATE( vidbrain )
 -------------------------------------------------*/
 
-#define RAM(_offset) state->vlsi_ram[_offset + i]
+#define RAM(_offset) \
+	state->vlsi_ram[_offset + i]
+
+#define IS_VISIBLE(_y) \
+	((_y >= cliprect->min_y) && (_y <= cliprect->max_y))
+
+#define DRAW_PIXEL(_scanline, _dot) \
+	if (IS_VISIBLE(_scanline)) *BITMAP_ADDR16(bitmap, (_scanline), _dot) = pixel;
 
 static VIDEO_UPDATE( vidbrain )
 {
@@ -323,29 +355,41 @@ static VIDEO_UPDATE( vidbrain )
 
 					if (state->cmd & COMMAND_Y_ZM)
 					{
+						int scanline = y + (sy * 2);
+
 						if (state->cmd & COMMAND_X_ZM)
 						{
-							*BITMAP_ADDR16(bitmap, y + (sy * 2), x + (sx * 8) + (bit * 2)) = pixel;
-							*BITMAP_ADDR16(bitmap, y + (sy * 2) + 1, x + (sx * 8) + (bit * 2)) = pixel;
-							*BITMAP_ADDR16(bitmap, y + (sy * 2), x + (sx * 8) + (bit * 2) + 1) = pixel;
-							*BITMAP_ADDR16(bitmap, y + (sy * 2) + 1, x + (sx * 8) + (bit * 2) + 1) = pixel;
+							int dot = (x * 2) + (sx * 16) + (bit * 2);
+
+							DRAW_PIXEL(scanline, dot);
+							DRAW_PIXEL(scanline, dot + 1);
+							DRAW_PIXEL(scanline + 1, dot);
+							DRAW_PIXEL(scanline + 1, dot + 1);
 						}
 						else
 						{
-							*BITMAP_ADDR16(bitmap, y + (sy * 2), x + (sx * 8) + bit) = pixel;
-							*BITMAP_ADDR16(bitmap, y + (sy * 2) + 1, x + (sx * 8) + bit) = pixel;
+							int dot = x + (sx * 8) + bit;
+
+							DRAW_PIXEL(scanline, dot);
+							DRAW_PIXEL(scanline + 1, dot);
 						}
 					}
 					else
 					{
+						int scanline = y + sy;
+
 						if (state->cmd & COMMAND_X_ZM)
 						{
-							*BITMAP_ADDR16(bitmap, y + sy, x + (sx * 8) + (bit * 2)) = pixel;
-							*BITMAP_ADDR16(bitmap, y + sy, x + (sx * 8) + (bit * 2) + 1) = pixel;
+							int dot = (x * 2) + (sx * 16) + (bit * 2);
+
+							DRAW_PIXEL(scanline, dot);
+							DRAW_PIXEL(scanline, dot + 1);
 						}
 						else
 						{
-							*BITMAP_ADDR16(bitmap, y + sy, x + (sx * 8) + bit) = pixel;
+							int dot = x + (sx * 8) + bit;
+
+							DRAW_PIXEL(scanline, dot);
 						}
 					}
 
@@ -397,6 +441,7 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 
 	if ((state->cmd & COMMAND_INT) && !(state->cmd & COMMAND_FRZ))
 	{
+		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->screen->vpos());
 //		f3853_set_external_interrupt_in_line(state->smi, 1);
 		state->ext_int_latch = 1;
 		vidbrain_interrupt_check(timer.machine);
@@ -429,7 +474,7 @@ MACHINE_CONFIG_FRAGMENT( vidbrain_video )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(320, 525)
-    MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 262-1)
+    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 240-1)
 	MDRV_GFXDECODE(vidbrain)
     MDRV_PALETTE_LENGTH(32)
     MDRV_PALETTE_INIT(vidbrain)

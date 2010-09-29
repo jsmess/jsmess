@@ -39,7 +39,6 @@ public:
 
 	/* sound state */
 	int sound_clk;
-	int sound_q[2];
 
 	/* devices */
 	running_device *discrete;
