@@ -2762,8 +2762,13 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 /**********************************************************************************************/
 
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
+static UINT16 cur_lch,cur_rch;
 static UINT16 pwm_cycle_reg; //used for latching
+static UINT8 pwm_timer_tick;
+static UINT16 lch_fifo_state,rch_fifo_state;
+
 static emu_timer *_32x_pwm_timer;
+
 
 static void calculate_pwm_timer(void)
 {
@@ -2774,18 +2779,36 @@ static void calculate_pwm_timer(void)
 	if(pwm_cycle == 1 || ((pwm_ctrl & 0xf) == 0))
 		timer_adjust_oneshot(_32x_pwm_timer, attotime_never, 0);
 	else
-		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1)) * pwm_tm_reg), 0);
+	{
+		pwm_timer_tick = 0;
+		lch_fifo_state = rch_fifo_state = 0x4000;
+		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
+	}
 }
 
 static TIMER_CALLBACK( _32x_pwm_callback )
 {
-	// ...
+	if(lch_fifo_state == 0x8000)
+	{
+		lch_fifo_state = 0x4000;
+		dac_data_16_w(machine->device("lch_pwm"), cur_lch);
+	}
+	if(rch_fifo_state == 0x8000)
+	{
+		rch_fifo_state = 0x4000;
+		dac_data_16_w(machine->device("rch_pwm"), cur_rch);
+	}
 
-	if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	pwm_timer_tick++;
 
-	if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	if(pwm_timer_tick == pwm_tm_reg)
+	{
+		pwm_timer_tick = 0;
+		if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	}
 
-	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1)) * pwm_tm_reg), 0);
+	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
 }
 
 static READ16_HANDLER( _32x_pwm_r )
@@ -2794,9 +2817,9 @@ static READ16_HANDLER( _32x_pwm_r )
 	{
 		case 0x00/2: return pwm_ctrl; //control register
 		case 0x02/2: return pwm_cycle_reg; // cycle register
-		case 0x04/2: return mame_rand(space->machine) & 0xc000; // l ch TODO
-		case 0x06/2: return mame_rand(space->machine) & 0xc000; // r ch TODO
-		case 0x08/2: return mame_rand(space->machine) & 0xc000; // mono ch TODO
+		case 0x04/2: return lch_fifo_state; // l ch
+		case 0x06/2: return rch_fifo_state; // r ch
+		case 0x08/2: return lch_fifo_state & rch_fifo_state; // mono ch
 	}
 
 	printf("Read at undefined PWM register %02x\n",offset);
@@ -2817,14 +2840,17 @@ static WRITE16_HANDLER( _32x_pwm_w )
 			calculate_pwm_timer();
 			break;
 		case 0x04/2:
-			dac_data_16_w(space->machine->device("lch_pwm"), ((data & 0xfff) << 4));
+			cur_lch = ((data & 0xfff) << 4);
+			lch_fifo_state = 0x8000;
 			break;
 		case 0x06/2:
-			dac_data_16_w(space->machine->device("rch_pwm"), ((data & 0xfff) << 4));
+			cur_rch = ((data & 0xfff) << 4);
+			rch_fifo_state = 0x8000;
 			break;
 		case 0x08/2:
-			dac_data_16_w(space->machine->device("lch_pwm"), ((data & 0xfff) << 4));
-			dac_data_16_w(space->machine->device("rch_pwm"), ((data & 0xfff) << 4));
+			cur_lch = ((data & 0xfff) << 4);
+			cur_rch = ((data & 0xfff) << 4);
+			lch_fifo_state = rch_fifo_state = 0x8000;
 			break;
 		default:
 			printf("Write at undefined PWM register %02x %04x\n",offset,data);
