@@ -2761,14 +2761,16 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 // access from the SH2 via 4030 - 403f
 /**********************************************************************************************/
 
+#define PWM_FIFO_SIZE pwm_tm_reg // guess, check this (Doom wants 3, Virtua Racing wants 1 like they sets this register?)
+
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
-static UINT16 cur_lch,cur_rch;
+static UINT16 cur_lch[0x10],cur_rch[0x10];
 static UINT16 pwm_cycle_reg; //used for latching
 static UINT8 pwm_timer_tick;
+static UINT8 lch_index_r,rch_index_r,lch_index_w,rch_index_w;
 static UINT16 lch_fifo_state,rch_fifo_state;
 
 static emu_timer *_32x_pwm_timer;
-
 
 static void calculate_pwm_timer(void)
 {
@@ -2782,22 +2784,29 @@ static void calculate_pwm_timer(void)
 	{
 		pwm_timer_tick = 0;
 		lch_fifo_state = rch_fifo_state = 0x4000;
+		lch_index_r = rch_index_r = 0;
+		lch_index_w = rch_index_w = 0;
 		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
 	}
 }
 
 static TIMER_CALLBACK( _32x_pwm_callback )
 {
-	if(lch_fifo_state == 0x8000)
+	if(lch_index_r < PWM_FIFO_SIZE)
 	{
-		lch_fifo_state = 0x4000;
-		dac_data_16_w(machine->device("lch_pwm"), cur_lch);
+		dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]);
+		lch_index_w = 0;
 	}
-	if(rch_fifo_state == 0x8000)
+
+	lch_fifo_state = (lch_index_r == PWM_FIFO_SIZE) ? 0x4000 : 0x0000;
+
+	if(rch_index_r < PWM_FIFO_SIZE)
 	{
-		rch_fifo_state = 0x4000;
-		dac_data_16_w(machine->device("rch_pwm"), cur_rch);
+		dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]);
+		rch_index_w = 0;
 	}
+
+	rch_fifo_state = (rch_index_r == PWM_FIFO_SIZE) ? 0x4000 : 0x0000;
 
 	pwm_timer_tick++;
 
@@ -2840,17 +2849,40 @@ static WRITE16_HANDLER( _32x_pwm_w )
 			calculate_pwm_timer();
 			break;
 		case 0x04/2:
-			cur_lch = ((data & 0xfff) << 4);
-			lch_fifo_state = 0x8000;
+			if(lch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_lch[lch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				lch_index_r = 0;
+			}
+
+			lch_fifo_state = (lch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			break;
 		case 0x06/2:
-			cur_rch = ((data & 0xfff) << 4);
-			rch_fifo_state = 0x8000;
+			if(rch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_rch[rch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				rch_index_r = 0;
+			}
+
+			rch_fifo_state = (rch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+
 			break;
 		case 0x08/2:
-			cur_lch = ((data & 0xfff) << 4);
-			cur_rch = ((data & 0xfff) << 4);
-			lch_fifo_state = rch_fifo_state = 0x8000;
+			if(lch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_lch[lch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				lch_index_r = 0;
+			}
+
+			if(rch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_rch[rch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				rch_index_r = 0;
+			}
+
+			lch_fifo_state = (lch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+			rch_fifo_state = (rch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+
 			break;
 		default:
 			printf("Write at undefined PWM register %02x %04x\n",offset,data);
@@ -6326,10 +6358,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	MDRV_QUANTUM_TIME(HZ(1800000))
 
 	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 
 	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -6349,6 +6381,12 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
+
+	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+
+	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
