@@ -67,11 +67,12 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
 #include "sound/fm.h"
+#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
@@ -2791,11 +2792,11 @@ static READ16_HANDLER( _32x_pwm_r )
 {
 	switch(offset)
 	{
-		case 0/2: return pwm_ctrl; //control register
-		case 2/2: return pwm_cycle_reg; // cycle register
-		case 4/2: return mame_rand(space->machine) & 0xc000; // l ch TODO
-		case 6/2: return mame_rand(space->machine) & 0xc000; // r ch TODO
-		case 8/2: return mame_rand(space->machine) & 0xc000; // mono ch TODO
+		case 0x00/2: return pwm_ctrl; //control register
+		case 0x02/2: return pwm_cycle_reg; // cycle register
+		case 0x04/2: return mame_rand(space->machine) & 0xc000; // l ch TODO
+		case 0x06/2: return mame_rand(space->machine) & 0xc000; // r ch TODO
+		case 0x08/2: return mame_rand(space->machine) & 0xc000; // mono ch TODO
 	}
 
 	printf("Read at undefined PWM register %02x\n",offset);
@@ -2806,23 +2807,24 @@ static WRITE16_HANDLER( _32x_pwm_w )
 {
 	switch(offset)
 	{
-		case 0/2:
+		case 0x00/2:
 			pwm_ctrl = data & 0xffff;
 			pwm_tm_reg = (pwm_ctrl & 0xf00) >> 8;
 			calculate_pwm_timer();
 			break;
-		case 2/2:
+		case 0x02/2:
 			pwm_cycle = pwm_cycle_reg = data & 0xfff;
 			calculate_pwm_timer();
 			break;
-		case 4/2:
-			// l ch TODO
+		case 0x04/2:
+			dac_data_16_w(space->machine->device("lch_pwm"), ((data & 0xfff) << 4));
 			break;
-		case 6/2:
-			// r ch TODO
+		case 0x06/2:
+			dac_data_16_w(space->machine->device("rch_pwm"), ((data & 0xfff) << 4));
 			break;
-		case 8/2:
-			// mono TODO
+		case 0x08/2:
+			dac_data_16_w(space->machine->device("lch_pwm"), ((data & 0xfff) << 4));
+			dac_data_16_w(space->machine->device("rch_pwm"), ((data & 0xfff) << 4));
 			break;
 		default:
 			printf("Write at undefined PWM register %02x %04x\n",offset,data);
@@ -3300,7 +3302,7 @@ static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dra
 
 
 /* the 32x treats everything as 16-bit registers, so we remap the 32-bit read & writes
-   to 2x 16-bit handlers here */
+   to 2x 16-bit handlers here (TODO: nuke this shit) */
 
 #define _32X_MAP_READHANDLERS(NAMEA,NAMEB)                                          \
 static READ32_HANDLER( _32x_sh2_##NAMEA##_##NAMEB##_r )                             \
@@ -6296,6 +6298,12 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
+
+	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+
+	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -6309,6 +6317,12 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
+	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
+	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
+	//
+	// boosting the interleave here actually makes Kolibri run incorrectly however, that
+	// one works best just boosting the interleave on communications?!
+	MDRV_QUANTUM_TIME(HZ(1800000))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
