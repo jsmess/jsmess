@@ -173,7 +173,7 @@ READ8_HANDLER ( mbeeppc_1c_r )
 
 WRITE8_HANDLER( mbeeppc_1c_w )
 {
-/*  d7 extended graphics - not emulated
+/*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
     d4 select attribute ram
     d3..d0 select videoram bank */
@@ -684,7 +684,6 @@ VIDEO_UPDATE( mbeeppc )
 	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
 	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
 	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
-	UINT16 colourm = (mbee_08 & 0x0e) << 7;
 
 	framecnt++;
 
@@ -699,10 +698,23 @@ VIDEO_UPDATE( mbeeppc )
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
 				chr = videoram[mem];
-				col = colorram[mem] | colourm;					// read a byte of colour
+				col = colorram[mem];						// read a byte of colour
 
-				if (chr & 0x80)
-					chr += (attribram[mem] << 7);				// bump chr to its particular pcg definition
+				if (mbee_1c & 0x80)						// are extended features enabled?
+				{
+					UINT8 attr = attribram[mem];
+
+					if (chr & 0x80)
+						chr += ((attr & 15) << 7);			// bump chr to its particular pcg definition
+
+					if (attr & 0x40)
+						inv ^= 0xff;					// inverse attribute
+
+
+					/* Flashing attribute - flash speed is unknown */
+					if ((attr & 0x80) && (framecnt & 8))
+						chr = 0x20;
+				}
 
 				if ((x & 15) == 0)
 				{
@@ -721,8 +733,8 @@ VIDEO_UPDATE( mbeeppc )
 
 				/* get pattern of pixels for that character scanline */
 				gfx = gfxram[(chr<<4) | ra] ^ inv;
-				fg = (col & 0x001f) | 64;					// map to foreground palette
-				bg = (col & 0x07e0) >> 5;					// and background palette
+				fg = col & 15;							// map to foreground palette
+				bg = (col & 0xf0) >> 4;						// and background palette
 
 				/* Display a scanline of a character (8 pixels) */
 				*p = ( gfx & 0x80 ) ? fg : bg; p++;
@@ -766,3 +778,29 @@ PALETTE_INIT( mbeeic )
 		palette_set_color(machine, i|64, MAKE_RGB(r, g, b));
 	}
 }
+
+
+PALETTE_INIT( mbeeppc )
+{
+	UINT16 i;
+	UINT8 r, b, g;
+
+	/* set up 8 low intensity colours */
+	for (i = 0; i < 8; i++)
+	{
+		r = (i & 1) ? 0x80 : 0;
+		g = (i & 2) ? 0x80 : 0;
+		b = (i & 4) ? 0x80 : 0;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+
+	/* set up 8 high intensity colours */
+	for (i = 9; i < 16; i++)
+	{
+		r = (i & 1) ? 0xff : 0;
+		g = (i & 2) ? 0xff : 0;
+		b = (i & 4) ? 0xff : 0;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+

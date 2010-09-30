@@ -81,5 +81,6 @@ VIDEO_UPDATE( mbeeic );
 VIDEO_START( mbeeppc );
 VIDEO_UPDATE( mbeeppc );
 PALETTE_INIT( mbeeic );
+PALETTE_INIT( mbeeppc );
 
 #endif /* MBEE_H_ */

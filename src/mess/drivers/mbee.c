@@ -364,6 +364,10 @@ static GFXDECODE_START( mbeeic )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 48 )
 GFXDECODE_END
 
+static GFXDECODE_START( mbeeppc )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
+GFXDECODE_END
+
 static FLOPPY_OPTIONS_START(mbee)
 	FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
@@ -502,6 +506,9 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MDRV_CPU_IO_MAP(mbeeppc_io)
 	MDRV_VIDEO_START(mbeeppc)
 	MDRV_VIDEO_UPDATE(mbeeppc)
+	MDRV_GFXDECODE(mbeeppc)
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT(mbeeppc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
