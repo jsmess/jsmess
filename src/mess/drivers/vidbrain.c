@@ -110,8 +110,8 @@ static WRITE8_HANDLER( sound_w )
 
         bit     description
 
-        0
-        1
+        0		sound Q0
+        1		sound Q1
         2
         3
         4       sound clock

@@ -3,13 +3,13 @@
 #ifndef __VIDBRAIN__
 #define __VIDBRAIN__
 
-#define F3850_TAG		"cd34"
-#define F3853_TAG		"cd5"
-#define SCREEN_TAG		"screen"
-#define DISCRETE_TAG	"discrete"
-#define TIMER_Y_INT_TAG	"y_int"
-#define TIMER_FIELD_TAG	"field"
-#define CASSETTE_TAG	"cassette"
+#define F3850_TAG			"cd34"
+#define F3853_TAG			"cd5"
+#define SCREEN_TAG			"screen"
+#define DISCRETE_TAG		"discrete"
+#define TIMER_Y_ODD_TAG		"odd"
+#define TIMER_Y_EVEN_TAG	"even"
+#define CASSETTE_TAG		"cassette"
 
 class vidbrain_state : public driver_device
 {
@@ -43,7 +43,8 @@ public:
 	/* devices */
 	running_device *discrete;
 	screen_device *screen;
-	timer_device *timer_y_int;
+	timer_device *timer_y_odd;
+	timer_device *timer_y_even;
 };
 
 /*----------- defined in driver/vidbrain.c -----------*/

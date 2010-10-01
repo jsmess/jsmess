@@ -7,6 +7,8 @@
 	- screen size
 	- scanline based update
 
+	http://zone.ni.com/devzone/cda/tut/p/id/4750
+
 */
 
 #include "emu.h"
@@ -40,7 +42,7 @@
 #define RAM_Y_LO_A					0x50	// Y value low order list A
 #define RAM_Y_LO_B					0x60	// Y value low order list B
 #define RAM_XY_HI_A					0x70	// Y value high order and X order list A
-#define RAM_XY_HI_B					0x80	// Y value high order and Y order list B
+#define RAM_XY_HI_B					0x80	// Y value high order and X order list B
 
 // command register bits
 #define COMMAND_YINT_H_O			0x80
@@ -57,6 +59,32 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
+    get_field_vpos - get scanline within field
+-------------------------------------------------*/
+
+static int get_field_vpos(screen_device *screen)
+{
+	int vpos = screen->vpos();
+	
+	if (vpos >= 262)
+	{
+		// even field
+		vpos -= 262;
+	}
+
+	return vpos;
+}
+
+/*-------------------------------------------------
+    get_field - get video field
+-------------------------------------------------*/
+
+static int get_field(screen_device *screen)
+{
+	return screen->vpos() < 262;
+}
+
+/*-------------------------------------------------
     vidbrain_vlsi_r - video VLSI read
 -------------------------------------------------*/
 
@@ -65,19 +93,18 @@ READ8_HANDLER( vidbrain_vlsi_r )
 	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	UINT8 data = 0xff;
-	int vpos = state->screen->vpos();
-
-	if (vpos >= 262) vpos -= 262;
 
 	switch (offset)
 	{
 	case REGISTER_X_FREEZE:
 		data = state->freeze_x;
+
 		if (LOG) logerror("X-Freeze %02x\n", data);
 		break;
 
 	case REGISTER_Y_FREEZE_LOW:
 		data = state->freeze_y & 0xff;
+
 		if (LOG) logerror("Y-Freeze Low %02x\n", data);
 		break;
 
@@ -97,12 +124,14 @@ READ8_HANDLER( vidbrain_vlsi_r )
 
 		*/
 
-		data = (state->field << 7) | (BIT(vpos, 8) << 1) | BIT(state->freeze_y, 8);
+		data = (get_field(state->screen) << 7) | (BIT(get_field_vpos(state->screen), 8) << 1) | BIT(state->freeze_y, 8);
+
 		if (LOG) logerror("Y-Freeze High %02x\n", data);
 		break;
 
 	case REGISTER_CURRENT_Y_LOW:
-		data = vpos & 0xff;
+		data = get_field_vpos(state->screen) & 0xff;
+
 		if (LOG) logerror("Current-Y Low %02x\n", data);
 		break;
 
@@ -124,7 +153,8 @@ static void set_y_interrupt(vidbrain_state *state)
 {
 	int scanline = ((state->cmd & COMMAND_YINT_H_O) << 1) | state->y_int;
 
-	state->timer_y_int->adjust(state->screen->time_until_pos(scanline, 0), 0, state->screen->frame_period());
+	state->timer_y_odd->adjust(state->screen->time_until_pos(scanline, 0), 0, state->screen->frame_period());
+	state->timer_y_even->adjust(state->screen->time_until_pos(scanline + 262, 0), 0, state->screen->frame_period());
 }
 
 /*-------------------------------------------------
@@ -294,7 +324,8 @@ static VIDEO_START( vidbrain )
 
 	/* get the devices */
 	state->screen = machine->device<screen_device>(SCREEN_TAG);
-	state->timer_y_int = machine->device<timer_device>(TIMER_Y_INT_TAG);
+	state->timer_y_odd = machine->device<timer_device>(TIMER_Y_ODD_TAG);
+	state->timer_y_even = machine->device<timer_device>(TIMER_Y_EVEN_TAG);
 }
 
 /*-------------------------------------------------
@@ -341,7 +372,7 @@ static VIDEO_UPDATE( vidbrain )
 		if (LOG) logerror("Object %u rp %04x color %u dx %u dy %u xcopy %u x %u y %u xord %u\n", i, rp, color, dx, dy, xcopy, x, y, xord);
 
 		if (rp == 0) continue;
-		if (y > 255) continue;
+		if (y > 262) continue;
 
 		for (int sy = 0; sy < dy; sy++)
 		{
@@ -448,17 +479,6 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_DEVICE_CALLBACK( field_tick )
--------------------------------------------------*/
-
-static TIMER_DEVICE_CALLBACK( field_tick )
-{
-	vidbrain_state *state = timer.machine->driver_data<vidbrain_state>();
-
-	state->field = !state->field;
-}
-
 /***************************************************************************
     MACHINE CONFIGURATION
 ***************************************************************************/
@@ -470,18 +490,17 @@ static TIMER_DEVICE_CALLBACK( field_tick )
 MACHINE_CONFIG_FRAGMENT( vidbrain_video )
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(30)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(320, 525)
-    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 240-1)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 320, 525, 0, 243)
+		
 	MDRV_GFXDECODE(vidbrain)
+
     MDRV_PALETTE_LENGTH(32)
     MDRV_PALETTE_INIT(vidbrain)
 
     MDRV_VIDEO_START(vidbrain)
     MDRV_VIDEO_UPDATE(vidbrain)
 
-	MDRV_TIMER_ADD(TIMER_Y_INT_TAG, y_int_tick)
-	MDRV_TIMER_ADD_PERIODIC(TIMER_FIELD_TAG, field_tick, HZ(60))
+	MDRV_TIMER_ADD(TIMER_Y_ODD_TAG, y_int_tick)
+	MDRV_TIMER_ADD(TIMER_Y_EVEN_TAG, y_int_tick)
 MACHINE_CONFIG_END
