@@ -56,9 +56,16 @@ System Driver Changes:
 
 - [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
+- [COCO] Fixed delays in when propagating interrupts signals from the floppy
+  disk controller to the CPU. Added a small pool of timers to allow
+  overlapping interrupt signals. [tim lindner]
+
+
 Imgtool Changes:
 ----------------
-(none)
+
+- Fixed WIMGTOOL to properly support file systems that use directory seperators
+  other than the backslash. [tim lindner]
 
 
 

@@ -18,6 +18,8 @@
 #define CARTSLOT_TAG			"cart"
 #define LOG_LINE				0
 
+/* TIMER_POOL: Must be power of two */
+#define TIMER_POOL         2
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -26,8 +28,9 @@
 typedef struct _coco_cartridge_line coco_cartridge_line;
 struct _coco_cartridge_line
 {
-	emu_timer					*timer;
-	UINT32						delay;	/* in clock cycles */
+	emu_timer					*timer[TIMER_POOL];
+	int                  timer_index;
+	int						delay;
 	cococart_line_value			value;
 	int							line;
 	int							q_count;
@@ -84,7 +87,8 @@ static DEVICE_START(coco_cartridge)
 	running_device *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-
+   int i;
+   
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));
 
@@ -103,15 +107,27 @@ static DEVICE_START(coco_cartridge)
 	}
 
 	/* finish setup */
-	cococart->cart_line.timer		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
-	cococart->cart_line.delay		= 0;
-	cococart->cart_line.callback	= config->cart_callback;
-	cococart->nmi_line.timer		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
-	cococart->nmi_line.delay		= 0;
-	cococart->nmi_line.callback		= config->nmi_callback;
-	cococart->halt_line.timer		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
-	cococart->halt_line.delay		= 7;
-	cococart->halt_line.callback	= config->halt_callback;
+
+	for( i=0; i<TIMER_POOL; i++ )
+	{
+	   cococart->cart_line.timer[i]		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
+	   cococart->nmi_line.timer[i] 		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
+	   cococart->halt_line.timer[i]		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
+   }
+   
+	cococart->cart_line.timer_index     = 0;
+	cococart->cart_line.delay		      = 0;
+	cococart->cart_line.callback        = config->cart_callback;
+
+	cococart->nmi_line.timer_index      = 0;
+	/* 12 allowed one more instruction to finished after the line is pulled */
+	cococart->nmi_line.delay		      = 12;
+	cococart->nmi_line.callback         = config->nmi_callback;
+
+	cococart->halt_line.timer_index     = 0;
+	/* 6 allowed one more instruction to finished after the line is pulled */
+	cococart->halt_line.delay		      = 6;
+	cococart->halt_line.callback        = config->halt_callback;
 }
 
 
@@ -181,7 +197,7 @@ static void set_line(running_device *device, const char *line_name, coco_cartrid
 		line->value = value;
 
 		if (LOG_LINE)
-			logerror("[%s]: set_line(): %s <= %s", cpuexec_describe_context(device->machine), line_name, line_value_string(value));
+			logerror("[%s]: set_line(): %s <= %s\n", cpuexec_describe_context(device->machine), line_name, line_value_string(value));
 
 		/* engage in a bit of gymnastics for this odious 'Q' value */
 		switch(line->value)
@@ -249,12 +265,13 @@ static TIMER_CALLBACK( halt_timer_callback )
 
 static void set_line_timer(running_device *device, coco_cartridge_line *line, cococart_line_value value)
 {
-	/* calculate delay; it isn't clear why we have to do this every single time */
+	/* calculate delay; delay dependant on cycles per second */
 	attotime delay = (line->delay != 0)
 		? device->machine->firstcpu->cycles_to_attotime(line->delay)
 		: attotime_zero;
 
-	timer_adjust_oneshot(line->timer, delay, (int) value);
+   timer_adjust_oneshot(line->timer[line->timer_index], delay, (int) value);
+   line->timer_index = (line->timer_index + 1) % TIMER_POOL;
 }
 
 
