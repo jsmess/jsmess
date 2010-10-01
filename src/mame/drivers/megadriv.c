@@ -2895,7 +2895,13 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 // access from the SH2 via 4030 - 403f
 /**********************************************************************************************/
 
-#define PWM_FIFO_SIZE pwm_tm_reg // guess, check this (Doom wants 3, Virtua Racing wants 1 like they sets this register?)
+/*
+TODO:
+- noticeable static noise on Virtua Fighter Sega logo at start-up
+- Understand if Speaker OFF makes the FIFO to advance or not
+*/
+
+#define PWM_FIFO_SIZE pwm_tm_reg // guess, Marsch calls this register as FIFO width
 
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
 static UINT16 cur_lch[0x10],cur_rch[0x10];
@@ -2928,7 +2934,14 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 {
 	if(lch_index_r < PWM_FIFO_SIZE)
 	{
-		dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]);
+		switch(pwm_ctrl & 3)
+		{
+			case 0: lch_index_r++; /*Speaker OFF*/ break;
+			case 1: dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine->device("rch_pwm"), cur_lch[lch_index_r++]); break;
+			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
+		}
+
 		lch_index_w = 0;
 	}
 
@@ -2936,7 +2949,14 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 
 	if(rch_index_r < PWM_FIFO_SIZE)
 	{
-		dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]);
+		switch((pwm_ctrl & 0xc) >> 2)
+		{
+			case 0: rch_index_r++; /*Speaker OFF*/ break;
+			case 1: dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine->device("lch_pwm"), cur_rch[rch_index_r++]); break;
+			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
+		}
+
 		rch_index_w = 0;
 	}
 
