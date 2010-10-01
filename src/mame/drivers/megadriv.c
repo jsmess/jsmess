@@ -3687,7 +3687,177 @@ ADDRESS_MAP_END
 *************************************************************************************************/
 
 static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
+
+
+static UINT16 a12000_halt_reset_reg = 0x0000;
+
+static WRITE16_HANDLER( scd_a12000_halt_reset_w )
+{
+	COMBINE_DATA(&a12000_halt_reset_reg);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		// reset line
+		if (a12000_halt_reset_reg&0x0001)
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
+		else
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
+
+		// request BUS
+		if (a12000_halt_reset_reg&0x0002)
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
+		else
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (a12000_halt_reset_reg&0x0100)
+		{
+			// check if it's masked! (irq check function?)
+			cputag_set_input_line(space->machine, "segacd_68k", 2, ASSERT_LINE);
+		}
+
+		if (a12000_halt_reset_reg&0x8000)
+		{
+			printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
+		}
+
+
+	}
+}
+
+static READ16_HANDLER( scd_a12000_halt_reset_r )
+{
+	return a12000_halt_reset_reg;
+}
+
+
+/********************************************************************************
+ MEMORY MODE CONTROL
+  - main / sub sides differ!
+********************************************************************************/
+
+//
+// we might need a delay on the segacd_maincpu_has_ram_access registers, as they actually indicate requests being made
+// so probably don't change instantly...
+//
+
+static UINT8 segacd_ram_writeprotect_bits;
+static int segacd_ram_mode;
+
+static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
+static int segacd_memory_priority_mode = 0;
+
+
+static READ16_HANDLER( scd_a12002_memory_mode_r )
+{
+	return (segacd_ram_writeprotect_bits << 8) |
+		   (segacd_4meg_prgbank << 6) |
+		   (segacd_ram_mode << 2) |
+		   ((segacd_maincpu_has_ram_access^1) << 1) |
+		   ((segacd_maincpu_has_ram_access) << 0);
+}
+
+static WRITE16_HANDLER( scd_a12002_memory_mode_w )
+{
+	printf("scd_a12002_memory_mode_w %04x %04x\n", data, mem_mask);
+
+	if (ACCESSING_BITS_0_7)
+	{
+
+		if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
+		if (data&0x0002)
+		{
+			printf("dmn set (swap requested)\n"); // give ram to sub?
+
+			// this should take some time?
+			segacd_maincpu_has_ram_access = 0;
+		}
+
+
+		if (data&0x0004) printf("mode set (invalid? can't set from main68k?)\n");
+		if (data&0x0038) printf("unknown bits set\n");
+
+		//if (data&0x00c0)
+		{
+			printf("bank set to %02x\n", (data&0x00c0)>>6);
+			segacd_4meg_prgbank = (data&0x00c0)>>6;
+
+		}
+
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			printf("write protect bits set %02x\n", data >> 8);
+		}
+
+		segacd_ram_writeprotect_bits = data >> 8;
+	}
+
+}
+
+// can't read the bank?
+static READ16_HANDLER( segacd_sub_memory_mode_r )
+{
+	return (segacd_ram_writeprotect_bits << 8) |
+	 	 /*(segacd_4meg_prgbank << 6) | */
+		   (segacd_memory_priority_mode << 3) |
+		   (segacd_ram_mode << 2) |
+		   ((segacd_maincpu_has_ram_access^1) << 1) |
+		   ((segacd_maincpu_has_ram_access) << 0);
+}
+
+static WRITE16_HANDLER( segacd_sub_memory_mode_w )
+{
+	printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		if (data&0x0001)
+		{
+			printf("ret bit set\n");
+			segacd_maincpu_has_ram_access = 1;
+		}
+
+
+		if (data&0x0002) printf("dmn set (swap requested) (invalid, can't be set from sub68k?\n");
+
+		//if (data&0x0004)
+		{
+			segacd_ram_mode = (data&0x0004)>>2;
+			printf("mode set %d\n", segacd_ram_mode);
+		}
+
+		//if (data&0x0018)
+		{
+
+			segacd_memory_priority_mode = (data&0x0018)>>3;
+			printf("priority mode bits set to %d\n", segacd_memory_priority_mode);
+
+		}
+
+		if (data&0x00e0) printf("unknown bits set\n");
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			printf("write protect bits set %02x (invalid, can only be set by main68k)\n", data >> 8);
+		}
+	}
+
+}
+
+
+/********************************************************************************
+ END MEMORY MODE CONTROL
+********************************************************************************/
 
 
 static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
@@ -3701,6 +3871,21 @@ static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
 
 }
 
+
+/* Callback when the genesis enters interrupt code */
+static IRQ_CALLBACK(segacd_sub_int_callback)
+{
+	if (irqline==2)
+	{
+		// clear this bit
+		a12000_halt_reset_reg &= ~0x0100;
+		cputag_set_input_line(device->machine, "segacd_68k", 2, CLEAR_LINE);
+	}
+
+	return (0x60+irqline*4)/4; // vector address
+}
+
+
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
@@ -3712,6 +3897,10 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
 
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
+
+	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
 }
 
@@ -3722,8 +3911,54 @@ static MACHINE_RESET( segacd )
 }
 
 
+static int segacd_redled = 0;
+static int segacd_greenled = 0;
+static int segacd_ready = 1; // actually set 100ms after startup?
+
+static READ16_HANDLER( segacd_sub_led_ready_r )
+{
+	UINT16 retdata = 0x0000;
+
+	if (ACCESSING_BITS_0_7)
+	{
+		retdata |= segacd_ready;
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		retdata |= segacd_redled << 8;
+		retdata |= segacd_greenled << 9;
+	}
+
+	return retdata;
+}
+
+static WRITE16_HANDLER( segacd_sub_led_ready_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if ((data&0x01) == 0x00)
+		{
+			// reset CD unit
+		}
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		segacd_redled = (data >> 8)&1;
+		segacd_greenled = (data >> 9)&1;
+	}
+
+}
+
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+
+	AM_RANGE(0x0ff8000 ,0x0ff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0x0ff8002 ,0x0ff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+
+
 ADDRESS_MAP_END
 
 
