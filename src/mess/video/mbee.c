@@ -29,8 +29,6 @@
 #include "emu.h"
 #include "includes/mbee.h"
 
-#define MBEE_WAIT_TIME 5000
-
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;
     UINT8 horizontal_displayed;
@@ -61,7 +59,6 @@ typedef struct {		 // CRTC 6545
 
 static CRTC6545 crt;
 static UINT8 framecnt = 0;
-static int mbee_wait_time = 0;
 
 static UINT8 *gfxram;
 static UINT8 *colorram;
@@ -265,15 +262,14 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 }
 
 
-
-
-
-
-static void m6545_update_strobe(running_machine *machine, int param)
+static void mbee_video_kbd_scan( running_machine *machine, int param )
 {
+	if ((param & 7) || (mbee_0b))
+		return;
+
 	keyboard_matrix_r(machine, param);
-	crt.update_strobe = 1;
 }
+
 
 READ8_HANDLER ( m6545_status_r )
 {
@@ -281,10 +277,6 @@ READ8_HANDLER ( m6545_status_r )
 	const rectangle &visarea = screen->visible_area();
 
 	int data = 0, y = space->machine->primary_screen->vpos();
-	int x = space->machine->primary_screen->hpos();
-
-	if (!mbee_wait_time)
-		m6545_update_strobe(space->machine, x+y*64);
 
 	if( y < visarea.min_y ||
 		y > visarea.max_y )
@@ -342,12 +334,10 @@ READ8_HANDLER ( m6545_status_r )
 		break;
 	case 16:
 		crt.lpen_strobe = 0;
-		crt.update_strobe = 0;
 		data = crt.lpen_hi;
 		break;
 	case 17:
 		crt.lpen_strobe = 0;
-		crt.update_strobe = 0;
 		data = crt.lpen_lo;
 		break;
 	case 18:
@@ -357,9 +347,13 @@ READ8_HANDLER ( m6545_status_r )
 		data = crt.transp_lo;
 		break;
 	case 31:
-		/* shared memory latch */
+		/* This firstly pushes the contents of the transparent registers onto the MA lines,
+		then increments the address, then sets strobe on. */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-		m6545_update_strobe(space->machine, addr);
+		keyboard_matrix_r(space->machine, addr);
+		crt.transp_lo++;
+		if (!crt.transp_lo) crt.transp_hi++;
+		crt.update_strobe = 1;
 		break;
 	default:
 		logerror("6545 read unmapped port $%X\n", crt.idx);
@@ -471,12 +465,15 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 19:
 		crt.transp_lo = data;
-		mbee_wait_time = MBEE_WAIT_TIME;
 		break;
 	case 31:
-		/* shared memory latch */
+		/* This firstly pushes the contents of the transparent registers onto the MA lines,
+		then increments the address, then sets strobe on. */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-		m6545_update_strobe(space->machine, addr);
+		keyboard_matrix_r(space->machine, addr);
+		crt.transp_lo++;
+		if (!crt.transp_lo) crt.transp_hi++;
+		crt.update_strobe = 1;
 		break;
 	default:
 		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);
@@ -582,13 +579,7 @@ VIDEO_UPDATE( mbee )
 				mem = (x + screen_home) & 0x7ff;
 				chr = videoram[mem];
 
-				if ((x & 15) == 0)
-				{
-					if (mbee_wait_time)
-						mbee_wait_time--;
-					else
-						m6545_update_strobe(screen->machine, x);
-				}
+				mbee_video_kbd_scan(screen->machine, x);
 
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
@@ -640,13 +631,7 @@ VIDEO_UPDATE( mbeeic )
 				chr = videoram[mem];
 				col = colorram[mem] | colourm;					// read a byte of colour
 
-				if ((x & 15) == 0)
-				{
-					if (mbee_wait_time)
-						mbee_wait_time--;
-					else
-						m6545_update_strobe(screen->machine, x);
-				}
+				mbee_video_kbd_scan(screen->machine, x);
 
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
@@ -716,13 +701,7 @@ VIDEO_UPDATE( mbeeppc )
 						chr = 0x20;
 				}
 
-				if ((x & 15) == 0)
-				{
-					if (mbee_wait_time)
-						mbee_wait_time--;
-					else
-						m6545_update_strobe(screen->machine, x);
-				}
+				mbee_video_kbd_scan(screen->machine, x);
 
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
