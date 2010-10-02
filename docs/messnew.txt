@@ -86,6 +86,10 @@ Source Changes:
 - Added automatic sector translation to the basicdsk format when the 
   INTERLEAVE parameter is specified in a FLOPPY_OPTION block. [Curt Coder]
 
+- Fixed writing with the WD17xx. When writing, a timed data request will only set
+  the DRQ. All of the other functionality (for reading) will be omitted.
+  [tim lindner]
+
 
 
 0.139

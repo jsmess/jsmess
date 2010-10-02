@@ -480,6 +480,16 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 	running_device *device = (running_device *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
+   /* check if this is a write command */
+   if( (w->command_type == TYPE_II && w->command == FDC_WRITE_SEC) ||
+         (w->command_type == TYPE_III && w->command == FDC_WRITE_TRK) )
+   {
+      /* we are ready for new data */
+      wd17xx_set_drq(device);
+
+      return;
+   }
+
 	/* any bytes remaining? */
 	if (w->data_count >= 1)
 	{
