@@ -1508,6 +1508,7 @@ const game_driver * const drivers[] =
 	DRIVER( pc8500 )
 
 	/* Nakajima manufactured eletronic typewriters */
+	DRIVER( es210_es )
 	DRIVER( drwrt200 )  /* 199? NTS DreamWriter T200     */
 	DRIVER( drwrt400 )  /* 1996 NTS DreamWriter T400     */
 	DRIVER( wales210 )  /* 199? Walther ES-210 (German)   */

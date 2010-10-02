@@ -37,6 +37,7 @@ Skeleton drivers:
 - Atari Falcon
 - Atari Falcon040
 - IBM PS/2 Model 55SX [Joseba Epalza]
+- Nakajima ES-210 (Spain) [Joseba Epalza]
 
 
 

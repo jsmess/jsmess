@@ -473,11 +473,14 @@ ROM_START(drwrt200)
 	ROM_LOAD("drwrt200.bin", 0x000000, 0x100000, CRC(3c39483c) SHA1(48293e6bdb7e7322d76da7174b716243c0ab7c2c) )
 ROM_END
 
+ROM_START( es210_es )
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD("nakajima_es.ic303", 0x00000, 0x80000, CRC(214d73ce) SHA1(ce9967c5b2d122ebebe9401278d8ea374e8fb289))
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
 COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
 COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, 0,      "Nakajima","ES-210 (Spain)",   GAME_NOT_WORKING )	/* Spanish */
 COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
 COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING )	/* English */
-
-
-
