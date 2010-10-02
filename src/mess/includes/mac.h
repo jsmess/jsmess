@@ -256,11 +256,8 @@ public:
 	INT32 adb_streaming, adb_stream_ptr;
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
-	UINT8 pm_data_send, pm_data_recv, pm_ack, pm_req;
-
-	// Apple Sound Chip
-	UINT8 mac_asc_regs[0x2000];
-	INT16 xfersamples[0x800];
+	UINT8 pm_data_send, pm_data_recv, pm_ack, pm_req, pm_cmd[32], pm_out[32], pm_dptr, pm_sptr, pm_slen, pm_state;
+	emu_timer *pmu_send_timer;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *mac6015_timer;

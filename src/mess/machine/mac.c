@@ -117,6 +117,7 @@
 static TIMER_CALLBACK(mac_scanline_tick);
 static TIMER_CALLBACK(mac_adb_tick);
 static TIMER_CALLBACK(mac_6015_tick);
+static TIMER_CALLBACK(mac_pmu_tick);
 static emu_timer *mac_scanline_timer, *mac_adb_timer;
 static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
@@ -2323,6 +2324,83 @@ static void mac_egret_newaction(mac_state *mac, int state)
 	}
 }
 
+static TIMER_CALLBACK(mac_pmu_tick)
+{
+	mac_state *mac = machine->driver_data<mac_state>();
+
+	#if LOG_ADB
+	printf("PM: timer tick, lowering ACK\n");
+	#endif
+	mac->pm_ack &= ~2;	// lower ACK to handshake next step
+}
+
+static void pmu_one_byte_reply(mac_state *mac, UINT8 result)
+{
+	mac->pm_out[0] = 1;	// length
+	mac->pm_out[1] = result;
+	mac->pm_slen = 2;
+	timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
+}
+
+// 900c74, 901ba4, 901bd8
+static void pmu_exec(mac_state *mac)
+{
+	mac->pm_sptr = 0;	// clear send pointer
+	mac->pm_slen = 0;	// and send length
+	mac->pm_dptr = 0;	// and recieve pointer
+
+	switch (mac->pm_cmd[0])
+	{
+		case 0x10:	// subsystem power and clock ctrl (no response)
+			break;
+
+		case 0x32:	// write extended PRAM byte(s).  cmd[2] = address, cmd[3] = length, cmd[4...] = data
+			if ((mac->pm_cmd[2] + mac->pm_cmd[3]) < 0x100)
+			{
+				int i;
+
+				for (i = 0; i < mac->pm_cmd[3]; i++)
+				{
+					mac->rtc_ram[mac->pm_cmd[2] + i] = mac->pm_cmd[4+i];
+				}
+
+				// no reply?
+			}
+
+		case 0x3a:	// read extended PRAM byte(s).  cmd[2] = address, cmd[3] = length
+			if ((mac->pm_cmd[2] + mac->pm_cmd[3]) < 0x100)
+			{
+				int i;
+
+				mac->pm_out[0] = mac->pm_cmd[3];
+				for (i = 0; i < mac->pm_cmd[3]; i++)
+				{
+					mac->pm_out[1 + i] = mac->rtc_ram[mac->pm_cmd[2] + i];
+				}
+				mac->pm_slen = mac->pm_cmd[3] + 1;
+				timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
+			}
+			break;
+
+		case 0x78:	// read interrupt flag
+			pmu_one_byte_reply(mac, 0);
+			break;
+
+		case 0xec:	// PMU self-test (send 1 count byte + reply)
+			pmu_one_byte_reply(mac, 0);
+			break;
+
+		default:
+			fatalerror("PMU: Unhandled command %02x\n", mac->pm_cmd[0]);
+			break;
+	}
+
+	if (mac->pm_slen > 0)
+	{
+		mac->pm_state = 1;
+	}
+}
+
 static void adb_vblank(running_machine *machine)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -2460,7 +2538,9 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 	{
 		case MODEL_MAC_PORTABLE:
 		case MODEL_MAC_PB100:
-//          printf("Read PM data %x\n", mac->pm_data_recv);
+			#if LOG_ADB
+			printf("Read PM data %x\n", mac->pm_data_recv);
+			#endif
 			return mac->pm_data_recv;
 
 		case MODEL_MAC_CLASSIC:
@@ -2556,7 +2636,9 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
+		#if LOG_ADB
 		printf("%02x to PM\n", data);
+		#endif
 		mac->pm_data_send = data;
 		return;
 	}
@@ -2600,7 +2682,58 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->mac_drive_select = ((data & 0x10) >> 4);
-//      printf("PM_REQ = %x, was %x\n", data & 1, mac->pm_req);
+
+		if ((data & 1) && !(mac->pm_req & 1))
+		{
+			#if LOG_ADB
+			printf("PM: 68k dropping /REQ\n");
+			#endif
+
+			if (mac->pm_state == 0)	 // do this in receive state only
+			{
+				mac->pm_data_recv = 0xff;
+				mac->pm_ack |= 2;
+
+				// check if length byte matches
+				if ((mac->pm_dptr >= 2) && (mac->pm_cmd[1] == (mac->pm_dptr-2)))
+				{
+					pmu_exec(mac);
+					#if LOG_ADB
+					printf("PMU exec: command %02x length %d\n", mac->pm_cmd[0], mac->pm_cmd[1]);
+					#endif
+				}
+			}
+		}
+		if (!(data & 1) && (mac->pm_req & 1))
+		{
+			if (mac->pm_state == 0)
+			{
+				#if LOG_ADB
+				printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", mac->pm_dptr, mac->pm_data_send);
+				#endif
+				mac->pm_ack &= ~2;	// clear, we're waiting for more bytes
+				mac->pm_cmd[mac->pm_dptr++] = mac->pm_data_send;
+			}
+			else	// receiving, so this is different
+			{
+				mac->pm_data_recv = mac->pm_out[mac->pm_sptr++];
+				mac->pm_slen--;
+				mac->pm_ack |= 2;	// raise ACK to indicate available byte
+				#if LOG_ADB
+				printf("PM: sending byte %02x\n", mac->pm_data_recv);
+				#endif
+
+				// another byte to send?
+				if (mac->pm_slen)
+				{
+					timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				}
+				else
+				{
+					mac->pm_state = 0;	// back to receive state
+				}
+			}
+		}
 		mac->pm_req = data & 1;
 		return;
 	}
@@ -2786,6 +2919,14 @@ MACHINE_START( mac )
 	{
 		mac_adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
 		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+
+		// also allocate PMU timer
+		if (ADB_IS_PM)
+		{
+			mac->pmu_send_timer = timer_alloc(machine, mac_pmu_tick, NULL);
+			timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+		}
+
 	}
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
@@ -2796,8 +2937,6 @@ MACHINE_START( mac )
 MACHINE_RESET(mac)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
-	mac_model_t model_save;
-	emu_timer *timer_save;
 
 	// stop 60.15 Hz timer
 	timer_adjust_oneshot(mac->mac6015_timer, attotime_never, 0);
@@ -2808,11 +2947,11 @@ MACHINE_RESET(mac)
 		timer_adjust_periodic(mac->mac6015_timer, ATTOTIME_IN_HZ(60.15), 0, ATTOTIME_IN_HZ(60.15));
 	}
 
-	// clear mac state struct
-	model_save = mac->mac_model;
-	timer_save = mac->inquiry_timeout;
-	mac->mac_model = model_save;
-	mac->inquiry_timeout = timer_save;
+	// clear PMU response timer
+	if (ADB_IS_PM)
+	{
+		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+	}
 
 	last_taken_interrupt = -1;
 
@@ -2861,6 +3000,28 @@ MACHINE_RESET(mac)
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 	}
+
+	mac->mac_drive_select = 0;
+	mac->mac_scsiirq_enable = 0;
+	mac->mac_via2_vbl = 0;
+	mac->mac_se30_vbl_enable = 0;
+	mac->mac_nubus_irq_state = 0;
+	mac->keyboard_reply = 0;
+	mac->kbd_comm = 0;
+	mac->kbd_receive = 0;
+	mac->kbd_shift_reg = 0;
+	mac->kbd_shift_count = 0;
+	mac->mouse_bit_x = mac->mouse_bit_y = 0;
+	mac->rtc_rTCEnb = 0;
+	mac->rtc_rTCClk = 0;
+	mac->rtc_bit_count = 0;
+	mac->rtc_data_dir = 0;
+	mac->rtc_data_out = 0;
+	mac->rtc_cmd = 0;
+	mac->rtc_write_protect = 0;
+	mac->rtc_state = 0;
+	mac->pm_data_send = mac->pm_data_recv = mac->pm_ack = mac->pm_req = mac->pm_dptr = 0;
+	mac->pm_state = 0;
 }
 
 

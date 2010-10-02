@@ -542,7 +542,7 @@ static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
-
+						
 static ADDRESS_MAP_START(macplus_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
@@ -557,9 +557,9 @@ static ADDRESS_MAP_START(macprtb_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-//  AM_RANGE(0xfa0000, 0xfaffff) AM_RAM // video RAM? registers?
+	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	// VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_READWRITE8(mac_asc_r, mac_asc_w, 0xffff)
-	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_w)
+	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
