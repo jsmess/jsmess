@@ -8,6 +8,7 @@ New System Drivers Supported:
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
+- Schachcomputer SC2 [Sandro Ronco]
 
 
 
@@ -60,12 +61,16 @@ System Driver Changes:
   disk controller to the CPU. Added a small pool of timers to allow
   overlapping interrupt signals. [tim lindner]
 
+- [PSION] Added support for datapack images [Sandro Ronco]
+
 
 Imgtool Changes:
 ----------------
 
 - Fixed WIMGTOOL to properly support file systems that use directory seperators
   other than the backslash. [tim lindner]
+
+- Added module for create and manage psion datapack images [Sandro Ronco]
 
 
 
