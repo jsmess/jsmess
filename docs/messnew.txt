@@ -38,6 +38,7 @@ Skeleton drivers:
 - Atari Falcon040
 - IBM PS/2 Model 55SX [Joseba Epalza]
 - Nakajima ES-210 (Spain) [Joseba Epalza]
+- Laser PC4 [Joseba Epalza, Curt Coder]
 
 
 

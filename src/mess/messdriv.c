@@ -1790,5 +1790,6 @@ const game_driver * const drivers[] =
 	DRIVER( casloopy )
 	DRIVER( tim011 )
 	DRIVER( bullet )
+	DRIVER( pc4 )
 
 #endif /* DRIVER_RECURSIVE */
