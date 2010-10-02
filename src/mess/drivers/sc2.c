@@ -90,6 +90,12 @@ static MACHINE_START(sc2)
 	sc2_state *state = machine->driver_data<sc2_state>();
 
 	state->beep = machine->device("beep");
+	
+	state_save_register_global_array(machine, state->led_7seg_data);
+	state_save_register_global(machine, state->kp_matrix);
+	state_save_register_global(machine, state->led_selected);
+	state_save_register_global(machine, state->digit_data);
+	state_save_register_global(machine, state->beep_state);
 }
 
 static MACHINE_RESET(sc2)
@@ -236,5 +242,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, sc2,  0,       0,	sc2,	sc2,	 0, 			 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, sc2,  0,       0,	sc2,	sc2,	 0, 			 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_SUPPORTS_SAVE)
 
