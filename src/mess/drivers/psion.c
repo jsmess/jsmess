@@ -40,8 +40,12 @@ struct datapack
 	bool write_flag;
 };
 
-static struct _psion
+class psion_state : public driver_device
 {
+public:
+	psion_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
 	UINT16 kb_counter;
 	UINT8 enable_nmi;
 	UINT8 *sys_register;
@@ -63,9 +67,14 @@ static struct _psion
 	UINT8 port6_ddr;
 	UINT8 port6;
 
-	struct datapack pack1;
-	struct datapack pack2;
-} psion;
+	datapack pack1;
+	datapack pack2;
+
+	// devices
+	hd44780_device *hd44780;
+	device_t *beep;
+};
+
 
 /***********************************************
 
@@ -73,7 +82,7 @@ static struct _psion
 
 ***********************************************/
 
-UINT8 datapack_update(datapack *pack, UINT8 data)
+static UINT8 datapack_update(datapack *pack, UINT8 data)
 {
 	assert(pack != NULL);
 
@@ -126,7 +135,7 @@ UINT8 datapack_update(datapack *pack, UINT8 data)
 	return data;
 }
 
-void datapack_control_lines_w(datapack *pack, UINT8 data)
+static void datapack_control_lines_w(datapack *pack, UINT8 data)
 {
 	assert(pack != NULL);
 
@@ -155,14 +164,14 @@ void datapack_control_lines_w(datapack *pack, UINT8 data)
 	pack->control_lines = data;
 }
 
-UINT8 datapack_control_lines_r(datapack *pack)
+static UINT8 datapack_control_lines_r(datapack *pack)
 {
 	assert(pack != NULL);
 
 	return pack->control_lines;
 }
 
-int datapack_load(device_image_interface &image, datapack &pack)
+static int datapack_load(device_image_interface &image, datapack &pack)
 {
 	running_machine *machine = image.device().machine;
 	char opk_head[6];
@@ -193,7 +202,7 @@ int datapack_load(device_image_interface &image, datapack &pack)
 	return IMAGE_INIT_PASS;
 }
 
-void datapack_unload(device_image_interface &image, datapack &pack)
+static void datapack_unload(device_image_interface &image, datapack &pack)
 {
 	running_machine *machine = image.device().machine;
 
@@ -223,19 +232,22 @@ void datapack_unload(device_image_interface &image, datapack &pack)
 
 static TIMER_CALLBACK( nmi_timer )
 {
-	if (psion.enable_nmi)
+	psion_state *state = machine->driver_data<psion_state>();
+
+	if (state->enable_nmi)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-UINT8 kb_read(running_machine *machine)
+static UINT8 kb_read(running_machine *machine)
 {
+	psion_state *state = machine->driver_data<psion_state>();
 	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
 	UINT8 line, data = 0x7c;
 
-	if (psion.kb_counter)
+	if (state->kb_counter)
 	{
 		for (line = 0; line < 7; line++)
-			if (psion.kb_counter == (0x7f & ~(1 << line)))
+			if (state->kb_counter == (0x7f & ~(1 << line)))
 				data = input_port_read(machine, bitnames[line]);
 	}
 	else
@@ -247,60 +259,66 @@ UINT8 kb_read(running_machine *machine)
 	return data & 0x7c;
 }
 
-void update_bank(running_machine *machine)
+static void update_bank(running_machine *machine)
 {
-	if (psion.ram_bank < psion.ram_bank_count && psion.ram_bank_count)
-		memory_set_bankptr(machine,"rambank", psion.paged_ram + psion.ram_bank*0x4000);
+	psion_state *state = machine->driver_data<psion_state>();
 
-	if (psion.rom_bank_count)
+	if (state->ram_bank < state->ram_bank_count && state->ram_bank_count)
+		memory_set_bankptr(machine,"rambank", state->paged_ram + state->ram_bank*0x4000);
+
+	if (state->rom_bank_count)
 	{
-		if (psion.rom_bank==0)
+		if (state->rom_bank==0)
 			memory_set_bankptr(machine,"rombank", memory_region(machine, "maincpu") + 0x8000);
-		else if (psion.rom_bank < psion.rom_bank_count)
-			memory_set_bankptr(machine,"rombank", memory_region(machine, "maincpu") + psion.rom_bank*0x4000 + 0xc000);
+		else if (state->rom_bank < state->rom_bank_count)
+			memory_set_bankptr(machine,"rombank", memory_region(machine, "maincpu") + state->rom_bank*0x4000 + 0xc000);
 	}
 }
 
-struct datapack *get_active_slot(running_machine *machine, UINT8 data)
+static struct datapack *get_active_slot(running_machine *machine, UINT8 data)
 {
+	psion_state *state = machine->driver_data<psion_state>();
+
 	switch(data & 0x70)
 	{
 		case 0x60:
-			return &psion.pack1;
+			return &state->pack1;
 		case 0x50:
-			return &psion.pack2;
+			return &state->pack2;
 	}
 
 	return NULL;
 }
 
-WRITE8_HANDLER( hd63701_int_reg_w )
+static WRITE8_HANDLER( hd63701_int_reg_w )
 {
+	psion_state *state = space->machine->driver_data<psion_state>();
+
 	switch (offset)
 	{
 	case 0x01:
-		psion.port2_ddr = data;
+		state->port2_ddr = data;
 		break;
 	case 0x03:
 		/* datapack i/o data bus */
-		if (psion.port2_ddr == 0xff)
+		if (state->port2_ddr == 0xff)
 		{
-			datapack *pack = get_active_slot(space->machine, psion.port6);
+			datapack *pack = get_active_slot(space->machine, state->port6);
 
 			if (pack)
-				psion.port2 = datapack_update(pack, data);
+				state->port2 = datapack_update(pack, data);
 			else
-				psion.port2 = data;
+				state->port2 = data;
 		}
 		break;
 	case 0x08:
-		psion.tcsr_value = data;
+		state->tcsr_value = data;
 		break;
 	case 0x15:
 		/* read-only */
 		break;
 	case 0x16:
-		psion.port6_ddr = data;
+		state->port6_ddr = data;
 		break;
 	case 0x17:
 		/*
@@ -315,13 +333,13 @@ WRITE8_HANDLER( hd63701_int_reg_w )
         ---- ---x clock line
         */
 		{
-			psion.port6 = (data & psion.port6_ddr) | (psion.port6 & ~psion.port6_ddr);
-			datapack *pack = get_active_slot(space->machine, psion.port6);
+			state->port6 = (data & state->port6_ddr) | (state->port6 & ~state->port6_ddr);
+			datapack *pack = get_active_slot(space->machine, state->port6);
 
 			if (pack != NULL)
 			{
-				datapack_control_lines_w(pack, psion.port6);
-				datapack_update(pack, psion.port2);
+				datapack_control_lines_w(pack, state->port6);
+				datapack_update(pack, state->port2);
 			}
 		}
 		break;
@@ -330,27 +348,29 @@ WRITE8_HANDLER( hd63701_int_reg_w )
 	hd63701_internal_registers_w(space, offset, data);
 }
 
-READ8_HANDLER( hd63701_int_reg_r )
+static READ8_HANDLER( hd63701_int_reg_r )
 {
+	psion_state *state = space->machine->driver_data<psion_state>();
+
 	switch (offset)
 	{
 	case 0x03:
 		/* datapack i/o data bus */
-		if (psion.port2_ddr == 0)
+		if (state->port2_ddr == 0)
 		{
-			datapack *pack = get_active_slot(space->machine, psion.port6);
+			datapack *pack = get_active_slot(space->machine, state->port6);
 
 			if (pack)
-				psion.port2 = datapack_update(pack, psion.port2);
+				state->port2 = datapack_update(pack, state->port2);
 			else
-				psion.port2 = 0;
+				state->port2 = 0;
 
-			return psion.port2;
+			return state->port2;
 		}
 		else
 			return 0;
 	case 0x14:
-		return (hd63701_internal_registers_r(space, offset)&0x7f) | (psion.stby_pwr<<7);
+		return (hd63701_internal_registers_r(space, offset)&0x7f) | (state->stby_pwr<<7);
 	case 0x15:
 		/*
         x--- ---- ON key active high
@@ -358,27 +378,29 @@ READ8_HANDLER( hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (psion.kb_counter == 0x7ff)<<1 | psion.pulse<<1;
+		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (state->kb_counter == 0x7ff)<<1 | state->pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		{
-			datapack *pack = get_active_slot(space->machine, psion.port6);
+			datapack *pack = get_active_slot(space->machine, state->port6);
 
 			if (pack)
 				return datapack_control_lines_r(pack);
 			else
-				return psion.port6;
+				return state->port6;
 		}
 	case 0x08:
-		hd63701_internal_registers_w(space, offset, psion.tcsr_value);
+		hd63701_internal_registers_w(space, offset, state->tcsr_value);
 	default:
 		return hd63701_internal_registers_r(space, offset);
 	}
 }
 
 /* Read/Write common */
-void io_rw(address_space* space, UINT16 offset)
+static void io_rw(address_space* space, UINT16 offset)
 {
+	psion_state *state = space->machine->driver_data<psion_state>();
+
 	if (space->debugger_access())
 		return;
 
@@ -386,84 +408,84 @@ void io_rw(address_space* space, UINT16 offset)
 	{
 	case 0xc0:
 		/* switch off, CPU goes into standby mode */
-		psion.enable_nmi = 0;
-		psion.stby_pwr = 1;
+		state->enable_nmi = 0;
+		state->stby_pwr = 1;
 		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
-		psion.pulse = 1;
+		state->pulse = 1;
 		break;
 	case 0x140:
-		psion.pulse = 0;
+		state->pulse = 0;
 		break;
 	case 0x200:
-		psion.kb_counter = 0;
+		state->kb_counter = 0;
 		break;
 	case 0x180:
-		beep_set_state(space->machine->device("beep"), 1);
+		beep_set_state(state->beep, 1);
 		break;
 	case 0x1c0:
-		beep_set_state(space->machine->device("beep"), 0);
+		beep_set_state(state->beep, 0);
 		break;
 	case 0x240:
-		if (offset == 0x260 && (psion.rom_bank_count || psion.ram_bank_count))
+		if (offset == 0x260 && (state->rom_bank_count || state->ram_bank_count))
 		{
-			psion.ram_bank=0;
-			psion.rom_bank=0;
+			state->ram_bank=0;
+			state->rom_bank=0;
 			update_bank(space->machine);
 		}
 		else
-			psion.kb_counter++;
+			state->kb_counter++;
 		break;
 	case 0x280:
-		if (offset == 0x2a0 && psion.ram_bank_count)
+		if (offset == 0x2a0 && state->ram_bank_count)
 		{
-			psion.ram_bank++;
+			state->ram_bank++;
 			update_bank(space->machine);
 		}
 		else
-			psion.enable_nmi = 1;
+			state->enable_nmi = 1;
 		break;
 	case 0x2c0:
-		if (offset == 0x2e0 && psion.rom_bank_count)
+		if (offset == 0x2e0 && state->rom_bank_count)
 		{
-			psion.rom_bank++;
+			state->rom_bank++;
 			update_bank(space->machine);
 		}
 		else
-			psion.enable_nmi = 0;
+			state->enable_nmi = 0;
 		break;
 	}
 }
 
-WRITE8_HANDLER( io_w )
+static WRITE8_HANDLER( io_w )
 {
-	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
+	psion_state *state = space->machine->driver_data<psion_state>();
 
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
 		if (offset & 1)
-			hd44780->data_write(offset, data);
+			state->hd44780->data_write(offset, data);
 		else
-			hd44780->control_write(offset, data);
+			state->hd44780->control_write(offset, data);
 		break;
 	default:
 		io_rw(space, offset);
 	}
 }
 
-READ8_HANDLER( io_r )
+static READ8_HANDLER( io_r )
 {
-	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
+		psion_state *state = space->machine->driver_data<psion_state>();
 
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
 		if (offset& 1)
-			return hd44780->data_read(offset);
+			return state->hd44780->data_read(offset);
 		else
-			return hd44780->control_read(offset);
+			return state->hd44780->control_read(offset);
 	default:
 		io_rw(space, offset);
 	}
@@ -483,27 +505,27 @@ static INPUT_CHANGED( psion_on )
 static ADDRESS_MAP_START(psioncm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(psionla_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
+	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(psionp350_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -511,9 +533,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(psionlam_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
+	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -521,9 +543,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(psionlz_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(&psion.sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(&psion.ram) AM_SIZE(&psion.ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -591,92 +613,109 @@ INPUT_PORTS_END
 
 static DEVICE_IMAGE_LOAD( psion_pack1 )
 {
-	return datapack_load(image, psion.pack1);
+	psion_state *state = image.device().machine->driver_data<psion_state>();
+
+	return datapack_load(image, state->pack1);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack1 )
 {
-	datapack_unload(image, psion.pack1);
+	psion_state *state = image.device().machine->driver_data<psion_state>();
+
+	datapack_unload(image, state->pack1);
 }
 
 static DEVICE_IMAGE_LOAD( psion_pack2 )
 {
-	return datapack_load(image, psion.pack2);
+	psion_state *state = image.device().machine->driver_data<psion_state>();
+
+	return datapack_load(image, state->pack2);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack2 )
 {
-	datapack_unload(image, psion.pack2);
+	psion_state *state = image.device().machine->driver_data<psion_state>();
+
+	datapack_unload(image, state->pack2);
 }
 
 static NVRAM_HANDLER( psion )
 {
+	psion_state *state = machine->driver_data<psion_state>();
+
 	if (read_or_write)
 	{
-		mame_fwrite(file, psion.sys_register, 0xc0);
-		mame_fwrite(file, psion.ram, psion.ram_size);
-		if (psion.ram_bank_count)
-			mame_fwrite(file, psion.paged_ram, psion.ram_bank_count * 0x4000);
+		mame_fwrite(file, state->sys_register, 0xc0);
+		mame_fwrite(file, state->ram, state->ram_size);
+		if (state->ram_bank_count)
+			mame_fwrite(file, state->paged_ram, state->ram_bank_count * 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, psion.sys_register, 0xc0);
-			mame_fread(file, psion.ram, psion.ram_size);
-			if (psion.ram_bank_count)
-				mame_fread(file, psion.paged_ram, psion.ram_bank_count * 0x4000);
+			mame_fread(file, state->sys_register, 0xc0);
+			mame_fread(file, state->ram, state->ram_size);
+			if (state->ram_bank_count)
+				mame_fread(file, state->paged_ram, state->ram_bank_count * 0x4000);
 
-			psion.stby_pwr = 1;
+			state->stby_pwr = 1;
 		}
 		else
-			psion.stby_pwr = 0;
+			state->stby_pwr = 0;
 	}
 }
 
 static MACHINE_START(psion)
 {
+	psion_state *state = machine->driver_data<psion_state>();
+
 	if (!strcmp(machine->gamedrv->name, "psionlam"))
 	{
-		psion.rom_bank_count = 3;
-		psion.ram_bank_count = 0;
+		state->rom_bank_count = 3;
+		state->ram_bank_count = 0;
 	}
 	else if (!strcmp(machine->gamedrv->name, "psionp350"))
 	{
-		psion.rom_bank_count = 0;
-		psion.ram_bank_count = 5;
+		state->rom_bank_count = 0;
+		state->ram_bank_count = 5;
 	}
 	else if (!strncmp(machine->gamedrv->name, "psionlz", 7))
 	{
-		psion.rom_bank_count = 3;
-		psion.ram_bank_count = 3;
+		state->rom_bank_count = 3;
+		state->ram_bank_count = 3;
 	}
 	else if (!strcmp(machine->gamedrv->name, "psionp464"))
 	{
-		psion.rom_bank_count = 3;
-		psion.ram_bank_count = 9;
+		state->rom_bank_count = 3;
+		state->ram_bank_count = 9;
 	}
 	else
 	{
-		psion.rom_bank_count = 0;
-		psion.ram_bank_count = 0;
+		state->rom_bank_count = 0;
+		state->ram_bank_count = 0;
 	}
 
-	if (psion.ram_bank_count)
-		psion.paged_ram = auto_alloc_array(machine, UINT8, psion.ram_bank_count * 0x4000);
+	if (state->ram_bank_count)
+		state->paged_ram = auto_alloc_array(machine, UINT8, state->ram_bank_count * 0x4000);
 
 	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, nmi_timer);
+
+	state->hd44780 = machine->device<hd44780_device>("hd44780");
+	state->beep = machine->device<device_t>("beep");
 }
 
 static MACHINE_RESET(psion)
 {
-	psion.enable_nmi=0;
-	psion.kb_counter=0;
-	psion.ram_bank=0;
-	psion.rom_bank=0;
-	psion.pulse=0;
+	psion_state *state = machine->driver_data<psion_state>();
 
-	if (psion.rom_bank_count || psion.ram_bank_count)
+	state->enable_nmi=0;
+	state->kb_counter=0;
+	state->ram_bank=0;
+	state->rom_bank=0;
+	state->pulse=0;
+
+	if (state->rom_bank_count || state->ram_bank_count)
 		update_bank(machine);
 }
 
@@ -686,16 +725,16 @@ static VIDEO_START( psion )
 
 static VIDEO_UPDATE( psion_2lines )
 {
-	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
+	psion_state *state = screen->machine->driver_data<psion_state>();
 
-	return hd44780->video_update( bitmap, cliprect );
+	return state->hd44780->video_update( bitmap, cliprect );
 }
 
 static VIDEO_UPDATE( psion_4lines )
 {
-	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
+	psion_state *state = screen->machine->driver_data<psion_state>();
 
-	return hd44780->video_update( bitmap, cliprect );
+	return state->hd44780->video_update( bitmap, cliprect );
 }
 
 static PALETTE_INIT( psion )
@@ -744,7 +783,7 @@ static const hd44780_interface psion_2line_display =
 };
 
 /* basic configuration for 2 lines display */
-static MACHINE_CONFIG_START( psion_2lines, driver_device )
+static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
@@ -794,7 +833,7 @@ static const hd44780_interface psion_4line_display =
 };
 
 /* basic configuration for 4 lines display */
-static MACHINE_CONFIG_START( psion_4lines, driver_device )
+static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
