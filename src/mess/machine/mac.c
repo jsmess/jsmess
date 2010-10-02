@@ -82,6 +82,9 @@
 #define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IISI)
 #define ADB_IS_PM	(mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 
+#define AUDIO_IS_CLASSIC (mac->mac_model < MODEL_MAC_II) && (mac->mac_model != MODEL_MAC_PORTABLE) && (mac->mac_model != MODEL_MAC_PB100)
+#define MAC_HAS_VIA2	(mac->mac_model >= MODEL_MAC_II)
+
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
 #define LOG_RTC			0
@@ -2595,7 +2598,6 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	{
 		running_device *fdc = device->machine->device("fdc");
 
-		mac_enable_sound(sound, (data & 0x80) == 0);
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->mac_drive_select = ((data & 0x10) >> 4);
 //      printf("PM_REQ = %x, was %x\n", data & 1, mac->pm_req);
@@ -2603,7 +2605,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		return;
 	}
 
-	if (mac->mac_model < MODEL_MAC_II)
+	if (AUDIO_IS_CLASSIC)
 	{
 		mac_enable_sound(sound, (data & 0x80) == 0);
 	}
@@ -2825,11 +2827,11 @@ MACHINE_RESET(mac)
 	mac_set_screen_buffer(1);
 
 	/* setup sound */
-	if (mac->mac_model < MODEL_MAC_II)
+	if (AUDIO_IS_CLASSIC)
 	{
 		mac_set_sound_buffer(machine->device("custom"), 0);
 	}
-	else	// prime CB1 for ASC and slot interrupts
+	else if (MAC_HAS_VIA2)	// prime CB1 for ASC and slot interrupts
 	{	
 		via6522_device *via2 = machine->device<via6522_device>("via6522_1");
 		via2->write_ca1(1);
@@ -3179,7 +3181,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	int scanline;
 	mac_state *mac = machine->driver_data<mac_state>();
 
-	if (mac->mac_model < MODEL_MAC_II)
+	if (AUDIO_IS_CLASSIC)
 	{
 		mac_sh_updatebuffer(machine->device("custom"));
 	}
