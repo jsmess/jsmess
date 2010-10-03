@@ -663,6 +663,7 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_DRIVERS)/lynx.o		\
 	$(MESS_AUDIO)/lynx.o		\
 	$(MESS_MACHINE)/lynx.o		\
+	$(MESS_DRIVERS)/portfoli.o	\
 
 $(MESSOBJ)/bally.a:				\
 	$(MAME_VIDEO)/astrocde.o	\

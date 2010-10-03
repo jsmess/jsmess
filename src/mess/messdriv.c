@@ -1791,5 +1791,6 @@ const game_driver * const drivers[] =
 	DRIVER( tim011 )
 	DRIVER( bullet )
 	DRIVER( pc4 )
+	DRIVER( portfoli )
 
 #endif /* DRIVER_RECURSIVE */
