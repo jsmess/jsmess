@@ -43,6 +43,7 @@
      - cosmiccp: black screen, Master SH-2 stalls on a RTS? (unchecked)
      - eccodemo: black screen after the Sega logo, faulty comms check
      - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
+     - marsch1: doesn't boot, Master / Slave communicates through SCI
      - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
      - nflquart: black screen, missing h irq?
      - sangoku4: black screen after the Sega logo
@@ -85,7 +86,7 @@ MD side check:
 #2 FM Bit
 #3 Irq Register
 #4 Bank Control Register
-#5 DREQ Control FULL bit (ERROR - presumably 7 bytes written, but FIFO sets FULL size?)
+#5 DREQ Control FULL bit
 #6 DREQ SRC Address
 #7 DREQ DST Address
 #8 DREQ SIZE Address
@@ -210,9 +211,45 @@ Framebuffer Check:
 MD or SH-2 DMA check:
 #122 SH-2 Master CPU Write DMA (68S) (ERROR)
 #123 SH-2 Slave CPU Write DMA (68S) (ERROR)
-#124 MD ROM to VRAM DMA
-(asserts after this)
-
+#124 MD ROM to VRAM DMA (asserts after this)
+-----
+#127 SH-2 Master ROM to SDRAM DMA
+#128 SH-2 Slave ROM to SDRAM DMA
+#129 SH-2 Master ROM to Frame DMA
+#130 SH-2 Slave ROM to Frame DMA
+#131 SH-2 Master SDRAM to Frame DMA
+#132 SH-2 Slave SDRAM to Frame DMA
+#133 SH-2 Master Frame to SDRAM DMA
+#134 SH-2 Slave Frame to SDRAM DMA
+Sound Test (these don't explicitly fails):
+#135 MD 68k Monaural Sound
+#136 MD 68k L Sound
+#137 MD 68k R Sound
+#138 MD 68k L -> R Sound
+#139 MD 68k R -> L Sound
+#140 SH-2 Master Monaural Sound
+#141 SH-2 Master L Sound
+#142 SH-2 Master R Sound
+#143 SH-2 Master L -> R Pan
+#144 SH-2 Master R -> L Pan
+#145 SH-2 Slave Monaural Sound
+#146 SH-2 Slave L Sound
+#147 SH-2 Slave R Sound
+#148 SH-2 Slave L -> R Pan
+#149 SH-2 Slave R -> L Pan
+#150 SH-2 Master PWM Interrupt
+#151 SH-2 Slave PWM Interrupt
+#152 SH-2 Master PWM DMA Write (!)
+#153 SH-2 Slave PWM DMA Write (!)
+#154 Z80 PWM Monaural Sound (!)
+#155 Z80 PWM L Sound (!)
+#156 Z80 PWM R Sound (!)
+GFX check (these don't explicitly fails):
+#157 Direct Color Mode
+#158 Packed Pixel Mode
+#159 Runlength Mode
+#160 Runlength Mode
+#161 Runlength Mode
 */
 
 
@@ -2501,7 +2538,7 @@ int fifo_block_b_full;
 static UINT16 a15106_reg;
 
 
-static READ16_HANDLER( _32x_68k_a15106_r)
+static READ16_HANDLER( _32x_68k_a15106_r )
 {
 	UINT16 retval;
 
@@ -2532,6 +2569,16 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
 			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "maincpu")+0x100);
+		}
+
+		if((a15106_reg & 4) == 0) // clears the FIFO state
+		{
+			current_fifo_block = fifo_block_a;
+			current_fifo_readblock = fifo_block_b;
+			current_fifo_write_pos = 0;
+			current_fifo_read_pos = 0;
+			fifo_block_a_full = 0;
+			fifo_block_b_full = 0;
 		}
 
 		//printf("_32x_68k_a15106_w %04x\n", data);
@@ -2631,6 +2678,12 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 	{
 		case 0x00/2: // a15108 / 4008
 		case 0x02/2: // a1510a / 400a
+			if (space != _68kspace)
+			{
+				printf("attempting to WRITE DREQ SRC with SH2!\n");
+				return;
+			}
+
 			dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
 
 			//if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
@@ -2640,6 +2693,12 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 
 		case 0x04/2: // a1510c / 400c
 		case 0x06/2: // a1510e / 400e
+			if (space != _68kspace)
+			{
+				printf("attempting to WRITE DREQ DST with SH2!\n");
+				return;
+			}
+
 			dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
 
 			//if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
@@ -2648,6 +2707,12 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			break;
 
 		case 0x08/2: // a15110 / 4010
+			if (space != _68kspace)
+			{
+				printf("attempting to WRITE DREQ SIZE with SH2!\n");
+				return;
+			}
+
 			dreq_size = data & 0xfffc;
 
 			//	if(dreq_size)
@@ -2671,6 +2736,12 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			if (current_fifo_block==fifo_block_b && fifo_block_b_full)
 			{
 				printf("attempt to write to Full Fifo block b!\n");
+				return;
+			}
+
+			if((a15106_reg & 4) == 0)
+			{
+				printf("attempting to WRITE FIFO with 68S cleared!");
 				return;
 			}
 
@@ -3392,12 +3463,12 @@ static WRITE16_HANDLER( _32x_sh2_common_4004_w )
 static READ16_HANDLER( _32x_sh2_common_4006_r )
 {
 	//printf("DREQ read!\n"); // tempo reads it, shut up for now
-	return 0;
+	return _32x_68k_a15106_r(space,offset,mem_mask);
 }
 
 static WRITE16_HANDLER( _32x_sh2_common_4006_w )
 {
-	printf("DREQ write!\n");
+	printf("DREQ write!\n"); //register is read only on SH-2 side
 }
 
 
