@@ -145,12 +145,6 @@ READ8_HANDLER ( mbeeic_0a_r )
 WRITE8_HANDLER ( mbeeic_0a_w )
 {
 	mbee_0a = data;
-	memory_set_bank(space->machine, "pak", data & 7);
-}
-
-WRITE8_HANDLER ( mbeeppc_0a_w )
-{
-	mbee_0a = data;
 	memory_set_bank(space->machine, "pak", data & 15);
 }
 
@@ -570,6 +564,7 @@ VIDEO_START( mbeeppc )
 	is_premium = 1;
 }
 
+/* monochrome bee */
 VIDEO_UPDATE( mbee )
 {
 	UINT8 y,ra,chr,gfx;
@@ -620,6 +615,7 @@ VIDEO_UPDATE( mbee )
 	return 0;
 }
 
+/* prom-based colours */
 VIDEO_UPDATE( mbeeic )
 {
 	UINT8 y,ra,chr,gfx,fg,bg;
@@ -674,7 +670,8 @@ VIDEO_UPDATE( mbeeic )
 	return 0;
 }
 
-/* Need to find how the colour works on this model */
+
+/* new colours & hires2 */
 VIDEO_UPDATE( mbeeppc )
 {
 	UINT8 y,ra,gfx,fg,bg;
@@ -759,6 +756,35 @@ PALETTE_INIT( mbeeic )
 		b = level[((i>>2)&1)|((i>>4)&2)];
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
+
+	/* set up foreground palette (64-95) by reading the prom */
+	for (i = 0; i < 32; i++)
+	{
+		k = color_prom[i];
+		r = level[((k>>2)&1)|((k>>4)&2)];
+		g = level[((k>>1)&1)|((k>>3)&2)];
+		b = level[((k>>0)&1)|((k>>2)&2)];
+		palette_set_color(machine, i|64, MAKE_RGB(r, g, b));
+	}
+}
+
+
+PALETTE_INIT( mbeepc85b )
+{
+	UINT16 i;
+	UINT8 r, b, g, k;
+	UINT8 level[] = { 0, 0x80, 0x80, 0xff };	/* off, half, full intensity */
+
+	/* set up background palette (00-63) */
+	for (i = 0; i < 64; i++)
+	{
+		r = level[((i>>0)&1)|((i>>2)&2)];
+		g = level[((i>>1)&1)|((i>>3)&2)];
+		b = level[((i>>2)&1)|((i>>4)&2)];
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+
+	level[2] = 0xff;
 
 	/* set up foreground palette (64-95) by reading the prom */
 	for (i = 0; i < 32; i++)

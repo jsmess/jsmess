@@ -893,6 +893,7 @@ const game_driver * const drivers[] =
 	DRIVER( mbeeic )	/* Microbee 32 IC      */
 	DRIVER( mbeepc )	/* Microbee 32 PC      */
 	DRIVER( mbeepc85 )  /* Microbee 32 PC85  */
+	DRIVER( mbeepc85b )  /* Microbee 32 PC85 (Business version) */
 	DRIVER( mbeepc85s )  /* Microbee 32 PC85 (Swedish) */
 	DRIVER( mbeeppc )   /* Microbee 32 PPC85    */
 	DRIVER( mbee56 )	/* Microbee 56K (CP/M)    */

@@ -234,7 +234,7 @@ DRIVER_INIT( mbeeic )
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
 
 	RAM = memory_region(machine, "pakrom");
-	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 0);
 	mbee_size = 0x8000;
@@ -251,7 +251,7 @@ DRIVER_INIT( mbeepc )
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memory_region(machine, "pakrom");
-	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 0);
 	memory_set_bank(machine, "telcom", 0);
@@ -269,7 +269,7 @@ DRIVER_INIT( mbeepc85 )
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memory_region(machine, "pakrom");
-	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
