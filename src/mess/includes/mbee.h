@@ -28,14 +28,24 @@ public:
 
 /*----------- defined in drivers/mbee.c -----------*/
 
-extern size_t mbee_size;
+
 
 /*----------- defined in machine/mbee.c -----------*/
 
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
+DRIVER_INIT( mbee );
+DRIVER_INIT( mbeeic );
+DRIVER_INIT( mbeepc );
+DRIVER_INIT( mbeepc85 );
+DRIVER_INIT( mbeeppc );
+DRIVER_INIT( mbee56 );
+DRIVER_INIT( mbee64 );
 MACHINE_RESET( mbee );
+WRITE8_HANDLER( mbee_04_w );
+WRITE8_HANDLER( mbee_06_w );
+READ8_HANDLER( mbee_07_r );
 
 READ8_HANDLER ( mbee_fdc_status_r );
 WRITE8_HANDLER ( mbee_fdc_motor_w );

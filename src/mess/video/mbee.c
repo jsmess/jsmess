@@ -17,12 +17,16 @@
         prompt press enter. Now, make sure the keyboard works properly.
 
 
-    The keyboard can be accessed either by using the transparent-mode
-    registers, or by monitoring the lightpen registers, or by monitoring
-    the lightpen strobe bit in the status register.
 
-    Edasm is an example of the latter; it is therefore necessary to do a
-    keyboard scan whenever the status is read.
+    TODO:
+
+    1. Above test 3 doesn't work. EDASM calls Basic to get keys, but
+    it just gets stuck (you can see it in the debugger) for no reason
+    whatsoever. Yet if you single-step the debugger, supplying values
+    as necessary, it works. g a428 to test.
+
+    2. mbeeppc keyboard response is quite slow. You need to hold each
+    key until it responds. It works much better if you overclock the cpu.
 
 ****************************************************************************/
 
@@ -264,8 +268,9 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 
 static void mbee_video_kbd_scan( running_machine *machine, int param )
 {
-	if ((param & 7) || (mbee_0b))
+	if ((mbee_0b) || (param & 0x8))
 		return;
+
 
 	keyboard_matrix_r(machine, param);
 }

@@ -9,12 +9,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "machine/mc146818.h"
 #include "devices/flopdrv.h"
 #include "includes/mbee.h"
 
+static size_t mbee_size;
 static UINT8 mbee_vsync;
 static UINT8 fdc_status = 0;
 static running_device *mbee_fdc;
+static mc146818_device *mbee_rtc;
 static running_device *mbee_z80pio;
 static running_device *mbee_speaker;
 static running_device *mbee_cassette;
@@ -142,6 +145,36 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 /***********************************************************
 
+    Real Time Clock option
+
+************************************************************/
+
+WRITE8_HANDLER( mbee_04_w )	// address
+{
+	mbee_rtc->write(*space, 0, data);
+}
+
+WRITE8_HANDLER( mbee_06_w )	// write
+{
+	mbee_rtc->write(*space, 1, data);
+}
+
+READ8_HANDLER( mbee_07_r )	// read
+{
+	return mbee_rtc->read(*space, 1);
+}
+
+static TIMER_CALLBACK( mbee_rtc_irq )
+{
+	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	mc146818_device *rtc = machine->device<mc146818_device>("rtc");
+	UINT8 data = rtc->read(*mem, 12);
+	if (data) mbee_vsync = 1;
+}
+
+
+/***********************************************************
+
     Machine
 
 ************************************************************/
@@ -167,6 +200,7 @@ MACHINE_RESET( mbee )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
+	mbee_rtc = machine->device<mc146818_device>("rtc");
 	//wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
 	//wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
 }
@@ -176,7 +210,7 @@ INTERRUPT_GEN( mbee_interrupt )
 {
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* once per frame, pulse the PIO B bit 7 */
-	mbee_vsync = 1;
+//	mbee_vsync = 1;
 
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
@@ -186,6 +220,105 @@ INTERRUPT_GEN( mbee_interrupt )
 
 	space->write_byte(0x109, centronics_busy_r(mbee_printer));
 }
+
+DRIVER_INIT( mbee )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	mbee_size = 0x4000;
+}
+
+DRIVER_INIT( mbeeic )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+
+	RAM = memory_region(machine, "pakrom");
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+
+	memory_set_bank(machine, "pak", 0);
+	mbee_size = 0x8000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
+DRIVER_INIT( mbeepc )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+
+	RAM = memory_region(machine, "telcomrom");
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
+
+	RAM = memory_region(machine, "pakrom");
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+
+	memory_set_bank(machine, "pak", 0);
+	memory_set_bank(machine, "telcom", 0);
+	mbee_size = 0x8000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
+DRIVER_INIT( mbeepc85 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+
+	RAM = memory_region(machine, "telcomrom");
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
+
+	RAM = memory_region(machine, "pakrom");
+	memory_configure_bank(machine, "pak", 0, 8, &RAM[0x0000], 0x2000);
+
+	memory_set_bank(machine, "pak", 5);
+	memory_set_bank(machine, "telcom", 0);
+	mbee_size = 0x8000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
+DRIVER_INIT( mbeeppc )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
+
+	RAM = memory_region(machine, "basicrom");
+	memory_configure_bank(machine, "basic", 0, 2, &RAM[0x0000], 0x2000);
+	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
+
+	RAM = memory_region(machine, "telcomrom");
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
+
+	RAM = memory_region(machine, "pakrom");
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
+
+	memory_set_bank(machine, "pak", 5);
+	memory_set_bank(machine, "telcom", 0);
+	memory_set_bank(machine, "basic", 0);
+	mbee_size = 0x8000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
+DRIVER_INIT( mbee56 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
+	mbee_size = 0xe000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
+DRIVER_INIT( mbee64 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
+	mbee_size = 0xe000;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+}
+
 
 /***********************************************************
 
