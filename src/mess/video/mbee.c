@@ -72,6 +72,7 @@ static UINT8 mbee_08;
 static UINT8 mbee_0a;
 static UINT8 mbee_0b;
 static UINT8 mbee_1c;
+static UINT8 is_premium;
 static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
 static void mc6845_screen_configure(running_machine *machine);
@@ -224,43 +225,49 @@ static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LIN
 /* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
 static void keyboard_matrix_r(running_machine *machine, int offs)
 {
-	int port = (offs >> 7) & 7;
-	int bit = (offs >> 4) & 7;
-	int extra = input_port_read(machine, "EXTRA");
-	int data = 0;
+	UINT8 port = (offs >> 7) & 7;
+	UINT8 bit = (offs >> 4) & 7;
+	UINT8 data = (input_port_read(machine, keynames[port]) >> bit) & 1;
 
-	data = (input_port_read(machine, keynames[port]) >> bit) & 1;
+	if ((data | is_premium) == 0)
+	{
+		UINT8 extra = input_port_read(machine, "EXTRA");
 
-	if( extra & 0x01 )	/* extra: cursor up */
-	{
-		if( port == 7 && bit == 1 ) data = 1;	/* Control */
-		if( port == 0 && bit == 5 ) data = 1;	/* E */
-	}
-	if( extra & 0x02 )	/* extra: cursor down */
-	{
-		if( port == 7 && bit == 1 ) data = 1;	/* Control */
-		if( port == 3 && bit == 0 ) data = 1;	/* X */
-	}
-	if( extra & 0x04 )	/* extra: cursor left */
-	{
-		if( port == 7 && bit == 1 ) data = 1;	/* Control */
-		if( port == 2 && bit == 3 ) data = 1;	/* S */
-	}
-	if( extra & 0x08 )	/* extra: cursor right */
-	{
-		if( port == 7 && bit == 1 ) data = 1;	/* Control */
-		if( port == 0 && bit == 4 ) data = 1;	/* D */
-	}
-	if( extra & 0x10 )	/* extra: insert */
-	{
-		if( port == 7 && bit == 1 ) data = 1;	/* Control */
-		if( port == 2 && bit == 6 ) data = 1;	/* V */
+		if( extra & 0x01 )	/* extra: cursor up */
+		{
+			if( port == 7 && bit == 1 ) data = 1;	/* Control */
+			if( port == 0 && bit == 5 ) data = 1;	/* E */
+		}
+		else
+		if( extra & 0x02 )	/* extra: cursor down */
+		{
+			if( port == 7 && bit == 1 ) data = 1;	/* Control */
+			if( port == 3 && bit == 0 ) data = 1;	/* X */
+		}
+		else
+		if( extra & 0x04 )	/* extra: cursor left */
+		{
+			if( port == 7 && bit == 1 ) data = 1;	/* Control */
+			if( port == 2 && bit == 3 ) data = 1;	/* S */
+		}
+		else
+		if( extra & 0x08 )	/* extra: cursor right */
+		{
+			if( port == 7 && bit == 1 ) data = 1;	/* Control */
+			if( port == 0 && bit == 4 ) data = 1;	/* D */
+		}
+		else
+		if( extra & 0x10 )	/* extra: insert */
+		{
+			if( port == 7 && bit == 1 ) data = 1;	/* Control */
+			if( port == 2 && bit == 6 ) data = 1;	/* V */
+		}
 	}
 
 	if( data )
 	{
-		crt.lpen_lo = offs & 0xff;
-		crt.lpen_hi = (offs >> 8) & 0x03;
+		crt.lpen_lo = offs;
+		crt.lpen_hi = offs >> 8;
 		crt.lpen_strobe = 1;
 	}
 }
@@ -268,9 +275,7 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 
 static void mbee_video_kbd_scan( running_machine *machine, int param )
 {
-	if ((mbee_0b) || (param & 0x8))
-		return;
-
+	if (mbee_0b) return;
 
 	keyboard_matrix_r(machine, param);
 }
@@ -545,6 +550,7 @@ VIDEO_START( mbee )
 {
 	videoram = memory_region(machine, "videoram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
+	is_premium = 0;
 }
 
 VIDEO_START( mbeeic )
@@ -552,6 +558,7 @@ VIDEO_START( mbeeic )
 	videoram = memory_region(machine, "videoram");
 	colorram = memory_region(machine, "colorram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
+	is_premium = 0;
 }
 
 VIDEO_START( mbeeppc )
@@ -560,6 +567,7 @@ VIDEO_START( mbeeppc )
 	colorram = memory_region(machine, "colorram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
 	attribram = memory_region(machine, "attrib");
+	is_premium = 1;
 }
 
 VIDEO_UPDATE( mbee )
@@ -772,9 +780,9 @@ PALETTE_INIT( mbeeppc )
 	/* set up 8 low intensity colours */
 	for (i = 0; i < 8; i++)
 	{
-		r = (i & 1) ? 0x80 : 0;
-		g = (i & 2) ? 0x80 : 0;
-		b = (i & 4) ? 0x80 : 0;
+		r = (i & 1) ? 0xc0 : 0;
+		g = (i & 2) ? 0xc0 : 0;
+		b = (i & 4) ? 0xc0 : 0;
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
