@@ -308,6 +308,7 @@ static int sh2_hint_in_vbl;
 
 static int sh2_master_vint_pending;
 static int sh2_slave_vint_pending;
+static int _32x_fb_swap;
 
 void _32x_check_irqs(running_machine* machine);
 
@@ -3207,6 +3208,33 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 }
 
 
+void _32x_check_framebuffer_swap(void)
+{
+
+	if(_32x_is_connected)
+	{
+
+		// this logic should be correct, but makes things worse?
+		//if (genesis_scanline_counter >= megadrive_irq6_scanline)
+		{
+			_32x_a1518a_reg = _32x_fb_swap & 1;
+
+
+
+			if (_32x_fb_swap & 1)
+			{
+				_32x_access_dram = _32x_dram0;
+				_32x_display_dram = _32x_dram1;
+			}
+			else
+			{
+				_32x_display_dram = _32x_dram0;
+				_32x_access_dram = _32x_dram1;
+			}
+		}
+	}
+}
+
 
 static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 {
@@ -3300,18 +3328,14 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 
 		case 0x0a/2:
 			// bit 0 is the framebuffer select, change is delayed until vblank;
-			_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
-
-			if (_32x_a1518a_reg & 1)
+		//	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe);
+			if (ACCESSING_BITS_0_7)
 			{
-				_32x_access_dram = _32x_dram0;
-				_32x_display_dram = _32x_dram1;
+				_32x_fb_swap = data & 1;
+				
+				_32x_check_framebuffer_swap();
 			}
-			else
-			{
-				_32x_display_dram = _32x_dram0;
-				_32x_access_dram = _32x_dram1;
-			}
+				
 			break;
 
 
@@ -3946,6 +3970,55 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
  END MEMORY MODE CONTROL
 ********************************************************************************/
 
+/********************************************************************************
+ COMMUNICATION FLAGS
+  - main / sub sides differ in which bits are write only
+********************************************************************************/
+
+static UINT16 segacd_comms_flags = 0x0000;
+
+static READ16_HANDLER( segacd_comms_flags_r )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	return segacd_comms_flags;
+}
+
+static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
+		timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			printf("sub cpu attempting to write non-zero data to read-only comms flags!\n");
+		}
+	}
+}
+
+static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if (data & 0x00ff)
+		{
+			printf("main cpu attempting to write non-zero data to read-only comms flags!\n");
+		}
+
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | (data & 0xff00);
+		timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	}
+}
+
+
 
 static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
 {
@@ -3972,6 +4045,197 @@ static IRQ_CALLBACK(segacd_sub_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
+UINT16 segacd_comms_part1[0x8];
+UINT16 segacd_comms_part2[0x8];
+
+static READ16_HANDLER( segacd_comms_main_part1_r )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	return segacd_comms_part1[offset];
+}
+
+static WRITE16_HANDLER( segacd_comms_main_part1_w )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	COMBINE_DATA(&segacd_comms_part1[offset]);
+}
+
+static READ16_HANDLER( segacd_comms_main_part2_r )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	return segacd_comms_part2[offset];
+}
+
+static WRITE16_HANDLER( segacd_comms_main_part2_w )
+{
+	printf("Sega CD main CPU attempting to write to read only comms regs\n");
+}
+
+
+static READ16_HANDLER( segacd_comms_sub_part1_r )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	return segacd_comms_part1[offset];
+}
+
+static WRITE16_HANDLER( segacd_comms_sub_part1_w )
+{
+	printf("Sega CD sub CPU attempting to write to read only comms regs\n");
+}
+
+static READ16_HANDLER( segacd_comms_sub_part2_r )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	return segacd_comms_part2[offset];
+}
+
+static WRITE16_HANDLER( segacd_comms_sub_part2_w )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	COMBINE_DATA(&segacd_comms_part2[offset]);
+}
+
+/**************************************************************
+ CDC Stuff ********
+**************************************************************/
+
+static int segacd_cdc_regaddress;
+static int segacd_cdc_destination_device;
+static UINT8 segacd_cdc_registers[0x10];
+
+static WRITE16_HANDLER( segacd_cdc_mode_address_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_cdc_regaddress = data & 0x0f;
+		if (data & 0xf0) printf("unknown bits set in register address write %04x\n", data);
+		
+		printf("CDC register address set to %02x\n" , segacd_cdc_regaddress);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		segacd_cdc_destination_device = (data & 0x0700)>>8;
+		if (data & 0xf800) printf("unknown bits set in destination address write %04x\n",data);
+		
+		printf("destination set to: ");
+		switch (segacd_cdc_destination_device&0x7)
+		{
+			case 0x00: printf("Illegal\n"); break;
+			case 0x01: printf("Illegal\n"); break;
+			case 0x02: printf("Main Cpu Read\n"); break;
+			case 0x03: printf("Sub Cpu Read\n"); break;
+			case 0x04: printf("RFC5164 PCM\n"); break;
+			case 0x05: printf("PRG RAM\n"); break;
+			case 0x06: printf("Illegal\n"); break;
+			case 0x07: printf("2M AM (2M Mode) / SUB CPU 1H RAM\n"); break; 
+		}
+	}
+}
+
+static READ16_HANDLER( segacd_cdc_mode_address_r )
+{
+	UINT16 retdata = 0x0000;
+	
+	if (ACCESSING_BITS_0_7)
+	{
+		retdata |= segacd_cdc_regaddress;
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		retdata |= segacd_cdc_destination_device << 8;
+		
+		// todo: hook them up
+		int data_set_ready = 0;
+		int end_of_data_transfer = 0;
+		
+		if (data_set_ready) retdata |= 0x4000;
+		if (end_of_data_transfer) retdata |= 0x8000;
+	
+	}
+	
+	return retdata;
+}
+
+static WRITE16_HANDLER( segacd_cdc_data_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_cdc_registers[segacd_cdc_regaddress] = data;
+		printf("CDC Register %02x set to %02x\n", segacd_cdc_regaddress, data & 0xff);
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		// nothing here?
+	}
+}
+
+static READ16_HANDLER( segacd_cdc_data_r )
+{
+	UINT16 retdata = 0x0000;
+
+	if (ACCESSING_BITS_0_7)
+	{
+		retdata |= segacd_cdc_registers[segacd_cdc_regaddress];
+		printf("CDC Register %02x Read\n", segacd_cdc_regaddress);
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		// nothing here?
+	}
+	
+	return retdata;
+}
+
+
+static UINT16* segacd_dataram;
+static UINT16* segacd_dataram2;
+
+
+static READ16_HANDLER( segacd_main_dataram_part1_r )
+{
+	if (segacd_ram_mode==0)
+	{
+		// is this correct?
+		if (segacd_maincpu_has_ram_access)
+			return segacd_dataram[offset];
+		else
+		{
+			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
+			return 0x0000;
+		}
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_main_dataram_part1_r in mode 1\n");
+		return 0x0000;
+	}
+	
+	return 0x0000;
+}
+
+static WRITE16_HANDLER( segacd_main_dataram_part1_w )
+{	
+	if (segacd_ram_mode==0)
+	{
+		// is this correct?
+		if (segacd_maincpu_has_ram_access)
+			COMBINE_DATA(&segacd_dataram[offset]);
+		else
+		{
+			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");		
+		}
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_main_dataram_part1_w in mode 1\n");
+	}
+}
+
+
 
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
@@ -3984,8 +4248,16 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
 
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
+
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
+
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
+
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12020, 0xa1202f, 0, 0, segacd_comms_main_part2_r, segacd_comms_main_part2_w);
+
 
 	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
@@ -4039,13 +4311,92 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 }
 
 
+
+static READ16_HANDLER( segacd_sub_dataram_part1_r )
+{
+	if (segacd_ram_mode==0)
+	{
+		// is this correct?
+		if (!segacd_maincpu_has_ram_access)
+			return segacd_dataram[offset];
+		else
+		{
+			printf("Illegal: segacd_sub_dataram_part1_r in mode 0 without permission\n");
+			return 0x0000;		
+		}
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_sub_dataram_part1_r in mode 1\n");
+		return 0x0000;
+	}
+	
+	return 0x0000;
+}
+
+static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
+{	
+	if (segacd_ram_mode==0)
+	{
+		// is this correct?
+		if (!segacd_maincpu_has_ram_access)
+			COMBINE_DATA(&segacd_dataram[offset]);
+		else
+		{
+			printf("Illegal: segacd_sub_dataram_part1_w in mode 0 without permission\n");
+		}
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_sub_dataram_part1_w in mode 1\n");
+	}
+}
+
+static READ16_HANDLER( segacd_sub_dataram_part2_r )
+{
+	if (segacd_ram_mode==0)
+	{
+		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 1\n");
+		return 0x0000;
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_sub_dataram_part2_r in mode 1\n");
+		return 0x0000;
+	}
+	
+	return 0x0000;
+}
+
+static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
+{
+	if (segacd_ram_mode==0)
+	{
+		printf("ILLEGAL segacd_sub_dataram_part2_w in mode 1\n");
+	}
+	else if (segacd_ram_mode==1)
+	{
+		printf("Unspported: segacd_sub_dataram_part2_w in mode 1\n");
+	}
+}
+
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+
+	AM_RANGE(0x0080000, 0x00bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
+	AM_RANGE(0x00c0000, 0x00dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
+
 
 	AM_RANGE(0x0ff8000 ,0x0ff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0x0ff8002 ,0x0ff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
+	AM_RANGE(0x0ff8004 ,0x0ff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0x0ff8006 ,0x0ff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
 
+	AM_RANGE(0x0ff800e ,0x0ff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0x0ff8010 ,0x0ff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0x0ff8020 ,0x0ff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 ADDRESS_MAP_END
 
 
@@ -6350,6 +6701,7 @@ void _32x_check_irqs(running_machine* machine)
 }
 
 
+
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
@@ -6388,26 +6740,10 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		}
 
-		#if 0
-		if(_32x_is_connected)
-		{
-			if (genesis_scanline_counter >= megadrive_irq6_scanline)
-			{
-				_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (_32x_fb_swap & 1);
+		
 
-				if (_32x_fb_swap & 1)
-				{
-					_32x_access_dram = _32x_dram0;
-					_32x_display_dram = _32x_dram1;
-				}
-				else
-				{
-					_32x_display_dram = _32x_dram0;
-					_32x_access_dram = _32x_dram1;
-				}
-			}
-		}
-		#endif
+		_32x_check_framebuffer_swap();
+		
 
 	//  if (genesis_scanline_counter==0) irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
@@ -6890,11 +7226,26 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
 
+	// we need to remove and re-add the sound system because the balance is different
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	MDRV_DEVICE_REMOVE("ymsnd")
+	MDRV_DEVICE_REMOVE("snsnd")
+
+
+	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+
+	/* sound hardware */
+	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+
 	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
 	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -6915,11 +7266,26 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
 
+	// we need to remove and re-add the sound system because the balance is different
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	MDRV_DEVICE_REMOVE("ymsnd")
+	MDRV_DEVICE_REMOVE("snsnd")
+
+
+	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
+	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+
+	/* sound hardware */
+	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+
 	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
 	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
