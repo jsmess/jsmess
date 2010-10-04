@@ -549,6 +549,18 @@ static MACHINE_CONFIG_DERIVED( mbee64, mbeeic )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
+/* Unused roms:
+    ROM_LOAD_OPTIONAL("net.rom", 0xe000,  0x1000, CRC(e14aac4c) SHA1(330902cf47f53c22c85003a620f7d7d3261ebb67) )
+    customised for a certain high school. Requires pulsing at bit 3 port 0 before it runs.
+
+    ROM_LOAD_OPTIONAL("chip8_22.rom", 0xe000,  0x1000, CRC(11fbb547) SHA1(7bd9dc4b67b33b8e1be99beb6a0ddff25bdbd3f7) )
+    Dreamcards Chip-8 V2.2 rom
+
+    ROM_LOAD_OPTIONAL("telcom11.rom", 0xe000,  0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) )
+    Telcom 1.1 for the mbeeic (It could have 1.0, 1.1 or 1.2)
+
+*/
+
 
 /* gfxram:
     0000 = normal characters in charrom
@@ -566,9 +578,6 @@ ROM_START( mbee )
 	ROM_LOAD_OPTIONAL("edasmb.ic33",  0xd000,  0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
 	ROM_LOAD_OPTIONAL("telcom10.rom", 0xe000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
 
-/*  Optional Dreamcards Chip-8 V2.2 rom, take out the Telcom rom and insert this in its place
-    ROM_LOAD_OPTIONAL("chip8_22.rom", 0xe000,  0x1000, CRC(11fbb547) SHA1(7bd9dc4b67b33b8e1be99beb6a0ddff25bdbd3f7) ) */
-
 	ROM_REGION(0x2000, "gfx", 0)
 	ROM_LOAD("charrom.ic13",          0x1000,  0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x0000, 0x0800 )
@@ -585,8 +594,6 @@ ROM_START( mbeeic )
 	ROM_LOAD("bas522a.rom",           0x8000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.rom",           0xa000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-/*  Telcom v1.1 was shipped with the first version of the IC model
-    ROM_LOAD_OPTIONAL("telcom11.rom", 0xe000,  0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) ) */
 	ROM_LOAD_OPTIONAL("telcom12.rom", 0xe000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
 
 	/* PAK option roms */
