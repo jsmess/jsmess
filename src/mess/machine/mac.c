@@ -2342,7 +2342,6 @@ static void pmu_one_byte_reply(mac_state *mac, UINT8 result)
 	timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
 }
 
-// 900c74, 901ba4, 901bd8
 static void pmu_exec(mac_state *mac)
 {
 	mac->pm_sptr = 0;	// clear send pointer
@@ -2363,9 +2362,22 @@ static void pmu_exec(mac_state *mac)
 				{
 					mac->rtc_ram[mac->pm_cmd[2] + i] = mac->pm_cmd[4+i];
 				}
-
-				// no reply?
 			}
+			break;
+
+		case 0x39:	// read first 20 bytes of PRAM
+			{
+				int i;
+
+				mac->pm_out[0] = 20;
+				for (i = 0; i < 20; i++)
+				{
+					mac->pm_out[1 + i] = mac->rtc_ram[i];
+				}
+				mac->pm_slen = 21;
+				timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
+			}
+			break;
 
 		case 0x3a:	// read extended PRAM byte(s).  cmd[2] = address, cmd[3] = length
 			if ((mac->pm_cmd[2] + mac->pm_cmd[3]) < 0x100)
@@ -2380,6 +2392,10 @@ static void pmu_exec(mac_state *mac)
 				mac->pm_slen = mac->pm_cmd[3] + 1;
 				timer_adjust_oneshot(mac->pmu_send_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
 			}
+			break;
+
+		case 0x68:	// read battery/charger level
+			pmu_one_byte_reply(mac, 1);
 			break;
 
 		case 0x78:	// read interrupt flag
@@ -2539,7 +2555,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_PORTABLE:
 		case MODEL_MAC_PB100:
 			#if LOG_ADB
-			printf("Read PM data %x\n", mac->pm_data_recv);
+//			printf("Read PM data %x\n", mac->pm_data_recv);
 			#endif
 			return mac->pm_data_recv;
 
@@ -2586,7 +2602,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
 //      printf("Read VIA B: PM_ACK %x\n", mac->pm_ack);
-		val = 0x80 | mac->pm_ack;	// SCC wait/request
+		val = 0x80 | 0x04 | mac->pm_ack;	// SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
 	}
 	else
 	{
@@ -2637,7 +2653,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
 		#if LOG_ADB
-		printf("%02x to PM\n", data);
+//		printf("%02x to PM\n", data);
 		#endif
 		mac->pm_data_send = data;
 		return;
@@ -2704,7 +2720,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 				}
 			}
 		}
-		if (!(data & 1) && (mac->pm_req & 1))
+		else if (!(data & 1) && (mac->pm_req & 1))
 		{
 			if (mac->pm_state == 0)
 			{
@@ -2720,7 +2736,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 				mac->pm_slen--;
 				mac->pm_ack |= 2;	// raise ACK to indicate available byte
 				#if LOG_ADB
-				printf("PM: sending byte %02x\n", mac->pm_data_recv);
+				printf("PM: 68k asserted /REQ, sending byte %02x\n", mac->pm_data_recv);
 				#endif
 
 				// another byte to send?
@@ -2731,9 +2747,11 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 				else
 				{
 					mac->pm_state = 0;	// back to receive state
+					timer_adjust_oneshot(mac->pmu_send_timer, attotime_never, 0);
 				}
 			}
 		}
+
 		mac->pm_req = data & 1;
 		return;
 	}
@@ -2982,11 +3000,6 @@ MACHINE_RESET(mac)
 		adb_reset(mac);
 	}
 
-	if (mac->mac_model >= MODEL_MAC_PLUS)
-	{
-//		ncr5380_scan_devices(machine->device("ncr5380"));
-	}
-
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
 	{
 		mac_set_sound_buffer(machine->device("custom"), 1);
@@ -2996,8 +3009,8 @@ MACHINE_RESET(mac)
 	}
 
 	scsi_interrupt = 0;
-	mac->mac_nubus_irq_state = 0xff;
-	if (machine->device<cpu_device>("maincpu")->debug()) {
+	if (machine->device<cpu_device>("maincpu")->debug()) 
+	{
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 	}
 
@@ -3005,7 +3018,7 @@ MACHINE_RESET(mac)
 	mac->mac_scsiirq_enable = 0;
 	mac->mac_via2_vbl = 0;
 	mac->mac_se30_vbl_enable = 0;
-	mac->mac_nubus_irq_state = 0;
+	mac->mac_nubus_irq_state = 0xff;
 	mac->keyboard_reply = 0;
 	mac->kbd_comm = 0;
 	mac->kbd_receive = 0;

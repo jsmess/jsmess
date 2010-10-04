@@ -67,6 +67,10 @@ System Driver Changes:
 
 - [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
+- [MAC] Macintosh IIci now boots, promoted to working [R. Belmont]
+
+- [MAC] Improvements to PMU and Egret MCU emulation. [R. Belmont]
+
 - [MBEE] Added Chess rom. [Robbbert]
 
 - [PSION] Added support for datapack images [Sandro Ronco]

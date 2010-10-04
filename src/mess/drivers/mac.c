@@ -86,18 +86,23 @@ static VIDEO_START( macrbv )
 	rbv_regs[2] = 0xff;
 }
 
-static VIDEO_UPDATE( macrbv )
+// do this here - VIDEO_UPDATE is called each scanline when stepping in the
+// debugger, which means you can't escape the VIA2 IRQ handler
+static INTERRUPT_GEN( mac_rbv_vbl )
 {
-	UINT32 *scanline;
-	int x, y;
-
 	rbv_regs[2] &= ~0x40;	// set vblank signal
 
 	if ((rbv_regs[0x12] & 0x40) && (rbv_ier & 0x2))
 	{
 		rbv_ifr |= 0x82;
-		mac_set_via2_interrupt(screen->machine, 1);
+		mac_set_via2_interrupt(device->machine, 1);
 	}
+}
+
+static VIDEO_UPDATE( macrbv )
+{
+	UINT32 *scanline;
+	int x, y;
 
 	switch (rbv_regs[0x10] & 7)
 	{
@@ -166,6 +171,23 @@ static VIDEO_UPDATE( macrbv )
 			}
 		}
 		break;
+
+		case 3: // 8bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+			
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 640; x++)
+				{
+					pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
+					*scanline++ = rbv_palette[pixels];
+				}
+			}
+		}
 	}
 
 	return 0;
@@ -256,7 +278,7 @@ static WRITE8_HANDLER ( mac_rbv_w )
 {
 	if (offset < 0x100)
 	{
-//		if ((offset != 3) && (offset != 0x12)) printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
+//		if (offset == 0x10) printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
 		switch (offset)
 		{
 			case 0x03:
@@ -265,7 +287,10 @@ static WRITE8_HANDLER ( mac_rbv_w )
 				break;
 
 			case 0x10:
-				rbv_immed10wr = 1;
+				if (data != 0)
+				{
+					rbv_immed10wr = 1;
+				}
 				rbv_regs[offset] = data;
 				break;
 
@@ -531,6 +556,11 @@ static VIDEO_UPDATE( mac_prtb )
 	return 0;
 }
 
+static READ16_HANDLER(mac_config_r)
+{
+	return 0xffff;	// not sure what this does
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -559,6 +589,7 @@ static ADDRESS_MAP_START(macprtb_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	// VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_READWRITE8(mac_asc_r, mac_asc_w, 0xffff)
+	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
@@ -869,8 +900,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
-	MDRV_RAM_EXTRA_OPTIONS("2M,4M,6M,8M")
+	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_EXTRA_OPTIONS("1M,3M,5M,7M,9M")
 
 MACHINE_CONFIG_END
 
@@ -1060,6 +1091,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 
 	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(maciici_map)
+	MDRV_CPU_VBLANK_INT("screen", mac_rbv_vbl)
 
 	MDRV_PALETTE_LENGTH(256)
 
