@@ -4,6 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Tomy Pyuuta [anondumper]
 - Elektronika KR-03 [Miodrag Milanovic]
+- Microbee PC85 Newer version [Robbbert]
 - Microbee PC85 Swedish version [Robbbert]
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
@@ -14,6 +15,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
+- Microbee Premium PC85 [Robbbert]
 - TRS-80 Model II [Curt Coder]
 
 
@@ -58,11 +60,13 @@ System Driver Changes:
 
 - [ATARIST] Added several language variants. [Curt Coder]
 
-- [HECTOR] Added initial support for DISK II unit [JJ Stacino]
-
 - [COCO] Fixed delays in when propagating interrupts signals from the floppy
   disk controller to the CPU. Added a small pool of timers to allow
   overlapping interrupt signals. [tim lindner]
+
+- [HECTOR] Added initial support for DISK II unit [JJ Stacino]
+
+- [MBEE] Added Chess rom. [Robbbert]
 
 - [PSION] Added support for datapack images [Sandro Ronco]
 
