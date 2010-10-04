@@ -9,7 +9,6 @@ New System Drivers Supported:
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
-- Schachcomputer SC2 [Sandro Ronco]
 
 
 
@@ -17,6 +16,8 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Microbee Premium PC85 [Robbbert]
 - TRS-80 Model II [Curt Coder]
+- Schachcomputer SC2 [Sandro Ronco]
+- Psion Organiser II [Sandro Ronco]
 
 
 

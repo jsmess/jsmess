@@ -900,7 +900,8 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( psioncm )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66))
+	ROM_SYSTEM_BIOS(0, "v24", "CM v2.4")
+	ROMX_LOAD( "24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(1))
 
     ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -908,7 +909,8 @@ ROM_END
 
 ROM_START( psionla )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46))
+	ROM_SYSTEM_BIOS(0, "v33", "LA v3.3")
+	ROMX_LOAD( "33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -916,8 +918,10 @@ ROM_END
 
 ROM_START( psionp350 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e))
-	ROM_LOAD( "38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a))
+	ROM_SYSTEM_BIOS(0, "v36", "POS350 v3.6")
+	ROMX_LOAD( "36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v38", "POS350 v3.8")
+	ROMX_LOAD( "38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(2))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -925,7 +929,8 @@ ROM_END
 
 ROM_START( psionlam )
     ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b))
+	ROM_SYSTEM_BIOS(0, "v37", "LA v3.7")
+	ROMX_LOAD( "37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -933,7 +938,8 @@ ROM_END
 
 ROM_START( psionlz64 )
     ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a))
+	ROM_SYSTEM_BIOS(0, "v44", "LZ64 v4.4")
+	ROMX_LOAD( "44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -941,7 +947,8 @@ ROM_END
 
 ROM_START( psionlz64s )
     ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd))
+	ROM_SYSTEM_BIOS(0, "v46", "LZ64 v4.6")
+	ROMX_LOAD( "46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -949,7 +956,8 @@ ROM_END
 
 ROM_START( psionlz )
     ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2))
+	ROM_SYSTEM_BIOS(0, "v46", "LZ v4.6")
+	ROMX_LOAD( "46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -957,7 +965,8 @@ ROM_END
 
 ROM_START( psionp464 )
     ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8))
+	ROM_SYSTEM_BIOS(0, "v46", "POS464 v4.6")
+	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(1))
 
 	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
 	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
@@ -966,11 +975,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		0)
+COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		0)
+COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	0)
+COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	0)
+COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	0)
+COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	0)
+COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		0)
+COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	0)
