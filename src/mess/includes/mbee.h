@@ -43,6 +43,7 @@ DRIVER_INIT( mbeeppc );
 DRIVER_INIT( mbee56 );
 DRIVER_INIT( mbee64 );
 MACHINE_RESET( mbee );
+MACHINE_RESET( mbee64 );
 WRITE8_HANDLER( mbee_04_w );
 WRITE8_HANDLER( mbee_06_w );
 READ8_HANDLER( mbee_07_r );
@@ -81,6 +82,7 @@ READ8_HANDLER( mbeeppc_low_r );
 READ8_HANDLER( mbeeppc_high_r );
 WRITE8_HANDLER( mbeeppc_high_w );
 WRITE8_HANDLER( mbeeppc_low_w );
+WRITE8_HANDLER( mbee64_50_w );
 
 
 VIDEO_START( mbee );

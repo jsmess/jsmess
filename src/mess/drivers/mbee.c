@@ -63,6 +63,7 @@
 
     TODO:
     - Printer is working, but with improper code. This needs to be fixed.
+	05-Oct-2010 printer hack commented out for now.. it doesn't work any more
     - Roms for mbeepc to be checked (I think they are correct)
     - Fix Paste (it loses most of the characters)
     - Fix the rtc (it's in as per the manuals, but it is completely ignored)
@@ -153,8 +154,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_ROM
+	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bankl")
+	AM_RANGE(0x8000, 0xefff) AM_RAMBANK("bankh")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
@@ -255,6 +256,7 @@ static ADDRESS_MAP_START(mbee64_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(mbee64_50_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mbee )
@@ -545,6 +547,7 @@ static MACHINE_CONFIG_DERIVED( mbee64, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
 	MDRV_CPU_IO_MAP(mbee64_io)
+	MDRV_MACHINE_RESET( mbee64 )
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
@@ -777,7 +780,9 @@ ROM_END
 
 ROM_START( mbee64 )
 	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("rom1.bin",              0xdf00,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+
+	ROM_REGION(0x2000,"bootrom", ROMREGION_ERASEFF)
+	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
 
 	ROM_REGION(0x2000, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )

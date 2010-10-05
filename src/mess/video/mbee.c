@@ -178,6 +178,25 @@ WRITE8_HANDLER( mbeeppc_1c_w )
 	memory_set_bank(space->machine, "basic", (data & 0x20) ? 1 : 0);
 }
 
+WRITE8_HANDLER( mbee64_50_w )
+{
+/* This does a number of other things in the 128k (and later) models - not sure if
+    they exist in the 64k */
+
+	if (data & 4)
+	{
+		memory_set_bank(space->machine, "boot", 0);
+		memory_set_bank(space->machine, "bankl", 0);
+		memory_set_bank(space->machine, "bankh", 0);
+	}
+	else
+	{
+		memory_set_bank(space->machine, "bankl", 1);
+		memory_set_bank(space->machine, "bankh", 1);
+	}
+}
+
+
 READ8_HANDLER( mbeeppc_low_r )
 {
 	if (mbee_1c & 16)
@@ -261,7 +280,7 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 	if( data )
 	{
 		crt.lpen_lo = offs;
-		crt.lpen_hi = offs >> 8;
+		crt.lpen_hi = (offs >> 8) & 0x3f;
 		crt.lpen_strobe = 1;
 	}
 }
