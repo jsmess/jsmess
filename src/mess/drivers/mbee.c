@@ -781,7 +781,43 @@ ROM_END
 ROM_START( mbee64 )
 	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x2000,"bootrom", ROMREGION_ERASEFF)
+	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
+	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+
+	ROM_REGION(0x2000, "gfx", 0)
+	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
+	ROM_RELOAD( 0x0000, 0x1000 )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+
+	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( mbee128 )
+	ROM_REGION(0x18000,"maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
+	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+
+	ROM_REGION(0x2000, "gfx", 0)
+	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
+	ROM_RELOAD( 0x0000, 0x1000 )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+
+	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( mbee256 )
+	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
 	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
 
 	ROM_REGION(0x2000, "gfx", 0)
@@ -812,4 +848,6 @@ COMP( 1985, mbeepc85s,mbee,	0,	mbeepc85, mbee,     mbeepc85,		"Applied Technolog
 COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,		"Applied Technology",  "Microbee 32 Premium PC85" , 0 )
 COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
 COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1986, mbee256,  mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
 
