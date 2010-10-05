@@ -218,6 +218,20 @@ MACHINE_RESET( mbee64 )
 	mbee_rtc = machine->device<mc146818_device>("rtc");
 }
 
+MACHINE_RESET( mbee256 )
+{
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+	memory_set_bank(machine, "boot", 1);
+	memory_set_bank(machine, "bankl", 1);
+	memory_set_bank(machine, "bankh", 1);
+	mbee_z80pio = machine->device("z80pio");
+	mbee_speaker = machine->device("speaker");
+	mbee_cassette = machine->device("cassette");
+	mbee_printer = machine->device("centronics");
+	mbee_fdc = machine->device("wd179x");
+	mbee_rtc = machine->device<mc146818_device>("rtc");
+}
+
 INTERRUPT_GEN( mbee_interrupt )
 {
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010

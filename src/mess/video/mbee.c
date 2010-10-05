@@ -196,6 +196,23 @@ WRITE8_HANDLER( mbee64_50_w )
 	}
 }
 
+WRITE8_HANDLER( mbee256_1c_w )
+{
+/*  d7 extended graphics (1=allow attributes and pcg banks)
+    d5 bankswitch basic rom
+    d4 select attribute ram
+    d3..d0 select videoram bank */
+
+	mbee_1c = data;
+}
+
+WRITE8_HANDLER( mbee256_50_w )
+{
+/* incomplete */
+	memory_set_bank(space->machine, "bankl", (data & 4) ? 0 : 1);
+	memory_set_bank(space->machine, "bankh", (data & 4) ? 0 : 1);
+}
+
 
 READ8_HANDLER( mbeeppc_low_r )
 {
