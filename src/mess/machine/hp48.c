@@ -818,7 +818,10 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 		if (hp48_modules[i].data)
 			memory_install_read_bank( space, base, end, 0, mirror, bank );
 		else
-			memory_install_read8_handler( space, base, end, 0, mirror, hp48_modules[i].read );
+		{
+			if (hp48_modules[i].read != NULL)
+				memory_install_read8_handler( space, base, end, 0, mirror, hp48_modules[i].read );
+		}
 
 		if (hp48_modules[i].isnop)
 			memory_nop_write(space, base, end, 0, mirror);
@@ -827,7 +830,10 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 			if (hp48_modules[i].data)
 				memory_install_write_bank( space, base, end, 0, mirror, bank );
 			else
-				memory_install_write8_handler( space, base, end, 0, mirror, hp48_modules[i].write );
+			{
+				if (hp48_modules[i].write != NULL)
+					memory_install_write8_handler( space, base, end, 0, mirror, hp48_modules[i].write );
+			}
 		}
 
 		LOG(( "hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n",
