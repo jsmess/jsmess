@@ -25,6 +25,11 @@ DECLARE_LEGACY_MEMORY_DEVICE(HD61830, hd61830);
 	MDRV_DEVICE_ADD(_tag, HD61830, _clock) \
 	MDRV_DEVICE_CONFIG_DATAPTR(hd61830_config, screen_tag, _screen)
 
+#define MDRV_HD61830_CGROM_ADD(_tag, _clock, _screen, _cgrom_map) \
+	MDRV_DEVICE_ADD(_tag, HD61830, _clock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(hd61830_config, screen_tag, _screen) \
+	MDRV_DEVICE_ADDRESS_MAP(1, _cgrom_map)
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
