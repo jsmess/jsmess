@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -844,7 +844,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macse, macplus )
 
 	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
@@ -893,7 +893,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
@@ -946,11 +946,9 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
-	MDRV_VIA6522_ADD("via6522_1", 1000000, mac_via6522_2_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
+	MDRV_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
@@ -1059,11 +1057,9 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
-	MDRV_VIA6522_ADD("via6522_1", 1000000, mac_via6522_2_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
+	MDRV_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
@@ -1160,11 +1156,9 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
-	MDRV_VIA6522_ADD("via6522_1", 1000000, mac_via6522_2_intf)
+	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
+	MDRV_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
