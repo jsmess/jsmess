@@ -755,7 +755,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD("shell-s.rom",           0xa000,  0x2000, CRC(bdf1768f) SHA1(4385351d07288cf94947ac63131eeed98572caa1) ) // 5
 
 	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1bcbf083) SHA1(6438649b8b5fc20dd772ec7195e69a5bbe016b09) )
+	ROM_LOAD("charrom-s.bin",         0x1000,  0x1000, CRC(1bcbf083) SHA1(6438649b8b5fc20dd772ec7195e69a5bbe016b09) )
 	ROM_RELOAD( 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
