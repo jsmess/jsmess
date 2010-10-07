@@ -756,6 +756,18 @@ const ins8250_interface i8250_intf =
 	NULL
 };
 
+//-------------------------------------------------
+//  centronics_interface centronics_intf
+//-------------------------------------------------
+
+static centronics_interface centronics_intf =
+{
+	TRUE,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
 //**************************************************************************
 //	IMAGE LOADING
 //**************************************************************************
@@ -882,7 +894,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	/* devices */
 	MDRV_I8255A_ADD(M82C55A_TAG, ppi_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MDRV_INS8250_ADD(M82C50A_TAG, i8250_intf) // should be MDRV_INS8250A_ADD
 	MDRV_TIMER_ADD_PERIODIC("counter", counter_tick, HZ(XTAL_32_768kHz/16384))
 	MDRV_TIMER_ADD_PERIODIC(TIMER_TICK_TAG, system_tick, HZ(XTAL_32_768kHz/32768))
