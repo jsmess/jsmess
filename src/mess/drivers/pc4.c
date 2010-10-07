@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "pc4.lh"
 
 class pc4_state : public driver_device
 {
@@ -58,7 +57,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MDRV_SCREEN_SIZE(312, 32)
 	MDRV_SCREEN_VISIBLE_AREA(0, 311, 0, 31)
 
-	MDRV_DEFAULT_LAYOUT(layout_pc4)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(pc4)
