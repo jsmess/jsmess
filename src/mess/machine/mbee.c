@@ -14,7 +14,7 @@
 #include "includes/mbee.h"
 
 static size_t mbee_size;
-static UINT8 mbee_vsync;
+static UINT8 mbee_clock_pulse;
 static UINT8 fdc_status = 0;
 static running_device *mbee_fdc;
 static mc146818_device *mbee_rtc;
@@ -72,9 +72,9 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	if (cassette_input(mbee_cassette) > 0.03)
 		data |= 0x01;
 
-	data |= mbee_vsync << 7;
+	data |= mbee_clock_pulse;
 
-	if (mbee_vsync) mbee_vsync = 0;
+	mbee_clock_pulse = 0;
 
 	return data;
 };
@@ -145,6 +145,21 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 /***********************************************************
 
+    Keyboard of the 256TC
+
+************************************************************/
+
+READ8_HANDLER( mbee256_18_r )	// read
+{
+	UINT8 data = z80pio_pb_r(mbee_z80pio,0);
+	z80pio_pb_w(mbee_z80pio, 0, data & 0xfd);
+// get next char and return it
+	return 0;
+}
+
+
+/***********************************************************
+
     Real Time Clock option
 
 ************************************************************/
@@ -169,7 +184,7 @@ static TIMER_CALLBACK( mbee_rtc_irq )
 	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mc146818_device *rtc = machine->device<mc146818_device>("rtc");
 	UINT8 data = rtc->read(*mem, 12);
-	if (data) mbee_vsync = 1;
+	if (data) mbee_clock_pulse = 0x80;
 }
 
 
@@ -200,7 +215,7 @@ MACHINE_RESET( mbee )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
-	mbee_rtc = machine->device<mc146818_device>("rtc");
+	//mbee_rtc = machine->device<mc146818_device>("rtc");
 	//wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
 	//wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
 }
@@ -215,7 +230,7 @@ MACHINE_RESET( mbee64 )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
-	mbee_rtc = machine->device<mc146818_device>("rtc");
+	//mbee_rtc = machine->device<mc146818_device>("rtc");
 }
 
 MACHINE_RESET( mbee256 )
@@ -240,17 +255,16 @@ INTERRUPT_GEN( mbee_interrupt )
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
 	but need to find out what it does */
-	mbee_vsync = 1;
+	mbee_clock_pulse = 0x80;
 
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
         The line below does what the interrupt should be doing. */
+	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
 	z80pio_astb_w( mbee_z80pio, centronics_busy_r(mbee_printer));	/* signal int when not busy (L->H) */
 
 	space->write_byte(0x109, centronics_busy_r(mbee_printer));
-
-	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 #endif
 }
 
