@@ -29,14 +29,14 @@
 
 	TODO:
 
-	- boot is always cold
+	- clock is running too fast
+	- access violation after OFF command
+	- create chargen ROM from tech manual
 	- memory error interrupt vector
 	- i/o port 8051
 	- screen contrast
 	- system tick frequency selection (1 or 128 Hz)
 	- speaker
-	- serial interface
-	- parallel interface
 	- credit card memory (A:/B:)
 	- software list
 
@@ -65,6 +65,16 @@ enum
 	INT_KEYBOARD,
 	INT_ERROR,
 	INT_EXTERNAL
+};
+
+enum
+{
+	PID_COMMCARD = 0x00,
+	PID_SERIAL,
+	PID_PARALLEL,
+	PID_PRINTER,
+	PID_MODEM,
+	PID_NONE = 0xff
 };
 
 static UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
@@ -101,6 +111,17 @@ static void trigger_interrupt(running_machine *machine, int level)
 }
 
 //-------------------------------------------------
+//  irq_status_r - interrupt status read
+//-------------------------------------------------
+
+static READ8_HANDLER( irq_status_r )
+{
+	portfolio_state *state = space->machine->driver_data<portfolio_state>();
+
+	return state->ip;
+}
+
+//-------------------------------------------------
 //  irq_mask_w - interrupt enable mask
 //-------------------------------------------------
 
@@ -123,6 +144,7 @@ static WRITE8_HANDLER( sivr_w )
 	portfolio_state *state = space->machine->driver_data<portfolio_state>();
 
 	state->sivr = data;
+	//logerror("SIVR %02x\n", data);
 }
 
 //-------------------------------------------------
@@ -277,7 +299,7 @@ static WRITE8_HANDLER( power_w )
 		bit		description
 
 		0		
-		1		
+		1		1=power off
 		2		
 		3		
 		4		
@@ -298,20 +320,39 @@ static READ8_HANDLER( battery_r )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
 		0		
 		1		
 		2		
 		3		
 		4		
-		5		
-		6		0=battery low
-		7		
+		5		PDET		1=peripheral connected
+		6		BATD?		0=battery low
+		7					1=cold boot
 
 	*/
 
-	return 0xc2;
+	portfolio_state *state = space->machine->driver_data<portfolio_state>();
+
+	UINT8 data = 0;
+
+	/* peripheral detect */
+	data |= (state->pid != PID_NONE) << 5;
+
+	/* battery status */
+	data |= BIT(input_port_read(space->machine, "BATTERY"), 0) << 6;
+
+	return data;
+}
+
+//-------------------------------------------------
+//  unknown_w - ?
+//-------------------------------------------------
+
+static WRITE8_HANDLER( unknown_w )
+{
+	//logerror("UNKNOWN %02x\n", data);
 }
 
 //**************************************************************************
@@ -431,7 +472,9 @@ static READ8_HANDLER( pid_r )
 
 	*/
 
-	return 0xff;
+	portfolio_state *state = space->machine->driver_data<portfolio_state>();
+
+	return state->pid;
 }
 
 //**************************************************************************
@@ -461,8 +504,8 @@ static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(speaker_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(power_w)
 	AM_RANGE(0x8040, 0x8041) AM_READWRITE(counter_r, counter_w)
-	AM_RANGE(0x8050, 0x8050) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x8051, 0x8051) AM_READ(battery_r)
+	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
+	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
 	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE_MEMBER(portfolio_state, contrast)
 //	AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE(M82C50A_TAG, ins8250_r, ins8250_w) Serial Interface
 //	AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE(M82C55A_TAG, i8255a_r, i8255a_w) Parallel Interface
@@ -566,6 +609,17 @@ static INPUT_PORTS_START( portfolio )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
+	PORT_CONFSETTING( 0x00, "Low Battery" )
+
+	PORT_START("PERIPHERAL")
+	PORT_CONFNAME( 0xff, PID_NONE, "Peripheral" )
+	PORT_CONFSETTING( PID_NONE, DEF_STR( None ) )
+	PORT_CONFSETTING( PID_PARALLEL, "Intelligent Parallel Interface (HPC-101)" )
+	PORT_CONFSETTING( PID_SERIAL, "Serial Interface (HPC-102)" )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -690,7 +744,7 @@ static I8255A_INTERFACE( ppi_intf )
 
 static INS8250_INTERRUPT( i8250_intrpt_w )
 {
-	trigger_interrupt(device->machine, INT_EXTERNAL);
+//	trigger_interrupt(device->machine, INT_EXTERNAL);
 }
 
 const ins8250_interface i8250_intf =
@@ -752,6 +806,40 @@ static MACHINE_START( portfolio )
 	/* set initial values */
 	state->keylatch = 0xff;
 	state->sivr = 0x2a;
+	state->pid = 0xff;
+
+	/* register for state saving */
+	state_save_register_global(machine, state->ip);
+	state_save_register_global(machine, state->ie);
+	state_save_register_global(machine, state->sivr);
+	state_save_register_global(machine, state->counter);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->contrast);
+	state_save_register_global(machine, state->pid);
+}
+
+//-------------------------------------------------
+//  MACHINE_RESET( portfolio )
+//-------------------------------------------------
+
+static MACHINE_RESET( portfolio )
+{
+	portfolio_state *state = machine->driver_data<portfolio_state>();
+	address_space *io = cputag_get_address_space(machine, M80C88A_TAG, ADDRESS_SPACE_IO);
+
+	/* peripheral */
+	state->pid = input_port_read(machine, "PERIPHERAL");
+
+	switch (state->pid)
+	{
+	case PID_SERIAL:
+		memory_install_readwrite8_device_handler(io, machine->device(M82C50A_TAG), 0x8070, 0x8077, 0, 0, ins8250_r, ins8250_w);
+		break;
+
+	case PID_PARALLEL:
+		memory_install_readwrite8_device_handler(io, machine->device(M82C55A_TAG), 0x8078, 0x807b, 0, 0, i8255a_r, i8255a_w);
+		break;
+	}
 }
 
 //**************************************************************************
@@ -769,6 +857,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
     MDRV_CPU_IO_MAP(portfolio_io)
 	
 	MDRV_MACHINE_START(portfolio)
+	MDRV_MACHINE_RESET(portfolio)
 
     /* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -853,4 +942,4 @@ ROM_END
 //**************************************************************************
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1989, pofo,	0,		0,		portfolio,	portfolio,	0,		"Atari",	"Portfolio",	GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1989, pofo,	0,		0,		portfolio,	portfolio,	0,		"Atari",	"Portfolio",	GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

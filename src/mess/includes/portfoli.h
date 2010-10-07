@@ -21,6 +21,7 @@ public:
 	/* interrupt state */
 	UINT8 ip;						/* interrupt pending */
 	UINT8 ie;						/* interrupt enable */
+	UINT8 sivr;						/* serial interrupt vector register */
 
 	/* counter state */
 	UINT16 counter;
@@ -31,8 +32,8 @@ public:
 	/* video state */
 	UINT8 contrast;
 
-	/* serial state */
-	UINT8 sivr;						/* serial interrupt vector register */
+	/* peripheral state */
+	UINT8 pid;						/* peripheral identification */
 
 	/* devices */
 	running_device *hd61830;
