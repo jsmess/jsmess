@@ -202,7 +202,7 @@ static INPUT_PORTS_START( arcadia )
 /* FIXME: the joystick are analog - the actual definition is merely an hack */
 
 #if 0
-    // shit, auto centering too slow, so only using 5 bits, and scaling at videoside
+    // auto centering too slow, so only using 5 bits, and scaling at videoside
     PORT_START("controller1_joy_x")
     PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_X)
     PORT_SENSITIVITY(1)
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( plldium )
 /* FIXME: the joystick are analog - the actual definition is merely an hack */
 
 #if 0
-    // shit, auto centering too slow, so only using 5 bits, and scaling at videoside
+    // auto centering too slow, so only using 5 bits, and scaling at videoside
     PORT_START("controller1_joy_x")
     PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_X)
     PORT_SENSITIVITY(1)

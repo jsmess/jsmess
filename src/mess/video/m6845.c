@@ -419,7 +419,7 @@ void m6845_frameclock(void)
 /* clock the 6845 */
 void m6845_clock(running_machine *machine)
 {
-	/* KT - I think the compiler might generate shit code when using "%" operator! */
+	/* KT - I think the compiler might generate bogus code when using "%" operator! */
 	/*crtc.Memory_Address=(crtc.Memory_Address+1)%0x4000;*/
 	crtc.Memory_Address=(crtc.Memory_Address+1)&0x03fff;
 
