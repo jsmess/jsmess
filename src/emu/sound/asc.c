@@ -18,8 +18,8 @@
     0x807: CLOCK RATE (0 = Mac 22257 Hz, 1 = undefined, 2 = 22050 Hz, 3 = 44100 Hz)
     0x80a: PLAY REC A
     0x80f: TEST (bits 6-7 = digital test, bits 4-5 = analog test)
-    0x810: WAVETABLE 0 PHASE (big-endian 8.16 fixed-point, only 24 bits valid)
-    0x814: WAVETABLE 0 INCREMENT (big-endian 8.16 fixed-point, only 24 bits valid)
+    0x810: WAVETABLE 0 PHASE (big-endian 9.15 fixed-point, only 24 bits valid)
+    0x814: WAVETABLE 0 INCREMENT (big-endian 9.15 fixed-point, only 24 bits valid)
     0x818: WAVETABLE 1 PHASE
     0x81C: WAVETABLE 1 INCREMENT
     0x820: WAVETABLE 2 PHASE
@@ -250,11 +250,11 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 					if (ch < 2)
 					{
-						smpl = (INT8)m_fifo_a[((m_phase[ch]>>16)&0x1ff) + wtoffs[ch&1]];
+						smpl = (INT8)m_fifo_a[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
 					}
 					else
 					{
-						smpl = (INT8)m_fifo_b[((m_phase[ch]>>16)&0x1ff) + wtoffs[ch&1]];
+						smpl = (INT8)m_fifo_b[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
 					}
 
 					smpl ^= 0x80;
@@ -488,6 +488,17 @@ void asc_device::write(UINT16 offset, UINT8 data)
 
 				m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
 				m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
+				break;
+
+			case R_FIFOMODE:
+				if (data & 0x80)
+				{
+					memset(m_fifo_a_wrhalf, 0, sizeof(m_fifo_a_wrhalf));
+					memset(m_fifo_b_wrhalf, 0, sizeof(m_fifo_b_wrhalf));
+
+					m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
+					m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
+				}
 				break;
 
 			case R_WTCONTROL:
