@@ -4338,6 +4338,8 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 	{
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
+
+		popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
 
 }
@@ -4408,27 +4410,52 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part2_w in mode 1\n");
+		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1\n");
 	}
 }
 
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 
-	AM_RANGE(0x0080000, 0x00bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
-	AM_RANGE(0x00c0000, 0x00dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
+//	AM_RANGE(0xfe0000, 0xfe3fff) // backup RAM, odd bytes only!
 
-	AM_RANGE(0x0ff8000 ,0x0ff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0x0ff8002 ,0x0ff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+//	AM_RANGE(0xff0000, 0xff7fff) // PCM, RF5C164
+	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
-	AM_RANGE(0x0ff8004 ,0x0ff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0x0ff8006 ,0x0ff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
+	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
+//	AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
+//	AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
+//	AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
+	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+//	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
+//	AM_RANGE(0xff8032, 0xff8033) // IRQ Mask
+//	AM_RANGE(0xff8034, 0xff8035) // CD Fader
+//	AM_RANGE(0xff8036, 0xff8037) // CDD Control
+//	AM_RANGE(0xff8038, 0xff804b) // CDD Communication ports 0-9
+//	AM_RANGE(0xff804c, 0xff804d) // Font Color
+//	AM_RANGE(0xff804e, 0xff804f) // Font bit
+//	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
+//	AM_RANGE(0xff8058, 0xff8059) // Stamp size
+//	AM_RANGE(0xff805a, 0xff805b) // Stamp map base address
+//	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
+//	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
+//	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
+//	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
+//	AM_RANGE(0xff8064, 0xff8065) // Image buffer V dot size
+//	AM_RANGE(0xff8066, 0xff8067) // Trace vector base address
+//	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
-	AM_RANGE(0x0ff800e ,0x0ff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0x0ff8010 ,0x0ff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0x0ff8020 ,0x0ff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+//	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
+//	AM_RANGE(0xff8180, 0xff81ff) // Image of subcode buffer area
+
 ADDRESS_MAP_END
 
 
