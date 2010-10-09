@@ -199,7 +199,7 @@ VIDEO_UPDATE( mac_cb264 )
 						*scanline++ = cb264_palette[pixels&0xf0];
 						*scanline++ = cb264_palette[(pixels<<4)&0xf0];
 					}
-				}
+				}	      
 			}
 			break;
 
@@ -310,5 +310,115 @@ WRITE32_HANDLER( mac_cb264_ramdac_w )
 //          printf("%x to unknown RAMDAC register @ %x\n", data, offset);
 			break;
 	}
+}
+
+// IIci/IIsi RAM-Based Video (RBV)
+
+VIDEO_START( macrbv )
+{
+	mac_state *mac = machine->driver_data<mac_state>();
+
+	memset(mac->rbv_regs, 0, sizeof(mac->rbv_regs));
+
+	mac->rbv_count = 0;
+	mac->rbv_clutoffs = 0;
+	mac->rbv_immed10wr = 0;
+
+	mac->rbv_regs[2] = 0xff;
+}
+
+VIDEO_UPDATE( macrbv )
+{
+	UINT32 *scanline;
+	int x, y;
+	mac_state *mac = screen->machine->driver_data<mac_state>();
+
+	switch (mac->rbv_regs[0x10] & 7)
+	{
+		case 0:	// 1bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram"));
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 640; x+=8)
+				{
+					pixels = vram8[(y * 80) + ((x/8)^3)];
+
+					*scanline++ = mac->rbv_palette[0xfe|(pixels>>7)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>6)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>5)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>4)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>3)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>2)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|((pixels>>1)&1)];
+					*scanline++ = mac->rbv_palette[0xfe|(pixels&1)];
+				}
+			}
+		}
+		break;
+
+		case 1:	// 2bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 640/4; x++)
+				{
+					pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = mac->rbv_palette[0xfc|((pixels>>6)&3)];
+					*scanline++ = mac->rbv_palette[0xfc|((pixels>>4)&3)];
+					*scanline++ = mac->rbv_palette[0xfc|((pixels>>2)&3)];
+					*scanline++ = mac->rbv_palette[0xfc|(pixels&3)];
+				}
+			}
+		}
+		break;
+
+		case 2: // 4bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 640/2; x++)
+				{
+					pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = mac->rbv_palette[0xf0|(pixels>>4)];
+					*scanline++ = mac->rbv_palette[0xf0|(pixels&0xf)];
+				}
+			}
+		}
+		break;
+
+		case 3: // 8bpp
+		{
+			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+			UINT8 pixels;
+			
+			for (y = 0; y < 480; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 640; x++)
+				{
+					pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
+					*scanline++ = mac->rbv_palette[pixels];
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 

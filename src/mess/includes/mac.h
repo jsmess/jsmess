@@ -161,6 +161,9 @@ VIDEO_UPDATE( mac );
 VIDEO_UPDATE( macse30 );
 PALETTE_INIT( mac );
 
+VIDEO_START( macrbv );
+VIDEO_UPDATE( macrbv );
+
 void mac_set_screen_buffer( int buffer );
 
 extern UINT32 *mac_cb264_vram;
@@ -261,6 +264,11 @@ public:
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *mac6015_timer;
+
+	// RBV and friends (V8, etc)
+	UINT8 rbv_regs[256], rbv_ier, rbv_ifr;
+	UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
+	UINT32 rbv_palette[256];
 };
 
 #endif /* MAC_H_ */

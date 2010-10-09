@@ -85,6 +85,8 @@
 #define AUDIO_IS_CLASSIC (mac->mac_model < MODEL_MAC_II) && (mac->mac_model != MODEL_MAC_PORTABLE) && (mac->mac_model != MODEL_MAC_PB100)
 #define MAC_HAS_VIA2	(mac->mac_model >= MODEL_MAC_II)
 
+#define ASC_INTS_RBV	((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI) || (mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC))
+
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
 #define LOG_RTC			0
@@ -102,6 +104,7 @@
 #endif
 
 #define LOG_ADB			0
+#define LOG_ADB_MCU_CMD		0
 
 // ADB states
 #define ADB_STATE_NEW_COMMAND	(0)
@@ -308,7 +311,13 @@ void mac_asc_irq(running_device *device, int state)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	if (mac->mac_model >= MODEL_MAC_II)
+	if (ASC_INTS_RBV)
+	{
+		mac->rbv_regs[3] |= 0x90;	// any VIA 2 interrupt | sound interrupt
+
+		// (need to figure out what gets triggered here)
+	}
+	else if (mac->mac_model >= MODEL_MAC_II)
 	{
 		via6522_device *via2 = device->machine->device<via6522_device>("via6522_1");
 
@@ -2098,7 +2107,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 	switch (mac->adb_buffer[1])
 	{
 		case 0x01:	// enable/disable ADB auto-polling
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			if (mac->adb_buffer[2])
 			{
 				printf("ADB: Egret enable ADB auto-poll\n");
@@ -2116,7 +2125,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			{
 				int addr = mac->adb_buffer[2]<<8 | mac->adb_buffer[3];
 
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_MCU_CMD 
 				printf("ADB: Egret read 6805 address %x\n", addr);
 				#endif
 
@@ -2135,7 +2144,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x03: // read RTC
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			printf("ADB: Egret read RTC = %08x\n", mac->rtc_seconds[3]<<24|mac->rtc_seconds[2]<<16|mac->rtc_seconds[1]<<8|mac->rtc_seconds[0]);
 			#endif
 
@@ -2143,7 +2152,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x07: // read PRAM
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			printf("ADB: Egret read PRAM from %x\n", mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
 			#endif
 
@@ -2155,7 +2164,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 				int addr = mac->adb_buffer[2]<<8 | mac->adb_buffer[3];
 				int len = mac->adb_datasize - 4;
 
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_MCU_CMD 
 				printf("ADB: Egret write %d bytes to address %x\n", len, addr);
 				#endif
 
@@ -2167,7 +2176,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 						mac->rtc_ram[(addr-0x100)+i] = mac->adb_buffer[4+i];
 					}
 				}
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_MCU_CMD 
 				else
 				{
 					printf("ADB: Egret unhandled direct write @ %x\n", addr);
@@ -2179,7 +2188,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x0c: // write PRAM
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			printf("ADB: Egret write %02x to PRAM at %x\n", mac->adb_buffer[4], mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
 			#endif
 
@@ -2196,7 +2205,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x0e: // send to DFAC
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			printf("ADB: Egret send %02x to DFAC\n", mac->adb_buffer[2]);
 			#endif
 
@@ -2204,7 +2213,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x1b: // set one-second interrupt
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			if (mac->adb_buffer[2])
 			{
 				printf("ADB: Egret enable one-second IRQ\n");
@@ -2219,7 +2228,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x1c:	// enable/disable keyboard NMI
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			if (mac->adb_buffer[2])
 			{
 				printf("ADB: Egret enable keyboard NMI\n");
@@ -2234,7 +2243,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		default:
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			printf("ADB: Unknown Egret MCU command %02x\n", mac->adb_buffer[1]);
 			#endif
 			break;
@@ -2285,7 +2294,7 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		// if bit 2 drops and bit 1 is zero, execute the command
 		if (!(state & 0x02) && !(state & 0x04) && (mac->adb_state & 0x04) && (mac->adb_datasize > 0))
 		{
-			#if LOG_ADB
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			int i;
 
 			printf("Egret ADB: exec command with %d bytes: ", mac->adb_datasize);
@@ -2302,7 +2311,28 @@ static void mac_egret_newaction(mac_state *mac, int state)
 			switch (mac->adb_buffer[0])
 			{
 				case 0:	// ADB command
-					mac->adb_datasize = 0;
+					switch (mac->adb_buffer[1] & 0xf)
+					{
+						case 0:		// reset
+							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							printf("Egret: ADB Reset\n");
+							#endif
+							mac_egret_response_std(mac, 0, 0, 0);
+							break;
+
+						case 1:		// flush
+							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							printf("Egret: ADB Reset\n");
+							#endif
+							mac_egret_response_std(mac, 1, 0, 0);
+							break;
+
+						default:
+							printf("Egret: Unhandled ADB command %x\n", mac->adb_buffer[1]);
+							mac->adb_datasize = 0;
+							break;
+
+					}
 					break;
 
 				case 1: // general Egret MCU command

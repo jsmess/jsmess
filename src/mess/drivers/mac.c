@@ -69,147 +69,40 @@ static READ32_HANDLER(mac_swim_r)
 	return 0x17171717;
 }
 
-// IIci/IIsi RAM-Based Video (RBV)
-
-static UINT8 rbv_regs[256], rbv_ier, rbv_ifr;
-static UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
-static UINT32 rbv_palette[256];
-
-static VIDEO_START( macrbv )
-{
-	memset(rbv_regs, 0, sizeof(rbv_regs));
-
-	rbv_count = 0;
-	rbv_clutoffs = 0;
-	rbv_immed10wr = 0;
-
-	rbv_regs[2] = 0xff;
-}
-
 // do this here - VIDEO_UPDATE is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
-static INTERRUPT_GEN( mac_rbv_vbl )
+INTERRUPT_GEN( mac_rbv_vbl )
 {
-	rbv_regs[2] &= ~0x40;	// set vblank signal
+	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	if ((rbv_regs[0x12] & 0x40) && (rbv_ier & 0x2))
+	mac->rbv_regs[2] &= ~0x40;	// set vblank signal
+
+	if ((mac->rbv_regs[0x12] & 0x40) && (mac->rbv_ier & 0x2))
 	{
-		rbv_ifr |= 0x82;
+		mac->rbv_ifr |= 0x82;
 		mac_set_via2_interrupt(device->machine, 1);
 	}
 }
 
-static VIDEO_UPDATE( macrbv )
-{
-	UINT32 *scanline;
-	int x, y;
-
-	switch (rbv_regs[0x10] & 7)
-	{
-		case 0:	// 1bpp
-		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram"));
-			UINT8 pixels;
-
-			for (y = 0; y < 480; y++)
-			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
-				for (x = 0; x < 640; x+=8)
-				{
-					pixels = vram8[(y * 80) + ((x/8)^3)];
-
-					*scanline++ = rbv_palette[0xfe|(pixels>>7)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>6)&1)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>5)&1)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>4)&1)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>3)&1)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>2)&1)];
-					*scanline++ = rbv_palette[0xfe|((pixels>>1)&1)];
-					*scanline++ = rbv_palette[0xfe|(pixels&1)];
-				}
-			}
-		}
-		break;
-
-		case 1:	// 2bpp
-		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
-			UINT8 pixels;
-
-			for (y = 0; y < 480; y++)
-			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
-				for (x = 0; x < 640/4; x++)
-				{
-					pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
-
-					*scanline++ = rbv_palette[0xfc|((pixels>>6)&3)];
-					*scanline++ = rbv_palette[0xfc|((pixels>>4)&3)];
-					*scanline++ = rbv_palette[0xfc|((pixels>>2)&3)];
-					*scanline++ = rbv_palette[0xfc|(pixels&3)];
-				}
-			}
-		}
-		break;
-
-		case 2: // 4bpp
-		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
-			UINT8 pixels;
-
-			for (y = 0; y < 480; y++)
-			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
-
-				for (x = 0; x < 640/2; x++)
-				{
-					pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
-
-					*scanline++ = rbv_palette[0xf0|(pixels>>4)];
-					*scanline++ = rbv_palette[0xf0|(pixels&0xf)];
-				}
-			}
-		}
-		break;
-
-		case 3: // 8bpp
-		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
-			UINT8 pixels;
-			
-			for (y = 0; y < 480; y++)
-			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
-
-				for (x = 0; x < 640; x++)
-				{
-					pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-					*scanline++ = rbv_palette[pixels];
-				}
-			}
-		}
-	}
-
-	return 0;
-}
-
 static WRITE32_HANDLER( rbv_ramdac_w )
 {
+	mac_state *mac = space->machine->driver_data<mac_state>();
+
 	if (!offset)
 	{
-		rbv_clutoffs = data>>24;
-		rbv_count = 0;
+		mac->rbv_clutoffs = data>>24;
+		mac->rbv_count = 0;
 	}
 	else
 	{
-		rbv_colors[rbv_count++] = data>>24;
+		mac->rbv_colors[mac->rbv_count++] = data>>24;
 
-		if (rbv_count == 3)
+		if (mac->rbv_count == 3)
 		{
-			palette_set_color(space->machine, rbv_clutoffs, MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]));
-			rbv_palette[rbv_clutoffs] = MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]);
-			rbv_clutoffs++;
-			rbv_count = 0;
+			palette_set_color(space->machine, mac->rbv_clutoffs, MAKE_RGB(mac->rbv_colors[0], mac->rbv_colors[1], mac->rbv_colors[2]));
+			mac->rbv_palette[mac->rbv_clutoffs] = MAKE_RGB(mac->rbv_colors[0], mac->rbv_colors[1], mac->rbv_colors[2]);
+			mac->rbv_clutoffs++;
+			mac->rbv_count = 0;
 		}
 	}
 }
@@ -217,10 +110,11 @@ static WRITE32_HANDLER( rbv_ramdac_w )
 static READ8_HANDLER ( mac_rbv_r )
 {
 	int data = 0;
+	mac_state *mac = space->machine->driver_data<mac_state>();
 	
 	if (offset < 0x100)
 	{	
-		data = rbv_regs[offset];
+		data = mac->rbv_regs[offset];
 
 		if (offset == 0x02)
 		{
@@ -232,14 +126,14 @@ static READ8_HANDLER ( mac_rbv_r )
 
 		if (offset == 0x10)
 		{
-			if (!rbv_immed10wr)
+			if (!mac->rbv_immed10wr)
 			{
 				data &= ~0x38;
 				data |= (6<<3);	// 13" RGB monitor at 640x480
 			}
 			else
 			{
-				rbv_immed10wr = 0;
+				mac->rbv_immed10wr = 0;
 			}
 		}
 
@@ -256,11 +150,11 @@ static READ8_HANDLER ( mac_rbv_r )
 		switch (offset)
 		{
 			case 13:	// IFR
-				return rbv_ifr;
+				return mac->rbv_ifr;
 				break;
 
 			case 14:	// IER
-				return rbv_ier;
+				return mac->rbv_ier;
 				break;
 
 			default:
@@ -276,6 +170,8 @@ static READ8_HANDLER ( mac_rbv_r )
 
 static WRITE8_HANDLER ( mac_rbv_w )
 {
+	mac_state *mac = space->machine->driver_data<mac_state>();
+
 	if (offset < 0x100)
 	{
 //		if (offset == 0x10) printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
@@ -283,43 +179,44 @@ static WRITE8_HANDLER ( mac_rbv_w )
 		{
 			case 0x03:
 				mac_set_via2_interrupt(space->machine, 0);
-				rbv_regs[offset] = data;
+				mac->rbv_regs[offset] = data;
 				break;
 
 			case 0x10:
 				if (data != 0)
 				{
-					rbv_immed10wr = 1;
+					mac->rbv_immed10wr = 1;
 				}
-				rbv_regs[offset] = data;
+				mac->rbv_regs[offset] = data;
 				break;
 
 			case 0x12:
 				if (data & 0x80)	// 1 bits write 1s
 				{
-					rbv_regs[offset] |= data & 0x7f;
+					mac->rbv_regs[offset] |= data & 0x7f;
 				}
 				else			// 1 bits write 0s
 				{
-					rbv_regs[offset] &= ~(data & 0x7f);
+					mac->rbv_regs[offset] &= ~(data & 0x7f);
 				}
 				break;
 
 			case 0x13:
 				if (data & 0x80)	// 1 bits write 1s
 				{
-					rbv_regs[offset] |= data & 0x7f;
+					mac->rbv_regs[offset] |= data & 0x7f;
 
-					if (data == 0xff) rbv_regs[offset] = 0x1f;	// I don't know why this is special, but the IIci ROM's POST demands it
+					if (data == 0xff) mac->rbv_regs[offset] = 0x1f;	// I don't know why this is special, but the IIci ROM's POST demands it
 				}
 				else			// 1 bits write 0s
 				{
-					rbv_regs[offset] &= ~(data & 0x7f);
+					mac->rbv_regs[offset] &= ~(data & 0x7f);
 				}
+//				printf("RBV: 0x13 (%02x) = %02x (PC %x)\n", data, mac->rbv_regs[offset], cpu_get_pc(space->cpu));
 				break;
 
 			default:
-				rbv_regs[offset] = data;
+				mac->rbv_regs[offset] = data;
 				break;
 		}
 	}
@@ -331,21 +228,21 @@ static WRITE8_HANDLER ( mac_rbv_w )
 		{
 			case 13:	// IFR
 //				printf("rbv_w: %02x to IFR\n", data);
-				rbv_ifr = data;
+				mac->rbv_ifr = data;
 				mac_set_via2_interrupt(space->machine, 0);
 				break;
 
 			case 14:	// IER
 				if (data & 0x80)	// 1 bits write 1s
 				{
-					rbv_ier |= data & 0x7f;
+					mac->rbv_ier |= data & 0x7f;
 				}
 				else	    // 1 bits write 0s
 				{
-					rbv_ier &= ~(data & 0x7f);
+					mac->rbv_ier &= ~(data & 0x7f);
 				}
 
-//				printf("rbv_w: %02x to IER => %02x\n", data, rbv_ier);
+//				printf("rbv_w: %02x to IER => %02x\n", data, mac->rbv_ier);
 				break;
 
 			default:
