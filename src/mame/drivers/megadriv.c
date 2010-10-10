@@ -364,8 +364,17 @@ static bitmap_t* render_bitmap;
 
 /* Sega CD stuff */
 static int sega_cd_connected = 0x00;
-static UINT16 segacd_cdd_ctrl,segacd_irq_mask;
-static UINT8 segacd_cdd_recv[10];
+static UINT16 segacd_irq_mask;
+static UINT8 segacd_cdd_rx[10];
+static struct
+{
+	UINT8 status;
+	UINT8 minute;
+	UINT8 seconds;
+	UINT8 frame;
+	UINT8 ext;
+	UINT8 ctrl;
+}segacd_cdd;
 
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
@@ -4306,10 +4315,10 @@ static MACHINE_RESET( segacd )
 
 	for(i=0;i<10;i++)
 	{
-		segacd_cdd_recv[i] = 0;
+		segacd_cdd_rx[i] = 0;
 	}
 
-	segacd_cdd_recv[9] = 0xf; // default checksum
+	segacd_cdd_rx[9] = 0xf; // default checksum
 }
 
 
@@ -4425,6 +4434,36 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 }
 
+static void cdd_hock_irq(running_machine *machine)
+{
+	int i,cdd_crc;
+
+	if(segacd_cdd.ctrl & 4 && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
+	{
+		// TODO: this shouldn't be instant, CDD should first fill receive data.
+		segacd_cdd.ctrl &= 0x103; // clear HOCK flag
+
+		segacd_cdd_rx[0] = (segacd_cdd.status & 0xf0) >> 4;
+		segacd_cdd_rx[1] = (segacd_cdd.status & 0x0f) >> 0;
+		segacd_cdd_rx[2] = (segacd_cdd.minute & 0xf0) >> 4;
+		segacd_cdd_rx[3] = (segacd_cdd.minute & 0x0f) >> 0;
+		segacd_cdd_rx[4] = (segacd_cdd.seconds & 0xf0) >> 4;
+		segacd_cdd_rx[5] = (segacd_cdd.seconds & 0x0f) >> 0;
+		segacd_cdd_rx[6] = (segacd_cdd.frame & 0xf0) >> 4;
+		segacd_cdd_rx[7] = (segacd_cdd.frame & 0x0f) >> 0;
+		segacd_cdd_rx[8] = (segacd_cdd.ext & 0x0f) >> 0;
+
+		/* Do checksum calculation of the above registers */
+		cdd_crc = 0;
+		for(i=0;i<9;i++)
+			cdd_crc += segacd_cdd_rx[i];
+
+		segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
+
+		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
+	}
+}
+
 static READ16_HANDLER( segacd_irq_mask_r )
 {
 	return segacd_irq_mask;
@@ -4434,31 +4473,26 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 {
 	segacd_irq_mask = data & 0x7e;
 
-	// check here pending IRQs
+	cdd_hock_irq(space->machine);
+	// check here other pending IRQs
 }
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
 {
-	return segacd_cdd_ctrl;
+	return segacd_cdd.ctrl;
 }
 
 static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 {
-	segacd_cdd_ctrl = data;
+	segacd_cdd.ctrl = data;
 
-	if(segacd_cdd_ctrl & 4 && segacd_irq_mask & 0x10) // HOst ClocK
-	{
-		// TODO: this shouldn't be instant, CDD should first fill receive data.
-		segacd_cdd_ctrl &= 0x103; // clear HOCK flag
-		// export status
-		cputag_set_input_line(space->machine, "segacd_68k", 4, HOLD_LINE);
-	}
+	cdd_hock_irq(space->machine);
 }
 
 /* 68k <- CDD communication comms are 4-bit wide */
 static READ8_HANDLER( segacd_cdd_rx_r )
 {
-	return segacd_cdd_recv[offset] & 0xf;
+	return segacd_cdd_rx[offset] & 0xf;
 }
 
 
@@ -4476,7 +4510,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 //	AM_RANGE(0xfe0000, 0xfe3fff) // backup RAM, odd bytes only!
 
-//	AM_RANGE(0xff0000, 0xff7fff) // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // PCM, RF5C164
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
@@ -4490,7 +4524,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 //	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
 	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
-//	AM_RANGE(0xff8034, 0xff8035) // CD Fader
+	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
@@ -4508,7 +4542,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//	AM_RANGE(0xff8180, 0xff81ff) // Image of subcode buffer area
+//	AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 ADDRESS_MAP_END
 
