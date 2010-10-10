@@ -4360,7 +4360,7 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
-		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
+		popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
 
 }
@@ -4435,11 +4435,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 }
 
-static void cdd_hock_irq(running_machine *machine)
+static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 {
 	int i,cdd_crc;
 
-	if(segacd_cdd.ctrl & 4 && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
+	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
 	{
 		// TODO: this shouldn't be instant, CDD should first fill receive data.
 		segacd_cdd.ctrl &= 0x103; // clear HOCK flag
@@ -4474,7 +4474,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 {
 	segacd_irq_mask = data & 0x7e;
 
-	cdd_hock_irq(space->machine);
+	cdd_hock_irq(space->machine,0);
 	// check here other pending IRQs
 }
 
@@ -4487,7 +4487,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 {
 	segacd_cdd.ctrl = data;
 
-	cdd_hock_irq(space->machine);
+	cdd_hock_irq(space->machine,0);
 }
 
 /* 68k <- CDD communication comms are 4-bit wide */
@@ -4514,15 +4514,66 @@ static const char *const segacd_cdd_cmd[] =
 	"Unknown 0xF"
 };
 
+static const char *const segacd_cdd_get_toc_cmd[] =
+{
+	"Get Current Position",
+	"Get Elapsed Time of Current Track",
+	"Get Current Track",
+	"Get Total Length",
+	"Get First and Last Track Number",
+	"Get Track Addresses",
+	"Invalid 0x6",
+	"Invalid 0x7",
+	"Invalid 0x8",
+	"Invalid 0x9",
+	"Invalid 0xA",
+	"Invalid 0xB",
+	"Invalid 0xC",
+	"Invalid 0xD",
+	"Invalid 0xE",
+	"Invalid 0xF",
+};
+
+static void segacd_cdd_get_status(running_machine *machine)
+{
+	// ...
+
+	cdd_hock_irq(machine,1);
+}
+
+static void segacd_cdd_stop_all(running_machine *machine)
+{
+	// ...
+	segacd_cdd.ctrl |= 0x100; // set data bit
+
+	//cdd_hock_irq(machine,1); // doesn't work?
+}
+
+
+static void segacd_cdd_get_toc_info(running_machine *machine)
+{
+	segacd_cdd.status = ((segacd_cdd_tx[3] & 0xf) << 4) | (segacd_cdd.status & 0xf);
+
+	switch(segacd_cdd_tx[3] & 0xf)
+	{
+		default: printf("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	}
+
+	cdd_hock_irq(machine,1);
+}
+
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
 	//printf("CDD Communication write %02x -> [%02x]\n",data,offset);
 	segacd_cdd_tx[offset] = data & 0xf;
 
-	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid ...)
+	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
 		switch(segacd_cdd_tx[0] & 0xf)
 		{
+			case 0x0: segacd_cdd_get_status(space->machine); break;
+			case 0x1: segacd_cdd_stop_all(space->machine); break;
+			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
 			default: printf("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		}
 	}
@@ -4535,7 +4586,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
-//	AM_RANGE(0xfe0000, 0xfe3fff) // backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // PCM, RF5C164
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
