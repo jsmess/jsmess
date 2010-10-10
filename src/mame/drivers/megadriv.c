@@ -362,7 +362,10 @@ static timer_device* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
+/* Sega CD stuff */
 static int sega_cd_connected = 0x00;
+static UINT16 segacd_cdd_ctrl,segacd_irq_mask;
+static UINT8 segacd_cdd_recv[10];
 
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
@@ -3496,7 +3499,7 @@ static WRITE16_HANDLER( _32x_sh2_common_4006_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){ cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
@@ -4295,10 +4298,18 @@ void segacd_init_main_cpu( running_machine* machine )
 
 static MACHINE_RESET( segacd )
 {
+	int i;
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
+
+	for(i=0;i<10;i++)
+	{
+		segacd_cdd_recv[i] = 0;
+	}
+
+	segacd_cdd_recv[9] = 0xf; // default checksum
 }
 
 
@@ -4339,7 +4350,7 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
-		popmessage("%02x %02x",segacd_greenled,segacd_redled);
+		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
 
 }
@@ -4414,6 +4425,48 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 }
 
+static READ16_HANDLER( segacd_irq_mask_r )
+{
+	return segacd_irq_mask;
+}
+
+static WRITE16_HANDLER( segacd_irq_mask_w )
+{
+	segacd_irq_mask = data & 0x7e;
+
+	// check here pending IRQs
+}
+
+static READ16_HANDLER( segacd_cdd_ctrl_r )
+{
+	return segacd_cdd_ctrl;
+}
+
+static WRITE16_HANDLER( segacd_cdd_ctrl_w )
+{
+	segacd_cdd_ctrl = data;
+
+	if(segacd_cdd_ctrl & 4 && segacd_irq_mask & 0x10) // HOst ClocK
+	{
+		// TODO: this shouldn't be instant, CDD should first fill receive data.
+		segacd_cdd_ctrl &= 0x103; // clear HOCK flag
+		// export status
+		cputag_set_input_line(space->machine, "segacd_68k", 4, HOLD_LINE);
+	}
+}
+
+/* 68k <- CDD communication comms are 4-bit wide */
+static READ8_HANDLER( segacd_cdd_rx_r )
+{
+	return segacd_cdd_recv[offset] & 0xf;
+}
+
+
+static WRITE8_HANDLER( segacd_cdd_tx_w )
+{
+	printf("CDD Communication write %02x -> [%02x]\n",data,offset);
+}
+
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -4436,10 +4489,11 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 //	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
-//	AM_RANGE(0xff8032, 0xff8033) // IRQ Mask
+	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
 //	AM_RANGE(0xff8034, 0xff8035) // CD Fader
-//	AM_RANGE(0xff8036, 0xff8037) // CDD Control
-//	AM_RANGE(0xff8038, 0xff804b) // CDD Communication ports 0-9
+	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
+	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
+	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
 //	AM_RANGE(0xff804c, 0xff804d) // Font Color
 //	AM_RANGE(0xff804e, 0xff804f) // Font bit
 //	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
