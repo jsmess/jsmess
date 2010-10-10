@@ -200,16 +200,17 @@ static TIMER_CALLBACK( mbee256_kbd )
 	}
 }
 
-READ8_HANDLER( mbee256_18_r )	// read
+READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i, ret = 121, data = z80pio_pb_r(mbee_z80pio,0);
+	UINT8 i, ret = 0;
 	if (mbee256_q_pos)
 	{
-		if (mbee256_q_pos) mbee256_q_pos--; // bump pointer
+		mbee256_q_pos--;
 		ret = mbee256_q[0]; // get oldest key
-		z80pio_pb_w(mbee_z80pio, 0, data & 0xfd); // clear irq
 		for (i = 0; i < mbee256_q_pos; i++) mbee256_q[i] = mbee256_q[i+1]; // ripple queue
 	}
+
+	z80pio_pb_w(mbee_z80pio, 0, z80pio_pb_r(mbee_z80pio,0) & 0xfd); // clear irq
 
     /* time delay of 0.01uf cap and 1.5k resistor */
 	timer_set(space->machine, ATTOTIME_IN_USEC(15), NULL, 0, mbee256_kbd);
