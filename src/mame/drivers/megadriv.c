@@ -366,6 +366,7 @@ static bitmap_t* render_bitmap;
 static int sega_cd_connected = 0x00;
 static UINT16 segacd_irq_mask;
 static UINT8 segacd_cdd_rx[10];
+static UINT8 segacd_cdd_tx[10];
 static struct
 {
 	UINT8 status;
@@ -4495,10 +4496,36 @@ static READ8_HANDLER( segacd_cdd_rx_r )
 	return segacd_cdd_rx[offset] & 0xf;
 }
 
+static const char *const segacd_cdd_cmd[] =
+{
+	"Status",
+	"Stop All",
+	"Get TOC Info",
+	"Read",
+	"Seek",
+	"Pause/Stop",
+	"Resume",
+	"Fast Forward",
+	"Fast Rewind",
+	"Recover Initial state",
+	"Close Tray",
+	"Open Tray",
+	"Unknown 0xE",
+	"Unknown 0xF"
+};
 
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
-	printf("CDD Communication write %02x -> [%02x]\n",data,offset);
+	//printf("CDD Communication write %02x -> [%02x]\n",data,offset);
+	segacd_cdd_tx[offset] = data & 0xf;
+
+	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid ...)
+	{
+		switch(segacd_cdd_tx[0] & 0xf)
+		{
+			default: printf("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+		}
+	}
 }
 
 
