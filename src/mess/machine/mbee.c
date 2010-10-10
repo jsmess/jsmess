@@ -185,11 +185,11 @@ static TIMER_CALLBACK( mbee256_kbd )
 					scancode = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
 					/* put it in the queue */
 					mbee256_q[mbee256_q_pos] = scancode;
-					if (mbee256_q_pos < 20) mbee256_q_pos++;
+					if (mbee256_q_pos < 19) mbee256_q_pos++;
 				}
 			}
+			mbee256_was_pressed[i] = pressed[i];
 		}
-		mbee256_was_pressed[i] = pressed[i];
 	}
 
     /* if anything queued, cause an interrupt */
@@ -202,7 +202,7 @@ static TIMER_CALLBACK( mbee256_kbd )
 
 READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i, ret = 0;
+	UINT8 i, ret = 0; // no idea what the 'nokey' value should be
 	if (mbee256_q_pos)
 	{
 		mbee256_q_pos--;
