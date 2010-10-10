@@ -329,7 +329,7 @@ READ8_HANDLER ( m6545_status_r )
 	return data;
 }
 
- READ8_HANDLER ( m6545_data_r )
+READ8_HANDLER ( m6545_data_r )
 {
 	int addr, data = 0;
 

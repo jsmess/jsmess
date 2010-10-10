@@ -29,9 +29,9 @@ static running_device *mbee_printer;
 
 ************************************************************/
 
-static WRITE8_DEVICE_HANDLER( mbee_pio_interrupt )
+static void mbee_pio_interrupt(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, data );
+	cputag_set_input_line(device->machine, "maincpu", 0, state );
 }
 
 static WRITE8_DEVICE_HANDLER( pio_ardy )
@@ -57,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
     d4 rs232 input (0=mark)
     d3 rs232 CTS (0=clear to send)
     d2 rs232 clock or DTR
-    d1 cass out
+    d1 cass out and (on 256tc) keyboard irq
     d0 cass in */
 
 	cassette_output(mbee_cassette, (data & 0x02) ? -1.0 : +1.0);
@@ -67,7 +67,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	UINT8 data = 0;
+	UINT8 data = z80pio_pb_r(mbee_z80pio,0) & 0x7e;
 
 	if (cassette_input(mbee_cassette) > 0.03)
 		data |= 0x01;
@@ -81,7 +81,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 const z80pio_interface mbee_z80pio_intf =
 {
-	DEVCB_HANDLER(mbee_pio_interrupt),	/* callback when change interrupt status */
+	DEVCB_LINE(mbee_pio_interrupt),	/* callback when change interrupt status */
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_port_a_w),
 	DEVCB_HANDLER(pio_ardy),
@@ -136,7 +136,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 /*  d7..d4 not used
     d3 density (1=MFM)
     d2 side (1=side 1)
-    d1..d0 drive select (0 to 3 - although no microbee ever had more than 2 drives) */
+    d1..d0 drive select (0 to 3) */
 
 	wd17xx_set_drive(mbee_fdc, data & 3);
 	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
@@ -149,12 +149,74 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 ************************************************************/
 
+static UINT8 mbee256_was_pressed[15] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+static UINT8 mbee256_q[20];
+static UINT8 mbee256_q_pos = 0;
+
+static TIMER_CALLBACK( mbee256_kbd )
+{
+    /* Keyboard scanner is a '3870' chip. It is not clocked, but is triggered by each read of port 18.
+    When a key is detected, it sets bit 1 of port 2 (one of the pio input lines). The next read of
+    port 18 will clear this line. The 3870 can store up to 9 keys, and has separate scan codes for
+    keys being pressed and being released. With no data sheet available, the following is a guess. */
+
+	UINT8 i, j, scancode;
+	UINT8 pressed[15] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+	char kbdrow[6];
+
+
+    /* see what is pressed */
+	for (i = 0; i < 15; i++)
+	{
+		sprintf(kbdrow,"LINE%d",i);
+		pressed[i] = (input_port_read(machine, kbdrow));
+	}
+
+    /* find what has changed */
+	for (i = 0; i < 15; i++)
+	{
+		if (pressed[i] != mbee256_was_pressed[i])
+		{
+			/* get scankey value */
+			for (j = 0; j < 8; j++)
+			{
+				if (BIT(pressed[i]^mbee256_was_pressed[i], j))
+				{
+					scancode = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
+					/* put it in the queue */
+					mbee256_q[mbee256_q_pos] = scancode;
+					if (mbee256_q_pos < 20) mbee256_q_pos++;
+				}
+			}
+		}
+		mbee256_was_pressed[i] = pressed[i];
+	}
+
+    /* if anything queued, cause an interrupt */
+	if (mbee256_q_pos)
+	{
+		i = z80pio_pb_r(mbee_z80pio,0);
+		z80pio_pb_w(mbee_z80pio, 0, i | 2);
+	}
+}
+
 READ8_HANDLER( mbee256_18_r )	// read
 {
-	UINT8 data = z80pio_pb_r(mbee_z80pio,0);
-	z80pio_pb_w(mbee_z80pio, 0, data & 0xfd);
-// get next char and return it
-	return 0;
+	UINT8 i, ret = 121, data = z80pio_pb_r(mbee_z80pio,0);
+	if (mbee256_q_pos)
+	{
+		if (mbee256_q_pos) mbee256_q_pos--; // bump pointer
+		ret = mbee256_q[0]; // get oldest key
+		z80pio_pb_w(mbee_z80pio, 0, data & 0xfd); // clear irq
+		for (i = 0; i < mbee256_q_pos; i++) mbee256_q[i] = mbee256_q[i+1]; // ripple queue
+	}
+
+    /* time delay of 0.01uf cap and 1.5k resistor */
+	timer_set(space->machine, ATTOTIME_IN_USEC(15), NULL, 0, mbee256_kbd);
+
+    /* get next char and return it */
+	
+	return ret;
 }
 
 
@@ -235,6 +297,7 @@ MACHINE_RESET( mbee64 )
 
 MACHINE_RESET( mbee256 )
 {
+	UINT8 i;
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(machine, "boot", 1);
 	memory_set_bank(machine, "bankl", 1);
@@ -245,6 +308,8 @@ MACHINE_RESET( mbee256 )
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
 	mbee_rtc = machine->device<mc146818_device>("rtc");
+	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
+	mbee256_q_pos = 0;
 }
 
 INTERRUPT_GEN( mbee_interrupt )
