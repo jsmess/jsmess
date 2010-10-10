@@ -48,6 +48,8 @@ MACHINE_RESET( mbee256 );
 WRITE8_HANDLER( mbee_04_w );
 WRITE8_HANDLER( mbee_06_w );
 READ8_HANDLER( mbee_07_r );
+READ8_HANDLER( mbee256_speed_low_r );
+READ8_HANDLER( mbee256_speed_high_r );
 READ8_HANDLER( mbee256_18_r );
 
 READ8_HANDLER ( mbee_fdc_status_r );

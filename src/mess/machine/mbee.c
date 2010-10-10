@@ -223,6 +223,26 @@ READ8_HANDLER( mbee256_18_r )
 
 /***********************************************************
 
+    Change CPU clock
+
+************************************************************/
+
+READ8_HANDLER( mbee256_speed_low_r )
+{
+	cputag_set_clock(space->machine, "maincpu", 3375000);
+	return 0xff;
+}
+
+READ8_HANDLER( mbee256_speed_high_r )
+{
+	cputag_set_clock(space->machine, "maincpu", 6750000);
+	return 0xff;
+}
+
+
+
+/***********************************************************
+
     Real Time Clock option
 
 ************************************************************/
