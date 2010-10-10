@@ -322,6 +322,8 @@ static UINT16* _32x_palette;
 static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
+static emu_timer *segacd_gfx_conversion_timer;
+
 /* SVP (virtua racing) */
 static cpu_device *_svp_cpu;
 
@@ -4110,6 +4112,7 @@ static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 static int segacd_cdc_regaddress;
 static int segacd_cdc_destination_device;
 static UINT8 segacd_cdc_registers[0x10];
+int segacd_conversion_active = 0;
 
 static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 {
@@ -4271,6 +4274,20 @@ static WRITE16_HANDLER( scd_a12006_hint_register_w )
 }
 
 
+static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
+{
+	// todo irqmask
+
+	printf("segacd_gfx_conversion_timer_callback\n");
+
+	if (segacd_irq_mask & 0x02)
+		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
+	
+	segacd_conversion_active = 0;
+}
+
+
+
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
@@ -4303,6 +4320,8 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
+	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
 }
 
@@ -4579,6 +4598,61 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 	}
 }
 
+int segacd_stampsize;
+
+static READ16_HANDLER( segacd_stampsize_r )
+{
+	UINT16 retdata = 0x0000;
+
+	retdata |= segacd_conversion_active<<15;
+
+	retdata |= segacd_stampsize & 0x7;
+
+	return retdata;
+
+}
+
+static WRITE16_HANDLER( segacd_stampsize_w )
+{
+	printf("segacd_stampsize_w %04x %04x\n",data, mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_stampsize = data & 0x07;
+		if (data & 0xf8)
+			printf("    unused bits (LSB) set in stampsize!\n");
+
+		if (data&1) printf("    Repeat On\n");
+		else printf("    Repeat Off\n");
+
+		if (data&2) printf("    32x32 dots\n");
+		else printf("    16x16 dots\n");
+
+		if (data&4) printf("    16x16 screens\n");
+		else printf("    1x1 screen\n");
+
+
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data&0xff00) printf("    unused bits (MSB) set in stampsize!\n");
+	}
+}
+
+// this triggers the conversion operation, which will cause an IRQ1 when finished
+WRITE16_HANDLER( segacd_trace_vector_base_address_w )
+{
+	if (segacd_ram_mode==1)
+	{
+		printf("ILLEGAL: segacd_trace_vector_base_address_w %04x %04x in mode 1!\n",data,mem_mask);
+	}
+
+	printf("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
+
+	segacd_conversion_active = 1;
+
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
+}
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -4609,14 +4683,14 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff804c, 0xff804d) // Font Color
 //	AM_RANGE(0xff804e, 0xff804f) // Font bit
 //	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
-//	AM_RANGE(0xff8058, 0xff8059) // Stamp size
+	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 //	AM_RANGE(0xff805a, 0xff805b) // Stamp map base address
 //	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
 //	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
 //	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
 //	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
 //	AM_RANGE(0xff8064, 0xff8065) // Image buffer V dot size
-//	AM_RANGE(0xff8066, 0xff8067) // Trace vector base address
+	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
 //	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
