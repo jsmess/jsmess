@@ -47,7 +47,9 @@
 #include "devices/harddriv.h"
 #include "formats/ap_dsk35.h"
 #include "devices/messram.h"
+#include "devices/chd_cd.h"
 #include "sound/asc.h"
+#include "sound/cdda.h"
 
 #define C7M	(7833600)
 #define C15M	(C7M*2)
@@ -177,6 +179,17 @@ static WRITE8_HANDLER ( mac_rbv_w )
 //		if (offset == 0x10) printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
 		switch (offset)
 		{
+			case 0x02:
+				if ((data & 0x40) && (mac->rbv_type == RBV_TYPE_SONORA))
+				{
+					mac->rbv_regs[offset] &= ~0x40;
+				}
+				else
+				{
+					mac->rbv_regs[offset] = data;
+				}
+				break;
+
 			case 0x03:
 				mac_set_via2_interrupt(space->machine, 0);
 				mac->rbv_regs[offset] = data;
@@ -344,98 +357,6 @@ static VIDEO_UPDATE( maclc )
 	return 0;
 }
 
-// LC III "Sonora" video
-
-static UINT8 sonora_regs[256];
-static UINT32 sonora_colors[3], sonora_count, sonora_clutoffs;
-static UINT32 sonora_palette[256];
-
-static READ16_HANDLER ( mac_sonora_r )
-{
-	int data, viaoffs;
-	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
-
-//  printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
-
-	viaoffs = (offset >> 8) & 0x0f;
-
-	switch (offset)
-	{
-		case 0:
-			data = via_1->read(*space, viaoffs);
-			return (data<<8) | sonora_regs[0];
-
-		default:
-			data = via_1->read(*space, viaoffs);
-			return (data<<8)|data;
-	}
-
-}
-
-static WRITE16_HANDLER ( mac_sonora_w )
-{
-	via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
-	int viaoffs;
-
-//  printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
-
-	viaoffs = (offset >> 8) & 0x0f;
-
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_8_15)
-			{
-				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
-			}
-			else
-			{
-				sonora_regs[0] = data&0xe7;
-			}
-			break;
-
-		default:
-			if (ACCESSING_BITS_8_15)
-			{
-				via_1->write(*space, viaoffs, (data >> 8) & 0xff);
-			}
-			break;
-	}
-}
-
-static WRITE32_HANDLER( mac_sonora_ramdac_w )
-{
-	if (mem_mask == 0xff000000)
-	{
-		sonora_clutoffs = data>>24;
-		sonora_count = 0;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		sonora_colors[sonora_count++] = data>>16;
-
-		if (sonora_count == 3)
-		{
-			sonora_count = 0;
-			palette_set_color(space->machine, sonora_clutoffs, MAKE_RGB(sonora_colors[0], sonora_colors[1], sonora_colors[2]));
-			sonora_palette[sonora_clutoffs] = MAKE_RGB(sonora_colors[0], sonora_colors[1], sonora_colors[2]);
-			sonora_clutoffs++;
-		}
-	}
-}
-
-static VIDEO_START( macsonora )
-{
-	memset(sonora_regs, 0, sizeof(sonora_regs));
-
-	sonora_regs[1] = 0x6;	// set init value
-}
-
-static VIDEO_UPDATE( macsonora )
-{
-	return 0;
-}
-
 static READ32_HANDLER(mac_lc3_id)
 {
 //  printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
@@ -511,19 +432,19 @@ static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f40000, 0x50fbffff) AM_RAM	// V8 VRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
+static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32)			 
+	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50014000, 0x50015fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50016000, 0x50017fff) AM_READ(mac_swim_r) AM_WRITENOP AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50024003) AM_WRITE(mac_sonora_ramdac_w) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_sonora_r, mac_sonora_w, 0xffffffff)	 AM_MIRROR(0x00f00000)// VIA2 (Sonora)
+	AM_RANGE(0x50024000, 0x50024007) AM_WRITE( rbv_ramdac_w ) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
 
 	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_lc3_id)
 
-	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("bootrom", 0x78000)
+	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_BASE_MEMBER(mac_state, rbv_vram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32)
@@ -891,7 +812,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MDRV_CPU_PROGRAM_MAP(maclc3_map)
 
 	MDRV_VIDEO_START(macsonora)
-	MDRV_VIDEO_UPDATE(macsonora)
+	MDRV_VIDEO_UPDATE(macrbvvram)
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
@@ -1002,12 +923,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciisi, macii )
 
-	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)
+	MDRV_CPU_REPLACE("maincpu", M68030, 20000000)
 	MDRV_CPU_PROGRAM_MAP(maciici_map)
 
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(maclc)
+	MDRV_VIDEO_START(macrbv)
 	MDRV_VIDEO_UPDATE(macrbv)
 
 	/* internal ram */

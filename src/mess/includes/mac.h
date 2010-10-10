@@ -22,6 +22,13 @@ typedef enum
 	MCU_STREAMING_WRAMWR
 } mac_streaming_t;
 
+enum
+{
+	RBV_TYPE_RBV = 0,
+	RBV_TYPE_V8,
+	RBV_TYPE_SONORA
+};
+
 /* tells which model is being emulated (set by macxxx_init) */
 typedef enum
 {
@@ -39,6 +46,8 @@ typedef enum
 	MODEL_MAC_IICX,
 	MODEL_MAC_IICI,
 	MODEL_MAC_IISI,
+	MODEL_MAC_IIVX,
+	MODEL_MAC_IIVI,
 	MODEL_MAC_IIFX,
 	MODEL_MAC_SE30,
 
@@ -162,7 +171,9 @@ VIDEO_UPDATE( macse30 );
 PALETTE_INIT( mac );
 
 VIDEO_START( macrbv );
+VIDEO_START( macsonora );
 VIDEO_UPDATE( macrbv );
+VIDEO_UPDATE( macrbvvram );
 
 void mac_set_screen_buffer( int buffer );
 
@@ -266,9 +277,10 @@ public:
 	emu_timer *mac6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 rbv_regs[256], rbv_ier, rbv_ifr;
+	UINT8 rbv_regs[256], rbv_ier, rbv_ifr, rbv_type;
 	UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
 	UINT32 rbv_palette[256];
+	UINT32 *rbv_vram;
 };
 
 #endif /* MAC_H_ */

@@ -177,15 +177,6 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 			break;
 
 		case 1:	// FIFO mode
-			if ((m_fifo_a_rdptr == 0) && (!m_fifo_a_wrhalf[0]))
-			{
-			   halt = 1;		
-			}
-			else if ((m_fifo_a_rdptr == 0x200) && (!m_fifo_a_wrhalf[1]))
-			{
-			   halt = 1;		
-			}
-
 			for (i = 0; i < samples; i++)
 			{
 				INT8 smpll, smplr;
@@ -204,22 +195,40 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 				smpll = (INT8)m_fifo_a[m_fifo_a_rdptr++]^0x80;
 				smplr = (INT8)m_fifo_b[m_fifo_b_rdptr++]^0x80;
 				
-				if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
+				switch (m_chip_type)
 				{
-					m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
-					if (m_irq_cb)
-					{
-						m_irq_cb(this, 1);
-					}
-				}
+					case ASC_TYPE_SONORA:
+						if (m_fifo_a_rdptr >= 0x200)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
+							m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
+							if (m_irq_cb)
+							{
+								m_irq_cb(this, 1);
+							}
+						}
+						break;
 
-				if ((m_fifo_b_rdptr == 0x200) || (m_fifo_b_rdptr == 0x400))
-				{
-					m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
-					if (m_irq_cb)
-					{
-						m_irq_cb(this, 1);
-					}
+					default:
+						if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
+							if (m_irq_cb)
+							{
+								m_irq_cb(this, 1);
+							}
+						}
+
+						// don't update for non-(E)ASC
+						if ((m_fifo_b_rdptr == 0x200) || (m_fifo_b_rdptr == 0x400))
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
+							if (m_irq_cb)
+							{
+								m_irq_cb(this, 1);
+							}
+						}
+						break;
 				}
 
 				m_fifo_a_rdptr &= 0x3ff;
@@ -423,7 +432,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			{
 				m_fifo_a_wrhalf[1] = 1;
 			}
-
+						       
 			m_fifo_a[m_fifo_a_wrptr++] = data;
 
 			if ((m_fifo_a_wrptr == 0x200) || (m_fifo_a_wrptr == 0x400))
@@ -467,7 +476,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			}
 
 			m_fifo_b_wrptr &= 0x3ff;
-		}
+		}    
 		else
 		{
 			m_fifo_b[offset-0x400] = data;

@@ -79,13 +79,13 @@
 #include "debugger.h"
 
 #define ADB_IS_BITBANG	((mac->mac_model == MODEL_MAC_SE || mac->mac_model == MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_SE30))
-#define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IISI)
+#define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || ((mac->mac_model >= MODEL_MAC_IISI) && (mac->mac_model <= MODEL_MAC_IIVI))
 #define ADB_IS_PM	(mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 
 #define AUDIO_IS_CLASSIC (mac->mac_model < MODEL_MAC_II) && (mac->mac_model != MODEL_MAC_PORTABLE) && (mac->mac_model != MODEL_MAC_PB100)
 #define MAC_HAS_VIA2	(mac->mac_model >= MODEL_MAC_II)
 
-#define ASC_INTS_RBV	((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI) || (mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC))
+#define ASC_INTS_RBV	((mac->mac_model >= MODEL_MAC_IICI) && (mac->mac_model <= MODEL_MAC_IIVI)) || ((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC))
 
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
@@ -388,7 +388,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		if (((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC)) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
+		if (((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) && (mac->mac_model != MODEL_MAC_LC_III)) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
 		{
 //			printf("V8 style machine: memory_size = %x (%s)\n", memory_size, is_rom ? "ROM" : "RAM");
 
@@ -398,13 +398,13 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 			}
 			else
 			{	
-				address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+//				address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 				UINT32 v8_internal_mirror_base;
 
 				v8_internal_mirror_base = 0xffffffff;	// default to "none"
 
 				// force unmap of entire RAM region
-				memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
+//				memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
 
 				// install the total RAM size at 0
 				mac_install_memory(machine, 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
@@ -3008,7 +3008,9 @@ MACHINE_RESET(mac)
 
 	/* setup the memory overlay */
 	if (mac->mac_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
-	set_memory_overlay(machine, 1);
+	{
+		set_memory_overlay(machine, 1);
+	}
 
 	/* setup videoram */
 	mac_set_screen_buffer(1);
@@ -3110,7 +3112,7 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 				mac->mac_overlay = -1;
 			}
 		}
-		else if ( (mac->mac_model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
+		else
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
@@ -3174,49 +3176,28 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	state_save_register_postload(machine, mac_state_load, NULL);
 }
 
-DRIVER_INIT(mac128k512k)
-{
-	mac_driver_init(machine, MODEL_MAC_128K512K);
+#define MAC_DRIVER_INIT(label, model)	\
+DRIVER_INIT( label )	\
+{	\
+	mac_driver_init(machine, model );	\
 }
 
-DRIVER_INIT(mac512ke)
-{
-	mac_driver_init(machine, MODEL_MAC_512KE);
-}
-
-DRIVER_INIT(macplus)
-{
-//  UINT32 *ROM = (UINT32 *)memory_region(machine, "bootrom");
-
-//  ROM[0x1aefc/4] = 0x6bbe709e;    // AppleTalk: change bpl to bmi
-
-	mac_driver_init(machine, MODEL_MAC_PLUS);
-}
-
-DRIVER_INIT(macse)
-{
-	mac_driver_init(machine, MODEL_MAC_SE);
-}
-
-DRIVER_INIT(macclassic)
-{
-	mac_driver_init(machine, MODEL_MAC_CLASSIC);
-}
-
-DRIVER_INIT(maclc)
-{
-	mac_driver_init(machine, MODEL_MAC_LC);
-}
-
-DRIVER_INIT(maclc2)
-{
-	mac_driver_init(machine, MODEL_MAC_LC_II);
-}
-
-DRIVER_INIT(maclc3)
-{
-	mac_driver_init(machine, MODEL_MAC_LC_III);
-}
+MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
+MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
+MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
+MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
+MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
+MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
+MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
+MAC_DRIVER_INIT(maclc3, MODEL_MAC_LC_III)
+MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
+MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
+MAC_DRIVER_INIT(macii, MODEL_MAC_II)
+MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
+MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
+MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
+MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
+MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine *machine)
@@ -3244,47 +3225,6 @@ DRIVER_INIT(maciix)
 {
 	patch_appletalk_iix(machine);
 	mac_driver_init(machine, MODEL_MAC_IIX);
-}
-
-DRIVER_INIT(maciici)
-{
-	mac_driver_init(machine, MODEL_MAC_IICI);
-}
-
-DRIVER_INIT(maciisi)
-{
-	mac_driver_init(machine, MODEL_MAC_IISI);
-}
-
-DRIVER_INIT(macii)
-{
-	mac_driver_init(machine, MODEL_MAC_II);
-}
-
-DRIVER_INIT(macse30)
-{
-	patch_appletalk_iix(machine);
-	mac_driver_init(machine, MODEL_MAC_SE30);
-}
-
-DRIVER_INIT(macclassic2)
-{
-	mac_driver_init(machine, MODEL_MAC_CLASSIC_II);
-}
-
-DRIVER_INIT(macpm6100)
-{
-	mac_driver_init(machine, MODEL_MAC_POWERMAC_6100);
-}
-
-DRIVER_INIT(macprtb)
-{
-	mac_driver_init(machine, MODEL_MAC_PORTABLE);
-}
-
-DRIVER_INIT(macpb100)
-{
-	mac_driver_init(machine, MODEL_MAC_PB100);
 }
 
 void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state)
