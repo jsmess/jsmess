@@ -3,6 +3,8 @@
 
 #include "emu.h"
 
+#define IRQ_LOG 0  // set to 1 to log IRQ line activity
+
 READ8_HANDLER( towns_gfx_high_r );
 WRITE8_HANDLER( towns_gfx_high_w );
 READ8_HANDLER( towns_gfx_r );
@@ -120,6 +122,8 @@ class towns_state : public driver_device
 	UINT8 towns_mouse_y;
 	UINT8 towns_volume[8];  // volume ports
 	UINT8 towns_volume_select;
+	UINT8 towns_scsi_control;
+	UINT8 towns_scsi_status;
 	struct towns_cdrom_controller towns_cd;
 	struct towns_video_controller video;
 	required_shared_ptr<UINT8>	m_nvram;
@@ -135,7 +139,12 @@ class towns_state : public driver_device
 	running_device* messram;
 	running_device* cdrom;
 	running_device* cdda;
-
+	running_device* scsibus;
+	running_device* hd0;
+	running_device* hd1;
+	running_device* hd2;
+	running_device* hd3;
+	running_device* hd4;
 };
 
 void towns_update_video_banks(address_space*);

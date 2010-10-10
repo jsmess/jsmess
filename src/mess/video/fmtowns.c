@@ -499,7 +499,7 @@ WRITE8_HANDLER(towns_video_5c8_w)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
 			pic8259_ir3_w(dev, 0);
-			logerror("PIC: IRQ11 (VSync) set low\n");
+			if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
 	}
@@ -1803,7 +1803,7 @@ static TIMER_CALLBACK( towns_vblank_end )
 	towns_state* state = machine->driver_data<towns_state>();
 	running_device* dev = (running_device*)ptr;
 	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
-	logerror("PIC: IRQ11 (VSync) set low\n");
+	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 	state->video.towns_vblank_flag = 0;
 }
 
@@ -1812,7 +1812,7 @@ INTERRUPT_GEN( towns_vsync_irq )
 	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* dev = state->pic_slave;
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
-	logerror("PIC: IRQ11 (VSync) set high\n");
+	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	state->video.towns_vblank_flag = 1;
 	timer_set(device->machine,device->machine->primary_screen->time_until_vblank_end(),(void*)dev,0,towns_vblank_end);
 	if(state->video.towns_tvram_enable)

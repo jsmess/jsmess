@@ -126,6 +126,9 @@
 #include "devices/messram.h"
 #include "includes/fmtowns.h"
 #include "machine/nvram.h"
+#include "devices/harddriv.h"
+#include "machine/scsi.h"
+#include "machine/scsibus.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
@@ -362,7 +365,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 	if(tstate->towns_fdc_irq6mask == 0)
 		state = 0;
 	pic8259_ir6_w(device, state);  // IRQ6 = FDC
-	logerror("PIC: IRQ6 (FDC) set to %i\n",state);
+	if(IRQ_LOG) logerror("PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
@@ -533,7 +536,7 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 	if(state->towns_kb_irq1_enable)
 	{
 		pic8259_ir1_w(dev, 1);
-		logerror("PIC: IRQ1 (keyboard) set high\n");
+		if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set high\n");
 	}
 	logerror("KB: sending scancode 0x%02x\n",scancode);
 }
@@ -576,7 +579,7 @@ static READ8_HANDLER(towns_keyboard_r)
 			ret = state->towns_kb_output;
 			//logerror("KB: read keyboard output port, returning %02x\n",ret);
 			pic8259_ir1_w(state->pic_master, 0);
-			logerror("PIC: IRQ1 (keyboard) set low\n");
+			if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set low\n");
 			if(state->towns_kb_extend != 0xff)
 			{
 				towns_kb_sendcode(space->machine,state->towns_kb_extend,2);
@@ -721,7 +724,7 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 			state->towns_pcm_channel_flag = 0;
 			state->towns_pcm_irq_flag = 0;
 			pic8259_ir5_w(state->pic_slave, 0);
-			logerror("PIC: IRQ13 (PCM) set low\n");
+			if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
 			break;
 //		default:
 			//logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
@@ -1139,7 +1142,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 					{
 						tstate->towns_cd.status |= 0x80;
 						pic8259_ir1_w(tstate->pic_slave, 1);
-						logerror("PIC: IRQ9 (CD-ROM) set high\n");
+						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set high\n");
 					}
 				}
 				else
@@ -1149,7 +1152,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				tstate->towns_cd.status &= ~0x80;
 				pic8259_ir1_w(tstate->pic_slave, 0);
-				logerror("PIC: IRQ9 (CD-ROM) set low\n");
+				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set low\n");
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
@@ -1161,7 +1164,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 					{
 						tstate->towns_cd.status |= 0x40;
 						pic8259_ir1_w(tstate->pic_slave, 1);
-						logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
+						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
 					}
 				}
 				else
@@ -1171,7 +1174,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				tstate->towns_cd.status &= ~0x40;
 				pic8259_ir1_w(tstate->pic_slave, 0);
-				logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
+				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
 			}
 			break;
 	}
@@ -1760,19 +1763,115 @@ static TIMER_CALLBACK(rtc_second)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
+// info from Toshiya Takeda's e-FMR50 source (the Towns uses the same controller?)
+// 0xc30 = Data register
+// 0xc32 = Status register (read)
+//         bit 7 = REQ
+//         bit 6 = IO
+//         bit 5 = MSG
+//         bit 4 = CD
+//         bit 3 = BUSY
+//         bit 1 = INT
+//         bit 0 = PERR
+// 0xc32 = Control register (write)
+//         bit 7 = WEN
+//         bit 6 = IMSK
+//         bit 4 = ATN
+//         bit 2 = SEL
+//         bit 1 = DMAE
+//         bit 0 = RST
 static READ8_HANDLER(towns_scsi_r)
 {
-	logerror("scsi_r (offset %i) read\n",offset);
-	if(offset == 2)
-		return 0x08;
+	towns_state* state = space->machine->driver_data<towns_state>();
+	UINT8 ret = 0x00;
+//	logerror("scsi_r (offset %i) read\n",offset);
+	switch(offset)
+	{
+	case 0x00:
+		return scsi_data_r(state->scsibus);
+	case 0x02:
+		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_REQ)) ? 0x00 : 0x80;
+		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_IO)) ? 0x00 : 0x40;
+		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_MSG)) ? 0x00 : 0x20;
+		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_CD)) ? 0x00 : 0x10;
+		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_BSY)) ? 0x00 : 0x08;
+		return ret;
+	}
 	return 0x00;
 }
 
+static WRITE8_HANDLER(towns_scsi_w)
+{
+	towns_state* state = space->machine->driver_data<towns_state>();
+	switch(offset)
+	{
+	case 0x00:
+		scsi_data_w(state->scsibus,data);
+		set_scsi_line(state->scsibus,SCSI_LINE_ACK,0);
+		logerror("SCSI data write %02x\n",data);
+		break;
+	case 0x02:
+		set_scsi_line(state->scsibus,SCSI_LINE_SEL,data & 0x04);
+		if(data & 0x01)
+		{
+			set_scsi_line(state->scsibus,SCSI_LINE_RESET,data & 0x01);
+		}
+		logerror("SCSI control write %02x\n",data);
+		break;
+	}
+}
+
+void towns_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
+{
+	towns_state* tstate = device->machine->driver_data<towns_state>();
+
+	if(state == 0)
+	{
+		switch(line)
+		{
+		case SCSI_LINE_REQ:
+			break;
+		case SCSI_LINE_IO:
+			break;
+		case SCSI_LINE_MSG:
+			break;
+		case SCSI_LINE_CD:
+			break;
+		case SCSI_LINE_BSY:
+			break;
+		}
+	}
+	else
+	{
+		switch(line)
+		{
+		case SCSI_LINE_REQ:
+			set_scsi_line(tstate->scsibus,SCSI_LINE_ACK,1);
+			break;
+		case SCSI_LINE_IO:
+			break;
+		case SCSI_LINE_MSG:
+			break;
+		case SCSI_LINE_CD:
+			break;
+		case SCSI_LINE_BSY:
+			break;
+		}
+	}
+
+}
+
 // Volume ports - I/O ports 0x4e0-0x4e3
-// 0x4e3 = channel select
-//         (4 and 5 = CD-DA left and right channels)
-//         (6 = MIC?)
-// 0x4e2 = volume level
+// 0x4e0 = input volume level
+// 0x4e1 = input channel select
+//         4 = Line in, left channel
+//         5 = Line in, right channel
+// 0x4e2 = output volume level
+// 0x4e3 = output channel select
+//         2 = MIC
+//         3 = MODEM
+//         4 = CD-DA left channel
+//         5 = CD-DA right channel
 static READ8_HANDLER(towns_volume_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
@@ -1843,13 +1942,13 @@ void towns_fm_irq(running_device* device, int irq)
 	{
 		state->towns_fm_irq_flag = 1;
 		pic8259_ir5_w(pic, 1);
-		logerror("PIC: IRQ13 (FM) set high\n");
+		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
 		state->towns_fm_irq_flag = 0;
 		pic8259_ir5_w(pic, 0);
-		logerror("PIC: IRQ13 (FM) set low\n");
+		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
 	}
 }
 
@@ -1864,7 +1963,7 @@ void towns_pcm_irq(running_device* device, int channel)
 		state->towns_pcm_irq_flag = 1;
 		state->towns_pcm_channel_flag |= (1 << channel);
 		pic8259_ir5_w(pic, 1);
-		logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
+		if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
 }
 
@@ -1882,7 +1981,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 	if(tstate->towns_timer_mask & 0x01)
 	{
 		pic8259_ir0_w(dev, state);
-		logerror("PIC: IRQ0 (PIT Timer) set to %i\n",state);
+		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer) set to %i\n",state);
 	}
 }
 
@@ -1989,7 +2088,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // SCSI controller
-  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_scsi_r,0xffffffff)
+  AM_RANGE(0x0c30,0x0c33) AM_READWRITE8(towns_scsi_r,towns_scsi_w,0xffffffff)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
@@ -2232,6 +2331,7 @@ static DRIVER_INIT( towns )
 	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)machine->device("dma_1"));
 
 	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
+	init_scsibus(machine->device("scsibus"));
 }
 
 static DRIVER_INIT( marty )
@@ -2254,6 +2354,12 @@ static MACHINE_RESET( towns )
 	state->messram = machine->device("messram");
 	state->cdrom = machine->device("cdrom");
 	state->cdda = machine->device("cdda");
+	state->scsibus = machine->device("scsibus");
+	state->hd0 = machine->device("harddisk0");
+	state->hd1 = machine->device("harddisk1");
+	state->hd2 = machine->device("harddisk2");
+	state->hd3 = machine->device("harddisk3");
+	state->hd4 = machine->device("harddisk4");
 	state->ftimer = 0x00;
 	state->nmi_mask = 0x00;
 	state->compat_mode = 0x00;
@@ -2352,6 +2458,24 @@ static const rf5c68_interface rf5c68_intf =
 	towns_pcm_irq
 };
 
+static const SCSIConfigTable towns_scsi_device_table =
+{
+	5,                                      /* 5 SCSI devices */
+	{
+		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_1, "harddisk1", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_2, "harddisk2", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_3, "harddisk3", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_4, "harddisk4", SCSI_DEVICE_HARDDISK },
+	}
+};
+
+static const SCSIBus_interface towns_scsi_config =
+{
+    &towns_scsi_device_table,
+    &towns_scsi_linechange
+};
+
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -2420,6 +2544,13 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MDRV_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
 
 	MDRV_CDROM_ADD("cdrom")
+
+	MDRV_HARDDISK_ADD("harddisk0")
+	MDRV_HARDDISK_ADD("harddisk1")
+	MDRV_HARDDISK_ADD("harddisk2")
+	MDRV_HARDDISK_ADD("harddisk3")
+	MDRV_HARDDISK_ADD("harddisk4")
+	MDRV_SCSIBUS_ADD("scsibus",towns_scsi_config)
 
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
