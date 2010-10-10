@@ -17,12 +17,6 @@ static running_device *super80_printer;
 
 static UINT8 keylatch;
 
-/* This activates when Control + C + 4 pressed */
-static void super80_pio_interrupt(running_device *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state );
-}
-
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
 	keylatch = data;
@@ -45,7 +39,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 Z80PIO_INTERFACE( super80_pio_intf )
 {
-	DEVCB_LINE(super80_pio_interrupt),		/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_port_a_w),
 	DEVCB_NULL,			/* portA ready active callback (not used in super80) */
