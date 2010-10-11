@@ -259,6 +259,7 @@ a tilemap-like structure, from which data is copied)
 
 
 #include "emu.h"
+#include "coreutil.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
@@ -269,6 +270,8 @@ a tilemap-like structure, from which data is copied)
 #include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/sh2/sh2comn.h"
+#include "devices/chd_cd.h"
+#include "sound/cdda.h"
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
@@ -388,6 +391,16 @@ static struct
 	UINT8 ext;
 	UINT8 ctrl;
 }segacd_cdd;
+static struct
+{
+	UINT32	current_frame;
+	UINT32	end_frame;
+	UINT32	last_frame;
+
+	cdrom_file	*cd;
+	const cdrom_toc*	toc;
+}segacd;
+
 static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
 #ifdef UNUSED_FUNCTION
@@ -4238,7 +4251,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
 
 			return segacd_dataram[offset];
-		
+
 		}
 		else
 		{
@@ -4312,7 +4325,7 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 
 	if (segacd_irq_mask & 0x02)
 		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
-	
+
 	segacd_conversion_active = 0;
 }
 
@@ -4685,6 +4698,26 @@ static MACHINE_RESET( segacd )
 	}
 
 	segacd_cdd_rx[9] = 0xf; // default checksum
+
+	/* init cd-rom device */
+
+	{
+		running_device *device;
+
+		device = machine->device("cdrom");
+		if ( device )
+		{
+			segacd.cd = mess_cd_get_cdrom_file(device);
+			if ( segacd.cd )
+			{
+				segacd.toc = cdrom_get_toc( segacd.cd );
+				cdda_set_cdrom( machine->device("cdda"), segacd.cd );
+				segacd.last_frame = cdrom_get_track_start( segacd.cd, cdrom_get_last_track( segacd.cd ) - 1 );
+				segacd.last_frame += segacd.toc->tracks[ cdrom_get_last_track( segacd.cd ) - 1 ].frames;
+				segacd.end_frame = segacd.last_frame;
+			}
+		}
+	}
 }
 
 
@@ -4906,13 +4939,24 @@ static void segacd_cdd_get_status(running_machine *machine)
 {
 	// ...
 
+	/*segacd_cdd.status = 0;
+	segacd_cdd.minute = 0;
+	segacd_cdd.seconds = 0;
+	segacd_cdd.frame = 0;
+	segacd_cdd.ext = 0;*/
+
 	cdd_hock_irq(machine,1);
 }
 
 static void segacd_cdd_stop_all(running_machine *machine)
 {
-	// ...
-	segacd_cdd.ctrl |= 0x100; // set data bit
+	segacd_cdd.ctrl |= 0x100;
+
+	segacd_cdd.status = 0;
+	segacd_cdd.minute = 0;
+	segacd_cdd.seconds = 0;
+	segacd_cdd.frame = 0;
+	segacd_cdd.ext = 0;
 
 	//cdd_hock_irq(machine,1); // doesn't work?
 }
@@ -4920,11 +4964,54 @@ static void segacd_cdd_stop_all(running_machine *machine)
 
 static void segacd_cdd_get_toc_info(running_machine *machine)
 {
-	segacd_cdd.status = ((segacd_cdd_tx[3] & 0xf) << 4) | (segacd_cdd.status & 0xf);
+	segacd_cdd.status = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.status & 0xf0);
+
+	logerror("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 
 	switch(segacd_cdd_tx[3] & 0xf)
 	{
-		default: printf("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+		case 0x3: //Get Total Length (in MSF)
+			if ( ! segacd.cd ) // no cd is present
+			{
+				segacd_cdd.status = (0) | (segacd_cdd.status & 0xf0);
+				segacd_cdd.minute = 0;
+				segacd_cdd.seconds = 0;
+				segacd_cdd.frame = 0;
+			}
+			else
+			{
+				UINT32 frame,msf;
+
+				frame = segacd.toc->tracks[segacd.toc->numtrks-1].physframeofs;
+				frame += segacd.toc->tracks[segacd.toc->numtrks-1].frames;
+				msf = lba_to_msf( frame );
+
+				segacd_cdd.status = (0x3 & 0xf) | (segacd_cdd.status & 0xf0);
+				segacd_cdd.minute = ((msf >> 16) & 0xff);
+				segacd_cdd.seconds = ((msf >> 8) & 0xff);
+				segacd_cdd.frame = ((msf >> 0) & 0xff);
+			}
+			segacd_cdd.ext = 0;
+			cdd_hock_irq(machine,1);
+			return;
+		case 0x4: //Get First and Last Track Number
+			if ( ! segacd.cd ) // no cd is present
+			{
+				segacd_cdd.status = (0) | (segacd_cdd.status & 0xf0);
+				segacd_cdd.minute = 0;
+				segacd_cdd.seconds = 0;
+			}
+			else
+			{
+				segacd_cdd.status = (0x4 & 0xf) | (segacd_cdd.status & 0xf0);
+				segacd_cdd.minute = dec_2_bcd(1);
+				segacd_cdd.seconds = dec_2_bcd(segacd.toc->numtrks);
+			}
+			segacd_cdd.frame = 0;
+			segacd_cdd.ext = 0;
+			cdd_hock_irq(machine,1);
+			return;
+		//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 	}
 
 	cdd_hock_irq(machine,1);
@@ -4937,12 +5024,14 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 
 	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
+		logerror("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+
 		switch(segacd_cdd_tx[0] & 0xf)
 		{
 			case 0x0: segacd_cdd_get_status(space->machine); break;
 			case 0x1: segacd_cdd_stop_all(space->machine); break;
 			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
-			default: printf("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+			//default: logerror("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		}
 	}
 }
@@ -4981,7 +5070,7 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 
 
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data&0xff00) printf("    unused bits (MSB) set in stampsize!\n");
@@ -4997,7 +5086,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 	}
 
 	logerror("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
-	
+
 	{
 		int base = (data & 0xfffe) * 4;
 
@@ -5008,7 +5097,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 
 		segacd_conversion_active = 1;
 		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
-		
+
 
 		int i;
 
@@ -5021,10 +5110,10 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			UINT16 param4 = segacd_dataram[(currbase+0x6)>>1];
 
 
-			logerror("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4); 
+			logerror("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4);
 
 		}
-		
+
 		{
 			// not real code.. yet
 			// should copy part of the stamp into the imagebuffer area using the rotation / zooming parameters given
@@ -5034,8 +5123,8 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			UINT16* x;
 			x = BITMAP_ADDR16(srcbitmap,10,10);
 			UINT16 datax;
-			datax = x[0]; 
-		
+			datax = x[0];
+
 			for (int i=0;i<0x100;i++)
 			{
 				int offsetx = ((segacd_imagebuffer_start_address&0xfff8)*2)+i;
@@ -8068,12 +8157,24 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(segacd_map)
+
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
 	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(segacd_map)
+
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 
@@ -8149,7 +8250,6 @@ static void megadriv_init_common(running_machine *machine)
 		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
 		sega_cd_connected = 1;
 		segacd_init_main_cpu(machine);
-
 	}
 
 	_svp_cpu = machine->device<cpu_device>("svp");
