@@ -29,11 +29,6 @@ static running_device *mbee_printer;
 
 ************************************************************/
 
-static void mbee_pio_interrupt(running_device *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state );
-}
-
 static WRITE8_DEVICE_HANDLER( pio_ardy )
 {
 	/* devices need to be redeclared in this callback for some strange reason */
@@ -81,7 +76,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 const z80pio_interface mbee_z80pio_intf =
 {
-	DEVCB_LINE(mbee_pio_interrupt),	/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_port_a_w),
 	DEVCB_HANDLER(pio_ardy),

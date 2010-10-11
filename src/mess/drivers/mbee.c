@@ -68,6 +68,7 @@
     - Fix Paste (it loses most of the characters)
     - Fix the rtc (it's in as per the manuals, but it is completely ignored)
     - Get details on the many other models not currently emulated
+    - 256TC keyboard IRQ is active all the time, it needs to be fully understood.
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
@@ -279,11 +280,15 @@ static ADDRESS_MAP_START(mbee256_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x0018, 0x0018) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
-	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
+	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
+	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
+	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
 	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x0048, 0x0048) AM_MIRROR(0xff00) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
-	AM_RANGE(0x0050, 0x0050) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
+	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
+	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
+	// AM_RANGE(0x0060, 0x0067) AM_MIRROR(0xff00) Reserved for file server selection (unused)
+	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) Reserved for 8530 SCC (unused)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mbee )
