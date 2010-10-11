@@ -843,6 +843,8 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 	// note, the RV bit on 32x is important for this to work, because it causes a normal cart mapping - see tempo
 	address_space *space68k = machine->device<legacy_cpu_device>("maincpu")->space();
 
+	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
+
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
 		if (_svp_cpu != NULL)
@@ -3825,6 +3827,8 @@ static UINT16 segacd_imagebuffer_vdot_size;
 static UINT16 a12000_halt_reset_reg = 0x0000;
 int segacd_conversion_active = 0;
 static UINT16 segacd_stampmap_base_address;
+static UINT16 segacd_imagebuffer_start_address;
+static UINT16 segacd_imagebuffer_offset;
 static tilemap_t    *segacd_stampmap[4];
 static void segacd_mark_stampmaps_dirty(void);
 
@@ -4230,11 +4234,16 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 	{
 		// is this correct?
 		if (segacd_maincpu_has_ram_access)
+		{
+			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
+
 			return segacd_dataram[offset];
+		
+		}
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
-			return 0x0000;
+			return 0xffff;
 		}
 	}
 	else if (segacd_ram_mode==1)
@@ -4987,12 +4996,12 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		printf("ILLEGAL: segacd_trace_vector_base_address_w %04x %04x in mode 1!\n",data,mem_mask);
 	}
 
-	printf("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
+	logerror("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
 	
 	{
 		int base = (data & 0xfffe) * 4;
 
-		printf("actual base = %06x\n", base + 0x80000);
+		logerror("actual base = %06x\n", base + 0x80000);
 
 		// nasty nasty nasty
 		segacd_mark_stampmaps_dirty();
@@ -5012,7 +5021,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			UINT16 param4 = segacd_dataram[(currbase+0x6)>>1];
 
 
-			printf("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4); 
+			logerror("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4); 
 
 		}
 		
@@ -5027,6 +5036,19 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			UINT16 datax;
 			datax = x[0]; 
 		
+			for (int i=0;i<0x100;i++)
+			{
+				int offsetx = ((segacd_imagebuffer_start_address&0xfff8)*2)+i;
+
+				//printf("data write %08x\n", offsetx*2);
+
+
+				segacd_dataram[offsetx]=mame_rand(space->machine);
+
+				segacd_mark_tiles_dirty(space->machine, offsetx);
+			}
+
+
 		}
 
 	}
@@ -5056,9 +5078,38 @@ static READ16_HANDLER( segacd_stampmap_base_address_r )
 }
 
 static WRITE16_HANDLER( segacd_stampmap_base_address_w )
-{
+{ // WORD ACCESS
+
+	// low 3 bitsa aren't used, are they stored?
 	COMBINE_DATA(&segacd_stampmap_base_address);
 }
+
+// destination for 'rendering' the section of the tilemap(stampmap) requested
+static READ16_HANDLER( segacd_imagebuffer_start_address_r )
+{
+	return segacd_imagebuffer_start_address;
+}
+
+static WRITE16_HANDLER( segacd_imagebuffer_start_address_w )
+{
+	COMBINE_DATA(&segacd_imagebuffer_start_address);
+
+	int base = (segacd_imagebuffer_start_address & 0xfffe) * 4;
+
+	printf("segacd_imagebuffer_start_address_w %04x %04x (actual base = %06x)\n", data, segacd_imagebuffer_start_address, base);
+}
+
+static READ16_HANDLER( segacd_imagebuffer_offset_r )
+{
+	return segacd_imagebuffer_offset;
+}
+
+static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
+{
+	COMBINE_DATA(&segacd_imagebuffer_offset);
+	printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
+}
+
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -5092,8 +5143,8 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 //	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
-//	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
-//	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
+	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
+	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
 //	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
 	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
 	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
