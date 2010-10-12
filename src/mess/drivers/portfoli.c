@@ -513,14 +513,6 @@ static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
 
-//-------------------------------------------------
-//  ADDRESS_MAP( portfolio_lcdc )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( portfolio_lcdc, 0, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(HD61830_TAG, 0)
-ADDRESS_MAP_END
-
 //**************************************************************************
 //	INPUT PORTS
 //**************************************************************************
@@ -648,6 +640,47 @@ static VIDEO_UPDATE( portfolio )
 
 	return 0;
 }
+
+//-------------------------------------------------
+//  HD61830_INTERFACE( lcdc_intf )
+//-------------------------------------------------
+
+static HD61830_RD_READ( hd61830_rd_r )
+{
+	UINT16 address = (md << 3) | ((ma >> 12) & 0x07);
+	UINT8 data = memory_region(device->machine, HD61830_TAG)[address];
+
+	return data;
+}
+
+static HD61830_INTERFACE( lcdc_intf )
+{
+	SCREEN_TAG,
+	hd61830_rd_r
+};
+
+//-------------------------------------------------
+//  gfx_layout charlayout
+//-------------------------------------------------
+
+static const gfx_layout charlayout =
+{
+	6, 8,
+	256,
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+//-------------------------------------------------
+//  GFXDECODE( portfolio )
+//-------------------------------------------------
+
+static GFXDECODE_START( portfolio )
+	GFXDECODE_ENTRY( HD61830_TAG, 0, charlayout, 0, 2 )
+GFXDECODE_END
 
 //**************************************************************************
 //	DEVICE CONFIGURATION
@@ -884,8 +917,9 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MDRV_PALETTE_INIT(portfolio)
 
 	MDRV_VIDEO_UPDATE(portfolio)
+	MDRV_GFXDECODE(portfolio)
 
-	MDRV_HD61830_CGROM_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, SCREEN_TAG, portfolio_lcdc)
+	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -946,7 +980,7 @@ ROM_START( pofo )
 	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
 
 	ROM_REGION( 0x800, HD61830_TAG, 0 )
-	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
 ROM_END
 
 //**************************************************************************
@@ -954,4 +988,4 @@ ROM_END
 //**************************************************************************
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1989, pofo,	0,		0,		portfolio,	portfolio,	0,		"Atari",	"Portfolio",	GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1989, pofo,	0,		0,		portfolio,	portfolio,	0,		"Atari",	"Portfolio",	GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

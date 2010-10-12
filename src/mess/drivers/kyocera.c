@@ -1327,7 +1327,6 @@ static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 }
 
 static MACHINE_CONFIG_START( kc85, kc85_state )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(kc85_mem)
@@ -1366,7 +1365,6 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc8201, kc85_state )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
@@ -1405,7 +1403,6 @@ static MACHINE_CONFIG_START( pc8201, kc85_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trsm100, kc85 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY(I8085_TAG)
 	MDRV_CPU_IO_MAP(trsm100_io)
@@ -1422,7 +1419,6 @@ static MACHINE_CONFIG_DERIVED( trsm100, kc85 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tandy102, trsm100 )
-
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("24K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
@@ -1430,7 +1426,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( tandy200, tandy200_state )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(tandy200_mem)

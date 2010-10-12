@@ -445,6 +445,12 @@ static VIDEO_UPDATE( micronic )
 	return 0;
 }
 
+static HD61830_INTERFACE( lcdc_intf )
+{
+	SCREEN_TAG,
+	NULL
+};
+
 static MACHINE_START( micronic )
 {
 	micronic_state *state = machine->driver_data<micronic_state>();
@@ -464,7 +470,6 @@ static MACHINE_START( micronic )
 //  state_save_register_global(machine, state->);
 }
 
-
 static MACHINE_RESET( micronic )
 {
 	memory_set_bank(machine, "bank1", 0);
@@ -472,7 +477,6 @@ static MACHINE_RESET( micronic )
 }
 
 static MACHINE_CONFIG_START( micronic, micronic_state )
-
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
     MDRV_CPU_PROGRAM_MAP(micronic_mem)
@@ -496,7 +500,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
     MDRV_VIDEO_START(micronic)
     MDRV_VIDEO_UPDATE(micronic)
 
-	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, SCREEN_TAG)
+	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )

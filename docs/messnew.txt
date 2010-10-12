@@ -104,6 +104,8 @@ Source Changes:
   the DRQ. All of the other functionality (for reading) will be omitted.
   [tim lindner]
 
+- Added support for external character generator ROM to HD61830 LCDC. [Curt Coder]
+
 
 
 0.139
