@@ -208,9 +208,70 @@ WRITE8_HANDLER( mbee256_1c_w )
 
 WRITE8_HANDLER( mbee256_50_w )
 {
-/* incomplete */
-	memory_set_bank(space->machine, "bankl", (data & 4) ? 0 : 1);
-	memory_set_bank(space->machine, "bankh", (data & 4) ? 0 : 1);
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	// primary low banks
+	memory_set_bank(space->machine, "boot", (data & 3) | ((data & 0x20) >> 3));
+	memory_set_bank(space->machine, "bank1", (data & 3) | ((data & 0x20) >> 3));
+
+	// 9000-EFFF
+	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
+
+	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
+	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
+
+	switch (data & 0x1c)
+	{
+		case 0x00:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			break;
+		case 0x04:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			break;
+		case 0x08:
+		case 0x18:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x0c:
+		case 0x1c:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x10:
+		case 0x14:
+			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+	}
 }
 
 
@@ -636,14 +697,14 @@ VIDEO_UPDATE( mbee )
 				gfx = gfxram[(chr<<4) | ra] ^ inv;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
 			}
 		}
 		ma+=crt.horizontal_displayed;
@@ -691,14 +752,14 @@ VIDEO_UPDATE( mbeeic )
 				bg = (col & 0x07e0) >> 5;					// and background palette
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? fg : bg; p++;
-				*p = ( gfx & 0x40 ) ? fg : bg; p++;
-				*p = ( gfx & 0x20 ) ? fg : bg; p++;
-				*p = ( gfx & 0x10 ) ? fg : bg; p++;
-				*p = ( gfx & 0x08 ) ? fg : bg; p++;
-				*p = ( gfx & 0x04 ) ? fg : bg; p++;
-				*p = ( gfx & 0x02 ) ? fg : bg; p++;
-				*p = ( gfx & 0x01 ) ? fg : bg; p++;
+				*p++ = ( gfx & 0x80 ) ? fg : bg;
+				*p++ = ( gfx & 0x40 ) ? fg : bg;
+				*p++ = ( gfx & 0x20 ) ? fg : bg;
+				*p++ = ( gfx & 0x10 ) ? fg : bg;
+				*p++ = ( gfx & 0x08 ) ? fg : bg;
+				*p++ = ( gfx & 0x04 ) ? fg : bg;
+				*p++ = ( gfx & 0x02 ) ? fg : bg;
+				*p++ = ( gfx & 0x01 ) ? fg : bg;
 			}
 		}
 		ma+=crt.horizontal_displayed;
@@ -741,9 +802,7 @@ VIDEO_UPDATE( mbeeppc )
 					if (attr & 0x40)
 						inv ^= 0xff;					// inverse attribute
 
-
-					/* Flashing attribute - flash speed is unknown */
-					if ((attr & 0x80) && (framecnt & 8))
+					if ((attr & 0x80) && (framecnt & 0x10))			// flashing attribute
 						chr = 0x20;
 				}
 
@@ -762,14 +821,14 @@ VIDEO_UPDATE( mbeeppc )
 				bg = (col & 0xf0) >> 4;						// and background palette
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? fg : bg; p++;
-				*p = ( gfx & 0x40 ) ? fg : bg; p++;
-				*p = ( gfx & 0x20 ) ? fg : bg; p++;
-				*p = ( gfx & 0x10 ) ? fg : bg; p++;
-				*p = ( gfx & 0x08 ) ? fg : bg; p++;
-				*p = ( gfx & 0x04 ) ? fg : bg; p++;
-				*p = ( gfx & 0x02 ) ? fg : bg; p++;
-				*p = ( gfx & 0x01 ) ? fg : bg; p++;
+				*p++ = ( gfx & 0x80 ) ? fg : bg;
+				*p++ = ( gfx & 0x40 ) ? fg : bg;
+				*p++ = ( gfx & 0x20 ) ? fg : bg;
+				*p++ = ( gfx & 0x10 ) ? fg : bg;
+				*p++ = ( gfx & 0x08 ) ? fg : bg;
+				*p++ = ( gfx & 0x04 ) ? fg : bg;
+				*p++ = ( gfx & 0x02 ) ? fg : bg;
+				*p++ = ( gfx & 0x01 ) ? fg : bg;
 			}
 		}
 		ma+=crt.horizontal_displayed;

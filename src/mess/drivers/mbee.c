@@ -163,10 +163,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee256_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bankl")
-	AM_RANGE(0x8000, 0xefff) AM_RAMBANK("bankh")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbeeppc_low_r, mbeeppc_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeppc_high_r, mbeeppc_high_w)
+	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0x87ff) AM_RAMBANK("bank8l")
+	AM_RANGE(0x8800, 0x8fff) AM_RAMBANK("bank8h")
+	AM_RANGE(0x9000, 0xefff) AM_RAMBANK("bank9")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bankfl")
+	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bankfh")
 ADDRESS_MAP_END
 
 
@@ -183,9 +185,6 @@ static ADDRESS_MAP_START(mbeeic_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x04, 0x04) AM_MIRROR(0x10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x06, 0x06) AM_MIRROR(0x10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x07, 0x07) AM_MIRROR(0x10) AM_READ(mbee_07_r)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0x10) AM_NOP /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbeeic_0a_r, mbeeic_0a_w)
@@ -197,9 +196,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeepc_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff10) AM_READ(mbee_07_r)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
@@ -211,9 +207,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeepc85_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff10) AM_READ(mbee_07_r)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
@@ -225,9 +218,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeeppc_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff10) AM_READ(mbee_07_r)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
@@ -241,9 +231,6 @@ static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x04, 0x04) AM_MIRROR(0x10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x06, 0x06) AM_MIRROR(0x10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x07, 0x07) AM_MIRROR(0x10) AM_READ(mbee_07_r)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -256,9 +243,6 @@ static ADDRESS_MAP_START(mbee64_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	//AM_RANGE(0x04, 0x04) AM_MIRROR(0x10) AM_WRITE(mbee_04_w)
-	//AM_RANGE(0x06, 0x06) AM_MIRROR(0x10) AM_WRITE(mbee_06_w)
-	//AM_RANGE(0x07, 0x07) AM_MIRROR(0x10) AM_READ(mbee_07_r)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -656,7 +640,6 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	//MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -963,7 +946,7 @@ ROM_START( mbee64 )
 ROM_END
 
 ROM_START( mbee128 )
-	ROM_REGION(0x18000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
 	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
@@ -981,7 +964,7 @@ ROM_START( mbee128 )
 ROM_END
 
 ROM_START( mbee256 )
-	ROM_REGION(0x28000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
 	ROM_LOAD("mbee256.bin",           0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4) )
@@ -1013,5 +996,5 @@ COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,		"Applied Technology
 COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
 COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
 COMP( 1986, mbee128,  mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
-COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256,  mbee64, 		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
+COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256,  mbee256, 		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
 

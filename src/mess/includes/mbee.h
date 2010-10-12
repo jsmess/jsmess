@@ -42,6 +42,7 @@ DRIVER_INIT( mbeepc85 );
 DRIVER_INIT( mbeeppc );
 DRIVER_INIT( mbee56 );
 DRIVER_INIT( mbee64 );
+DRIVER_INIT( mbee256 );
 MACHINE_RESET( mbee );
 MACHINE_RESET( mbee64 );
 MACHINE_RESET( mbee256 );

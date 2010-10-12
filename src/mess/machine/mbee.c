@@ -140,7 +140,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 /***********************************************************
 
-    Keyboard of the 256TC
+    256TC Keyboard
 
 ************************************************************/
 
@@ -197,7 +197,7 @@ static TIMER_CALLBACK( mbee256_kbd )
 
 READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i, ret = 0; // no idea what the 'nokey' value should be
+	UINT8 i, ret = 5; // no idea what the 'nokey' value should be
 	if (mbee256_q_pos)
 	{
 		mbee256_q_pos--;
@@ -218,7 +218,7 @@ READ8_HANDLER( mbee256_18_r )
 
 /***********************************************************
 
-    Change CPU clock
+    256TC Change CPU speed
 
 ************************************************************/
 
@@ -238,7 +238,7 @@ READ8_HANDLER( mbee256_speed_high_r )
 
 /***********************************************************
 
-    Real Time Clock option
+    256TC Real Time Clock
 
 ************************************************************/
 
@@ -268,6 +268,16 @@ static TIMER_CALLBACK( mbee_rtc_irq )
 
 /***********************************************************
 
+    256 Memory Banking
+
+************************************************************/
+
+
+
+
+
+/***********************************************************
+
     Machine
 
 ************************************************************/
@@ -293,7 +303,6 @@ MACHINE_RESET( mbee )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
-	//mbee_rtc = machine->device<mc146818_device>("rtc");
 	//wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
 	//wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
 }
@@ -308,16 +317,12 @@ MACHINE_RESET( mbee64 )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
-	//mbee_rtc = machine->device<mc146818_device>("rtc");
 }
 
 MACHINE_RESET( mbee256 )
 {
 	UINT8 i;
-	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
-	memory_set_bank(machine, "boot", 1);
-	memory_set_bank(machine, "bankl", 1);
-	memory_set_bank(machine, "bankh", 1);
+	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mbee_z80pio = machine->device("z80pio");
 	mbee_speaker = machine->device("speaker");
 	mbee_cassette = machine->device("cassette");
@@ -326,6 +331,9 @@ MACHINE_RESET( mbee256 )
 	mbee_rtc = machine->device<mc146818_device>("rtc");
 	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
 	mbee256_q_pos = 0;
+	mbee256_50_w(mem,0,0); // set banks to default
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+	memory_set_bank(machine, "boot", 8); // boot time
 }
 
 INTERRUPT_GEN( mbee_interrupt )
@@ -366,8 +374,6 @@ DRIVER_INIT( mbeeic )
 
 	memory_set_bank(machine, "pak", 0);
 	mbee_size = 0x8000;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
 
 DRIVER_INIT( mbeepc )
@@ -384,8 +390,6 @@ DRIVER_INIT( mbeepc )
 	memory_set_bank(machine, "pak", 0);
 	memory_set_bank(machine, "telcom", 0);
 	mbee_size = 0x8000;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
 
 DRIVER_INIT( mbeepc85 )
@@ -402,8 +406,6 @@ DRIVER_INIT( mbeepc85 )
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
 	mbee_size = 0x8000;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
 
 DRIVER_INIT( mbeeppc )
@@ -425,8 +427,6 @@ DRIVER_INIT( mbeeppc )
 	memory_set_bank(machine, "telcom", 0);
 	memory_set_bank(machine, "basic", 0);
 	mbee_size = 0x8000;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
 
 DRIVER_INIT( mbee56 )
@@ -434,8 +434,6 @@ DRIVER_INIT( mbee56 )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
 	mbee_size = 0xe000;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
 
 DRIVER_INIT( mbee64 )
@@ -451,6 +449,24 @@ DRIVER_INIT( mbee64 )
 	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
 	mbee_size = 0xf000;
+}
+
+DRIVER_INIT( mbee256 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 8, &RAM[0x0000],  0x8000); // standard banks 0000
+	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x1000],  0x8000); // standard banks 1000
+	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800],  0x0000); // shadow ram
+
+	RAM = memory_region(machine, "bootrom");
+	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
+	memory_configure_bank(machine, "boot", 8, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
+	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000],  0x0000); // rom
+	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 }
