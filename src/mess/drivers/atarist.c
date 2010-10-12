@@ -1285,9 +1285,11 @@ static INPUT_PORTS_START( stbook )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tt030 )
+	PORT_INCLUDE(ste)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( falcon )
+	PORT_INCLUDE(ste)
 INPUT_PORTS_END
 
 /* Sound Interface */
