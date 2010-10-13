@@ -193,14 +193,14 @@ UINT8 get_scsi_line(running_device *device, UINT8 lineno)
 
     switch (lineno)
     {
-        case SCSI_LINE_SEL      : result=(bus->linestate & (1<<SCSI_LINE_SEL)) >> SCSI_LINE_SEL;
-        case SCSI_LINE_BSY      : result=(bus->linestate & (1<<SCSI_LINE_BSY)) >> SCSI_LINE_BSY;
-        case SCSI_LINE_REQ      : result=(bus->linestate & (1<<SCSI_LINE_REQ)) >> SCSI_LINE_REQ;
-        case SCSI_LINE_ACK      : result=(bus->linestate & (1<<SCSI_LINE_ACK)) >> SCSI_LINE_ACK;
-        case SCSI_LINE_CD       : result=(bus->linestate & (1<<SCSI_LINE_CD )) >> SCSI_LINE_CD;
-        case SCSI_LINE_IO       : result=(bus->linestate & (1<<SCSI_LINE_IO )) >> SCSI_LINE_IO;
-        case SCSI_LINE_MSG      : result=(bus->linestate & (1<<SCSI_LINE_MSG)) >> SCSI_LINE_MSG;
-        case SCSI_LINE_RESET    : result=(bus->linestate & (1<<SCSI_LINE_RESET)) >> SCSI_LINE_RESET;
+        case SCSI_LINE_SEL      : result=(bus->linestate & (1<<SCSI_LINE_SEL)) >> SCSI_LINE_SEL; break;
+        case SCSI_LINE_BSY      : result=(bus->linestate & (1<<SCSI_LINE_BSY)) >> SCSI_LINE_BSY; break;
+        case SCSI_LINE_REQ      : result=(bus->linestate & (1<<SCSI_LINE_REQ)) >> SCSI_LINE_REQ; break;
+        case SCSI_LINE_ACK      : result=(bus->linestate & (1<<SCSI_LINE_ACK)) >> SCSI_LINE_ACK; break;
+        case SCSI_LINE_CD       : result=(bus->linestate & (1<<SCSI_LINE_CD )) >> SCSI_LINE_CD; break;
+        case SCSI_LINE_IO       : result=(bus->linestate & (1<<SCSI_LINE_IO )) >> SCSI_LINE_IO; break;
+        case SCSI_LINE_MSG      : result=(bus->linestate & (1<<SCSI_LINE_MSG)) >> SCSI_LINE_MSG; break;
+        case SCSI_LINE_RESET    : result=(bus->linestate & (1<<SCSI_LINE_RESET)) >> SCSI_LINE_RESET; break;
     }
 
     LOG(2,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
