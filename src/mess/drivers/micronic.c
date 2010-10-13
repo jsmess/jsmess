@@ -319,8 +319,8 @@ static ADDRESS_MAP_START(micronic_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x02, 0x02) AM_WRITE(kp_matrix_w)
 
 	/* hd61830 */
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(HD61830_TAG, hd61830_data_r, hd61830_data_w)
-	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE(HD61830_TAG, hd61830_status_r, hd61830_control_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, data_r, data_w)
+	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, status_r, control_w)
 
 	/* rtc-146818 */
 	AM_RANGE(0x08, 0x08) AM_WRITE(rtc_address_w)
@@ -440,7 +440,7 @@ static VIDEO_UPDATE( micronic )
 {
 	micronic_state *state = screen->machine->driver_data<micronic_state>();
 
-	hd61830_update(state->hd61830, bitmap, cliprect);
+	state->hd61830->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -448,7 +448,7 @@ static VIDEO_UPDATE( micronic )
 static HD61830_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_START( micronic )
@@ -456,7 +456,7 @@ static MACHINE_START( micronic )
 	micronic_state *state = machine->driver_data<micronic_state>();
 
 	/* find devices */
-	state->hd61830 = machine->device(HD61830_TAG);
+	state->hd61830 = machine->device<hd61830_device>(HD61830_TAG);
 	state->speaker = machine->device("beep");
 
 	/* ROM banks */

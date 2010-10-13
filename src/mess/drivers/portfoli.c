@@ -42,6 +42,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "includes/portfoli.h"
 #include "cpu/i86/i86.h"
@@ -87,63 +89,53 @@ static UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 //  check_interrupt - check interrupt status
 //-------------------------------------------------
 
-static void check_interrupt(running_machine *machine)
+void portfolio_state::check_interrupt()
 {
-	portfolio_state *state = machine->driver_data<portfolio_state>();
-
-	int level = (state->ip & state->ie) ? ASSERT_LINE : CLEAR_LINE;
+	int level = (m_ip & m_ie) ? ASSERT_LINE : CLEAR_LINE;
 	
-	cputag_set_input_line(machine, M80C88A_TAG, INPUT_LINE_INT0, level);
+	cpu_set_input_line(m_maincpu, INPUT_LINE_INT0, level);
 }
 
 //-------------------------------------------------
 //  trigger_interrupt - trigger interrupt request
 //-------------------------------------------------
 
-static void trigger_interrupt(running_machine *machine, int level)
+void portfolio_state::trigger_interrupt(int level)
 {
-	portfolio_state *state = machine->driver_data<portfolio_state>();
-
 	// set interrupt pending bit
-	state->ip |= 1 << level;
+	m_ip |= 1 << level;
 
-	check_interrupt(machine);
+	check_interrupt();
 }
 
 //-------------------------------------------------
 //  irq_status_r - interrupt status read
 //-------------------------------------------------
 
-static READ8_HANDLER( irq_status_r )
+READ8_MEMBER( portfolio_state::irq_status_r )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	return state->ip;
+	return m_ip;
 }
 
 //-------------------------------------------------
 //  irq_mask_w - interrupt enable mask
 //-------------------------------------------------
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER( portfolio_state::irq_mask_w )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	state->ie = data;
+	m_ie = data;
 	//logerror("IE %02x\n", data);
 
-	check_interrupt(space->machine);
+	check_interrupt();
 }
 
 //-------------------------------------------------
 //  sivr_w - serial interrupt vector register
 //-------------------------------------------------
 
-static WRITE8_HANDLER( sivr_w )
+WRITE8_MEMBER( portfolio_state::sivr_w )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	state->sivr = data;
+	m_sivr = data;
 	//logerror("SIVR %02x\n", data);
 }
 
@@ -151,21 +143,21 @@ static WRITE8_HANDLER( sivr_w )
 //  IRQ_CALLBACK( portfolio_int_ack )
 //-------------------------------------------------
 
-static IRQ_CALLBACK( portfolio_int_ack )
+IRQ_CALLBACK( portfolio_int_ack )
 {
 	portfolio_state *state = device->machine->driver_data<portfolio_state>();
 
-	UINT8 vector = state->sivr;
+	UINT8 vector = state->m_sivr;
 	
 	for (int i = 0; i < 4; i++)
 	{
-		if (BIT(state->ip, i))
+		if (BIT(state->m_ip, i))
 		{
 			// clear interrupt pending bit
-			state->ip &= ~(1 << i);
+			state->m_ip &= ~(1 << i);
 
 			if (i == 3)
-				vector = state->sivr;
+				vector = state->m_sivr;
 			else
 				vector = INTERRUPT_VECTOR[i];
 
@@ -173,7 +165,7 @@ static IRQ_CALLBACK( portfolio_int_ack )
 		}
 	}
 
-	check_interrupt(device->machine);
+	state->check_interrupt();
 
 	return vector;
 }
@@ -186,17 +178,15 @@ static IRQ_CALLBACK( portfolio_int_ack )
 //  scan_keyboard - scan keyboard
 //-------------------------------------------------
 
-static void scan_keyboard(running_machine *machine)
+void portfolio_state::scan_keyboard()
 {
-	portfolio_state *state = machine->driver_data<portfolio_state>();
-
 	UINT8 keycode = 0xff;
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = input_port_read(machine, keynames[row]);
+		UINT8 data = input_port_read(&m_machine, keynames[row]);
 
 		if (data != 0xff)
 		{
@@ -213,21 +203,21 @@ static void scan_keyboard(running_machine *machine)
 	if (keycode != 0xff)
 	{
 		// key pressed
-		if (keycode != state->keylatch)
+		if (keycode != m_keylatch)
 		{
-			state->keylatch = keycode;
+			m_keylatch = keycode;
 
-			trigger_interrupt(machine, INT_KEYBOARD);
+			trigger_interrupt(INT_KEYBOARD);
 		}
 	}
 	else
 	{
 		// key released
-		if (state->keylatch != 0xff)
+		if (m_keylatch != 0xff)
 		{
-			state->keylatch |= 0x80;
+			m_keylatch |= 0x80;
 
-			trigger_interrupt(machine, INT_KEYBOARD);
+			trigger_interrupt(INT_KEYBOARD);
 		}
 	}
 }
@@ -236,20 +226,20 @@ static void scan_keyboard(running_machine *machine)
 //  TIMER_DEVICE_CALLBACK( keyboard_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( keyboard_tick )
+TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	scan_keyboard(timer.machine);
+	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
+
+	state->scan_keyboard();
 }
 
 //-------------------------------------------------
 //  keyboard_r - keyboard scan code register
 //-------------------------------------------------
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER( portfolio_state::keyboard_r )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	return state->keylatch;
+	return m_keylatch;
 }
 
 //**************************************************************************
@@ -260,7 +250,7 @@ static READ8_HANDLER( keyboard_r )
 //  speaker_w - internal speaker output
 //-------------------------------------------------
 
-static WRITE8_HANDLER( speaker_w )
+WRITE8_MEMBER( portfolio_state::speaker_w )
 {
 	/*
 
@@ -277,9 +267,7 @@ static WRITE8_HANDLER( speaker_w )
 
 	*/
 
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	speaker_level_w(state->speaker, !BIT(data, 7));
+	speaker_level_w(m_speaker, !BIT(data, 7));
 
 	//logerror("SPEAKER %02x\n", data);
 }
@@ -292,7 +280,7 @@ static WRITE8_HANDLER( speaker_w )
 //  power_w - power management
 //-------------------------------------------------
 
-static WRITE8_HANDLER( power_w )
+WRITE8_MEMBER( portfolio_state::power_w )
 {
 	/*
 
@@ -316,7 +304,7 @@ static WRITE8_HANDLER( power_w )
 //  battery_r - battery status
 //-------------------------------------------------
 
-static READ8_HANDLER( battery_r )
+READ8_MEMBER( portfolio_state::battery_r )
 {
 	/*
 
@@ -333,15 +321,13 @@ static READ8_HANDLER( battery_r )
 
 	*/
 
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
 	UINT8 data = 0;
 
 	/* peripheral detect */
-	data |= (state->pid != PID_NONE) << 5;
+	data |= (m_pid != PID_NONE) << 5;
 
 	/* battery status */
-	data |= BIT(input_port_read(space->machine, "BATTERY"), 0) << 6;
+	data |= BIT(input_port_read(&m_machine, "BATTERY"), 0) << 6;
 
 	return data;
 }
@@ -350,7 +336,7 @@ static READ8_HANDLER( battery_r )
 //  unknown_w - ?
 //-------------------------------------------------
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER( portfolio_state::unknown_w )
 {
 	//logerror("UNKNOWN %02x\n", data);
 }
@@ -363,40 +349,40 @@ static WRITE8_HANDLER( unknown_w )
 //  TIMER_DEVICE_CALLBACK( system_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( system_tick )
+TIMER_DEVICE_CALLBACK( system_tick )
 {
-	trigger_interrupt(timer.machine, INT_TICK);
+	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
+
+	state->trigger_interrupt(INT_TICK);
 }
 
 //-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK( counter_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( counter_tick )
+TIMER_DEVICE_CALLBACK( counter_tick )
 {
 	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
 
-	state->counter++;
+	state->m_counter++;
 }
 
 //-------------------------------------------------
 //  counter_r - counter register read
 //-------------------------------------------------
 
-static READ8_HANDLER( counter_r )
+READ8_MEMBER( portfolio_state::counter_r )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
 	UINT8 data = 0;
 
 	switch (offset)
 	{
 	case 0:
-		data = state->counter & 0xff;
+		data = m_counter & 0xff;
 		break;
 
 	case 1:
-		data = state->counter >> 1;
+		data = m_counter >> 1;
 		break;
 	}
 
@@ -407,18 +393,16 @@ static READ8_HANDLER( counter_r )
 //  counter_w - counter register write
 //-------------------------------------------------
 
-static WRITE8_HANDLER( counter_w )
+WRITE8_MEMBER( portfolio_state::counter_w )
 {
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
 	switch (offset)
 	{
 	case 0:
-		state->counter = (state->counter & 0xff00) | data;
+		m_counter = (m_counter & 0xff00) | data;
 		break;
 
 	case 1:
-		state->counter = (data << 8) | (state->counter & 0xff);
+		m_counter = (data << 8) | (m_counter & 0xff);
 		break;
 	}
 }
@@ -431,14 +415,14 @@ static WRITE8_HANDLER( counter_w )
 //  ncc1_w - credit card memory select
 //-------------------------------------------------
 
-static WRITE8_HANDLER( ncc1_w )
+WRITE8_MEMBER( portfolio_state::ncc1_w )
 {
-	address_space *program = cputag_get_address_space(space->machine, M80C88A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	if (BIT(data, 0))
 	{
 		// system ROM
-		UINT8 *rom = memory_region(space->machine, M80C88A_TAG);
+		UINT8 *rom = memory_region(&m_machine, M80C88A_TAG);
 		memory_install_rom(program, 0xc0000, 0xdffff, 0, 0, rom);
 	}
 	else
@@ -454,7 +438,7 @@ static WRITE8_HANDLER( ncc1_w )
 //  pid_r - peripheral identification
 //-------------------------------------------------
 
-static READ8_HANDLER( pid_r )
+READ8_MEMBER( portfolio_state::pid_r )
 {
 	/*
 
@@ -472,9 +456,7 @@ static READ8_HANDLER( pid_r )
 
 	*/
 
-	portfolio_state *state = space->machine->driver_data<portfolio_state>();
-
-	return state->pid;
+	return m_pid;
 }
 
 //**************************************************************************
@@ -485,7 +467,7 @@ static READ8_HANDLER( pid_r )
 //  ADDRESS_MAP( portfolio_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( portfolio_mem, ADDRESS_SPACE_PROGRAM, 8, portfolio_state )
 	AM_RANGE(0x00000, 0x1efff) AM_RAM AM_SHARE("nvram1")
 	AM_RANGE(0x1f000, 0x9efff) AM_RAM // expansion
 	AM_RANGE(0xb0000, 0xb0fff) AM_MIRROR(0xf000) AM_RAM AM_SHARE("nvram2") // video RAM
@@ -497,18 +479,18 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8, portfolio_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r)
-	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE(HD61830_TAG, hd61830_data_r, hd61830_data_w)
-	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE(HD61830_TAG, hd61830_status_r, hd61830_control_w)
+	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
+	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(speaker_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(power_w)
 	AM_RANGE(0x8040, 0x8041) AM_READWRITE(counter_r, counter_w)
 	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
 	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
-	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE_MEMBER(portfolio_state, contrast)
-//	AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE(M82C50A_TAG, ins8250_r, ins8250_w) Serial Interface
-//	AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE(M82C55A_TAG, i8255a_r, i8255a_w) Parallel Interface
+	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE(m_contrast)
+//	AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE_LEGACY(M82C50A_TAG, ins8250_r, ins8250_w) // Serial Interface
+//	AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE_LEGACY(M82C55A_TAG, i8255a_r, i8255a_w) // Parallel Interface
 	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)
 	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
@@ -602,6 +584,26 @@ static INPUT_PORTS_START( portfolio )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
+	PORT_START("PPI-PB")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(CENTRONICS_TAG, centronics_strobe_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(CENTRONICS_TAG, centronics_autofeed_w)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(CENTRONICS_TAG, centronics_init_w)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) // PORT_WRITE_LINE_DEVICE(CENTRONICS_TAG, centronics_select_in_w)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("PPI-PC")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_pe_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_vcc_r)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_fault_r)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_busy_r)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_ack_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("BATTERY")
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
@@ -629,25 +631,12 @@ static PALETTE_INIT( portfolio )
 }
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( portfolio )
-//-------------------------------------------------
-
-static VIDEO_UPDATE( portfolio )
-{
-	portfolio_state *state = screen->machine->driver_data<portfolio_state>();
-
-	hd61830_update(state->hd61830, bitmap, cliprect);
-
-	return 0;
-}
-
-//-------------------------------------------------
 //  HD61830_INTERFACE( lcdc_intf )
 //-------------------------------------------------
 
-static HD61830_RD_READ( hd61830_rd_r )
+READ8_DEVICE_HANDLER( hd61830_rd_r )
 {
-	UINT16 address = (md << 3) | ((ma >> 12) & 0x07);
+	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
 	UINT8 data = memory_region(device->machine, HD61830_TAG)[address];
 
 	return data;
@@ -656,7 +645,7 @@ static HD61830_RD_READ( hd61830_rd_r )
 static HD61830_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
-	hd61830_rd_r
+	DEVCB_HANDLER(hd61830_rd_r)
 };
 
 //-------------------------------------------------
@@ -670,7 +659,7 @@ static const gfx_layout charlayout =
 	1,
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -690,84 +679,13 @@ GFXDECODE_END
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( ppi_pb_w )
-{
-	/*
-
-        bit     signal
-
-        PB0		strobe
-        PB1		autofeed
-        PB2		init/reset
-        PB3		select in
-        PB4		
-        PB5		
-        PB6		
-        PB7		
-
-    */
-
-	portfolio_state *state = device->machine->driver_data<portfolio_state>();
-
-	/* strobe */
-	centronics_strobe_w(state->centronics, BIT(data, 0));
-	
-	/* autofeed */
-	centronics_autofeed_w(state->centronics, BIT(data, 1));
-	
-	/* init/reset */
-	centronics_init_w(state->centronics, BIT(data, 2));
-	
-	/* select in */
-	//centronics_select_in_w(state->centronics, BIT(data, 3));
-}
-
-static READ8_DEVICE_HANDLER( ppi_pc_r )
-{
-	/*
-
-        bit     signal
-
-        PC0		paper
-        PC1		select
-        PC2		
-        PC3		error
-        PC4		busy
-        PC5		ack
-        PC6		
-        PC7		
-
-    */
-
-	portfolio_state *state = device->machine->driver_data<portfolio_state>();
-
-	UINT8 data = 0;
-
-	/* paper end */
-	data |= centronics_pe_r(state->centronics);
-
-	/* select */
-	data |= centronics_vcc_r(state->centronics) << 1;
-
-	/* error */
-	data |= centronics_fault_r(state->centronics) << 3;
-
-	/* busy */
-	data |= centronics_busy_r(state->centronics) << 4;
-
-	/* acknowledge */
-	data |= centronics_ack_r(state->centronics) << 5;
-
-	return data;
-}
-
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,													// Port A read
 	DEVCB_NULL,													// Port B read
-	DEVCB_HANDLER(ppi_pc_r),									// Port C read
+	DEVCB_INPUT_PORT("PPI-PC"),									// Port C read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
-	DEVCB_HANDLER(ppi_pb_w),									// Port B write
+	DEVCB_INPUT_PORT("PPI-PB"),									// Port B write
 	DEVCB_NULL													// Port C write
 };
 
@@ -777,10 +695,12 @@ static I8255A_INTERFACE( ppi_intf )
 
 static INS8250_INTERRUPT( i8250_intrpt_w )
 {
-//	trigger_interrupt(device->machine, INT_EXTERNAL);
+	portfolio_state *driver_state = device->machine->driver_data<portfolio_state>();
+
+	driver_state->trigger_interrupt(INT_EXTERNAL);
 }
 
-const ins8250_interface i8250_intf =
+static const ins8250_interface i8250_intf =
 {
 	XTAL_1_8432MHz,
 	i8250_intrpt_w,
@@ -819,22 +739,18 @@ static DEVICE_IMAGE_LOAD( portfolio_cart )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_START( portfolio )
+//  machine_start
 //-------------------------------------------------
 
-static MACHINE_START( portfolio )
+void portfolio_state::machine_start()
 {
-	portfolio_state *state = machine->driver_data<portfolio_state>();
-	address_space *program = cputag_get_address_space(machine, M80C88A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* set CPU interrupt vector callback */
-	cpu_set_irq_callback(machine->device(M80C88A_TAG), portfolio_int_ack);
+	cpu_set_irq_callback(m_maincpu, portfolio_int_ack);
 
 	/* find devices */
-	state->hd61830 = machine->device(HD61830_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->timer_tick = machine->device<timer_device>(TIMER_TICK_TAG);
+	m_timer_tick = machine->device<timer_device>(TIMER_TICK_TAG);
 
 	/* memory expansions */
 	switch (messram_get_size(machine->device("messram")))
@@ -849,40 +765,42 @@ static MACHINE_START( portfolio )
 	}
 
 	/* set initial values */
-	state->keylatch = 0xff;
-	state->sivr = 0x2a;
-	state->pid = 0xff;
+	m_keylatch = 0xff;
+	m_sivr = 0x2a;
+	m_pid = 0xff;
 
 	/* register for state saving */
-	state_save_register_global(machine, state->ip);
-	state_save_register_global(machine, state->ie);
-	state_save_register_global(machine, state->sivr);
-	state_save_register_global(machine, state->counter);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->contrast);
-	state_save_register_global(machine, state->pid);
+	state_save_register_global(machine, m_ip);
+	state_save_register_global(machine, m_ie);
+	state_save_register_global(machine, m_sivr);
+	state_save_register_global(machine, m_counter);
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_contrast);
+	state_save_register_global(machine, m_pid);
 }
 
 //-------------------------------------------------
-//  MACHINE_RESET( portfolio )
+//  machine_reset
 //-------------------------------------------------
 
-static MACHINE_RESET( portfolio )
+void portfolio_state::machine_reset()
 {
-	portfolio_state *state = machine->driver_data<portfolio_state>();
-	address_space *io = cputag_get_address_space(machine, M80C88A_TAG, ADDRESS_SPACE_IO);
+	address_space *io = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO);
 
-	/* peripheral */
-	state->pid = input_port_read(machine, "PERIPHERAL");
+	// peripherals
+	m_pid = input_port_read(&m_machine, "PERIPHERAL");
 
-	switch (state->pid)
+	memory_unmap_readwrite(io, 0x8070, 0x807b, 0, 0);
+	memory_unmap_readwrite(io, 0x807d, 0x807e, 0, 0);
+
+	switch (m_pid)
 	{
 	case PID_SERIAL:
-		memory_install_readwrite8_device_handler(io, machine->device(M82C50A_TAG), 0x8070, 0x8077, 0, 0, ins8250_r, ins8250_w);
+		memory_install_readwrite8_device_handler(io, m_uart, 0x8070, 0x8077, 0, 0, ins8250_r, ins8250_w);
 		break;
 
 	case PID_PARALLEL:
-		memory_install_readwrite8_device_handler(io, machine->device(M82C55A_TAG), 0x8078, 0x807b, 0, 0, i8255a_r, i8255a_w);
+		memory_install_readwrite8_device_handler(io, m_ppi, 0x8078, 0x807b, 0, 0, i8255a_r, i8255a_w);
 		break;
 	}
 }
@@ -901,9 +819,6 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
     MDRV_CPU_PROGRAM_MAP(portfolio_mem)
     MDRV_CPU_IO_MAP(portfolio_io)
 	
-	MDRV_MACHINE_START(portfolio)
-	MDRV_MACHINE_RESET(portfolio)
-
     /* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(72)
@@ -916,7 +831,6 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(portfolio)
 
-	MDRV_VIDEO_UPDATE(portfolio)
 	MDRV_GFXDECODE(portfolio)
 
 	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)

@@ -44,14 +44,14 @@ static VIDEO_START( tandy200 )
 	tandy200_state *state = machine->driver_data<tandy200_state>();
 
 	/* find devices */
-	state->hd61830 = machine->device(HD61830_TAG);
+	state->hd61830 = machine->device<hd61830_device>(HD61830_TAG);
 }
 
 static VIDEO_UPDATE( tandy200 )
 {
 	tandy200_state *state = screen->machine->driver_data<tandy200_state>();
 
-	hd61830_update(state->hd61830, bitmap, cliprect);
+	state->hd61830->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -59,7 +59,7 @@ static VIDEO_UPDATE( tandy200 )
 static HD61830_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
-	NULL
+	DEVCB_NULL
 };
 
 MACHINE_CONFIG_FRAGMENT( kc85_video )

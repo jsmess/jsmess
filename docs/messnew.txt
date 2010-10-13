@@ -38,9 +38,9 @@ Skeleton drivers:
 - TIM-011
 - WaveMate Bullet
 - ABC 1600 [Rune Tapper, Curt Coder]
-- Atari TT030
-- Atari Falcon
-- Atari Falcon040
+- Atari TT030 [Curt Coder]
+- Atari Falcon [Curt Coder]
+- Atari Falcon040 [Curt Coder]
 - IBM PS/2 Model 55SX [Joseba Epalza]
 - Nakajima ES-210 (Spain) [Joseba Epalza]
 - Laser PC4 [Joseba Epalza, Curt Coder]
@@ -75,7 +75,10 @@ System Driver Changes:
 
 - [MBEE] Added Chess rom. [Robbbert]
 
+- [POFO] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
+
 - [PSION] Added support for datapack images [Sandro Ronco]
+
 
 
 Imgtool Changes:
@@ -105,6 +108,10 @@ Source Changes:
   [tim lindner]
 
 - Added support for external character generator ROM to HD61830 LCDC. [Curt Coder]
+
+- Introduced more accurate MC6847 palette. [Ensjo]
+
+- Refactored the HD61830 LCD to a C++ device. [Curt Coder]
 
 
 

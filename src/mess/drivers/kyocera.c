@@ -43,6 +43,7 @@
     - tandy200 UART8251
     - tandy200 RTC alarm
     - tandy200 TCM5089 sound
+	- tandy200 LCDC has only 8K of video RAM
     - international keyboard option ROMs
 
 */
@@ -568,8 +569,15 @@ static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_stbk_r, tandy200_stbk_w)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_r, hd61830_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, data_r, data_w)
+	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, status_r, control_w)
 ADDRESS_MAP_END
+/*
+static ADDRESS_MAP_START( tandy200_lcdc, 0, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+ADDRESS_MAP_END
+*/
 
 /* Input Ports */
 

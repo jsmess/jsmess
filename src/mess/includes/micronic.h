@@ -1,9 +1,12 @@
 #ifndef __MICRONIC__
 #define __MICRONIC__
 
+#include "video/hd61830.h"
+
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
 #define MC146818_TAG	"mc146818"
+#define HD61830_TAG		"hd61830"
 
 class micronic_state : public driver_device
 {
@@ -25,7 +28,7 @@ public:
 	emu_timer *rtc_periodic_irq;
 
 	/* devices */
-	running_device *hd61830;
+	hd61830_device *hd61830;
 	running_device *speaker;
 
 };
