@@ -747,18 +747,18 @@ static IRQ_CALLBACK(at_irq_callback)
 
 static void pc_set_irq_line(running_machine *machine,int irq, int state)
 {
-	pc_state *st = machine->driver_data<pc_state>();;
+	at_state *st = machine->driver_data<at_state>();;
 
 	switch (irq)
 	{
-	case 0: pic8259_ir0_w(st->pic8259, state); break;
-	case 1: pic8259_ir1_w(st->pic8259, state); break;
-	case 2: pic8259_ir2_w(st->pic8259, state); break;
-	case 3: pic8259_ir3_w(st->pic8259, state); break;
-	case 4: pic8259_ir4_w(st->pic8259, state); break;
-	case 5: pic8259_ir5_w(st->pic8259, state); break;
-	case 6: pic8259_ir6_w(st->pic8259, state); break;
-	case 7: pic8259_ir7_w(st->pic8259, state); break;
+	case 0: pic8259_ir0_w(st->pic8259_master, state); break;
+	case 1: pic8259_ir1_w(st->pic8259_master, state); break;
+	case 2: pic8259_ir2_w(st->pic8259_master, state); break;
+	case 3: pic8259_ir3_w(st->pic8259_master, state); break;
+	case 4: pic8259_ir4_w(st->pic8259_master, state); break;
+	case 5: pic8259_ir5_w(st->pic8259_master, state); break;
+	case 6: pic8259_ir6_w(st->pic8259_master, state); break;
+	case 7: pic8259_ir7_w(st->pic8259_master, state); break;
 	}
 }
 
