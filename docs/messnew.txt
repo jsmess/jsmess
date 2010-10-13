@@ -113,6 +113,8 @@ Source Changes:
 
 - Refactored the HD61830 LCD to a C++ device. [Curt Coder]
 
+- Added call to fetch metadata (in cartslot.c) so correct PCB can be loaded.
+  [tim lindner]
 
 
 0.139
