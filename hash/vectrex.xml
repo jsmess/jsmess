@@ -12,13 +12,13 @@ guys
 -->
 
 <softwarelist name="vectrex" description="GCE Vectrex cartridges">
-	<software name="minestrm">
+	<software name="3dmnstrm">
 		<description>3D Mine Storm</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="minestrm.bin" size="8192" crc="b2313487" sha1="1731e892da8945fe4945b43847d23960c581682a" offset="0" />
+				<rom name="3dmnstrm.bin" size="8192" crc="b2313487" sha1="1731e892da8945fe4945b43847d23960c581682a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,24 +221,24 @@ guys
 		</part>
 	</software>
 
-	<software name="mnestorm">
+	<software name="minestrm">
 		<description>Mine Storm</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mnestorm.bin" size="4096" crc="6d509566" sha1="5f00ed35f189357b4a16a190520166371ca57906" offset="0" />
+				<rom name="minestrm.bin" size="4096" crc="6d509566" sha1="5f00ed35f189357b4a16a190520166371ca57906" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mnestrm2">
+	<software name="minestr2">
 		<description>Mine Storm II</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mnestrm2.bin" size="4096" crc="f5b3b374" sha1="1fdcc6e54ae5177bc9cdc79ce616ae3401e5c229" offset="0" />
+				<rom name="minestr2.bin" size="4096" crc="f5b3b374" sha1="1fdcc6e54ae5177bc9cdc79ce616ae3401e5c229" offset="0" />
 			</dataarea>
 		</part>
 	</software>
