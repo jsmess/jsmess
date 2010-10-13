@@ -16,6 +16,7 @@
 static size_t mbee_size;
 static UINT8 mbee_clock_pulse;
 static UINT8 fdc_status = 0;
+static UINT8 mbee_0a;
 static running_device *mbee_fdc;
 static mc146818_device *mbee_rtc;
 static running_device *mbee_z80pio;
@@ -268,12 +269,237 @@ static TIMER_CALLBACK( mbee_rtc_irq )
 
 /***********************************************************
 
-    256 Memory Banking
+    256TC Memory Banking
+
+    Bits 0, 1 and 5 select which bank goes into 0000-7FFF.
+    Bit 2 disables ROM, replacing it with RAM.
+    Bit 3 disables Video, replacing it with RAM.
+    Bit 4 switches the video circuits between F000-FFFF and
+          8000-8FFF.
+
+    In case of a clash, video overrides ROM which overrides RAM.
 
 ************************************************************/
 
+WRITE8_HANDLER( mbee256_50_w )
+{
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	// primary low banks
+	memory_set_bank(space->machine, "boot", (data & 3) | ((data & 0x20) >> 3));
+	memory_set_bank(space->machine, "bank1", (data & 3) | ((data & 0x20) >> 3));
+
+	// 9000-EFFF
+	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
+
+	// 8000-8FFF, F000-FFFF
+	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
+	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
+
+	switch (data & 0x1c)
+	{
+		case 0x00:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			break;
+		case 0x04:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			break;
+		case 0x08:
+		case 0x18:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x0c:
+		case 0x1c:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x10:
+		case 0x14:
+			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+	}
+}
+
+/***********************************************************
+
+    128k Memory Banking
+
+    The only difference to the 256TC is that bit 5 switches
+    between rom2 and rom3. Since neither of these is dumped,
+    this bit is not emulated. If it was, this scheme is used:
+
+    Low - rom2 occupies C000-FFFF
+    High - ram = C000-DFFF, rom3 = E000-FFFF.
+
+************************************************************/
+
+WRITE8_HANDLER( mbee128_50_w )
+{
+	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	// primary low banks
+	memory_set_bank(space->machine, "boot", (data & 3));
+	memory_set_bank(space->machine, "bank1", (data & 3));
+
+	// 9000-EFFF
+	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
+
+	// 8000-8FFF, F000-FFFF
+	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
+	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
+	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
+
+	switch (data & 0x1c)
+	{
+		case 0x00:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			break;
+		case 0x04:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			break;
+		case 0x08:
+		case 0x18:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 0); // rom
+			memory_set_bank(space->machine, "bank8h", 0); // rom
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x0c:
+		case 0x1c:
+			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
+			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bank8l", 1); // ram
+			memory_set_bank(space->machine, "bank8h", 1); // ram
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+		case 0x10:
+		case 0x14:
+			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
+			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
+			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			memory_set_bank(space->machine, "bankfl", 0); // ram
+			memory_set_bank(space->machine, "bankfh", 0); // ram
+			break;
+	}
+}
 
 
+/***********************************************************
+
+    64k Memory Banking
+
+    Bit 2 disables ROM, replacing it with RAM.
+
+    Due to lack of documentation, it is not possible to know
+    if other bits are used.
+
+************************************************************/
+
+WRITE8_HANDLER( mbee64_50_w )
+{
+	if (data & 4)
+	{
+		memory_set_bank(space->machine, "boot", 0);
+		memory_set_bank(space->machine, "bankl", 0);
+		memory_set_bank(space->machine, "bankh", 0);
+	}
+	else
+	{
+		memory_set_bank(space->machine, "bankl", 1);
+		memory_set_bank(space->machine, "bankh", 1);
+	}
+}
+
+
+/***********************************************************
+
+    ROM Banking on older models
+
+    Set A to 0 or 1 then read the port to switch between the
+    halves of the Telcom ROM.
+
+    Output the PAK number to choose an optional PAK ROM.
+
+    The bios will support 256 PAKs, although normally only
+    8 are available in hardware. Each PAK is normally a 4K
+    ROM. If 8K ROMs are used, the 2nd half becomes PAK+8,
+    thus 16 PAKs in total. This is what we support.
+
+************************************************************/
+
+READ8_HANDLER ( mbeeic_0a_r )
+{
+	return mbee_0a;
+}
+
+WRITE8_HANDLER ( mbeeic_0a_w )
+{
+	mbee_0a = data;
+	memory_set_bank(space->machine, "pak", data & 15);
+}
+
+READ8_HANDLER ( mbeepc_telcom_low_r )
+{
+/* Read of port 0A - set Telcom rom to first half */
+	memory_set_bank(space->machine, "telcom", 0);
+	return mbee_0a;
+}
+
+READ8_HANDLER ( mbeepc_telcom_high_r )
+{
+/* Read of port 10A - set Telcom rom to 2nd half */
+	memory_set_bank(space->machine, "telcom", 1);
+	return mbee_0a;
+}
 
 
 /***********************************************************
@@ -317,6 +543,18 @@ MACHINE_RESET( mbee64 )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
+}
+
+MACHINE_RESET( mbee128 )
+{
+	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	mbee_z80pio = machine->device("z80pio");
+	mbee_speaker = machine->device("speaker");
+	mbee_cassette = machine->device("cassette");
+	mbee_printer = machine->device("centronics");
+	mbee_fdc = machine->device("wd179x");
+	mbee128_50_w(mem,0,0); // set banks to default
+	memory_set_bank(machine, "boot", 4); // boot time
 }
 
 MACHINE_RESET( mbee256 )
@@ -449,6 +687,24 @@ DRIVER_INIT( mbee64 )
 	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
 	mbee_size = 0xf000;
+}
+
+DRIVER_INIT( mbee128 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 4, &RAM[0x0000],  0x8000); // standard banks 0000
+	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x1000],  0x8000); // standard banks 1000
+	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000],  0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800],  0x0000); // shadow ram
+
+	RAM = memory_region(machine, "bootrom");
+	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
+	memory_configure_bank(machine, "boot", 4, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
+	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000],  0x0000); // rom
+	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
 }
 
 DRIVER_INIT( mbee256 )

@@ -6,7 +6,7 @@
 
     Brett Selwood, Andrew Davies (technical assistance)
 
-    Various fixes by Robbbert.
+    Various additions by Robbbert.
 
     Thanks to The Bee Board (http://microbee.no-ip.com/beeboard), who
     through a very dedicated community, have provided us with rom dumps,
@@ -61,20 +61,37 @@
 
     These early colour computers have a PROM to create the foreground palette.
 
-    TODO:
-    - Printer is working, but with improper code. This needs to be fixed.
-	05-Oct-2010 printer hack commented out for now.. it doesn't work any more
-    - Roms for mbeepc to be checked (I think they are correct)
-    - Fix Paste (it loses most of the characters)
-    - Fix the rtc (it's in as per the manuals, but it is completely ignored)
-    - Get details on the many other models not currently emulated
-    - 256TC keyboard IRQ is active all the time, it needs to be fully understood.
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
     - Change it to parallel by entering OUTL#1
     - After you mount/create a printfile, you can LPRINT and LLIST.
 
+
+***************************************************************************
+
+    TODO/not working:
+
+    - Printer needs to be understood and fixed.
+
+    - Roms for mbeepc to be checked against ubee512
+
+    - Fix Paste (it loses most of the characters)
+
+    - RTC for 256TC works, but it is supposed to be an option on other
+      models. It is being completely ignored.
+
+    - Most early models have a clock in Telcom, and in the menu. It doesn't
+      work.
+
+    - 256TC keyboard IRQ is active all the time, it needs to be rewritten
+
+    - The Monitor program on 128k and 256TC crashes the system. This appears
+      to be a MAME core bug involving the z80pio.
+
+    - Keyboard on EDASM on bankswitched models locks up. This also is
+      suspected to be a core bug, since the identical edasm works on the
+      non-bankswitch model.
 
 ***************************************************************************/
 
@@ -161,7 +178,7 @@ static ADDRESS_MAP_START(mbee64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee256_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mbee128_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAMBANK("bank8l")
@@ -236,7 +253,7 @@ static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee64_io, ADDRESS_SPACE_IO, 8)
@@ -248,8 +265,22 @@ static ADDRESS_MAP_START(mbee64_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(mbee64_50_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x50, 0x57) AM_WRITE(mbee64_50_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(mbee128_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
+	AM_RANGE(0x0b, 0x0b) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x1c, 0x1f) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee256_io, ADDRESS_SPACE_IO, 8)
@@ -681,23 +712,27 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee64, mbeeic )
+static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
 	MDRV_CPU_IO_MAP(mbee64_io)
 	MDRV_MACHINE_RESET( mbee64 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP(mbee128_mem)
+	MDRV_CPU_IO_MAP(mbee128_io)
+	MDRV_MACHINE_RESET( mbee128 )
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee256, mbeeppc )
+static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbee256_mem)
 	MDRV_CPU_IO_MAP(mbee256_io)
 	MDRV_MACHINE_RESET( mbee256 )
 	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
-	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
 /* Unused roms:
@@ -709,6 +744,11 @@ MACHINE_CONFIG_END
 
     ROM_LOAD_OPTIONAL("telcom11.rom", 0xe000,  0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) )
     Telcom 1.1 for the mbeeic (It could have 1.0, 1.1 or 1.2)
+
+    ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+    ROM_LOAD("bn56.bin",              0x0000,  0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f) )
+    These are alternate boot roms for the 128k. They have no menu, and look just like the 64k/56k bootup.
+
 
 */
 
@@ -931,7 +971,7 @@ ROM_START( mbee64 )
 	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
-	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+	ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
 
 	ROM_REGION(0x2000, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
@@ -949,18 +989,15 @@ ROM_START( mbee128 )
 	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
-	ROM_LOAD("rom1.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+	ROM_LOAD("bn60.bin",              0x0000,  0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda) )
 
-	ROM_REGION(0x2000, "gfx", 0)
+	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x0000, 0x1000 )
 
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
-
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( mbee256 )
@@ -995,6 +1032,6 @@ COMP( 1985, mbeepc85s,mbee,	0,	mbeepc85, mbee,     mbeepc85,		"Applied Technolog
 COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,		"Applied Technology",  "Microbee 32 Premium PC85" , 0 )
 COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
 COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,	0,	mbee128,  mbee,     mbee128, 		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
 COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256,  mbee256, 		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
 

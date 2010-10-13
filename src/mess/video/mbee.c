@@ -69,7 +69,6 @@ static UINT8 *colorram;
 static UINT8 *videoram;
 static UINT8 *attribram;
 static UINT8 mbee_08;
-static UINT8 mbee_0a;
 static UINT8 mbee_0b;
 static UINT8 mbee_1c;
 static UINT8 is_premium;
@@ -77,6 +76,12 @@ static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
 static void mc6845_screen_configure(running_machine *machine);
 
+
+/***********************************************************
+
+    Handlers of video, colour, and attribute RAM
+
+************************************************************/
 
 READ8_HANDLER( mbee_low_r )
 {
@@ -137,31 +142,6 @@ WRITE8_HANDLER ( mbeeic_high_w )
 		gfxram[0x0800 | offset] = data;
 }
 
-READ8_HANDLER ( mbeeic_0a_r )
-{
-	return mbee_0a;
-}
-
-WRITE8_HANDLER ( mbeeic_0a_w )
-{
-	mbee_0a = data;
-	memory_set_bank(space->machine, "pak", data & 15);
-}
-
-READ8_HANDLER ( mbeepc_telcom_low_r )
-{
-/* Read of port 0A - set Telcom rom to first half */
-	memory_set_bank(space->machine, "telcom", 0);
-	return mbee_0a;
-}
-
-READ8_HANDLER ( mbeepc_telcom_high_r )
-{
-/* Read of port 10A - set Telcom rom to 2nd half */
-	memory_set_bank(space->machine, "telcom", 1);
-	return mbee_0a;
-}
-
 READ8_HANDLER ( mbeeppc_1c_r )
 {
 	return mbee_1c;
@@ -178,24 +158,6 @@ WRITE8_HANDLER( mbeeppc_1c_w )
 	memory_set_bank(space->machine, "basic", (data & 0x20) ? 1 : 0);
 }
 
-WRITE8_HANDLER( mbee64_50_w )
-{
-/* This does a number of other things in the 128k (and later) models - not sure if
-    they exist in the 64k */
-
-	if (data & 4)
-	{
-		memory_set_bank(space->machine, "boot", 0);
-		memory_set_bank(space->machine, "bankl", 0);
-		memory_set_bank(space->machine, "bankh", 0);
-	}
-	else
-	{
-		memory_set_bank(space->machine, "bankl", 1);
-		memory_set_bank(space->machine, "bankh", 1);
-	}
-}
-
 WRITE8_HANDLER( mbee256_1c_w )
 {
 /*  d7 extended graphics (1=allow attributes and pcg banks)
@@ -205,75 +167,6 @@ WRITE8_HANDLER( mbee256_1c_w )
 
 	mbee_1c = data;
 }
-
-WRITE8_HANDLER( mbee256_50_w )
-{
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	// primary low banks
-	memory_set_bank(space->machine, "boot", (data & 3) | ((data & 0x20) >> 3));
-	memory_set_bank(space->machine, "bank1", (data & 3) | ((data & 0x20) >> 3));
-
-	// 9000-EFFF
-	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
-
-	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
-	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
-
-	switch (data & 0x1c)
-	{
-		case 0x00:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
-			memory_set_bank(space->machine, "bank8l", 0); // rom
-			memory_set_bank(space->machine, "bank8h", 0); // rom
-			break;
-		case 0x04:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
-			memory_set_bank(space->machine, "bank8l", 1); // ram
-			memory_set_bank(space->machine, "bank8h", 1); // ram
-			break;
-		case 0x08:
-		case 0x18:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
-			memory_set_bank(space->machine, "bank8l", 0); // rom
-			memory_set_bank(space->machine, "bank8h", 0); // rom
-			memory_set_bank(space->machine, "bankfl", 0); // ram
-			memory_set_bank(space->machine, "bankfh", 0); // ram
-			break;
-		case 0x0c:
-		case 0x1c:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
-			memory_set_bank(space->machine, "bank8l", 1); // ram
-			memory_set_bank(space->machine, "bank8h", 1); // ram
-			memory_set_bank(space->machine, "bankfl", 0); // ram
-			memory_set_bank(space->machine, "bankfh", 0); // ram
-			break;
-		case 0x10:
-		case 0x14:
-			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
-			memory_set_bank(space->machine, "bankfl", 0); // ram
-			memory_set_bank(space->machine, "bankfh", 0); // ram
-			break;
-	}
-}
-
 
 READ8_HANDLER( mbeeppc_low_r )
 {
@@ -310,6 +203,12 @@ WRITE8_HANDLER ( mbeeppc_high_w )
 		gfxram[(((mbee_1c & 15) + 1) << 11) | offset] = data;
 }
 
+
+/***********************************************************
+
+    CRTC-driven keyboard
+
+************************************************************/
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -371,6 +270,12 @@ static void mbee_video_kbd_scan( running_machine *machine, int param )
 	keyboard_matrix_r(machine, param);
 }
 
+
+/***********************************************************
+
+    CRTC registers
+
+************************************************************/
 
 READ8_HANDLER ( m6545_status_r )
 {
@@ -581,8 +486,17 @@ WRITE8_HANDLER ( m6545_data_w )
 	}
 }
 
-/* The 6845 can produce a variety of cursor shapes - all are emulated here
-    Need to find out if the 6545 works the same way */
+
+
+/***********************************************************
+
+    The 6845 can produce a variety of cursor shapes - all
+    are emulated here.
+
+    Need to find out if the 6545 works the same way.
+
+************************************************************/
+
 static void mc6845_cursor_configure(void)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
@@ -617,7 +531,15 @@ static void mc6845_cursor_configure(void)
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
-/* Resize the screen within the limits of the hardware. Expand the image to fill the screen area */
+
+
+/***********************************************************
+
+    Resize the screen within the limits of the hardware.
+    Expand the image to fill the screen area.
+
+************************************************************/
+
 static void mc6845_screen_configure(running_machine *machine)
 {
 	rectangle visarea;
@@ -636,6 +558,14 @@ static void mc6845_screen_configure(running_machine *machine)
 	visarea.max_y = height-1;
 	if (bytes < 0x800) machine->primary_screen->set_visible_area(0, width, 0, height);
 }
+
+
+
+/***********************************************************
+
+    Video
+
+************************************************************/
 
 VIDEO_START( mbee )
 {
@@ -836,6 +766,12 @@ VIDEO_UPDATE( mbeeppc )
 	return 0;
 }
 
+
+/***********************************************************
+
+    Palette
+
+************************************************************/
 
 PALETTE_INIT( mbeeic )
 {
