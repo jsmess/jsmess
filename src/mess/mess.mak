@@ -131,6 +131,7 @@ CPUS += I8008
 CPUS += SCMP
 #CPUS += MN10200
 CPUS += UNSP
+CPUS += COSMAC
 
 #-------------------------------------------------
 # specify available sound cores; some of these are

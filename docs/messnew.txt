@@ -79,6 +79,9 @@ System Driver Changes:
 
 - [PSION] Added support for datapack images [Sandro Ronco]
 
+- [VIP] Refactored driver to define ADDRESS_MAP_MODERN and use the new
+  RCA COSMAC CPU. [Curt Coder]
+
 
 
 Imgtool Changes:
@@ -115,6 +118,9 @@ Source Changes:
 
 - Added call to fetch metadata (in cartslot.c) so correct PCB can be loaded.
   [tim lindner]
+
+- Refactored the RCA CDP1802 CPU to a C++ device (COSMAC). [Curt Coder]
+
 
 
 0.139
