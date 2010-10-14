@@ -4664,13 +4664,12 @@ static TILE_GET_INFO( get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, UINT16 xpos, UINT16 ypos)
+INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
 	
 	int wraparound = segacd_stampsize&1;
-	wraparound = 1;
 	
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
@@ -4701,13 +4700,12 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, UI
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, UINT16 xpos, UINT16 ypos)
+INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
 	
 	int wraparound = segacd_stampsize&1;
-	wraparound = 1;
 	
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
@@ -4738,13 +4736,12 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, UI
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, UINT16 xpos, UINT16 ypos)
+INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
 	
 	int wraparound = segacd_stampsize&1;
-	wraparound = 1;
 	
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
@@ -4775,13 +4772,12 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, UINT16 xpos, UINT16 ypos)
+INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
 	
 	int wraparound = segacd_stampsize&1;
-	wraparound = 1;
 	
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
@@ -5290,7 +5286,7 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbitmap, UINT16 x, UINT16 y)
+INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbitmap, int x, int y)
 {
 /*
 	if (!srcbitmap)
@@ -5388,7 +5384,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 	{
 		int base = (data & 0xfffe) * 4;
 
-		logerror("actual base = %06x\n", base + 0x80000);
+		//printf("actual base = %06x\n", base + 0x80000);
 
 		// nasty nasty nasty
 		//segacd_mark_stampmaps_dirty();
@@ -5406,18 +5402,20 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
 		{
 			int currbase = base + line * 0x8;
-			UINT16 param1,param2,param3,param4;
 			
-			param1 = segacd_dataram[(currbase+0x0)>>1];
-			param2 = segacd_dataram[(currbase+0x2)>>1];
-			param3 = segacd_dataram[(currbase+0x4)>>1];
-			param4 = segacd_dataram[(currbase+0x6)>>1];
+			// are the 256x256 tile modes using the same sign bits?
+			INT16 tilemapxoffs,tilemapyoffs;
+			INT16 deltax,deltay;
+			
+			tilemapxoffs = segacd_dataram[(currbase+0x0)>>1];
+			tilemapyoffs = segacd_dataram[(currbase+0x2)>>1];
+			deltax = segacd_dataram[(currbase+0x4)>>1]; // x-zoom
+			deltay = segacd_dataram[(currbase+0x6)>>1]; // rotation
 
+			//printf("%06x:  %04x (%d) %04x (%d) %04x %04x\n", currbase, tilemapxoffs, tilemapxoffs>>3, tilemapyoffs, tilemapyoffs>>3, deltax, deltay);
 
-			//printf("%06x:  %04x (%d) %04x (%d) %04x %04x\n", currbase, param1, param1>>3, param2, param2>>3, param3, param4);
-
-			int xbase = param1 << 8;
-			int ybase = param2 << 8;
+			int xbase = tilemapxoffs * 256;
+			int ybase = tilemapyoffs * 256;
 			int count;
 						
 			for (count=0;count<(segacd_imagebuffer_hdot_size>>3);count++)
@@ -5428,15 +5426,9 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 				{	
 					pixblock |= read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8)) << (i);
 					
-					if (param3&0x8000)
-						xbase -= param3&0x7fff;
-					else
-						xbase += param3&0x7fff;
-						
-					if (param4&0x8000)
-						ybase -= param4&0x7fff;
-					else
-						ybase += param4&0x7fff;
+					
+					xbase += deltax;
+					ybase += deltay;
 					
 
 				}
