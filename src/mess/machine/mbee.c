@@ -15,6 +15,7 @@
 
 static size_t mbee_size;
 static UINT8 mbee_clock_pulse;
+static UINT8 mbee256_key_available;
 static UINT8 fdc_status = 0;
 static UINT8 mbee_0a;
 static running_device *mbee_fdc;
@@ -63,12 +64,12 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	UINT8 data = z80pio_pb_r(mbee_z80pio,0) & 0x7e;
+	UINT8 data = 0;
 
-	if (cassette_input(mbee_cassette) > 0.03)
-		data |= 0x01;
+	if (cassette_input(mbee_cassette) > 0.03) data |= 1;
 
 	data |= mbee_clock_pulse;
+	data |= mbee256_key_available;
 
 	mbee_clock_pulse = 0;
 
@@ -147,28 +148,30 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 static UINT8 mbee256_was_pressed[15] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 static UINT8 mbee256_q[20];
-static UINT8 mbee256_q_pos = 0;
+static UINT8 mbee256_q_pos;
 
 static TIMER_CALLBACK( mbee256_kbd )
 {
-    /* Keyboard scanner is a '3870' chip. It is not clocked, but is triggered by each read of port 18.
-    When a key is detected, it sets bit 1 of port 2 (one of the pio input lines). The next read of
-    port 18 will clear this line. The 3870 can store up to 9 keys, and has separate scan codes for
-    keys being pressed and being released. With no data sheet available, the following is a guess. */
+    /* Keyboard scanner is a '3870' chip. Its speed of operation is determined by a 15k resistor on
+    pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
+    line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
+    port 18 will clear this line, and read the key scancode. It will also signal the 3870 that the key
+    data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no data sheet
+    available, the following is a guess. */
 
-	UINT8 i, j, scancode;
-	UINT8 pressed[15] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+	UINT8 i, j;
+	UINT8 pressed[15];
 	char kbdrow[6];
 
 
-    /* see what is pressed */
+	/* see what is pressed */
 	for (i = 0; i < 15; i++)
 	{
 		sprintf(kbdrow,"LINE%d",i);
 		pressed[i] = (input_port_read(machine, kbdrow));
 	}
 
-    /* find what has changed */
+	/* find what has changed */
 	for (i = 0; i < 15; i++)
 	{
 		if (pressed[i] != mbee256_was_pressed[i])
@@ -178,9 +181,8 @@ static TIMER_CALLBACK( mbee256_kbd )
 			{
 				if (BIT(pressed[i]^mbee256_was_pressed[i], j))
 				{
-					scancode = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
 					/* put it in the queue */
-					mbee256_q[mbee256_q_pos] = scancode;
+					mbee256_q[mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
 					if (mbee256_q_pos < 19) mbee256_q_pos++;
 				}
 			}
@@ -188,32 +190,24 @@ static TIMER_CALLBACK( mbee256_kbd )
 		}
 	}
 
-    /* if anything queued, cause an interrupt */
+	/* if anything queued, cause an interrupt */
 	if (mbee256_q_pos)
-	{
-		i = z80pio_pb_r(mbee_z80pio,0);
-		z80pio_pb_w(mbee_z80pio, 0, i | 2);
-	}
+		mbee256_key_available = 2; // set irq
 }
 
 READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i, ret = 5; // no idea what the 'nokey' value should be
+	UINT8 i;
+	UINT8 data = mbee256_q[0]; // get oldest key
+
 	if (mbee256_q_pos)
 	{
 		mbee256_q_pos--;
-		ret = mbee256_q[0]; // get oldest key
 		for (i = 0; i < mbee256_q_pos; i++) mbee256_q[i] = mbee256_q[i+1]; // ripple queue
 	}
 
-	z80pio_pb_w(mbee_z80pio, 0, z80pio_pb_r(mbee_z80pio,0) & 0xfd); // clear irq
-
-    /* time delay of 0.01uf cap and 1.5k resistor */
-	timer_set(space->machine, ATTOTIME_IN_USEC(15), NULL, 0, mbee256_kbd);
-
-    /* get next char and return it */
-	
-	return ret;
+	mbee256_key_available = 0; // clear irq
+	return data;
 }
 
 
@@ -472,7 +466,7 @@ WRITE8_HANDLER( mbee64_50_w )
     The bios will support 256 PAKs, although normally only
     8 are available in hardware. Each PAK is normally a 4K
     ROM. If 8K ROMs are used, the 2nd half becomes PAK+8,
-    thus 16 PAKs in total. This is what we support.
+    thus 16 PAKs in total. This is used in the PC85 models.
 
 ************************************************************/
 
@@ -725,6 +719,7 @@ DRIVER_INIT( mbee256 )
 	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
 }
 
 

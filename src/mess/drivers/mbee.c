@@ -74,8 +74,6 @@
 
     - Printer needs to be understood and fixed.
 
-    - Roms for mbeepc to be checked against ubee512
-
     - Fix Paste (it loses most of the characters)
 
     - RTC for 256TC works, but it is supposed to be an option on other
@@ -83,8 +81,6 @@
 
     - Most early models have a clock in Telcom, and in the menu. It doesn't
       work.
-
-    - 256TC keyboard IRQ is active all the time, it needs to be rewritten
 
     - The Monitor program on 128k and 256TC crashes the system. This appears
       to be a MAME core bug involving the z80pio.
