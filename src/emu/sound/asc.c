@@ -4,7 +4,7 @@
 
     Apple Sound Chip (ASC) 344S0063
     Enhanced Apple Sound Chip (EASC) 343S1063
-    
+
     Emulation by R. Belmont
 
     Registers:
@@ -18,8 +18,8 @@
     0x807: CLOCK RATE (0 = Mac 22257 Hz, 1 = undefined, 2 = 22050 Hz, 3 = 44100 Hz)
     0x80a: PLAY REC A
     0x80f: TEST (bits 6-7 = digital test, bits 4-5 = analog test)
-    0x810: WAVETABLE 0 PHASE (big-endian 9.15 fixed-point, only 24 bits valid)
-    0x814: WAVETABLE 0 INCREMENT (big-endian 9.15 fixed-point, only 24 bits valid)
+    0x810: WAVETABLE 0 PHASE (big-endian 8.16 fixed-point, only 24 bits valid)
+    0x814: WAVETABLE 0 INCREMENT (big-endian 8.16 fixed-point, only 24 bits valid)
     0x818: WAVETABLE 1 PHASE
     0x81C: WAVETABLE 1 INCREMENT
     0x820: WAVETABLE 2 PHASE
@@ -177,6 +177,15 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 			break;
 
 		case 1:	// FIFO mode
+			if ((m_fifo_a_rdptr == 0) && (!m_fifo_a_wrhalf[0]))
+			{
+			   halt = 1;
+			}
+			else if ((m_fifo_a_rdptr == 0x200) && (!m_fifo_a_wrhalf[1]))
+			{
+			   halt = 1;
+			}
+
 			for (i = 0; i < samples; i++)
 			{
 				INT8 smpll, smplr;
@@ -194,41 +203,23 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 				smpll = (INT8)m_fifo_a[m_fifo_a_rdptr++]^0x80;
 				smplr = (INT8)m_fifo_b[m_fifo_b_rdptr++]^0x80;
-				
-				switch (m_chip_type)
+
+				if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
 				{
-					case ASC_TYPE_SONORA:
-						if (m_fifo_a_rdptr >= 0x200)
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
-							m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
-						}
-						break;
+					m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
+					if (m_irq_cb)
+					{
+						m_irq_cb(this, 1);
+					}
+				}
 
-					default:
-						if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
-						}
-
-						// don't update for non-(E)ASC
-						if ((m_fifo_b_rdptr == 0x200) || (m_fifo_b_rdptr == 0x400))
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
-						}
-						break;
+				if ((m_fifo_b_rdptr == 0x200) || (m_fifo_b_rdptr == 0x400))
+				{
+					m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
+					if (m_irq_cb)
+					{
+						m_irq_cb(this, 1);
+					}
 				}
 
 				m_fifo_a_rdptr &= 0x3ff;
@@ -240,7 +231,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 			if (halt)
 			{
-//				m_regs[R_MODE-0x800] = 0;
+//              m_regs[R_MODE-0x800] = 0;
 			}
 			break;
 
@@ -251,7 +242,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 				INT8 smpl;
 
 				mixL = mixR = 0;
-		 	
+
 				// update channel pointers
 				for (ch = 0; ch < 4; ch++)
 				{
@@ -259,11 +250,11 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 					if (ch < 2)
 					{
-						smpl = (INT8)m_fifo_a[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
+						smpl = (INT8)m_fifo_a[((m_phase[ch]>>16)&0x1ff) + wtoffs[ch&1]];
 					}
 					else
 					{
-						smpl = (INT8)m_fifo_b[((m_phase[ch]>>15)&0x1ff) + wtoffs[ch&1]];
+						smpl = (INT8)m_fifo_b[((m_phase[ch]>>16)&0x1ff) + wtoffs[ch&1]];
 					}
 
 					smpl ^= 0x80;
@@ -286,7 +277,7 @@ UINT8 asc_device::read(UINT16 offset)
 {
 	UINT8 rv;
 
-//	printf("ASC: read at %x\n", offset);
+//  printf("ASC: read at %x\n", offset);
 
 	// not sure what actually happens when the CPU reads the FIFO...
 	if (offset < 0x400)
@@ -418,7 +409,7 @@ UINT8 asc_device::read(UINT16 offset)
 
 void asc_device::write(UINT16 offset, UINT8 data)
 {
-//	printf("ASC: write %02x to %x\n", data, offset);
+//  printf("ASC: write %02x to %x\n", data, offset);
 
 	if (offset < 0x400)
 	{
@@ -432,7 +423,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			{
 				m_fifo_a_wrhalf[1] = 1;
 			}
-						       
+
 			m_fifo_a[m_fifo_a_wrptr++] = data;
 
 			if ((m_fifo_a_wrptr == 0x200) || (m_fifo_a_wrptr == 0x400))
@@ -476,7 +467,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			}
 
 			m_fifo_b_wrptr &= 0x3ff;
-		}    
+		}
 		else
 		{
 			m_fifo_b[offset-0x400] = data;
@@ -484,7 +475,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 	}
 	else
 	{
-//		printf("ASC: %02x to %x (was %x)\n", data, offset, m_regs[offset-0x800]);
+//      printf("ASC: %02x to %x (was %x)\n", data, offset, m_regs[offset-0x800]);
 
 		stream_update(m_stream);
 		switch (offset)
@@ -499,22 +490,11 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
 				break;
 
-			case R_FIFOMODE:
-				if (data & 0x80)
-				{
-					memset(m_fifo_a_wrhalf, 0, sizeof(m_fifo_a_wrhalf));
-					memset(m_fifo_b_wrhalf, 0, sizeof(m_fifo_b_wrhalf));
-
-					m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
-					m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
-				}
-				break;
-
 			case R_WTCONTROL:
-//				printf("One-shot wavetable %02x\n", data);
+//              printf("One-shot wavetable %02x\n", data);
 				break;
 
-			case 0x811: 
+			case 0x811:
 				m_phase[0] &= 0x00ffff;
 				m_phase[0] |= data<<16;
 				break;
@@ -529,7 +509,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[0] |= data;
 				break;
 
-			case 0x815: 
+			case 0x815:
 				m_incr[0] &= 0x00ffff;
 				m_incr[0] |= data<<16;
 				break;
@@ -544,7 +524,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[0] |= data;
 				break;
 
-			case 0x819: 
+			case 0x819:
 				m_phase[1] &= 0x00ffff;
 				m_phase[1] |= data<<16;
 				break;
@@ -559,7 +539,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[1] |= data;
 				break;
 
-			case 0x81d: 
+			case 0x81d:
 				m_incr[1] &= 0x00ffff;
 				m_incr[1] |= data<<16;
 				break;
@@ -574,7 +554,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[1] |= data;
 				break;
 
-			case 0x821: 
+			case 0x821:
 				m_phase[2] &= 0x00ffff;
 				m_phase[2] |= data<<16;
 				break;
@@ -589,7 +569,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[2] |= data;
 				break;
 
-			case 0x825: 
+			case 0x825:
 				m_incr[2] &= 0x00ffff;
 				m_incr[2] |= data<<16;
 				break;
@@ -604,7 +584,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[2] |= data;
 				break;
 
-			case 0x829: 
+			case 0x829:
 				m_phase[3] &= 0x00ffff;
 				m_phase[3] |= data<<16;
 				break;
@@ -619,7 +599,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[3] |= data;
 				break;
 
-			case 0x82d: 
+			case 0x82d:
 				m_incr[3] &= 0x00ffff;
 				m_incr[3] |= data<<16;
 				break;

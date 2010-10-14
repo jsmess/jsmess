@@ -233,6 +233,7 @@ SOUNDS += CDP1864
 #SOUNDS += ZSG2
 SOUNDS += MOS656X
 #SOUNDS += S2636
+SOUNDS += ASC
 SOUNDS += SOCRATES
 SOUNDS += TMC0285
 SOUNDS += TMS5200
@@ -242,7 +243,6 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
-SOUNDS += ASC
 
 #-------------------------------------------------
 # this is the list of driver libraries that

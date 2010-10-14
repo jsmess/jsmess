@@ -16,7 +16,11 @@
 
 const device_type X2212 = x2212_device_config::static_alloc_device_config;
 
-static ADDRESS_MAP_START( x2212_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( x2212_sram_map, ADDRESS_SPACE_0, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x2212_e2prom_map, ADDRESS_SPACE_1, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -34,8 +38,8 @@ x2212_device_config::x2212_device_config(const machine_config &mconfig, const ch
 	: device_config(mconfig, static_alloc_device_config, "X2212", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
-	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
+	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
+	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
 	  m_auto_save(false)
 {
 }
@@ -112,7 +116,7 @@ void x2212_device::device_start()
 {
 	state_save_register_device_item(this, 0, m_store);
 	state_save_register_device_item(this, 0, m_array_recall);
-	
+
 	m_sram = m_addrspace[0];
 	m_e2prom = m_addrspace[1];
 }
@@ -173,7 +177,7 @@ void x2212_device::nvram_write(mame_file &file)
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_config.m_auto_save)
 		store();
-	
+
 	UINT8 buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
@@ -187,7 +191,7 @@ void x2212_device::nvram_write(mame_file &file)
 //**************************************************************************
 
 //-------------------------------------------------
-//  store - store data from live RAM into the 
+//  store - store data from live RAM into the
 //  EEPROM
 //-------------------------------------------------
 
@@ -199,7 +203,7 @@ void x2212_device::store()
 
 
 //-------------------------------------------------
-//  recall - fetch data from the EEPROM into live 
+//  recall - fetch data from the EEPROM into live
 //  RAM
 //-------------------------------------------------
 

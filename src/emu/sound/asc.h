@@ -138,7 +138,7 @@ protected:
 	UINT8	m_fifo_a[0x400];
 	UINT8	m_fifo_b[0x400];
 
-	UINT8	m_regs[0x800];
+	UINT8	m_regs[0x100];
 
 	UINT32	m_phase[4], m_incr[4];
 

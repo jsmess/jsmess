@@ -93,7 +93,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.139u3.  This incorporates all features of the
+- The core is based on MAME 0.139u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed Z80-SIO and DMA to allow trs80m2 to boot CP/M and TRSDOS. [Curt Coder]

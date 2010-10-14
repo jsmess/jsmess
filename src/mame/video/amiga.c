@@ -636,7 +636,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 		CUSTOM_REG(REG_COLOR00) = state->genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 2;	/* copper runs on odd timeslots */
+	next_copper_x = 2;
 	for (x = 0; x < 0xe4*2; x++)
 	{
 		int sprpix;

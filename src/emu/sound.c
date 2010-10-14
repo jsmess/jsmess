@@ -124,12 +124,17 @@ void sound_init(running_machine *machine)
 {
 	sound_private *global;
 	const char *filename;
+        const char *filenameavi;
 
 	machine->sound_data = global = auto_alloc_clear(machine, sound_private);
 
-	/* handle -nosound */
+        /* get filename for WAV file or AVI file if specified */
+	filename = options_get_string(machine->options(), OPTION_WAVWRITE);
+        filenameavi = options_get_string(machine->options(), OPTION_AVIWRITE);
+
+	/* handle -nosound and lower sample rate if not recording WAV or AVI*/
 	global->nosound_mode = !options_get_bool(machine->options(), OPTION_SOUND);
-	if (global->nosound_mode)
+	if (global->nosound_mode && filename[0] == 0 && filenameavi[0] == 0)
 		machine->sample_rate = 11025;
 
 	/* count the speakers */
@@ -145,7 +150,6 @@ void sound_init(running_machine *machine)
 	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
 	/* open the output WAV file if specified */
-	filename = options_get_string(machine->options(), OPTION_WAVWRITE);
 	if (filename[0] != 0)
 		global->wavfile = wav_open(filename, machine->sample_rate, 2);
 
@@ -372,7 +376,7 @@ static TIMER_CALLBACK( sound_update )
 
 	/* force all the speaker streams to generate the proper number of samples */
 	for (speaker_device *speaker = speaker_first(*machine); speaker != NULL; speaker = speaker_next(speaker))
-		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled || global->nosound_mode);
+		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled);
 
 	/* now downmix the final result */
 	finalmix_step = video_get_speed_factor();
@@ -403,7 +407,8 @@ static TIMER_CALLBACK( sound_update )
 	/* play the result */
 	if (finalmix_offset > 0)
 	{
-		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
+		if (!global->nosound_mode)
+			osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
 		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
 		if (global->wavfile != NULL)
 			wav_add_data_16(global->wavfile, finalmix, finalmix_offset);

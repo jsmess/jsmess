@@ -68,9 +68,11 @@ static TIMER_CALLBACK( math_run_clear )
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( starwars_nstore_w )
+WRITE8_HANDLER( starwars_nstore_w )
 {
-	x2212_store(device, data & 0x01);
+	space->machine->device<x2212_device>("x2212")->store(0);
+	space->machine->device<x2212_device>("x2212")->store(1);
+	space->machine->device<x2212_device>("x2212")->store(0);
 }
 
 /*************************************
@@ -112,7 +114,7 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 7:		/* NVRAM array recall */
-			x2212_array_recall(space->machine->device("x2212"), data >> 7);
+			space->machine->device<x2212_device>("x2212")->recall(~data & 0x80);
 			break;
 	}
 }

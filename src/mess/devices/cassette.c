@@ -368,7 +368,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 		dev = dev->typenext();
 	}
 
-	y *= ui_get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	y *= ui_get_line_height(*device->machine) + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */
 	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
 	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
@@ -393,7 +393,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 		(int) length);
 
 	/* draw the cassette */
-	ui_draw_text_box(render_container_get_ui(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+	ui_draw_text_box(&device->machine->render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 }
 
 /*-------------------------------------------------

@@ -2935,6 +2935,17 @@ ROM_START( seawolf )
 	ROM_LOAD( "sw0044.e",   0x0c00, 0x0400, CRC(c3557d6a) SHA1(bd345dd72fed8ce15da76c381782b025f71b006f) )
 ROM_END
 
+ROM_START( seawolfo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x0200, CRC(941b8f2b) SHA1(1a46f91478d902b1452962972d7097ae217488a3) )
+	ROM_LOAD( "2.g1",   0x0200, 0x0200, CRC(c047ef88) SHA1(e731cbcd849ed0ad0c69a28f24e9986bf02c17e8) )
+	ROM_LOAD( "3.f1",   0x0400, 0x0200, CRC(9624b1ab) SHA1(a5b234ad3216def8dd006496a0d02ce275b88fa0) )
+	ROM_LOAD( "4.e1",   0x0600, 0x0200, CRC(553ff531) SHA1(0382f99f8cf148adae4a66db9693c8625250b3f5) )
+	ROM_LOAD( "5.d1",   0x0800, 0x0200, CRC(e8e07d03) SHA1(053b28edcf34400c809d5195b825469ae7744ddb) )
+	ROM_LOAD( "6.c1",   0x0a00, 0x0200, CRC(e2ffe499) SHA1(4e62aa14c510504872e76eacc298912d60b2e6fe) )
+	ROM_LOAD( "7.b1",   0x0c00, 0x0200, CRC(d40a52b5) SHA1(ffa7bb9109248be748f92f173d22b9a8bed3875f) )
+	ROM_LOAD( "8.a1",   0x0e00, 0x0200, CRC(da61df76) SHA1(49cae7772c0ee99aaba3a5d0981f970c85755872) )
+ROM_END
 
 ROM_START( gunfight )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2944,6 +2955,17 @@ ROM_START( gunfight )
 	ROM_LOAD( "7609e.bin",  0x0c00, 0x0400, CRC(773264e2) SHA1(de3f2e6841122bbe6e2fda5b87d37842c072289a) )
 ROM_END
 
+ROM_START( gunfighto )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gf-h.h",   0x0000, 0x0200, CRC(9d29cc7a) SHA1(3aef38948f1b82539e6c868ada6b9dcf2a743c4e) )
+	ROM_LOAD( "gf-g.g",   0x0200, 0x0200, CRC(5816911b) SHA1(eeb5835d3db1db1075d78a95f1f0189489910cce) )
+	ROM_LOAD( "gf-f.f",   0x0400, 0x0200, CRC(58f6ee8d) SHA1(03c3743424772202231d3066ce39d9c386887d22) )
+	ROM_LOAD( "gf-e.e",   0x0600, 0x0200, CRC(59078036) SHA1(4f3c1f2eb6ce3a1354b4031a225857b37e56cfcd) )
+	ROM_LOAD( "gf-d.d",   0x0800, 0x0200, CRC(2b64e17f) SHA1(8a5d52a859866f926ecd324ed97609102fa38e54) )
+	ROM_LOAD( "gf-c.c",   0x0a00, 0x0200, CRC(e0bbf98c) SHA1(eada3fdf09a752af98fdefdfad8de0b59beec422) )
+	ROM_LOAD( "gf-b.b",   0x0c00, 0x0200, CRC(91114108) SHA1(9480ddb45900b63ec295b983768e2825e06a0d71) )
+	ROM_LOAD( "gf-a.a",   0x0e00, 0x0200, CRC(3fbf9a91) SHA1(c74986362bc9db2aa3f881b3c98fe44537632979) )
+ROM_END
 
 ROM_START( tornbase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3178,8 +3200,10 @@ ROM_END
 
 /* PCB #              rom       parent    machine   inp */
 
-/* 596 */ GAME( 1976, seawolf,  0,        seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 596 */ GAME( 1976, seawolf,  0,        seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/* 596 */ GAME( 1976, seawolfo, seawolf,  seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )

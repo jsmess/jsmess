@@ -580,12 +580,12 @@ void v9938_reset (int which)
 	// collision location. The unused bits are set to 1.
 	// SR3: x x x x x x x x
 	// SR4: 1 1 1 1 1 1 1 x
-	// SR5: y y y y y y y y 
-	// SR6: 1 1 1 1 1 1 y y 
-	// Note that status register 4 is used in detection algorithms to tell 
+	// SR5: y y y y y y y y
+	// SR6: 1 1 1 1 1 1 y y
+	// Note that status register 4 is used in detection algorithms to tell
 	// apart the tms9929 from the v99x8.
-	
-	// TODO: SR3-S6 do not yet store the information about the sprite collision 
+
+	// TODO: SR3-S6 do not yet store the information about the sprite collision
 	vdp->statReg[4] = 0xfe;
 	vdp->statReg[6] = 0xfc;
 }
