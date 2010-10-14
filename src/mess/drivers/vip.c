@@ -504,8 +504,6 @@ static READ_LINE_DEVICE_HANDLER( ef4_r )
 
 static COSMAC_SC_WRITE( vip_sc_w )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
-
 	switch (input_port_read(device->machine, "SOUND"))
 	{
 	case SOUND_VP550:
