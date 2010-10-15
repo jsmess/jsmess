@@ -3937,6 +3937,39 @@ static READ16_HANDLER( scd_a12002_memory_mode_r )
 		   ((segacd_maincpu_has_ram_access) << 0);
 }
 
+
+/* I'm still not 100% clear how this works, the sources I have are a bit vague,
+   it might still be incorrect in both modes
+ */
+
+// DMNA = Decleration Mainram No Access (bit 0)
+// RET = Return access (bit 1)
+
+/* In Mode 0
+
+*/
+
+/* In Mode 1
+
+
+RET
+
+0 = Main CPU Accesses WordRam0 (1st Half of WordRAM)
+    Sub CPU  Accesses WordRam1 (2nd Half of WordRAM)
+	
+1 = Main CPU Accesses WordRam1 (2nd Half of WordRAM)
+    Sub  CPU Accesses WordRam0 (1st Half of WordRAM)
+	
+DMNA
+
+Setting this bis sends a Swap request to the SUB-CPU (Main CPU access only?)
+  1 = Swap Reqested / In Progress
+  0 = Swap Complete
+
+ (personal note, is this just a software flag? in this mode? sub p11/p12)
+
+*/
+
 static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 {
 	//printf("scd_a12002_memory_mode_w %04x %04x\n", data, mem_mask);
@@ -3947,7 +3980,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 		//if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
 		if (data&0x0002)
 		{
-			//printf("dmn set (swap requested)\n"); // give ram to sub?
+			//printf("dmna set (swap requested)\n"); // give ram to sub?
 
 			// this should take some time?
 			segacd_maincpu_has_ram_access = 0;
@@ -4002,7 +4035,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 		}
 
 
-		//if (data&0x0002) printf("dmn set (swap requested) (invalid, can't be set from sub68k?\n");
+		//if (data&0x0002) printf("dmna set (swap requested) (invalid, can't be set from sub68k?\n");
 
 		//if (data&0x0004)
 		{
@@ -4282,8 +4315,18 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_main_dataram_part1_r in mode 1\n");
-		return 0x0000;
+
+		if (offset<0x20000/2)
+		{
+			// wordram accees
+			printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
+			return 0x0000;
+		}
+		else
+		{
+			printf("Unspported: segacd_main_dataram_part1_r (Cell rearranged RAM) in mode 1\n"); 
+			return 0x0000;
+		}		
 	}
 
 	return 0x0000;
@@ -4306,7 +4349,15 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_main_dataram_part1_w in mode 1\n");
+		if (offset<0x20000/2)
+		{
+			printf("Unspported: segacd_main_dataram_part1_w (word RAM) in mode 1\n");
+			// wordram accees
+		}
+		else
+		{
+			printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
+		}		
 	}
 }
 
@@ -4986,7 +5037,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part1_r in mode 1\n");
+		printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
 		return 0x0000;
 	}
 
@@ -5010,7 +5061,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part1_w in mode 1\n");
+		printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
 	}
 }
 
@@ -5018,12 +5069,12 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 {
 	if (segacd_ram_mode==0)
 	{
-		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 1\n");
+		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 0\n"); // not mapepd to anything in mode 0
 		return 0x0000;
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part2_r in mode 1\n");
+		printf("Unspported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
 		return 0x0000;
 	}
 
@@ -5034,11 +5085,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 {
 	if (segacd_ram_mode==0)
 	{
-		printf("ILLEGAL segacd_sub_dataram_part2_w in mode 1\n");
+		printf("ILLEGAL segacd_sub_dataram_part2_w in mode 0\n"); // not mapepd to anything in mode 0
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1\n");
+		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
 	}
 }
 
