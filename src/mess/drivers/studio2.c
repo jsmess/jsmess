@@ -193,9 +193,11 @@ Notes:
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "includes/studio2.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "devices/cartslot.h"
 #include "formats/studio2_st2.h"
 #include "sound/beep.h"
@@ -205,67 +207,75 @@ Notes:
 
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( keylatch_w )
+WRITE8_MEMBER( studio2_state::keylatch_w )
 {
-	studio2_state *state = space->machine->driver_data<studio2_state>();
-
-	state->keylatch = data & 0x0f;
+	m_keylatch = data & 0x0f;
 }
 
-static READ8_DEVICE_HANDLER( studio2_cdp1861_dispon_r )
+READ8_MEMBER( studio2_state::dispon_r )
 {
-	cdp1861_dispon_w(device, 1);
-	cdp1861_dispon_w(device, 0);
+	cdp1861_dispon_w(m_vdc, 1);
+	cdp1861_dispon_w(m_vdc, 0);
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( visicom_cdp1861_dispon_w )
+WRITE8_MEMBER( studio2_state::dispon_w )
 {
-	cdp1861_dispon_w(device, 1);
-	cdp1861_dispon_w(device, 0);
+	cdp1861_dispon_w(m_vdc, 1);
+	cdp1861_dispon_w(m_vdc, 0);
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, studio2_cdp1861_dispon_r)
+	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram)
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram1)
+	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE(m_color_ram)
+	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE(m_color_ram1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1861_TAG, visicom_cdp1861_dispon_w)
+static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
+	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram)
+	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE(m_color_ram)
 	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static INPUT_CHANGED( reset_w )
+{
+	studio2_state *state = field->port->machine->driver_data<studio2_state>();
+
+	if (oldval && !newval)
+	{
+		state->machine_reset();
+	}
+}
 
 static INPUT_PORTS_START( studio2 )
 	PORT_START("A")
@@ -291,31 +301,27 @@ static INPUT_PORTS_START( studio2 )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B 7") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B 8") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B 9") PORT_CODE(KEYCODE_3_PAD)
+
+	PORT_START("CLEAR")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clear") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED(reset_w, 0)
 INPUT_PORTS_END
 
 /* Video */
-
-static WRITE_LINE_DEVICE_HANDLER( studio2_efx_w )
-{
-	studio2_state *driver_state = device->machine->driver_data<studio2_state>();
-
-	driver_state->cdp1861_efx = state;
-}
 
 static CDP1861_INTERFACE( studio2_cdp1861_intf )
 {
 	CDP1802_TAG,
 	SCREEN_TAG,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(studio2_efx_w)
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
 static VIDEO_UPDATE( studio2 )
 {
 	studio2_state *state = screen->machine->driver_data<studio2_state>();
 
-	cdp1861_update(state->cdp1861, bitmap, cliprect);
+	cdp1861_update(state->m_vdc, bitmap, cliprect);
 
 	return 0;
 }
@@ -328,32 +334,25 @@ static PALETTE_INIT( visicom )
     palette_set_color_rgb(machine, 3, 0xff, 0x00, 0x00);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( mpt02_efx_w )
-{
-	studio2_state *driver_state = device->machine->driver_data<studio2_state>();
-
-	driver_state->cdp1864_efx = state;
-}
-
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
 	studio2_state *state = device->machine->driver_data<studio2_state>();
 
-	return BIT(state->color, 0);
+	return BIT(state->m_color, 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
 	studio2_state *state = device->machine->driver_data<studio2_state>();
 
-	return BIT(state->color, 1);
+	return BIT(state->m_color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
 	studio2_state *state = device->machine->driver_data<studio2_state>();
 
-	return BIT(state->color, 2);
+	return BIT(state->m_color, 2);
 }
 
 static CDP1864_INTERFACE( mpt02_cdp1864_intf )
@@ -364,9 +363,9 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	DEVCB_LINE(rdata_r),
 	DEVCB_LINE(bdata_r),
 	DEVCB_LINE(gdata_r),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(mpt02_efx_w),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -377,32 +376,30 @@ static VIDEO_UPDATE( mpt02 )
 {
 	studio2_state *state = screen->machine->driver_data<studio2_state>();
 
-	cdp1864_update(state->cdp1864, bitmap, cliprect);
+	cdp1864_update(state->m_cti, bitmap, cliprect);
 
 	return 0;
 }
 
 /* CDP1802 Configuration */
 
-static CDP1802_MODE_READ( studio2_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
-
-	return state->cdp1802_mode;
+	return BIT(input_port_read(device->machine, "CLEAR"), 0);
 }
 
-static CDP1802_EF_READ( studio2_ef_r )
+static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
 	studio2_state *state = device->machine->driver_data<studio2_state>();
 
-	int ef = 0x0f;
+	return BIT(input_port_read(device->machine, "A"), state->m_keylatch);
+}
 
-	if (state->cdp1861_efx) ef -= EF1;
+static READ_LINE_DEVICE_HANDLER( ef4_r )
+{
+	studio2_state *state = device->machine->driver_data<studio2_state>();
 
-	if (input_port_read(device->machine, "A") & (1 << state->keylatch)) ef -= EF3;
-	if (input_port_read(device->machine, "B") & (1 << state->keylatch)) ef -= EF4;
-
-	return ef;
+	return BIT(input_port_read(device->machine, "B"), state->m_keylatch);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
@@ -411,108 +408,61 @@ static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 	beep_set_state(speaker, state);
 }
 
-static CDP1802_INTERFACE( studio2_config )
+static COSMAC_INTERFACE( studio2_cosmac_intf )
 {
-	studio2_mode_r,
-	studio2_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(ef3_r),
+	DEVCB_LINE(ef4_r),
 	DEVCB_LINE(studio2_q_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
-
-static CDP1802_EF_READ( mpt02_ef_r )
-{
-	studio2_state *state = device->machine->driver_data<studio2_state>();
-
-	int ef = 0x0f;
-
-	if (state->cdp1864_efx) ef -= EF1;
-
-	if (input_port_read(device->machine, "A") & (1 << state->keylatch)) ef -= EF3;
-	if (input_port_read(device->machine, "B") & (1 << state->keylatch)) ef -= EF4;
-
-	return ef;
-}
 
 static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
 	studio2_state *state = device->machine->driver_data<studio2_state>();
 	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
-	state->color = state->color_ram[addr];
+	state->m_color = state->m_color_ram[addr];
 
-	cdp1864_con_w(state->cdp1864, 0); // HACK
-	cdp1864_dma_w(state->cdp1864, offset, data);
+	cdp1864_con_w(state->m_cti, 0); // HACK
+	cdp1864_dma_w(state->m_cti, offset, data);
 }
 
-static CDP1802_INTERFACE( mpt02_config )
+static COSMAC_INTERFACE( mpt02_cosmac_intf )
 {
-	studio2_mode_r,
-	mpt02_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(ef3_r),
+	DEVCB_LINE(ef4_r),
 	DEVCB_LINE(studio2_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(mpt02_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1864_TAG, mpt02_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
 
-static TIMER_CALLBACK( set_cpu_mode )
+void studio2_state::machine_start()
 {
-	studio2_state *state = machine->driver_data<studio2_state>();
-
-	state->cdp1802_mode = CDP1802_MODE_RUN;
+	// register for state saving
+	state_save_register_global(machine, m_keylatch);
 }
 
-static MACHINE_START( studio2 )
+void studio2_state::machine_reset()
 {
-	studio2_state *state = machine->driver_data<studio2_state>();
-
-	/* find devices */
-	state->cdp1861 = machine->device(CDP1861_TAG);
-
-	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->cdp1861_efx);
-}
-
-static MACHINE_RESET( studio2 )
-{
-	studio2_state *state = machine->driver_data<studio2_state>();
-
-	/* reset CPU */
-	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-
-	/* reset CDP1861 */
-	state->cdp1861->reset();
-}
-
-static MACHINE_START( mpt02 )
-{
-	studio2_state *state = machine->driver_data<studio2_state>();
-
-	/* find devices */
-	state->cdp1864 = machine->device(CDP1864_TAG);
-
-	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->cdp1864_efx);
-}
-
-static MACHINE_RESET( mpt02 )
-{
-	studio2_state *state = machine->driver_data<studio2_state>();
-
-	/* reset CPU */
-	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-
-	/* reset CDP1864 */
-	state->cdp1864->reset();
+	if (m_vdc) m_vdc->reset();
+	if (m_cti) m_cti->reset();
 }
 
 /* Machine Drivers */
@@ -525,15 +475,11 @@ static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( studio2, studio2_state )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, 1760000) /* the real clock is derived from an oscillator circuit */
 	MDRV_CPU_PROGRAM_MAP(studio2_map)
 	MDRV_CPU_IO_MAP(studio2_io_map)
-	MDRV_CPU_CONFIG(studio2_config)
-
-	MDRV_MACHINE_START(studio2)
-	MDRV_MACHINE_RESET(studio2)
+	MDRV_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
 	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, 1760000)
@@ -553,15 +499,11 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( visicom, studio2_state )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
 	MDRV_CPU_PROGRAM_MAP(visicom_map)
 	MDRV_CPU_IO_MAP(visicom_io_map)
-	MDRV_CPU_CONFIG(studio2_config)
-
-	MDRV_MACHINE_START(studio2)
-	MDRV_MACHINE_RESET(studio2)
+	MDRV_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
 	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
@@ -581,15 +523,11 @@ static MACHINE_CONFIG_START( visicom, studio2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpt02, studio2_state )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1864_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mpt02_map)
 	MDRV_CPU_IO_MAP(mpt02_io_map)
-	MDRV_CPU_CONFIG(mpt02_config)
-
-	MDRV_MACHINE_START(mpt02)
-	MDRV_MACHINE_RESET(mpt02)
+	MDRV_CPU_CONFIG(mpt02_cosmac_intf)
 
     /* video hardware */
 	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)

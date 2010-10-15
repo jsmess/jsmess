@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __VIP__
 #define __VIP__
 

@@ -13,12 +13,6 @@ public:
 	tmc1800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* cpu state */
-	int reset;				/* reset activated */
-
-	/* video state */
-	int cdp1861_efx;		/* EFx */
-
 	/* keyboard state */
 	int keylatch;			/* key latch */
 
@@ -32,9 +26,6 @@ class osc1000b_state : public driver_device
 public:
 	osc1000b_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-
-	/* cpu state */
-	int reset;				/* reset activated */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
@@ -50,9 +41,6 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video state */
-	int cdp1864_efx;		/* EFx */
-	int reset;				/* reset activated */
-
 	UINT8 *colorram;		/* color memory */
 	UINT8 color;
 
@@ -64,18 +52,11 @@ public:
 	running_device *cassette;
 };
 
-class oscnano_state : public driver_device
+class nano_state : public driver_device
 {
 public:
-	oscnano_state(running_machine &machine, const driver_device_config_base &config)
+	nano_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-
-	/* cpu state */
-	int monitor_ef4;		/* EF4 line */
-	int reset;				/* reset activated */
-
-	/* video state */
-	int cdp1864_efx;		/* EFx */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
@@ -93,6 +74,6 @@ public:
 MACHINE_CONFIG_EXTERN( tmc1800_video );
 MACHINE_CONFIG_EXTERN( osc1000b_video );
 MACHINE_CONFIG_EXTERN( tmc2000_video );
-MACHINE_CONFIG_EXTERN( oscnano_video );
+MACHINE_CONFIG_EXTERN( nano_video );
 
 #endif

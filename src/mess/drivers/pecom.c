@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
@@ -175,7 +175,7 @@ static const cassette_config pecom_cassette_config =
 static MACHINE_CONFIG_START( pecom64, pecom_state )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", CDP1802, CDP1869_DOT_CLK_PAL/3)
+	MDRV_CPU_ADD("maincpu", COSMAC, CDP1869_DOT_CLK_PAL/3)
 	MDRV_CPU_PROGRAM_MAP(pecom64_mem)
 	MDRV_CPU_IO_MAP(pecom64_io)
 	MDRV_CPU_CONFIG(pecom64_cdp1802_config)

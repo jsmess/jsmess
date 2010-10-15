@@ -332,6 +332,7 @@ cosmac_device::cosmac_device(running_machine &_machine, const cosmac_device_conf
 	: cpu_device(_machine, config),
 	  m_op(0),
 	  m_state(COSMAC_STATE_1_RESET),
+	  m_mode(COSMAC_MODE_RESET),
 	  m_irq(0),
 	  m_dmain(0),
 	  m_dmaout(0),
@@ -1149,7 +1150,7 @@ void cosmac_device::ret()	{ return_from_interrupt(true); }
 void cosmac_device::dis()	{ return_from_interrupt(false); }
 
 // input/output byte transfer opcode handlers
-void cosmac_device::out()	{ IO_W(N, RAM_R(R[X]++)); }
+void cosmac_device::out()	{ IO_W(N, RAM_R(R[X])); R[X]++; }
 
 /*
 

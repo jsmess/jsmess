@@ -1,26 +1,19 @@
 #include "emu.h"
 #include "includes/tmc1800.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "video/cdp1861.h"
 #include "sound/cdp1864.h"
 #include "machine/rescap.h"
 
 /* Telmac 1800 */
 
-static WRITE_LINE_DEVICE_HANDLER( tmc1800_efx_w )
-{
-	tmc1800_state *driver_state = device->machine->driver_data<tmc1800_state>();
-
-	driver_state->cdp1861_efx = state;
-}
-
 static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 {
 	CDP1802_TAG,
 	SCREEN_TAG,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(tmc1800_efx_w)
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
 static VIDEO_UPDATE( tmc1800 )
@@ -55,13 +48,6 @@ static READ_LINE_DEVICE_HANDLER( gdata_r )
 	return BIT(state->color, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tmc2000_efx_w )
-{
-	tmc2000_state *driver_state = device->machine->driver_data<tmc2000_state>();
-
-	driver_state->cdp1864_efx = state;
-}
-
 static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 {
 	CDP1802_TAG,
@@ -70,9 +56,9 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 	DEVCB_LINE(rdata_r),
 	DEVCB_LINE(bdata_r),
 	DEVCB_LINE(gdata_r),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(tmc2000_efx_w),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	RES_K(1.21),	// RL64
 	RES_K(2.05),	// RL63
 	RES_K(2.26),	// RL61
@@ -90,14 +76,7 @@ static VIDEO_UPDATE( tmc2000 )
 
 /* OSCOM Nano */
 
-static WRITE_LINE_DEVICE_HANDLER( oscnano_efx_w )
-{
-	oscnano_state *driver_state = device->machine->driver_data<oscnano_state>();
-
-	driver_state->cdp1864_efx = state;
-}
-
-static CDP1864_INTERFACE( oscnano_cdp1864_intf )
+static CDP1864_INTERFACE( nano_cdp1864_intf )
 {
 	CDP1802_TAG,
 	SCREEN_TAG,
@@ -105,19 +84,19 @@ static CDP1864_INTERFACE( oscnano_cdp1864_intf )
 	DEVCB_LINE_VCC,
 	DEVCB_LINE_VCC,
 	DEVCB_LINE_VCC,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(oscnano_efx_w),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	RES_K(1.21), // R18 unconfirmed
 	0, // not connected
 	0, // not connected
 	0  // not connected
 };
 
-static VIDEO_UPDATE( oscnano )
+static VIDEO_UPDATE( nano )
 {
-	oscnano_state *state = screen->machine->driver_data<oscnano_state>();
-
+	nano_state *state = screen->machine->driver_data<nano_state>();
+	
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
 	return 0;
@@ -172,13 +151,13 @@ MACHINE_CONFIG_FRAGMENT( tmc2000_video )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( oscnano_video )
+MACHINE_CONFIG_FRAGMENT( nano_video )
 	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 
 	MDRV_PALETTE_LENGTH(8+8)
-	MDRV_VIDEO_UPDATE(oscnano)
+	MDRV_VIDEO_UPDATE(nano)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, oscnano_cdp1864_intf)
+	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, nano_cdp1864_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

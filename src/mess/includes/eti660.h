@@ -1,7 +1,7 @@
 #ifndef __ETI660__
 #define __ETI660__
 
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"ic3"
@@ -21,14 +21,10 @@ public:
 	eti660_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* cpu state */
-	cdp1802_control_mode cdp1802_mode;
-
 	/* keyboard state */
 	UINT8 keylatch;
 
 	/* video state */
-	int cdp1864_efx;
 	UINT8 color_ram[0x100];
 	UINT8 color;
 

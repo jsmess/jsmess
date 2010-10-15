@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "includes/elf.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "machine/mm74c922.h"
@@ -100,7 +100,7 @@ static INPUT_CHANGED( input_w )
 	if (newval)
 	{
 		/* assert DMAIN */
-		cputag_set_input_line(field->port->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, ASSERT_LINE);
+		cputag_set_input_line(field->port->machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
 
@@ -142,49 +142,33 @@ INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-static CDP1802_MODE_READ( elf2_mode_r )
+static READ_LINE_DEVICE_HANDLER( wait_r )
 {
-	cdp1802_control_mode mode = CDP1802_MODE_RESET;
-
-	switch ((RUN(device->machine) << 1) | !LOAD(device->machine))
-	{
-	case 0: mode = CDP1802_MODE_LOAD;	popmessage("LOAD");		break;
-	case 1: mode = CDP1802_MODE_RESET;	popmessage("RESET");	break;
-	case 2: mode = CDP1802_MODE_PAUSE;	popmessage("PAUSE");	break;
-	case 3: mode = CDP1802_MODE_RUN;	popmessage("RUN");		break;
-	}
-
-	return mode;
+	return LOAD(device->machine);
 }
 
-static CDP1802_EF_READ( elf2_ef_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	/*
-        EF1     CDP1861
-        EF2
-        EF3
-        EF4     input switch
-    */
-
-	elf2_state *state = device->machine->driver_data<elf2_state>();
-
-	UINT8 flags = 0x0f;
-
-	/* CDP1861 */
-	if (state->cdp1861_efx) flags -= EF1;
-
-	/* input switch */
-	if (!INPUT(device->machine)) flags -= EF4;
-
-	return flags;
+	return RUN(device->machine);
 }
 
-static CDP1802_SC_WRITE( elf2_sc_w )
+static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	if (sc1)
+	return INPUT(device->machine);
+}
+
+static COSMAC_SC_WRITE( elf2_sc_w )
+{
+	switch (sc)
 	{
+	case COSMAC_STATE_CODE_S2_DMA:
+	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		/* clear DMAIN */
-		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
+		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		break;
+	
+	default:
+		break;
 	}
 }
 
@@ -200,14 +184,20 @@ static READ8_DEVICE_HANDLER( elf2_dma_r )
 	return state->data;
 }
 
-static CDP1802_INTERFACE( elf2_config )
+static COSMAC_INTERFACE( elf2_config )
 {
-	elf2_mode_r,
-	elf2_ef_r,
-	elf2_sc_w,
+	DEVCB_LINE(wait_r),
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(ef4_r),
 	DEVCB_LINE(elf2_q_w),
 	DEVCB_HANDLER(elf2_dma_r),
-	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
+	elf2_sc_w,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* MM74C923 Interface */
@@ -254,20 +244,13 @@ static VIDEO_UPDATE( elf2 )
 	return 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( elf2_efx_w )
-{
-	elf2_state *driver_state = device->machine->driver_data<elf2_state>();
-
-	driver_state->cdp1861_efx = state;
-}
-
 static CDP1861_INTERFACE( elf2_cdp1861_intf )
 {
 	CDP1802_TAG,
 	SCREEN_TAG,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(elf2_efx_w)
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
 /* Machine Initialization */
@@ -295,7 +278,6 @@ static MACHINE_START( elf2 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1861_efx);
 	state_save_register_global(machine, state->data);
 }
 
@@ -310,9 +292,8 @@ static const cassette_config elf_cassette_config =
 };
 
 static MACHINE_CONFIG_START( elf2, elf2_state )
-
 	/* basic machine hardware */
-    MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
+    MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
     MDRV_CPU_PROGRAM_MAP(elf2_mem)
     MDRV_CPU_IO_MAP(elf2_io)
 	MDRV_CPU_CONFIG(elf2_config)

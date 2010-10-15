@@ -8,8 +8,8 @@
 
 #include "emu.h"
 #include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "sound/wave.h"	
+#include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
 
 static READ8_DEVICE_HANDLER( pecom_page_ram_r )
@@ -71,7 +71,7 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 	{
 		driver_state->dma = 0;
 
-		cputag_set_input_line(device->machine, "maincpu", CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "maincpu", COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 	else
 	{
@@ -109,7 +109,7 @@ static VIDEO_START( pecom )
 	state->cdp1869 = machine->device(CDP1869_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->reset);
 	state_save_register_global(machine, state->dma);
 	state_save_register_global_pointer(machine, state->page_ram, PECOM_PAGE_RAM_SIZE);
 }

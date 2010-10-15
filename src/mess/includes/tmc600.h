@@ -1,5 +1,9 @@
+#pragma once
+
 #ifndef __TMC600__
 #define __TMC600__
+
+#include "cpu/cosmac/cosmac.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"cdp1802"
@@ -14,30 +18,45 @@ class tmc600_state : public driver_device
 {
 public:
 	tmc600_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, CDP1802_TAG),
+		  m_vis(*this, CDP1869_TAG),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_ram(*this, "messram")
+	 { }
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<running_device> m_vis;
+	required_device<running_device> m_cassette;
+	required_device<running_device> m_ram;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE8_MEMBER(keyboard_latch_w);
+	DECLARE_WRITE8_MEMBER(vismac_register_w);
+	DECLARE_WRITE8_MEMBER(vismac_data_w);
+
+	UINT8 get_color(UINT16 pma);
 
 	/* video state */
-	int vismac_reg_latch;	/* video register latch */
-	int vismac_color_latch;	/* color latch */
-	int vismac_bkg_latch;	/* background color latch */
-	int blink;				/* cursor blink */
+	int m_vismac_reg_latch;	/* video register latch */
+	int m_vismac_color_latch;	/* color latch */
+	int m_vismac_bkg_latch;	/* background color latch */
+	int m_blink;				/* cursor blink */
 
-	UINT8 *page_ram;		/* page memory */
-	UINT8 *color_ram;		/* color memory */
-	UINT8 *char_rom;		/* character generator ROM */
+	UINT8 *m_page_ram;		/* page memory */
+	UINT8 *m_color_ram;		/* color memory */
+	UINT8 *m_char_rom;		/* character generator ROM */
 
 	/* keyboard state */
-	int keylatch;			/* key latch */
-
-	/* devices */
-	running_device *cdp1869;
-	running_device *cassette;
+	int m_keylatch;			/* key latch */
 };
 
 /* ---------- defined in video/tmc600.c ---------- */
-
-WRITE8_HANDLER( tmc600_vismac_register_w );
-WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w );
 
 MACHINE_CONFIG_EXTERN( tmc600_video );
 

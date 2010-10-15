@@ -31,7 +31,7 @@
 
 #include "emu.h"
 #include "includes/tmc2000e.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "devices/printer.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
@@ -147,13 +147,6 @@ static READ_LINE_DEVICE_HANDLER( gdata_r )
 	return BIT(state->color, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tmc2000e_efx_w )
-{
-	tmc2000e_state *driver_state = device->machine->driver_data<tmc2000e_state>();
-
-	driver_state->cdp1864_efx = state;
-}
-
 static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 {
 	CDP1802_TAG,
@@ -162,9 +155,9 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	DEVCB_LINE(rdata_r),
 	DEVCB_LINE(bdata_r),
 	DEVCB_LINE(gdata_r),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(tmc2000e_efx_w),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -182,45 +175,23 @@ static VIDEO_UPDATE( tmc2000e )
 
 /* CDP1802 Interface */
 
-static CDP1802_MODE_READ( tmc2000e_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	if (input_port_read(device->machine, "RUN") & 0x01)
-	{
-		return CDP1802_MODE_RUN;
-	}
-	else
-	{
-		return CDP1802_MODE_RESET;
-	}
+	return BIT(input_port_read(device->machine, "RUN"), 0);
 }
 
-static CDP1802_EF_READ( tmc2000e_ef_r )
+static READ_LINE_DEVICE_HANDLER( ef2_r )
+{
+	return cassette_input(device) < 0;
+}
+
+static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
 	tmc2000e_state *state = device->machine->driver_data<tmc2000e_state>();
-
-	UINT8 flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	UINT8 data = ~input_port_read(device->machine, keynames[state->keylatch / 8]);
 
-	/*
-        EF1     CDP1864
-        EF2     tape in/floppy
-        EF3     keyboard
-        EF4     I/O port
-    */
-
-	// CDP1864
-
-	if (!state->cdp1864_efx) flags -= EF1;
-
-	// tape in
-
-	if (cassette_input(state->cassette) > +1.0) flags -= EF2;
-
-	// keyboard
-
-	if (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
-
-	return flags;
+	return BIT(data, state->keylatch % 8);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000e_q_w )
@@ -252,14 +223,20 @@ static WRITE8_DEVICE_HANDLER( tmc2000e_dma_w )
 	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
-static CDP1802_INTERFACE( tmc2000e_config )
+static COSMAC_INTERFACE( tmc2000e_config )
 {
-	tmc2000e_mode_r,
-	tmc2000e_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_LINE(ef3_r),
+	DEVCB_NULL,
 	DEVCB_LINE(tmc2000e_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tmc2000e_dma_w)
+	DEVCB_HANDLER(tmc2000e_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
@@ -287,8 +264,6 @@ static MACHINE_RESET( tmc2000e )
 
 	state->cdp1864->reset();
 
-	cputag_set_input_line(machine, CDP1802_TAG, INPUT_LINE_RESET, PULSE_LINE);
-
 	// reset program counter to 0xc000
 }
 
@@ -301,9 +276,6 @@ static const cassette_config tmc2000_cassette_config =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
 	NULL
 };
-static FLOPPY_OPTIONS_START(tmc2000e)
-	// dsk
-FLOPPY_OPTIONS_END
 
 static const floppy_config tmc2000e_floppy_config =
 {
@@ -312,15 +284,14 @@ static const floppy_config tmc2000e_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(tmc2000e),
+	FLOPPY_STANDARD_5_25_DSDD,
+	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };
 
 static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
-
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map)
 	MDRV_CPU_CONFIG(tmc2000e_config)
@@ -343,7 +314,7 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD("cassette", tmc2000_cassette_config)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(tmc2000e_floppy_config)
+	MDRV_FLOPPY_2_DRIVES_ADD(tmc2000e_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

@@ -221,17 +221,17 @@ static void detect_keypress(running_device *device)
 			cdp1871->shift = devcb_call_read_line(&cdp1871->in_shift_func);
 			cdp1871->control = devcb_call_read_line(&cdp1871->in_control_func);
 			cdp1871->inhibit = 1;
-			cdp1871->next_da = 0;
+			cdp1871->next_da = ASSERT_LINE;
 		}
 		else
 		{
-			cdp1871->next_rpt = 0;
+			cdp1871->next_rpt = ASSERT_LINE;
 		}
 	}
 	else
 	{
 		cdp1871->inhibit = 0;
-		cdp1871->next_rpt = 1;
+		cdp1871->next_rpt = CLEAR_LINE;
 	}
 }
 
@@ -264,9 +264,31 @@ READ8_DEVICE_HANDLER( cdp1871_data_r )
 
 	// reset DA on next TPB
 
-	cdp1871->next_da = 1;
+	cdp1871->next_da = CLEAR_LINE;
 
 	return CDP1871_KEY_CODES[table][cdp1871->drive][cdp1871->sense];
+}
+
+/*-------------------------------------------------
+    cdp1871_da_r - keyboard data available
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( cdp1871_da_r )
+{
+	cdp1871_t *cdp1871 = get_safe_token(device);
+
+	return cdp1871->da;
+}
+
+/*-------------------------------------------------
+    cdp1871_rpt_r - keyboard repeat
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( cdp1871_rpt_r )
+{
+	cdp1871_t *cdp1871 = get_safe_token(device);
+
+	return cdp1871->rpt;
 }
 
 /*-------------------------------------------------
@@ -297,8 +319,8 @@ static DEVICE_START( cdp1871 )
 	devcb_resolve_read_line(&cdp1871->in_alpha_func, &intf->in_alpha_func, device);
 
 	/* set initial values */
-	cdp1871->next_da = 1;
-	cdp1871->next_rpt = 1;
+	cdp1871->next_da = CLEAR_LINE;
+	cdp1871->next_rpt = CLEAR_LINE;
 	change_output_lines(device);
 
 	/* create the timers */
@@ -335,11 +357,11 @@ DEVICE_GET_INFO( cdp1871 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1871");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1871");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
 

@@ -107,13 +107,13 @@ Notes:
     - tape input/output
     - tmc2000: add missing keys
     - tmc2000: TOOL-2000 rom banking
-    - oscnano: correct time constant for EF4 RC circuit
+    - nano: correct time constant for EF4 RC circuit
 
 */
 
 #include "emu.h"
 #include "includes/tmc1800.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "video/cdp1861.h"
 #include "sound/cdp1864.h"
 #include "devices/cassette.h"
@@ -135,7 +135,7 @@ static QUICKLOAD_LOAD( tmc1800 );
 
 static MACHINE_RESET( tmc1800 );
 static MACHINE_RESET( tmc2000 );
-static MACHINE_RESET( oscnano );
+static MACHINE_RESET( nano );
 
 /* Read/Write Handlers */
 
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 	state->keylatch = data & 0x3f;
 }
 
-static WRITE8_HANDLER( oscnano_keylatch_w )
+static WRITE8_HANDLER( nano_keylatch_w )
 {
 	/*
 
@@ -185,7 +185,7 @@ static WRITE8_HANDLER( oscnano_keylatch_w )
 
     */
 
-	oscnano_state *state = space->machine->driver_data<oscnano_state>();
+	nano_state *state = space->machine->driver_data<nano_state>();
 
 	state->keylatch = data & 0x0f;
 }
@@ -235,7 +235,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	cdp1864_tone_latch_w(device, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( oscnano_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( nano_bankswitch_w )
 {
 	/* enable RAM */
 
@@ -304,15 +304,15 @@ ADDRESS_MAP_END
 
 // OSCOM Nano
 
-static ADDRESS_MAP_START( oscnano_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nano_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0x83ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscnano_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nano_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(oscnano_keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, oscnano_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(nano_keylatch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, nano_bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -406,7 +406,35 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( oscnano )
+static INPUT_CHANGED( run_pressed )
+{
+	if (oldval && !newval)
+	{
+		running_machine *machine = field->port->machine;
+		MACHINE_RESET_CALL(nano);
+	}
+}
+
+static INPUT_CHANGED( monitor_pressed )
+{
+	running_machine *machine = field->port->machine;
+	nano_state *state = machine->driver_data<nano_state>();
+
+	if (oldval && !newval)
+	{
+		MACHINE_RESET_CALL(nano);
+
+		cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, CLEAR_LINE);
+	}
+	else if (!oldval && newval)
+	{
+		// TODO: what are the correct values?
+		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
+		timer_adjust_oneshot(state->ef4_timer, ATTOTIME_IN_MSEC(t), 0);
+	}
+}
+
+static INPUT_PORTS_START( nano )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
@@ -428,64 +456,33 @@ static INPUT_PORTS_START( oscnano )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHANGED(run_pressed, 0)
 
 	PORT_START("MONITOR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M) PORT_CHANGED(monitor_pressed, 0)
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
 
 // Telmac 1800
 
-static CDP1802_MODE_READ( tmc1800_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	tmc1800_state *state = device->machine->driver_data<tmc1800_state>();
-
-	if (input_port_read(device->machine, "RUN") & 0x01)
-	{
-		if (state->reset)
-		{
-			running_machine *machine = device->machine;
-			MACHINE_RESET_CALL(tmc2000);
-
-			state->reset = 0;
-		}
-
-		return CDP1802_MODE_RUN;
-	}
-	else
-	{
-		state->reset = 1;
-
-		return CDP1802_MODE_RESET;
-	}
+	return BIT(input_port_read(device->machine, "RUN"), 0);
 }
 
-static CDP1802_EF_READ( tmc1800_ef_r )
+static READ_LINE_DEVICE_HANDLER( ef2_r )
+{
+	return cassette_input(device) < 0;
+}
+
+static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
 	tmc1800_state *state = device->machine->driver_data<tmc1800_state>();
-
-	UINT8 flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	UINT8 data = ~input_port_read(device->machine, keynames[state->keylatch / 8]);
 
-	/*
-        EF1     CDP1861
-        EF2     tape in
-        EF3     keyboard
-        EF4     ?
-    */
-
-	/* CDP1861 */
-	if (state->cdp1861_efx) flags -= EF1;
-
-	/* tape input */
-	if (cassette_input(state->cassette) < 0) flags -= EF2;
-
-	/* keyboard */
-	if (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
-
-	return flags;
+	return BIT(data, state->keylatch % 8);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
@@ -496,77 +493,39 @@ static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_INTERFACE( tmc1800_config )
+static COSMAC_INTERFACE( tmc1800_config )
 {
-	tmc1800_mode_r,
-	tmc1800_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_LINE(ef3_r),
+	DEVCB_NULL,
 	DEVCB_LINE(tmc1800_q_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static CDP1802_INTERFACE( osc1000b_config )
+static COSMAC_INTERFACE( osc1000b_config )
 {
-	tmc1800_mode_r,
-	tmc1800_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_LINE(ef3_r),
+	DEVCB_NULL,
 	DEVCB_LINE(tmc1800_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 // Telmac 2000
-
-static CDP1802_MODE_READ( tmc2000_mode_r )
-{
-	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
-
-	if (input_port_read(device->machine, "RUN") & 0x01)
-	{
-		if (state->reset)
-		{
-			running_machine *machine = device->machine;
-			MACHINE_RESET_CALL(tmc2000);
-
-			state->reset = 0;
-		}
-
-		return CDP1802_MODE_RUN;
-	}
-	else
-	{
-		state->reset = 1;
-
-		return CDP1802_MODE_RESET;
-	}
-}
-
-static CDP1802_EF_READ( tmc2000_ef_r )
-{
-	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
-
-	int flags = 0x0f;
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-
-	/*
-        EF1     CDP1864
-        EF2     tape in
-        EF3     keyboard
-        EF4     ?
-    */
-
-	/* CDP1864 */
-	if (state->cdp1864_efx) flags -= EF1;
-
-	/* tape input */
-	if (cassette_input(state->cassette) < 0) flags -= EF2;
-
-	/* keyboard */
-	if (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
-
-	return flags;
-}
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
 {
@@ -592,98 +551,54 @@ static WRITE8_DEVICE_HANDLER( tmc2000_dma_w )
 	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
-static CDP1802_INTERFACE( tmc2000_config )
+static COSMAC_INTERFACE( tmc2000_config )
 {
-	tmc2000_mode_r,
-	tmc2000_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_LINE(ef3_r),
+	DEVCB_NULL,
 	DEVCB_LINE(tmc2000_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tmc2000_dma_w)
+	DEVCB_HANDLER(tmc2000_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 // OSCOM Nano
 
-static TIMER_CALLBACK( oscnano_ef4_tick )
+static TIMER_CALLBACK( nano_ef4_tick )
 {
-	oscnano_state *state = machine->driver_data<oscnano_state>();
-
-	/* assert EF4 */
-	state->monitor_ef4 = 1;
+	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 }
 
-static CDP1802_MODE_READ( oscnano_mode_r )
+static READ_LINE_DEVICE_HANDLER( nano_clear_r )
 {
-	oscnano_state *state = device->machine->driver_data<oscnano_state>();
+	int run = BIT(input_port_read(device->machine, "RUN"), 0);
+	int monitor = BIT(input_port_read(device->machine, "MONITOR"), 0);
 
-	int run = input_port_read(device->machine, "RUN") & 0x01;
-	int monitor = input_port_read(device->machine, "MONITOR") & 0x01;
-
-	if (run && monitor)
-	{
-		if (state->reset)
-		{
-			running_machine *machine = device->machine;
-			MACHINE_RESET_CALL(oscnano);
-
-			state->reset = 0;
-		}
-
-		return CDP1802_MODE_RUN;
-	}
-	else
-	{
-		state->reset = 1;
-
-		if (!monitor)
-		{
-			// TODO: what are the correct values?
-			int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-
-			/* clear EF4 */
-			state->monitor_ef4 = 0;
-
-			/* set EF4 timer */
-			timer_adjust_oneshot(state->ef4_timer, ATTOTIME_IN_MSEC(t), 0);
-		}
-
-		return CDP1802_MODE_RESET;
-	}
+	return run & monitor;
 }
 
-static CDP1802_EF_READ( oscnano_ef_r )
+static READ_LINE_DEVICE_HANDLER( nano_ef2_r )
 {
-	oscnano_state *state = device->machine->driver_data<oscnano_state>();
+	return cassette_input(device) < 0;
+}
 
+static READ_LINE_DEVICE_HANDLER( nano_ef3_r )
+{
+	nano_state *state = device->machine->driver_data<nano_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	UINT8 data = ~input_port_read(device->machine, keynames[state->keylatch / 8]);
 
-	int flags = 0x0f;
-
-	/*
-        EF1     CDP1864
-        EF2     tape in
-        EF3     keyboard
-        EF4     monitor
-    */
-
-	/* CDP1864 */
-	if (state->cdp1864_efx) flags -= EF1;
-
-	/* tape input */
-	if (cassette_input(state->cassette) < 0) flags -= EF2;
-
-	/* keyboard */
-	if (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
-
-	/* monitor */
-	if (state->monitor_ef4) flags -= EF4;
-
-	return flags;
+	return BIT(data, state->keylatch % 8);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
+static WRITE_LINE_DEVICE_HANDLER( nano_q_w )
 {
-	oscnano_state *driver_state = device->machine->driver_data<oscnano_state>();
+	nano_state *driver_state = device->machine->driver_data<nano_state>();
 
 	/* CDP1864 audio output enable */
 	cdp1864_aoe_w(driver_state->cdp1864, state);
@@ -695,14 +610,20 @@ static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_INTERFACE( oscnano_config )
+static COSMAC_INTERFACE( nano_config )
 {
-	oscnano_mode_r,
-	oscnano_ef_r,
-	NULL,
-	DEVCB_LINE(oscnano_q_w),
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(nano_clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CDP1864_TAG, cdp1864_dma_w)
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, nano_ef2_r),
+	DEVCB_LINE(nano_ef3_r),
+	DEVCB_NULL,
+	DEVCB_LINE(nano_q_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(CDP1864_TAG, cdp1864_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
@@ -718,9 +639,7 @@ static MACHINE_START( tmc1800 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1861_efx);
 	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( tmc1800 )
@@ -742,7 +661,6 @@ static MACHINE_START( osc1000b )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( osc1000b )
@@ -778,9 +696,7 @@ static MACHINE_START( tmc2000 )
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->colorram, TMC2000_COLORRAM_SIZE);
-	state_save_register_global(machine, state->cdp1864_efx);
 	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( tmc2000 )
@@ -803,33 +719,30 @@ static MACHINE_RESET( tmc2000 )
 
 // OSCOM Nano
 
-static MACHINE_START( oscnano )
+static MACHINE_START( nano )
 {
-	oscnano_state *state = machine->driver_data<oscnano_state>();
+	nano_state *state = machine->driver_data<nano_state>();
 
 	/* RAM/ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
 
 	/* allocate monitor timer */
-	state->ef4_timer = timer_alloc(machine, oscnano_ef4_tick, NULL);
-
-	/* initialize variables */
-	state->monitor_ef4 = 1;
+	state->ef4_timer = timer_alloc(machine, nano_ef4_tick, NULL);
 
 	/* find devices */
 	state->cdp1864 = machine->device(CDP1864_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->monitor_ef4);
-	state_save_register_global(machine, state->cdp1864_efx);
 	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->reset);
 }
 
-static MACHINE_RESET( oscnano )
+static MACHINE_RESET( nano )
 {
-	oscnano_state *state = machine->driver_data<oscnano_state>();
+	nano_state *state = machine->driver_data<nano_state>();
+
+	/* assert EF4 */
+	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 
 	/* reset CDP1864 */
 	state->cdp1864->reset();
@@ -850,9 +763,8 @@ static const cassette_config tmc1800_cassette_config =
 };
 
 static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
-
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map)
 	MDRV_CPU_IO_MAP(tmc1800_io_map)
 	MDRV_CPU_CONFIG(tmc1800_config)
@@ -880,9 +792,8 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
-
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(osc1000b_map)
 	MDRV_CPU_IO_MAP(osc1000b_io_map)
 	MDRV_CPU_CONFIG(osc1000b_config)
@@ -910,9 +821,8 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
-
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map)
 	MDRV_CPU_IO_MAP(tmc2000_io_map)
 	MDRV_CPU_CONFIG(tmc2000_config)
@@ -933,19 +843,18 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oscnano, oscnano_state )
-
+static MACHINE_CONFIG_START( nano, nano_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
-	MDRV_CPU_PROGRAM_MAP(oscnano_map)
-	MDRV_CPU_IO_MAP(oscnano_io_map)
-	MDRV_CPU_CONFIG(oscnano_config)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MDRV_CPU_PROGRAM_MAP(nano_map)
+	MDRV_CPU_IO_MAP(nano_io_map)
+	MDRV_CPU_CONFIG(nano_config)
 
-	MDRV_MACHINE_START(oscnano)
-	MDRV_MACHINE_RESET(oscnano)
+	MDRV_MACHINE_START(nano)
+	MDRV_MACHINE_RESET(nano)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(oscnano_video)
+	MDRV_FRAGMENT_ADD(nano_video)
 
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
@@ -1024,4 +933,4 @@ static DRIVER_INIT( tmc1800 )
 COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,	"Telercas Oy",	"Telmac 1800",  GAME_NOT_WORKING )
 COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
 COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, nano,		tmc2000,0,		oscnano,	oscnano,	0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1980, nano,		tmc2000,0,		nano,		nano,	0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )

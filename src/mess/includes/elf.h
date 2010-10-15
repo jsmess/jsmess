@@ -16,7 +16,6 @@ public:
 		: driver_device(machine, config) { }
 
 	/* display state */
-	int cdp1861_efx;				/* EFx */
 	UINT8 data;
 
 	/* devices */

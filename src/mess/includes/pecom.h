@@ -1,6 +1,8 @@
 #ifndef __PECOM__
 #define __PECOM__
 
+#include "cpu/cosmac/cosmac.h"
+
 #define SCREEN_TAG	"screen"
 #define CDP1869_TAG	"cdp1869"
 
@@ -15,7 +17,7 @@ public:
 
 	UINT8 *page_ram;		/* page memory */
 	UINT8 *charram;			/* character generator ROM */
-	int cdp1802_mode;		/* CPU mode */
+	int reset;				/* CPU mode */
 	int dma;				/* memory refresh DMA */
 	running_device *cdp1869;
 
@@ -31,7 +33,7 @@ extern MACHINE_RESET( pecom );
 extern WRITE8_HANDLER( pecom_bank_w );
 extern READ8_HANDLER (pecom_keyboard_r);
 
-extern const cdp1802_interface pecom64_cdp1802_config;
+extern const cosmac_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */
 

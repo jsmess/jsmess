@@ -10,9 +10,11 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "includes/comx35.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "devices/flopdrv.h"
@@ -28,7 +30,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROMBANK("bank2")
@@ -36,19 +38,19 @@ static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank3")
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE_LEGACY(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE_LEGACY(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_WRITE(comx35_bank_select_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(comx35_io_r, comx35_io_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD(CDP1871_TAG, cdp1871_data_r) AM_DEVWRITE(CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ(comx35_io2_r) AM_DEVWRITE(CDP1869_TAG, cdp1869_out4_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_TAG, cdp1869_out5_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_TAG, cdp1869_out6_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_TAG, cdp1869_out7_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(bank_select_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(CDP1871_TAG, cdp1871_data_r) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out3_w)
+	AM_RANGE(0x04, 0x04) AM_READ(io2_r) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out7_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -201,84 +203,71 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static CDP1802_MODE_READ( comx35_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
 	comx35_state *state = device->machine->driver_data<comx35_state>();
 
-	return (cdp1802_control_mode)state->cdp1802_mode;
+	return state->m_reset;
 }
 
-static CDP1802_EF_READ( comx35_ef_r )
+static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
 	comx35_state *state = device->machine->driver_data<comx35_state>();
 
-	int flags = 0x0f;
-
-	/*
-        EF1     predis
-        EF2     on power up: 1=PAL/0=NTSC, after toggle Q: _EFXB
-        EF3     _EFXA
-        EF4     cassette in (ear)
-    */
-
-	// CDP1869 predisplay
-	if (!state->cdp1869_prd) flags -= EF1;
-
-	if (state->iden)
+	if (state->m_iden)
 	{
 		// interrupts disabled: PAL/NTSC
-		if (!state->pal_ntsc) flags -= EF2;
+		return cdp1869_pal_ntsc_r(state->m_vis);
 	}
 	else
 	{
 		// interrupts enabled: keyboard repeat
-		if (!state->cdp1871_efxb) flags -= EF2;
+		return cdp1871_rpt_r(state->m_kbe);
 	}
-
-	// keyboard data available
-	if (!state->cdp1871_efxa) flags -= EF3;
-
-	// cassette input, expansion device flag
-	if ((state->cassette && (cassette_input(state->cassette) < +0.0)) || !state->cdp1802_ef4) flags -= EF4;
-
-	return flags;
 }
 
-static CDP1802_SC_WRITE( comx35_sc_w )
+static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
-	switch (state)
+	return (cassette_input(device) < 0) | state->m_cdp1802_ef4;
+}
+
+static COSMAC_SC_WRITE( comx35_sc_w )
+{
+	comx35_state *state = device->machine->driver_data<comx35_state>();
+
+	switch (sc)
 	{
-	case CDP1802_STATE_CODE_S0_FETCH:
+	case COSMAC_STATE_CODE_S0_FETCH:
 		// not connected
 		break;
 
-	case CDP1802_STATE_CODE_S1_EXECUTE:
+	case COSMAC_STATE_CODE_S1_EXECUTE:
 		// every other S1 triggers a DMAOUT request
-		if (driver_state->dma)
+		if (state->m_dma)
 		{
-			driver_state->dma = 0;
+			state->m_dma = 0;
 
-			if (!driver_state->iden)
+			if (!state->m_iden)
 			{
-				cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+				cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
 			}
 		}
 		else
 		{
-			driver_state->dma = 1;
+			state->m_dma = 1;
 		}
 		break;
 
-	case CDP1802_STATE_CODE_S2_DMA:
+	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 
-	case CDP1802_STATE_CODE_S3_INTERRUPT:
+	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		// interrupt acknowledge clears the INT request
-		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cpu_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 		break;
 	}
 }
@@ -287,43 +276,35 @@ static WRITE_LINE_DEVICE_HANDLER( comx35_q_w )
 {
 	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
 
-	driver_state->cdp1802_q = state;
+	driver_state->m_cdp1802_q = state;
 
-	if (driver_state->iden && state)
+	if (driver_state->m_iden && state)
 	{
 		// enable interrupts
-		driver_state->iden = 0;
+		driver_state->m_iden = 0;
 	}
 
 	// cassette output
-	if (driver_state->cassette) cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
+	cassette_output(driver_state->m_cassette, state ? +1.0 : -1.0);
 }
 
-static CDP1802_INTERFACE( comx35_cdp1802_config )
+static COSMAC_INTERFACE( cosmac_intf )
 {
-	comx35_mode_r,
-	comx35_ef_r,
-	comx35_sc_w,
-	DEVCB_LINE(comx35_q_w),
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE_VCC,								// wait
+	DEVCB_LINE(clear_r),						// clear
+	DEVCB_NULL,									// EF1
+	DEVCB_LINE(ef2_r),							// EF2
+	DEVCB_NULL,									// EF3
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef4_r),		// EF4
+	DEVCB_LINE(comx35_q_w),						// Q
+	DEVCB_NULL,									// DMA in
+	DEVCB_NULL,									// DMA out
+	comx35_sc_w,								// SC
+	DEVCB_NULL,									// TPA
+	DEVCB_NULL									// TPB
 };
 
 /* CDP1871 Interface */
-
-static WRITE_LINE_DEVICE_HANDLER( comx35_da_w )
-{
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
-
-	driver_state->cdp1871_efxa = state;
-}
-
-static WRITE_LINE_DEVICE_HANDLER( comx35_rpt_w )
-{
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
-
-	driver_state->cdp1871_efxb = state;
-}
 
 static READ_LINE_DEVICE_HANDLER( comx35_shift_r )
 {
@@ -351,8 +332,8 @@ static CDP1871_INTERFACE( comx35_cdp1871_intf )
 	DEVCB_LINE(comx35_shift_r),
 	DEVCB_LINE(comx35_control_r),
 	DEVCB_NULL,
-	DEVCB_LINE(comx35_da_w),
-	DEVCB_LINE(comx35_rpt_w)
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3),
+	DEVCB_NULL // polled
 };
 
 /* Machine Drivers */
@@ -377,39 +358,15 @@ static const floppy_config comx35_floppy_config =
 	NULL
 };
 
-/* F4 Character Displayer */
-static const gfx_layout comx35_charlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( comx35 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, comx35_charlayout, 0, 36 )
-GFXDECODE_END
-
-
-static MACHINE_CONFIG_START( comx35_pal, comx35_state )
-
+static MACHINE_CONFIG_START( pal, comx35_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_PAL)
 	MDRV_CPU_PROGRAM_MAP(comx35_map)
 	MDRV_CPU_IO_MAP(comx35_io_map)
-	MDRV_CPU_CONFIG(comx35_cdp1802_config)
-
-	MDRV_MACHINE_START(comx35p)
-	MDRV_MACHINE_RESET(comx35)
+	MDRV_CPU_CONFIG(cosmac_intf)
 
 	/* sound and video hardware */
 	MDRV_FRAGMENT_ADD(comx35_pal_video)
-	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
@@ -425,20 +382,15 @@ static MACHINE_CONFIG_START( comx35_pal, comx35_state )
 	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( comx35_ntsc, comx35_state )
-
+static MACHINE_CONFIG_START( ntsc, comx35_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_NTSC)
 	MDRV_CPU_PROGRAM_MAP(comx35_map)
 	MDRV_CPU_IO_MAP(comx35_io_map)
-	MDRV_CPU_CONFIG(comx35_cdp1802_config)
-
-	MDRV_MACHINE_START(comx35n)
-	MDRV_MACHINE_RESET(comx35)
+	MDRV_CPU_CONFIG(cosmac_intf)
 
 	/* sound and video hardware */
 	MDRV_FRAGMENT_ADD(comx35_ntsc_video)
-	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
@@ -498,5 +450,5 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  COMPANY                       FULLNAME            FLAGS
-COMP( 1983, comx35p,	0,		0,		comx35_pal,	comx35,   0,	"Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
-COMP( 1983, comx35n,	comx35p,0,		comx35_ntsc,comx35,   0,	"Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35p,	0,		0,		pal,		comx35,   0,	"Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35n,	comx35p,0,		ntsc,		comx35,   0,	"Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )

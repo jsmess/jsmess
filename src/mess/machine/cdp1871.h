@@ -85,4 +85,8 @@ struct _cdp1871_interface
 /* keyboard data */
 READ8_DEVICE_HANDLER( cdp1871_data_r );
 
+/* keyboard status */
+READ_LINE_DEVICE_HANDLER( cdp1871_da_r );
+READ_LINE_DEVICE_HANDLER( cdp1871_rpt_r );
+
 #endif

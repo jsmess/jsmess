@@ -11,15 +11,17 @@
 
 #include "emu.h"
 #include "includes/eti660.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "devices/cassette.h"
 #include "devices/messram.h"
 #include "machine/6821pia.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 
+static MACHINE_RESET( eti660 );
+
 #define RX(_machine) \
-	cpu_get_reg(_machine->firstcpu, CDP1802_R0 + cpu_get_reg(_machine->firstcpu, CDP1802_X))
+	cpu_get_reg(_machine->firstcpu, COSMAC_R0 + cpu_get_reg(_machine->firstcpu, COSMAC_X))
 
 /* Read/Write Handlers */
 
@@ -63,11 +65,13 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_reset )
+static INPUT_CHANGED( reset_pressed )
 {
-	eti660_state *state = field->port->machine->driver_data<eti660_state>();
-
-	state->cdp1802_mode = newval ? CDP1802_MODE_RUN : CDP1802_MODE_RESET;
+	if (oldval && !newval)
+	{
+		running_machine *machine = field->port->machine;
+		MACHINE_RESET_CALL(eti660);
+	}
 }
 
 static INPUT_PORTS_START( eti660 )
@@ -96,18 +100,11 @@ static INPUT_PORTS_START( eti660 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(reset_pressed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
 INPUT_PORTS_END
 
 /* Video */
-
-static WRITE_LINE_DEVICE_HANDLER( eti660_efx_w )
-{
-	eti660_state *driver_state = device->machine->driver_data<eti660_state>();
-
-	driver_state->cdp1864_efx = state;
-}
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
@@ -138,9 +135,9 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	DEVCB_LINE(rdata_r),
 	DEVCB_LINE(bdata_r),
 	DEVCB_LINE(gdata_r),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
-	DEVCB_LINE(eti660_efx_w),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	RES_K(2.2), /* R7 */
 	RES_K(1),	/* R5 */
 	RES_K(4.7), /* R6 */
@@ -158,29 +155,19 @@ static VIDEO_UPDATE( eti660 )
 
 /* CDP1802 Interface */
 
-static CDP1802_MODE_READ( eti660_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
-
-	return state->cdp1802_mode;
+	return BIT(input_port_read(device->machine, "SPECIAL"), 0);
 }
 
-static CDP1802_EF_READ( eti660_ef_r )
+static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	return cassette_input(device) < 0;
+}
 
-	int ef = 0x0f;
-
-	/* CDP1864 EFx */
-	if (state->cdp1864_efx) ef -= EF1;
-
-	/* tape input */
-	if (cassette_input(state->cassette) < 0) ef -= EF2;
-
-	/* STEP key */
-	if (!BIT(input_port_read(device->machine, "SPECIAL"), 1)) ef -= EF4;
-
-	return ef;
+static READ_LINE_DEVICE_HANDLER( ef4_r )
+{
+	return BIT(input_port_read(device->machine, "SPECIAL"), 1);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
@@ -208,14 +195,20 @@ static WRITE8_DEVICE_HANDLER( eti660_dma_w )
 	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
-static CDP1802_INTERFACE( eti660_config )
+static COSMAC_INTERFACE( eti660_config )
 {
-	eti660_mode_r,
-	eti660_ef_r,
-	NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_NULL,
+	DEVCB_LINE(ef4_r),
 	DEVCB_LINE(eti660_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(eti660_dma_w)
+	DEVCB_HANDLER(eti660_dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* PIA6821 Interface */
@@ -288,13 +281,6 @@ static const pia6821_interface eti660_mc6821_intf =
 
 /* Machine Initialization */
 
-static TIMER_CALLBACK( set_cpu_mode )
-{
-	eti660_state *state = machine->driver_data<eti660_state>();
-
-	state->cdp1802_mode = CDP1802_MODE_RUN;
-}
-
 static MACHINE_START( eti660 )
 {
 	eti660_state *state = machine->driver_data<eti660_state>();
@@ -302,19 +288,11 @@ static MACHINE_START( eti660 )
 	/* find devices */
 	state->cdp1864 = machine->device(CDP1864_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
-
-	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
-	state_save_register_global(machine, state->cdp1864_efx);
 }
 
 static MACHINE_RESET( eti660 )
 {
 	eti660_state *state = machine->driver_data<eti660_state>();
-
-	/* reset CPU */
-	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(0), NULL, 0, set_cpu_mode);
 
 	/* reset CDP1864 */
 	state->cdp1864->reset();
@@ -331,9 +309,8 @@ static const cassette_config eti660_cassette_config =
 };
 
 static MACHINE_CONFIG_START( eti660, eti660_state )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_8_867238MHz/5)
 	MDRV_CPU_PROGRAM_MAP(eti660_map)
 	MDRV_CPU_IO_MAP(eti660_io_map)
 	MDRV_CPU_CONFIG(eti660_config)
