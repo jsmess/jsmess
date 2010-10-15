@@ -274,6 +274,7 @@ a tilemap-like structure, from which data is copied)
 #ifdef MESS
 #include "devices/chd_cd.h"
 #endif
+#include "sound/rf5c68.h"
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
@@ -5572,7 +5573,10 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
 
-	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+	
+	 
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
@@ -8542,6 +8546,10 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
+	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+
 	#ifdef MESS
 	MDRV_CDROM_ADD( "cdrom" )
 	#endif
@@ -8555,6 +8563,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	#ifdef MESS
 	MDRV_CDROM_ADD( "cdrom" )
