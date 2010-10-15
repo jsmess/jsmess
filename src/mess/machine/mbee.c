@@ -197,8 +197,7 @@ static TIMER_CALLBACK( mbee256_kbd )
 
 READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i;
-	UINT8 data = mbee256_q[0]; // get oldest key
+	UINT8 i, data = mbee256_q[0]; // get oldest key
 
 	if (mbee256_q_pos)
 	{
@@ -699,6 +698,8 @@ DRIVER_INIT( mbee128 )
 	memory_configure_bank(machine, "boot", 4, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000],  0x0000); // rom
 	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
+
+	mbee_size = 0x8000;
 }
 
 DRIVER_INIT( mbee256 )
@@ -720,6 +721,8 @@ DRIVER_INIT( mbee256 )
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
+
+	mbee_size = 0x8000;
 }
 
 

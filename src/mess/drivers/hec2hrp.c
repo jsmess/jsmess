@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrx, driver_device )
+static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 /*****************************************************************************/
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
