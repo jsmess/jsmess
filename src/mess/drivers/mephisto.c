@@ -57,8 +57,9 @@ $8000-$FFF ROM
 #include "cpu/m6502/m6502.h"
 // #include "sound/dac.h"
 #include "sound/beep.h"
+//#include "mephisto.lh"
 
-#include "mephisto.lh"
+#include "machine/mboard.h"
 
 static UINT8 lcd_shift_counter;
 static UINT8 led_status;
@@ -93,29 +94,44 @@ static READ8_HANDLER(read_keys)
 	return data | 0x7f;
 }
 
-static READ8_HANDLER(read_board)
-{
-	return 0xff;	// Mephisto needs it for working
-}
-
 static WRITE8_HANDLER ( write_led )
 {
-
+	UINT8 LED_offset=100;
 	data &= 0x80;
+
 	if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
-	if (offset<6)output_set_led_value(offset, led_status&1<<offset?1:0);
+	if (offset<6)output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
 	if (offset==7) led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
+static WRITE8_HANDLER ( write_led_mm2 )
+{
+
+	UINT8 LED_offset=100;
+	data &= 0x80;
+
+	if (data==0)
+		led_status &= 255-(1<<offset); 
+	else 
+		led_status|=1<<offset;
+
+	if (offset<6)
+		output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
+
+	if (offset==7) 
+	    led7= data & 0x80 ? 0xff :0x00;	//MM2
+
+}
+
 static ADDRESS_MAP_START(rebel5_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM // AM_BASE(&mephisto_ram)//
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE(&mephisto_ram)//
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE( write_lcd )
-	AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys )	// Rebel 5.0
-	AM_RANGE( 0x2000, 0x2007) AM_WRITE( write_led )	// Status LEDs+ buzzer
-	AM_RANGE( 0x3000, 0x4000) AM_READ( read_board )	// Chessboard
-	AM_RANGE( 0x6000, 0x6000) AM_RAM
-	AM_RANGE( 0x7000, 0x7000) AM_RAM
+	AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys )			// Rebel 5.0
+	AM_RANGE( 0x2000, 0x2007) AM_WRITE( write_led )			// Status LEDs+ buzzer
+	AM_RANGE( 0x3000, 0x4000) AM_READ( read_board_8 )		// Chessboard
+	AM_RANGE( 0x6000, 0x6000) AM_WRITE ( write_LED_8)		// Chessboard
+	AM_RANGE( 0x7000, 0x7000) AM_WRITE ( write_board_8 )	// Chessboard
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -124,16 +140,127 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE(&mephisto_ram )//
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd )
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys )
-	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led )	// Status LEDs+ buzzer
-	AM_RANGE( 0x2400, 0x2407) AM_RAM	// Chessboard
-	AM_RANGE( 0x2800, 0x2800) AM_RAM	// Chessboard
-	AM_RANGE( 0x3800, 0x3800) AM_RAM	// unknwon write access
-	AM_RANGE( 0x3000, 0x3000) AM_READ( read_board )	// Chessboard
-	AM_RANGE( 0x4000, 0x7fff) AM_ROM	// Opening Library
+	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led )			// Status LEDs+ buzzer
+	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( write_board_8)		// Chessboard
+	AM_RANGE( 0x3800, 0x3800) AM_RAM						// unknwon write access
+	AM_RANGE( 0x3000, 0x3000) AM_READ( read_board_8 )		// Chessboard	
+	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(mm2_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE(&mephisto_ram )	
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )				
+	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )					
+	AM_RANGE( 0x1000, 0x1007) AM_WRITE( write_led_mm2 )		//Status LEDs
 
+	AM_RANGE( 0x3000, 0x3000) AM_WRITE ( write_LED_8 )		//Chessboard  
+	AM_RANGE( 0x3800, 0x3800) AM_WRITE ( write_board_8)		//Chessboard
+	AM_RANGE( 0x2000, 0x2000) AM_READ( read_board_8 )		//Chessboard		 	
+
+	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library ?
+	AM_RANGE( 0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( board )
+	PORT_START("LINE2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+
+	PORT_START("LINE10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+
+	PORT_START("B_WHITE") 
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+
+	PORT_START("B_BLACK") 
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+
+	PORT_START("B_BUTTONS") 
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephisto )
 	PORT_START("KEY1_0") //Port $2c00
@@ -169,6 +296,9 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C 3") PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3)
 	PORT_START("KEY2_7") //Port $2c0f
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 4") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4)
+
+	PORT_INCLUDE( board )
+
 INPUT_PORTS_END
 
 
@@ -180,19 +310,56 @@ static TIMER_CALLBACK( update_nmi )
 	beep_set_state(speaker,led_status&64?1:0);
 }
 
+static TIMER_CALLBACK( update_irq )		//only mm2
+{
+	running_device *speaker = machine->device("beep");
+
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+
+	beep_set_state(speaker,led_status&64?1:0);
+}
 static MACHINE_START( mephisto )
 {
 	lcd_shift_counter=3;
-	// timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
+
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
-	// cputag_set_input_line(machine, "maincpu", M65C02_IRQ_LINE,CLEAR_LINE);
-	//beep_set_frequency(0, 4000);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, update_artwork);
+
+	mboard_savestate_register(machine);
+}
+
+static MACHINE_START( mm2 )
+{
+	lcd_shift_counter=3;
+	led7=0xff;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(450), NULL, 0, update_irq);	
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, update_artwork);
+
+	mboard_savestate_register(machine);
 }
 
 
 static MACHINE_RESET( mephisto )
 {
 	lcd_shift_counter = 3;
+
+	set_boarder_pieces();
+	set_board();
+
+/* adjust artwork depending on current emulation*/
+
+	if (!strcmp(machine->m_game.name,"mm2") )
+		output_set_value("MM",1);
+	else if (!strcmp(machine->m_game.name,"mm4") )
+		output_set_value("MM",2);
+	else if (!strcmp(machine->m_game.name,"mm5") )
+		output_set_value("MM",3);
+	else if (!strcmp(machine->m_game.name,"mm50") )
+		output_set_value("MM",3);
+	else if (!strcmp(machine->m_game.name,"rebel5") )
+		output_set_value("MM",4);
 }
 
 
@@ -205,7 +372,7 @@ static MACHINE_CONFIG_START( mephisto, driver_device )
 	MDRV_MACHINE_RESET( mephisto )
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_mephisto)
+//	MDRV_DEFAULT_LAYOUT(layout_mephisto)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -215,14 +382,29 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
+//	MDRV_IMPORT_FROM( mephisto )		 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mm2, mephisto )
+//	MDRV_IMPORT_FROM( mephisto )
+	MDRV_CPU_REPLACE("maincpu", M65C02, 3700000)
+	MDRV_CPU_PROGRAM_MAP(mm2_mem)
+	MDRV_MACHINE_START( mm2 )
+MACHINE_CONFIG_END
+
+
 ROM_START(rebel5)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("rebel5.rom", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083))
+ROM_END
+
+ROM_START(mm2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("mm2_1.bin", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad))
+	ROM_LOAD("mm2_2.bin", 0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d))
 ROM_END
 
 ROM_START(mm4)
@@ -235,7 +417,7 @@ ROM_END
 
 ROM_START(mm5)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
 	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2))
@@ -262,9 +444,11 @@ static DRIVER_INIT( mephisto )
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
-//CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto, "Hegener & Glaser", "Mephisto Schach Computer",         GAME_NOT_WORKING )
-CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       0 )
-CONS( 1990, mm5,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     0 )
-CONS( 1990, mm50,       mm5,    0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
-CONS( 1986, rebel5,     0,      0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", 0 )
+
+CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       GAME_SUPPORTS_SAVE )
+CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     GAME_SUPPORTS_SAVE )
+CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     GAME_SUPPORTS_SAVE )
+CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE )
+CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE )
+
 // second design sold (same computer/program?)

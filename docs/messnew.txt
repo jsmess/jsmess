@@ -11,7 +11,8 @@ New System Drivers Supported:
 - Panasonic JR-100U [Murray Moffatt, Miodrag Milanovic]
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
-
+- Mephisto MM2 [Ralf Schaefer]
+- Mephisto Vancouver 16 Bit [Ralf Schaefer]
 
 
 Systems Promoted from GAME_NOT_WORKING:
@@ -82,7 +83,11 @@ System Driver Changes:
 - [VIP] Refactored driver to define ADDRESS_MAP_MODERN and use the new
   RCA COSMAC CPU. [Curt Coder]
 
+- [MEPHISTO] the mephisto chess board is defined as a 
+  machine (mboard). [Ralf Schaefer]
 
+- [MEPHISTO] to reduce the artwork files glasgow, amsterd and mm4 
+  are defined as PARENTS. [Ralf Schaefer]
 
 Imgtool Changes:
 ----------------

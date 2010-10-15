@@ -1557,17 +1557,19 @@ const game_driver * const drivers[] =
 
 	/* Hegener & Glaser Munich */
 //  DRIVER( mephisto )  /* Mephisto  */
-	DRIVER( mm4 )	   /* Mephisto 4       */
-	DRIVER( mm5 )	   /* Mephisto 5.1 ROM   */
-	DRIVER( mm50 )	  /* Mephisto 5.0 ROM    */
-	DRIVER( rebel5 )	/* Mephisto 5      */
-	DRIVER( glasgow )	   /* Glasgow     */
-	DRIVER( amsterd )	   /* Amsterdam */
-	DRIVER( dallas )	/* Dallas      */
-	DRIVER( dallas16 )	  /* Dallas    */
-	DRIVER( dallas32 )	  /* Dallas    */
-	DRIVER( roma )	  /* Roma    */
-	DRIVER( roma32 )	/* Roma  */
+	DRIVER( mm2 )       /* Mephisto 2 */
+	DRIVER( mm4 )       /* Mephisto 4       */
+	DRIVER( mm5 )       /* Mephisto 5.1 ROM   */
+	DRIVER( mm50 )      /* Mephisto 5.0 ROM    */
+	DRIVER( rebel5 )    /* Mephisto 5      */
+	DRIVER( glasgow )       /* Glasgow     */
+	DRIVER( amsterd )       /* Amsterdam */
+	DRIVER( dallas )    /* Dallas      */
+	DRIVER( dallas16 )      /* Dallas    */
+	DRIVER( dallas32 )      /* Dallas    */
+	DRIVER( roma )      /* Roma    */
+	DRIVER( roma32 )    /* Roma  */
+	DRIVER( van16 ) /* Vancouver 16 Bit */
 
 	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
 	DRIVER( batman )	/* The Batman, 2004 */
