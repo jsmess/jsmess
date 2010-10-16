@@ -224,7 +224,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		{
 			/* choose a screen */
 			screen_device *screen = screen_first(*machine);
-			while((screen != NULL) && !render_is_live_screen(screen))
+			while((screen != NULL) && !machine->render().is_live(*screen))
 			{
 				screen = screen_next(screen);
 			}
@@ -427,7 +427,7 @@ static void testmess_exit(running_machine &machine)
 {
 	if (target != NULL)
 	{
-		render_target_free(target);
+		machine.render().target_free(target);
 		target = NULL;
 	}
 }
@@ -437,8 +437,8 @@ static void testmess_exit(running_machine &machine)
 void osd_init(running_machine *machine)
 {
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
-	target = render_target_alloc(machine, NULL, 0);
-	render_target_set_orientation(target, 0);
+	target = machine->render().target_alloc();
+	target->set_orientation(0);
 }
 
 
@@ -642,11 +642,11 @@ static void command_switch(running_machine *machine)
 	/* special hack until we support video targets natively */
 	if (!strcmp(current_command->u.switch_args.name, "Video type"))
 	{
-		render_target *target = render_target_get_indexed(0);
+		render_target *target = machine->render().target_by_index(0);
 		int view_index = 0;
 		const char *view_name;
 
-		while((view_name = render_target_get_view_name(target, view_index)) != NULL)
+		while((view_name = target->view_name(view_index)) != NULL)
 		{
 			if (!strcmp(view_name, current_command->u.switch_args.value))
 				break;
@@ -655,7 +655,7 @@ static void command_switch(running_machine *machine)
 
 		if (view_name)
 		{
-			render_target_set_view(target, view_index);
+			target->set_view(view_index);
 			return;
 		}
 	}
@@ -1019,7 +1019,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	attotime time_limit;
 	attotime current_time;
 
-	render_target_get_primitives(target);
+	target->get_primitives();
 
 	/* don't do anything if we are initializing! */
 	switch(machine->phase())
