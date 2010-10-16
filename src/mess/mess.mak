@@ -970,7 +970,6 @@ $(MESSOBJ)/hegener.a:			\
 	$(MESS_MACHINE)/mboard.o	\
 	$(MESS_DRIVERS)/glasgow.o	\
 	$(MESS_DRIVERS)/mephisto.o	\
-	$(MESS_DRIVERS)/vancouver.o	\
 
 $(MESSOBJ)/hitachi.a:			\
 	$(MESS_DRIVERS)/bmjr.o		\

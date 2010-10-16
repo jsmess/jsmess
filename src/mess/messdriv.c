@@ -1569,7 +1569,6 @@ const game_driver * const drivers[] =
 	DRIVER( dallas32 )      /* Dallas    */
 	DRIVER( roma )      /* Roma    */
 	DRIVER( roma32 )    /* Roma  */
-	DRIVER( van16 ) /* Vancouver 16 Bit */
 
 	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
 	DRIVER( batman )	/* The Batman, 2004 */

@@ -12,7 +12,6 @@ New System Drivers Supported:
 - National JR-100 [anonymous, Miodrag Milanovic]
 - Novag SuperConstellation Chess Computer [Ralf Schaefer]
 - Mephisto MM2 [Ralf Schaefer]
-- Mephisto Vancouver 16 Bit [Ralf Schaefer]
 
 
 Systems Promoted from GAME_NOT_WORKING:
