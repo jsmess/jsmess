@@ -75,6 +75,9 @@ static UINT8 is_premium;
 static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
 static void mc6845_screen_configure(running_machine *machine);
+static running_device *mc6845;
+static UINT8 speed,flash;
+static UINT16 cursor;
 
 
 /***********************************************************
@@ -370,6 +373,9 @@ READ8_HANDLER ( m6545_data_r )
 WRITE8_HANDLER ( m6545_index_w )
 {
 	crt.idx = data & 0x1f;
+	data &= 0x1f;
+//	mc6845_ind = data;
+	mc6845_address_w( mc6845, 0, data );
 }
 
 WRITE8_HANDLER ( m6545_data_w )
@@ -484,6 +490,10 @@ WRITE8_HANDLER ( m6545_data_w )
 	default:
 		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);
 	}
+//	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
+//	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(space->machine); /* adjust screen size */
+//	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	mc6845_register_w( mc6845, 0, data );
 }
 
 
@@ -569,6 +579,7 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
+	mc6845 = machine->device("crtc");
 	videoram = memory_region(machine, "videoram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
 	is_premium = 0;
@@ -576,6 +587,7 @@ VIDEO_START( mbee )
 
 VIDEO_START( mbeeic )
 {
+	mc6845 = machine->device("crtc");
 	videoram = memory_region(machine, "videoram");
 	colorram = memory_region(machine, "colorram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
@@ -584,6 +596,7 @@ VIDEO_START( mbeeic )
 
 VIDEO_START( mbeeppc )
 {
+	mc6845 = machine->device("crtc");
 	videoram = memory_region(machine, "videoram");
 	colorram = memory_region(machine, "colorram");
 	gfxram = memory_region(machine, "gfx")+0x1000;
@@ -591,179 +604,158 @@ VIDEO_START( mbeeppc )
 	is_premium = 1;
 }
 
-/* monochrome bee */
 VIDEO_UPDATE( mbee )
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 mem,sy=0,ma=0,x;
-	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
-	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
-	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
-
 	framecnt++;
-
-	for (y = 0; y < crt.vertical_displayed; y++)						// for each row of chars
-	{
-		for (ra = 0; ra < (crt.scan_lines&15)+1; ra++)					// for each scanline - RA4 is used as an update strobe for the keyboard
-		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
-
-			for (x = ma; x < ma + crt.horizontal_displayed; x++)			// for each character
-			{
-				UINT8 inv=0;
-				mem = (x + screen_home) & 0x7ff;
-				chr = videoram[mem];
-
-				mbee_video_kbd_scan(screen->machine, x);
-
-				/* process cursor */
-				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-					(mem == cursor))					// displaying at cursor position?
-						inv ^= mc6845_cursor[ra];			// cursor scan row
-
-				/* get pattern of pixels for that character scanline */
-				gfx = gfxram[(chr<<4) | ra] ^ inv;
-
-				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
-			}
-		}
-		ma+=crt.horizontal_displayed;
-	}
+	cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
+	speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
+	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
-/* prom-based colours */
-VIDEO_UPDATE( mbeeic )
+
+MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr )
 {
-	UINT8 y,ra,chr,gfx,fg,bg;
-	UINT16 mem,sy=0,ma=0,x,col;
-	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
-	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
-	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
-	UINT16 colourm = (mbee_08 & 0x0e) << 7;
+/* not sure what goes in here - parameters passed are device, addr, strobe */
+}
 
-	framecnt++;
+MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
+{
+/* not used on 256TC */
+}
 
-	for (y = 0; y < crt.vertical_displayed; y++)						// for each row of chars
+
+/* monochrome bee */
+MC6845_UPDATE_ROW( mbee_update_row )
+{
+	UINT8 chr,gfx;
+	UINT16 mem,x;
+	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)			// for each character
 	{
-		for (ra = 0; ra < (crt.scan_lines&15)+1; ra++)					// for each scanline - RA4 is used as an update strobe for the keyboard
-		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+		UINT8 inv=0;
+		mem = (ma + x) & 0x7ff;
+		chr = videoram[mem];
 
-			for (x = ma; x < ma + crt.horizontal_displayed; x++)			// for each character
-			{
-				UINT8 inv=0;
-				mem = (x + screen_home) & 0x7ff;
-				chr = videoram[mem];
-				col = colorram[mem] | colourm;					// read a byte of colour
+		mbee_video_kbd_scan(device->machine, x+ma);
 
-				mbee_video_kbd_scan(screen->machine, x);
+		/* process cursor */
+		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
+			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == cursor))					// displaying at cursor position?
+				inv ^= mc6845_cursor[ra];			// cursor scan row
 
-				/* process cursor */
-				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-					(mem == cursor))					// displaying at cursor position?
-						inv ^= mc6845_cursor[ra];			// cursor scan row
+		/* get pattern of pixels for that character scanline */
+		gfx = gfxram[(chr<<4) | ra] ^ inv;
 
-				/* get pattern of pixels for that character scanline */
-				gfx = gfxram[(chr<<4) | ra] ^ inv;
-				fg = (col & 0x001f) | 64;					// map to foreground palette
-				bg = (col & 0x07e0) >> 5;					// and background palette
-
-				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? fg : bg;
-				*p++ = ( gfx & 0x40 ) ? fg : bg;
-				*p++ = ( gfx & 0x20 ) ? fg : bg;
-				*p++ = ( gfx & 0x10 ) ? fg : bg;
-				*p++ = ( gfx & 0x08 ) ? fg : bg;
-				*p++ = ( gfx & 0x04 ) ? fg : bg;
-				*p++ = ( gfx & 0x02 ) ? fg : bg;
-				*p++ = ( gfx & 0x01 ) ? fg : bg;
-			}
-		}
-		ma+=crt.horizontal_displayed;
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = ( gfx & 0x80 ) ? 1 : 0;
+		*p++ = ( gfx & 0x40 ) ? 1 : 0;
+		*p++ = ( gfx & 0x20 ) ? 1 : 0;
+		*p++ = ( gfx & 0x10 ) ? 1 : 0;
+		*p++ = ( gfx & 0x08 ) ? 1 : 0;
+		*p++ = ( gfx & 0x04 ) ? 1 : 0;
+		*p++ = ( gfx & 0x02 ) ? 1 : 0;
+		*p++ = ( gfx & 0x01 ) ? 1 : 0;
 	}
-	return 0;
+}
+
+/* prom-based colours */
+MC6845_UPDATE_ROW( mbeeic_update_row )
+{
+	UINT8 chr,gfx,fg,bg;
+	UINT16 mem,x,col;
+	UINT16 colourm = (mbee_08 & 0x0e) << 7;
+	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)			// for each character
+	{
+		UINT8 inv=0;
+		mem = (ma + x) & 0x7ff;
+		chr = videoram[mem];
+		col = colorram[mem] | colourm;					// read a byte of colour
+
+		mbee_video_kbd_scan(device->machine, x+ma);
+
+		/* process cursor */
+		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
+			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == cursor))					// displaying at cursor position?
+				inv ^= mc6845_cursor[ra];			// cursor scan row
+
+		/* get pattern of pixels for that character scanline */
+		gfx = gfxram[(chr<<4) | ra] ^ inv;
+		fg = (col & 0x001f) | 64;					// map to foreground palette
+		bg = (col & 0x07e0) >> 5;					// and background palette
+
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = ( gfx & 0x80 ) ? fg : bg;
+		*p++ = ( gfx & 0x40 ) ? fg : bg;
+		*p++ = ( gfx & 0x20 ) ? fg : bg;
+		*p++ = ( gfx & 0x10 ) ? fg : bg;
+		*p++ = ( gfx & 0x08 ) ? fg : bg;
+		*p++ = ( gfx & 0x04 ) ? fg : bg;
+		*p++ = ( gfx & 0x02 ) ? fg : bg;
+		*p++ = ( gfx & 0x01 ) ? fg : bg;
+	}
 }
 
 
 /* new colours & hires2 */
-VIDEO_UPDATE( mbeeppc )
+MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
-	UINT8 y,ra,gfx,fg,bg;
-	UINT16 mem,sy=0,ma=0,x,col,chr;
-	UINT8 speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
-	UINT16 cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
-	UINT16 screen_home = (crt.screen_address_hi<<8) | crt.screen_address_lo;		// screen home offset (usually zero)
+	UINT8 gfx,fg,bg;
+	UINT16 mem,x,col,chr;
+	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	framecnt++;
-
-	for (y = 0; y < crt.vertical_displayed; y++)						// for each row of chars
+	for (x = 0; x < x_count; x++)			// for each character
 	{
-		for (ra = 0; ra < (crt.scan_lines&15)+1; ra++)					// for each scanline - RA4 is used as an update strobe for the keyboard
+		UINT8 inv=0;
+		mem = (ma + x) & 0x7ff;
+		chr = videoram[mem];
+		col = colorram[mem];						// read a byte of colour
+
+		if (mbee_1c & 0x80)						// are extended features enabled?
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT8 attr = attribram[mem];
 
-			for (x = ma; x < ma + crt.horizontal_displayed; x++)			// for each character
-			{
-				UINT8 inv=0;
-				mem = (x + screen_home) & 0x7ff;
-				chr = videoram[mem];
-				col = colorram[mem];						// read a byte of colour
+			if (chr & 0x80)
+				chr += ((attr & 15) << 7);			// bump chr to its particular pcg definition
 
-				if (mbee_1c & 0x80)						// are extended features enabled?
-				{
-					UINT8 attr = attribram[mem];
+			if (attr & 0x40)
+				inv ^= 0xff;					// inverse attribute
 
-					if (chr & 0x80)
-						chr += ((attr & 15) << 7);			// bump chr to its particular pcg definition
-
-					if (attr & 0x40)
-						inv ^= 0xff;					// inverse attribute
-
-					if ((attr & 0x80) && (framecnt & 0x10))			// flashing attribute
-						chr = 0x20;
-				}
-
-				mbee_video_kbd_scan(screen->machine, x);
-
-				/* process cursor */
-				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-					(mem == cursor))					// displaying at cursor position?
-						inv ^= mc6845_cursor[ra];			// cursor scan row
-
-				/* get pattern of pixels for that character scanline */
-				gfx = gfxram[(chr<<4) | ra] ^ inv;
-				fg = col & 15;							// map to foreground palette
-				bg = (col & 0xf0) >> 4;						// and background palette
-
-				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? fg : bg;
-				*p++ = ( gfx & 0x40 ) ? fg : bg;
-				*p++ = ( gfx & 0x20 ) ? fg : bg;
-				*p++ = ( gfx & 0x10 ) ? fg : bg;
-				*p++ = ( gfx & 0x08 ) ? fg : bg;
-				*p++ = ( gfx & 0x04 ) ? fg : bg;
-				*p++ = ( gfx & 0x02 ) ? fg : bg;
-				*p++ = ( gfx & 0x01 ) ? fg : bg;
-			}
+			if ((attr & 0x80) && (framecnt & 0x10))			// flashing attribute
+				chr = 0x20;
 		}
-		ma+=crt.horizontal_displayed;
+
+		mbee_video_kbd_scan(device->machine, x+ma);
+
+		/* process cursor */
+		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
+			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == cursor))					// displaying at cursor position?
+				inv ^= mc6845_cursor[ra];			// cursor scan row
+
+		/* get pattern of pixels for that character scanline */
+		gfx = gfxram[(chr<<4) | ra] ^ inv;
+		fg = col & 15;							// map to foreground palette
+		bg = (col & 0xf0) >> 4;						// and background palette
+
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = ( gfx & 0x80 ) ? fg : bg;
+		*p++ = ( gfx & 0x40 ) ? fg : bg;
+		*p++ = ( gfx & 0x20 ) ? fg : bg;
+		*p++ = ( gfx & 0x10 ) ? fg : bg;
+		*p++ = ( gfx & 0x08 ) ? fg : bg;
+		*p++ = ( gfx & 0x04 ) ? fg : bg;
+		*p++ = ( gfx & 0x02 ) ? fg : bg;
+		*p++ = ( gfx & 0x01 ) ? fg : bg;
 	}
-	return 0;
 }
 
 

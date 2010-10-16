@@ -99,7 +99,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/mbee.h"
-
+#define XTAL_13_5MHz 13500000
 
 /********** NOTE !!! ***********************************************************
     The microbee uses lots of bankswitching and the memory maps are still
@@ -592,6 +592,58 @@ static const floppy_config mbee_floppy_config =
 	NULL
 };
 
+static const mc6845_interface mbee_crtc = {
+	"screen",			/* name of screen */
+	8,			/* number of dots per character */
+	NULL,
+	mbee_update_row,		/* handler to display a scanline */
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	mbee_update_addr		/* handler to process transparent mode */
+};
+
+static const mc6845_interface mbeeic_crtc = {
+	"screen",			/* name of screen */
+	8,			/* number of dots per character */
+	NULL,
+	mbeeic_update_row,		/* handler to display a scanline */
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	mbee_update_addr		/* handler to process transparent mode */
+};
+
+static const mc6845_interface mbeeppc_crtc = {
+	"screen",			/* name of screen */
+	8,			/* number of dots per character */
+	NULL,
+	mbeeppc_update_row,		/* handler to display a scanline */
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	mbee_update_addr		/* handler to process transparent mode */
+};
+
+static const mc6845_interface mbee256_crtc = {
+	"screen",			/* name of screen */
+	8,			/* number of dots per character */
+	NULL,
+	mbeeppc_update_row,		/* handler to display a scanline */
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	mbee256_update_addr		/* handler to process transparent mode */
+};
+
 static MACHINE_CONFIG_START( mbee, mbee_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
@@ -626,6 +678,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
+	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_12MHz / 8, mbee_crtc)
 	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -635,7 +688,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
 	MDRV_CPU_IO_MAP(mbeeic_io)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
@@ -657,7 +710,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MDRV_PALETTE_INIT(mbeeic)
 
 	MDRV_VIDEO_START(mbeeic)
-	MDRV_VIDEO_UPDATE(mbeeic)
+	MDRV_VIDEO_UPDATE(mbee)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -667,6 +720,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
+	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeic_crtc)
 	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -694,10 +748,11 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MDRV_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MDRV_CPU_IO_MAP(mbeeppc_io)
 	MDRV_VIDEO_START(mbeeppc)
-	MDRV_VIDEO_UPDATE(mbeeppc)
 	MDRV_GFXDECODE(mbeeppc)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(mbeeppc)
+	MDRV_DEVICE_REMOVE("crtc")
+	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeppc_crtc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
@@ -729,6 +784,8 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MDRV_CPU_IO_MAP(mbee256_io)
 	MDRV_MACHINE_RESET( mbee256 )
 	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MDRV_DEVICE_REMOVE("crtc")
+	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
 MACHINE_CONFIG_END
 
 /* Unused roms:

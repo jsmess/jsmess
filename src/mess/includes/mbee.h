@@ -13,6 +13,7 @@
 #include "machine/z80pio.h"
 #include "devices/cassette.h"
 #include "machine/ctronics.h"
+#include "video/mc6845.h"
 #include "sound/speaker.h"
 
 
@@ -93,7 +94,11 @@ READ8_HANDLER( mbeeppc_low_r );
 READ8_HANDLER( mbeeppc_high_r );
 WRITE8_HANDLER( mbeeppc_high_w );
 WRITE8_HANDLER( mbeeppc_low_w );
-
+MC6845_UPDATE_ROW( mbee_update_row );
+MC6845_UPDATE_ROW( mbeeic_update_row );
+MC6845_UPDATE_ROW( mbeeppc_update_row );
+MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
+MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
 
 VIDEO_START( mbee );
 VIDEO_UPDATE( mbee );
