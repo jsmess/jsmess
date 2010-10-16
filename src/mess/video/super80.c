@@ -411,7 +411,6 @@ static void mc6845_screen_configure(running_machine *machine)
 VIDEO_START( super80v )
 {
 	mc6845 = machine->device("crtc");
-	FNT = memory_region(machine, "gfx1");
 	pcgram = memory_region(machine, "maincpu")+0xf000;
 	videoram = memory_region(machine, "videoram");
 	colorram = memory_region(machine, "colorram");
