@@ -85,6 +85,8 @@
     - The Monitor program on 256TC crashes the system. This appears
       to be a MAME core bug involving the z80pio.
 
+    - Disk system doesn't work because of fdc problems.
+
 
 ***************************************************************************/
 
@@ -245,7 +247,7 @@ static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -257,7 +259,7 @@ static ADDRESS_MAP_START(mbee64_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee64_50_w)
 ADDRESS_MAP_END
@@ -271,7 +273,7 @@ static ADDRESS_MAP_START(mbee128_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
@@ -291,7 +293,7 @@ static ADDRESS_MAP_START(mbee256_io, ADDRESS_SPACE_IO, 8)
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
-	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
@@ -756,7 +758,8 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
 	MDRV_CPU_IO_MAP(mbee56_io)
-	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	MDRV_MACHINE_RESET( mbee56 )
+	MDRV_WD2793_ADD("fdc", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
@@ -772,7 +775,7 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MDRV_CPU_PROGRAM_MAP(mbee128_mem)
 	MDRV_CPU_IO_MAP(mbee128_io)
 	MDRV_MACHINE_RESET( mbee128 )
-	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	MDRV_WD2793_ADD("fdc", mbee_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 

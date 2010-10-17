@@ -513,39 +513,49 @@ static TIMER_CALLBACK( mbee_reset )
 	memory_set_bank(machine, "boot", 0);
 }
 
-MACHINE_RESET( mbee )
+static void machine_reset_common(running_machine *machine)
 {
-	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
-	memory_set_bank(machine, "boot", 1);
 	mbee_z80pio = machine->device("z80pio");
 	mbee_speaker = machine->device("speaker");
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
-	mbee_fdc = machine->device("wd179x");
-	//wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
-	//wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
+}
+
+static void machine_reset_common_disk(running_machine *machine)
+{
+	machine_reset_common(machine);
+	mbee_fdc = machine->device("fdc");
+	/* These values need to be fine tuned or the fdc repaired */
+	wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
+	wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
+}
+
+MACHINE_RESET( mbee )
+{
+	machine_reset_common(machine);
+	memory_set_bank(machine, "boot", 1);
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+}
+
+MACHINE_RESET( mbee56 )
+{
+	machine_reset_common_disk(machine);
+	memory_set_bank(machine, "boot", 1);
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 }
 
 MACHINE_RESET( mbee64 )
 {
+	machine_reset_common_disk(machine);
 	memory_set_bank(machine, "boot", 1);
 	memory_set_bank(machine, "bankl", 1);
 	memory_set_bank(machine, "bankh", 1);
-	mbee_z80pio = machine->device("z80pio");
-	mbee_speaker = machine->device("speaker");
-	mbee_cassette = machine->device("cassette");
-	mbee_printer = machine->device("centronics");
-	mbee_fdc = machine->device("wd179x");
 }
 
 MACHINE_RESET( mbee128 )
 {
 	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mbee_z80pio = machine->device("z80pio");
-	mbee_speaker = machine->device("speaker");
-	mbee_cassette = machine->device("cassette");
-	mbee_printer = machine->device("centronics");
-	mbee_fdc = machine->device("wd179x");
+	machine_reset_common_disk(machine);
 	mbee128_50_w(mem,0,0); // set banks to default
 	memory_set_bank(machine, "boot", 4); // boot time
 }
@@ -554,11 +564,7 @@ MACHINE_RESET( mbee256 )
 {
 	UINT8 i;
 	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mbee_z80pio = machine->device("z80pio");
-	mbee_speaker = machine->device("speaker");
-	mbee_cassette = machine->device("cassette");
-	mbee_printer = machine->device("centronics");
-	mbee_fdc = machine->device("wd179x");
+	machine_reset_common_disk(machine);
 	mbee_rtc = machine->device<mc146818_device>("rtc");
 	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
 	mbee256_q_pos = 0;
