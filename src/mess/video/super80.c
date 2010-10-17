@@ -2,8 +2,7 @@
 
 /* Notes on using MAME MC6845 Device (MMD).
     1. Speed of MMD is about 20% slower than pre-MMD coding
-    2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here
-    3. MMD doesn't support auto-screen-resize, so we do it here. */
+    2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here. */
 
 
 #include "emu.h"
@@ -289,6 +288,14 @@ VIDEO_START( super80 )
 	FNT = memory_region(machine, "gfx1");
 }
 
+/**************************** I/O PORTS *****************************************************************/
+
+WRITE8_HANDLER( super80_f1_w )
+{
+	vidpg = (data & 0xfe) << 8;
+	current_charset = data & 1;
+}
+
 /*---------------------------------------------------------------
 
     Super-80R and Super-80V
@@ -298,7 +305,7 @@ VIDEO_START( super80 )
 static UINT8 mc6845_cursor[16];				// cursor shape
 static UINT8 mc6845_reg[20];				/* registers */
 static UINT8 mc6845_ind;				/* register index */
-static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 static running_device *mc6845;
 static UINT8 framecnt=0;
 static UINT8 speed,flash;
@@ -390,24 +397,6 @@ static void mc6845_cursor_configure(void)
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
-/* Resize the screen within the limits of the hardware. Expand the image to fill the screen area */
-static void mc6845_screen_configure(running_machine *machine)
-{
-	rectangle visarea;
-
-	UINT16 width = mc6845_reg[1]*7-1;							// width in pixels
-	UINT16 height = mc6845_reg[6]*(mc6845_reg[9]+1)-1;					// height in pixels
-	UINT16 bytes = mc6845_reg[1]*mc6845_reg[6]-1;						// video ram needed -1
-
-	/* Resize the screen */
-	visarea.min_x = 0;
-	visarea.max_x = width-1;
-	visarea.min_y = 0;
-	visarea.max_y = height-1;
-	if ((width < 610) && (height < 460) && (bytes < 0x1000))	/* bounds checking to prevent an assert or violation */
-		machine->primary_screen->set_visible_area(0, width, 0, height);
-}
-
 VIDEO_START( super80v )
 {
 	mc6845 = machine->device("crtc");
@@ -492,15 +481,7 @@ WRITE8_HANDLER( super80v_10_w )
 
 WRITE8_HANDLER( super80v_11_w )
 {
-	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
-	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(space->machine); /* adjust screen size */
-	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
 	mc6845_register_w( mc6845, 0, data );
+	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }
-
-WRITE8_HANDLER( super80_f1_w )
-{
-	vidpg = (data & 0xfe) << 8;
-	current_charset = data & 1;
-}
-

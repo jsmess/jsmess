@@ -218,12 +218,15 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 			if( port == 7 && bit == 1 ) data = 1;	/* Control */
 			if( port == 0 && bit == 4 ) data = 1;	/* D */
 		}
+#if 0
+		// this key doesn't appear on any keyboard afaik
 		else
 		if( extra & 0x10 )	/* extra: insert */
 		{
 			if( port == 7 && bit == 1 ) data = 1;	/* Control */
 			if( port == 2 && bit == 6 ) data = 1;	/* V */
 		}
+#endif
 	}
 
 	if( data )
@@ -254,7 +257,7 @@ READ8_HANDLER ( m6545_status_r )
 	screen_device *screen = screen_first(*space->machine);
 	const rectangle &visarea = screen->visible_area();
 
-	UINT8 data = sy6545_status;
+	UINT8 data = sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
 	int y = space->machine->primary_screen->vpos();
 
 	if( y < visarea.min_y || y > visarea.max_y )
@@ -265,7 +268,8 @@ READ8_HANDLER ( m6545_status_r )
 
 READ8_HANDLER ( m6545_data_r )
 {
-	int addr, data = 0;
+	UINT16 addr;
+	UINT8 data = mc6845_register_r(mc6845, 0);
 
 	switch( sy6545_ind )
 	{
@@ -300,7 +304,7 @@ WRITE8_HANDLER ( m6545_data_w )
 	switch( sy6545_ind )
 	{
 	case 12:
-		data &= 0x3f;
+		data &= 0x3f; // select alternate character set
 		if( sy6545_reg[12] != data )
 			memcpy(gfxram, memory_region(space->machine, "gfx") + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
@@ -412,7 +416,7 @@ VIDEO_UPDATE( mbee )
 
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr )
 {
-/* not sure what goes in here - parameters passed are device, addr, strobe */
+/* not sure what goes in here - parameters passed are device, address, strobe */
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
