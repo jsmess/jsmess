@@ -138,6 +138,9 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 	wd17xx_set_drive(mbee_fdc, data & 3);
 	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
 	wd17xx_dden_w(mbee_fdc, !BIT(data, 3));
+	/* no idea what turns the motors on & off, guessing it could be drive select 
+	commented out because it prevents 128k and 256TC from booting up */
+	//floppy_mon_w(floppy_get_device(space->machine, data & 3), CLEAR_LINE); // motor on
 }
 
 /***********************************************************
@@ -578,33 +581,35 @@ INTERRUPT_GEN( mbee_interrupt )
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
 #if 0
 
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
-	but need to find out what it does */
-	mbee_clock_pulse = 0x80;
-
+	//address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	z80pio_astb_w( mbee_z80pio, centronics_busy_r(mbee_printer));	/* signal int when not busy (L->H) */
+	//z80pio_astb_w( mbee_z80pio, centronics_busy_r(mbee_printer));	/* signal int when not busy (L->H) */
+	//space->write_byte(0x109, centronics_busy_r(mbee_printer));
 
-	space->write_byte(0x109, centronics_busy_r(mbee_printer));
+
+	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
+	but need to find out what it does */
+	mbee_clock_pulse = 0x80;
+	irq0_line_hold(device);
+
 #endif
 }
 
 DRIVER_INIT( mbee )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 	mbee_size = 0x4000;
 }
 
 DRIVER_INIT( mbeeic )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
 	RAM = memory_region(machine, "pakrom");
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
@@ -616,7 +621,7 @@ DRIVER_INIT( mbeeic )
 DRIVER_INIT( mbeepc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
 	RAM = memory_region(machine, "telcomrom");
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
@@ -632,7 +637,7 @@ DRIVER_INIT( mbeepc )
 DRIVER_INIT( mbeepc85 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
 	RAM = memory_region(machine, "telcomrom");
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
@@ -669,17 +674,17 @@ DRIVER_INIT( mbeeppc )
 DRIVER_INIT( mbee56 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000],  0xe000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
 	mbee_size = 0xe000;
 }
 
 DRIVER_INIT( mbee64 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000],  0x0000);
-	memory_configure_bank(machine, "bankl", 0, 1, &RAM[0x1000],  0x0000);
-	memory_configure_bank(machine, "bankl", 1, 1, &RAM[0x9000],  0x0000);
-	memory_configure_bank(machine, "bankh", 0, 1, &RAM[0x8000],  0x0000);
+	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
+	memory_configure_bank(machine, "bankl", 0, 1, &RAM[0x1000], 0x0000);
+	memory_configure_bank(machine, "bankl", 1, 1, &RAM[0x9000], 0x0000);
+	memory_configure_bank(machine, "bankh", 0, 1, &RAM[0x8000], 0x0000);
 
 	RAM = memory_region(machine, "bootrom");
 	memory_configure_bank(machine, "bankh", 1, 1, &RAM[0x0000], 0x0000);
@@ -691,19 +696,19 @@ DRIVER_INIT( mbee64 )
 DRIVER_INIT( mbee128 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 4, &RAM[0x0000],  0x8000); // standard banks 0000
-	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x1000],  0x8000); // standard banks 1000
-	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800],  0x0000); // shadow ram
+	memory_configure_bank(machine, "boot", 0, 4, &RAM[0x0000], 0x8000); // standard banks 0000
+	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x1000], 0x8000); // standard banks 1000
+	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800], 0x0000); // shadow ram
 
 	RAM = memory_region(machine, "bootrom");
 	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
 	memory_configure_bank(machine, "boot", 4, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
-	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000],  0x0000); // rom
-	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
+	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
+	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800], 0x0000); // rom
 
 	mbee_size = 0x8000;
 }
@@ -711,19 +716,19 @@ DRIVER_INIT( mbee128 )
 DRIVER_INIT( mbee256 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 8, &RAM[0x0000],  0x8000); // standard banks 0000
-	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x1000],  0x8000); // standard banks 1000
-	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000],  0x0000); // shadow ram
-	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800],  0x0000); // shadow ram
+	memory_configure_bank(machine, "boot", 0, 8, &RAM[0x0000], 0x8000); // standard banks 0000
+	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x1000], 0x8000); // standard banks 1000
+	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bank8h", 1, 1, &RAM[0x0800], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bank9", 1, 1, &RAM[0x1000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000], 0x0000); // shadow ram
+	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800], 0x0000); // shadow ram
 
 	RAM = memory_region(machine, "bootrom");
 	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
 	memory_configure_bank(machine, "boot", 8, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
-	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000],  0x0000); // rom
-	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800],  0x0000); // rom
+	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
+	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800], 0x0000); // rom
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */

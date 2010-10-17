@@ -649,7 +649,6 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MDRV_CPU_PROGRAM_MAP(mbee_mem)
 	MDRV_CPU_IO_MAP(mbee_io)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
-	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
 	MDRV_MACHINE_RESET( mbee )
 
@@ -691,7 +690,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
 	MDRV_CPU_IO_MAP(mbeeic_io)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
-	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
+	//MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
 	MDRV_MACHINE_RESET( mbee )
 
