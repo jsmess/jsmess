@@ -82,12 +82,9 @@
     - Most early models have a clock in Telcom, and in the menu. It doesn't
       work.
 
-    - The Monitor program on 128k and 256TC crashes the system. This appears
+    - The Monitor program on 256TC crashes the system. This appears
       to be a MAME core bug involving the z80pio.
 
-    - Keyboard on EDASM on bankswitched models locks up. This also is
-      suspected to be a core bug, since the identical edasm works on the
-      non-bankswitch model.
 
 ***************************************************************************/
 

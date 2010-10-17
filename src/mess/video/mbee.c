@@ -20,12 +20,7 @@
 
     TODO:
 
-    1. Above test 3 doesn't work. EDASM calls Basic to get keys, but
-    it just gets stuck (you can see it in the debugger) for no reason
-    whatsoever. Yet if you single-step the debugger, supplying values
-    as necessary, it works. g a428 to test.
-
-    2. mbeeppc keyboard response is quite slow. You need to hold each
+    1. mbeeppc keyboard response is quite slow. You need to hold each
     key until it responds. It works much better if you overclock the cpu.
 
 ****************************************************************************/
@@ -33,37 +28,7 @@
 #include "emu.h"
 #include "includes/mbee.h"
 
-typedef struct {		 // CRTC 6545
-	UINT8 horizontal_total;
-    UINT8 horizontal_displayed;
-    UINT8 horizontal_sync_pos;
-    UINT8 horizontal_length;
-    UINT8 vertical_total;
-    UINT8 vertical_adjust;
-    UINT8 vertical_displayed;
-    UINT8 vertical_sync_pos;
-    UINT8 crt_mode;
-    UINT8 scan_lines;
-    UINT8 cursor_top;
-    UINT8 cursor_bottom;
-    UINT8 screen_address_hi;
-    UINT8 screen_address_lo;
-    UINT8 cursor_address_hi;
-    UINT8 cursor_address_lo;
-	UINT8 lpen_hi;
-	UINT8 lpen_lo;
-	UINT8 transp_hi;
-	UINT8 transp_lo;
-    UINT8 idx;
-	UINT8 cursor_visible;
-	UINT8 cursor_phase;
-	UINT8 lpen_strobe;
-	UINT8 update_strobe;
-} CRTC6545;
-
-static CRTC6545 crt;
 static UINT8 framecnt = 0;
-
 static UINT8 *gfxram;
 static UINT8 *colorram;
 static UINT8 *videoram;
@@ -72,12 +37,16 @@ static UINT8 mbee_08;
 static UINT8 mbee_0b;
 static UINT8 mbee_1c;
 static UINT8 is_premium;
-static UINT8 mc6845_cursor[16];				// cursor shape
-static void mc6845_cursor_configure(void);
-static void mc6845_screen_configure(running_machine *machine);
+static UINT8 sy6545_cursor[16];
+static UINT8 sy6545_status = 0;
+static void sy6545_cursor_configure(void);
 static running_device *mc6845;
 static UINT8 speed,flash;
 static UINT16 cursor;
+static UINT8 sy6545_reg[20];				/* registers */
+static UINT8 sy6545_ind;				/* register index */
+static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
+
 
 
 /***********************************************************
@@ -259,9 +228,9 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 
 	if( data )
 	{
-		crt.lpen_lo = offs;
-		crt.lpen_hi = (offs >> 8) & 0x3f;
-		crt.lpen_strobe = 1;
+		sy6545_reg[17] = offs;
+		sy6545_reg[16] = (offs >> 8) & 0x3f;
+		sy6545_status |= 0x40; //lpen_strobe
 	}
 }
 
@@ -285,15 +254,11 @@ READ8_HANDLER ( m6545_status_r )
 	screen_device *screen = screen_first(*space->machine);
 	const rectangle &visarea = screen->visible_area();
 
-	int data = 0, y = space->machine->primary_screen->vpos();
+	UINT8 data = sy6545_status;
+	int y = space->machine->primary_screen->vpos();
 
-	if( y < visarea.min_y ||
-		y > visarea.max_y )
+	if( y < visarea.min_y || y > visarea.max_y )
 		data |= 0x20;	/* vertical blanking */
-	if( crt.lpen_strobe )
-		data |= 0x40;	/* lpen register full */
-	if( crt.update_strobe )
-		data |= 0x80;	/* update strobe has occured */
 
 	return data;
 }
@@ -302,198 +267,56 @@ READ8_HANDLER ( m6545_data_r )
 {
 	int addr, data = 0;
 
-	switch( crt.idx )
+	switch( sy6545_ind )
 	{
-/* These are write only on a Rockwell 6545 */
-#if 0
-	case 0:
-		return crt.horizontal_total;
-	case 1:
-		return crt.horizontal_displayed;
-	case 2:
-		return crt.horizontal_sync_pos;
-	case 3:
-		return crt.horizontal_length;
-	case 4:
-		return crt.vertical_total;
-	case 5:
-		return crt.vertical_adjust;
-	case 6:
-		return crt.vertical_displayed;
-	case 7:
-		return crt.vertical_sync_pos;
-	case 8:
-		return crt.crt_mode;
-	case 9:
-		return crt.scan_lines;
-	case 10:
-		return crt.cursor_top;
-	case 11:
-		return crt.cursor_bottom;
-	case 12:
-		return crt.screen_address_hi;
-	case 13:
-		return crt.screen_address_lo;
-#endif
-	case 14:
-		data = crt.cursor_address_hi;
-		break;
-	case 15:
-		data = crt.cursor_address_lo;
-		break;
 	case 16:
-		crt.lpen_strobe = 0;
-		data = crt.lpen_hi;
-		break;
 	case 17:
-		crt.lpen_strobe = 0;
-		data = crt.lpen_lo;
-		break;
-	case 18:
-		data = crt.transp_hi;
-		break;
-	case 19:
-		data = crt.transp_lo;
+		sy6545_status &= 0x80; // turn off lpen_strobe
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
-		then increments the address, then sets strobe on. */
-		addr = (crt.transp_hi << 8) | crt.transp_lo;
+		then increments the address, then sets update strobe on. */
+		addr = (sy6545_reg[18] << 8) | sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
-		crt.transp_lo++;
-		if (!crt.transp_lo) crt.transp_hi++;
-		crt.update_strobe = 1;
+		sy6545_reg[19]++;
+		if (!sy6545_reg[19]) sy6545_reg[18]++;
+		sy6545_status |= 0x80; // update_strobe
 		break;
-	default:
-		logerror("6545 read unmapped port $%X\n", crt.idx);
 	}
 	return data;
 }
 
 WRITE8_HANDLER ( m6545_index_w )
 {
-	crt.idx = data & 0x1f;
 	data &= 0x1f;
-//	mc6845_ind = data;
+	sy6545_ind = data;
 	mc6845_address_w( mc6845, 0, data );
 }
 
 WRITE8_HANDLER ( m6545_data_w )
 {
-	int addr;
+	int addr = 0;
 
-	switch( crt.idx )
+	switch( sy6545_ind )
 	{
-	case 0:
-		if( crt.horizontal_total == data )
-			break;
-		crt.horizontal_total = data;
-		break;
-	case 1:
-		crt.horizontal_displayed = data;
-		mc6845_screen_configure(space->machine);
-		break;
-	case 2:
-		if( crt.horizontal_sync_pos == data )
-			break;
-		crt.horizontal_sync_pos = data;
-		break;
-	case 3:
-		crt.horizontal_length = data;
-		break;
-	case 4:
-		if( crt.vertical_total == data )
-			break;
-		crt.vertical_total = data;
-		break;
-	case 5:
-		if( crt.vertical_adjust == data )
-			break;
-		crt.vertical_adjust = data;
-		break;
-	case 6:
-		crt.vertical_displayed = data;
-		mc6845_screen_configure(space->machine);
-		break;
-	case 7:
-		if( crt.vertical_sync_pos == data )
-			break;
-		crt.vertical_sync_pos = data;
-		break;
-	case 8:
-		crt.crt_mode = data;
-
-		{
-			logerror("6545 mode_w $%02X\n", data);
-			logerror("     interlace          %d\n", data & 3);
-			logerror("     addr mode          %d\n", (data >> 2) & 1);
-			logerror("     refresh RAM        %s\n", ((data >> 3) & 1) ? "transparent" : "shared");
-			logerror("     disp enb, skew     %d\n", (data >> 4) & 3);
-			logerror("     pin 34             %s\n", ((data >> 6) & 1) ? "update strobe" : "RA4");
-			logerror("     update read mode   %s\n", ((data >> 7) & 1) ? "interleaved" : "during h/v-blank");
-		}
-		break;
-	case 9:
-		data &= 15;
-		if( crt.scan_lines == data )
-			break;
-		crt.scan_lines = data;
-		mc6845_screen_configure(space->machine);
-		mc6845_cursor_configure();
-		break;
-	case 10:
-		crt.cursor_top = data;
-		mc6845_cursor_configure();
-		break;
-	case 11:
-		crt.cursor_bottom = data;
-		mc6845_cursor_configure();
-		break;
 	case 12:
 		data &= 0x3f;
-		if( crt.screen_address_hi == data )
-			break;
-		crt.screen_address_hi = data;
-		memcpy(gfxram, memory_region(space->machine, "gfx") + ((data & 32) << 6), 0x800);
-		break;
-	case 13:
-		crt.screen_address_lo = data;
-		break;
-	case 14:
-		crt.cursor_address_hi = data & 0x3f;
-		break;
-	case 15:
-		crt.cursor_address_lo = data;
-		break;
-	case 16:
-		/* lpen hi is read only */
-		break;
-	case 17:
-		/* lpen lo is read only */
-		break;
-	case 18:
-		data &= 63;
-		crt.transp_hi = data;
-		break;
-	case 19:
-		crt.transp_lo = data;
+		if( sy6545_reg[12] != data )
+			memcpy(gfxram, memory_region(space->machine, "gfx") + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
-		then increments the address, then sets strobe on. */
-		addr = (crt.transp_hi << 8) | crt.transp_lo;
+		then increments the address, then sets update strobe on. */
+		addr = (sy6545_reg[18] << 8) | sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
-		crt.transp_lo++;
-		if (!crt.transp_lo) crt.transp_hi++;
-		crt.update_strobe = 1;
+		sy6545_reg[19]++;
+		if (!sy6545_reg[19]) sy6545_reg[18]++;
+		sy6545_status |= 0x80; // update_strobe
 		break;
-	default:
-		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);
 	}
-//	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
-//	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(space->machine); /* adjust screen size */
-//	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	sy6545_reg[sy6545_ind] = data & sy6545_mask[sy6545_ind];	/* save data in register */
 	mc6845_register_w( mc6845, 0, data );
+	if ((sy6545_ind > 8) && (sy6545_ind < 12)) sy6545_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }
 
 
@@ -507,7 +330,7 @@ WRITE8_HANDLER ( m6545_data_w )
 
 ************************************************************/
 
-static void mc6845_cursor_configure(void)
+static void sy6545_cursor_configure(void)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
 
@@ -517,11 +340,11 @@ static void mc6845_cursor_configure(void)
         2 = full cursor
         3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(sy6545_cursor); i++) sy6545_cursor[i] = 0;		// prepare cursor by erasing old one
 
-	r9  = crt.scan_lines;					// number of scan lines - 1
-	r10 = crt.cursor_top & 0x1f;				// cursor start line = last 5 bits
-	r11 = crt.cursor_bottom+1;				// cursor end line incremented to suit for-loops below
+	r9  = sy6545_reg[9];					// number of scan lines - 1
+	r10 = sy6545_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = sy6545_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
@@ -534,40 +357,13 @@ static void mc6845_cursor_configure(void)
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(sy6545_cursor);i++) sy6545_cursor[i]=0xff; // turn on full cursor
 
-	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
+	if (curs_type == 1) for (i = r10;i < r11;i++) sy6545_cursor[i]=0xff; // for each line that should show, turn on that scan line
 
-	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
+	if (curs_type == 3) for (i = r11; i < r10;i++) sy6545_cursor[i]=0; // now take a bite out of the middle
 }
 
-
-
-/***********************************************************
-
-    Resize the screen within the limits of the hardware.
-    Expand the image to fill the screen area.
-
-************************************************************/
-
-static void mc6845_screen_configure(running_machine *machine)
-{
-	rectangle visarea;
-
-	UINT16 width = crt.horizontal_displayed*8-1;							// width in pixels
-	UINT16 height = crt.vertical_displayed*(crt.scan_lines+1)-1;					// height in pixels
-	UINT16 bytes = crt.horizontal_displayed*crt.vertical_displayed-1;				// video ram needed
-
-	if (width > 0x27f) width=0x27f;
-	if (height > 0x10f) height=0x10f;
-
-	/* Resize the screen */
-	visarea.min_x = 0;
-	visarea.max_x = width-1;
-	visarea.min_y = 0;
-	visarea.max_y = height-1;
-	if (bytes < 0x800) machine->primary_screen->set_visible_area(0, width, 0, height);
-}
 
 
 
@@ -607,8 +403,8 @@ VIDEO_START( mbeeppc )
 VIDEO_UPDATE( mbee )
 {
 	framecnt++;
-	cursor = (crt.cursor_address_hi<<8) | crt.cursor_address_lo;			// get cursor position
-	speed = crt.cursor_top&0x20, flash = crt.cursor_top&0x40;				// cursor modes
+	speed = sy6545_reg[10]&0x20, flash = sy6545_reg[10]&0x40;			// cursor modes
+	cursor = (sy6545_reg[14]<<8) | sy6545_reg[15];					// get cursor position
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -645,7 +441,7 @@ MC6845_UPDATE_ROW( mbee_update_row )
 			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
 			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
 			(mem == cursor))					// displaying at cursor position?
-				inv ^= mc6845_cursor[ra];			// cursor scan row
+				inv ^= sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = gfxram[(chr<<4) | ra] ^ inv;
@@ -684,7 +480,7 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
 			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
 			(mem == cursor))					// displaying at cursor position?
-				inv ^= mc6845_cursor[ra];			// cursor scan row
+				inv ^= sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = gfxram[(chr<<4) | ra] ^ inv;
@@ -739,7 +535,7 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
 			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
 			(mem == cursor))					// displaying at cursor position?
-				inv ^= mc6845_cursor[ra];			// cursor scan row
+				inv ^= sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = gfxram[(chr<<4) | ra] ^ inv;
