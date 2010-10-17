@@ -43,7 +43,7 @@ static void sy6545_cursor_configure(void);
 static running_device *mc6845;
 static UINT8 speed,flash;
 static UINT16 cursor;
-static UINT8 sy6545_reg[20];				/* registers */
+static UINT8 sy6545_reg[32];				/* registers */
 static UINT8 sy6545_ind;				/* register index */
 static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
 
