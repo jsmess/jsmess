@@ -343,6 +343,7 @@ static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
+static emu_timer *segacd_dmna_ret_timer;
 static emu_timer *segacd_irq3_timer;
 static int segacd_wordram_mapped = 0;
 static TIMER_CALLBACK( segacd_irq3_timer_callback );
@@ -3919,10 +3920,46 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 // so probably don't change instantly...
 //
 
+int segacd_dmna = 0;
+int segacd_ret = 0;
+
+static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
+{
+
+	// this is the initial state, and the state after changing modes?
+	if ((segacd_dmna==0) && (segacd_ret ==0))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 0;
+		segacd_ret = 1;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else if ((segacd_dmna==1) && (segacd_ret == 1))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 1;
+		segacd_ret = 0;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else if ((segacd_dmna==1) && (segacd_ret == 0))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 0;
+		segacd_ret = 1;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else
+	{
+		printf("huh? %d %d\n", segacd_dmna, segacd_ret);
+	}
+}
+
+
 static UINT8 segacd_ram_writeprotect_bits;
 static int segacd_ram_mode;
+static int segacd_ram_mode_old;
 
-static int segacd_maincpu_has_ram_access = 0;
+//static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 static int segacd_memory_priority_mode = 0;
 static int segacd_stampsize;
@@ -3933,13 +3970,16 @@ static READ16_HANDLER( scd_a12002_memory_mode_r )
 	return (segacd_ram_writeprotect_bits << 8) |
 		   (segacd_4meg_prgbank << 6) |
 		   (segacd_ram_mode << 2) |
-		   ((segacd_maincpu_has_ram_access^1) << 1) |
-		   ((segacd_maincpu_has_ram_access) << 0);
+		   ((segacd_dmna) << 1) |
+		   ((segacd_ret) << 0);
 }
 
 
 /* I'm still not 100% clear how this works, the sources I have are a bit vague,
    it might still be incorrect in both modes
+
+  for a simple way to swap blocks of ram between cpus this is stupidly convoluted
+
  */
 
 // DMNA = Decleration Mainram No Access (bit 0)
@@ -3983,7 +4023,26 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 			//printf("dmna set (swap requested)\n"); // give ram to sub?
 
 			// this should take some time?
-			segacd_maincpu_has_ram_access = 0;
+			
+			//segacd_ret = 1;
+
+			//printf("main cpu dmna set dmna: %d ret: %d\n", segacd_dmna, segacd_ret); 
+			if (segacd_ram_mode==0)
+			{
+				if (!timer_enabled(segacd_dmna_ret_timer))
+				{
+					if (!segacd_dmna)
+					{
+						//printf("main dmna\n");
+						segacd_dmna = 1;
+						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+					}
+				}
+			}
+			else
+			{
+				printf("dmna bit in mode 1\n");
+			}
 		}
 
 
@@ -4018,8 +4077,8 @@ static READ16_HANDLER( segacd_sub_memory_mode_r )
 	 	 /*(segacd_4meg_prgbank << 6) | */
 		   (segacd_memory_priority_mode << 3) |
 		   (segacd_ram_mode << 2) |
-		   ((segacd_maincpu_has_ram_access^1) << 1) |
-		   ((segacd_maincpu_has_ram_access) << 0);
+		   ((segacd_dmna) << 1) |
+		   ((segacd_ret) << 0);
 }
 
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
@@ -4031,7 +4090,42 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 		if (data&0x0001)
 		{
 			//printf("ret bit set\n");
-			segacd_maincpu_has_ram_access = 1;
+			//segacd_dmna = 0;
+			
+
+			//printf("sub cpu ret set dmna: %d ret: %d\n", segacd_dmna, segacd_ret); 
+
+			if (segacd_ram_mode==0)
+			{
+				if (!timer_enabled(segacd_dmna_ret_timer))
+				{
+					if (segacd_dmna)
+					{
+					//	printf("sub ret\n");
+					//	segacd_ret = 1;
+					//	segacd_dmna = 0;
+						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+					}
+				}
+			}
+			else
+			{
+				// in mode 1 this changes the word ram 1 to main cpu and word ram 0 to sub cpu?
+				// but should be proceeded by a dmna request? is this only valid if dmna has been
+				// set to 1 by the main CPU first?
+				printf("ret bit in mode 1\n");
+				segacd_ret = 1;
+			}
+		}
+		else
+		{
+			// in mode 1 this changes the word ram 0 to main cpu and word ram 1 to sub cpu?
+			// but should be proceeded by a dmna request? is this only valid if dmna has been
+			// set to 1 by the main CPU first?
+			if (segacd_ram_mode==1)
+			{
+				segacd_ret = 0;
+			}
 		}
 
 
@@ -4040,7 +4134,26 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 		//if (data&0x0004)
 		{
 			segacd_ram_mode = (data&0x0004)>>2;
-			//printf("mode set %d\n", segacd_ram_mode);
+			if (segacd_ram_mode!=segacd_ram_mode_old)
+			{
+				printf("mode set %d\n", segacd_ram_mode);
+				segacd_ram_mode_old = segacd_ram_mode;
+
+				if (segacd_ram_mode==0)
+				{
+					// reset it flags etc.?
+					segacd_ret = 0;
+					segacd_dmna = 0;
+					timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+				}
+				else
+				{
+					segacd_ret = 0;
+					segacd_dmna = 0;
+
+
+				}
+			}
 		}
 
 		//if (data&0x0018)
@@ -4300,18 +4413,20 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (segacd_maincpu_has_ram_access)
+		if (!segacd_dmna)
 		{
 			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
 
 			return segacd_dataram[offset];
 
 		}
+		/*
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
 			return 0xffff;
 		}
+		*/
 	}
 	else if (segacd_ram_mode==1)
 	{
@@ -4337,15 +4452,17 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (segacd_maincpu_has_ram_access)
+		if (!segacd_dmna)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
 		}
+		/*
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
 		}
+		*/
 	}
 	else if (segacd_ram_mode==1)
 	{
@@ -4902,6 +5019,10 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
+	segacd_dmna_ret_timer = timer_alloc(machine, segacd_dmna_ret_timer_callback, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
+
+
 	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
 	timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
 
@@ -4975,6 +5096,14 @@ static MACHINE_RESET( segacd )
 		}
 	}
 	#endif
+
+	segacd_dmna = 0;
+	segacd_ret = 0;
+
+	segacd_ram_mode = 0;
+	segacd_ram_mode_old = 0;
+
+	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime_zero, 0);
 }
 
 
@@ -5027,7 +5156,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (!segacd_maincpu_has_ram_access)
+		if (segacd_dmna)
 			return segacd_dataram[offset];
 		else
 		{
@@ -5049,7 +5178,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (!segacd_maincpu_has_ram_access)
+		if (segacd_dmna)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
@@ -5450,7 +5579,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1000), 0);
+		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(500), 0);
 
 
 		int line;
