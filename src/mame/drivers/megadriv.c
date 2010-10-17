@@ -4420,13 +4420,12 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			return segacd_dataram[offset];
 
 		}
-		/*
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
 			return 0xffff;
 		}
-		*/
+
 	}
 	else if (segacd_ram_mode==1)
 	{
@@ -4434,8 +4433,18 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 		if (offset<0x20000/2)
 		{
 			// wordram accees
-			printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
-			return 0x0000;
+			//printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
+
+			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+			if (segacd_ret)
+			{
+				return segacd_dataram[offset+0x20000/2];
+			}
+			else
+			{
+				return segacd_dataram[offset+0x00000/2];
+			}
+
 		}
 		else
 		{
@@ -4457,19 +4466,28 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
 		}
-		/*
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
 		}
-		*/
+	
 	}
 	else if (segacd_ram_mode==1)
 	{
 		if (offset<0x20000/2)
 		{
-			printf("Unspported: segacd_main_dataram_part1_w (word RAM) in mode 1\n");
+			//printf("Unspported: segacd_main_dataram_part1_w (word RAM) in mode 1\n");
 			// wordram accees
+		
+			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+			if (segacd_ret)
+			{
+				COMBINE_DATA(&segacd_dataram[offset+0x20000/2]);
+			}
+			else
+			{
+				COMBINE_DATA(&segacd_dataram[offset+0x00000/2]);
+			}
 		}
 		else
 		{
@@ -5203,8 +5221,17 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
-		return 0x0000;
+		//printf("Unsupported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
+		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+		if (!segacd_ret)
+		{
+			return segacd_dataram[offset+0x20000/2];
+		}
+		else
+		{
+			return segacd_dataram[offset+0x00000/2];
+		}
+
 	}
 
 	return 0x0000;
@@ -5218,7 +5245,17 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
+		//printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
+		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+		if (!segacd_ret)
+		{
+			COMBINE_DATA(&segacd_dataram[offset+0x20000/2]);
+		}
+		else
+		{
+			COMBINE_DATA(&segacd_dataram[offset+0x00000/2]);
+		}
+
 	}
 }
 
