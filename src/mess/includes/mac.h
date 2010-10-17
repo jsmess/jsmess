@@ -93,7 +93,7 @@ typedef enum
 	MODEL_MAC_PB190cs,
 
 	MODEL_MAC_POWERMAC_6100	// original PowerMac
-} mac_model_t;
+} model_t;
 
 // video parameters for classic Macs
 #define MAC_H_VIS	(512)
@@ -103,7 +103,6 @@ typedef enum
 
 /*----------- defined in machine/mac.c -----------*/
 
-extern mac_model_t mac_model;
 extern const via6522_interface mac_via6522_intf;
 extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
@@ -117,6 +116,7 @@ DRIVER_INIT(mac512ke);
 DRIVER_INIT(macplus);
 DRIVER_INIT(macse);
 DRIVER_INIT(macclassic);
+DRIVER_INIT(maclrcclassic);
 DRIVER_INIT(maclc);
 DRIVER_INIT(macii);
 DRIVER_INIT(maciifdhd);
@@ -171,9 +171,11 @@ VIDEO_UPDATE( macse30 );
 PALETTE_INIT( mac );
 
 VIDEO_START( macrbv );
+VIDEO_START( macv8 );
 VIDEO_START( macsonora );
 VIDEO_UPDATE( macrbv );
 VIDEO_UPDATE( macrbvvram );
+VIDEO_RESET(macrbv);
 
 void mac_set_screen_buffer( int buffer );
 
@@ -203,11 +205,11 @@ public:
 	mac_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	mac_model_t mac_model;
+	model_t model;
 
-	UINT32 mac_overlay;
-	int mac_drive_select;
-	int mac_scsiirq_enable;
+	UINT32 overlay;
+	int drive_select;
+	int scsiirq_enable;
 
 	UINT32 mac_via2_vbl;
 	UINT32 mac_se30_vbl_enable;
@@ -277,11 +279,15 @@ public:
 	emu_timer *mac6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 rbv_regs[256], rbv_ier, rbv_ifr, rbv_type;
+	UINT8 rbv_regs[256], rbv_ier, rbv_ifr, rbv_type, rbv_montype;
 	UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
 	UINT32 rbv_palette[256];
 	UINT32 *rbv_vram;
+	UINT8 sonora_vctl[4];
 };
+
+// defined in machine/mac.c
+void mac_v8_resize(running_machine *machine, mac_state *mac);
 
 #endif /* MAC_H_ */
 

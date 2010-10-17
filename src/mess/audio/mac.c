@@ -70,7 +70,7 @@ static STREAM_UPDATE( mac_sound_update )
 	mac_sound *token = get_token(device);
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	if ((mac->mac_model == MODEL_MAC_PORTABLE) || (mac->mac_model == MODEL_MAC_PB100))
+	if ((mac->model == MODEL_MAC_PORTABLE) || (mac->model == MODEL_MAC_PB100))
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;

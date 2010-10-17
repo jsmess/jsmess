@@ -78,14 +78,14 @@
 #include "devices/messram.h"
 #include "debugger.h"
 
-#define ADB_IS_BITBANG	((mac->mac_model == MODEL_MAC_SE || mac->mac_model == MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_SE30))
-#define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || ((mac->mac_model >= MODEL_MAC_IISI) && (mac->mac_model <= MODEL_MAC_IIVI))
-#define ADB_IS_PM	(mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
+#define ADB_IS_BITBANG	((mac->model == MODEL_MAC_SE || mac->model == MODEL_MAC_CLASSIC) || (mac->model >= MODEL_MAC_II && mac->model <= MODEL_MAC_IICI) || (mac->model == MODEL_MAC_SE30))
+#define ADB_IS_EGRET	(mac->model >= MODEL_MAC_LC && mac->model <= MODEL_MAC_COLOR_CLASSIC) || ((mac->model >= MODEL_MAC_IISI) && (mac->model <= MODEL_MAC_IIVI))
+#define ADB_IS_PM	(mac->model >= MODEL_MAC_PORTABLE && mac->model <= MODEL_MAC_PB100)
 
-#define AUDIO_IS_CLASSIC (mac->mac_model < MODEL_MAC_II) && (mac->mac_model != MODEL_MAC_PORTABLE) && (mac->mac_model != MODEL_MAC_PB100)
-#define MAC_HAS_VIA2	(mac->mac_model >= MODEL_MAC_II)
+#define AUDIO_IS_CLASSIC (mac->model < MODEL_MAC_II) && (mac->model != MODEL_MAC_PORTABLE) && (mac->model != MODEL_MAC_PB100)
+#define MAC_HAS_VIA2	(mac->model >= MODEL_MAC_II)
 
-#define ASC_INTS_RBV	((mac->mac_model >= MODEL_MAC_IICI) && (mac->mac_model <= MODEL_MAC_IIVI)) || ((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC))
+#define ASC_INTS_RBV	((mac->model >= MODEL_MAC_IICI) && (mac->model <= MODEL_MAC_IIVI)) || ((mac->model >= MODEL_MAC_LC) && (mac->model <= MODEL_MAC_COLOR_CLASSIC))
 
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
@@ -176,7 +176,7 @@ const via6522_interface mac_via6522_2_intf =
 // returns non-zero if this Mac has ADB
 static int has_adb(mac_state *mac)
 {
-	return mac->mac_model >= MODEL_MAC_SE;
+	return mac->model >= MODEL_MAC_SE;
 }
 
 // handle disk enable lines
@@ -184,7 +184,7 @@ void mac_fdc_set_enable_lines(running_device *device,int enable_mask)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	if (mac->mac_model != MODEL_MAC_SE)
+	if (mac->model != MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device,enable_mask);
 	}
@@ -192,7 +192,7 @@ void mac_fdc_set_enable_lines(running_device *device,int enable_mask)
 	{
 		if (enable_mask)
 		{
-			sony_set_enable_lines(device,mac->mac_drive_select ? 1 : 2);
+			sony_set_enable_lines(device,mac->drive_select ? 1 : 2);
 		}
 		else
 		{
@@ -243,7 +243,7 @@ static void mac_field_interrupts(running_machine *machine)
 
 	int take_interrupt = -1;
 
-	if (mac->mac_model < MODEL_MAC_II)
+	if (mac->model < MODEL_MAC_II)
 	{
 		if ((scc_interrupt) || (scsi_interrupt))
 		{
@@ -254,7 +254,7 @@ static void mac_field_interrupts(running_machine *machine)
 			take_interrupt = 1;
 		}
 	}
-	else if (mac->mac_model < MODEL_MAC_POWERMAC_6100)
+	else if (mac->model < MODEL_MAC_POWERMAC_6100)
 	{
 		if (scc_interrupt)
 		{
@@ -315,9 +315,14 @@ void mac_asc_irq(running_device *device, int state)
 	{
 		mac->rbv_regs[3] |= 0x90;	// any VIA 2 interrupt | sound interrupt
 
-		// (need to figure out what gets triggered here)
+		if (mac->rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
+		{
+			mac->rbv_ifr |= 0x90;
+			mac_set_via2_interrupt(device->machine, 1);
+		}
+
 	}
-	else if (mac->mac_model >= MODEL_MAC_II)
+	else if (mac->model >= MODEL_MAC_II)
 	{
 		via6522_device *via2 = device->machine->device<via6522_device>("via6522_1");
 
@@ -356,6 +361,81 @@ static void set_scc_waitrequest(int waitrequest)
 	/* Not Yet Implemented */
 }
 
+void mac_v8_resize(running_machine *machine, mac_state *mac)
+{
+	offs_t memory_size;
+	UINT8 *memory_data;
+	int is_rom;
+
+	is_rom = (mac->overlay) ? 1 : 0;
+
+	// get what memory we're going to map
+	if (is_rom)
+	{
+		/* ROM mirror */
+		memory_size = memory_region_length(machine, "bootrom");
+		memory_data = memory_region(machine, "bootrom");
+		is_rom = TRUE;
+	}
+	else
+	{
+		/* RAM */
+		memory_size = messram_get_size(machine->device("messram"));
+		memory_data = messram_get_ptr(machine->device("messram"));
+		is_rom = FALSE;
+	}
+
+//	printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, mac->rbv_regs[1] & 0xe0, mac->overlay, is_rom ? "ROM" : "RAM");
+
+	if (is_rom)
+	{
+		mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+	}
+	else
+	{	
+		address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		UINT32 onboard_amt, simm_amt, simm_size;
+		UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
+
+		// force unmap of entire RAM region
+		memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
+
+		// LC has 2 MB built-in, all other V8-style machines have 4 MB
+		// we reserve the first 2 or 4 MB of mess_ram for the onboard, 
+		// RAM above that mark is the SIMM
+		onboard_amt = ((mac->model == MODEL_MAC_LC) || (mac->model == MODEL_MAC_CLASSIC_II)) ? 2*1024*1024 : 4*1024*1024;
+		simm_amt = (mac->rbv_regs[1]>>6) & 3;	// size of SIMM RAM window
+		simm_size = memory_size - onboard_amt;	// actual amount of RAM available for SIMMs
+		
+		// installing SIMM RAM?
+		if (simm_amt != 0)
+		{
+//			printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
+			
+			if ((simm_amt > 0) && (simm_size > 0))
+			{
+				mac_install_memory(machine, 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
+			}
+
+			// onboard RAM sits immediately above the SIMM, if any
+			if (simm_sizes[simm_amt] + onboard_amt <= 0x800000)
+			{
+				mac_install_memory(machine, simm_sizes[simm_amt], simm_sizes[simm_amt] + onboard_amt - 1, onboard_amt, memory_data, is_rom, "bank2");
+			}
+				
+			// a mirror of the first 2 MB of on board RAM always lives at 0x800000
+			mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, memory_data, is_rom, "bank3");
+		}
+		else
+		{
+//			printf("mac_v8_resize: SIMM off, mobo RAM at 0 and top\n");
+
+			mac_install_memory(machine, 0x000000, onboard_amt-1, onboard_amt, memory_data, is_rom, "bank1");
+			mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, memory_data, is_rom, "bank3");
+		}
+	}
+}
+
 static void set_memory_overlay(running_machine *machine, int overlay)
 {
 	offs_t memory_size;
@@ -366,7 +446,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 	/* normalize overlay */
 	overlay = overlay ? TRUE : FALSE;
 
-	if (overlay != mac->mac_overlay)
+	if (overlay != mac->overlay)
 	{
 		/* set up either main RAM area or ROM mirror at 0x000000-0x3fffff */
 		if (overlay)
@@ -375,9 +455,6 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 			memory_size = memory_region_length(machine, "bootrom");
 			memory_data = memory_region(machine, "bootrom");
 			is_rom = TRUE;
-
-			/* HACK! - copy in the initial reset/stack */
-			memcpy(messram_get_ptr(machine->device("messram")), memory_data, 8);
 		}
 		else
 		{
@@ -388,82 +465,16 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		if (((mac->mac_model >= MODEL_MAC_LC) && (mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) && (mac->mac_model != MODEL_MAC_LC_III)) || (mac->mac_model == MODEL_MAC_CLASSIC_II))
+		if (((mac->model >= MODEL_MAC_LC) && (mac->model <= MODEL_MAC_COLOR_CLASSIC) && (mac->model != MODEL_MAC_LC_III)) || (mac->model == MODEL_MAC_CLASSIC_II))
 		{
-//			printf("V8 style machine: memory_size = %x (%s)\n", memory_size, is_rom ? "ROM" : "RAM");
-
-			if (is_rom)
-			{
-				mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
-			}
-			else
-			{	
-//				address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-				UINT32 v8_internal_mirror_base;
-
-				v8_internal_mirror_base = 0xffffffff;	// default to "none"
-
-				// force unmap of entire RAM region
-//				memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
-
-				// install the total RAM size at 0
-				mac_install_memory(machine, 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
-
-				// LC has 2 MB built-in, all other V8-style machines have 4 MB
-				if (mac->mac_model == MODEL_MAC_LC)
-				{
-					switch (memory_size / 0x100000)
-					{
-						case 2:	// 2 MB: RAM at 0 and mirrored at 800000
-							v8_internal_mirror_base = 0x000000;				
-							break;
-
-						case 4:	// 4 MB: 2 MB SIMM at 0, internal RAM at 200000, mirrored at 800000
-							v8_internal_mirror_base = 0x200000;				
-							break;
-
-						case 6: // 6 MB: 4 MB SIMM at 0, internal RAM at 400000, mirrored at 800000
-							v8_internal_mirror_base = 0x400000;
-							break;
-
-						case 10: // 10 MB: 8 MB SIMM at 0, internal RAM at 800000, no mirror
-							break;
-					}
-				}
-				else
-				{
-					switch (memory_size / 0x100000)
-					{
-						case 2:	// 2 MB: RAM at 0 and mirrored at 800000
-						case 4:	// 4 MB: RAM at 0 and mirrored at 800000
-							v8_internal_mirror_base = 0x000000;				
-							break;
-
-						case 6: // 6 MB: 2 MB SIMM at 0, internal RAM at 200000, mirrored at 800000
-							v8_internal_mirror_base = 0x200000;
-							break;
-
-						case 8: // 8 MB: 4 MB SIMM at 0, internal RAM at 400000, mirrored at 800000
-							v8_internal_mirror_base = 0x400000;
-							break;
-
-						case 10: // 10 MB: 8 MB SIMM at 0, internal RAM at 800000, no mirror
-							break;
-					}
-				}
-
-				if (v8_internal_mirror_base != 0xffffffff)
-				{
-//					printf("V8 style machine: setting internal RAM mirror from offset %x\n", v8_internal_mirror_base);
-					mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, &memory_data[v8_internal_mirror_base], is_rom, "bank2");
-				}
-			}
+			mac->overlay = overlay;
+			mac_v8_resize(machine, mac);
 		}
-		else if (mac->mac_model == MODEL_MAC_POWERMAC_6100)
+		else if (mac->model == MODEL_MAC_POWERMAC_6100)
 		{
 			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI))
+		else if ((mac->model == MODEL_MAC_IICI) || (mac->model == MODEL_MAC_IISI))
 		{
 			// ROM is OK to flood to 3fffffff
 			if (is_rom)
@@ -475,24 +486,24 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 				mac_install_memory(machine, 0x00000000, 0x03ffffff, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((mac->mac_model == MODEL_MAC_PORTABLE) || (mac->mac_model == MODEL_MAC_PB100))
+		else if ((mac->model == MODEL_MAC_PORTABLE) || (mac->model == MODEL_MAC_PB100))
 		{
 			mac_install_memory(machine, 0x000000, 0x8fffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((mac->mac_model == MODEL_MAC_CLASSIC_II) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)))
+		else if ((mac->model >= MODEL_MAC_II) && (mac->model <= MODEL_MAC_SE30))
 		{
 			mac_install_memory(machine, 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if (mac->mac_model == MODEL_MAC_LC_III)	// up to 36 MB
+		else if (mac->model == MODEL_MAC_LC_III)	// up to 36 MB
 		{
-			mac_install_memory(machine, 0x00000000, 0x023fffff, memory_size, memory_data, is_rom, "bank1");
+			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else
 		{
 			mac_install_memory(machine, 0x00000000, 0x003fffff, memory_size, memory_data, is_rom, "bank1");
 		}
 
-		mac->mac_overlay = overlay;
+		mac->overlay = overlay;
 
 		if (LOG_GENERAL)
 			logerror("set_memory_overlay: overlay=%i\n", overlay);
@@ -1037,7 +1048,7 @@ void mac_scsi_irq(running_machine *machine, int state)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
 
-	if ((mac->mac_scsiirq_enable) && ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC)))
+	if ((mac->scsiirq_enable) && ((mac->model == MODEL_MAC_SE) || (mac->model == MODEL_MAC_CLASSIC)))
 	{
 		scsi_interrupt = state;
 		mac_field_interrupts(machine);
@@ -1400,7 +1411,7 @@ NVRAM_HANDLER( mac )
 			mac->rtc_ram[0x12] = 0x01;
 			mac->rtc_ram[0x13] = 0x4c;
 
-			if (mac->mac_model >= MODEL_MAC_II)
+			if (mac->model >= MODEL_MAC_II)
 			{
 				mac->rtc_ram[0xc] = 0x4e;	// XPRAM valid is different for these
 				mac->rtc_ram[0xd] = 0x75;
@@ -2580,7 +2591,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 //  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(device->machine->device("maincpu")));
 
-	switch (mac->mac_model)
+	switch (mac->model)
 	{
 		case MODEL_MAC_PORTABLE:
 		case MODEL_MAC_PB100:
@@ -2599,7 +2610,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_SE30:
 			return 0x81 | PA6;
 
-		case MODEL_MAC_LC:
+		case MODEL_MAC_LC:		// apollo board is 0x38, box 0x11 (17), vid hw 0x21
 		case MODEL_MAC_LC_II:
 			return 0x81 | PA6 | PA4 | PA2;
 
@@ -2615,6 +2626,16 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
 
+		case MODEL_MAC_PB170:		// since the decoders are different, these are allowed to "collide"
+		case MODEL_MAC_CLASSIC_II:
+			return 0x81 | PA4 | PA1;
+
+		case MODEL_MAC_QUADRA_700:
+			return 0x81 | PA6;
+
+		case MODEL_MAC_QUADRA_900:
+			return 0x81 | PA6 | PA4;
+
 		default:
 			return 0x80;
 
@@ -2629,7 +2650,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
 	// portable/PB100 is pretty different
-	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
+	if (mac->model >= MODEL_MAC_PORTABLE && mac->model <= MODEL_MAC_PB100)
 	{
 //      printf("Read VIA B: PM_ACK %x\n", mac->pm_ack);
 		val = 0x80 | 0x04 | mac->pm_ack;	// SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
@@ -2680,7 +2701,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
-	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
+	if (mac->model >= MODEL_MAC_PORTABLE && mac->model <= MODEL_MAC_PB100)
 	{
 		#if LOG_ADB
 //		printf("%02x to PM\n", data);
@@ -2692,17 +2713,17 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
 	sony_set_sel_line(fdc,(data & 0x20) >> 5);
-	if (mac->mac_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
+	if (mac->model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
-		mac->mac_drive_select = ((data & 0x10) >> 4);
+		mac->drive_select = ((data & 0x10) >> 4);
 	}
 
-	if (mac->mac_model < MODEL_MAC_SE)	// SE no longer has dual buffers
+	if (mac->model < MODEL_MAC_SE)	// SE no longer has dual buffers
 	{
 		mac_set_sound_buffer(sound, (data & 0x08) >> 3);
 	}
 
-	if (mac->mac_model < MODEL_MAC_II)
+	if (mac->model < MODEL_MAC_II)
 	{
 		mac_set_volume(sound, data & 0x07);
 	}
@@ -2710,8 +2731,10 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
      * possibly later models), overlay was set on reset, but cleared on the
      * first access to the ROM. */
-	if (mac->mac_model < MODEL_MAC_SE)
+	if (mac->model < MODEL_MAC_SE)
+	{
 		set_memory_overlay(device->machine, (data & 0x10) >> 4);
+	}
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
@@ -2722,12 +2745,12 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
-	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
+	if (mac->model >= MODEL_MAC_PORTABLE && mac->model <= MODEL_MAC_PB100)
 	{
 		running_device *fdc = device->machine->device("fdc");
 
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
-		mac->mac_drive_select = ((data & 0x10) >> 4);
+		mac->drive_select = ((data & 0x10) >> 4);
 
 		if ((data & 1) && !(mac->pm_req & 1))
 		{
@@ -2792,13 +2815,13 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	}
 
 	// SE and Classic have SCSI enable/disable here
-	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
+	if ((mac->model == MODEL_MAC_SE) || (mac->model == MODEL_MAC_CLASSIC))
 	{
-		mac->mac_scsiirq_enable = (data & 0x40) ? 0 : 1;
-//      printf("VIAB & 0x40 = %02x, IRQ enable %d\n", data & 0x40, mac->mac_scsiirq_enable);
+		mac->scsiirq_enable = (data & 0x40) ? 0 : 1;
+//      printf("VIAB & 0x40 = %02x, IRQ enable %d\n", data & 0x40, mac->scsiirq_enable);
 	}
 
-	if (mac->mac_model == MODEL_MAC_SE30)
+	if (mac->model == MODEL_MAC_SE30)
 	{
 		// 0x40 = 0 means enable vblank on SE/30
 		mac->mac_se30_vbl_enable = (data & 0x40) ? 0 : 1;
@@ -2917,12 +2940,12 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 
 //  logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(device->machine->device("maincpu")));
 
-	if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
+	if ((mac->model == MODEL_MAC_LC) || (mac->model == MODEL_MAC_LC_II) || (mac->model == MODEL_MAC_CLASSIC_II))
 	{
 		return 0x4f;
 	}
 
-	if (mac->mac_model == MODEL_MAC_SE30)
+	if (mac->model == MODEL_MAC_SE30)
 	{
 		return 0x87;	// bits 3 and 6 are tied low on SE/30
 	}
@@ -2990,7 +3013,7 @@ MACHINE_RESET(mac)
 	timer_adjust_oneshot(mac->mac6015_timer, attotime_never, 0);
 
 	// start 60.15 Hz timer for IIci/IIsi (and eventually others)
-	if ((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI))
+	if ((mac->model == MODEL_MAC_IICI) || (mac->model == MODEL_MAC_IISI))
 	{
 		timer_adjust_periodic(mac->mac6015_timer, ATTOTIME_IN_HZ(60.15), 0, ATTOTIME_IN_HZ(60.15));
 	}
@@ -3007,8 +3030,9 @@ MACHINE_RESET(mac)
 	rtc_init(mac);
 
 	/* setup the memory overlay */
-	if (mac->mac_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
+	if (mac->model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
 	{
+		mac->overlay = -1;	// insure no match
 		set_memory_overlay(machine, 1);
 	}
 
@@ -3032,7 +3056,7 @@ MACHINE_RESET(mac)
 		adb_reset(mac);
 	}
 
-	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
+	if ((mac->model == MODEL_MAC_SE) || (mac->model == MODEL_MAC_CLASSIC))
 	{
 		mac_set_sound_buffer(machine->device("custom"), 1);
 
@@ -3046,8 +3070,8 @@ MACHINE_RESET(mac)
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 	}
 
-	mac->mac_drive_select = 0;
-	mac->mac_scsiirq_enable = 0;
+	mac->drive_select = 0;
+	mac->scsiirq_enable = 0;
 	mac->mac_via2_vbl = 0;
 	mac->mac_se30_vbl_enable = 0;
 	mac->mac_nubus_irq_state = 0xff;
@@ -3076,8 +3100,8 @@ static STATE_POSTLOAD( mac_state_load )
 	int overlay;
 	mac_state *mac = machine->driver_data<mac_state>();
 
-	overlay = mac->mac_overlay;
-	mac->mac_overlay = -1;
+	overlay = mac->overlay;
+	mac->overlay = -1;
 	set_memory_overlay(machine, overlay);
 }
 
@@ -3086,30 +3110,27 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
 
-	if (mac->mac_overlay != -1)
+	if (mac->overlay != -1)
 	{
-		if ((mac->mac_model == MODEL_MAC_PORTABLE) || (mac->mac_model == MODEL_MAC_PB100))
+		if ((mac->model == MODEL_MAC_PORTABLE) || (mac->model == MODEL_MAC_PB100))
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
 				set_memory_overlay(machine, 0);		// kill the overlay
-				mac->mac_overlay = -1;
 			}
 		}
-		else if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
+		else if ((mac->model == MODEL_MAC_SE) || (mac->model == MODEL_MAC_CLASSIC))
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
 				set_memory_overlay(machine, 0);		// kill the overlay
-				mac->mac_overlay = -1;
 			}
 		}
-		else if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
+		else if ((mac->model == MODEL_MAC_LC) || (mac->model == MODEL_MAC_LC_II) || (mac->model == MODEL_MAC_CLASSIC_II))
 		{
 			if ((address >= 0xa00000) && (address <= 0xafffff))
 			{
 				set_memory_overlay(machine, 0);		// kill the overlay
-				mac->mac_overlay = -1;
 			}
 		}
 		else
@@ -3117,7 +3138,6 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
 				set_memory_overlay(machine, 0);		// kill the overlay
-				mac->mac_overlay = -1;
 			}
 		}
 	}
@@ -3125,15 +3145,15 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 	return address;
 }
 
-static void mac_driver_init(running_machine *machine, mac_model_t model)
+static void mac_driver_init(running_machine *machine, model_t model)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
 
-	mac->mac_overlay = -1;
+	mac->overlay = 1;
 	scsi_interrupt = 0;
-	mac->mac_model = model;
+	mac->model = model;
 
-	if ((mac->mac_model == MODEL_MAC_PORTABLE) || (mac->mac_model == MODEL_MAC_PB100))
+	if ((mac->model == MODEL_MAC_PORTABLE) || (mac->model == MODEL_MAC_PB100))
 	{
 	}
 	else if (model < MODEL_MAC_II)
@@ -3145,22 +3165,14 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
 			memory_region_length(machine, "bootrom"), memory_region(machine, "bootrom"), TRUE, "bank3");
 	}
-	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III))
-	{
-		mac_install_memory(machine, 0x000000, messram_get_size(machine->device("messram"))-1, messram_get_size(machine->device("messram")), messram_get_ptr(machine->device("messram")), FALSE, "bank2");
-	}
-	else if ((mac->mac_model == MODEL_MAC_CLASSIC_II) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)))
-	{
-		mac_install_memory(machine, 0x00000000, 0x3fffffff, messram_get_size(machine->device("messram")), messram_get_ptr(machine->device("messram")), FALSE, "bank2");
-	}
 
+	mac->overlay = -1;
 	set_memory_overlay(machine, 1);
-	mac->mac_overlay = 1;
 
 	memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
-	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) ||
+	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->model >= MODEL_MAC_II) && (mac->model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
 		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, *machine));
@@ -3172,7 +3184,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	mac->inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
 
 	/* save state stuff */
-	state_save_register_global(machine, mac->mac_overlay);
+	state_save_register_global(machine, mac->overlay);
 	state_save_register_postload(machine, mac_state_load, NULL);
 }
 
@@ -3195,6 +3207,7 @@ MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
 MAC_DRIVER_INIT(macii, MODEL_MAC_II)
 MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
 MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
+MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
 MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
 MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
 MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
@@ -3289,7 +3302,7 @@ static void mac_vblank_irq(running_machine *machine)
 	}
 
 	/* signal VBlank on CA1 input on the VIA */
-	if (mac->mac_model < MODEL_MAC_II)
+	if (mac->model < MODEL_MAC_II)
 	{
 		ca1_data ^= 1;
 		via_0->write_ca1(ca1_data);
@@ -3307,7 +3320,7 @@ static void mac_vblank_irq(running_machine *machine)
 	}
 
 	// handle SE/30 vblank IRQ
-	if (mac->mac_model == MODEL_MAC_SE30)
+	if (mac->model == MODEL_MAC_SE30)
 	{
 		if (mac->mac_se30_vbl_enable)
 		{
@@ -3335,7 +3348,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 		mac_vblank_irq(machine);
 
 	/* check for mouse changes at 10 irqs per frame */
-	if (mac->mac_model <= MODEL_MAC_PLUS)
+	if (mac->model <= MODEL_MAC_PLUS)
 	{
 		if (!(scanline % 10))
 			mouse_callback(machine);
