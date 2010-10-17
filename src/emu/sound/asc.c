@@ -198,40 +198,43 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 					m_fifo_cap_b--;
 				}
 
-				switch (m_chip_type)
+				if ((m_fifo_cap_a) || (m_fifo_cap_b))
 				{
-					case ASC_TYPE_SONORA:
-						if (m_fifo_cap_a <= 0x200)
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
-							m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
-							if (m_irq_cb)
+					switch (m_chip_type)
+					{
+						case ASC_TYPE_SONORA:
+							if (m_fifo_cap_a <= 0x200)
 							{
-								m_irq_cb(this, 1);
+								m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
+								m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
+								if (m_irq_cb)
+								{
+									m_irq_cb(this, 1);
+								}
 							}
-						}
-						break;
+							break;
 
-					default:
-						if (m_fifo_cap_a <= 0x200)
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
-							if (m_irq_cb)
+						default:
+							if (m_fifo_cap_a <= 0x200)
 							{
-								m_irq_cb(this, 1);
+								m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
+								if (m_irq_cb)
+								{
+									m_irq_cb(this, 1);
+								}
 							}
-						}
 
-						// don't update for non-(E)ASC
-						if (m_fifo_cap_b <= 0x200)
-						{
-							m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
-							if (m_irq_cb)
+							// don't update for non-(E)ASC
+							if (m_fifo_cap_b <= 0x200)
 							{
-								m_irq_cb(this, 1);
+								m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
+								if (m_irq_cb)
+								{
+									m_irq_cb(this, 1);
+								}
 							}
-						}
-						break;
+							break;
+					}
 				}
 
 				outL[i] = smpll * 64;
