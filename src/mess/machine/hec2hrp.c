@@ -721,7 +721,14 @@ sn76477_interface hector_sn76477_interface =
     RES_K(10000)	/* 24  oneshot_res*/
 };
 
-void hector_reset(running_machine *machine, int hr)
+void hec2hrp_reset(running_machine *machine, int hr)
+{
+	hector_flag_hr = hr;
+	flag_clk = 0;
+	write_cassette = 0;
+}
+
+void hec2hrx_reset(running_machine *machine, int hr)
 {
 	hector_flag_hr = hr;
 	flag_clk = 0;
@@ -730,7 +737,6 @@ void hector_reset(running_machine *machine, int hr)
 	//upd765_reset_w(fdc, 1);
 
 	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_RESET, PULSE_LINE);
-
 }
 
 void hector_init(running_machine *machine)

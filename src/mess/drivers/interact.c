@@ -117,7 +117,7 @@ DISCRETE_SOUND_END
 
 static MACHINE_RESET(interact)
 {
-	hector_reset(machine, 0);
+	hec2hrp_reset(machine, 0);
 }
 
 static MACHINE_START(interact)

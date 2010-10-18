@@ -78,7 +78,8 @@ extern WRITE8_HANDLER( hector_color_a_w );
 extern WRITE8_HANDLER( hector_color_b_w );
 
 extern void hector_init(running_machine *machine);
-extern void hector_reset(running_machine *machine, int hr);
+extern void hec2hrp_reset(running_machine *machine, int hr);
+extern void hec2hrx_reset(running_machine *machine, int hr);
 
 extern READ8_HANDLER( hector_mx_io_port_r );
 extern WRITE8_HANDLER( hector_mx80_io_port_w );

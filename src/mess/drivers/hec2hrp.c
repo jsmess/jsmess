@@ -244,19 +244,45 @@ static MACHINE_START( hec2hrp )
 /*****************************************************************************/
 {
 	UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
-    UINT8 *RAMD2 = memory_region(machine, "disk2cpu"); // pointer to mess ram
 	UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
 	UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
-UINT32 index=0;
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+//    cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT / NMI...
+
+    // Memory install for bank switching
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
+
+    // Set bank HECTOR_BANK_PROG as basic bank
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+
+/******************************************************SPECIFIQUE MX ***************************/
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]  , 0); // Mess ram
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, &ROM1[0x0000] , 0); // Rom page 1
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+/******************************************************SPECIFIQUE MX ***************************/
+	hector_init(machine);
+}
+
+/*****************************************************************************/
+static MACHINE_START( hec2hrx )
+/*****************************************************************************/
+{
+	UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
+	UINT8 *RAMD2 = memory_region(machine, "disk2cpu"); // pointer to mess ram
+	UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
+	UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
+	UINT32 index=0;
 //Patch rom possible !
 //RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
 //Initialisation ROM
-while (index <0x01001) 
-{	
-	Disk2memory[index] = RAMD2[index];
-	index++;
-}
+	while (index <0x01001) 
+	{	
+		Disk2memory[index] = RAMD2[index];
+		index++;
+	}
 	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_RESET, PULSE_LINE);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 //    cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT / NMI...
@@ -282,7 +308,14 @@ static MACHINE_RESET(hec2hrp)
 {
 	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-	hector_reset(machine, 1);
+	hec2hrp_reset(machine, 1);
+}
+
+static MACHINE_RESET(hec2hrx)
+{
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	hec2hrx_reset(machine, 1);
 }
 
 /* Cassette definition */
@@ -400,8 +433,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MDRV_CPU_IO_MAP(hec2mx40_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_MACHINE_RESET(hec2hrp)
-	MDRV_MACHINE_START(hec2hrp)
+	MDRV_MACHINE_RESET(hec2hrx)
+	MDRV_MACHINE_START(hec2hrx)
 
 	/* Disk II unit */
 	MDRV_CPU_ADD("disk2cpu",Z80, XTAL_4MHz)
@@ -449,8 +482,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MDRV_CPU_IO_MAP(hec2hrx_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_MACHINE_RESET(hec2hrp)
-	MDRV_MACHINE_START(hec2hrp)
+	MDRV_MACHINE_RESET(hec2hrx)
+	MDRV_MACHINE_START(hec2hrx)
 
 	/* Disk II unit */
 	MDRV_CPU_ADD("disk2cpu",Z80, XTAL_4MHz)
