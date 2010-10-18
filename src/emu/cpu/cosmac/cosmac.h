@@ -228,7 +228,7 @@ protected:
 	inline void sample_wait_clear();
 	inline void sample_ef_lines();
 	inline void output_state_code();
-	inline void set_q_flag(bool state);
+	inline void set_q_flag(int state);
 
 	// arithmetic handlers
 	void add(int left, int right);
@@ -237,12 +237,12 @@ protected:
 	void subtract_with_borrow(int left, int right);
 
 	// condition handlers
-	void short_branch(bool taken);
-	void long_branch(bool taken);
-	void long_skip(bool taken);
+	void short_branch(int taken);
+	void long_branch(int taken);
+	void long_skip(int taken);
 
 	// control handlers
-	void return_from_interrupt(bool ie);
+	void return_from_interrupt(int ie);
 
 	// memory reference opcode handlers
 	void ldn();
@@ -391,9 +391,9 @@ protected:
 	UINT8				m_t;				// temporary register
 
 	// flags
-	bool				m_df;				// data flag (ALU carry)
-	bool				m_ie;				// interrupt enable
-	bool				m_q;				// output flip-flop
+	int					m_df;				// data flag (ALU carry)
+	int					m_ie;				// interrupt enable
+	int					m_q;				// output flip-flop
 
 	// internal stuff
 	int					m_icount;

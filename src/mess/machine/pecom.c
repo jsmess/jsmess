@@ -13,10 +13,6 @@
 #include "includes/pecom.h"
 #include "devices/messram.h"
 
-static UINT8 pecom_caps_state = 4;
-static UINT8 pecom_prev_caps_state = 4;
-
-
 static TIMER_CALLBACK( reset_tick )
 {
 	pecom_state *state = machine->driver_data<pecom_state>();
@@ -47,9 +43,6 @@ MACHINE_RESET( pecom )
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
 	memory_set_bankptr(machine, "bank4", rom + 0xf800);
-
-	pecom_caps_state = 4;
-	pecom_prev_caps_state = 4;
 
 	state->reset = 0;
 	state->dma = 0;
@@ -103,12 +96,6 @@ READ8_HANDLER (pecom_keyboard_r)
 
 /* CDP1802 Interface */
 
-static running_device *cassette_device_image(running_machine *machine)
-{
-	return machine->device("cassette");
-}
-
-
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
 	pecom_state *state = device->machine->driver_data<pecom_state>();
@@ -118,13 +105,12 @@ static READ_LINE_DEVICE_HANDLER( clear_r )
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	return cassette_input(device) < 0;
+	int shift = BIT(input_port_read(device->machine, "CNT"), 1);
+	double cas = cassette_input(device);
+
+	return (cas > 0.0) | shift;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef3_r )
-{
-	return 0;
-}
 /*
 static COSMAC_EF_READ( pecom64_ef_r )
 {
@@ -149,7 +135,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
 */
 static WRITE_LINE_DEVICE_HANDLER( pecom64_q_w )
 {
-	cassette_output(cassette_device_image(device->machine), state ? -1.0 : +1.0);
+	cassette_output(device, state ? -1.0 : +1.0);
 }
 
 static COSMAC_SC_WRITE( pecom64_sc_w )
@@ -178,9 +164,9 @@ COSMAC_INTERFACE( pecom64_cdp1802_config )
 	DEVCB_LINE(clear_r),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("cassette", ef2_r),
-	DEVCB_LINE(ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(pecom64_q_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("cassette", pecom64_q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	pecom64_sc_w,

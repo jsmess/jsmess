@@ -308,11 +308,11 @@ void cosmac_device_config::device_config_complete()
 	{
 		memset(&m_in_wait_func, 0, sizeof(m_in_wait_func));
 		memset(&m_in_clear_func, 0, sizeof(m_in_clear_func));
+		// TODO: clear ef1-4
 		memset(&m_out_q_func, 0, sizeof(m_out_q_func));
 		memset(&m_in_dma_func, 0, sizeof(m_in_dma_func));
-		// TODO: clear ef1-4
-		m_out_sc_func = NULL;
 		memset(&m_out_dma_func, 0, sizeof(m_out_dma_func));
+		m_out_sc_func = NULL;
 		memset(&m_out_tpa_func, 0, sizeof(m_out_tpa_func));
 		memset(&m_out_tpb_func, 0, sizeof(m_out_tpb_func));
 	}
@@ -615,8 +615,6 @@ void cosmac_device::execute_run()
 				I = 0;
 				N = 0;
 				run();
-
-				m_icount--;
 			}
 			break;
 
@@ -767,11 +765,11 @@ inline void cosmac_device::output_state_code()
 //  set_q_flag - set Q flag state and output it
 //-------------------------------------------------
 
-inline void cosmac_device::set_q_flag(bool state)
+inline void cosmac_device::set_q_flag(int state)
 {
 	Q = state;
 
-	devcb_call_write_line(&m_out_q_func, Q ? 1 : 0);
+	devcb_call_write_line(&m_out_q_func, Q);
 }
 
 
@@ -804,8 +802,8 @@ inline void cosmac_device::reset()
 	m_op = 0;
 	I = 0;
 	N = 0;
-	Q = false;
-	IE = true;
+	Q = 0;
+	IE = 1;
 
 	m_icount -= CLOCKS_RESET;
 }
@@ -943,7 +941,7 @@ inline void cosmac_device::interrupt()
 	T = (X << 4) | P;
 	X = 2;
 	P = 1;
-	IE = false;
+	IE = 0;
 
 	m_icount -= CLOCKS_INTERRUPT;
 
@@ -969,12 +967,12 @@ inline void cosmac_device::interrupt()
 
 // memory reference opcode handlers
 void cosmac_device::ldn()	{ D = RAM_R(R[N]); }
-void cosmac_device::lda()	{ D = RAM_R(R[N]++); }
+void cosmac_device::lda()	{ D = RAM_R(R[N]); R[N]++; }
 void cosmac_device::ldx()	{ D = RAM_R(R[X]); }
-void cosmac_device::ldxa()	{ D = RAM_R(R[X]++); }
-void cosmac_device::ldi()	{ D = RAM_R(R[P]++); }
+void cosmac_device::ldxa()	{ D = RAM_R(R[X]); R[X]++; }
+void cosmac_device::ldi()	{ D = RAM_R(R[P]); R[P]++; }
 void cosmac_device::str()	{ RAM_W(R[N], D); }
-void cosmac_device::stxd()	{ RAM_W(R[X]--, D); }
+void cosmac_device::stxd()	{ RAM_W(R[X], D); R[X]--; }
 
 // register operations opcode handlers
 void cosmac_device::inc()	{ R[N]++; }
@@ -987,62 +985,64 @@ void cosmac_device::phi()	{ R[N] = (D << 8) | (R[N] & 0xff); }
 
 // logic operations opcode handlers
 void cosmac_device::_or()	{ D = RAM_R(R[X]) | D; }
-void cosmac_device::ori()	{ D = RAM_R(R[P]++) | D; }
+void cosmac_device::ori()	{ D = RAM_R(R[P]) | D; R[P]++; }
 void cosmac_device::_xor()	{ D = RAM_R(R[X]) ^ D; }
-void cosmac_device::xri()	{ D = RAM_R(R[P]++) ^ D; }
+void cosmac_device::xri()	{ D = RAM_R(R[P]) ^ D; R[P]++; }
 void cosmac_device::_and()	{ D = RAM_R(R[X]) & D; }
-void cosmac_device::ani()	{ D = RAM_R(R[P]++) & D; }
+void cosmac_device::ani()	{ D = RAM_R(R[P]) & D; R[P]++; }
 void cosmac_device::shr()	{ DF = BIT(D, 0); D >>= 1; }
-void cosmac_device::shrc()	{ DF = BIT(D, 0); D >>= 1; D |= DF ? 0x80 : 0; }
+void cosmac_device::shrc()	{ int b = DF; DF = BIT(D, 0); D >>= 1; D |= b << 7; }
 void cosmac_device::shl()	{ DF = BIT(D, 7); D <<= 1; }
-void cosmac_device::shlc()	{ DF = BIT(D, 7); D <<= 1; D |= DF ? 0x01 : 0; }
+void cosmac_device::shlc()	{ int b = DF; DF = BIT(D, 7); D <<= 1; D |= b; }
 
 // arithmetic operations opcode handlers
 void cosmac_device::add(int left, int right)
 {
 	int result = left + right;
+
 	D = result & 0xff;
-	DF = BIT(result, 8) ? true : false;
+	DF = result > 0xff;
 }
 
 void cosmac_device::add_with_carry(int left, int right)
 {
 	int result = left + right + DF;
+
 	D = result & 0xff;
-	DF = BIT(result, 8) ? true : false;
+	DF = result > 0xff;
 }
 
 void cosmac_device::subtract(int left, int right)
 {
-	int result = left + (~right & 0xff) + 1;
+	int result = left + (right ^ 0xff) + 1;
 
 	D = result & 0xff;
-	DF = BIT(result, 8) ? true : false;
+	DF = result > 0xff;
 }
 
 void cosmac_device::subtract_with_borrow(int left, int right)
 {
-	int result = left + (~right & 0xff) + DF;
+	int result = left + (right ^ 0xff) + DF;
 
 	D = result & 0xff;
-	DF = BIT(result, 8) ? true : false;
+	DF = result > 0xff;
 }
 
 void cosmac_device::add()	{ add(RAM_R(R[X]), D); }
-void cosmac_device::adi()	{ add(RAM_R(R[P]++), D); }
+void cosmac_device::adi()	{ add(RAM_R(R[P]), D); R[P]++; }
 void cosmac_device::adc()	{ add_with_carry(RAM_R(R[X]), D); }
-void cosmac_device::adci()	{ add_with_carry(RAM_R(R[P]++), D); }
+void cosmac_device::adci()	{ add_with_carry(RAM_R(R[P]), D); R[P]++; }
 void cosmac_device::sd()	{ subtract(RAM_R(R[X]), D); }
-void cosmac_device::sdi()	{ subtract(RAM_R(R[P]++), D); }
+void cosmac_device::sdi()	{ subtract(RAM_R(R[P]), D); R[P]++; }
 void cosmac_device::sdb()	{ subtract_with_borrow(RAM_R(R[X]), D); }
-void cosmac_device::sdbi()	{ subtract_with_borrow(RAM_R(R[P]++), D); }
+void cosmac_device::sdbi()	{ subtract_with_borrow(RAM_R(R[P]), D); R[P]++; }
 void cosmac_device::sm()	{ subtract(D, RAM_R(R[X])); }
-void cosmac_device::smi()	{ subtract(D, RAM_R(R[P]++)); }
+void cosmac_device::smi()	{ subtract(D, RAM_R(R[P])); R[P]++; }
 void cosmac_device::smb()	{ subtract_with_borrow(D, RAM_R(R[X])); }
-void cosmac_device::smbi()	{ subtract_with_borrow(D, RAM_R(R[P]++)); }
+void cosmac_device::smbi()	{ subtract_with_borrow(D, RAM_R(R[P])); R[P]++; }
 
 // short branch instructions opcode handlers
-void cosmac_device::short_branch(bool taken)
+void cosmac_device::short_branch(int taken)
 {
 	if (taken)
 	{
@@ -1050,12 +1050,12 @@ void cosmac_device::short_branch(bool taken)
 	}
 	else
 	{
-		R[P] = R[P] + 1;
+		R[P]++;
 	}
 }
 
-void cosmac_device::br()	{ short_branch(true); }
-void cosmac_device::nbr()	{ short_branch(false); }
+void cosmac_device::br()	{ short_branch(1); }
+void cosmac_device::nbr()	{ short_branch(0); }
 void cosmac_device::bz()	{ short_branch(D == 0); }
 void cosmac_device::bnz()	{ short_branch(D != 0); }
 void cosmac_device::bdf()	{ short_branch(DF); }
@@ -1066,7 +1066,7 @@ void cosmac_device::b()		{ short_branch(EF[N & 0x03]); }
 void cosmac_device::bn()	{ short_branch(!EF[N & 0x03]); }
 
 // long branch instructions opcode handlers
-void cosmac_device::long_branch(bool taken)
+void cosmac_device::long_branch(int taken)
 {
 	if (taken)
 	{
@@ -1088,8 +1088,8 @@ void cosmac_device::long_branch(bool taken)
 	m_icount -= CLOCKS_EXECUTE;
 }
 
-void cosmac_device::lbr()	{ long_branch(true); }
-void cosmac_device::nlbr()	{ long_skip(true); }
+void cosmac_device::lbr()	{ long_branch(1); }
+void cosmac_device::nlbr()	{ long_skip(1); }
 void cosmac_device::lbz()	{ long_branch(D == 0); }
 void cosmac_device::lbnz()	{ long_branch(D != 0); }
 void cosmac_device::lbdf()	{ long_branch(DF); }
@@ -1098,7 +1098,7 @@ void cosmac_device::lbq()	{ long_branch(Q); }
 void cosmac_device::lbnq()	{ long_branch(!Q); }
 
 // skip instructions opcode handlers
-void cosmac_device::long_skip(bool taken)
+void cosmac_device::long_skip(int taken)
 {
 	if (taken)
 	{
@@ -1125,29 +1125,29 @@ void cosmac_device::idl()	{ /* idle */ }
 void cosmac_device::nop()	{ m_icount -= CLOCKS_EXECUTE; }
 void cosmac_device::sep()	{ P = N; }
 void cosmac_device::sex()	{ X = N; }
-void cosmac_device::seq()	{ set_q_flag(true); }
-void cosmac_device::req()	{ set_q_flag(false); }
+void cosmac_device::seq()	{ set_q_flag(1); }
+void cosmac_device::req()	{ set_q_flag(0); }
 void cosmac_device::sav()	{ RAM_W(R[X], T); }
 
 void cosmac_device::mark()
 {
-	UINT8 result = (X << 4) | P;
-	T = result;
-	RAM_W(R[2], result);
+	T = (X << 4) | P;
+	RAM_W(R[2], T);
 	X = P;
-	R[2] = R[2] - 1;
+	R[2]--;
 }
 
-void cosmac_device::return_from_interrupt(bool ie)
+void cosmac_device::return_from_interrupt(int ie)
 {
-	UINT8 data = RAM_R(R[X]++);
+	UINT8 data = RAM_R(R[X]);
+	R[X]++;
 	P = data & 0xf;
 	X = data >> 4;
 	IE = ie;
 }
 
-void cosmac_device::ret()	{ return_from_interrupt(true); }
-void cosmac_device::dis()	{ return_from_interrupt(false); }
+void cosmac_device::ret()	{ return_from_interrupt(1); }
+void cosmac_device::dis()	{ return_from_interrupt(0); }
 
 // input/output byte transfer opcode handlers
 void cosmac_device::out()	{ IO_W(N, RAM_R(R[X])); R[X]++; }
