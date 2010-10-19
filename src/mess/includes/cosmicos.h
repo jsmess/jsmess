@@ -1,7 +1,7 @@
 #ifndef __COSMICOS__
 #define __COSMICOS__
 
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 
 #define CDP1802_TAG		"ic19"
 #define CDP1864_TAG		"ic3"
@@ -32,10 +32,15 @@ class cosmicos_state : public driver_device
 {
 public:
 	cosmicos_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, CDP1802_TAG)
+	{ }
+
+	required_device<cosmac_device> m_maincpu;
 
 	/* CPU state */
-	cdp1802_control_mode cdp1802_mode;
+	int wait;
+	int clear;
 	int sc1;
 
 	/* memory state */

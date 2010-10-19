@@ -240,7 +240,7 @@ void comx35_state::fdc_w(UINT8 data)
 
 		if (!m_fdc_drq_enable)
 		{
-			m_cdp1802_ef4 = 1;
+			m_cdp1802_ef4 = CLEAR_LINE;
 		}
 
 		wd17xx_set_side(m_fdc, BIT(data, 5));
@@ -589,7 +589,7 @@ void comx35_state::machine_start()
 		memory_unmap_readwrite(program, 0xe000, 0xefff, 0, 0);
 		memory_set_bank(machine, "bank2", 0);
 	}
-
+	
 	/* card slot banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(&m_machine, CDP1802_TAG) + 0xc000, 0);
 	memory_configure_bank(machine, "bank1", BANK_FLOPPY, 1, memory_region(&m_machine, "fdc"), 0);
@@ -632,7 +632,7 @@ void comx35_state::machine_reset()
 
 	m_reset = 0;
 	m_iden = 1;
-	m_cdp1802_ef4 = 1;
+	m_cdp1802_ef4 = CLEAR_LINE;
 
 	timer_adjust_oneshot(m_reset_timer, ATTOTIME_IN_MSEC(t), 0);
 }

@@ -38,19 +38,16 @@ static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8, comx35_state )
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank3")
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE_LEGACY(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE_LEGACY(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_WRITE(bank_select_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(CDP1871_TAG, cdp1871_data_r) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ(io2_r) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out4_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out5_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out6_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY(CDP1869_TAG, cdp1869_out7_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(CDP1871_TAG, cdp1871_data_r)
+	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -217,7 +214,7 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 	if (state->m_iden)
 	{
 		// interrupts disabled: PAL/NTSC
-		return cdp1869_pal_ntsc_r(state->m_vis);
+		return state->m_vis->pal_ntsc_r();
 	}
 	else
 	{

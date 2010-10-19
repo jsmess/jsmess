@@ -26,11 +26,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pecom64_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r) AM_DEVWRITE(CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1869_TAG, cdp1869_out4_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_TAG, cdp1869_out5_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_TAG, cdp1869_out6_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_TAG, cdp1869_out7_w)
+	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r)
+	AM_RANGE(0x03, 0x07) AM_WRITE(pecom_cdp1869_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -53,7 +50,7 @@ mappings, this is another situation where natural keyboard comes very handy!    
 
 static INPUT_CHANGED( ef_w )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", (int)(FPTR)param, newval);
+	cputag_set_input_line(field->port->machine, CDP1802_TAG, (int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -180,7 +177,7 @@ static const cassette_config pecom_cassette_config =
 static MACHINE_CONFIG_START( pecom64, pecom_state )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", COSMAC, CDP1869_DOT_CLK_PAL/3)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_DOT_CLK_PAL/3)
 	MDRV_CPU_PROGRAM_MAP(pecom64_mem)
 	MDRV_CPU_IO_MAP(pecom64_io)
 	MDRV_CPU_CONFIG(pecom64_cdp1802_config)
@@ -202,7 +199,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pecom64 )
-	  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	  ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
 	  ROM_SYSTEM_BIOS(0, "ver4", "version 4")
 	  ROMX_LOAD( "pecom64-1.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
 	  ROMX_LOAD( "pecom64-2.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )

@@ -34,7 +34,7 @@
 
 #include "emu.h"
 #include "includes/cosmicos.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "devices/cassette.h"
 #include "devices/messram.h"
 #include "devices/snapquik.h"
@@ -43,6 +43,14 @@
 #include "sound/speaker.h"
 #include "video/dm9368.h"
 #include "cosmicos.lh"
+
+enum
+{
+	MODE_RUN,
+	MODE_LOAD,
+	MODE_PAUSE,
+	MODE_RESET
+};
 
 /* Read/Write Handlers */
 
@@ -193,9 +201,9 @@ static INPUT_CHANGED( enter )
 {
 	cosmicos_state *state = field->port->machine->driver_data<cosmicos_state>();
 
-	if (!newval && (state->cdp1802_mode == CDP1802_MODE_LOAD))
+	if (!newval && !state->wait && !state->clear)
 	{
-		cputag_set_input_line(field->port->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, ASSERT_LINE);
+		cputag_set_input_line(field->port->machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
 
@@ -204,11 +212,9 @@ static INPUT_CHANGED( single_step )
 	// if in PAUSE mode, set RUN mode until TPB=active
 }
 
-static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode)
+static void set_cdp1802_mode(running_machine *machine, int mode)
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
-
-	state->cdp1802_mode = mode;
 
 	output_set_led_value(LED_RUN, 0);
 	output_set_led_value(LED_LOAD, 0);
@@ -217,22 +223,33 @@ static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode
 
 	switch (mode)
 	{
-	case CDP1802_MODE_RUN:
+	case MODE_RUN:
 		output_set_led_value(LED_RUN, 1);
+
+		state->wait = 1;
+		state->clear = 1;
 		break;
 
-	case CDP1802_MODE_LOAD:
+	case MODE_LOAD:
 		output_set_led_value(LED_LOAD, 1);
+
+		state->wait = 0;
+		state->clear = 0;
 		break;
 
-	case CDP1802_MODE_PAUSE:
+	case MODE_PAUSE:
 		output_set_led_value(LED_PAUSE, 1);
+
+		state->wait = 1;
+		state->clear = 0;
 		break;
 
-	case CDP1802_MODE_RESET:
-		cputag_set_input_line(machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-		cputag_set_input_line(machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
+	case MODE_RESET:
+		cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
 
+		state->wait = 1;
+		state->clear = 0;
 		state->boot = 1;
 
 		output_set_led_value(LED_RESET, 1);
@@ -240,10 +257,10 @@ static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode
 	}
 }
 
-static INPUT_CHANGED( run )   { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RUN); }
-static INPUT_CHANGED( load )  { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_LOAD); }
-static INPUT_CHANGED( cosmicos_pause ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_PAUSE); }
-static INPUT_CHANGED( reset ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RESET); }
+static INPUT_CHANGED( run )				{ if (!newval) set_cdp1802_mode(field->port->machine, MODE_RUN); }
+static INPUT_CHANGED( load )			{ if (!newval) set_cdp1802_mode(field->port->machine, MODE_LOAD); }
+static INPUT_CHANGED( cosmicos_pause )	{ if (!newval) set_cdp1802_mode(field->port->machine, MODE_PAUSE); }
+static INPUT_CHANGED( reset )			{ if (!newval) set_cdp1802_mode(field->port->machine, MODE_RESET); }
 
 static void clear_input_data(running_machine *machine)
 {
@@ -351,10 +368,10 @@ static INPUT_PORTS_START( cosmicos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEC") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REQ") PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SEQ") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RET") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEC") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("REQ") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SEQ") PORT_CODE(KEYCODE_F4)
 INPUT_PORTS_END
 
 /* Video */
@@ -370,7 +387,7 @@ static TIMER_DEVICE_CALLBACK( digit_tick )
 
 static TIMER_DEVICE_CALLBACK( int_tick )
 {
-	cputag_set_input_line(timer.machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, CDP1802_TAG, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_dmaout_w )
@@ -395,7 +412,7 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 	DEVCB_LINE_VCC,
 	DEVCB_LINE_VCC,
 	DEVCB_LINE_VCC,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_LINE(cosmicos_dmaout_w),
 	DEVCB_LINE(cosmicos_efx_w),
 	RES_K(2), // R2
@@ -415,52 +432,54 @@ static VIDEO_UPDATE( cosmicos )
 
 /* CDP1802 Configuration */
 
-static CDP1802_MODE_READ( cosmicos_mode_r )
+static READ_LINE_DEVICE_HANDLER( wait_r )
 {
 	cosmicos_state *state = device->machine->driver_data<cosmicos_state>();
 
-	return state->cdp1802_mode;
+	return state->wait;
 }
 
-static CDP1802_EF_READ( cosmicos_ef_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	/*
-        EF1
-        EF2     cassette input
-        EF3
-        EF4     ENTER
-    */
-
 	cosmicos_state *state = device->machine->driver_data<cosmicos_state>();
+
+	return state->clear;
+}
+
+static READ_LINE_DEVICE_HANDLER( ef1_r )
+{
 	UINT8 special = input_port_read(device->machine, "SPECIAL");
-	UINT8 flags = 0x0f;
 
-	/* cassette input */
-	if (cassette_input(state->cassette) < 0.0)
-	{
-		output_set_led_value(LED_CASSETTE, 1);
-		flags &= ~EF2;
-	}
-	else
-	{
-		output_set_led_value(LED_CASSETTE, 0);
-	}
-
-	/* ENTER */
-	if (!BIT(input_port_read(device->machine, "BUTTONS"), 0)) flags &= ~EF4;
-
-	/* hexadecimal keypad */
-	if (!BIT(special, 0)) flags &= ~EF1;
-	if (!BIT(special, 1)) flags &= ~EF2;
-	if (!BIT(special, 2)) flags &= ~EF3;
-	if (!BIT(special, 3)) flags &= ~(EF2 | EF3);
-
-	return flags;
+	return BIT(special, 0);
 }
 
-static CDP1802_SC_WRITE( cosmicos_sc_w )
+static READ_LINE_DEVICE_HANDLER( ef2_r )
+{
+	UINT8 special = input_port_read(device->machine, "SPECIAL");
+	int casin = cassette_input(device) < 0.0;
+	
+	output_set_led_value(LED_CASSETTE, casin);
+
+	return BIT(special, 1) | BIT(special, 3) | casin;
+}
+
+static READ_LINE_DEVICE_HANDLER( ef3_r )
+{
+	UINT8 special = input_port_read(device->machine, "SPECIAL");
+
+	return BIT(special, 2) | BIT(special, 3);
+}
+
+static READ_LINE_DEVICE_HANDLER( ef4_r )
+{
+	return BIT(input_port_read(device->machine, "BUTTONS"), 0);
+}
+
+static COSMAC_SC_WRITE( cosmicos_sc_w )
 {
 	cosmicos_state *driver_state = device->machine->driver_data<cosmicos_state>();
+
+	int sc1 = BIT(sc, 1);
 
 	if (driver_state->sc1 && !sc1)
 	{
@@ -469,8 +488,8 @@ static CDP1802_SC_WRITE( cosmicos_sc_w )
 
 	if (sc1)
 	{
-		cpu_set_input_line(device, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-		cpu_set_input_line(device, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
+		cpu_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
 	}
 
 	driver_state->sc1 = sc1;
@@ -499,15 +518,22 @@ static READ8_DEVICE_HANDLER( cosmicos_dma_r )
 	return state->data;
 }
 
-static CDP1802_INTERFACE( cosmicos_config )
+static COSMAC_INTERFACE( cosmicos_config )
 {
-	cosmicos_mode_r,
-	cosmicos_ef_r,
-	cosmicos_sc_w,
+	DEVCB_LINE(wait_r),
+	DEVCB_LINE(clear_r),
+	DEVCB_LINE(ef1_r),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_LINE(ef3_r),
+	DEVCB_LINE(ef4_r),
 	DEVCB_LINE(cosmicos_q_w),
 	DEVCB_HANDLER(cosmicos_dma_r),
+	DEVCB_NULL,
+	cosmicos_sc_w,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
+
 
 /* Machine Initialization */
 
@@ -540,7 +566,8 @@ static MACHINE_START( cosmicos )
 	set_ram_mode(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->wait);
+	state_save_register_global(machine, state->clear);
 	state_save_register_global(machine, state->sc1);
 	state_save_register_global(machine, state->data);
 	state_save_register_global(machine, state->boot);
@@ -558,7 +585,7 @@ static MACHINE_START( cosmicos )
 
 static MACHINE_RESET( cosmicos )
 {
-	set_cdp1802_mode(machine, CDP1802_MODE_RESET);
+	set_cdp1802_mode(machine, MODE_RESET);
 }
 
 /* Quickload */
@@ -585,9 +612,8 @@ static const cassette_config cosmicos_cassette_config =
 };
 
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
-
 	/* basic machine hardware */
-    MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+    MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
     MDRV_CPU_PROGRAM_MAP(cosmicos_mem)
     MDRV_CPU_IO_MAP(cosmicos_io)
 	MDRV_CPU_CONFIG(cosmicos_config)

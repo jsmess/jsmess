@@ -6,32 +6,45 @@
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+WRITE8_MEMBER( comx35_state::cdp1869_w )
+{
+	UINT16 ma = m_maincpu->get_memory_address();
+
+	switch (offset + 3)
+	{
+	case 3:
+		m_vis->out3_w(space, ma, data);
+		break;
+
+	case 4:
+		m_vis->out4_w(space, ma, data);
+		break;
+		
+	case 5:
+		m_vis->out5_w(space, ma, data);
+		break;
+
+	case 6:
+		m_vis->out6_w(space, ma, data);
+		break;
+
+	case 7:
+		m_vis->out7_w(space, ma, data);
+		break;
+	}
+}
+
 /* CDP1869 */
 
-static READ8_DEVICE_HANDLER( comx35_pageram_r )
-{
-	comx35_state *state = device->machine->driver_data<comx35_state>();
-
-	UINT16 addr = offset & COMX35_PAGERAM_MASK;
-
-	return state->m_pageram[addr];
-}
-
-static WRITE8_DEVICE_HANDLER( comx35_pageram_w )
-{
-	comx35_state *state = device->machine->driver_data<comx35_state>();
-
-	UINT16 addr = offset & COMX35_PAGERAM_MASK;
-
-	state->m_pageram[addr] = data;
-}
+static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
+ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 {
 	comx35_state *state = device->machine->driver_data<comx35_state>();
 
-	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
-	UINT8 column = state->m_pageram[pageaddr] & 0x7f;
+	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
 	return state->m_charram[charaddr];
@@ -41,8 +54,7 @@ static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 {
 	comx35_state *state = device->machine->driver_data<comx35_state>();
 
-	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
-	UINT8 column = state->m_pageram[pageaddr] & 0x7f;
+	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
 	state->m_charram[charaddr] = data;
@@ -50,11 +62,7 @@ static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 
 static CDP1869_PCB_READ( comx35_pcb_r )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
-
-	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
-
-	return BIT(state->m_pageram[pageaddr], 7);
+	return BIT(pmd, 7);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
@@ -71,12 +79,9 @@ static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
 
 static CDP1869_INTERFACE( pal_cdp1869_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	DEVCB_HANDLER(comx35_pageram_r),
-	DEVCB_HANDLER(comx35_pageram_w),
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
@@ -85,12 +90,9 @@ static CDP1869_INTERFACE( pal_cdp1869_intf )
 
 static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_NTSC,
 	CDP1869_NTSC,
-	DEVCB_HANDLER(comx35_pageram_r),
-	DEVCB_HANDLER(comx35_pageram_w),
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
@@ -100,12 +102,10 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 void comx35_state::video_start()
 {
 	// allocate memory
-	m_pageram = auto_alloc_array(machine, UINT8, COMX35_PAGERAM_SIZE);
 	m_charram = auto_alloc_array(machine, UINT8, COMX35_CHARRAM_SIZE);
 	m_videoram = auto_alloc_array(machine, UINT8, COMX35_VIDEORAM_SIZE);
 
 	// register for save state
-	state_save_register_global_pointer(machine, m_pageram, COMX35_PAGERAM_SIZE);
 	state_save_register_global_pointer(machine, m_charram, COMX35_CHARRAM_SIZE);
 	state_save_register_global_pointer(machine, m_videoram, COMX35_VIDEORAM_SIZE);
 }
@@ -114,14 +114,14 @@ bool comx35_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 {
 	if (screen.width() == CDP1869_SCREEN_WIDTH)
 	{
-		cdp1869_update(m_vis, &bitmap, &cliprect);
+		m_vis->update_screen(&bitmap, &cliprect);
 	}
 	else
 	{
 		mc6845_update(m_crtc, &bitmap, &cliprect);
 	}
 
-	return 0;
+	return false;
 }
 
 /* MC6845 */
@@ -219,7 +219,7 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pal_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pal_cdp1869_intf, cdp1869_page_ram)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
@@ -238,7 +238,7 @@ MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, ntsc_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, ntsc_cdp1869_intf, cdp1869_page_ram)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")

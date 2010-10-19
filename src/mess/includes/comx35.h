@@ -2,6 +2,7 @@
 #define __COMX35__
 
 #include "cpu/cosmac/cosmac.h"
+#include "sound/cdp1869.h"
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 
@@ -17,11 +18,9 @@
 
 #define CASSETTE_TAG		"cassette"
 
-#define COMX35_PAGERAM_SIZE 0x400
 #define COMX35_CHARRAM_SIZE 0x800
 #define COMX35_VIDEORAM_SIZE 0x800
 
-#define COMX35_PAGERAM_MASK 0x3ff
 #define COMX35_CHARRAM_MASK 0x7ff
 #define COMX35_VIDEORAM_MASK 0x7ff
 
@@ -53,7 +52,7 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<running_device> m_vis;
+	required_device<cdp1869_device> m_vis;
 	required_device<running_device> m_crtc;
 	required_device<running_device> m_fdc;
 	required_device<running_device> m_kbe;
@@ -66,11 +65,17 @@ public:
 	virtual void video_start();
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
+	DECLARE_WRITE8_MEMBER(cdp1869_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_READ8_MEMBER(io2_r);
-
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ_LINE_MEMBER(clear_r);
+	DECLARE_READ_LINE_MEMBER(ef2_r);
+	DECLARE_READ_LINE_MEMBER(ef4_r);
+	DECLARE_WRITE_LINE_MEMBER(comx35_q_w);
+	DECLARE_READ_LINE_MEMBER(comx35_shift_r);
+	DECLARE_READ_LINE_MEMBER(comx35_control_r);
 
 	UINT8 read_expansion();
 	bool is_expansion_box_installed();
@@ -82,35 +87,37 @@ public:
 	void get_active_bank(UINT8 data);
 	void set_active_bank();
 
-	/* processor state */
-	int m_reset;				/* CPU mode */
-	int m_cdp1802_q;			/* Q flag */
-	int m_cdp1802_ef4;			/* EF4 flag */
-	int m_iden;					/* interrupt/DMA enable */
-	int m_slot;					/* selected slot */
-	int m_bank;					/* selected device bank */
-	int m_rambank;				/* selected RAM bank */
-	int m_dma;					/* memory refresh DMA */
+	// processor state
+	int m_reset;				// CPU mode
+	int m_cdp1802_q;			// Q flag
+	int m_cdp1802_ef4;			// EF4 flag
+	int m_iden;					// interrupt/DMA enable
+	int m_slot;					// selected slot
+	int m_bank;					// selected device bank
+	int m_rambank;				// selected RAM bank
+	int m_dma;					// memory refresh DMA
 
-	UINT8 *m_pageram;			/* page memory */
-	UINT8 *m_charram;			/* character memory */
-	UINT8 *m_videoram;			/* 80 column video memory */
+	// video state
+	UINT8 *m_charram;			// character memory
+	UINT8 *m_videoram;			// 80 column video memory
 
-	/* floppy state */
-	int m_fdc_addr;				/* FDC address */
-	int m_fdc_irq;				/* interrupt request */
-	int m_fdc_drq_enable;		/* EF4 enabled */
+	// floppy state
+	int m_fdc_addr;				// FDC address
+	int m_fdc_irq;				// interrupt request
+	int m_fdc_drq_enable;		// EF4 enabled
 
-	/* timers */
-	emu_timer *m_reset_timer;	/* power on reset timer */
+	// timers
+	emu_timer *m_reset_timer;	// power on reset timer
 };
 
-/* ---------- defined in machine/comx35.c ---------- */
+// ---------- defined in machine/comx35.c ----------
+
 extern const wd17xx_interface comx35_wd17xx_interface;
 
 INPUT_CHANGED( comx35_reset );
 
-/* ---------- defined in video/comx35.c ---------- */
+// ---------- defined in video/comx35.c ----------
+
 MACHINE_CONFIG_EXTERN( comx35_pal_video );
 MACHINE_CONFIG_EXTERN( comx35_ntsc_video );
 

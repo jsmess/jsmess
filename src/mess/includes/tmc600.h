@@ -26,37 +26,37 @@ public:
 	 { }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<running_device> m_vis;
+	required_device<cdp1869_device> m_vis;
 	required_device<running_device> m_cassette;
 	required_device<running_device> m_ram;
 
 	virtual void machine_start();
-	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, &cliprect); return false; }
 
 	DECLARE_WRITE8_MEMBER(keyboard_latch_w);
 	DECLARE_WRITE8_MEMBER(vismac_register_w);
 	DECLARE_WRITE8_MEMBER(vismac_data_w);
+	DECLARE_WRITE8_MEMBER(page_ram_w);
 
 	UINT8 get_color(UINT16 pma);
 
-	/* video state */
-	int m_vismac_reg_latch;	/* video register latch */
-	int m_vismac_color_latch;	/* color latch */
-	int m_vismac_bkg_latch;	/* background color latch */
-	int m_blink;				/* cursor blink */
+	// video state
+	int m_vismac_reg_latch;		// video register latch
+	int m_vismac_color_latch;	// color latch
+	int m_vismac_bkg_latch;		// background color latch
+	int m_blink;				// cursor blink
 
-	UINT8 *m_page_ram;		/* page memory */
-	UINT8 *m_color_ram;		/* color memory */
-	UINT8 *m_char_rom;		/* character generator ROM */
+	UINT8 *m_page_ram;			// page memory
+	UINT8 *m_color_ram;			// color memory
+	UINT8 *m_char_rom;			// character generator ROM
 
-	/* keyboard state */
-	int m_keylatch;			/* key latch */
+	// keyboard state
+	int m_keylatch;				// key latch
 };
 
-/* ---------- defined in video/tmc600.c ---------- */
+// ---------- defined in video/tmc600.c ----------
 
 MACHINE_CONFIG_EXTERN( tmc600_video );
 

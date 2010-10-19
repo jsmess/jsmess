@@ -28,8 +28,8 @@ MACHINE_START( pecom )
 
 MACHINE_RESET( pecom )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, CDP1802_TAG);
+	address_space *space = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	pecom_state *state = machine->driver_data<pecom_state>();
 
@@ -49,21 +49,45 @@ MACHINE_RESET( pecom )
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(5), 0);
 }
 
+static READ8_HANDLER( pecom_cdp1869_charram_r )
+{
+	pecom_state *state = space->machine->driver_data<pecom_state>();
+	return state->cdp1869->char_ram_r(*space, offset);
+}
+
+static WRITE8_HANDLER( pecom_cdp1869_charram_w )
+{
+	pecom_state *state = space->machine->driver_data<pecom_state>();
+	return state->cdp1869->char_ram_w(*space, offset, data);
+}
+
+static READ8_HANDLER( pecom_cdp1869_pageram_r )
+{
+	pecom_state *state = space->machine->driver_data<pecom_state>();
+	return state->cdp1869->page_ram_r(*space, offset);
+}
+
+static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
+{
+	pecom_state *state = space->machine->driver_data<pecom_state>();
+	return state->cdp1869->page_ram_w(*space, offset, data);
+}
+
 WRITE8_HANDLER( pecom_bank_w )
 {
-	running_device *cdp1869 = space->machine->device(CDP1869_TAG);
-	address_space *space2 = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+//	pecom_state *state = space->machine->driver_data<pecom_state>();
+	address_space *space2 = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(space->machine, CDP1802_TAG);
+	memory_install_write_bank(cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")) + 0x0000);
 
 	if (data==2)
 	{
-		memory_install_read8_device_handler (space2, cdp1869, 0xf000, 0xf7ff, 0, 0, cdp1869_charram_r);
-		memory_install_write8_device_handler(space2, cdp1869, 0xf000, 0xf7ff, 0, 0, cdp1869_charram_w);
-		memory_install_read8_device_handler (space2, cdp1869, 0xf800, 0xffff, 0, 0, cdp1869_pageram_r);
-		memory_install_write8_device_handler(space2, cdp1869, 0xf800, 0xffff, 0, 0, cdp1869_pageram_w);
-	}
+		memory_install_read8_handler (space2, 0xf000, 0xf7ff, 0, 0, pecom_cdp1869_charram_r);
+		memory_install_write8_handler(space2, 0xf000, 0xf7ff, 0, 0, pecom_cdp1869_charram_w);
+		memory_install_read8_handler (space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_r);
+		memory_install_write8_handler(space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_w);
+	} 
 	else
 	{
 		memory_unmap_write(space2, 0xf000, 0xf7ff, 0, 0);
@@ -88,7 +112,7 @@ READ8_HANDLER (pecom_keyboard_r)
        Address is available on address bus during reading of value from port, and that is
        used to determine keyboard line reading
     */
-	UINT16 addr = cpu_get_reg(space->machine->device("maincpu"), COSMAC_R0 + cpu_get_reg(space->machine->device("maincpu"), COSMAC_X));
+	UINT16 addr = cpu_get_reg(space->machine->device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(space->machine->device(CDP1802_TAG), COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
 	return input_port_read(space->machine, keynames[addr - 0x7cca]) & 0x03;
@@ -151,7 +175,7 @@ static COSMAC_SC_WRITE( pecom64_sc_w )
 
 	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cputag_set_input_line(device->machine, "maincpu", COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cputag_set_input_line(device->machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		break;

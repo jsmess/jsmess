@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
@@ -9,33 +11,36 @@ WRITE8_MEMBER( tmc600_state::vismac_register_w )
 
 WRITE8_MEMBER( tmc600_state::vismac_data_w )
 {
+	UINT16 ma = m_maincpu->get_memory_address();
+
 	switch (m_vismac_reg_latch)
 	{
 	case 0x20:
-		// set character color
+		// character color latch
 		m_vismac_color_latch = data;
 		break;
 
 	case 0x30:
-		// write cdp1869 command on the data bus
+		// background color latch
 		m_vismac_bkg_latch = data & 0x07;
-		cdp1869_out3_w(m_vis, 0, data);
+
+		m_vis->out3_w(space, ma, data);
 		break;
 
 	case 0x40:
-		cdp1869_out4_w(m_vis, 0, data);
+		m_vis->out4_w(space, ma, data);
 		break;
 
 	case 0x50:
-		cdp1869_out5_w(m_vis, 0, data);
+		m_vis->out5_w(space, ma, data);
 		break;
 
 	case 0x60:
-		cdp1869_out6_w(m_vis, 0, data);
+		m_vis->out6_w(space, ma, data);
 		break;
 
 	case 0x70:
-		cdp1869_out7_w(m_vis, 0, data);
+		m_vis->out7_w(space, ma, data);
 		break;
 	}
 }
@@ -60,33 +65,23 @@ UINT8 tmc600_state::get_color(UINT16 pma)
 	return color;
 }
 
-static READ8_DEVICE_HANDLER( tmc600_page_ram_r )
+WRITE8_MEMBER( tmc600_state::page_ram_w )
 {
-	tmc600_state *state = device->machine->driver_data<tmc600_state>();
-
-	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
-
-	return state->m_page_ram[addr];
+	m_page_ram[offset] = data;
+	m_color_ram[offset] = m_vismac_color_latch;
 }
 
-static WRITE8_DEVICE_HANDLER( tmc600_page_ram_w )
-{
-	tmc600_state *state = device->machine->driver_data<tmc600_state>();
-
-	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
-
-	state->m_page_ram[addr] = data;
-	state->m_color_ram[addr] = state->m_vismac_color_latch;
-}
+static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, tmc600_state )
+	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_BASE(m_page_ram) AM_WRITE(page_ram_w)
+ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
 {
 	tmc600_state *state = device->machine->driver_data<tmc600_state>();
 
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 column = state->m_page_ram[pageaddr];
 	UINT8 color = state->get_color(pageaddr);
-	UINT16 charaddr = ((cma & 0x08) << 8) | (column << 3) | (cma & 0x07);
+	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
 	UINT8 cdb = state->m_char_rom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
@@ -105,31 +100,26 @@ static CDP1869_PCB_READ( tmc600_pcb_r )
 	return BIT(color, 0);
 }
 
-static CDP1869_INTERFACE( tmc600_cdp1869_intf )
+static CDP1869_INTERFACE( vis_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	DEVCB_HANDLER(tmc600_page_ram_r),
-	DEVCB_HANDLER(tmc600_page_ram_w),
 	tmc600_pcb_r,
 	tmc600_char_ram_r,
 	NULL,
-	DEVCB_NULL
+	DEVCB_NULL // ?
 };
 
 void tmc600_state::video_start()
 {
-	/* allocate memory */
-	m_page_ram = auto_alloc_array(machine, UINT8, TMC600_PAGE_RAM_SIZE);
+	// allocate memory
 	m_color_ram = auto_alloc_array(machine, UINT8, TMC600_PAGE_RAM_SIZE);
 
-	/* find memory regions */
+	// find memory regions
 	m_char_rom = memory_region(machine, "chargen");
 
-	/* register for state saving */
-	state_save_register_global_pointer(machine, m_page_ram, TMC600_PAGE_RAM_SIZE);
+	// register for state saving
 	state_save_register_global_pointer(machine, m_color_ram, TMC600_PAGE_RAM_SIZE);
 
 	state_save_register_global(machine, m_vismac_reg_latch);
@@ -138,23 +128,31 @@ void tmc600_state::video_start()
 	state_save_register_global(machine, m_blink);
 }
 
-bool tmc600_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static const gfx_layout tmc600_charlayout =
 {
-	cdp1869_update(m_vis, &bitmap, &cliprect);
+	6, 9,					// 6 x 9 characters
+	256,					// 256 characters
+	1,						// 1 bits per pixel
+	{ 0 },					// no bitplanes
+	// x offsets
+	{ 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8 },
+	8*8						// every char takes 8 x 8 bytes
+};
 
-	return 0;
-}
+static GFXDECODE_START( tmc600 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
+GFXDECODE_END
 
 MACHINE_CONFIG_FRAGMENT( tmc600_video )
+	// video hardware
+	MDRV_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
 	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
+	MDRV_GFXDECODE(tmc600)
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_PALETTE_LENGTH(8+64)
-	MDRV_PALETTE_INIT(cdp1869)
-	MDRV_SCREEN_RAW_PARAMS(CDP1869_DOT_CLK_PAL, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL)
-
+	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, tmc600_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, vis_intf, cdp1869_page_ram)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
