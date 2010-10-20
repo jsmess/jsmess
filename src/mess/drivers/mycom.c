@@ -7,7 +7,8 @@
     TODO:
     - SN doesn't seem to work properly, needs to find out what's the WE bit
       for.
-    - Hook-up FDC and CMT load / save;
+    - Hook-up FDC (only the basic components have been added)
+    - Hook-up CMT load / save; (save works, load does not)
     - Printer
     - RTC
 
@@ -18,199 +19,159 @@
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
 #include "sound/sn76496.h"
+#include "devices/cassette.h"
+#include "sound/wave.h"
+#include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
+#include "formats/basicdsk.h"
 
-static UINT16 mycom_amask;
-static UINT8 ram_bank;
+static UINT8 mc6845_reg[32];				/* registers */
+static UINT8 mc6845_ind;				/* register index */
+static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+static running_device *mc6845;
+static running_device *mycom_cassette;
+static UINT8 *vram;
+static UINT8 *gfx_rom;
 static UINT16 vram_addr;
-static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag,shift_press_flag;
 static UINT8 video_mode,sn_we;
 
 static VIDEO_START( mycom )
 {
+	mc6845 = machine->device("crtc");
+	vram = memory_region(machine, "vram");
+	gfx_rom = memory_region(machine, "gfx");
 }
 
 static VIDEO_UPDATE( mycom )
 {
-	int x,y,count;
-	int xi,yi;
-	int width;
-	static UINT8 *vram = memory_region(screen->machine, "vram");
-	static UINT8 *gfx_rom = memory_region(screen->machine, "gfx");
+	mc6845_update(mc6845, bitmap, cliprect);
+	return 0;
+}
 
-	count = 0;
+static MC6845_UPDATE_ROW( mycom_update_row )
+{
+	UINT8 chr,gfx=0,z;
+	UINT16 mem,x;
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
 	if(video_mode & 0x40)
 	{
-		width = (video_mode & 0x80) ? 160 : 320;
-
-		for(y=0;y<24;y++)
+		for (x = 0; x < x_count; x++)					// lores pixels
 		{
-			for(x=0;x<width;x+=4)
-			{
-				//int xi,yi;
-				int xi,yi;
-
-				for(yi=0;yi<4;yi++)
-				{
-					for(xi=0;xi<2;xi++)
-					{
-						int pen;
-
-						pen = vram[count] >> (yi+(xi*4));
-						pen &= 1;
-
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+0))*2+0) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+1))*2+0) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+0))*2+0) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+1))*2+0) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+0))*2+1) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+1))*2+1) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+0))*2+1) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+1))*2+1) = screen->machine->pens[pen];
-					}
-				}
-
-				count++;
-			}
+			UINT8 dbit=1;
+			if (x == cursor_x) dbit=0;
+			mem = (ma + x) & 0x7ff;
+			chr = vram[mem];
+			z = ra / 3;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			z += 4;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = BIT( chr, z ) ? dbit: dbit^1;
 		}
 
-		return 0;
+//		width = (video_mode & 0x80) ? 160 : 320;
+
 	}
 	else
 	{
-		width = (video_mode & 0x80) ? 40 : 80;
-
-		for(y=0;y<24;y++)
+		for (x = 0; x < x_count; x++)					// text
 		{
-			for(x=0;x<width;x++)
+			UINT8 inv=0;
+			if (x == cursor_x) inv=0xff;
+			mem = (ma + x) & 0x7ff;
+			if (ra > 7)
+				gfx = inv;	// some blank spacing lines
+			else
 			{
-				int tile = vram[count];
-				//int color = (display_reg & 0x80) ? 7 : (attr & 0x07);
-
-					for(yi=0;yi<8;yi++)
-					{
-						for(xi=0;xi<8;xi++)
-						{
-							int pen;
-
-							pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 1 : 0;
-
-							//if(pen)
-								*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
-						}
-					}
-
-					if(cursor_addr == count)
-					{
-						int xc,yc,cursor_on;
-
-						cursor_on = 0;
-						switch(cursor_raster & 0x60)
-						{
-							case 0x00: cursor_on = 1; break; //always on
-							case 0x20: cursor_on = 0; break; //always off
-							case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-							case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
-						}
-
-						if(cursor_on)
-						{
-							for(yc=0;yc<(8-(cursor_raster & 7));yc++)
-							{
-								for(xc=0;xc<8;xc++)
-								{
-									*BITMAP_ADDR16(bitmap, y*8+yc, x*8+xc) = screen->machine->pens[0x1];
-								}
-							}
-						}
-					}
-
-				count++;
+				chr = vram[mem];
+				gfx = gfx_rom[(chr<<3) | ra] ^ inv;
 			}
+
+			/* Display a scanline of a character */
+			*p++ = ( gfx & 0x80 ) ? 1 : 0;
+			*p++ = ( gfx & 0x40 ) ? 1 : 0;
+			*p++ = ( gfx & 0x20 ) ? 1 : 0;
+			*p++ = ( gfx & 0x10 ) ? 1 : 0;
+			*p++ = ( gfx & 0x08 ) ? 1 : 0;
+			*p++ = ( gfx & 0x04 ) ? 1 : 0;
+			*p++ = ( gfx & 0x02 ) ? 1 : 0;
+			*p++ = ( gfx & 0x01 ) ? 1 : 0;
 		}
 	}
-
-    return 0;
 }
 
-static READ8_HANDLER( wram_r )
-{
-	static UINT8 *ram = memory_region(space->machine, "maincpu");
+//		width = (video_mode & 0x80) ? 40 : 80;
 
-	if(offset & 0xc000 && ram_bank)
-		return ram[(offset & 0x3fff) | 0x10000];
 
-	return ram[offset | mycom_amask];
-}
-
-static WRITE8_HANDLER( wram_w )
-{
-	static UINT8 *ram = memory_region(space->machine, "maincpu");
-
-	ram[offset | mycom_amask] = data;
-}
-
-static WRITE8_HANDLER( sys_control_w )
+static WRITE8_HANDLER( mycom_00_w )
 {
 	switch(data)
 	{
-		case 0x00: mycom_amask = 0xc000; break;
-		case 0x01: mycom_amask = 0x0000; break;
-		case 0x02: ram_bank = 0; break;
-		case 0x03: ram_bank = 1; break;
+		case 0x00: memory_set_bank(space->machine, "boot", 1); break;
+		case 0x01: memory_set_bank(space->machine, "boot", 0); break;
+		case 0x02: memory_set_bank(space->machine, "upper", 0); break;
+		case 0x03: memory_set_bank(space->machine, "upper", 1); break;
 	}
+}
+
+static READ8_HANDLER( mycom_6845_r )
+{
+	if (!offset)
+		return 0;
+
+	/* need to read the start registers or scroll wont work */
+	if ((mc6845_ind & 0x1e) == 0x0c)
+		return mc6845_reg[mc6845_ind];
+	else
+		return mc6845_register_r(mc6845, 0);
 }
 
 static WRITE8_HANDLER( mycom_6845_w )
 {
-	static int addr_latch;
-
 	if(offset == 0)
 	{
-		addr_latch = data;
-		mc6845_address_w(space->machine->device("crtc"), 0,data);
+		mc6845_ind = data;
+		mc6845_address_w(mc6845, 0, data);
 	}
 	else
 	{
-		if(addr_latch == 0x0a)
-			cursor_raster = data;
-		if(addr_latch == 0x0e)
-			cursor_addr = ((data<<8) & 0x3f00) | (cursor_addr & 0xff);
-		else if(addr_latch == 0x0f)
-			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
-
-		mc6845_register_w(space->machine->device("crtc"), 0,data);
+		mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];
+		mc6845_register_w(mc6845, 0,data);
 	}
 }
 
 static READ8_HANDLER( vram_data_r )
 {
-	static UINT8 *vram = memory_region(space->machine,"vram");
-
 	return vram[vram_addr];
 }
 
 static WRITE8_HANDLER( vram_data_w )
 {
-	static UINT8 *vram = memory_region(space->machine,"vram");
-
 	vram[vram_addr] = data;
 }
 
 static ADDRESS_MAP_START(mycom_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(wram_r,wram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
+	AM_RANGE(0x1000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("upper")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mycom_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sys_control_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREAD("crtc", mc6845_register_r) AM_WRITE(mycom_6845_w)
+	AM_RANGE(0x02, 0x03) AM_READWRITE(mycom_6845_r,mycom_6845_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -346,12 +307,20 @@ static GFXDECODE_START( mycom )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
+static const wd17xx_interface wd1771_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL, // no information available
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
+	8,		/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
+	mycom_update_row,		/* row update callback */
 	NULL,		/* after pixel update callback */
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
@@ -360,7 +329,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( vram_laddr_w )
+static WRITE8_DEVICE_HANDLER( mycom_04_w )
 {
 	vram_addr = (vram_addr & 0x700) | (data & 0x0ff);
 
@@ -370,27 +339,30 @@ static WRITE8_DEVICE_HANDLER( vram_laddr_w )
 	//  sn76496_w(device->machine->device("sn1"), 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( vram_haddr_w )
+static WRITE8_DEVICE_HANDLER( mycom_06_w )
 {
 	vram_addr = (vram_addr & 0x0ff) | ((data & 0x007) << 8);
 }
 
-static READ8_DEVICE_HANDLER( input_1a )
+static READ8_DEVICE_HANDLER( mycom_08_r )
 {
 	/*
     x--- ---- display flag
     ---- --x- keyboard shift
     ---- ---x keyboard strobe
     */
-	int res;
+	UINT8 data = shift_press_flag << 1;
 
-	res = keyb_press_flag;
+	data |= keyb_press_flag;
 	keyb_press_flag = 0;
 
-	return 0x00 | (shift_press_flag << 1) | res;
+	//if (cassette_input(mycom_cassette) > 0.03) // not working
+	//	data+=4;
+
+	return data;
 }
 
-static READ8_DEVICE_HANDLER( input_0c )
+static READ8_DEVICE_HANDLER( mycom_06_r )
 {
 	/*
     xxxx ---- keyboard related, it expects to return 1101 here
@@ -398,13 +370,13 @@ static READ8_DEVICE_HANDLER( input_0c )
 	return (mame_rand(device->machine) & 0x20) | 0x00;
 }
 
-static READ8_DEVICE_HANDLER( key_r )
+static READ8_DEVICE_HANDLER( mycom_05_r )
 {
 	//keyb_press_flag = 0;
 	return keyb_press;
 }
 
-static WRITE8_DEVICE_HANDLER( output_1c )
+static WRITE8_DEVICE_HANDLER( mycom_0a_w )
 {
 	/*
     x--- ---- width 80/40 (0 = 80, 1 = 40)
@@ -417,6 +389,9 @@ static WRITE8_DEVICE_HANDLER( output_1c )
     ---- ---x printer strobe
     */
 
+	if (data & 8) // motor on
+		cassette_output(mycom_cassette, (data & 4) ? -1.0 : +1.0);
+
 	video_mode = data & 0xc0;
 	sn_we = data & 0x10;
 //  printf("%02x\n",data & 0x10);
@@ -424,22 +399,22 @@ static WRITE8_DEVICE_HANDLER( output_1c )
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_HANDLER(key_r),			/* Port B read */
-	DEVCB_HANDLER(input_0c),		/* Port C read */
-	DEVCB_HANDLER(vram_laddr_w),	/* Port A write */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_HANDLER(vram_haddr_w)		/* Port C write */
+	DEVCB_NULL,			/* Port A read */
+	DEVCB_HANDLER(mycom_05_r),	/* Port B read */
+	DEVCB_HANDLER(mycom_06_r),	/* Port C read */
+	DEVCB_HANDLER(mycom_04_w),	/* Port A write */
+	DEVCB_NULL,			/* Port B write */
+	DEVCB_HANDLER(mycom_06_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_HANDLER(input_1a),			/* Port A read */
+	DEVCB_HANDLER(mycom_08_r),	/* Port A read */
 	DEVCB_NULL,			/* Port B read */
 	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
 	DEVCB_NULL,			/* Port B write */
-	DEVCB_HANDLER(output_1c)		/* Port C write */
+	DEVCB_HANDLER(mycom_0a_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
@@ -502,62 +477,76 @@ static TIMER_CALLBACK( keyboard_callback )
 static MACHINE_START(mycom)
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+	mycom_cassette = machine->device("cassette");
 }
 
 static MACHINE_RESET(mycom)
 {
-	mycom_amask = 0xc000;
+	memory_set_bank(machine, "boot", 1);
+	memory_set_bank(machine, "upper", 0);
+}
+
+static DRIVER_INIT( mycom )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
+	memory_configure_bank(machine, "upper", 0, 2, &RAM[0xc000], 0x4000);
 }
 
 static MACHINE_CONFIG_START( mycom, driver_device )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(mycom_map)
-    MDRV_CPU_IO_MAP(mycom_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(mycom_map)
+	MDRV_CPU_IO_MAP(mycom_io)
 
-    MDRV_MACHINE_START(mycom)
-    MDRV_MACHINE_RESET(mycom)
+	MDRV_MACHINE_START(mycom)
+	MDRV_MACHINE_RESET(mycom)
 
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(mycom)
 
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-    MDRV_VIDEO_START(mycom)
-    MDRV_VIDEO_UPDATE(mycom)
+	MDRV_VIDEO_START(mycom)
+	MDRV_VIDEO_UPDATE(mycom)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* Devices */
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_WD179X_ADD("fdc", wd1771_intf) // WD1771
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mycom )
-    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0xc000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a))
-	ROM_LOAD( "basic.rom",0xf000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1))
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0xc000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a) )
+	ROM_LOAD( "basic.rom",0xf000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1) )
 
 	ROM_REGION( 0x0800, "vram", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0800, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8))
+	ROM_REGION( 0x0800, "gfx", 0 )
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1981, mycom,  	0,       0, 		mycom,	mycom,	 0, 	   "Japan Electronics College",   "MYCOMZ-80A",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, mycom,  	0,       0, 	mycom,	mycom,	 mycom,	   "Japan Electronics College",   "MYCOMZ-80A",	GAME_NOT_WORKING | GAME_NO_SOUND)
 
