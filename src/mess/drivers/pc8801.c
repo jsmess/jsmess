@@ -96,7 +96,6 @@
 #include "emu.h"
 #include "includes/pc8801.h"
 #include "cpu/z80/z80.h"
-#include "cpu/v30mz/nec.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
 #include "machine/ctronics.h"
@@ -175,15 +174,6 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
 //  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown -- not yet) */
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(CPU_I8255A_TAG, i8255a_r, i8255a_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_io, ADDRESS_SPACE_IO, 8 )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_v30_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8801fd_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -647,26 +637,6 @@ static MACHINE_CONFIG_DERIVED( pc88srh, pc88srl )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc88va, pc88_state )
-
-	MDRV_CPU_ADD("maincpu", Z80, 8000000)        /* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc88va_mem)
-	MDRV_CPU_IO_MAP(pc88va_io)
-
-	MDRV_CPU_ADD("cpu2", V30MZ, 8000000)        /* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc88va_v30_mem)
-
-	/* No accurate at all, it's just skeleton code */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	/*MDRV_ASPECT_RATIO(8, 5)*/
-	MDRV_SCREEN_SIZE(640, 440)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT( pc8801 )
-MACHINE_CONFIG_END
-
 /* ROMs */
 
 ROM_START( pc8801 )
@@ -895,30 +865,6 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
-ROM_START( pc88va )
-	ROM_REGION( 0xb0000, "maincpu", 0 )
-	/* FWIW, varom00 contains some piece of N88-BASIC */
-	ROM_LOAD( "varom00.rom",   0x10000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )	// multiple banks to be loaded at 0x0000?
-	ROM_LOAD( "varom08.rom",   0x90000, 0x20000, CRC(eef6d4a0) SHA1(47e5f89f8b0ce18ff8d5d7b7aef8ca0a2a8e3345) )	// multiple banks to be loaded at 0x8000?
-
-	ROM_REGION( 0x20000, "cpu2", 0 )	// not sure, it may be the V30 program
-	ROM_LOAD( "varom1.rom", 0x0000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
-
-	ROM_REGION( 0x2000, "sub", 0 )		// not sure what this should do...
-	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
-
-	ROM_REGION( 0x50000, "gfx1", 0 )
-	ROM_LOAD( "vafont.rom", 0x00000, 0x50000, CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) )
-
-	/* 32 banks, to be loaded at 0xc000 - 0xffff */
-	ROM_REGION( 0x80000, "dictionary", 0 )
-	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
-ROM_END
-
 /* System Drivers */
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
@@ -939,10 +885,6 @@ COMP( 1987, pc8801ma,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Elec
 COMP( 1988, pc8801ma2,      pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
 //COMP( 1989, pc8801fe2,    pc8801, 0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
 COMP( 1989, pc8801mc,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MC", GAME_NOT_WORKING )
-
-COMP( 1987, pc88va,         0,		0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )
 
 //COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO", GAME_NOT_WORKING )
 //COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO+", GAME_NOT_WORKING )
