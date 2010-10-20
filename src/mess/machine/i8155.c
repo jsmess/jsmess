@@ -15,154 +15,209 @@
 
 */
 
+#include "emu.h"
 #include "i8155.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 #define LOG 0
 
 enum
 {
-	I8155_REGISTER_COMMAND = 0,
-	I8155_REGISTER_STATUS = 0,
-	I8155_REGISTER_PORT_A,
-	I8155_REGISTER_PORT_B,
-	I8155_REGISTER_PORT_C,
-	I8155_REGISTER_TIMER_LOW,
-	I8155_REGISTER_TIMER_HIGH
+	REGISTER_COMMAND = 0,
+	REGISTER_STATUS = 0,
+	REGISTER_PORT_A,
+	REGISTER_PORT_B,
+	REGISTER_PORT_C,
+	REGISTER_TIMER_LOW,
+	REGISTER_TIMER_HIGH
 };
 
 enum
 {
-	I8155_PORT_A = 0,
-	I8155_PORT_B,
-	I8155_PORT_C,
-	I8155_PORT_COUNT
+	PORT_A = 0,
+	PORT_B,
+	PORT_C,
+	PORT_COUNT
 };
 
 enum
 {
-	I8155_PORT_MODE_INPUT = 0,
-	I8155_PORT_MODE_OUTPUT,
-	I8155_PORT_MODE_STROBED_PORT_A,	/* not supported */
-	I8155_PORT_MODE_STROBED			/* not supported */
+	PORT_MODE_INPUT = 0,
+	PORT_MODE_OUTPUT,
+	PORT_MODE_STROBED_PORT_A,	// not supported
+	PORT_MODE_STROBED			// not supported
 };
 
-#define I8155_COMMAND_PA					0x01
-#define I8155_COMMAND_PB					0x02
-#define I8155_COMMAND_PC_MASK				0x0c
-#define I8155_COMMAND_PC_ALT_1				0x00
-#define I8155_COMMAND_PC_ALT_2				0x0c
-#define I8155_COMMAND_PC_ALT_3				0x04	/* not supported */
-#define I8155_COMMAND_PC_ALT_4				0x08	/* not supported */
-#define I8155_COMMAND_IEA					0x10	/* not supported */
-#define I8155_COMMAND_IEB					0x20	/* not supported */
-#define I8155_COMMAND_TM_MASK				0xc0
-#define I8155_COMMAND_TM_NOP				0x00
-#define I8155_COMMAND_TM_STOP				0x40
-#define I8155_COMMAND_TM_STOP_AFTER_TC		0x80
-#define I8155_COMMAND_TM_START				0xc0
+#define COMMAND_PA					0x01
+#define COMMAND_PB					0x02
+#define COMMAND_PC_MASK				0x0c
+#define COMMAND_PC_ALT_1			0x00
+#define COMMAND_PC_ALT_2			0x0c
+#define COMMAND_PC_ALT_3			0x04	// not supported
+#define COMMAND_PC_ALT_4			0x08	// not supported
+#define COMMAND_IEA					0x10	// not supported
+#define COMMAND_IEB					0x20	// not supported
+#define COMMAND_TM_MASK				0xc0
+#define COMMAND_TM_NOP				0x00
+#define COMMAND_TM_STOP				0x40
+#define COMMAND_TM_STOP_AFTER_TC	0x80
+#define COMMAND_TM_START			0xc0
 
-#define I8155_STATUS_INTR_A					0x01	/* not supported */
-#define I8155_STATUS_A_BF					0x02	/* not supported */
-#define I8155_STATUS_INTE_A					0x04	/* not supported */
-#define I8155_STATUS_INTR_B					0x08	/* not supported */
-#define I8155_STATUS_B_BF					0x10	/* not supported */
-#define I8155_STATUS_INTE_B					0x20	/* not supported */
-#define I8155_STATUS_TIMER					0x40
+#define STATUS_INTR_A				0x01	// not supported
+#define STATUS_A_BF					0x02	// not supported
+#define STATUS_INTE_A				0x04	// not supported
+#define STATUS_INTR_B				0x08	// not supported
+#define STATUS_B_BF					0x10	// not supported
+#define STATUS_INTE_B				0x20	// not supported
+#define STATUS_TIMER				0x40
 
-#define I8155_TIMER_MODE_MASK				0xc0
-#define I8155_TIMER_MODE_LOW				0x00
-#define I8155_TIMER_MODE_SQUARE_WAVE		0x40
-#define I8155_TIMER_MODE_SINGLE_PULSE		0x80
-#define I8155_TIMER_MODE_AUTOMATIC_RELOAD	0xc0
+#define TIMER_MODE_MASK				0xc0
+#define TIMER_MODE_LOW				0x00
+#define TIMER_MODE_SQUARE_WAVE		0x40
+#define TIMER_MODE_SINGLE_PULSE		0x80
+#define TIMER_MODE_AUTOMATIC_RELOAD	0xc0
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _i8155_t i8155_t;
-struct _i8155_t
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type I8155 = i8155_device_config::static_alloc_device_config;
+
+
+// default address map
+static ADDRESS_MAP_START( i8155, 0, 8 )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  i8155_device_config - constructor
+//-------------------------------------------------
+
+i8155_device_config::i8155_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "Intel 8155", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {
-	devcb_resolved_read8		in_port_func[I8155_PORT_COUNT];
-	devcb_resolved_write8		out_port_func[I8155_PORT_COUNT];
-	devcb_resolved_write_line	out_to_func;
-
-	/* memory */
-	UINT8 ram[256];				/* RAM */
-
-	/* registers */
-	UINT8 command;				/* command register */
-	UINT8 status;				/* status register */
-	UINT8 output[3];			/* output latches */
-
-	/* counter */
-	UINT16 count_length;		/* count length register */
-	UINT16 counter;				/* counter register */
-	int to;						/* timer output */
-
-	/* timers */
-	emu_timer *timer;			/* counter timer */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE i8155_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	return (i8155_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const i8155_interface *get_interface(running_device *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *i8155_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	assert(device->type() == I8155);
-	return (const i8155_interface *) device->baseconfig().static_config();
+	return global_alloc(i8155_device_config(mconfig, tag, owner, clock));
 }
 
-INLINE UINT8 get_timer_mode(i8155_t *i8155)
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *i8155_device_config::alloc_device(running_machine &machine) const
 {
-	return (i8155->count_length >> 8) & I8155_TIMER_MODE_MASK;
+	return auto_alloc(&machine, i8155_device(machine, *this));
 }
 
-INLINE void timer_output(i8155_t *i8155)
-{
-	devcb_call_write_line(&i8155->out_to_func, i8155->to);
 
-	if (LOG) logerror("8155 Timer Output: %u\n", i8155->to);
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *i8155_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
-INLINE void pulse_timer_output(i8155_t *i8155)
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8155_device_config::device_config_complete()
 {
-	i8155->to = 0; timer_output(i8155);
-	i8155->to = 1; timer_output(i8155);
+	// inherit a copy of the static data
+	const i8155_interface *intf = reinterpret_cast<const i8155_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8155_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&in_pa_func, 0, sizeof(in_pa_func));
+		memset(&out_pa_func, 0, sizeof(out_pa_func));
+		memset(&in_pb_func, 0, sizeof(in_pb_func));
+		memset(&out_pb_func, 0, sizeof(out_pb_func));
+		memset(&in_pc_func, 0, sizeof(in_pc_func));
+		memset(&out_pc_func, 0, sizeof(out_pc_func));
+		memset(&out_to_func, 0, sizeof(out_to_func));
+	}
 }
 
-INLINE int get_port_mode(i8155_t *i8155, int port)
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+inline UINT8 i8155_device::get_timer_mode()
+{
+	return (m_count_length >> 8) & TIMER_MODE_MASK;
+}
+
+inline void i8155_device::timer_output()
+{
+	devcb_call_write_line(&m_out_to_func, m_to);
+
+	if (LOG) logerror("8155 '%s' Timer Output: %u\n", tag(), m_to);
+}
+
+inline void i8155_device::pulse_timer_output()
+{
+	m_to = 0; timer_output();
+	m_to = 1; timer_output();
+}
+
+inline int i8155_device::get_port_mode(int port)
 {
 	int mode = -1;
 
 	switch (port)
 	{
-	case I8155_PORT_A:
-		mode = (i8155->command & I8155_COMMAND_PA) ? I8155_PORT_MODE_OUTPUT : I8155_PORT_MODE_INPUT;
+	case PORT_A:
+		mode = (m_command & COMMAND_PA) ? PORT_MODE_OUTPUT : PORT_MODE_INPUT;
 		break;
 
-	case I8155_PORT_B:
-		mode = (i8155->command & I8155_COMMAND_PB) ? I8155_PORT_MODE_OUTPUT : I8155_PORT_MODE_INPUT;
+	case PORT_B:
+		mode = (m_command & COMMAND_PB) ? PORT_MODE_OUTPUT : PORT_MODE_INPUT;
 		break;
 
-	case I8155_PORT_C:
-		switch (i8155->command & I8155_COMMAND_PC_MASK)
+	case PORT_C:
+		switch (m_command & COMMAND_PC_MASK)
 		{
-		case I8155_COMMAND_PC_ALT_1: mode = I8155_PORT_MODE_INPUT;			break;
-		case I8155_COMMAND_PC_ALT_2: mode = I8155_PORT_MODE_OUTPUT;			break;
-		case I8155_COMMAND_PC_ALT_3: mode = I8155_PORT_MODE_STROBED_PORT_A; break;
-		case I8155_COMMAND_PC_ALT_4: mode = I8155_PORT_MODE_STROBED;		break;
+		case COMMAND_PC_ALT_1: mode = PORT_MODE_INPUT;			break;
+		case COMMAND_PC_ALT_2: mode = PORT_MODE_OUTPUT;			break;
+		case COMMAND_PC_ALT_3: mode = PORT_MODE_STROBED_PORT_A; break;
+		case COMMAND_PC_ALT_4: mode = PORT_MODE_STROBED;		break;
 		}
 		break;
 	}
@@ -170,39 +225,39 @@ INLINE int get_port_mode(i8155_t *i8155, int port)
 	return mode;
 }
 
-INLINE UINT8 read_port(i8155_t *i8155, int port)
+inline UINT8 i8155_device::read_port(int port)
 {
 	UINT8 data = 0;
 
 	switch (port)
 	{
-	case I8155_PORT_A:
-	case I8155_PORT_B:
-		switch (get_port_mode(i8155, port))
+	case PORT_A:
+	case PORT_B:
+		switch (get_port_mode(port))
 		{
-		case I8155_PORT_MODE_INPUT:
-			data = devcb_call_read8(&i8155->in_port_func[port], 0);
+		case PORT_MODE_INPUT:
+			data = devcb_call_read8(&m_in_port_func[port], 0);
 			break;
 
-		case I8155_PORT_MODE_OUTPUT:
-			data = i8155->output[port];
+		case PORT_MODE_OUTPUT:
+			data = m_output[port];
 			break;
 		}
 		break;
 
-	case I8155_PORT_C:
-		switch (get_port_mode(i8155, I8155_PORT_C))
+	case PORT_C:
+		switch (get_port_mode(PORT_C))
 		{
-		case I8155_PORT_MODE_INPUT:
-			data = devcb_call_read8(&i8155->in_port_func[port], 0) & 0x3f;
+		case PORT_MODE_INPUT:
+			data = devcb_call_read8(&m_in_port_func[port], 0) & 0x3f;
 			break;
 
-		case I8155_PORT_MODE_OUTPUT:
-			data = i8155->output[port] & 0x3f;
+		case PORT_MODE_OUTPUT:
+			data = m_output[port] & 0x3f;
 			break;
 
 		default:
-			logerror("8155 Unsupported Port C mode!\n");
+			logerror("8155 '%s' Unsupported Port C mode!\n", tag());
 		}
 		break;
 	}
@@ -210,341 +265,325 @@ INLINE UINT8 read_port(i8155_t *i8155, int port)
 	return data;
 }
 
-INLINE void write_port(i8155_t *i8155, int port, UINT8 data)
+inline void i8155_device::write_port(int port, UINT8 data)
 {
-	switch (get_port_mode(i8155, port))
+	switch (get_port_mode(port))
 	{
-	case I8155_PORT_MODE_OUTPUT:
-		i8155->output[port] = data;
-		devcb_call_write8(&i8155->out_port_func[port], 0, i8155->output[port]);
+	case PORT_MODE_OUTPUT:
+		m_output[port] = data;
+		devcb_call_write8(&m_out_port_func[port], 0, m_output[port]);
 		break;
 	}
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( counter_tick )
--------------------------------------------------*/
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-static TIMER_CALLBACK( counter_tick )
+//-------------------------------------------------
+//  i8155_device - constructor
+//-------------------------------------------------
+
+i8155_device::i8155_device(running_machine &_machine, const i8155_device_config &config)
+    : device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+      m_config(config)
 {
-	running_device *device = (running_device *)ptr;
-	i8155_t *i8155 = get_safe_token(device);
 
-	/* count down */
-	i8155->counter--;
+}
 
-	if (get_timer_mode(i8155) == I8155_TIMER_MODE_LOW)
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8155_device::device_start()
+{
+	// resolve callbacks
+	devcb_resolve_read8(&m_in_port_func[0], &m_config.in_pa_func, this);
+	devcb_resolve_read8(&m_in_port_func[1], &m_config.in_pb_func, this);
+	devcb_resolve_read8(&m_in_port_func[2], &m_config.in_pc_func, this);
+	devcb_resolve_write8(&m_out_port_func[0], &m_config.out_pa_func, this);
+	devcb_resolve_write8(&m_out_port_func[1], &m_config.out_pb_func, this);
+	devcb_resolve_write8(&m_out_port_func[2], &m_config.out_pc_func, this);
+	devcb_resolve_write_line(&m_out_to_func, &m_config.out_to_func, this);
+
+	// allocate timers
+	m_timer = device_timer_alloc(*this);
+
+	// register for state saving
+	state_save_register_device_item(this, 0, m_command);
+	state_save_register_device_item(this, 0, m_status);
+	state_save_register_device_item_array(this, 0, m_output);
+	state_save_register_device_item(this, 0, m_count_length);
+	state_save_register_device_item(this, 0, m_counter);
+	state_save_register_device_item(this, 0, m_to);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8155_device::device_reset()
+{
+	// clear output registers
+	m_output[PORT_A] = 0;
+	m_output[PORT_B] = 0;
+	m_output[PORT_C] = 0;
+
+	// set ports to input mode
+	register_w(REGISTER_COMMAND, m_command & ~(COMMAND_PA | COMMAND_PB | COMMAND_PC_MASK));
+
+	// clear timer flag
+	m_status &= ~STATUS_TIMER;
+
+	// stop counting
+	timer_enable(m_timer, 0);
+
+	// clear timer output
+	m_to = 1;
+	timer_output();
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// count down
+	m_counter--;
+
+	if (get_timer_mode() == TIMER_MODE_LOW)
 	{
-		/* pulse on every count */
-		pulse_timer_output(i8155);
+		// pulse on every count
+		pulse_timer_output();
 	}
 
-	if (i8155->counter == 0)
+	if (m_counter == 0)
 	{
-		if (LOG) logerror("8155 Timer Count Reached\n");
+		if (LOG) logerror("8155 '%s' Timer Count Reached\n", tag());
 
-		switch (i8155->command & I8155_COMMAND_TM_MASK)
+		switch (m_command & COMMAND_TM_MASK)
 		{
-		case I8155_COMMAND_TM_STOP_AFTER_TC:
-			/* stop timer */
-			timer_enable(i8155->timer, 0);
+		case COMMAND_TM_STOP_AFTER_TC:
+			// stop timer
+			timer_enable(m_timer, 0);
 
-			if (LOG) logerror("8155 Timer Stopped\n");
+			if (LOG) logerror("8155 '%s' Timer Stopped\n", tag());
 			break;
 		}
 
-		switch (get_timer_mode(i8155))
+		switch (get_timer_mode())
 		{
-		case I8155_TIMER_MODE_SQUARE_WAVE:
-			/* toggle timer output */
-			i8155->to = !i8155->to;
-			timer_output(i8155);
+		case TIMER_MODE_SQUARE_WAVE:
+			// toggle timer output
+			m_to = !m_to;
+			timer_output();
 			break;
 
-		case I8155_TIMER_MODE_SINGLE_PULSE:
-			/* single pulse upon TC being reached */
-			pulse_timer_output(i8155);
+		case TIMER_MODE_SINGLE_PULSE:
+			// single pulse upon TC being reached
+			pulse_timer_output();
 
-			/* clear timer mode setting */
-			i8155->command &= ~I8155_COMMAND_TM_MASK;
+			// clear timer mode setting
+			m_command &= ~COMMAND_TM_MASK;
 			break;
 
-		case I8155_TIMER_MODE_AUTOMATIC_RELOAD:
-			/* automatic reload, i.e. single pulse every time TC is reached */
-			pulse_timer_output(i8155);
+		case TIMER_MODE_AUTOMATIC_RELOAD:
+			// automatic reload, i.e. single pulse every time TC is reached
+			pulse_timer_output();
 			break;
 		}
 
-		/* set timer flag */
-		i8155->status |= I8155_STATUS_TIMER;
+		// set timer flag
+		m_status |= STATUS_TIMER;
 
-		/* reload timer counter */
-		i8155->counter = i8155->count_length & 0x3fff;
+		// reload timer counter
+		m_counter = m_count_length & 0x3fff;
 	}
 }
 
-/*-------------------------------------------------
-    i8155_register_r - register read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( i8155_r )
+//-------------------------------------------------
+//  io_r - register read
+//-------------------------------------------------
+
+READ8_MEMBER( i8155_device::io_r )
 {
-	i8155_t *i8155 = get_safe_token(device);
-
 	UINT8 data = 0;
 
 	switch (offset & 0x03)
 	{
-	case I8155_REGISTER_STATUS:
-		data = i8155->status;
+	case REGISTER_STATUS:
+		data = m_status;
 
-		/* clear timer flag */
-		i8155->status &= ~I8155_STATUS_TIMER;
+		// clear timer flag
+		m_status &= ~STATUS_TIMER;
 		break;
 
-	case I8155_REGISTER_PORT_A:
-		data = read_port(i8155, I8155_PORT_A);
+	case REGISTER_PORT_A:
+		data = read_port(PORT_A);
 		break;
 
-	case I8155_REGISTER_PORT_B:
-		data = read_port(i8155, I8155_PORT_B);
+	case REGISTER_PORT_B:
+		data = read_port(PORT_B);
 		break;
 
-	case I8155_REGISTER_PORT_C:
-		data = read_port(i8155, I8155_PORT_C);
+	case REGISTER_PORT_C:
+		data = read_port(PORT_C);
 		break;
 	}
 
 	return data;
 }
 
-/*-------------------------------------------------
-    i8155_register_w - register write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( i8155_w )
+//-------------------------------------------------
+//  register_w - register write
+//-------------------------------------------------
+
+void i8155_device::register_w(int offset, UINT8 data)
 {
-	i8155_t *i8155 = get_safe_token(device);
-
 	switch (offset & 0x07)
 	{
-	case I8155_REGISTER_COMMAND:
-		i8155->command = data;
+	case REGISTER_COMMAND:
+		m_command = data;
 
-		if (LOG) logerror("8155 Port A Mode: %s\n", (data & I8155_COMMAND_PA) ? "output" : "input");
-		if (LOG) logerror("8155 Port B Mode: %s\n", (data & I8155_COMMAND_PB) ? "output" : "input");
+		if (LOG) logerror("8155 '%s' Port A Mode: %s\n", tag(), (data & COMMAND_PA) ? "output" : "input");
+		if (LOG) logerror("8155 '%s' Port B Mode: %s\n", tag(), (data & COMMAND_PB) ? "output" : "input");
 
-		if (LOG) logerror("8155 Port A Interrupt: %s\n", (data & I8155_COMMAND_IEA) ? "enabled" : "disabled");
-		if (LOG) logerror("8155 Port B Interrupt: %s\n", (data & I8155_COMMAND_IEB) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 '%s' Port A Interrupt: %s\n", tag(), (data & COMMAND_IEA) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 '%s' Port B Interrupt: %s\n", tag(), (data & COMMAND_IEB) ? "enabled" : "disabled");
 
-		switch (data & I8155_COMMAND_PC_MASK)
+		switch (data & COMMAND_PC_MASK)
 		{
-		case I8155_COMMAND_PC_ALT_1:
-			if (LOG) logerror("8155 Port C Mode: Alt 1\n");
+		case COMMAND_PC_ALT_1:
+			if (LOG) logerror("8155 '%s' Port C Mode: Alt 1\n", tag());
 			break;
 
-		case I8155_COMMAND_PC_ALT_2:
-			if (LOG) logerror("8155 Port C Mode: Alt 2\n");
+		case COMMAND_PC_ALT_2:
+			if (LOG) logerror("8155 '%s' Port C Mode: Alt 2\n", tag());
 			break;
 
-		case I8155_COMMAND_PC_ALT_3:
-			if (LOG) logerror("8155 Port C Mode: Alt 3\n");
+		case COMMAND_PC_ALT_3:
+			if (LOG) logerror("8155 '%s' Port C Mode: Alt 3\n", tag());
 			break;
 
-		case I8155_COMMAND_PC_ALT_4:
-			if (LOG) logerror("8155 Port C Mode: Alt 4\n");
+		case COMMAND_PC_ALT_4:
+			if (LOG) logerror("8155 '%s' Port C Mode: Alt 4\n", tag());
 			break;
 		}
 
-		switch (data & I8155_COMMAND_TM_MASK)
+		switch (data & COMMAND_TM_MASK)
 		{
-		case I8155_COMMAND_TM_NOP:
-			/* do not affect counter operation */
+		case COMMAND_TM_NOP:
+			// do not affect counter operation
 			break;
 
-		case I8155_COMMAND_TM_STOP:
-			/* NOP if timer has not started, stop counting if the timer is running */
-			if (LOG) logerror("8155 Timer Command: Stop\n");
-			timer_enable(i8155->timer, 0);
+		case COMMAND_TM_STOP:
+			// NOP if timer has not started, stop counting if the timer is running
+			if (LOG) logerror("8155 '%s' Timer Command: Stop\n", tag());
+			timer_enable(m_timer, 0);
 			break;
 
-		case I8155_COMMAND_TM_STOP_AFTER_TC:
-			/* stop immediately after present TC is reached (NOP if timer has not started) */
-			if (LOG) logerror("8155 Timer Command: Stop after TC\n");
+		case COMMAND_TM_STOP_AFTER_TC:
+			// stop immediately after present TC is reached (NOP if timer has not started)
+			if (LOG) logerror("8155 '%s' Timer Command: Stop after TC\n", tag());
 			break;
 
-		case I8155_COMMAND_TM_START:
-			if (LOG) logerror("8155 Timer Command: Start\n");
+		case COMMAND_TM_START:
+			if (LOG) logerror("8155 '%s' Timer Command: Start\n", tag());
 
-			if (timer_enabled(i8155->timer))
+			if (timer_enabled(m_timer))
 			{
-				/* if timer is running, start the new mode and CNT length immediately after present TC is reached */
+				// if timer is running, start the new mode and CNT length immediately after present TC is reached
 			}
 			else
 			{
-				/* load mode and CNT length and start immediately after loading (if timer is not running) */
-				i8155->counter = i8155->count_length;
-				timer_adjust_periodic(i8155->timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
+				// load mode and CNT length and start immediately after loading (if timer is not running)
+				m_counter = m_count_length;
+				timer_adjust_periodic(m_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock()));
 			}
 			break;
 		}
 		break;
 
-	case I8155_REGISTER_PORT_A:
-		write_port(i8155, I8155_PORT_A, data);
+	case REGISTER_PORT_A:
+		write_port(PORT_A, data);
 		break;
 
-	case I8155_REGISTER_PORT_B:
-		write_port(i8155, I8155_PORT_B, data);
+	case REGISTER_PORT_B:
+		write_port(PORT_B, data);
 		break;
 
-	case I8155_REGISTER_PORT_C:
-		write_port(i8155, I8155_PORT_C, data);
+	case REGISTER_PORT_C:
+		write_port(PORT_C, data);
 		break;
 
-	case I8155_REGISTER_TIMER_LOW:
-		i8155->count_length = (i8155->count_length & 0xff00) | data;
-		if (LOG) logerror("8155 Count Length Low: %04x\n", i8155->count_length);
+	case REGISTER_TIMER_LOW:
+		m_count_length = (m_count_length & 0xff00) | data;
+		if (LOG) logerror("8155 '%s' Count Length Low: %04x\n", tag(), m_count_length);
 		break;
 
-	case I8155_REGISTER_TIMER_HIGH:
-		i8155->count_length = (data << 8) | (i8155->count_length & 0xff);
-		if (LOG) logerror("8155 Count Length High: %04x\n", i8155->count_length);
+	case REGISTER_TIMER_HIGH:
+		m_count_length = (data << 8) | (m_count_length & 0xff);
+		if (LOG) logerror("8155 '%s' Count Length High: %04x\n", tag(), m_count_length);
 
-		switch (data & I8155_TIMER_MODE_MASK)
+		switch (data & TIMER_MODE_MASK)
 		{
-		case I8155_TIMER_MODE_LOW:
-			/* puts out LOW during second half of count */
-			if (LOG) logerror("8155 Timer Mode: LOW\n");
+		case TIMER_MODE_LOW:
+			// puts out LOW during second half of count
+			if (LOG) logerror("8155 '%s' Timer Mode: LOW\n", tag());
 			break;
 
-		case I8155_TIMER_MODE_SQUARE_WAVE:
-			/* square wave, i.e. the period of the square wave equals the count length programmed with automatic reload at terminal count */
-			if (LOG) logerror("8155 Timer Mode: Square wave\n");
+		case TIMER_MODE_SQUARE_WAVE:
+			// square wave, i.e. the period of the square wave equals the count length programmed with automatic reload at terminal count
+			if (LOG) logerror("8155 '%s' Timer Mode: Square wave\n", tag());
 			break;
 
-		case I8155_TIMER_MODE_SINGLE_PULSE:
-			/* single pulse upon TC being reached */
-			if (LOG) logerror("8155 Timer Mode: Single pulse\n");
+		case TIMER_MODE_SINGLE_PULSE:
+			// single pulse upon TC being reached
+			if (LOG) logerror("8155 '%s' Timer Mode: Single pulse\n", tag());
 			break;
 
-		case I8155_TIMER_MODE_AUTOMATIC_RELOAD:
-			/* automatic reload, i.e. single pulse every time TC is reached */
-			if (LOG) logerror("8155 Timer Mode: Automatic reload\n");
+		case TIMER_MODE_AUTOMATIC_RELOAD:
+			// automatic reload, i.e. single pulse every time TC is reached
+			if (LOG) logerror("8155 '%s' Timer Mode: Automatic reload\n", tag());
 			break;
 		}
 		break;
 	}
 }
 
-/*-------------------------------------------------
-    i8155_ram_r - memory read
--------------------------------------------------*/
+//-------------------------------------------------
+//  io_w - register write
+//-------------------------------------------------
 
-READ8_DEVICE_HANDLER( i8155_ram_r )
+WRITE8_MEMBER( i8155_device::io_w )
 {
-	i8155_t *i8155 = get_safe_token(device);
-
-	return i8155->ram[offset & 0xff];
+	register_w(offset, data);
 }
 
-/*-------------------------------------------------
-    i8155_ram_w - memory write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( i8155_ram_w )
+//-------------------------------------------------
+//  memory_r - internal RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( i8155_device::memory_r )
 {
-	i8155_t *i8155 = get_safe_token(device);
-
-	i8155->ram[offset & 0xff] = data;
+	return this->space()->read_byte(offset);
 }
 
-/*-------------------------------------------------
-    DEVICE_START( i8155 )
--------------------------------------------------*/
 
-static DEVICE_START( i8155 )
+//-------------------------------------------------
+//  memory_w - internal RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( i8155_device::memory_w )
 {
-	i8155_t *i8155 = (i8155_t *)downcast<legacy_device_base *>(device)->token();
-	const i8155_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&i8155->in_port_func[0], &intf->in_pa_func, device);
-	devcb_resolve_read8(&i8155->in_port_func[1], &intf->in_pb_func, device);
-	devcb_resolve_read8(&i8155->in_port_func[2], &intf->in_pc_func, device);
-	devcb_resolve_write8(&i8155->out_port_func[0], &intf->out_pa_func, device);
-	devcb_resolve_write8(&i8155->out_port_func[1], &intf->out_pb_func, device);
-	devcb_resolve_write8(&i8155->out_port_func[2], &intf->out_pc_func, device);
-	devcb_resolve_write_line(&i8155->out_to_func, &intf->out_to_func, device);
-
-	/* create the timers */
-	i8155->timer = timer_alloc(device->machine, counter_tick, (void *)device);
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, i8155->command);
-	state_save_register_device_item(device, 0, i8155->status);
-	state_save_register_device_item_array(device, 0, i8155->output);
-	state_save_register_device_item(device, 0, i8155->count_length);
-	state_save_register_device_item(device, 0, i8155->counter);
-	state_save_register_device_item_array(device, 0, i8155->ram);
-	state_save_register_device_item(device, 0, i8155->to);
+	this->space()->write_byte(offset, data);
 }
-
-/*-------------------------------------------------
-    DEVICE_RESET( i8155 )
--------------------------------------------------*/
-
-static DEVICE_RESET( i8155 )
-{
-	i8155_t *i8155 = (i8155_t *)downcast<legacy_device_base *>(device)->token();
-
-	/* clear output registers */
-	i8155->output[I8155_PORT_A] = 0;
-	i8155->output[I8155_PORT_B] = 0;
-	i8155->output[I8155_PORT_C] = 0;
-
-	/* set ports to input mode */
-	i8155_w(device, I8155_REGISTER_COMMAND, i8155->command & ~(I8155_COMMAND_PA | I8155_COMMAND_PB | I8155_COMMAND_PC_MASK));
-
-	/* clear timer flag */
-	i8155->status &= ~I8155_STATUS_TIMER;
-
-	/* stop counting */
-	timer_enable(i8155->timer, 0);
-
-	/* clear timer output */
-	i8155->to = 1;
-	timer_output(i8155);
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( i8155 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( i8155 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8155_t);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8155);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(i8155);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8155");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel MCS-85");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(I8155, i8155);

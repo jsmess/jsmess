@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_WRITE(bank_select_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(CDP1871_TAG, cdp1871_data_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD(CDP1871_TAG, cdp1871_device, data_r)
 	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
@@ -219,7 +219,7 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 	else
 	{
 		// interrupts enabled: keyboard repeat
-		return cdp1871_rpt_r(state->m_kbe);
+		return state->m_kbe->rpt_r();
 	}
 }
 

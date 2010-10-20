@@ -22,27 +22,18 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __I8212__
 #define __I8212__
 
-#include "devcb.h"
+#include "emu.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(I8212, i8212);
 
-#define MDRV_I8212_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8212, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
-
-#define I8212_INTERFACE(name) \
-	const i8212_interface (name)=
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+///*************************************************************************
+//	MACROS / CONSTANTS
+///*************************************************************************
 
 enum
 {
@@ -50,8 +41,28 @@ enum
 	I8212_MODE_OUTPUT
 };
 
-typedef struct _i8212_interface i8212_interface;
-struct _i8212_interface
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MDRV_I8212_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD((_tag), I8212, 0)	\
+	MDRV_DEVICE_CONFIG(_config)
+
+#define I8212_INTERFACE(name) \
+	const i8212_interface (name) =
+
+
+
+///*************************************************************************
+//	TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> i8212_interface
+
+struct i8212_interface
 {
 	devcb_write_line	out_int_func;
 
@@ -59,14 +70,67 @@ struct _i8212_interface
 	devcb_write8		out_do_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* data latch access */
-READ8_DEVICE_HANDLER( i8212_r );
-WRITE8_DEVICE_HANDLER( i8212_w );
 
-/* strobe */
-WRITE_LINE_DEVICE_HANDLER( i8212_stb_w );
+
+// ======================> i8212_device_config
+
+class i8212_device_config :   public device_config,
+                                public i8212_interface
+{
+    friend class i8212_device;
+
+    // construction/destruction
+    i8212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+};
+
+
+
+// ======================> i8212_device
+
+class i8212_device :	public device_t
+{
+    friend class i8212_device_config;
+
+    // construction/destruction
+    i8212_device(running_machine &_machine, const i8212_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( data_r );
+    DECLARE_WRITE8_MEMBER( data_w );
+
+	DECLARE_WRITE_LINE_MEMBER( md_w );
+	DECLARE_WRITE_LINE_MEMBER( stb_w );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+
+private:
+	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_read8		m_in_di_func;
+	devcb_resolved_write8		m_out_do_func;
+
+	int m_md;					// mode
+	int m_stb;					// strobe
+	UINT8 m_data;				// data latch
+
+	const i8212_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type I8212;
+
+
 
 #endif

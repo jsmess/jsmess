@@ -9,10 +9,14 @@
 
 #include "emu.h"
 #include "cdp1871.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/devhelpr.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 {
@@ -77,292 +81,239 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 	}
 };
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _cdp1871_t cdp1871_t;
-struct _cdp1871_t
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type CDP1871 = cdp1871_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(cdp1871, "RCA CDP1871")
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1871_device_config::device_config_complete()
 {
-	devcb_resolved_write_line	out_da_func;
-	devcb_resolved_write_line	out_rpt_func;
-	devcb_resolved_read8		in_d1_func;
-	devcb_resolved_read8		in_d2_func;
-	devcb_resolved_read8		in_d3_func;
-	devcb_resolved_read8		in_d4_func;
-	devcb_resolved_read8		in_d5_func;
-	devcb_resolved_read8		in_d6_func;
-	devcb_resolved_read8		in_d7_func;
-	devcb_resolved_read8		in_d8_func;
-	devcb_resolved_read8		in_d9_func;
-	devcb_resolved_read8		in_d10_func;
-	devcb_resolved_read8		in_d11_func;
-	devcb_resolved_read_line	in_shift_func;
-	devcb_resolved_read_line	in_control_func;
-	devcb_resolved_read_line	in_alpha_func;
+	// inherit a copy of the static data
+	const cdp1871_interface *intf = reinterpret_cast<const cdp1871_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1871_interface *>(this) = *intf;
 
-	int inhibit;					/* scan counter clock inhibit */
-	int sense;						/* sense input scan counter */
-	int drive;						/* modifier inputs */
-
-	int shift;						/* latched shift modifier */
-	int control;					/* latched control modifier */
-
-	int da;							/* data available flag */
-	int next_da;					/* next value of data available flag */
-	int rpt;						/* repeat flag */
-	int next_rpt;					/* next value of repeat flag */
-
-	/* timers */
-	emu_timer *scan_timer;			/* keyboard scan timer */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE cdp1871_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-
-	return (cdp1871_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-INLINE const cdp1871_interface *get_interface(running_device *device)
-{
-	assert(device != NULL);
-	assert((device->type() == CDP1871));
-	return (const cdp1871_interface *) device->baseconfig().static_config();
-}
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    change_output_lines - change output line
-    state
--------------------------------------------------*/
-
-static void change_output_lines(running_device *device)
-{
-	cdp1871_t *cdp1871 = get_safe_token(device);
-
-	if (cdp1871->next_da != cdp1871->da)
+	// or initialize to defaults if none provided
+	else
 	{
-		cdp1871->da = cdp1871->next_da;
-
-		devcb_call_write_line(&cdp1871->out_da_func, cdp1871->da);
-	}
-
-	if (cdp1871->next_rpt != cdp1871->rpt)
-	{
-		cdp1871->rpt = cdp1871->next_rpt;
-
-		devcb_call_write_line(&cdp1871->out_rpt_func, cdp1871->rpt);
+		memset(&out_da_func, 0, sizeof(out_da_func));
+		memset(&out_rpt_func, 0, sizeof(out_rpt_func));
+		// m_in_d_func[]
+		memset(&in_shift_func, 0, sizeof(in_shift_func));
+		memset(&in_control_func, 0, sizeof(in_control_func));
+		memset(&in_alpha_func, 0, sizeof(in_alpha_func));
 	}
 }
 
-/*-------------------------------------------------
-    clock_scan_counters - clock the keyboard
-    scan counters
--------------------------------------------------*/
 
-static void clock_scan_counters(running_device *device)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1871_device - constructor
+//-------------------------------------------------
+
+cdp1871_device::cdp1871_device(running_machine &_machine, const cdp1871_device_config &config)
+    : device_t(_machine, config),
+	  m_inhibit(false),
+	  m_sense(0),
+	  m_drive(0),
+	  m_next_da(CLEAR_LINE),
+	  m_next_rpt(CLEAR_LINE),
+      m_config(config)
 {
-	cdp1871_t *cdp1871 = get_safe_token(device);
 
-	if (!cdp1871->inhibit)
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cdp1871_device::device_start()
+{
+	// resolve callbacks
+	devcb_resolve_write_line(&m_out_da_func, &m_config.out_da_func, this);
+	devcb_resolve_write_line(&m_out_rpt_func, &m_config.out_rpt_func, this);
+	devcb_resolve_read8(&m_in_d_func[0], &m_config.in_d1_func, this);
+	devcb_resolve_read8(&m_in_d_func[1], &m_config.in_d2_func, this);
+	devcb_resolve_read8(&m_in_d_func[2], &m_config.in_d3_func, this);
+	devcb_resolve_read8(&m_in_d_func[3], &m_config.in_d4_func, this);
+	devcb_resolve_read8(&m_in_d_func[4], &m_config.in_d5_func, this);
+	devcb_resolve_read8(&m_in_d_func[5], &m_config.in_d6_func, this);
+	devcb_resolve_read8(&m_in_d_func[6], &m_config.in_d7_func, this);
+	devcb_resolve_read8(&m_in_d_func[7], &m_config.in_d8_func, this);
+	devcb_resolve_read8(&m_in_d_func[8], &m_config.in_d9_func, this);
+	devcb_resolve_read8(&m_in_d_func[9], &m_config.in_d10_func, this);
+	devcb_resolve_read8(&m_in_d_func[10], &m_config.in_d11_func, this);
+	devcb_resolve_read_line(&m_in_shift_func, &m_config.in_shift_func, this);
+	devcb_resolve_read_line(&m_in_control_func, &m_config.in_control_func, this);
+	devcb_resolve_read_line(&m_in_alpha_func, &m_config.in_alpha_func, this);
+
+	// set initial values
+	change_output_lines();
+
+	// allocate timers
+	m_scan_timer = device_timer_alloc(*this);
+	timer_adjust_periodic(m_scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock()));
+
+	// register for state saving
+	state_save_register_device_item(this, 0, m_inhibit);
+	state_save_register_device_item(this, 0, m_sense);
+	state_save_register_device_item(this, 0, m_drive);
+	state_save_register_device_item(this, 0, m_shift);
+	state_save_register_device_item(this, 0, m_control);
+	state_save_register_device_item(this, 0, m_da);
+	state_save_register_device_item(this, 0, m_next_da);
+	state_save_register_device_item(this, 0, m_rpt);
+	state_save_register_device_item(this, 0, m_next_rpt);
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void cdp1871_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	change_output_lines();
+	clock_scan_counters();
+	detect_keypress();
+}
+
+
+//-------------------------------------------------
+//  change_output_lines - change output lines
+//-------------------------------------------------
+
+void cdp1871_device::change_output_lines()
+{
+	if (m_next_da != m_da)
 	{
-		cdp1871->sense++;
+		m_da = m_next_da;
 
-		if (cdp1871->sense == 8)
+		devcb_call_write_line(&m_out_da_func, m_da);
+	}
+
+	if (m_next_rpt != m_rpt)
+	{
+		m_rpt = m_next_rpt;
+
+		devcb_call_write_line(&m_out_rpt_func, m_rpt);
+	}
+}
+
+
+//-------------------------------------------------
+//  clock_scan_counters - clock the keyboard
+//	scan counters
+//-------------------------------------------------
+
+void cdp1871_device::clock_scan_counters()
+{
+	if (!m_inhibit)
+	{
+		m_sense++;
+
+		if (m_sense == 8)
 		{
-			cdp1871->sense = 0;
-			cdp1871->drive++;
+			m_sense = 0;
+			m_drive++;
 
-			if (cdp1871->drive == 11)
+			if (m_drive == 11)
 			{
-				cdp1871->drive = 0;
+				m_drive = 0;
 			}
 		}
 	}
 }
 
-/*-------------------------------------------------
-    detect_keypress - detect key press
--------------------------------------------------*/
 
-static void detect_keypress(running_device *device)
+//-------------------------------------------------
+//  detect_keypress - detect key press
+//-------------------------------------------------
+
+void cdp1871_device::detect_keypress()
 {
-	cdp1871_t *cdp1871 = get_safe_token(device);
-
 	UINT8 data = 0;
 
-	switch (cdp1871->drive)
-	{
-	case 0:		data = devcb_call_read8(&cdp1871->in_d1_func, 0);	break;
-	case 1:		data = devcb_call_read8(&cdp1871->in_d2_func, 0);	break;
-	case 2:		data = devcb_call_read8(&cdp1871->in_d3_func, 0);	break;
-	case 3:		data = devcb_call_read8(&cdp1871->in_d4_func, 0);	break;
-	case 4:		data = devcb_call_read8(&cdp1871->in_d5_func, 0);	break;
-	case 5:		data = devcb_call_read8(&cdp1871->in_d6_func, 0);	break;
-	case 6:		data = devcb_call_read8(&cdp1871->in_d7_func, 0);	break;
-	case 7:		data = devcb_call_read8(&cdp1871->in_d8_func, 0);	break;
-	case 8:		data = devcb_call_read8(&cdp1871->in_d9_func, 0);	break;
-	case 9:		data = devcb_call_read8(&cdp1871->in_d10_func, 0);	break;
-	case 10:	data = devcb_call_read8(&cdp1871->in_d11_func, 0);	break;
-	}
+	data = devcb_call_read8(&m_in_d_func[m_drive], 0);
 
-	if (data == (1 << cdp1871->sense))
+	if (data == (1 << m_sense))
 	{
-		if (!cdp1871->inhibit)
+		if (!m_inhibit)
 		{
-			cdp1871->shift = devcb_call_read_line(&cdp1871->in_shift_func);
-			cdp1871->control = devcb_call_read_line(&cdp1871->in_control_func);
-			cdp1871->inhibit = 1;
-			cdp1871->next_da = ASSERT_LINE;
+			m_shift = devcb_call_read_line(&m_in_shift_func);
+			m_control = devcb_call_read_line(&m_in_control_func);
+			m_inhibit = true;
+			m_next_da = ASSERT_LINE;
 		}
 		else
 		{
-			cdp1871->next_rpt = ASSERT_LINE;
+			m_next_rpt = ASSERT_LINE;
 		}
 	}
 	else
 	{
-		cdp1871->inhibit = 0;
-		cdp1871->next_rpt = CLEAR_LINE;
+		m_inhibit = false;
+		m_next_rpt = CLEAR_LINE;
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( cdp1871_scan_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( cdp1871_scan_tick )
+//-------------------------------------------------
+//  data_r - keyboard data read
+//-------------------------------------------------
+
+READ8_MEMBER( cdp1871_device::data_r )
 {
-	running_device *device = (running_device *)ptr;
-
-	change_output_lines(device);
-	clock_scan_counters(device);
-	detect_keypress(device);
-}
-
-/*-------------------------------------------------
-    cdp1871_data_r - interface retrieving
-    keyboard data
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( cdp1871_data_r )
-{
-	cdp1871_t *cdp1871 = get_safe_token(device);
-
 	int table = 0;
-	int alpha = devcb_call_read_line(&cdp1871->in_alpha_func);
+	int alpha = devcb_call_read_line(&m_in_alpha_func);
 
-	if (cdp1871->control) table = 3; else if (cdp1871->shift) table = 2; else if (alpha) table = 1;
+	if (m_control) table = 3; else if (m_shift) table = 2; else if (alpha) table = 1;
 
 	// reset DA on next TPB
+	m_next_da = CLEAR_LINE;
 
-	cdp1871->next_da = CLEAR_LINE;
-
-	return CDP1871_KEY_CODES[table][cdp1871->drive][cdp1871->sense];
+	return CDP1871_KEY_CODES[table][m_drive][m_sense];
 }
 
-/*-------------------------------------------------
-    cdp1871_da_r - keyboard data available
--------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( cdp1871_da_r )
+//-------------------------------------------------
+//  da_r - data available
+//-------------------------------------------------
+
+READ_LINE_MEMBER( cdp1871_device::da_r )
 {
-	cdp1871_t *cdp1871 = get_safe_token(device);
-
-	return cdp1871->da;
+	return m_da;
 }
 
-/*-------------------------------------------------
-    cdp1871_rpt_r - keyboard repeat
--------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( cdp1871_rpt_r )
+//-------------------------------------------------
+//  rpt_r - keyboard repeat
+//-------------------------------------------------
+
+READ_LINE_MEMBER( cdp1871_device::rpt_r )
 {
-	cdp1871_t *cdp1871 = get_safe_token(device);
-
-	return cdp1871->rpt;
+	return m_rpt;
 }
-
-/*-------------------------------------------------
-    DEVICE_START( cdp1871 )
--------------------------------------------------*/
-
-static DEVICE_START( cdp1871 )
-{
-	cdp1871_t *cdp1871 = get_safe_token(device);
-	const cdp1871_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_write_line(&cdp1871->out_da_func, &intf->out_da_func, device);
-	devcb_resolve_write_line(&cdp1871->out_rpt_func, &intf->out_rpt_func, device);
-	devcb_resolve_read8(&cdp1871->in_d1_func, &intf->in_d1_func, device);
-	devcb_resolve_read8(&cdp1871->in_d2_func, &intf->in_d2_func, device);
-	devcb_resolve_read8(&cdp1871->in_d3_func, &intf->in_d3_func, device);
-	devcb_resolve_read8(&cdp1871->in_d4_func, &intf->in_d4_func, device);
-	devcb_resolve_read8(&cdp1871->in_d5_func, &intf->in_d5_func, device);
-	devcb_resolve_read8(&cdp1871->in_d6_func, &intf->in_d6_func, device);
-	devcb_resolve_read8(&cdp1871->in_d7_func, &intf->in_d7_func, device);
-	devcb_resolve_read8(&cdp1871->in_d8_func, &intf->in_d8_func, device);
-	devcb_resolve_read8(&cdp1871->in_d9_func, &intf->in_d9_func, device);
-	devcb_resolve_read8(&cdp1871->in_d10_func, &intf->in_d10_func, device);
-	devcb_resolve_read8(&cdp1871->in_d11_func, &intf->in_d11_func, device);
-	devcb_resolve_read_line(&cdp1871->in_shift_func, &intf->in_shift_func, device);
-	devcb_resolve_read_line(&cdp1871->in_control_func, &intf->in_control_func, device);
-	devcb_resolve_read_line(&cdp1871->in_alpha_func, &intf->in_alpha_func, device);
-
-	/* set initial values */
-	cdp1871->next_da = CLEAR_LINE;
-	cdp1871->next_rpt = CLEAR_LINE;
-	change_output_lines(device);
-
-	/* create the timers */
-	cdp1871->scan_timer = timer_alloc(device->machine, cdp1871_scan_tick, (void *)device);
-	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, cdp1871->inhibit);
-	state_save_register_device_item(device, 0, cdp1871->sense);
-	state_save_register_device_item(device, 0, cdp1871->drive);
-	state_save_register_device_item(device, 0, cdp1871->shift);
-	state_save_register_device_item(device, 0, cdp1871->control);
-	state_save_register_device_item(device, 0, cdp1871->da);
-	state_save_register_device_item(device, 0, cdp1871->next_da);
-	state_save_register_device_item(device, 0, cdp1871->rpt);
-	state_save_register_device_item(device, 0, cdp1871->next_rpt);
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( cdp1871 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( cdp1871 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1871_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1871);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1871");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(CDP1871, cdp1871);

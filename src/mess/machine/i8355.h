@@ -30,17 +30,25 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __I8355__
 #define __I8355__
 
 #include "emu.h"
-#include "devcb.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(I8355,  i8355);
+
+///*************************************************************************
+//	MACROS / CONSTANTS
+///*************************************************************************
+
+
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
 
 #define MDRV_I8355_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), I8355, _clock)	\
@@ -49,28 +57,94 @@ DECLARE_LEGACY_DEVICE(I8355,  i8355);
 #define I8355_INTERFACE(name) \
 	const i8355_interface (name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _i8355_interface i8355_interface;
-struct _i8355_interface
+
+///*************************************************************************
+//	TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> i8355_interface
+
+struct i8355_interface
 {
 	devcb_read8				in_pa_func;
-	devcb_read8				in_pb_func;
-
 	devcb_write8			out_pa_func;
+
+	devcb_read8				in_pb_func;
 	devcb_write8			out_pb_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* register access */
-READ8_DEVICE_HANDLER( i8355_r );
-WRITE8_DEVICE_HANDLER( i8355_w );
 
-/* memory access */
-READ8_DEVICE_HANDLER( i8355_rom_r );
+
+// ======================> i8355_device_config
+
+class i8355_device_config :   public device_config,
+								public device_config_memory_interface,
+                                public i8355_interface
+{
+    friend class i8355_device;
+
+    // construction/destruction
+    i8355_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
+};
+
+
+
+// ======================> i8355_device
+
+class i8355_device :	public device_t,
+						public device_memory_interface
+{
+    friend class i8355_device_config;
+
+    // construction/destruction
+    i8355_device(running_machine &_machine, const i8355_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( io_r );
+    DECLARE_WRITE8_MEMBER( io_w );
+
+    DECLARE_READ8_MEMBER( memory_r );
+    DECLARE_WRITE8_MEMBER( memory_w );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+
+	inline UINT8 read_port(int port);
+	inline void write_port(int port, UINT8 data);
+
+private:
+	devcb_resolved_read8		m_in_port_func[2];
+	devcb_resolved_write8		m_out_port_func[2];
+
+	// registers
+	UINT8 m_output[2];			// output latches
+	UINT8 m_ddr[2];				// DDR latches
+
+	const i8355_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type I8355;
+
+
 
 #endif

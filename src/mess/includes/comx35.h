@@ -3,6 +3,7 @@
 
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
+#include "machine/cdp1871.h"
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 
@@ -55,7 +56,7 @@ public:
 	required_device<cdp1869_device> m_vis;
 	required_device<running_device> m_crtc;
 	required_device<running_device> m_fdc;
-	required_device<running_device> m_kbe;
+	required_device<cdp1871_device> m_kbe;
 	required_device<running_device> m_cassette;
 	required_device<running_device> m_ram;
 

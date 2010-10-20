@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "includes/mikromik.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
 #include "cpu/i8085/i8085.h"
@@ -12,6 +11,7 @@
 #include "video/upd7220.h"
 #include "sound/speaker.h"
 #include "devices/messram.h"
+#include "includes/mikromik.h"
 
 /*
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
-	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)
+	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE_MODERN(I8212_TAG, i8212_device, data_r, data_w)
 	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
@@ -621,8 +621,8 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 		if (keydata != 0xff)
 		{
 			/* strobe in key data */
-			i8212_stb_w(state->i8212, 1);
-			i8212_stb_w(state->i8212, 0);
+			state->i8212->stb_w(1);
+			state->i8212->stb_w(0);
 		}
 	}
 
@@ -691,7 +691,7 @@ static MACHINE_START( mm1 )
 	address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* look up devices */
-	state->i8212 = machine->device(I8212_TAG);
+	state->i8212 = machine->device<i8212_device>(I8212_TAG);
 	state->i8237 = machine->device(I8237_TAG);
 	state->i8275 = machine->device(I8275_TAG);
 	state->upd765 = machine->device(UPD765_TAG);

@@ -9,7 +9,7 @@
 /*
 
     TODO:
-
+	
     - needs a terminal, or a dump of the hexadecimal keyboard monitor ROM
     - serial input/output at SID/SOD pins
     - disable ROM mirror after boot
@@ -38,8 +38,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exp85_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(I8355_TAG, i8355_r, i8355_w)
-	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN(I8355_TAG, i8355_device, io_r, io_w)
+	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
 //  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
 ADDRESS_MAP_END
 
@@ -77,10 +77,10 @@ static VIDEO_UPDATE( exp85 )
 static I8155_INTERFACE( i8155_intf )
 {
 	DEVCB_NULL,	/* port A read */
-	DEVCB_NULL,	/* port B read */
-	DEVCB_NULL,	/* port C read */
 	DEVCB_NULL,	/* port A write */
+	DEVCB_NULL,	/* port B read */
 	DEVCB_NULL,	/* port B write */
+	DEVCB_NULL,	/* port C read */
 	DEVCB_NULL,	/* port C write */
 	DEVCB_NULL	/* timer output */
 };
@@ -136,8 +136,8 @@ static WRITE8_DEVICE_HANDLER( i8355_a_w )
 static I8355_INTERFACE( i8355_intf )
 {
 	DEVCB_HANDLER(i8355_a_r),	/* port A read */
-	DEVCB_NULL,					/* port B read */
 	DEVCB_HANDLER(i8355_a_w),	/* port A write */
+	DEVCB_NULL,					/* port B read */
 	DEVCB_NULL,					/* port B write */
 };
 
@@ -202,7 +202,6 @@ static const cassette_config exp85_cassette_config =
 };
 
 static MACHINE_CONFIG_START( exp85, exp85_state )
-
     /* basic machine hardware */
     MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
     MDRV_CPU_PROGRAM_MAP(exp85_mem)

@@ -40,7 +40,7 @@ public:
 	int tc;
 
 	/* devices */
-	running_device *i8212;
+	i8212_device *i8212;
 	running_device *i8237;
 	running_device *i8275;
 	running_device *upd765;

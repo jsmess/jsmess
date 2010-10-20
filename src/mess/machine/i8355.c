@@ -7,28 +7,23 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - attempt to direct-map
-
-*/
-
+#include "emu.h"
 #include "i8355.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 #define LOG 0
 
 enum
 {
-	I8355_REGISTER_PORT_A = 0,
-	I8355_REGISTER_PORT_B,
-	I8355_REGISTER_PORT_A_DDR,
-	I8355_REGISTER_PORT_B_DDR
+	REGISTER_PORT_A = 0,
+	REGISTER_PORT_B,
+	REGISTER_PORT_A_DDR,
+	REGISTER_PORT_B_DDR
 };
 
 enum
@@ -38,190 +33,237 @@ enum
 	PORT_COUNT
 };
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _i8355_t i8355_t;
-struct _i8355_t
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type I8355 = i8355_device_config::static_alloc_device_config;
+
+
+// default address map
+static ADDRESS_MAP_START( i8355, 0, 8 )
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  i8355_device_config - constructor
+//-------------------------------------------------
+
+i8355_device_config::i8355_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "Intel 8355", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(i8355))
 {
-	devcb_resolved_read8		in_rom_func;
-	devcb_resolved_read8		in_port_func[PORT_COUNT];
-	devcb_resolved_write8		out_port_func[PORT_COUNT];
-
-	/* registers */
-	UINT8 output[PORT_COUNT];	/* output latches */
-	UINT8 ddr[PORT_COUNT];		/* DDR latches */
-
-	/* ROM */
-	const UINT8 *rom;			/* ROM */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE i8355_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	return (i8355_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const i8355_interface *get_interface(running_device *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *i8355_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	assert(device->type() == I8355);
-	return (const i8355_interface *) device->baseconfig().static_config();
+	return global_alloc(i8355_device_config(mconfig, tag, owner, clock));
 }
 
-INLINE UINT8 read_port(i8355_t *i8355, int port)
-{
-	UINT8 data = i8355->output[port] & i8355->ddr[port];
 
-	if (i8355->ddr[port] != 0xff)
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *i8355_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, i8355_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *i8355_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8355_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const i8355_interface *intf = reinterpret_cast<const i8355_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8355_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
 	{
-		data |= devcb_call_read8(&i8355->in_port_func[port], 0) & ~i8355->ddr[port];
+		memset(&in_pa_func, 0, sizeof(in_pa_func));
+		memset(&out_pa_func, 0, sizeof(out_pa_func));
+		memset(&in_pb_func, 0, sizeof(in_pb_func));
+		memset(&out_pb_func, 0, sizeof(out_pb_func));
+	}
+}
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_port - read from input port
+//-------------------------------------------------
+
+inline UINT8 i8355_device::read_port(int port)
+{
+	UINT8 data = m_output[port] & m_ddr[port];
+
+	if (m_ddr[port] != 0xff)
+	{
+		data |= devcb_call_read8(&m_in_port_func[port], 0) & ~m_ddr[port];
 	}
 
 	return data;
 }
 
-INLINE void write_port(i8355_t *i8355, int port, UINT8 data)
-{
-	i8355->output[port] = data;
 
-	devcb_call_write8(&i8355->out_port_func[port], 0, i8355->output[port] & i8355->ddr[port]);
+//-------------------------------------------------
+//  write_port - write to output port
+//-------------------------------------------------
+
+inline void i8355_device::write_port(int port, UINT8 data)
+{
+	m_output[port] = data;
+
+	devcb_call_write8(&m_out_port_func[port], 0, m_output[port] & m_ddr[port]);
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    i8355_register_r - register read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( i8355_r )
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  i8355_device - constructor
+//-------------------------------------------------
+
+i8355_device::i8355_device(running_machine &_machine, const i8355_device_config &config)
+    : device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+      m_config(config)
 {
-	i8355_t *i8355 = get_safe_token(device);
+
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8355_device::device_start()
+{
+	// resolve callbacks
+	devcb_resolve_read8(&m_in_port_func[0], &m_config.in_pa_func, this);
+	devcb_resolve_read8(&m_in_port_func[1], &m_config.in_pb_func, this);
+	devcb_resolve_write8(&m_out_port_func[0], &m_config.out_pa_func, this);
+	devcb_resolve_write8(&m_out_port_func[1], &m_config.out_pb_func, this);
+
+	// register for state saving
+	state_save_register_device_item_array(this, 0, m_output);
+	state_save_register_device_item_array(this, 0, m_ddr);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8355_device::device_reset()
+{
+	// set ports to input mode
+	m_ddr[PORT_A] = 0;
+	m_ddr[PORT_B] = 0;
+}
+
+
+//-------------------------------------------------
+//  io_r - register read
+//-------------------------------------------------
+
+READ8_MEMBER( i8355_device::io_r )
+{
 	int port = offset & 0x01;
 
 	UINT8 data = 0;
 
 	switch (offset & 0x03)
 	{
-	case I8355_REGISTER_PORT_A:
-	case I8355_REGISTER_PORT_B:
-		data = read_port(i8355, port);
+	case REGISTER_PORT_A:
+	case REGISTER_PORT_B:
+		data = read_port(port);
 		break;
 
-	case I8355_REGISTER_PORT_A_DDR:
-	case I8355_REGISTER_PORT_B_DDR:
-		/* write only */
+	case REGISTER_PORT_A_DDR:
+	case REGISTER_PORT_B_DDR:
+		// write only
 		break;
 	}
 
 	return data;
 }
 
-/*-------------------------------------------------
-    i8355_register_w - register write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( i8355_w )
+//-------------------------------------------------
+//  io_w - register write
+//-------------------------------------------------
+
+WRITE8_MEMBER( i8355_device::io_w )
 {
-	i8355_t *i8355 = get_safe_token(device);
 	int port = offset & 0x01;
 
 	switch (offset & 0x03)
 	{
-	case I8355_REGISTER_PORT_A:
-	case I8355_REGISTER_PORT_B:
-		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", device->tag(), 'A' + port, data);
-		write_port(i8355, port, data);
+	case REGISTER_PORT_A:
+	case REGISTER_PORT_B:
+		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", tag(), 'A' + port, data);
+		
+		write_port(port, data);
 		break;
 
-	case I8355_REGISTER_PORT_A_DDR:
-	case I8355_REGISTER_PORT_B_DDR:
-		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", device->tag(), 'A' + port, data);
-		i8355->ddr[port] = data;
-		write_port(i8355, port, data);
+	case REGISTER_PORT_A_DDR:
+	case REGISTER_PORT_B_DDR:
+		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", tag(), 'A' + port, data);
+		
+		m_ddr[port] = data;
+		write_port(port, data);
 		break;
 	}
 }
 
-/*-------------------------------------------------
-    i8355_rom_r - memory read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( i8355_rom_r )
+//-------------------------------------------------
+//  memory_r - internal ROM read
+//-------------------------------------------------
+
+READ8_MEMBER( i8355_device::memory_r )
 {
-	i8355_t *i8355 = get_safe_token(device);
-
-	return i8355->rom[offset & 0x7ff];
+	return this->space()->read_byte(offset);
 }
-
-/*-------------------------------------------------
-    DEVICE_START( i8355 )
--------------------------------------------------*/
-
-static DEVICE_START( i8355 )
-{
-	i8355_t *i8355 = (i8355_t *)downcast<legacy_device_base *>(device)->token();
-	const i8355_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&i8355->in_port_func[PORT_A], &intf->in_pa_func, device);
-	devcb_resolve_read8(&i8355->in_port_func[PORT_B], &intf->in_pb_func, device);
-	devcb_resolve_write8(&i8355->out_port_func[PORT_A], &intf->out_pa_func, device);
-	devcb_resolve_write8(&i8355->out_port_func[PORT_B], &intf->out_pb_func, device);
-
-	/* find memory region */
-	i8355->rom = memory_region(device->machine, device->tag());
-	assert(i8355->rom != NULL);
-
-	/* register for state saving */
-	state_save_register_device_item_array(device, 0, i8355->output);
-	state_save_register_device_item_array(device, 0, i8355->ddr);
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( i8355 )
--------------------------------------------------*/
-
-static DEVICE_RESET( i8355 )
-{
-	i8355_t *i8355 = (i8355_t *)downcast<legacy_device_base *>(device)->token();
-
-	/* set ports to input mode */
-	i8355->ddr[PORT_A] = 0;
-	i8355->ddr[PORT_B] = 0;
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( i8355 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( i8355 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8355_t);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8355);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(i8355);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8355");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel MCS-85");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(I8355,  i8355);

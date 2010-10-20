@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
@@ -540,7 +540,7 @@ static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional 128K ROM cartridge
 	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8201_ctrl_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_bank_r, pc8201_bank_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w )
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
@@ -564,7 +564,7 @@ static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
@@ -948,10 +948,10 @@ static WRITE_LINE_DEVICE_HANDLER( kc85_8155_to_w )
 static I8155_INTERFACE( kc85_8155_intf )
 {
 	DEVCB_NULL,								/* port A read */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(kc85_8155_port_c_r),		/* port C read */
 	DEVCB_HANDLER(kc85_8155_port_a_w),		/* port A write */
+	DEVCB_NULL,								/* port B read */
 	DEVCB_HANDLER(kc85_8155_port_b_w),		/* port B write */
+	DEVCB_HANDLER(kc85_8155_port_c_r),		/* port C read */
 	DEVCB_NULL,								/* port C write */
 	DEVCB_LINE(kc85_8155_to_w)				/* timer output */
 };
@@ -1018,10 +1018,10 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 static I8155_INTERFACE( pc8201_8155_intf )
 {
 	DEVCB_NULL,								/* port A read */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(pc8201_8155_port_c_r),	/* port C read */
 	DEVCB_HANDLER(kc85_8155_port_a_w),		/* port A write */
+	DEVCB_NULL,								/* port B read */
 	DEVCB_HANDLER(pc8201_8155_port_b_w),	/* port B write */
+	DEVCB_HANDLER(pc8201_8155_port_c_r),	/* port C read */
 	DEVCB_NULL,								/* port C write */
 	DEVCB_LINE(kc85_8155_to_w)				/* timer output */
 };
@@ -1117,10 +1117,10 @@ static WRITE_LINE_DEVICE_HANDLER( tandy200_8155_to_w )
 static I8155_INTERFACE( tandy200_8155_intf )
 {
 	DEVCB_NULL,								/* port A read */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(tandy200_8155_port_c_r),	/* port C read */
 	DEVCB_HANDLER(tandy200_8155_port_a_w),	/* port A write */
+	DEVCB_NULL,								/* port B read */
 	DEVCB_HANDLER(tandy200_8155_port_b_w),	/* port B write */
+	DEVCB_HANDLER(tandy200_8155_port_c_r),	/* port C read */
 	DEVCB_NULL,								/* port C write */
 	DEVCB_LINE(tandy200_8155_to_w)			/* timer output */
 };

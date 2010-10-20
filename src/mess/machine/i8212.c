@@ -8,185 +8,173 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "machine/devhelpr.h"
 #include "i8212.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
 
-#define LOG 1
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
-typedef struct _i8212_t i8212_t;
-struct _i8212_t
+#define LOG 0
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type I8212 = i8212_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(i8212, "Intel 8212")
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8212_device_config::device_config_complete()
 {
-	devcb_resolved_write_line	out_int_func;
-	devcb_resolved_read8		in_di_func;
-	devcb_resolved_write8		out_do_func;
+	// inherit a copy of the static data
+	const i8212_interface *intf = reinterpret_cast<const i8212_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8212_interface *>(this) = *intf;
 
-	int md;						/* mode */
-	int stb;					/* strobe */
-	UINT8 data;					/* data latch */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE i8212_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	return (i8212_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-INLINE const i8212_interface *get_interface(running_device *device)
-{
-	assert(device != NULL);
-	assert((device->type() == I8212));
-	return (const i8212_interface *) device->baseconfig().static_config();
-}
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    i8212_r - data output read
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( i8212_r )
-{
-	i8212_t *i8212 = get_safe_token(device);
-
-	/* clear interrupt line */
-	devcb_call_write_line(&i8212->out_int_func, CLEAR_LINE);
-
-	if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag(), CLEAR_LINE);
-
-	return i8212->data;
-}
-
-/*-------------------------------------------------
-    i8212_w - data input write
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( i8212_w )
-{
-	i8212_t *i8212 = get_safe_token(device);
-
-	/* latch data */
-	i8212->data = data;
-
-	/* output data */
-	devcb_call_write8(&i8212->out_do_func, 0, i8212->data);
-}
-
-/*-------------------------------------------------
-    i8212_md_w - mode write
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTION
-WRITE_LINE_DEVICE_HANDLER( i8212_md_w )
-{
-	i8212_t *i8212 = get_safe_token(device);
-
-	if (LOG) logerror("I8212 '%s' Mode: %s\n", device->tag(), state ? "output" : "input");
-
-	i8212->md = state;
-}
-#endif
-
-/*-------------------------------------------------
-    i8212_stb_w - strobe write
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( i8212_stb_w )
-{
-	i8212_t *i8212 = get_safe_token(device);
-
-	if (LOG) logerror("I8212 '%s' STB: %u\n", device->tag(), state);
-
-	if (i8212->md == I8212_MODE_INPUT)
+	// or initialize to defaults if none provided
+	else
 	{
-		if (i8212->stb && !state)
+		memset(&out_int_func, 0, sizeof(out_int_func));
+		memset(&in_di_func, 0, sizeof(in_di_func));
+		memset(&out_do_func, 0, sizeof(out_do_func));
+	}
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  i8212_device - constructor
+//-------------------------------------------------
+
+i8212_device::i8212_device(running_machine &_machine, const i8212_device_config &config)
+    : device_t(_machine, config),
+	  m_md(I8212_MODE_INPUT),
+	  m_stb(0),
+      m_config(config)
+{
+
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8212_device::device_start()
+{
+	// resolve callbacks
+	devcb_resolve_write_line(&m_out_int_func, &m_config.out_int_func, this);
+	devcb_resolve_read8(&m_in_di_func, &m_config.in_di_func, this);
+	devcb_resolve_write8(&m_out_do_func, &m_config.out_do_func, this);
+
+	// register for state saving
+	state_save_register_device_item(this, 0, m_md);
+	state_save_register_device_item(this, 0, m_stb);
+	state_save_register_device_item(this, 0, m_data);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8212_device::device_reset()
+{
+	m_data = 0;
+
+	if (m_md == I8212_MODE_OUTPUT)
+	{
+		// output data
+		devcb_call_write8(&m_out_do_func, 0, m_data);
+	}
+}
+
+
+//-------------------------------------------------
+//  data_r - data latch read
+//-------------------------------------------------
+
+READ8_MEMBER( i8212_device::data_r )
+{
+	// clear interrupt line
+	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+
+	if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), CLEAR_LINE);
+
+	return m_data;
+}
+
+
+//-------------------------------------------------
+//  data_w - data latch write
+//-------------------------------------------------
+
+WRITE8_MEMBER( i8212_device::data_w )
+{
+	// latch data
+	m_data = data;
+
+	// output data
+	devcb_call_write8(&m_out_do_func, 0, m_data);
+}
+
+
+//-------------------------------------------------
+//  md_w - mode write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( i8212_device::md_w )
+{
+	if (LOG) logerror("I8212 '%s' Mode: %s\n", tag(), state ? "output" : "input");
+
+	m_md = state;
+}
+
+
+//-------------------------------------------------
+//  stb_w - data strobe write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( i8212_device::stb_w )
+{
+	if (LOG) logerror("I8212 '%s' STB: %u\n", tag(), state);
+
+	if (m_md == I8212_MODE_INPUT)
+	{
+		if (m_stb && !state)
 		{
-			/* input data */
-			i8212->data = devcb_call_read8(&i8212->in_di_func, 0);
+			// input data
+			m_data = devcb_call_read8(&m_in_di_func, 0);
 
-			/* assert interrupt line */
-			devcb_call_write_line(&i8212->out_int_func, ASSERT_LINE);
+			// assert interrupt line
+			devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
 
-			if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag(), ASSERT_LINE);
+			if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), ASSERT_LINE);
 		}
 	}
 
-	i8212->stb = state;
+	m_stb = state;
 }
-
-/*-------------------------------------------------
-    DEVICE_START( i8212 )
--------------------------------------------------*/
-
-static DEVICE_START( i8212 )
-{
-	i8212_t *i8212 = get_safe_token(device);
-	const i8212_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_write_line(&i8212->out_int_func, &intf->out_int_func, device);
-	devcb_resolve_read8(&i8212->in_di_func, &intf->in_di_func, device);
-	devcb_resolve_write8(&i8212->out_do_func, &intf->out_do_func, device);
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, i8212->md);
-	state_save_register_device_item(device, 0, i8212->stb);
-	state_save_register_device_item(device, 0, i8212->data);
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( i8212 )
--------------------------------------------------*/
-
-static DEVICE_RESET( i8212 )
-{
-	i8212_t *i8212 = get_safe_token(device);
-
-	i8212->data = 0;
-
-	if (i8212->md == I8212_MODE_OUTPUT)
-	{
-		/* output data */
-		devcb_call_write8(&i8212->out_do_func, 0, i8212->data);
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( i8212 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( i8212 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8212_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8212);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(i8212);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8212");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel MCS-80");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(I8212, i8212);

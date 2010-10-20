@@ -30,17 +30,25 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __I8155__
 #define __I8155__
 
 #include "emu.h"
-#include "devcb.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(I8155, i8155);
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
+
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MDRV_I8155_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), I8155, _clock)	\
@@ -49,34 +57,117 @@ DECLARE_LEGACY_DEVICE(I8155, i8155);
 #define I8155_INTERFACE(name) \
 	const i8155_interface (name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _i8155_interface i8155_interface;
-struct _i8155_interface
+
+//**************************************************************************
+//	TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> i8155_interface
+
+struct i8155_interface
 {
 	devcb_read8				in_pa_func;
-	devcb_read8				in_pb_func;
-	devcb_read8				in_pc_func;
-
 	devcb_write8			out_pa_func;
+
+	devcb_read8				in_pb_func;
 	devcb_write8			out_pb_func;
+
+	devcb_read8				in_pc_func;
 	devcb_write8			out_pc_func;
 
-	/* this gets called for each change of the TIMER OUT pin (pin 6) */
+	// this gets called for each change of the TIMER OUT pin (pin 6)
 	devcb_write_line		out_to_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* register access */
-READ8_DEVICE_HANDLER( i8155_r );
-WRITE8_DEVICE_HANDLER( i8155_w );
 
-/* memory access */
-READ8_DEVICE_HANDLER( i8155_ram_r );
-WRITE8_DEVICE_HANDLER( i8155_ram_w );
+
+// ======================> i8155_device_config
+
+class i8155_device_config :   public device_config,
+								public device_config_memory_interface,
+                                public i8155_interface
+{
+    friend class i8155_device;
+
+    // construction/destruction
+    i8155_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
+};
+
+
+
+// ======================> i8155_device
+
+class i8155_device :	public device_t,
+						public device_memory_interface
+{
+    friend class i8155_device_config;
+
+    // construction/destruction
+    i8155_device(running_machine &_machine, const i8155_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( io_r );
+    DECLARE_WRITE8_MEMBER( io_w );
+
+    DECLARE_READ8_MEMBER( memory_r );
+    DECLARE_WRITE8_MEMBER( memory_w );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	inline UINT8 get_timer_mode();
+	inline void timer_output();
+	inline void pulse_timer_output();
+	inline int get_port_mode(int port);
+	inline UINT8 read_port(int port);
+	inline void write_port(int port, UINT8 data);
+
+	void register_w(int offset, UINT8 data);
+
+private:
+	devcb_resolved_read8		m_in_port_func[3];
+	devcb_resolved_write8		m_out_port_func[3];
+	devcb_resolved_write_line	m_out_to_func;
+
+	// registers
+	UINT8 m_command;			// command register
+	UINT8 m_status;				// status register
+	UINT8 m_output[3];			// output latches
+
+	// counter
+	UINT16 m_count_length;		// count length register
+	UINT16 m_counter;			// counter register
+	int m_to;					// timer output
+
+	// timers
+	emu_timer *m_timer;			// counter timer
+
+	const i8155_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type I8155;
+
+
 
 #endif
