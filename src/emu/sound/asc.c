@@ -101,6 +101,14 @@ device_t *asc_device_config::alloc_device(running_machine &machine) const
 //  LIVE DEVICE
 //**************************************************************************
 
+// does nothing, this timer exists only to make MAME sync itself at our audio rate
+static TIMER_CALLBACK( sync_timer_cb )
+{
+	asc_device *pDevice = (asc_device *)ptr;
+
+	stream_update(pDevice->m_stream);
+}
+
 //-------------------------------------------------
 //  asc_device - constructor
 //-------------------------------------------------
@@ -125,6 +133,8 @@ void asc_device::device_start()
 	m_stream = stream_create(this, 0, 2, 22257, this, static_stream_generate);
 
 	memset(m_regs, 0, sizeof(m_regs));
+
+	m_sync_timer = timer_alloc(this->machine, sync_timer_cb, this);
 }
 
 
@@ -198,43 +208,40 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 					m_fifo_cap_b--;
 				}
 
-				if ((m_fifo_cap_a) || (m_fifo_cap_b))
+				switch (m_chip_type)
 				{
-					switch (m_chip_type)
-					{
-						case ASC_TYPE_SONORA:
-							if (m_fifo_cap_a <= 0x200)
+					case ASC_TYPE_SONORA:
+						if (m_fifo_cap_a < 0x200)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
+							m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
+							if (m_irq_cb)
 							{
-								m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
-								m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
-								if (m_irq_cb)
-								{
-									m_irq_cb(this, 1);
-								}
+								m_irq_cb(this, 1);
 							}
-							break;
+						}
+						break;
 
-						default:
-							if (m_fifo_cap_a <= 0x200)
+					default:
+						if (m_fifo_cap_a == 0x1ff)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
+							if ((m_irq_cb) && (m_fifo_cap_a)) 
 							{
-								m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
-								if (m_irq_cb)
-								{
-									m_irq_cb(this, 1);
-								}
+								m_irq_cb(this, 1);
 							}
+						}
 
-							// don't update for non-(E)ASC
-							if (m_fifo_cap_b <= 0x200)
+						// don't update for non-(E)ASC
+						if (m_fifo_cap_b == 0x1ff)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
+							if ((m_irq_cb) && (m_fifo_cap_b)) 
 							{
-								m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
-								if (m_irq_cb)
-								{
-									m_irq_cb(this, 1);
-								}
+								m_irq_cb(this, 1);
 							}
-							break;
-					}
+						}
+						break;
 				}
 
 				outL[i] = smpll * 64;
@@ -274,6 +281,8 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 			}
 			break;
 	}
+
+//	printf("rdA %04x rdB %04x wrA %04x wrB %04x (capA %04x B %04x)\n", m_fifo_a_rdptr, m_fifo_b_rdptr, m_fifo_a_wrptr, m_fifo_b_wrptr, m_fifo_cap_a, m_fifo_cap_b);
 }
 
 //-------------------------------------------------
@@ -361,7 +370,7 @@ UINT8 asc_device::read(UINT16 offset)
 				// reading this register clears all bits
 				m_regs[R_FIFOSTAT-0x800] = 0;
 
-				// reading this clears interrupts?
+				// reading this clears interrupts
 				if (m_irq_cb)
 				{
 					m_irq_cb(this, 0);
@@ -425,7 +434,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			m_fifo_a[m_fifo_a_wrptr++] = data;
 			m_fifo_cap_a++;
 
-			if (m_fifo_cap_a == 0x800)
+			if (m_fifo_cap_a == 0x3ff)
 			{
 				m_regs[R_FIFOSTAT-0x800] |= 2;	// fifo A full
 			}
@@ -444,7 +453,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 			m_fifo_b[m_fifo_b_wrptr++] = data;
 			m_fifo_cap_b++;
 
-			if (m_fifo_cap_b == 0x800)
+			if (m_fifo_cap_b == 0x3ff)
 			{
 				m_regs[R_FIFOSTAT-0x800] |= 8;	// fifo B full
 			}
@@ -471,6 +480,15 @@ void asc_device::write(UINT16 offset, UINT8 data)
 					m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
 					m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
 					m_fifo_cap_a = m_fifo_cap_b = 0;
+
+					if (data != 0)
+					{
+						timer_adjust_periodic(m_sync_timer, attotime_zero, 0, ATTOTIME_IN_HZ(22257/4));
+					}
+					else
+					{
+						timer_adjust_oneshot(m_sync_timer, attotime_never, 0);
+					}
 				}
 				break;
 
