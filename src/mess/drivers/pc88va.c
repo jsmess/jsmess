@@ -16,6 +16,9 @@
 #include "cpu/nec/nec.h"
 //#include "cpu/z80/z80.h"
 
+static UINT16 *palram;
+static UINT16 bank_reg;
+
 static VIDEO_START( pc88va )
 {
 
@@ -26,11 +29,183 @@ static VIDEO_UPDATE( pc88va )
 	return 0;
 }
 
+static READ8_HANDLER( sys_mem_r )
+{
+	switch((bank_reg & 0xf00) >> 8)
+	{
+		case 0: // select bus slot
+			return 0xff;
+		case 1: // TVRAM
+		{
+			UINT8 *tvram = memory_region(space->machine, "tvram");
+			if((offset & 0x30000) == 0)
+				return tvram[offset];
+
+			return 0xff;
+		}
+		case 4:
+		{
+			UINT8 *gvram = memory_region(space->machine, "gvram");
+
+			return gvram[offset];
+		}
+		case 8: // kanji ROM
+		case 9:
+		{
+			UINT8 *knj_ram = memory_region(space->machine, "kanji");
+			UINT32 knj_offset;
+
+			knj_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+
+			/* 0x00000 - 0x3ffff Kanji ROM 1*/
+			/* 0x40000 - 0x4ffff Kanji ROM 2*/
+			/* 0x50000 - 0x53fff Kanji RAM */
+			/* anything else is a NOP (I presume?) */
+
+			return knj_ram[knj_offset];
+		}
+		break;
+		case 0xc: // Dictionary ROM
+		case 0xd:
+		{
+			UINT8 *dic_rom = memory_region(space->machine, "dictionary");
+			UINT32 dic_offset;
+
+			dic_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+
+			return dic_rom[dic_offset];
+		}
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( sys_mem_w )
+{
+	switch((bank_reg & 0xf00) >> 8)
+	{
+		case 0: // select bus slot
+			break;
+		case 1: // TVRAM
+		{
+			UINT8 *tvram = memory_region(space->machine, "tvram");
+
+			if((offset & 0x30000) == 0)
+				tvram[offset] = data;
+		}
+		break;
+		case 4: // TVRAM
+		{
+			UINT8 *gvram = memory_region(space->machine, "gvram");
+
+			gvram[offset] = data;
+		}
+		break;
+		case 8: // kanji ROM
+		case 9:
+		{
+			UINT8 *knj_ram = memory_region(space->machine, "kanji");
+			UINT32 knj_offset;
+
+			knj_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+
+			if(knj_offset >= 0x50000 && knj_offset <= 0x53fff)
+				knj_ram[knj_offset] = data;
+		}
+		break;
+		case 0xc: // Dictionary ROM
+		case 0xd:
+		{
+			// ...
+		}
+		break;
+	}
+}
+
 static ADDRESS_MAP_START( pc88va_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_code",0)
+//	AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
+	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE8(sys_mem_r,sys_mem_w,0xffff)
+	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("rom00_bank")
+	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("rom10_bank")
 ADDRESS_MAP_END
+
+static READ8_HANDLER( idp_status_r )
+{
+/*
+    x--- ---- LP   Light-pen signal detection (with VA use failure)
+    -x-- ---- VB   Vertical elimination period
+    --x- ---- SC   Sprite control (sprite over/collision)
+    ---x ---- ER   Error occurrence
+    ---- x--- In the midst of execution of EMEN emulation development
+    ---- -x-- In the midst of BUSY command execution
+    ---- --x- OBF output data buffer full
+    ---- ---x IBF input data buffer full (command/parameter commonness)
+*/
+	return 0x00;
+}
+
+static WRITE8_HANDLER( idp_command_w )
+{
+	// ...
+}
+
+static WRITE8_HANDLER( idp_param_w )
+{
+	// ...
+}
+
+static WRITE16_HANDLER( palette_ram_w )
+{
+	int r,g,b;
+	COMBINE_DATA(&palram[offset]);
+
+	b = (palram[offset] & 0x001e) >> 1;
+	r = (palram[offset] & 0x03c0) >> 6;
+	g = (palram[offset] & 0x7800) >> 11;
+
+	palette_set_color_rgb(space->machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
+}
+
+static READ16_HANDLER( sys_port4_r )
+{
+	UINT8 vrtc;
+	vrtc = (space->machine->primary_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
+
+	return vrtc;
+}
+
+static READ16_HANDLER( bios_bank_r )
+{
+	return bank_reg;
+}
+
+static WRITE16_HANDLER( bios_bank_w )
+{
+	/*
+	-x-- ---- ---- ---- SMM (compatibility mode)
+	---x ---- ---- ---- GMSP (VRAM drawing Mode)
+	---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
+	---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
+	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
+	*/
+	bank_reg = data;
+
+	/* RBC1 */
+	{
+		UINT8 *ROM10 = memory_region(space->machine, "rom10");
+
+		if((bank_reg & 0xe0) == 0x00)
+			memory_set_bankptr(space->machine, "rom10_bank", &ROM10[(bank_reg & 0x10) ? 0x10000 : 0x00000]);
+	}
+
+	/* RBC0 */
+	{
+		UINT8 *ROM00 = memory_region(space->machine, "rom00");
+
+		memory_set_bankptr(space->machine, "rom00_bank", &ROM00[(bank_reg & 0xf)*0x10000]); // TODO: docs says that only 0 - 5 are used, dunno why ...
+	}
+}
 
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0000, 0x000f) Keyboard ROW reading
@@ -41,7 +216,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0032, 0x0032) (R) ? (W) System Port 2
 //	AM_RANGE(0x0034, 0x0034) GVRAM Control Port 1
 //	AM_RANGE(0x0035, 0x0035) GVRAM Control Port 2
-//	AM_RANGE(0x0040, 0x0040) (R) System Port 4 (W) System port 3 (strobe port)
+	AM_RANGE(0x0040, 0x0041) AM_READ(sys_port4_r) // (R) System Port 4 (W) System port 3 (strobe port)
 //	AM_RANGE(0x0044, 0x0045) YM2203
 //	AM_RANGE(0x0046, 0x0047) YM2203 mirror
 //	AM_RANGE(0x005c, 0x005c) (R) GVRAM status
@@ -70,12 +245,12 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
 //	AM_RANGE(0x012e, 0x012f) ? (related to Transparent Color of Text/Sprite)
 //	AM_RANGE(0x0130, 0x0137) Picture Mask Parameter
-//	AM_RANGE(0x0142, 0x0143) Text Controller (IDP) - (R) Status (W) command
-//	AM_RANGE(0x0146, 0x0147) Text Controller (IDP) - (R/W) Parameter
+	AM_RANGE(0x0142, 0x0143) AM_READWRITE8(idp_status_r,idp_command_w,0x00ff) //Text Controller (IDP) - (R) Status (W) command
+	AM_RANGE(0x0146, 0x0147) AM_WRITE8(idp_param_w,0x00ff) //Text Controller (IDP) - (R/W) Parameter
 //	AM_RANGE(0x0148, 0x0149) Text control port 1
 //	AM_RANGE(0x014c, 0x014f) ? CG Port
 //	AM_RANGE(0x0150, 0x0151) System Operational Mode
-//	AM_RANGE(0x0152, 0x0153) Memory Map Register
+	AM_RANGE(0x0152, 0x0153) AM_READWRITE(bios_bank_r,bios_bank_w) // Memory Map Register
 //	AM_RANGE(0x0154, 0x0155) Refresh Register (wait states)
 //	AM_RANGE(0x0156, 0x0157) ROM bank status
 //	AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
@@ -95,7 +270,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0220, 0x023f) Frame buffer 1 control parameter
 //	AM_RANGE(0x0240, 0x025f) Frame buffer 2 control parameter
 //	AM_RANGE(0x0260, 0x027f) Frame buffer 3 control parameter
-//	AM_RANGE(0x0300, 0x033f) Palette RAM (xBBBBxRRRRxGGGG format)
+	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_BASE(&palram) // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //	AM_RANGE(0x0500, 0x05ff) GVRAM
 //	AM_RANGE(0x1000, 0xfeff) user area (???)
@@ -115,6 +290,17 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pc88va )
 INPUT_PORTS_END
 
+static MACHINE_RESET( pc88va )
+{
+	UINT8 *ROM00 = memory_region(machine, "rom00");
+	UINT8 *ROM10 = memory_region(machine, "rom10");
+
+	memory_set_bankptr(machine, "rom10_bank", &ROM10[0x00000]);
+	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
+
+	bank_reg = 0x4100;
+}
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -130,13 +316,15 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(640, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(32)
 //	MDRV_PALETTE_INIT( pc8801 )
 
 	MDRV_VIDEO_START( pc88va )
 	MDRV_VIDEO_UPDATE( pc88va )
+
+	MDRV_MACHINE_RESET( pc88va )
 
 MACHINE_CONFIG_END
 
@@ -146,14 +334,12 @@ ROM_START( pc88va )
 
 	ROM_REGION( 0x100000, "subcpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0xc0000, "rom", 0 )
-	ROM_LOAD( "varom00.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )	// multiple banks to be loaded at 0x0000?
-	ROM_LOAD( "varom08.rom",   0x80000, 0x20000, CRC(eef6d4a0) SHA1(47e5f89f8b0ce18ff8d5d7b7aef8ca0a2a8e3345) )	// multiple banks to be loaded at 0x8000?
-	ROM_LOAD( "varom1.rom",    0xa0000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
+	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
+	ROM_LOAD( "varom00.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )
+	ROM_LOAD( "varom08.rom",   0x80000, 0x20000, CRC(eef6d4a0) SHA1(47e5f89f8b0ce18ff8d5d7b7aef8ca0a2a8e3345) )
 
-	ROM_REGION( 0x20000, "boot_code", 0 )
-	ROM_COPY( "rom", 0xb0000, 0x00000, 0x10000 )
-	ROM_COPY( "rom", 0xa0000, 0x10000, 0x10000 )
+	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
+	ROM_LOAD( "varom1.rom",    0x00000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
 
 	ROM_REGION( 0x2000, "sub", 0 )		// not sure what this should do...
 	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
@@ -162,12 +348,16 @@ ROM_START( pc88va )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x50000, "gfx1", 0 )
-	ROM_LOAD( "vafont.rom", 0x00000, 0x50000, BAD_DUMP CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) )
+	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "vafont.rom", 0x00000, 0x50000, BAD_DUMP CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) ) // should be splitted
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
+
+	ROM_REGION( 0x10000, "tvram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "gvram", ROMREGION_ERASE00 )
 ROM_END
 
 COMP( 1987, pc88va,         0,		0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
