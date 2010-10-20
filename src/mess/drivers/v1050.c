@@ -72,7 +72,7 @@ Notes:
     6502    - Synertek SY6502A CPU
     4164    - NEC D4164-2 64Kx1 Dynamic RAM
     9016    - AMD AM9016EPC 16Kx1 Dynamic RAM
-    8214    - NEC ?PB8214C Priority Interrupt Control Unit
+    8214    - NEC uPB8214C Priority Interrupt Control Unit
     8255A   - NEC D8255AC-5 Programmable Peripheral Interface
     8251A   - NEC D8251AC Programmable Communication Interface
     WD1793  - Mitsubishi MB8877 Floppy Disc Controller
@@ -94,11 +94,6 @@ Notes:
 /*
 
     TODO:
-
-    - ?
-        Device 'u76': warning - attempt to direct-map address 00001FFD in program space
-        Device 'u76': warning - attempt to direct-map address 00001FFE in program space
-        Device 'u76': warning - attempt to direct-map address 00001FFF in program space
 
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
@@ -123,11 +118,6 @@ Notes:
 #include "video/mc6845.h"
 #include "sound/discrete.h"
 #include "devices/messram.h"
-
-INLINE running_device *get_floppy_image(running_machine *machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
 
 void v1050_set_int(running_machine *machine, UINT8 mask, int state)
 {
@@ -811,10 +801,10 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 	wd17xx_set_side(state->mb8877, BIT(data, 4));
 
 	/* floppy motor */
-	floppy_mon_w(get_floppy_image(device->machine, 0), BIT(data, 6));
-	floppy_mon_w(get_floppy_image(device->machine, 1), BIT(data, 6));
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), f_motor_on, 1);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), f_motor_on, 1);
+	floppy_mon_w(floppy_get_device(device->machine, 0), BIT(data, 6));
+	floppy_mon_w(floppy_get_device(device->machine, 1), BIT(data, 6));
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), f_motor_on, 1);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), f_motor_on, 1);
 
 	/* density select */
 	wd17xx_dden_w(state->mb8877, BIT(data, 7));
@@ -880,6 +870,12 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 
 	/* floppy interrupt enable */
 	state->f_int_enb = BIT(data, 1);
+
+	if (!state->f_int_enb)
+	{
+		v1050_set_int(device->machine, INT_FLOPPY, 0);
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+	}
 
 	/* baud select */
 	if (baud_sel != state->baud_sel)
@@ -1055,10 +1051,12 @@ static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_intrq_w )
 	v1050_state *driver_state = device->machine->driver_data<v1050_state>();
 
 	if (driver_state->f_int_enb)
+	{
 		v1050_set_int(device->machine, INT_FLOPPY, state);
+	}
+	else
 	{
 		v1050_set_int(device->machine, INT_FLOPPY, 0);
-		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -1067,10 +1065,11 @@ static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_drq_w )
 	v1050_state *driver_state = device->machine->driver_data<v1050_state>();
 
 	if (driver_state->f_int_enb)
+	{
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, state);
+	}
 	else
 	{
-		v1050_set_int(device->machine, INT_FLOPPY, 0);
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
@@ -1080,7 +1079,7 @@ static const wd17xx_interface v1050_wd17xx_intf =
 	DEVCB_NULL,
 	DEVCB_LINE(v1050_mb8877_intrq_w),
 	DEVCB_LINE(v1050_mb8877_drq_w),
-	{FLOPPY_0,FLOPPY_1,NULL,NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* Machine Initialization */
