@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( supercon, driver_device )
 
     /* video hardware */
 
-	MDRV_DEFAULT_LAYOUT(layout_supercon)
+	//MDRV_DEFAULT_LAYOUT(layout_supercon)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

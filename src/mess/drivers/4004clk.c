@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( 4004clk, _4004clk_state )
 	MDRV_MACHINE_START(4004clk)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_4004clk)
+	//MDRV_DEFAULT_LAYOUT(layout_4004clk)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
