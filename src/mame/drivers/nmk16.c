@@ -59,6 +59,7 @@ TODO:
 - Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game is in
   japanese mode,but it's like this on the original game,it's just a japanese write for
   "bomb" word (I presume)
+- (PCB owners): Measure pixel clock / vblank duration for all of these games.
 
 ----
 
@@ -142,7 +143,6 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "cpu/z80/z80.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -1322,7 +1322,7 @@ static INPUT_PORTS_START( manybloc )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:4")	// "Play Type"
 	PORT_DIPSETTING(      0x0008, DEF_STR( Upright ) )						//   "Uplight" !
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )						//   "Table"
-	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )						// "Test Mode"
+	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_HIGH, "SW1:5" )						// "Test Mode"
 	PORT_DIPNAME( 0x0060, 0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0060, DEF_STR( Easy ) )					//   "Level 1
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )				//   "Level 2
@@ -3517,11 +3517,32 @@ static const ym2203_interface ym2203_config =
 	ym2203_irqhandler
 };
 
-static INTERRUPT_GEN( nmk_interrupt )
+static TIMER_DEVICE_CALLBACK( nmk16_scanline )
 {
-	if (cpu_getiloops(device) == 0) cpu_set_input_line(device, 4, HOLD_LINE);
-	else cpu_set_input_line(device, 2, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line(timer.machine, "maincpu", 4, HOLD_LINE);
+
+	/* This is either vblank-in or sprite dma irq complete, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
+       cpu_getiloops() implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
+	if(scanline == 0)
+		cputag_set_input_line(timer.machine, "maincpu", 2, HOLD_LINE);
 }
+
+/* bee-oh board, almost certainly it has different timings */
+static TIMER_DEVICE_CALLBACK( manybloc_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 248) // vblank-out irq
+		cputag_set_input_line(timer.machine, "maincpu", 4, HOLD_LINE);
+
+	/* This is either vblank-in or sprite dma irq complete */
+	if(scanline == 0)
+		cputag_set_input_line(timer.machine, "maincpu", 2, HOLD_LINE);
+}
+
 
 static const nmk112_interface nmk16_nmk112_intf =
 {
@@ -3533,8 +3554,8 @@ static MACHINE_CONFIG_START( tharrier, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(tharrier_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_map)
@@ -3579,8 +3600,8 @@ static MACHINE_CONFIG_START( manybloc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
 	MDRV_CPU_PROGRAM_MAP(manybloc_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,56)/* this needs to equal the framerate on this, rather than being double it .. */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", manybloc_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_map)
@@ -3623,8 +3644,8 @@ static MACHINE_CONFIG_START( mustang, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustang_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -3666,8 +3687,8 @@ static MACHINE_CONFIG_START( mustangb, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustangb_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3701,8 +3722,8 @@ static MACHINE_CONFIG_START( bioship, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,100)/* 112 breaks the title screen */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -3743,8 +3764,8 @@ static MACHINE_CONFIG_START( vandyke, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vandyke_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -3785,8 +3806,8 @@ static MACHINE_CONFIG_START( vandykeb, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(vandykeb_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	MDRV_DEVICE_DISABLE()
@@ -3820,8 +3841,8 @@ static MACHINE_CONFIG_START( acrobatm, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(acrobatm_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -3864,8 +3885,8 @@ static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden s
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragonb_map)
 	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3895,9 +3916,9 @@ static MACHINE_CONFIG_START( tdragon, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tdragon_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -3974,8 +3995,8 @@ static MACHINE_CONFIG_START( strahl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(strahl_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -4819,7 +4840,7 @@ static MACHINE_CONFIG_START( stagger1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega_sound_cpu)
@@ -4900,7 +4921,7 @@ static MACHINE_CONFIG_START( firehawk, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(afega)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(firehawk_sound_cpu)
@@ -4935,8 +4956,8 @@ static MACHINE_CONFIG_START( twinactn, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(twinactn_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(twinactn_sound_cpu)

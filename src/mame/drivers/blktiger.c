@@ -313,9 +313,6 @@ static MACHINE_RESET( blktiger )
 	state->scroll_y[1] = 0;
 	state->scroll_bank = 0;
 	state->screen_layout = 0;
-	state->chon = 0;
-	state->objon = 0;
-	state->bgon = 0;
 	state->z80_latch = 0;
 	state->i8751_latch = 0;
 }

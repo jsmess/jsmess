@@ -95,7 +95,6 @@ CPUS += ADSP21062
 CPUS += DSP56156
 CPUS += RSP
 CPUS += ALPHA8201
-CPUS += CDP1802
 CPUS += COP400
 CPUS += TLCS90
 CPUS += TLCS900
@@ -122,13 +121,15 @@ CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
 CPUS += MN10200
+CPUS += COSMAC
+
+
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
 # only for MESS and so aren't included
 #-------------------------------------------------
 
-SOUNDS += CUSTOM
 SOUNDS += SAMPLES
 SOUNDS += DAC
 SOUNDS += DMADAC
@@ -225,6 +226,8 @@ SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
 #SOUNDS += ASC
+
+
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1579,6 +1582,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/magicard.o \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/magictg.o \
+	$(DRIVERS)/magtouch.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
@@ -1670,6 +1674,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
+
+
 
 #-------------------------------------------------
 # layout dependencies
@@ -1897,6 +1903,7 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
+
 
 
 #-------------------------------------------------

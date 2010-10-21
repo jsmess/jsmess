@@ -129,15 +129,14 @@ CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
 #CPUS += MN10200
-CPUS += UNSP
 CPUS += COSMAC
+CPUS += UNSP
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
 # only for MAME and so aren't included
 #-------------------------------------------------
 
-#SOUNDS += CUSTOM
 #SOUNDS += SAMPLES
 SOUNDS += DAC
 SOUNDS += DMADAC
@@ -234,6 +233,7 @@ SOUNDS += CDP1864
 SOUNDS += MOS656X
 #SOUNDS += S2636
 SOUNDS += ASC
+#SOUNDS += CUSTOM
 SOUNDS += SOCRATES
 SOUNDS += TMC0285
 SOUNDS += TMS5200

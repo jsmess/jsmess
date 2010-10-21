@@ -23,6 +23,8 @@ Memory Map :
   0xd000 - 0xdfff - VRAM mirrored write,
         tilemap offset = address & 0x3ff
         tile number =  bits 0-7 = data, bits 8,9  = address bits 10,11
+  0xe000 - 0xefff - VRAM mirror
+  0xf000 - 0xffff - (unconnected)
 
 Video :
     No scrolling , no sprites.
@@ -30,10 +32,8 @@ Video :
 
     3 gfx ROMS
     ROM1 - R component (ROM ->(parallel in) shift register 74166 (serial out) -> jamma output
-    ROM2 - B component
-    ROM3 - G component
-
-    Default MAME color palette is used
+    ROM2 - G component
+    ROM3 - B component
 
 Sound :
  AY 3 8910
@@ -49,7 +49,6 @@ Sound :
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/4enraya.h"
@@ -74,6 +73,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, videoram, videoram_size)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
+	AM_RANGE(0xf000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -144,7 +145,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( 4enraya )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 static MACHINE_START( 4enraya )
@@ -163,13 +164,22 @@ static MACHINE_RESET( 4enraya )
 	state->last_snd_ctrl = 0;
 }
 
+static PALETTE_INIT( 4enraya )
+{
+	int i;
+
+	/* RGB format */
+	for(i=0;i<8;i++)
+		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+}
+
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
 
 	MDRV_MACHINE_START(4enraya)
 	MDRV_MACHINE_RESET(4enraya)
@@ -182,14 +192,16 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(4enraya)
-	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_PALETTE_INIT(4enraya)
+	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_VIDEO_START(4enraya)
 	MDRV_VIDEO_UPDATE(4enraya)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4) /* guess */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -210,7 +222,7 @@ ROM_START( 4enraya )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
 	ROM_REGION( 0x0020,  "proms", 0 )
-	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* not used */
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* system control - not used */
 ROM_END
 
 GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )

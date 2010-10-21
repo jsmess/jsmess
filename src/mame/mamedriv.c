@@ -176,6 +176,7 @@ const game_driver * const drivers[] =
 	DRIVER( redufob )	/* bootleg */
 	DRIVER( exodus )	/* Subelectro - bootleg? */
 	DRIVER( streakng )	/* [1980] Shoei */
+	DRIVER( streaknga )	/* [1980] Shoei */
 	DRIVER( pacmanbl )	/* bootleg */
 	DRIVER( pacmanbla )	/* bootleg */
 	DRIVER( phoenxp2 )	/* bootleg */
@@ -10021,6 +10022,7 @@ Other Sun games
 	DRIVER( funriver )	/* (c) 2005 Amcoe - Fun River */
 	DRIVER( funriverv )	/* (c) 2005 Amcoe */
 	DRIVER( dvisland )	/* (c) 2006 Amcoe - Devil's Island */
+	DRIVER( dvislando )	/* (c) 2006 Amcoe */
 	DRIVER( atworld )	/* (c) 2007 Amcoe - Around The World */
 	DRIVER( atworldd1 )	/* (c) 2007 Amcoe */
 	DRIVER( amclink )	/* (c) 200? Amcoe - Amcoe Link Control Box? */
@@ -10143,6 +10145,9 @@ Other Sun games
 	DRIVER( streetgr3 )	/* (c) 1993 */
 	DRIVER( streetg2 )	/* (c) 1993 */
 	DRIVER( streetg2r5 )	/* (c) 1993 */
+
+	/* Micro Manufacturing */
+	DRIVER( magtouch )  /* (c) 1995 */
 
 	/* Coinmaster-Gaming VGA based */
 	DRIVER( colorama )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
