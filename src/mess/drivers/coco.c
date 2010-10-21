@@ -694,46 +694,23 @@ INPUT_PORTS_END
   Bitbanger port
 ***************************************************************************/
 
-static int coco_bitbanger_filter(running_device *img, const int *pulses, int total_pulses, int total_duration)
-{
-	int i;
-	int result = 0;
-	int word;
-	int pos;
-	int pulse_type;
-	int c;
-
-	if (total_duration >= 11)
-	{
-		word = 0;
-		pos = 0;
-		pulse_type = 0;
-		result = 1;
-
-		for (i = 0; i < total_pulses; i++)
-		{
-			if (pulse_type)
-				word |= ((1 << pulses[i]) - 1) << pos;
-			pulse_type ^= 1;
-			pos += pulses[i];
-		}
-
-		c = (word >> 1) & 0xff;
-		printer_output(img, c);
-	}
-	return result;
-}
-
 static const bitbanger_config coco_bitbanger_config =
 {
-	coco_bitbanger_filter,
-	1.0 / 10.0,
-	0.2,
-	2,
-	10,
-	0,
-	0
+	coco_bitbanger_callback,
+	BITBANGER_PRINTER,   /* default mode */
+	BITBANGER_600,       /* default output baud */
+	BITBANGER_0PERCENT   /* default fine tune adjustment */
 };
+
+static const bitbanger_config coco3_bitbanger_config =
+{
+	coco3_bitbanger_callback,
+	BITBANGER_PRINTER,   /* default mode */
+	BITBANGER_600,       /* dafault output baud */
+	BITBANGER_0PERCENT   /* default fine tune adjustment */
+};
+
+
 
 /* ----------------------------------------------------------------------- */
 
@@ -1199,7 +1176,7 @@ static MACHINE_CONFIG_START( coco3, coco_state )
 	MDRV_FRAGMENT_ADD( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
+	MDRV_BITBANGER_ADD("bitbanger", coco3_bitbanger_config)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD("snapshot", coco3_pak, "pak", 0)

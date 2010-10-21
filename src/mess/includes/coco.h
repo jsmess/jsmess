@@ -162,4 +162,8 @@ struct coco3_video_vars
 
 extern const struct coco3_video_vars coco3_vidvars;
 
+/* Setting it bitbanger bit */
+void coco_bitbanger_callback(running_machine *machine, UINT8 bit);
+void coco3_bitbanger_callback(running_machine *machine, UINT8 bit);
+
 #endif /* __COCO_H__ */

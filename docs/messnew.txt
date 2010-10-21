@@ -88,6 +88,11 @@ System Driver Changes:
 - [MEPHISTO] to reduce the artwork files glasgow, amsterd and mm4 
   are defined as PARENTS. [Ralf Schaefer]
 
+- [COCO] Added bi-directional bitbanger support. Needs further core
+  changes to be fully implemented. [tim lindner]
+
+
+
 Imgtool Changes:
 ----------------
 

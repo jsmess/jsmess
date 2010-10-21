@@ -20,7 +20,6 @@
 
   TODO:
         - Implement unimplemented SAM registers
-        - Implement unimplemented interrupts (serial)
         - Choose and implement more appropriate ratios for the speed up poke
         - Handle resets correctly
 
@@ -76,6 +75,11 @@ the CoCo 1/2 should stay in coco.c, and that the coco3 and dragon specifc code
 should go into coco3.c and dragon.c which should (hopefully) make the code
 easier to manage.
     P.Harvey-Smith, Dec 2006-Feb 2007
+    
+Added bi-directional bitbanger support. Also fixed reading PIA 1, port A. The
+DAC and bitbanger values written should be reflected in the read.
+    tim lindner, October 2010
+
 ***************************************************************************/
 
 #include <math.h>
@@ -125,6 +129,9 @@ static emu_timer *update_keyboard_timer;
 static emu_timer *mux_sel1_timer;
 static emu_timer *mux_sel2_timer;
 static UINT8 mux_sel1, mux_sel2;
+static UINT8 bitbanger_output_value;
+static UINT8 bitbanger_input_value;
+static UINT8 dac_value;
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_pb_w );
 static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w );
@@ -1536,7 +1543,8 @@ static void (*printer_out)(running_machine *machine, int data);
 /* Printer output for the CoCo, output to bitbanger port */
 static void printer_out_coco(running_machine *machine, int data)
 {
-	bitbanger_output(bitbanger_image(machine), (data & 2) >> 1);
+   bitbanger_output_value = (data & 2) >> 1;
+	bitbanger_output(bitbanger_image(machine), bitbanger_output_value);
 }
 
 /* Printer output for the Dragon, output to Paralel port */
@@ -1564,6 +1572,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	static int dclg_previous_bit;
 	UINT8 ctrl = input_port_read_safe(device->machine, "ctrl_sel", 0x00);
 	UINT8 hires = input_port_read_safe(device->machine, "hires_intf", 0x00);
+   dac_value = dac >> 2;
 
 	coco_sound_update(device->machine);
 
@@ -1828,21 +1837,46 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w )
 		CASSETTE_MASK_MOTOR);
 }
 
-
-
 static READ8_DEVICE_HANDLER ( d_pia1_pa_r )
 {
-	return (cassette_input(cassette_device_image(device->machine)) >= 0) ? 1 : 0;
+   UINT8 result;
+
+   result = cassette_input(cassette_device_image(device->machine)) >= 0 ? 1 : 0;
+   result |= bitbanger_output_value << 1;
+   result |= dac_value << 2;
+
+	return result;
 }
 
+void coco_bitbanger_callback(running_machine *machine, UINT8 bit)
+{
+      bitbanger_input_value = bit;
+}
 
+void coco3_bitbanger_callback(running_machine *machine, UINT8 bit)
+{
+   /* rant: this interrupt is next to useless. It would be useful information to know when a
+            start bit (high to low) occurs, but this interrupt activates in the opposite situation.
+   */
+
+   if( bitbanger_input_value == 0 && bit == 1)
+   {
+      bitbanger_input_value = bit;
+      coco3_raise_interrupt(machine, COCO3_INT_EI2, 0);
+      coco3_raise_interrupt(machine, COCO3_INT_EI2, 1);
+   }
+   else
+   {
+      bitbanger_input_value = bit;
+   }
+}
 
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 {
 	coco_state *state = device->machine->driver_data<coco_state>();
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 1,
-     * and serial-in (pb0). Serial-in not yet implemented. */
+     * and serial-in (pb0). */
 	int result;
 
 	/* For the CoCo 1, the logic has been changed to only select 64K rams
@@ -1858,6 +1892,8 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 		result = 0x04;
 	else
 		result = 0x00;			/* 4K Rams */
+
+   result += bitbanger_input_value;
 
 	return result;
 }
@@ -1886,7 +1922,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 	coco_state *state = device->machine->driver_data<coco_state>();
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 2 and 3,
-     * and serial-in (pb0). Serial-in not yet implemented.
+     * and serial-in (pb0).
      */
 	int result;
 
@@ -1896,6 +1932,9 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 		result = 0x04;					/* 16K: wire pia1_pb2 high */
 	else
 		result = (pia6821_get_output_b(state->pia_0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
+
+   result += bitbanger_input_value;
+
 	return result;
 }
 
@@ -2826,6 +2865,11 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(coco_dasm_override);
 	}
+
+   /* setup printer input line to "space", this is what a Tandy printer would do */
+   bitbanger_output_value = 1;
+   bitbanger_input_value = 0;
+   dac_value = 0;
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);

@@ -15,6 +15,9 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
+/* bitbanger control */
+void ui_mess_menu_bitbanger_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+
 /* tape control */
 void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 astring *tapecontrol_gettime(astring *dest, running_device *device, int *curpos, int *endpos);

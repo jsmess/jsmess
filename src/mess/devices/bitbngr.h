@@ -12,6 +12,45 @@
 #include "image.h"
 
 
+enum
+{
+	BITBANGER_PRINTER			= 0,
+	BITBANGER_MODEM,
+   BITBANGER_MODE_MAX,
+
+	BITBANGER_150				= 0,
+	BITBANGER_300,
+	BITBANGER_600,
+	BITBANGER_1200,
+	BITBANGER_2400,
+	BITBANGER_4800,
+	BITBANGER_9600,
+	BITBANGER_14400,
+	BITBANGER_28800,
+	BITBANGER_38400,
+	BITBANGER_57600,
+	BITBANGER_115200,
+	BITBANGER_BAUD_MAX,
+
+	BITBANGER_NEG40PERCENT  = 0,
+	BITBANGER_NEG35PERCENT,
+	BITBANGER_NEG30PERCENT,
+	BITBANGER_NEG25PERCENT,
+	BITBANGER_NEG20PERCENT,
+	BITBANGER_NEG15PERCENT,
+	BITBANGER_NEG10PERCENT,
+	BITBANGER_NEG5PERCENT,
+	BITBANGER_0PERCENT,
+	BITBANGER_POS5PERCENT,
+	BITBANGER_POS10PERCENT,
+	BITBANGER_POS15PERCENT,
+	BITBANGER_POS20PERCENT,
+	BITBANGER_POS25PERCENT,
+	BITBANGER_POS30PERCENT,
+	BITBANGER_POS35PERCENT,
+	BITBANGER_POS40PERCENT,
+	BITBANGER_TUNE_MAX
+};
 
 /***************************************************************************
     CONSTANTS
@@ -30,14 +69,11 @@ DECLARE_LEGACY_IMAGE_DEVICE(BITBANGER, bitbanger);
 typedef struct _bitbanger_config bitbanger_config;
 struct _bitbanger_config
 {
-	/* filter function; returns non-zero if input accepted */
-	int (*filter)(running_device *device, const int *pulses, int total_pulses, int total_duration);
-	double pulse_threshhold;			/* the maximum duration pulse that we will consider */
-	double pulse_tolerance;				/* deviation tolerance for pulses */
-	int minimum_pulses;					/* the minimum amount of pulses before we start analyzing */
-	int maximum_pulses;					/* the maximum amount of pulses that we will track */
-	int begin_pulse_value;				/* the begining value of a pulse */
-	int initial_value;					/* the initial value of the bitbanger line */
+	/* callback to driver */
+	void (*input_callback)(running_machine *machine, UINT8 bit);
+	int default_mode;					   /* emulating a printer or modem */
+	int default_baud;					   /* output bits per second */
+	int default_tune;                /* fine tune adjustment to the baud */
 };
 
 
@@ -49,5 +85,17 @@ struct _bitbanger_config
 /* outputs data to a bitbanger port */
 void bitbanger_output(running_device *device, int value);
 
+void bitbanger_online_func(running_device *device, int state);
+
+/* ui functions */
+const char *bitbanger_mode_string(running_device *device);
+const char *bitbanger_baud_string(running_device *device);
+const char *bitbanger_tune_string(running_device *device);
+bool bitbanger_inc_mode(running_device *device, bool test);
+bool bitbanger_dec_mode(running_device *device, bool test);
+bool bitbanger_inc_tune(running_device *device, bool test);
+bool bitbanger_dec_tune(running_device *device, bool test);
+bool bitbanger_inc_baud(running_device *device, bool test);
+bool bitbanger_dec_baud(running_device *device, bool test);
 
 #endif /* __BITBNGR_H__ */
