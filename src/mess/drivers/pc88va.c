@@ -207,8 +207,19 @@ static WRITE16_HANDLER( bios_bank_w )
 	}
 }
 
+static READ8_HANDLER( rom_bank_r )
+{
+	return 0xff; // bit 7 low is va91 rom bank status
+}
+
+static READ8_HANDLER( key_r )
+{
+	// note row C bit 2 does something at POST ... some kind of test mode?
+	return 0xff; // TODO
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
-//	AM_RANGE(0x0000, 0x000f) Keyboard ROW reading
+	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 //	AM_RANGE(0x0020, 0x0021) RS-232C
 //	AM_RANGE(0x0030, 0x0030) (R) DSW1 (W) Text Control Port 0
@@ -252,7 +263,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0150, 0x0151) System Operational Mode
 	AM_RANGE(0x0152, 0x0153) AM_READWRITE(bios_bank_r,bios_bank_w) // Memory Map Register
 //	AM_RANGE(0x0154, 0x0155) Refresh Register (wait states)
-//	AM_RANGE(0x0156, 0x0157) ROM bank status
+	AM_RANGE(0x0156, 0x0157) AM_READ8(rom_bank_r,0x00ff) // ROM bank status
 //	AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //	AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
 //	AM_RANGE(0x0160, 0x016f) DMA Controller
@@ -301,6 +312,35 @@ static MACHINE_RESET( pc88va )
 	bank_reg = 0x4100;
 }
 
+static const gfx_layout pc88va_chars_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout pc88va_chars_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( pc88va )
+	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -320,6 +360,7 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(32)
 //	MDRV_PALETTE_INIT( pc8801 )
+	MDRV_GFXDECODE( pc88va )
 
 	MDRV_VIDEO_START( pc88va )
 	MDRV_VIDEO_UPDATE( pc88va )
