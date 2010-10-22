@@ -844,7 +844,7 @@ static void pce_cd_nec_get_dir_info( running_machine *machine )
 	case 0x01:		/* Get total disk size in MSF format */
 		frame = toc->tracks[toc->numtrks-1].physframeofs;
 		frame += toc->tracks[toc->numtrks-1].frames;
-		msf = lba_to_msf( frame );
+		msf = lba_to_msf( frame + 150 );
 
 		pce_cd.data_buffer[0] = ( msf >> 16 ) & 0xFF;	/* M */
 		pce_cd.data_buffer[1] = ( msf >> 8 ) & 0xFF;	/* S */
