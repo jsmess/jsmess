@@ -69,9 +69,12 @@ System Driver Changes:
 
 - [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
-- [MAC] Macintosh IIci now boots, promoted to working [R. Belmont]
+- [MAC] Macintosh IIci now boots, promoted to working. [R. Belmont]
 
 - [MAC] Improvements to PMU and Egret MCU emulation. [R. Belmont]
+
+- [MAC] Greatly improved Apple Sound Chip emulation for Mac II, IIx,
+  IIcx, and SE/30. [R. Belmont]
 
 - [MBEE] Added Chess rom. [Robbbert]
 
