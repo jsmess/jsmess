@@ -397,6 +397,7 @@ static struct
 {
 	UINT8 buffer[5];
 	UINT8 ctrl;
+	UINT8 scd_status; // SCSI status?
 }segacd_cdd;
 #ifdef MESS
 static struct
@@ -5108,6 +5109,8 @@ static MACHINE_RESET( segacd )
 				segacd.end_frame = segacd.last_frame;
 			}
 		}
+
+		segacd_cdd.scd_status = 0x00; // initial state
 	}
 	#endif
 
@@ -5365,11 +5368,11 @@ static const char *const segacd_cdd_get_toc_cmd[] =
 
 static void segacd_cdd_get_status(running_machine *machine)
 {
-	segacd_cdd.buffer[0] = 0;
-	segacd_cdd.buffer[1] = 0;
-	segacd_cdd.buffer[2] = 0;
-	segacd_cdd.buffer[3] = 0;
-	segacd_cdd.buffer[4] = 0;
+	//segacd_cdd.buffer[0] = 0;
+	//segacd_cdd.buffer[1] = 0;
+	//segacd_cdd.buffer[2] = 0;
+	//segacd_cdd.buffer[3] = 0;
+	//segacd_cdd.buffer[4] = 0;
 
 	cdd_hock_irq(machine,1);
 }
@@ -5390,7 +5393,7 @@ static void segacd_cdd_stop_all(running_machine *machine)
 
 static void segacd_cdd_get_toc_info(running_machine *machine)
 {
-	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.scd_status & 0xf0); // TODO: remove me
 
 	#if LOG_CDD
 	printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
@@ -5429,13 +5432,16 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 
 				frame = segacd.toc->tracks[segacd.toc->numtrks-1].physframeofs;
 				frame += segacd.toc->tracks[segacd.toc->numtrks-1].frames;
+				frame += 150; // 2 seconds of pre-gap
 				msf = lba_to_msf( frame );
 
-				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.scd_status & 0xf0);
 				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
 				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
 				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
 				segacd_cdd.buffer[4] = 0;
+
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
 
 				cdd_hock_irq(machine,1);
 				return;
@@ -5443,11 +5449,14 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 			}
 		case 0x4: //Get First and Last Track Number
 			{
-				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+				segacd_cdd.scd_status = 0x40;
+				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.scd_status & 0xf0);
 				segacd_cdd.buffer[1] = dec_2_bcd(1);
-				segacd_cdd.buffer[2] = dec_2_bcd(segacd.toc->numtrks);
+				segacd_cdd.buffer[2] = dec_2_bcd(segacd.toc->numtrks - 1); // TODO: check me
 				segacd_cdd.buffer[3] = 0;
 				segacd_cdd.buffer[4] = 0;
+
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
 
 				cdd_hock_irq(machine,1);
 			}
