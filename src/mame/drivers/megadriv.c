@@ -405,6 +405,8 @@ static struct
 	UINT32	current_frame;
 	UINT32	end_frame;
 	UINT32	last_frame;
+	UINT8	first_track;
+	UINT8	last_track;
 
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
@@ -5329,7 +5331,7 @@ static const char *const segacd_cdd_cmd[] =
 	"Status",
 	"Stop All",
 	"Get TOC Info",
-	"Read",
+	"Play",
 	"Seek",
 	"Pause/Stop",
 	"Resume",
@@ -5401,7 +5403,8 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 
 	if ( ! segacd.cd ) // no cd is present
 	{
-		segacd_cdd.buffer[0] = (0) | (segacd_cdd.buffer[0] & 0xf0);
+		segacd_cdd.scd_status = 0x00;
+		segacd_cdd.buffer[0] = (0) | (segacd_cdd.scd_status & 0xf0);
 		segacd_cdd.buffer[1] = 0;
 		segacd_cdd.buffer[2] = 0;
 		segacd_cdd.buffer[3] = 0;
@@ -5447,12 +5450,14 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 				return;
 
 			}
-		case 0x4: //Get First and Last Track Number
+			case 0x4: //Get First and Last Track Number
 			{
 				segacd_cdd.scd_status = 0x40;
 				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd_cdd.buffer[1] = dec_2_bcd(1);
-				segacd_cdd.buffer[2] = dec_2_bcd(segacd.toc->numtrks - 1); // TODO: check me
+				segacd.first_track = dec_2_bcd(1);
+				segacd.last_track = dec_2_bcd(segacd.toc->numtrks - 1);
+				segacd_cdd.buffer[1] = segacd.first_track;
+				segacd_cdd.buffer[2] = segacd.last_track;
 				segacd_cdd.buffer[3] = 0;
 				segacd_cdd.buffer[4] = 0;
 
@@ -5461,6 +5466,32 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 				cdd_hock_irq(machine,1);
 			}
 			return;
+			case 0x5: //Get Track Addresses
+			{
+				UINT8 track_num;
+				UINT32 start_frame,end_frame,frame,msf;
+
+				track_num = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
+
+				if(track_num > segacd.last_track)
+					track_num = segacd.last_track;
+				if(track_num < segacd.first_track)
+					track_num = segacd.first_track;
+				start_frame = segacd.toc->tracks[ bcd_2_dec( track_num - 1 ) ].physframeofs;
+				end_frame = segacd.toc->tracks[ bcd_2_dec( track_num ) ].physframeofs;
+				frame = end_frame - start_frame;
+				msf = lba_to_msf( frame );
+
+				segacd_cdd.buffer[0] = (0x5 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
+				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
+				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
+				segacd_cdd.buffer[4] = (track_num % 10) | (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x80 : 0x00);
+
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
+
+				cdd_hock_irq(machine,1);
+			}
 			//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 		}
 	}
@@ -5469,6 +5500,37 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 }
 
 #endif
+
+static void segacd_cdd_seek(running_machine *machine)
+{
+	UINT8 m,s,f;
+	UINT8 track_num;
+	UINT32 frame;
+
+	// TODO: check if tray is open or CD isn't there
+
+	segacd_cdd.scd_status = 0x20; //READY flag
+
+	m = ((segacd_cdd_tx[2] & 0xf) * 10) | (segacd_cdd_tx[3] & 0x0f);
+	s = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
+	f = ((segacd_cdd_tx[6] & 0xf) * 10) | (segacd_cdd_tx[7] & 0x0f);
+
+	frame = (m << 16) | (s << 8) | (f);
+
+	track_num = cdrom_get_track(segacd.cd, frame);
+//	printf("%02x %02x %02x %02x\n",m,s,f,track_num);
+
+	segacd_cdd.ctrl &= 0xfeff;
+	segacd_cdd.ctrl |= (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x000 : 0x100);
+
+	segacd_cdd.buffer[0] = segacd_cdd.scd_status & 0x20; // set READY
+	segacd_cdd.buffer[1] = 0;
+	segacd_cdd.buffer[2] = 0;
+	segacd_cdd.buffer[3] = 0;
+	segacd_cdd.buffer[4] = 0;
+
+	cdd_hock_irq(machine,1);
+}
 
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
@@ -5488,6 +5550,8 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 			case 0x0: segacd_cdd_get_status(space->machine); break;
 			case 0x1: segacd_cdd_stop_all(space->machine); break;
 			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
+			//case 0x3: segacd_cdd_play(space->machine); break;
+			case 0x4: segacd_cdd_seek(space->machine); break;
 			//default: logerror("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		}
 	}
