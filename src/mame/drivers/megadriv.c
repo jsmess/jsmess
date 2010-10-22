@@ -5398,8 +5398,11 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.scd_status & 0xf0); // TODO: remove me
 
 	#if LOG_CDD
-	printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	if(segacd_cdd_tx[3] >= 6)
+		printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 	#endif
+
+	// TODO: check if tray is open
 
 	if ( ! segacd.cd ) // no cd is present
 	{
@@ -5417,15 +5420,51 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 	{
 		switch(segacd_cdd_tx[3] & 0xf)
 		{
+			case 0x0: //Get Current Position
+			{
+				UINT32 msf;
+
+				segacd_cdd.scd_status = 0x40; //TODO: check this
+
+				msf = lba_to_msf( segacd.current_frame );
+				segacd_cdd.buffer[0] = (0x0 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
+				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
+				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
+				segacd_cdd.buffer[4] = 0;
+
+				cdd_hock_irq(machine,1);
+				return;
+			}
+			case 0x1: //Get Elapsed Time of Current Track
+			{
+				UINT32 msf;
+				UINT32 end_frame_track;
+
+				segacd_cdd.scd_status = 0x40; //TODO: check this
+
+				end_frame_track = segacd.toc->tracks[ cdrom_get_track(segacd.cd, segacd.current_frame) + 1 ].physframeofs; // correct?
+
+				msf = lba_to_msf( end_frame_track - segacd.current_frame );
+
+				segacd_cdd.buffer[0] = (0x1 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
+				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
+				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
+				segacd_cdd.buffer[4] = 0;
+
+				cdd_hock_irq(machine,1);
+				return;
+			}
 			case 0x2: //Get Current Track
 			{
 				segacd_cdd.buffer[0] = (0x2 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
 
-				segacd_cdd.buffer[0] = 1; // current track number, TODO
-				segacd_cdd.buffer[1] = 0;
+				segacd_cdd.buffer[1] = cdrom_get_track(segacd.cd, segacd.current_frame);
 				segacd_cdd.buffer[2] = 0;
 				segacd_cdd.buffer[3] = 0;
 				segacd_cdd.buffer[4] = 0;
+
 				cdd_hock_irq(machine,1);
 				return;
 			}
@@ -5507,7 +5546,7 @@ static void segacd_cdd_seek(running_machine *machine)
 	UINT8 track_num;
 	UINT32 frame;
 
-	// TODO: check if tray is open or CD isn't there
+	// TODO: check if tray is open or CD isn't there and throw an error if so
 
 	segacd_cdd.scd_status = 0x20; //READY flag
 
@@ -5518,6 +5557,7 @@ static void segacd_cdd_seek(running_machine *machine)
 	frame = (m << 16) | (s << 8) | (f);
 
 	track_num = cdrom_get_track(segacd.cd, frame);
+	segacd.current_frame = frame;
 //	printf("%02x %02x %02x %02x\n",m,s,f,track_num);
 
 	segacd_cdd.ctrl &= 0xfeff;
@@ -5541,7 +5581,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
 		#if LOG_CDD
-		if(segacd_cdd_tx[0] != 0)
+		if(segacd_cdd_tx[0] != 0 && segacd_cdd_tx[0] != 2)
 			printf("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		#endif
 
