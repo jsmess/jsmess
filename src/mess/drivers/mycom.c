@@ -35,6 +35,8 @@ static UINT8 *gfx_rom;
 static UINT16 vram_addr;
 static UINT8 keyb_press,keyb_press_flag,shift_press_flag;
 static UINT8 video_mode,sn_we;
+static UINT32 upper_sw;
+static UINT8 * RAM;
 
 static VIDEO_START( mycom )
 {
@@ -74,9 +76,6 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
 		}
-
-//		width = (video_mode & 0x80) ? 160 : 320;
-
 	}
 	else
 	{
@@ -106,18 +105,25 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	}
 }
 
-//		width = (video_mode & 0x80) ? 40 : 80;
-
-
 static WRITE8_HANDLER( mycom_00_w )
 {
 	switch(data)
 	{
 		case 0x00: memory_set_bank(space->machine, "boot", 1); break;
 		case 0x01: memory_set_bank(space->machine, "boot", 0); break;
-		case 0x02: memory_set_bank(space->machine, "upper", 0); break;
-		case 0x03: memory_set_bank(space->machine, "upper", 1); break;
+		case 0x02: upper_sw = 0x10000; break;
+		case 0x03: upper_sw = 0x0c000; break;
 	}
+}
+
+static READ8_HANDLER( mycom_upper_r )
+{
+	return RAM[offset | upper_sw];
+}
+
+static WRITE8_HANDLER( mycom_upper_w )
+{
+	RAM[offset | 0xc000] = data;
 }
 
 static READ8_HANDLER( mycom_6845_r )
@@ -160,7 +166,7 @@ static ADDRESS_MAP_START(mycom_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("upper")
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(mycom_upper_r,mycom_upper_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mycom_io, ADDRESS_SPACE_IO, 8)
@@ -478,19 +484,19 @@ static MACHINE_START(mycom)
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
 	mycom_cassette = machine->device("cassette");
+	RAM = memory_region(machine, "maincpu");
 }
 
 static MACHINE_RESET(mycom)
 {
 	memory_set_bank(machine, "boot", 1);
-	memory_set_bank(machine, "upper", 0);
+	upper_sw = 0x10000;
 }
 
 static DRIVER_INIT( mycom )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
-	memory_configure_bank(machine, "upper", 0, 2, &RAM[0xc000], 0x4000);
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
 }
 
 static MACHINE_CONFIG_START( mycom, driver_device )
@@ -536,8 +542,13 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( mycom )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0xc000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a) )
-	ROM_LOAD( "basic.rom",0xf000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1) )
+	ROM_DEFAULT_BIOS("mycom")
+	ROM_SYSTEM_BIOS(0, "mycom", "40 column")
+	ROMX_LOAD( "bios.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(1))
+	ROMX_LOAD( "basic.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "Takeda", "80 column")
+	ROMX_LOAD( "bios.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(2))
+	ROMX_LOAD( "basic.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(2))
 
 	ROM_REGION( 0x0800, "vram", ROMREGION_ERASE00 )
 
