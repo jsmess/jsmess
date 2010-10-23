@@ -934,6 +934,7 @@ const game_driver * const drivers[] =
 	DRIVER( cp400 )	 /* Prologica CP400   */
 	DRIVER( mc10 )	  /* MC-10  */
 	DRIVER( alice )	 /* Matra & Hachette Ordinateur Alice   */
+	DRIVER( alice32 ) /* Matra & Hachette Alice 32   */
 
 	/* EACA */
 	DRIVER( cgenie )	/* Colour Genie EG2000    */

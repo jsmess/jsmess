@@ -12,6 +12,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
 #include "video/m6847.h"
+#include "video/ef9345.h"
 #include "devices/cassette.h"
 #include "formats/coco_cas.h"
 #include "devices/messram.h"
@@ -28,6 +29,7 @@ public:
 		: driver_device(machine, config) { }
 
 	running_device *mc6847;
+	running_device *ef9345;
 	running_device *dac;
 	running_device *cassette;
 
@@ -70,6 +72,32 @@ static WRITE8_HANDLER( mc10_bfff_w )
 	mc6847_gm0_w(mc10->mc6847, BIT(data, 4));
 	mc6847_ag_w(mc10->mc6847, BIT(data, 5));
 	mc6847_css_w(mc10->mc6847, BIT(data, 6));
+
+	/* bit 7, dac output */
+	dac_data_w(mc10->dac, BIT(data, 7));
+}
+
+
+static READ8_HANDLER( alice32_bfff_r )
+{
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
+	UINT8 result = 0xff;
+
+	if (!BIT(mc10->keyboard_strobe, 0)) result &= input_port_read(space->machine, "pb0");
+	if (!BIT(mc10->keyboard_strobe, 1)) result &= input_port_read(space->machine, "pb1");
+	if (!BIT(mc10->keyboard_strobe, 2)) result &= input_port_read(space->machine, "pb2");
+	if (!BIT(mc10->keyboard_strobe, 3)) result &= input_port_read(space->machine, "pb3");
+	if (!BIT(mc10->keyboard_strobe, 4)) result &= input_port_read(space->machine, "pb4");
+	if (!BIT(mc10->keyboard_strobe, 5)) result &= input_port_read(space->machine, "pb5");
+	if (!BIT(mc10->keyboard_strobe, 6)) result &= input_port_read(space->machine, "pb6");
+	if (!BIT(mc10->keyboard_strobe, 7)) result &= input_port_read(space->machine, "pb7");
+
+	return result;
+}
+
+static WRITE8_HANDLER( alice32_bfff_w )
+{
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 
 	/* bit 7, dac output */
 	dac_data_w(mc10->dac, BIT(data, 7));
@@ -143,6 +171,21 @@ static VIDEO_UPDATE( mc10 )
 	return mc6847_update(mc10->mc6847, bitmap, cliprect);
 }
 
+static VIDEO_UPDATE( alice32 )
+{
+	mc10_state *state = screen->machine->driver_data<mc10_state>();
+
+	video_update_ef9345(state->ef9345, bitmap, cliprect);
+
+	return 0;
+}
+
+static TIMER_DEVICE_CALLBACK( alice32_scanline )
+{
+	mc10_state *state = timer.machine->driver_data<mc10_state>();
+
+	ef9345_scanline(state->ef9345, (UINT16)param);
+}
 
 /***************************************************************************
     DRIVER INIT
@@ -177,6 +220,35 @@ static DRIVER_INIT( mc10 )
 	state_save_register_global(machine, mc10->keyboard_strobe);
 }
 
+static DRIVER_INIT( alice32 )
+{
+	mc10_state *mc10 = machine->driver_data<mc10_state>();
+	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* initialize keyboard strobe */
+	mc10->keyboard_strobe = 0x00;
+
+	/* find devices */
+	mc10->ef9345 = machine->device("ef9345");
+	mc10->dac = machine->device("dac");
+	mc10->cassette = machine->device("cassette");
+
+	/* initialize memory */
+	mc10->ram = messram_get_ptr(machine->device("messram"));
+	mc10->ram_size = messram_get_size(machine->device("messram"));
+
+	memory_set_bankptr(machine, "bank1", mc10->ram);
+
+	/* initialize memory expansion */
+	if (mc10->ram_size == 24*1024)
+		memory_set_bankptr(machine, "bank2", mc10->ram + 0x2000);
+	else
+		memory_nop_readwrite(prg, 0x5000, 0x8fff, 0, 0);
+
+	/* register for state saving */
+	state_save_register_global(machine, mc10->keyboard_strobe);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -196,6 +268,15 @@ static ADDRESS_MAP_START( mc10_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(mc10_port2_r, mc10_port2_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( alice32_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
+	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
+	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
+	AM_RANGE(0x9000, 0xafff) AM_NOP /* unused */
+	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_r, ef9345_w)
+	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(alice32_bfff_r, alice32_bfff_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
+ADDRESS_MAP_END
 
 /***************************************************************************
     INPUT PORTS
@@ -435,6 +516,44 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 MACHINE_CONFIG_END
 
 
+static const ef9345_config alice32_ef9345_config =
+{
+	"screen",			/* screen we are acting on */
+	"ef9345"			/* charset */
+};
+
+static MACHINE_CONFIG_START( alice32, mc10_state )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
+	MDRV_CPU_PROGRAM_MAP(alice32_mem)
+	MDRV_CPU_IO_MAP(mc10_io)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(336, 270)
+	MDRV_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_VIDEO_UPDATE(alice32)
+
+	MDRV_EF9345_ADD("ef9345", alice32_ef9345_config)
+	MDRV_TIMER_ADD_SCANLINE("alice32_sl", alice32_scanline, "screen", 0, 10)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD("cassette", mc10_cassette_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("24K")
+	MDRV_RAM_EXTRA_OPTIONS("8K")
+MACHINE_CONFIG_END
+
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -449,6 +568,13 @@ ROM_START( alice )
 	ROM_LOAD("alice.rom", 0x0000, 0x2000, CRC(f876abe9) SHA1(c2166b91e6396a311f486832012aa43e0d2b19f8))
 ROM_END
 
+ROM_START( alice32 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("alice32.rom", 0x0000, 0x4000, CRC(c3854ddf) SHA1(f34e61c3cf711fb59ff4f1d4c0d2863dab0ab5d1))
+
+	ROM_REGION( 0x2000, "ef9345", 0 )
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
+ROM_END
 
 /***************************************************************************
     GAME DRIVERS
@@ -457,3 +583,4 @@ ROM_END
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY              FULLNAME  FLAGS */
 COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
 COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )
+COMP( 1984, alice32, mc10, 0,      alice32, alice, alice32, "Matra & Hachette",  "Alice 32",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
