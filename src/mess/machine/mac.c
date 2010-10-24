@@ -65,8 +65,7 @@
      Egret version spotting:
      341S0417 - 0x???? - Color Classic
      341S0850 - 0x???? - LC, LC II
-     341S0851 - 0x0101 - Classic II, IIvx, LC III (probably also IIvi?)
-     344S0851 - 0x???? - IIsi
+     341S0851 - 0x0101 - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
 
      Cuda version spotting:
      341S0060 - 0x0002 - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
