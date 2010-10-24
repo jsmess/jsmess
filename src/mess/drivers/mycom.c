@@ -248,7 +248,7 @@ static INPUT_PORTS_START( mycom )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':')
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<") PORT_CODE(KEYCODE_COMMA) PORT_CHAR('<')
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3d =
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3e >
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3f ?
@@ -371,9 +371,12 @@ static READ8_DEVICE_HANDLER( mycom_08_r )
 static READ8_DEVICE_HANDLER( mycom_06_r )
 {
 	/*
-    xxxx ---- keyboard related, it expects to return 1101 here
+    x--- ---- keyboard s5
+    -x-- ---- keyboard s4 (motor on/off)
+    --x- ---- keyboard s3 (must be high)
+    ---x ---- keyboard s2
     */
-	return (mame_rand(device->machine) & 0x20) | 0x00;
+	return 0xff;
 }
 
 static READ8_DEVICE_HANDLER( mycom_05_r )
@@ -471,6 +474,8 @@ static TIMER_CALLBACK( keyboard_callback )
 					if(scancode == 0x3c)
 						scancode = 0x3e;
 				}
+				if (keymod & 1) scancode &= 0xbf; // ctrl, sets d6 low
+				if (keymod & 4) scancode |= 0x80; // kana, sets d7 high
 				keyb_press = scancode;
 				keyb_press_flag = 1;
 				return;
