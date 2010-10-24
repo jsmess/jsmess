@@ -349,7 +349,7 @@ VIDEO_RESET(macrbv)
 	}
 	else
 	{
-		mac->rbv_montype = input_port_read(machine, "MONTYPE");
+		mac->rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
 		switch (mac->rbv_montype)
 		{
 			case 1:	// 15" portrait display

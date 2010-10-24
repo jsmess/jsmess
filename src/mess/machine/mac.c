@@ -62,6 +62,21 @@
           (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
         - What on earth are 0x700000-0x7fffff mapped to ?
 
+     Egret version spotting:
+     341S0417 - 0x???? - Color Classic
+     341S0850 - 0x???? - LC, LC II
+     341S0851 - 0x0101 - Classic II, IIvx, LC III (probably also IIvi?)
+     344S0851 - 0x???? - IIsi
+
+     Cuda version spotting:
+     341S0060 - 0x0002 - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
+     341S0078 - 0x???? - Quadra 660AV/840AV
+     341S0262 - 0x???? - some PMac 6500
+     341S0285 - 0x???? - PMac 4400 + Mac clones
+     341S0788 - 0x???? - LC 475/575/Quadra 605, PMac 7200
+     343S0788 - 0x???? - PMac x100 (typo - actually 341S0788?)
+
+
 ****************************************************************************/
 
 #include <time.h>
@@ -313,12 +328,20 @@ void mac_asc_irq(running_device *device, int state)
 
 	if (ASC_INTS_RBV)
 	{
-		mac->rbv_regs[3] |= 0x90;	// any VIA 2 interrupt | sound interrupt
-
-		if (mac->rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
+		if (state)
 		{
-			mac->rbv_ifr |= 0x90;
-			mac_set_via2_interrupt(device->machine, 1);
+			mac->rbv_regs[3] |= 0x90;	// any VIA 2 interrupt | sound interrupt
+
+			if (mac->rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
+			{
+				mac->rbv_ifr |= 0x90;
+				mac_set_via2_interrupt(device->machine, 1);
+			}
+		}
+		else
+		{
+			mac->rbv_regs[3] &= ~0x90;
+			mac->rbv_ifr &= ~0x10;
 		}
 
 	}
@@ -2635,6 +2658,9 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 		case MODEL_MAC_QUADRA_900:
 			return 0x81 | PA6 | PA4;
+
+		case MODEL_MAC_COLOR_CLASSIC:
+			return 0x81 | PA1;
 
 		default:
 			return 0x80;
