@@ -29,33 +29,34 @@ static VIDEO_UPDATE( pc88va )
 	return 0;
 }
 
-static READ8_HANDLER( sys_mem_r )
+static READ16_HANDLER( sys_mem_r )
 {
 	switch((bank_reg & 0xf00) >> 8)
 	{
 		case 0: // select bus slot
-			return 0xff;
+			return 0xffff;
 		case 1: // TVRAM
 		{
-			UINT8 *tvram = memory_region(space->machine, "tvram");
+			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
+
 			if((offset & 0x30000) == 0)
 				return tvram[offset];
 
-			return 0xff;
+			return 0xffff;
 		}
 		case 4:
 		{
-			UINT8 *gvram = memory_region(space->machine, "gvram");
+			UINT16 *gvram = (UINT16 *)memory_region(space->machine, "gvram");
 
 			return gvram[offset];
 		}
 		case 8: // kanji ROM
 		case 9:
 		{
-			UINT8 *knj_ram = memory_region(space->machine, "kanji");
+			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
 			UINT32 knj_offset;
 
-			knj_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+			knj_offset = (offset + (((bank_reg & 0x100) >> 8)*0x40000)) / 2;
 
 			/* 0x00000 - 0x3ffff Kanji ROM 1*/
 			/* 0x40000 - 0x4ffff Kanji ROM 2*/
@@ -68,19 +69,19 @@ static READ8_HANDLER( sys_mem_r )
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			UINT8 *dic_rom = memory_region(space->machine, "dictionary");
+			UINT16 *dic_rom = (UINT16 *)memory_region(space->machine, "dictionary");
 			UINT32 dic_offset;
 
-			dic_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+			dic_offset = (offset + (((bank_reg & 0x100) >> 8)*0x40000)) / 2;
 
 			return dic_rom[dic_offset];
 		}
 	}
 
-	return 0xff;
+	return 0xffff;
 }
 
-static WRITE8_HANDLER( sys_mem_w )
+static WRITE16_HANDLER( sys_mem_w )
 {
 	switch((bank_reg & 0xf00) >> 8)
 	{
@@ -88,35 +89,35 @@ static WRITE8_HANDLER( sys_mem_w )
 			break;
 		case 1: // TVRAM
 		{
-			UINT8 *tvram = memory_region(space->machine, "tvram");
+			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
 
 			if((offset & 0x30000) == 0)
-				tvram[offset] = data;
+				COMBINE_DATA(&tvram[offset]);
 		}
 		break;
 		case 4: // TVRAM
 		{
-			UINT8 *gvram = memory_region(space->machine, "gvram");
+			UINT16 *gvram = (UINT16 *)memory_region(space->machine, "gvram");
 
-			gvram[offset] = data;
+			COMBINE_DATA(&gvram[offset]);
 		}
 		break;
-		case 8: // kanji ROM
+		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
 		case 9:
 		{
-			UINT8 *knj_ram = memory_region(space->machine, "kanji");
+			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
 			UINT32 knj_offset;
 
 			knj_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
 
 			if(knj_offset >= 0x50000 && knj_offset <= 0x53fff)
-				knj_ram[knj_offset] = data;
+				COMBINE_DATA(&knj_ram[knj_offset]);
 		}
 		break;
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			// ...
+			// NOP?
 		}
 		break;
 	}
@@ -125,7 +126,7 @@ static WRITE8_HANDLER( sys_mem_w )
 static ADDRESS_MAP_START( pc88va_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 //	AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
-	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE8(sys_mem_r,sys_mem_w,0xffff)
+	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE(sys_mem_r,sys_mem_w)
 	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("rom00_bank")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("rom10_bank")
 ADDRESS_MAP_END
