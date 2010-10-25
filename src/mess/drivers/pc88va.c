@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "cpu/nec/nec.h"
 //#include "cpu/z80/z80.h"
+#include "machine/i8255a.h"
 
 static UINT16 *palram;
 static UINT16 bank_reg;
@@ -212,7 +213,13 @@ static WRITE16_HANDLER( bios_bank_w )
 	---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
 	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
 	*/
-	bank_reg = data;
+	if ((mem_mask&0xffff) == 0xffff)
+		bank_reg = data;
+	else if ((mem_mask & 0xffff) == 0xff00)
+		bank_reg = (data & 0xff00) | (bank_reg & 0x00ff);
+	else if ((mem_mask & 0xffff) == 0x00ff)
+		bank_reg = (data & 0x00ff) | (bank_reg & 0xff00);
+
 
 	/* RBC1 */
 	{
@@ -251,6 +258,16 @@ static WRITE16_HANDLER( backupram_wp_0_w )
 	backupram_wp = 0;
 }
 
+static READ8_HANDLER( hdd_status_r )
+{
+	return 0x20;
+}
+
+static READ8_HANDLER( fdc_r )
+{
+	return mame_rand(space->machine);
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -268,14 +285,15 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0070, 0x0070) ? (*)
 //	AM_RANGE(0x0071, 0x0071) Expansion ROM select (*)
 //	AM_RANGE(0x0078, 0x0078) Memory offset increment (*)
-//	AM_RANGE(0x0080, 0x0083) HDD control, byte access 7-0
+//	AM_RANGE(0x0080, 0x0081) HDD related
+	AM_RANGE(0x0082, 0x0083) AM_READ8(hdd_status_r,0xff)// HDD control, byte access 7-0
 //	AM_RANGE(0x00bc, 0x00bf) d8255 1
 //	AM_RANGE(0x00e2, 0x00e3) Expansion RAM selection (*)
 //	AM_RANGE(0x00e4, 0x00e4) 8214 IRQ control (*)
 //	AM_RANGE(0x00e6, 0x00e6) 8214 IRQ mask (*)
 //	AM_RANGE(0x00e8, 0x00e9) ? (*)
 //	AM_RANGE(0x00ec, 0x00ed) ? (*)
-//	AM_RANGE(0x00fc, 0x00ff) d8255 2, FDD
+	AM_RANGE(0x00fc, 0x00ff) AM_DEVREADWRITE8("d8255_2", i8255a_r,i8255a_w,0xffff) // d8255 2, FDD
 
 //	AM_RANGE(0x0100, 0x0101) Screen Control Register
 //	AM_RANGE(0x0102, 0x0103) Graphic Screen Control Register
@@ -307,7 +325,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
 //	AM_RANGE(0x01a0, 0x01a7) TCU (timer counter unit)
 //	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
-//	AM_RANGE(0x01b0, 0x01bb) FDC related (765)
+	AM_RANGE(0x01b0, 0x01bb) AM_READ8(fdc_r,0xffff)// FDC related (765)
 //	AM_RANGE(0x01c0, 0x01c1) ?
 //	AM_RANGE(0x01c8, 0x01cf) i8255 3 (byte access)
 //	AM_RANGE(0x01d0, 0x01d1) Expansion RAM bank selection
@@ -375,6 +393,50 @@ static GFXDECODE_START( pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
 
+static READ8_DEVICE_HANDLER( fdd_porta_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( fdd_portb_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( fdd_portc_r )
+{
+	static UINT8 test1,test2;
+
+	test1^=4;
+	test2^=1;
+
+	return 0xff ^ test1 ^ test2;
+}
+
+static WRITE8_DEVICE_HANDLER( fdd_porta_w )
+{
+	// ...
+}
+
+static WRITE8_DEVICE_HANDLER( fdd_portb_w )
+{
+	// ...
+}
+
+static WRITE8_DEVICE_HANDLER( fdd_portc_w )
+{
+	// ...
+}
+
+static I8255A_INTERFACE( fdd_intf )
+{
+	DEVCB_HANDLER(fdd_porta_r),						/* Port A read */
+	DEVCB_HANDLER(fdd_portb_r),						/* Port B read */
+	DEVCB_HANDLER(fdd_portc_r),						/* Port C read */
+	DEVCB_HANDLER(fdd_porta_w),						/* Port A write */
+	DEVCB_HANDLER(fdd_portb_w),						/* Port B write */
+	DEVCB_HANDLER(fdd_portc_w)						/* Port C write */
+};
 
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
@@ -401,6 +463,9 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_VIDEO_UPDATE( pc88va )
 
 	MDRV_MACHINE_RESET( pc88va )
+
+	MDRV_I8255A_ADD( "d8255_2", fdd_intf )
+
 
 MACHINE_CONFIG_END
 
