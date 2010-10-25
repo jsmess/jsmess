@@ -18,6 +18,7 @@
 
 static UINT16 *palram;
 static UINT16 bank_reg;
+static UINT8 backupram_wp;
 
 static VIDEO_START( pc88va )
 {
@@ -39,7 +40,7 @@ static READ16_HANDLER( sys_mem_r )
 		{
 			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
 
-			if((offset & 0x30000) == 0)
+			if(((offset*2) & 0x30000) == 0)
 				return tvram[offset];
 
 			return 0xffff;
@@ -56,11 +57,11 @@ static READ16_HANDLER( sys_mem_r )
 			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
 			UINT32 knj_offset;
 
-			knj_offset = (offset + (((bank_reg & 0x100) >> 8)*0x40000)) / 2;
+			knj_offset = (offset + (((bank_reg & 0x100) >> 8)*0x20000));
 
 			/* 0x00000 - 0x3ffff Kanji ROM 1*/
 			/* 0x40000 - 0x4ffff Kanji ROM 2*/
-			/* 0x50000 - 0x53fff Kanji RAM */
+			/* 0x50000 - 0x53fff Backup RAM */
 			/* anything else is a NOP (I presume?) */
 
 			return knj_ram[knj_offset];
@@ -72,7 +73,7 @@ static READ16_HANDLER( sys_mem_r )
 			UINT16 *dic_rom = (UINT16 *)memory_region(space->machine, "dictionary");
 			UINT32 dic_offset;
 
-			dic_offset = (offset + (((bank_reg & 0x100) >> 8)*0x40000)) / 2;
+			dic_offset = (offset + (((bank_reg & 0x100) >> 8)*0x20000));
 
 			return dic_rom[dic_offset];
 		}
@@ -91,7 +92,7 @@ static WRITE16_HANDLER( sys_mem_w )
 		{
 			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
 
-			if((offset & 0x30000) == 0)
+			if(((offset*2) & 0x30000) == 0)
 				COMBINE_DATA(&tvram[offset]);
 		}
 		break;
@@ -108,10 +109,14 @@ static WRITE16_HANDLER( sys_mem_w )
 			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
 			UINT32 knj_offset;
 
-			knj_offset = offset + (((bank_reg & 0x100) >> 8)*0x40000);
+			knj_offset = ((offset) + (((bank_reg & 0x100) >> 8)*0x20000));
 
-			if(knj_offset >= 0x50000 && knj_offset <= 0x53fff)
+			if(knj_offset >= 0x50000/2 && knj_offset <= 0x53fff/2) // TODO: there's an area that can be write protected
+			{
 				COMBINE_DATA(&knj_ram[knj_offset]);
+				gfx_element_mark_dirty(space->machine->gfx[0], (knj_offset * 2) / 8);
+				gfx_element_mark_dirty(space->machine->gfx[1], (knj_offset * 2) / 32);
+			}
 		}
 		break;
 		case 0xc: // Dictionary ROM
@@ -148,12 +153,29 @@ static READ8_HANDLER( idp_status_r )
 
 static WRITE8_HANDLER( idp_command_w )
 {
-	// ...
+	switch(data)
+	{
+		case 0x10: printf("Unemulated IDP SYNC cmd set\n"); break;
+		case 0x12: printf("Unemulated IDP DSPON cmd set\n"); break;
+		case 0x13: printf("Unemulated IDP DSPOFF cmd set\n"); break;
+		case 0x14: printf("Unemulated IDP DSPDEF cmd set\n"); break;
+		case 0x15: printf("Unemulated IDP CURDEF cmd set\n"); break;
+		case 0x16: printf("Unemulated IDP ACTSCR cmd set\n"); break;
+		case 0x1e: printf("Unemulated IDP CURS cmd set\n"); break;
+		case 0x8c: printf("Unemulated IDP EMUL cmd set\n"); break;
+		case 0x88: printf("Unemulated IDP EXIT cmd set\n"); break;
+		case 0x82: printf("Unemulated IDP SPRON cmd set\n"); break;
+		case 0x83: printf("Unemulated IDP SPROFF cmd set\n"); break;
+		case 0x85: printf("Unemulated IDP SPRSW cmd set\n"); break;
+		case 0x81: printf("Unemulated IDP SPROV cmd set\n"); break;
+
+		default:   printf("Unknown IDP %02x cmd set\n",data); break;
+	}
 }
 
 static WRITE8_HANDLER( idp_param_w )
 {
-	// ...
+	printf("%02x\n",data);
 }
 
 static WRITE16_HANDLER( palette_ram_w )
@@ -219,6 +241,16 @@ static READ8_HANDLER( key_r )
 	return 0xff; // TODO
 }
 
+static WRITE16_HANDLER( backupram_wp_1_w )
+{
+	backupram_wp = 1;
+}
+
+static WRITE16_HANDLER( backupram_wp_0_w )
+{
+	backupram_wp = 0;
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -271,7 +303,8 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0184, 0x018b) IRQ Controller
 //	AM_RANGE(0x0190, 0x0191) System Port 5
 //	AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
-//	AM_RANGE(0x0198, 0x019b) Memory switch write inhibit/permission
+	AM_RANGE(0x0198, 0x0199) AM_WRITE(backupram_wp_1_w) //Backup RAM write inhibit
+	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
 //	AM_RANGE(0x01a0, 0x01a7) TCU (timer counter unit)
 //	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
 //	AM_RANGE(0x01b0, 0x01bb) FDC related (765)
@@ -311,6 +344,7 @@ static MACHINE_RESET( pc88va )
 	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
 
 	bank_reg = 0x4100;
+	backupram_wp = 1;
 }
 
 static const gfx_layout pc88va_chars_8x8 =
