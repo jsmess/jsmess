@@ -68,12 +68,11 @@
      341S0851 - 0x0101 - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
 
      Cuda version spotting:
-     341S0060 - 0x0002 - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
-     341S0078 - 0x???? - Quadra 660AV/840AV
-     341S0262 - 0x???? - some PMac 6500
-     341S0285 - 0x???? - PMac 4400 + Mac clones
-     341S0788 - 0x???? - LC 475/575/Quadra 605, PMac 7200
-     343S0788 - 0x???? - PMac x100 (typo - actually 341S0788?)
+     341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
+     341S0262 - 0x???????? (?.??) - some PMac 6500
+     341S0285 - 0x???????? (?.??) - PMac 4400 + Mac clones
+     341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
+     343S0788 - 0x???????? (?.??) - PMac x100 (typo - actually 341S0788?)
 
 
 ****************************************************************************/
@@ -3030,6 +3029,7 @@ MACHINE_START( mac )
 	mac->mac6015_timer = timer_alloc(machine, mac_6015_tick, NULL);
 	timer_adjust_oneshot(mac->mac6015_timer, attotime_never, 0);
 }
+
 MACHINE_RESET(mac)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -3116,6 +3116,8 @@ MACHINE_RESET(mac)
 	mac->rtc_state = 0;
 	mac->pm_data_send = mac->pm_data_recv = mac->pm_ack = mac->pm_req = mac->pm_dptr = 0;
 	mac->pm_state = 0;
+
+	memset(mac->egregs, 0xff, sizeof(mac->egregs));
 }
 
 

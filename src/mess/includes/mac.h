@@ -284,6 +284,9 @@ public:
 	UINT32 rbv_palette[256];
 	UINT32 *rbv_vram;
 	UINT8 sonora_vctl[4];
+
+	// Egret/Caboose/Cuda stuff
+	UINT8 egregs[0x20];
 };
 
 // defined in machine/mac.c
