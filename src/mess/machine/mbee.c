@@ -16,7 +16,7 @@
 static size_t mbee_size;
 static UINT8 mbee_clock_pulse;
 static UINT8 mbee256_key_available;
-static UINT8 fdc_status = 0;
+static UINT8 fdc_intrq,fdc_drq;
 static UINT8 mbee_0a;
 static running_device *mbee_fdc;
 static mc146818_device *mbee_rtc;
@@ -98,18 +98,12 @@ const z80pio_interface mbee_z80pio_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_intrq_w )
 {
-	if (state)
-		fdc_status |= 0x80;
-	else
-		fdc_status &= 0x7f;
+	fdc_intrq = state ? 0x80 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_drq_w )
 {
-	if (state)
-		fdc_status |= 0x80;
-	else
-		fdc_status &= 0x7f;
+	fdc_drq = state ? 0x80 : 0;
 }
 
 const wd17xx_interface mbee_wd17xx_interface =
@@ -125,7 +119,7 @@ READ8_HANDLER ( mbee_fdc_status_r )
 /*  d7 indicate if IRQ or DRQ is occuring (1=happening)
     d6..d0 not used */
 
-	return fdc_status;
+	return 0x7f | fdc_intrq | fdc_drq;
 }
 
 WRITE8_HANDLER ( mbee_fdc_motor_w )
