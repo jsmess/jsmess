@@ -1570,6 +1570,7 @@ const game_driver * const drivers[] =
 	DRIVER( dallas32 )      /* Dallas    */
 	DRIVER( roma )      /* Roma    */
 	DRIVER( roma32 )    /* Roma  */
+        DRIVER( polgar )      /* Polgar    */
 
 	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
 	DRIVER( batman )	/* The Batman, 2004 */
