@@ -467,7 +467,7 @@ static int at_get_out2(running_machine *machine) {
  *  3 - P13 - Undefined
  *  4 - P14 - External RAM ( 1 = Enable external RAM, 0 = Disable external RAM )
  *  5 - P15 - Manufacturing setting ( 1 = Setting enabled, 0 = Setting disabled )
- *  6 - P16 - Display type switch ( 1 = Color display, 0 = Monochrome display )
+ *  6 - P16 - Display type switch ( 1 = Monochrome display, 0 = Color display )
  *  7 - P17 - Keyboard inhibit switch ( 1 = Keyboard enabled, 0 = Keyboard inhibited )
  *
  *  Port 2 (Output port)
@@ -497,7 +497,7 @@ static struct {
 static READ8_HANDLER( at_kbdc8042_p1_r )
 {
 	//logerror("%04x: reading P1\n", cpu_get_pc(space->machine->device("maincpu")) );
-	return 0xFF;
+	return 0xbf;
 }
 
 
