@@ -272,6 +272,11 @@ static VIDEO_UPDATE( mc1000 )
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
 
+UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch,int line)
+{
+	return ch;
+}
+
 /* AY-3-8910 Interface */
 
 static WRITE8_DEVICE_HANDLER( keylatch_w )
@@ -438,6 +443,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
     MDRV_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
     MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MDRV_MC6847_CHAR_ROM(mc1000_get_char_rom)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
