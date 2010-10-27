@@ -40,8 +40,76 @@ static VIDEO_START( pc88va )
 
 }
 
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT16 *tvram = (UINT16 *)memory_region(machine, "tvram");
+	int offs,i;
+
+	offs = tsp.spr_offset;
+	for(i=0;i<(0x100);i+=(8))
+	{
+		int xp,yp,sw,md,xsize,ysize,spda,fg_col,bc;
+		int x_i,y_i;
+
+		ysize = (tvram[(offs + i + 0) / 2] & 0xfc00) >> 10;
+		sw = (tvram[(offs + i + 0) / 2] & 0x200) >> 9;
+		yp = (tvram[(offs + i + 0) / 2] & 0x1ff);
+		xsize = (tvram[(offs + i + 2) / 2] & 0xf800) >> 11;
+		md = (tvram[(offs + i + 2) / 2] & 0x400) >> 10;
+		xp = (tvram[(offs + i + 2) / 2] & 0x3ff);
+		spda = (tvram[(offs + i + 4) / 2] & 0xffff);
+		fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
+		bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
+
+		if(!sw)
+			continue;
+
+		if(yp & 0x100)
+		{
+			yp &= 0xff;
+			yp = 0x100 - yp;
+		}
+
+		if(0) // uhm, makes more sense without the sign?
+		if(xp & 0x200)
+		{
+			xp &= 0x1ff;
+			xp = 0x200 - xp;
+		}
+
+		if(md) // 1bpp mode
+		{
+			xsize = (xsize + 1) * 32;
+			ysize = (ysize + 1) * 4;
+
+			for(y_i=0;y_i<ysize;y_i++)
+			{
+				for(x_i=0;x_i<xsize;x_i++)
+				{
+					//UINT8 pen;
+
+					// TODO: hook up drawing routines
+
+					*BITMAP_ADDR32(bitmap, yp+y_i, xp+x_i) = machine->pens[fg_col];
+				}
+			}
+		}
+		else // 4bpp mode
+		{
+			xsize = (xsize + 1) * 8;
+			ysize = (ysize + 1) * 4;
+			// ...
+		}
+	}
+}
+
 static VIDEO_UPDATE( pc88va )
 {
+	bitmap_fill(bitmap, cliprect, 0);
+
+	if(tsp.spr_on)
+		draw_sprites(screen->machine,bitmap,cliprect);
+
 	return 0;
 }
 
@@ -899,7 +967,7 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(32)
