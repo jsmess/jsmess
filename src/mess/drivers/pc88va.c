@@ -152,11 +152,22 @@ static READ8_HANDLER( idp_status_r )
 	return 0x00;
 }
 
+static UINT8 cmd,buf_size,buf_index;
+static UINT8 sync_cmd[14];
+
+#define SYNC 0x10
+
+
 static WRITE8_HANDLER( idp_command_w )
 {
 	switch(data)
 	{
-		case 0x10: printf("Unemulated IDP SYNC cmd set\n"); break;
+		/* SYNC: sets CRTC values */
+		case SYNC: cmd = SYNC;
+				   buf_size = 14;
+				   buf_index = 0;
+				   //printf("IDP SYNC cmd set\n");
+				   break;
 		case 0x12: printf("Unemulated IDP DSPON cmd set\n"); break;
 		case 0x13: printf("Unemulated IDP DSPOFF cmd set\n"); break;
 		case 0x14: printf("Unemulated IDP DSPDEF cmd set\n"); break;
@@ -170,13 +181,77 @@ static WRITE8_HANDLER( idp_command_w )
 		case 0x85: printf("Unemulated IDP SPRSW cmd set\n"); break;
 		case 0x81: printf("Unemulated IDP SPROV cmd set\n"); break;
 
-		default:   printf("Unknown IDP %02x cmd set\n",data); break;
+		default:   cmd = 0x00; printf("Unknown IDP %02x cmd set\n",data); break;
 	}
 }
 
 static WRITE8_HANDLER( idp_param_w )
 {
-	printf("%02x\n",data);
+	switch(cmd)
+	{
+		case SYNC:
+		{
+			sync_cmd[buf_index] = data;
+			buf_index++;
+			if(buf_index >= buf_size)
+			{
+				buf_index = 0;
+				// execute SYNC cmd here
+				/*
+				???? ???? [0] - unknown
+				???? ???? [1] - unknown
+				--xx xxxx [2] - h blank start
+				--xx xxxx [3] - h border start
+				xxxx xxxx [4] - h visible area
+				--xx xxxx [5] - h border end
+				--xx xxxx [6] - h blank end
+				--xx xxxx [7] - h sync
+				--xx xxxx [8] - v blank start
+				--xx xxxx [9] - v border start
+				xxxx xxxx [A] - v visible area
+				-x-- ---- [B] - v visible area (bit 9)
+				--xx xxxx [C] - v border end
+				--xx xxxx [D] - v blank end
+				--xx xxxx [E] - v sync
+				*/
+				/* TODO: very preliminary, needs something showable first */
+				{
+					rectangle visarea;
+					attoseconds_t refresh;
+					static UINT16 x_vis_area,y_vis_area;
+
+					//printf("V blank start: %d\n",(sync_cmd[0x8]));
+					//printf("V border start: %d\n",(sync_cmd[0x9]));
+					//printf("V Visible Area: %d\n",(sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2));
+					//printf("V border end: %d\n",(sync_cmd[0xc]));
+					//printf("V blank end: %d\n",(sync_cmd[0xd]));
+
+					x_vis_area = sync_cmd[4] * 4;
+					y_vis_area = (sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2);
+
+					visarea.min_x = 0;
+					visarea.min_y = 0;
+					visarea.max_x = x_vis_area - 1;
+					visarea.max_y = y_vis_area - 1;
+
+					//if(y_vis_area == 400)
+					//	refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz
+					//else
+					//	refresh = HZ_TO_ATTOSECONDS(15730) * x_vis_area * y_vis_area; //15.73 KHz
+
+					refresh = HZ_TO_ATTOSECONDS(60);
+
+					space->machine->primary_screen->configure(640, 480, visarea, refresh);
+
+				}
+
+			}
+			break;
+		}
+		default:
+			printf("%02x\n",data);
+			break;
+	}
 }
 
 static WRITE16_HANDLER( palette_ram_w )
@@ -193,10 +268,12 @@ static WRITE16_HANDLER( palette_ram_w )
 
 static READ16_HANDLER( sys_port4_r )
 {
-	UINT8 vrtc;
+	UINT8 vrtc,sw1;
 	vrtc = (space->machine->primary_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
 
-	return vrtc;
+	sw1 = (input_port_read(space->machine, "DSW") & 1) ? 2 : 0;
+
+	return vrtc | sw1;
 }
 
 static READ16_HANDLER( bios_bank_r )
@@ -332,7 +409,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
 	AM_RANGE(0x01b0, 0x01bb) AM_READ8(fdc_r,0xffff)// FDC related (765)
 //	AM_RANGE(0x01c0, 0x01c1) ?
-//	AM_RANGE(0x01c8, 0x01cf) i8255 3 (byte access)
+	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8("d8255_3", i8255a_r,i8255a_w,0xff00) //i8255 3 (byte access)
 //	AM_RANGE(0x01d0, 0x01d1) Expansion RAM bank selection
 //	AM_RANGE(0x0200, 0x021f) Frame buffer 0 control parameter
 //	AM_RANGE(0x0220, 0x023f) Frame buffer 1 control parameter
@@ -504,6 +581,32 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("KEYF")
 	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "CRT Mode" )
+	PORT_DIPSETTING(    0x01, "15.7 KHz" )
+	PORT_DIPSETTING(    0x00, "24.8 KHz" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_RESET( pc88va )
@@ -591,6 +694,57 @@ static I8255A_INTERFACE( fdd_intf )
 	DEVCB_HANDLER(fdd_portc_w)						/* Port C write */
 };
 
+static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
+{
+	static UINT8 sw5, sw4, sw3, sw2;
+
+	sw5 = (input_port_read(device->machine, "DSW") & 0x10);
+	sw4 = (input_port_read(device->machine, "DSW") & 0x08);
+	sw3 = (input_port_read(device->machine, "DSW") & 0x04);
+	sw2 = (input_port_read(device->machine, "DSW") & 0x02);
+
+	return 0xe1 | sw5 | sw4 | sw3 | sw2;
+}
+
+static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
+{
+	static UINT8 xsw1;
+
+	xsw1 = (input_port_read(device->machine, "DSW") & 1) ? 0 : 8;
+
+	return 0xf7 | xsw1;
+}
+
+static READ8_DEVICE_HANDLER( r232_ctrl_portc_r )
+{
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( r232_ctrl_porta_w )
+{
+	// ...
+}
+
+static WRITE8_DEVICE_HANDLER( r232_ctrl_portb_w )
+{
+	// ...
+}
+
+static WRITE8_DEVICE_HANDLER( r232_ctrl_portc_w )
+{
+	// ...
+}
+
+static I8255A_INTERFACE( r232c_ctrl_intf )
+{
+	DEVCB_HANDLER(r232_ctrl_porta_r),						/* Port A read */
+	DEVCB_HANDLER(r232_ctrl_portb_r),						/* Port B read */
+	DEVCB_HANDLER(r232_ctrl_portc_r),						/* Port C read */
+	DEVCB_HANDLER(r232_ctrl_porta_w),						/* Port A write */
+	DEVCB_HANDLER(r232_ctrl_portb_w),						/* Port B write */
+	DEVCB_HANDLER(r232_ctrl_portc_w)						/* Port C write */
+};
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -606,7 +760,7 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 256)
+	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(32)
 //	MDRV_PALETTE_INIT( pc8801 )
@@ -618,6 +772,7 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_MACHINE_RESET( pc88va )
 
 	MDRV_I8255A_ADD( "d8255_2", fdd_intf )
+	MDRV_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
 
 
 MACHINE_CONFIG_END
