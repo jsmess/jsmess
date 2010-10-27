@@ -179,6 +179,9 @@ static UINT8 buf_ram[16];
 #define EMUL   0x8c
 #define EXIT   0x88
 #define SPRON  0x82
+#define SPROFF 0x83
+#define SPRSW  0x85
+#define SPROV  0x81
 
 static WRITE8_HANDLER( idp_command_w )
 {
@@ -205,17 +208,23 @@ static WRITE8_HANDLER( idp_command_w )
 		/* 0x15 - CURS: set CURSor position */
 		case CURS:   cmd = CURS;   buf_size = 4; buf_index = 0; break;
 
+		/* 0x8c - EMUL: set 3301 EMULation */
 		case EMUL:   cmd = EMUL;   buf_size = 4; buf_index = 0; break;
 
 		/* 0x88 - EXIT: ??? */
 		case EXIT: break;
 
 		/* 0x82 - SPRON: set SPRite ON */
-		case 0x82:   cmd = SPRON;  buf_size = 3; buf_index = 0; break;
+		case SPRON:   cmd = SPRON;  buf_size = 3; buf_index = 0; break;
 
-		case 0x83: printf("Unemulated IDP SPROFF cmd set\n"); break;
-		case 0x85: printf("Unemulated IDP SPRSW cmd set\n"); break;
-		case 0x81: printf("Unemulated IDP SPROV cmd set\n"); break;
+		/* 0x83 - SPROFF: set SPRite OFF */
+		case SPROFF:  tsp.spr_on = 0; break;
+
+		/* 0x85 - SPRSW: ??? */
+		case SPRSW:   cmd = SPRSW;  buf_size = 1; buf_index = 0; break;
+
+		/* 0x81 - SPROV: set SPRite OVerflow information */
+		case 0x81: /* ... */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		default:   cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(space->cpu),data); break;
@@ -347,11 +356,17 @@ static void execute_spron_cmd(running_machine *machine)
 	*/
 	tsp.spr_offset = buf_ram[0] << 8;
 	tsp.spr_on = 1;
+	printf("SPR TABLE %02x %02x %02x\n",buf_ram[0],buf_ram[1],buf_ram[2]);
+}
+
+static void execute_sprsw_cmd(running_machine *machine)
+{
+	/* TODO: no idea about this command, some kind of manual sprite switch? */
 }
 
 static WRITE8_HANDLER( idp_param_w )
 {
-	if(cmd == DSPOFF || cmd == EXIT) // no param commands
+	if(cmd == DSPOFF || cmd == EXIT || cmd == SPROFF || cmd == SPROV) // no param commands
 		return;
 
 	buf_ram[buf_index] = data;
@@ -369,10 +384,11 @@ static WRITE8_HANDLER( idp_param_w )
 			case ACTSCR: 	execute_actscr_cmd(space->machine); break;
 			case CURS:		execute_curs_cmd(space->machine);   break;
 			case EMUL:		execute_emul_cmd(space->machine);   break;
-			case SPRON:		execute_spron_cmd(space->machine);   break;
+			case SPRON:		execute_spron_cmd(space->machine);  break;
+			case SPRSW:		execute_sprsw_cmd(space->machine);	break;
 
 			default:
-				printf("%02x\n",data);
+				//printf("%02x\n",data);
 				break;
 		}
 	}
