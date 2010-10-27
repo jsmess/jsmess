@@ -955,7 +955,7 @@ enum
 	GREEN, YELLOW, BLUE, RED,		/*  0 -  3 */
 	BUFF, CYAN, MAGENTA, ORANGE,	/*  4 -  7 */
 
-	BLACK,							/*  8 */
+	BLACK = 10,						/* 10 */
 
 	DKGREEN = 12, LTGREEN = 13,		/* 12 - 13 */
 	DKORANGE = 14, LTORANGE = 15,	/* 14 - 15 */
@@ -965,6 +965,60 @@ enum
 
 
 #define ATTOTIME_STRING_PRECISION	9
+
+/* MC6847 video output pins: Y, phiA, phiB (Y'UV color space).
+ *
+ * Y voltage levels:
+ * VB ("Black") = 0.72V; VWL ("White Low") = 0.65V; VWM ("White Medium") = 0.54V;
+ * VWH ("White High") = 0.42V.
+ *
+ * phiA and phiB voltage levels:
+ * VOL ("Output Low") = 1.0V; VR ("Reference"?) = 1.5V; VIH ("Input High") = 2.0V.
+ *
+ * Color composition:
+ * 
+ * COLOR       |  Y  | phiA | phiB
+ * ------------+-----+------+------
+ * GREEN       | VWM | VOL  | VOL
+ * YELLOW      | VWH | VOL  | VR
+ * BLUE        | VWL | VIH  | VR
+ * RED         | VWL | VR   | VIH
+ * WHITE       | VWH | VR   | VR
+ * CYAN        | VWM | VR   | VOL
+ * MAGENTA     | VWM | VIH  | VIH
+ * ORANGE      | VWM | VOL  | VIH
+ * BLACK       | VB  | VR   | VR
+ * DARK GREEN  | VB  | VOL  | VOL
+ * DARK ORANGE | VB  | VOL  | VIH
+ *
+ *
+ * Mapping voltages to a 0~255 range:
+ *
+ * Y values:
+ * VB = 0; VWL = 59; VWM = 153; VWH = 255.
+ *
+ * phiA and phiB values:
+ * VOL = -128; VR = 0; VIH = +128.
+ *
+ *
+ * Y'UV to RGB convertion:
+ * R = Y' + 1.13983 x U
+ * G = Y' - 0.39465 x U - 0.58060 x V
+ * B = Y' + 2.03211 x V
+ * 
+ * So we get:
+ * GREEN = Y'UV(153,-128,-128) = RGB(7,277,-107) --> #07ff00
+ * YELLOW = Y'UV(255,-128,0) = RGB(255,305,-5) --> #ffff00
+ * BLUE = Y'UV(59,+128,0) = RGB(59,8,319) --> #3b08ff
+ * RED: Y'UV(59,0,+128) = RGB(204,-15,59) --> #cc003b
+ * WHITE: Y'UV(255,0,0) = RGB(255,255,255) --> #ffffff
+ * CYAN: Y'UV(153,0,-128) = RGB(7,227,153) --> #07e399
+ * MAGENTA: Y'UV(153,+128,+128) = RGB(298,28,413) --> #ff1cff
+ * ORANGE: Y'UV(153,-128,+128) = RGB(298,129,-107) --> #ff8100
+ * BLACK: Y'UV(0,0,0) = RGB(0,0,0) --> #000000
+ * DARK GREEN: Y'UV(0,-128,-128) = RGB(-145,124,-260) --> #007c00
+ * DARK ORANGE: Y'UV(0,-128,+128) = RGB(145,-23,-260) --> #910000
+ */
 
 #define M6847_RGB(r,g,b)	((r << 16) | (g << 8) | (b << 0))
 
@@ -980,8 +1034,8 @@ static const UINT32 default_palette[] =
 	M6847_RGB(0xff, 0x1c, 0xff),	/* MAGENTA */
 	M6847_RGB(0xff, 0x81, 0x00),	/* ORANGE */
 
-	M6847_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	M6847_RGB(0x00, 0x7c, 0x00),	/* GREEN */
+	M6847_RGB(0x00, 0x7c, 0x00),	/* DARK GREEN */
+	M6847_RGB(0x07, 0xff, 0x00),	/* GREEN */
 	M6847_RGB(0x00, 0x00, 0x00),	/* BLACK */
 	M6847_RGB(0xff, 0xff, 0xff),	/* BUFF */
 
