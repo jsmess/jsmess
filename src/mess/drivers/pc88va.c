@@ -19,6 +19,20 @@
 
 static UINT16 *palram;
 static UINT16 bank_reg;
+static struct
+{
+	UINT16 tvram_vreg_offset;
+	UINT16 attr_offset;
+	UINT16 spr_offset;
+	UINT8 disp_on;
+	UINT8 spr_on;
+	UINT8 pitch;
+	UINT8 line_height;
+	UINT8 h_line_pos;
+	UINT8 blink;
+	UINT16 cur_pos_x,cur_pos_y;
+}tsp;
+
 static UINT8 backupram_wp;
 
 static VIDEO_START( pc88va )
@@ -153,104 +167,214 @@ static READ8_HANDLER( idp_status_r )
 }
 
 static UINT8 cmd,buf_size,buf_index;
-static UINT8 sync_cmd[14];
+static UINT8 buf_ram[16];
 
-#define SYNC 0x10
-
+#define SYNC   0x10
+#define DSPON  0x12
+#define DSPOFF 0x13
+#define DSPDEF 0x14
+#define CURDEF 0x15
+#define ACTSCR 0x16
+#define CURS   0x1e
+#define EMUL   0x8c
+#define EXIT   0x88
+#define SPRON  0x82
 
 static WRITE8_HANDLER( idp_command_w )
 {
 	switch(data)
 	{
-		/* SYNC: sets CRTC values */
-		case SYNC: cmd = SYNC;
-				   buf_size = 14;
-				   buf_index = 0;
-				   //printf("IDP SYNC cmd set\n");
-				   break;
-		case 0x12: printf("Unemulated IDP DSPON cmd set\n"); break;
-		case 0x13: printf("Unemulated IDP DSPOFF cmd set\n"); break;
-		case 0x14: printf("Unemulated IDP DSPDEF cmd set\n"); break;
-		case 0x15: printf("Unemulated IDP CURDEF cmd set\n"); break;
-		case 0x16: printf("Unemulated IDP ACTSCR cmd set\n"); break;
-		case 0x1e: printf("Unemulated IDP CURS cmd set\n"); break;
-		case 0x8c: printf("Unemulated IDP EMUL cmd set\n"); break;
-		case 0x88: printf("Unemulated IDP EXIT cmd set\n"); break;
-		case 0x82: printf("Unemulated IDP SPRON cmd set\n"); break;
+		/* 0x10 - SYNC: sets CRTC values */
+		case SYNC:   cmd = SYNC;  buf_size = 14; buf_index = 0; break;
+
+		/* 0x12 - DSPON: set DiSPlay ON and set up tvram table vreg */
+		case DSPON:  cmd = DSPON; buf_size = 3;  buf_index = 0; break;
+
+		/* 0x13 - DSPOFF: set DiSPlay OFF */
+		case DSPOFF: tsp.disp_on = 0; break;
+
+		/* 0x14 - DSPDEF: set DiSPlay DEFinitions */
+		case DSPDEF: cmd = DSPDEF; buf_size = 6; buf_index = 0; break;
+
+		/* 0x15 - CURDEF: set CURsor DEFinition */
+		case CURDEF: cmd = CURDEF; buf_size = 1; buf_index = 0; break;
+
+		/* 0x16 - ACTSCR: ??? */
+		case ACTSCR: cmd = ACTSCR; buf_size = 1; buf_index = 0; break;
+
+		/* 0x15 - CURS: set CURSor position */
+		case CURS:   cmd = CURS;   buf_size = 4; buf_index = 0; break;
+
+		case EMUL:   cmd = EMUL;   buf_size = 4; buf_index = 0; break;
+
+		/* 0x88 - EXIT: ??? */
+		case EXIT: break;
+
+		/* 0x82 - SPRON: set SPRite ON */
+		case 0x82:   cmd = SPRON;  buf_size = 3; buf_index = 0; break;
+
 		case 0x83: printf("Unemulated IDP SPROFF cmd set\n"); break;
 		case 0x85: printf("Unemulated IDP SPRSW cmd set\n"); break;
 		case 0x81: printf("Unemulated IDP SPROV cmd set\n"); break;
 
-		default:   cmd = 0x00; printf("Unknown IDP %02x cmd set\n",data); break;
+		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
+		default:   cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(space->cpu),data); break;
 	}
+}
+
+/* TODO: very preliminary, needs something showable first */
+static void execute_sync_cmd(running_machine *machine)
+{
+	/*
+		???? ???? [0] - unknown
+		???? ???? [1] - unknown
+		--xx xxxx [2] - h blank start
+		--xx xxxx [3] - h border start
+		xxxx xxxx [4] - h visible area
+		--xx xxxx [5] - h border end
+		--xx xxxx [6] - h blank end
+		--xx xxxx [7] - h sync
+		--xx xxxx [8] - v blank start
+		--xx xxxx [9] - v border start
+		xxxx xxxx [A] - v visible area
+		-x-- ---- [B] - v visible area (bit 9)
+		--xx xxxx [C] - v border end
+		--xx xxxx [D] - v blank end
+		--xx xxxx [E] - v sync
+	*/
+	rectangle visarea;
+	attoseconds_t refresh;
+	static UINT16 x_vis_area,y_vis_area;
+
+	//printf("V blank start: %d\n",(sync_cmd[0x8]));
+	//printf("V border start: %d\n",(sync_cmd[0x9]));
+	//printf("V Visible Area: %d\n",(sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2));
+	//printf("V border end: %d\n",(sync_cmd[0xc]));
+	//printf("V blank end: %d\n",(sync_cmd[0xd]));
+
+	x_vis_area = buf_ram[4] * 4;
+	y_vis_area = (buf_ram[0xa])|((buf_ram[0xb] & 0x40)<<2);
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = x_vis_area - 1;
+	visarea.max_y = y_vis_area - 1;
+
+	//if(y_vis_area == 400)
+	//	refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz
+	//else
+	//	refresh = HZ_TO_ATTOSECONDS(15730) * x_vis_area * y_vis_area; //15.73 KHz
+
+	refresh = HZ_TO_ATTOSECONDS(60);
+
+	machine->primary_screen->configure(640, 480, visarea, refresh);
+}
+
+static void execute_dspon_cmd(running_machine *machine)
+{
+	/*
+	[0] text table offset (hi word)
+	[1] unknown
+	[2] unknown
+	*/
+	tsp.tvram_vreg_offset = buf_ram[0] << 8;
+	tsp.disp_on = 1;
+}
+
+static void execute_dspdef_cmd(running_machine *machine)
+{
+	/*
+	[0] attr offset (lo word)
+	[1] attr offset (hi word)
+	[2] pitch
+	[3] line height
+	[4] h line position
+	[5] blink number
+	*/
+	tsp.attr_offset = buf_ram[0] | buf_ram[1] << 8;
+	tsp.pitch = (buf_ram[2] & 0xf0) >> 4;
+	tsp.line_height = buf_ram[3] + 1;
+	tsp.h_line_pos = buf_ram[4];
+	tsp.blink = (buf_ram[5] & 0xf8) >> 3;
+}
+
+static void execute_curdef_cmd(running_machine *machine)
+{
+	/*
+	xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
+	---- --x- [0] (bit in sprite def)
+	---- ---x [0] Blink Enable
+	*/
+
+	/* TODO: needs basic sprite emulation */
+}
+
+static void execute_actscr_cmd(running_machine *machine)
+{
+	/*
+	xxxx xxxx [0] param * 32 (???)
+	*/
+
+	/* TODO: no idea about this command */
+}
+
+static void execute_curs_cmd(running_machine *machine)
+{
+	/*
+	[0] Cursor Position Y (lo word)
+	[1] Cursor Position Y (hi word)
+	[2] Cursor Position X (lo word)
+	[3] Cursor Position X (hi word)
+	*/
+
+	tsp.cur_pos_y = buf_ram[0] | buf_ram[1] << 8;
+	tsp.cur_pos_x = buf_ram[2] | buf_ram[3] << 8;
+}
+
+static void execute_emul_cmd(running_machine *machine)
+{
+	// TODO: this starts 3301 video emulation
+}
+
+static void execute_spron_cmd(running_machine *machine)
+{
+	/*
+	[0] Sprite Table Offset (hi word)
+	[1] (unknown / reserved)
+	xxxx x--- [2] HSPN: some kind of Sprite Over register
+	---- --x- [2] MG: ???
+	---- ---x [2] GR: ???
+	*/
+	tsp.spr_offset = buf_ram[0] << 8;
+	tsp.spr_on = 1;
 }
 
 static WRITE8_HANDLER( idp_param_w )
 {
-	switch(cmd)
+	if(cmd == DSPOFF || cmd == EXIT) // no param commands
+		return;
+
+	buf_ram[buf_index] = data;
+	buf_index++;
+
+	if(buf_index >= buf_size)
 	{
-		case SYNC:
+		buf_index = 0;
+		switch(cmd)
 		{
-			sync_cmd[buf_index] = data;
-			buf_index++;
-			if(buf_index >= buf_size)
-			{
-				buf_index = 0;
-				// execute SYNC cmd here
-				/*
-				???? ???? [0] - unknown
-				???? ???? [1] - unknown
-				--xx xxxx [2] - h blank start
-				--xx xxxx [3] - h border start
-				xxxx xxxx [4] - h visible area
-				--xx xxxx [5] - h border end
-				--xx xxxx [6] - h blank end
-				--xx xxxx [7] - h sync
-				--xx xxxx [8] - v blank start
-				--xx xxxx [9] - v border start
-				xxxx xxxx [A] - v visible area
-				-x-- ---- [B] - v visible area (bit 9)
-				--xx xxxx [C] - v border end
-				--xx xxxx [D] - v blank end
-				--xx xxxx [E] - v sync
-				*/
-				/* TODO: very preliminary, needs something showable first */
-				{
-					rectangle visarea;
-					attoseconds_t refresh;
-					static UINT16 x_vis_area,y_vis_area;
+			case SYNC: 		execute_sync_cmd(space->machine); 	break;
+			case DSPON: 	execute_dspon_cmd(space->machine); 	break;
+			case DSPDEF: 	execute_dspdef_cmd(space->machine); break;
+			case CURDEF: 	execute_curdef_cmd(space->machine); break;
+			case ACTSCR: 	execute_actscr_cmd(space->machine); break;
+			case CURS:		execute_curs_cmd(space->machine);   break;
+			case EMUL:		execute_emul_cmd(space->machine);   break;
+			case SPRON:		execute_spron_cmd(space->machine);   break;
 
-					//printf("V blank start: %d\n",(sync_cmd[0x8]));
-					//printf("V border start: %d\n",(sync_cmd[0x9]));
-					//printf("V Visible Area: %d\n",(sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2));
-					//printf("V border end: %d\n",(sync_cmd[0xc]));
-					//printf("V blank end: %d\n",(sync_cmd[0xd]));
-
-					x_vis_area = sync_cmd[4] * 4;
-					y_vis_area = (sync_cmd[0xa])|((sync_cmd[0xb] & 0x40)<<2);
-
-					visarea.min_x = 0;
-					visarea.min_y = 0;
-					visarea.max_x = x_vis_area - 1;
-					visarea.max_y = y_vis_area - 1;
-
-					//if(y_vis_area == 400)
-					//	refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz
-					//else
-					//	refresh = HZ_TO_ATTOSECONDS(15730) * x_vis_area * y_vis_area; //15.73 KHz
-
-					refresh = HZ_TO_ATTOSECONDS(60);
-
-					space->machine->primary_screen->configure(640, 480, visarea, refresh);
-
-				}
-
-			}
-			break;
+			default:
+				printf("%02x\n",data);
+				break;
 		}
-		default:
-			printf("%02x\n",data);
-			break;
 	}
 }
 
