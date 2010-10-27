@@ -16,7 +16,8 @@
         a - shiftlock (toggle). You can then enter any lowercase character.
         c - clear screen and home cursor
         d - insert
-        f - vertical tab (cursor up)
+        f - vertical tab (cursor up) You can scroll backwards with this,
+            and you can reuse old input lines.
         u - cursor right
     - There are switches on the right-hand side which are connected directly
       to one of the PIAs. The switches (not emulated):
@@ -33,13 +34,12 @@
       Internally, this turns the Kana bit off/on. On our keyboard, hold down
       the ALT key to get Kana; release it to get English.
 
-    TODO:
-    - SN doesn't seem to work properly, needs to find out what's the WE bit
-      for.
-    - Hook-up FDC (only the basic components have been added)
-    - Hook-up CMT load / save; (save works, load does not)
+    TODO/info:
+    - Sound not working. See the info down the page.
+    - FDC, type 1771, single sided, capacity 143KBytes, not connected up
+    - Cassette doesn't load
     - Printer
-    - RTC
+    - RTC, type MSM5832RS, unemulated device
     - Keyboard lookup table for Kana and Shifted Kana
     - Keyboard autorepeat
 
@@ -56,16 +56,15 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
-static UINT8 mc6845_reg[32];				/* registers */
-static UINT8 mc6845_ind;				/* register index */
-static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 static running_device *mc6845;
+static running_device *mycom_audio;
 static running_device *mycom_cassette;
+static running_device *mycom_fdc;
 static UINT8 *vram;
 static UINT8 *gfx_rom;
 static UINT16 vram_addr;
 static UINT8 keyb_press,keyb_press_flag;
-static UINT8 video_mode,sn_we;
+static UINT8 mycom_0a,sn_we;
 static UINT32 upper_sw;
 static UINT8 *RAM;
 
@@ -88,7 +87,7 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	if(video_mode & 0x40)
+	if (mycom_0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)					// lores pixels
 		{
@@ -157,32 +156,6 @@ static WRITE8_HANDLER( mycom_upper_w )
 	RAM[offset | 0xc000] = data;
 }
 
-static READ8_HANDLER( mycom_6845_r )
-{
-	if (!offset)
-		return 0;
-
-	/* need to read the start registers or scroll wont work */
-	if ((mc6845_ind & 0x1e) == 0x0c)
-		return mc6845_reg[mc6845_ind];
-	else
-		return mc6845_register_r(mc6845, 0);
-}
-
-static WRITE8_HANDLER( mycom_6845_w )
-{
-	if(offset == 0)
-	{
-		mc6845_ind = data;
-		mc6845_address_w(mc6845, 0, data);
-	}
-	else
-	{
-		mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];
-		mc6845_register_w(mc6845, 0,data);
-	}
-}
-
 static READ8_HANDLER( vram_data_r )
 {
 	return vram[vram_addr];
@@ -204,7 +177,8 @@ static ADDRESS_MAP_START(mycom_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
-	AM_RANGE(0x02, 0x03) AM_READWRITE(mycom_6845_r,mycom_6845_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("crtc", mc6845_status_r,mc6845_address_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
@@ -340,10 +314,11 @@ static WRITE8_DEVICE_HANDLER( mycom_04_w )
 {
 	vram_addr = (vram_addr & 0x700) | data;
 
+	sn_we = data;
 	/* doesn't work? */
-	//printf("%02x %02x\n",data,sn_we);
+	//printf(":%X ",data);
 	//if(sn_we)
-	//  sn76496_w(device->machine->device("sn1"), 0, data);
+	  //sn76496_w(mycom_audio, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( mycom_06_w )
@@ -391,18 +366,35 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
     -x-- ---- video mode (0= tile, 1 = bitmap)
     --x- ---- PSG Chip Select bit
     ---x ---- PSG Write Enable bit
-    ---- x--- cmt remote
+    ---- x--- cmt remote (defaults to on)
     ---- -x-- cmt output
     ---- --x- printer reset
     ---- ---x printer strobe
     */
 
+	if ((mycom_0a & 8) != (data & 8))
+		cassette_change_state(mycom_cassette,
+		(data & 8) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
 	if (data & 8) // motor on
 		cassette_output(mycom_cassette, (data & 4) ? -1.0 : +1.0);
 
-	video_mode = data & 0xc0;
-	sn_we = data & 0x10;
-//  printf("%02x\n",data & 0x10);
+	if ((data & 0x80) != (mycom_0a & 0x80))
+		mc6845_set_clock(mc6845, (data & 0x80) ? 1008000 : 2016000);
+
+	mycom_0a = data;
+
+	/* Info about sound
+	- uses a SN76489N chip at an unknown clock
+	- each time a key is pressed, 4 lots of data are output to port 4
+	- after each data byte, there is a 4 byte control sequence to port 0a
+	- the control sequence is 9F,8F,AF,BF
+	- the data bytes are 8D,01,9F,9F
+	- the end result is silence  :(  */
+
+	// no sound comes out
+	if ((data & 0x30)==0)
+		sn76496_w(mycom_audio, 0, sn_we);
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -490,7 +482,9 @@ static TIMER_CALLBACK( mycom_kbd )
 
 static MACHINE_START(mycom)
 {
+	mycom_audio = machine->device("sn1");
 	mycom_cassette = machine->device("cassette");
+	mycom_fdc = machine->device("fdc");
 	RAM = memory_region(machine, "maincpu");
 	timer_pulse(machine, ATTOTIME_IN_HZ(20), NULL, 0, mycom_kbd);
 }
@@ -499,6 +493,7 @@ static MACHINE_RESET(mycom)
 {
 	memory_set_bank(machine, "boot", 1);
 	upper_sw = 0x10000;
+	mycom_0a = 0;
 }
 
 static DRIVER_INIT( mycom )
@@ -509,7 +504,7 @@ static DRIVER_INIT( mycom )
 
 static MACHINE_CONFIG_START( mycom, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_10MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(mycom_map)
 	MDRV_CPU_IO_MAP(mycom_io)
 
@@ -531,7 +526,9 @@ static MACHINE_CONFIG_START( mycom, driver_device )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(mycom)
 
-	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
+	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
+	MDRV_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
 
 	MDRV_VIDEO_START(mycom)
 	MDRV_VIDEO_UPDATE(mycom)
@@ -539,7 +536,7 @@ static MACHINE_CONFIG_START( mycom, driver_device )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MDRV_SOUND_ADD("sn1", SN76489, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
