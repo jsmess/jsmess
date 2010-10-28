@@ -337,8 +337,8 @@ static READ8_DEVICE_HANDLER( mycom_08_r )
 
 	data = keyb_press_flag; //~keyb_press_flag & 1;
 
-	//if (cassette_input(mycom_cassette) > 0.03) // not working
-	//	data+=4;
+	if (cassette_input(mycom_cassette) > 0.03) // not working
+		data+=4;
 
 	return data;
 }
