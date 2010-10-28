@@ -589,6 +589,15 @@ static READ8_HANDLER( fdc_r )
 	return mame_rand(space->machine);
 }
 
+static READ16_HANDLER( sysop_r )
+{
+	static UINT8 sys_op;
+
+	sys_op = input_port_read(space->machine, "SYSOP_SW") & 3;
+
+	return 0xfffc | sys_op; // docs says all the other bits are high
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -632,7 +641,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0146, 0x0147) AM_WRITE8(idp_param_w,0x00ff) //Text Controller (IDP) - (R/W) Parameter
 //	AM_RANGE(0x0148, 0x0149) Text control port 1
 //	AM_RANGE(0x014c, 0x014f) ? CG Port
-//	AM_RANGE(0x0150, 0x0151) System Operational Mode
+	AM_RANGE(0x0150, 0x0151) AM_READ(sysop_r) // System Operational Mode
 	AM_RANGE(0x0152, 0x0153) AM_READWRITE(bios_bank_r,bios_bank_w) // Memory Map Register
 //	AM_RANGE(0x0154, 0x0155) Refresh Register (wait states)
 	AM_RANGE(0x0156, 0x0157) AM_READ8(rom_bank_r,0x00ff) // ROM bank status
@@ -648,6 +657,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
 	AM_RANGE(0x01b0, 0x01bb) AM_READ8(fdc_r,0xffff)// FDC related (765)
 //	AM_RANGE(0x01c0, 0x01c1) ?
+	AM_RANGE(0x01c6, 0x01c7) AM_WRITENOP // ???
 	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8("d8255_3", i8255a_r,i8255a_w,0xff00) //i8255 3 (byte access)
 //	AM_RANGE(0x01d0, 0x01d1) Expansion RAM bank selection
 //	AM_RANGE(0x0200, 0x021f) Frame buffer 0 control parameter
@@ -658,7 +668,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 
 //	AM_RANGE(0x0500, 0x05ff) GVRAM
 //	AM_RANGE(0x1000, 0xfeff) user area (???)
-//	AM_RANGE(0xff00, 0xffff) CPU internal use
+	AM_RANGE(0xff00, 0xffff) AM_NOP // CPU internal use
 ADDRESS_MAP_END
 // (*) are specific N88 V1 / V2 ports
 
@@ -851,6 +861,13 @@ static INPUT_PORTS_START( pc88va )
 	PORT_DIPNAME( 0x01, 0x01, "Speed Mode" )
 	PORT_DIPSETTING(    0x01, "H Mode" )
 	PORT_DIPSETTING(    0x00, "S Mode" )
+
+	PORT_START("SYSOP_SW")
+	PORT_DIPNAME( 0x03, 0x01, "System Operational Mode" )
+//	PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
+	PORT_DIPSETTING(    0x01, "N88 V2 Mode" )
+//	PORT_DIPSETTING(    0x03, "???" )
 INPUT_PORTS_END
 
 static MACHINE_RESET( pc88va )
@@ -863,6 +880,13 @@ static MACHINE_RESET( pc88va )
 
 	bank_reg = 0x4100;
 	backupram_wp = 1;
+
+	/* default palette */
+	{
+		UINT8 i;
+		for(i=0;i<32;i++)
+			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
+	}
 }
 
 static const gfx_layout pc88va_chars_8x8 =
