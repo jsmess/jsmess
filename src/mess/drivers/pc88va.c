@@ -49,7 +49,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	for(i=0;i<(0x100);i+=(8))
 	{
 		int xp,yp,sw,md,xsize,ysize,spda,fg_col,bc;
-		int x_i,y_i;
+		int x_i,y_i,x_s;
+		int spr_count;
+		int pen;
 
 		ysize = (tvram[(offs + i + 0) / 2] & 0xfc00) >> 10;
 		sw = (tvram[(offs + i + 0) / 2] & 0x200) >> 9;
@@ -82,23 +84,52 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			xsize = (xsize + 1) * 32;
 			ysize = (ysize + 1) * 4;
 
+			if(!(spda & 0x8000)) // correct?
+				spda *= 2;
+
+			spr_count = 0;
+
 			for(y_i=0;y_i<ysize;y_i++)
 			{
-				for(x_i=0;x_i<xsize;x_i++)
+				for(x_i=0;x_i<xsize;x_i+=16)
 				{
-					//UINT8 pen;
+					for(x_s=0;x_s<16;x_s++)
+					{
+						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
-					// TODO: hook up drawing routines
+						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
-					*BITMAP_ADDR32(bitmap, yp+y_i, xp+x_i) = machine->pens[fg_col];
+						if(pen != -1) //transparent pen
+							*BITMAP_ADDR32(bitmap, yp+y_i, xp+x_i+(x_s)) = machine->pens[pen];
+					}
+					spr_count+=2;
 				}
 			}
 		}
-		else // 4bpp mode
+		else // 4bpp mode (UNTESTED)
 		{
 			xsize = (xsize + 1) * 8;
 			ysize = (ysize + 1) * 4;
-			// ...
+
+			if(!(spda & 0x8000)) // correct?
+				spda *= 2;
+
+			spr_count = 0;
+
+			for(y_i=0;y_i<ysize;y_i++)
+			{
+				for(x_i=0;x_i<xsize;x_i+=2)
+				{
+					for(x_s=0;x_s<2;x_s++)
+					{
+						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+
+						//if(bc != -1) //transparent pen
+						*BITMAP_ADDR32(bitmap, yp+y_i, xp+x_i+(x_s)) = machine->pens[pen];
+					}
+					spr_count+=2;
+				}
+			}
 		}
 	}
 }
