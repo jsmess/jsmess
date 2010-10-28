@@ -68,6 +68,9 @@ System Driver Changes:
   disk controller to the CPU. Added a small pool of timers to allow
   overlapping interrupt signals. [tim lindner]
 
+- [COCO] Added bi-directional bitbanger support. Needs further core
+  changes to be fully implemented. [tim lindner]
+
 - [HECTOR] Added initial support for DISK II unit [JJ Stacino]
 
 - [MAC] Macintosh IIci now boots, promoted to working. [R. Belmont]
@@ -77,7 +80,15 @@ System Driver Changes:
 - [MAC] Greatly improved Apple Sound Chip emulation for Mac II, IIx,
   IIcx, and SE/30. [R. Belmont]
 
-- [MBEE] Added Chess rom. [Robbbert]
+- [MEPHISTO] the mephisto chess board is defined as a 
+  machine (mboard). [Ralf Schaefer]
+
+- [MEPHISTO] to reduce the artwork files glasgow, amsterd and mm4 
+  are defined as PARENTS. [Ralf Schaefer]
+
+- [MYCOM] Improved video and keyboard [Robbbert]
+
+- [MBEE] Added some accessory roms, made various improvements. [Robbbert]
 
 - [POFO] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
@@ -86,21 +97,12 @@ System Driver Changes:
 - [VIP] Refactored driver to define ADDRESS_MAP_MODERN and use the new
   RCA COSMAC CPU. [Curt Coder]
 
-- [MEPHISTO] the mephisto chess board is defined as a 
-  machine (mboard). [Ralf Schaefer]
-
-- [MEPHISTO] to reduce the artwork files glasgow, amsterd and mm4 
-  are defined as PARENTS. [Ralf Schaefer]
-
-- [COCO] Added bi-directional bitbanger support. Needs further core
-  changes to be fully implemented. [tim lindner]
-
 
 
 Imgtool Changes:
 ----------------
 
-- Fixed WIMGTOOL to properly support file systems that use directory seperators
+- Fixed WIMGTOOL to properly support file systems that use directory separators
   other than the backslash. [tim lindner]
 
 - Added module for create and manage psion datapack images [Sandro Ronco]
