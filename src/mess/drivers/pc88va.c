@@ -846,6 +846,11 @@ static INPUT_PORTS_START( pc88va )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SPEED_SW")
+	PORT_DIPNAME( 0x01, 0x01, "Speed Mode" )
+	PORT_DIPSETTING(    0x01, "H Mode" )
+	PORT_DIPSETTING(    0x00, "S Mode" )
 INPUT_PORTS_END
 
 static MACHINE_RESET( pc88va )
@@ -935,14 +940,15 @@ static I8255A_INTERFACE( fdd_intf )
 
 static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
 {
-	static UINT8 sw5, sw4, sw3, sw2;
+	static UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
+	speed_sw = (input_port_read(device->machine, "SPEED_SW") & 1) ? 0x20 : 0x00;
 	sw5 = (input_port_read(device->machine, "DSW") & 0x10);
 	sw4 = (input_port_read(device->machine, "DSW") & 0x08);
 	sw3 = (input_port_read(device->machine, "DSW") & 0x04);
 	sw2 = (input_port_read(device->machine, "DSW") & 0x02);
 
-	return 0xe1 | sw5 | sw4 | sw3 | sw2;
+	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
 
 static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
