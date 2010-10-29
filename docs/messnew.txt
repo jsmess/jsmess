@@ -60,6 +60,8 @@ System Driver Changes:
 - [ABC800] Emulated the "fast" floppy disk controller. Note that only raw
   sector dumps work currently (td0 not supported). [Curt Coder, exon]
 
+- [ABC800] Refactored drivers to define ADDRESS_MAP_MODERN. [Curt Coder]
+
 - [ABC806] Added enhanced options ROM. [exon, Curt Coder]
 
 - [ATARIST] Added several language variants. [Curt Coder]

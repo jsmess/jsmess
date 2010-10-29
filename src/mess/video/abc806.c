@@ -8,6 +8,7 @@
 
     TODO:
 
+	- check compatibility with new MC6845
     - HRU II PROM reading
 
 */
@@ -18,7 +19,18 @@
 #include "machine/e0516.h"
 #include "video/mc6845.h"
 
-/* Palette Initialization */
+
+
+// these are needed because the MC6845 emulation does
+// not position the active display area correctly
+#define HORIZONTAL_PORCH_HACK	109
+#define VERTICAL_PORCH_HACK		27
+
+
+
+//-------------------------------------------------
+//  PALETTE_INIT( abc806 )
+//-------------------------------------------------
 
 static PALETTE_INIT( abc806 )
 {
@@ -32,9 +44,12 @@ static PALETTE_INIT( abc806 )
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
 
-/* High Resolution Screen Select */
 
-WRITE8_HANDLER( abc806_hrs_w )
+//-------------------------------------------------
+//  abc806_hrs_w - high resolution memory banking
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::hrs_w )
 {
 	/*
 
@@ -51,63 +66,71 @@ WRITE8_HANDLER( abc806_hrs_w )
 
     */
 
-	abc806_state *state = space->machine->driver_data<abc806_state>();
-
-	state->hrs = data;
+	m_hrs = data;
 }
 
-/* High Resolution Palette */
 
-WRITE8_HANDLER( abc806_hrc_w )
+//-------------------------------------------------
+//  abc806_hrc_w - high resolution color write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::hrc_w )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
-
 	int reg = (offset >> 8) & 0x0f;
 
-	state->hrc[reg] = data;
+	m_hrc[reg] = data;
 }
 
-/* Character Memory */
 
-READ8_HANDLER( abc806_charram_r )
+//-------------------------------------------------
+//  abc806_charram_r - character RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( abc806_state::charram_r )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
+	m_attr_data = m_color_ram[offset];
 
-	state->attr_data = state->colorram[offset];
-
-	return state->charram[offset];
+	return m_char_ram[offset];
 }
 
-WRITE8_HANDLER( abc806_charram_w )
-{
-	abc806_state *state = space->machine->driver_data<abc806_state>();
 
-	state->colorram[offset] = state->attr_data;
-	state->charram[offset] = data;
+//-------------------------------------------------
+//  abc806_charram_w - character RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::charram_w )
+{
+	m_color_ram[offset] = m_attr_data;
+	m_char_ram[offset] = data;
 }
 
-/* Attribute Memory */
 
-READ8_HANDLER( abc806_ami_r )
+//-------------------------------------------------
+//  abc806_ami_r - attribute memory read
+//-------------------------------------------------
+
+READ8_MEMBER( abc806_state::ami_r )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
-
-	return state->attr_data;
+	return m_attr_data;
 }
 
-WRITE8_HANDLER( abc806_amo_w )
-{
-	abc806_state *state = space->machine->driver_data<abc806_state>();
 
-	state->attr_data = data;
+//-------------------------------------------------
+//  abc806_amo_w - attribute memory write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::amo_w )
+{
+	m_attr_data = data;
 }
 
-/* High Resolution Palette / Real-Time Clock */
 
-READ8_HANDLER( abc806_cli_r )
+//-------------------------------------------------
+//  abc806_cli_r - palette PROM read
+//-------------------------------------------------
+
+READ8_MEMBER( abc806_state::cli_r )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
-
 	/*
 
         bit     description
@@ -123,17 +146,20 @@ READ8_HANDLER( abc806_cli_r )
 
     */
 
-	UINT16 hru2_addr = (state->hru2_a8 << 8) | (offset >> 8);
-	UINT8 data = state->hru2_prom[hru2_addr] & 0x0f;
+	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
+	UINT8 data = m_hru2_prom[hru2_addr] & 0x0f;
 
-	data |= e0516_dio_r(state->e0516) << 7;
+	data |= e0516_dio_r(m_rtc) << 7;
 
 	return data;
 }
 
-/* Special */
 
-READ8_HANDLER( abc806_sti_r )
+//-------------------------------------------------
+//  abc806_sti_r - protection device read
+//-------------------------------------------------
+
+READ8_MEMBER( abc806_state::sti_r )
 {
 	/*
 
@@ -153,113 +179,117 @@ READ8_HANDLER( abc806_sti_r )
 	return 0x7f;
 }
 
-WRITE8_HANDLER( abc806_sto_w )
-{
-	abc806_state *state = space->machine->driver_data<abc806_state>();
 
+//-------------------------------------------------
+//  abc806_sto_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::sto_w )
+{
 	int level = BIT(data, 7);
 
 	switch (data & 0x07)
 	{
 	case 0:
-		/* external memory enable */
-		state->eme = level;
+		// external memory enable
+		m_eme = level;
 		break;
 	case 1:
-		/* 40/80 column display */
-		state->_40 = level;
+		// 40/80 column display
+		m_40 = level;
 		break;
 	case 2:
-		/* HRU II address line 8, PROT A0 */
-		state->hru2_a8 = level;
+		// HRU II address line 8, PROT A0
+		m_hru2_a8 = level;
 		break;
 	case 3:
-		/* PROT INI */
+		// PROT INI
 		break;
 	case 4:
-		/* text display enable */
-		state->txoff = level;
+		// text display enable
+		m_txoff = level;
 		break;
 	case 5:
-		/* RTC chip select */
-		e0516_cs_w(state->e0516, !level);
+		// RTC chip select
+		e0516_cs_w(m_rtc, !level);
 		break;
 	case 6:
-		/* RTC clock */
-		e0516_clk_w(state->e0516, level);
+		// RTC clock
+		e0516_clk_w(m_rtc, level);
 		break;
 	case 7:
-		/* RTC data in, PROT DIN */
-		e0516_dio_w(state->e0516, level);
+		// RTC data in, PROT DIN
+		e0516_dio_w(m_rtc, level);
 		break;
 	}
 }
 
-/* Sync Delay */
 
-WRITE8_HANDLER( abc806_sso_w )
+//-------------------------------------------------
+//  abc806_sso_w - sync offset write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc806_state::sso_w )
 {
-	abc806_state *state = space->machine->driver_data<abc806_state>();
-
-	state->sync = data & 0x3f;
+	m_sync = data & 0x3f;
 }
 
-/* MC6845 */
+
+//-------------------------------------------------
+//  MC6845_UPDATE_ROW( abc806_update_row )
+//-------------------------------------------------
 
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine->driver_data<abc806_state>();
-
-	int column;
 
 	UINT8 old_data = 0xff;
 	int fg_color = 7;
 	int bg_color = 0;
 	int underline = 0;
 	int flash = 0;
-	int e5 = state->_40;
-	int e6 = state->_40;
+	int e5 = state->m_40;
+	int e6 = state->m_40;
 	int th = 0;
 
-	/* prevent wraparound */
+	// prevent wraparound
 	if (y >= 240) return;
 
-	y += state->sync + 27;
+	y += state->m_sync + VERTICAL_PORCH_HACK;
 
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 data = state->charram[(ma + column) & 0x7ff];
-		UINT8 attr = state->colorram[(ma + column) & 0x7ff];
-		UINT16 rad_addr, chargen_addr;
-		UINT8 rad_data, chargen_data;
-		int bit, x;
+		UINT8 data = state->m_char_ram[(ma + column) & 0x7ff];
+		UINT8 attr = state->m_color_ram[(ma + column) & 0x7ff];
+		UINT16 rad_addr;
+		UINT8 rad_data;
 
 		if ((attr & 0x07) == ((attr >> 3) & 0x07))
 		{
-			/* special case */
+			// special case
 
 			switch (attr >> 6)
 			{
 			case 0:
-				/* use previously selected attributes */
+				// use previously selected attributes
 				break;
 			case 1:
-				/* reserved for future use */
+				// reserved for future use
 				break;
 			case 2:
-				/* blank */
+				// blank
 				fg_color = 0;
 				bg_color = 0;
 				underline = 0;
 				flash = 0;
 				break;
 			case 3:
-				/* double width */
+				// double width
 				e5 = BIT(attr, 0);
 				e6 = BIT(attr, 1);
 
-				/* read attributes from next byte */
-				attr = state->colorram[(ma + column + 1) & 0x7ff];
+				// read attributes from next byte
+				attr = state->m_color_ram[(ma + column + 1) & 0x7ff];
 
 				if (attr != 0x00)
 				{
@@ -273,14 +303,13 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		}
 		else
 		{
-			/* normal case */
-
+			// normal case
 			fg_color = attr & 0x07;
 			bg_color = (attr >> 3) & 0x07;
 			underline = BIT(attr, 6);
 			flash = BIT(attr, 7);
-			e5 = state->_40;
-			e6 = state->_40;
+			e5 = state->m_40;
+			e6 = state->m_40;
 		}
 
 		if (column == cursor_x)
@@ -289,17 +318,17 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		}
 		else
 		{
-			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (state->flshclk << 4) | ra;
-			rad_data = state->rad_prom[rad_addr] & 0x0f;
+			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (state->m_flshclk << 4) | ra;
+			rad_data = state->m_rad_prom[rad_addr] & 0x0f;
 
 			rad_data = ra; // HACK because the RAD prom is not dumped yet
 		}
 
-		chargen_addr = (th << 12) | (data << 4) | rad_data;
-		chargen_data = state->char_rom[chargen_addr & 0xfff] << 2;
-		x = 109 + (column + 4) * ABC800_CHAR_WIDTH;
+		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
+		UINT8 chargen_data = state->m_char_rom[chargen_addr & 0xfff] << 2;
+		int x = HORIZONTAL_PORCH_HACK + (column + 4) * ABC800_CHAR_WIDTH;
 
-		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 
@@ -322,59 +351,68 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( hs_w )
-{
-	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
+//-------------------------------------------------
+//  hs_w - horizontal sync write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc806_state::hs_w )
+{
 	int vsync;
 
 	if (!state)
 	{
-		driver_state->v50_addr++;
+		m_v50_addr++;
 
-		/* clock current vsync value into the shift register */
-		driver_state->vsync_shift <<= 1;
-		driver_state->vsync_shift = (driver_state->vsync_shift & 0xfffffffel) | driver_state->vsync;
+		// clock current vsync value into the shift register
+		m_vsync_shift <<= 1;
+		m_vsync_shift |= m_vsync;
 
-		vsync = BIT(driver_state->vsync_shift, driver_state->sync);
+		vsync = BIT(m_vsync_shift, m_sync);
 
-		if (!driver_state->d_vsync && vsync)
+		if (!m_d_vsync && vsync)
 		{
-			/* clear V50 address */
-			driver_state->v50_addr = 0;
+			// clear V50 address
+			m_v50_addr = 0;
 		}
-		else if (driver_state->d_vsync && !vsync)
+		else if (m_d_vsync && !vsync)
 		{
-			/* flash clock */
-			if (driver_state->flshclk_ctr & 0x20)
+			// flash clock
+			if (m_flshclk_ctr & 0x20)
 			{
-				driver_state->flshclk = !driver_state->flshclk;
-				driver_state->flshclk_ctr = 0;
+				m_flshclk = !m_flshclk;
+				m_flshclk_ctr = 0;
 			}
 			else
 			{
-				driver_state->flshclk_ctr++;
+				m_flshclk_ctr++;
 			}
 		}
 
-		if (driver_state->d_vsync != vsync)
+		if (m_d_vsync != vsync)
 		{
-			/* signal _DEW to DART */
-			z80dart_rib_w(driver_state->z80dart, !vsync);
+			// signal _DEW to DART
+			z80dart_rib_w(m_dart, !vsync);
 		}
 
-		driver_state->d_vsync = vsync;
+		m_d_vsync = vsync;
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( vs_w )
-{
-	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
-	driver_state->vsync = state;
+//-------------------------------------------------
+//  vs_w - vertical sync write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc806_state::vs_w )
+{
+	m_vsync = state;
 }
 
-/* MC6845 Interfaces */
+
+//-------------------------------------------------
+//  mc6845_interface crtc_intf
+//-------------------------------------------------
 
 static const mc6845_interface crtc_intf =
 {
@@ -385,30 +423,30 @@ static const mc6845_interface crtc_intf =
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(hs_w),
-	DEVCB_LINE(vs_w),
+	DEVCB_DRIVER_LINE_MEMBER(abc806_state, hs_w),
+	DEVCB_DRIVER_LINE_MEMBER(abc806_state, vs_w),
 	NULL
 };
 
-/* HR */
 
-static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+//-------------------------------------------------
+//  hr_update - high resolution screen update
+//-------------------------------------------------
+
+void abc806_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	abc806_state *state = machine->driver_data<abc806_state>();
+	UINT32 addr = (m_hrs & 0x0f) << 15;
 
-	UINT32 addr = (state->hrs & 0x0f) << 15;
-	int sx, y, pixel;
-
-	for (y = state->sync + 27; y < MIN(cliprect->max_y + 1, state->sync + 27 + 240); y++)
+	for (int y = m_sync + VERTICAL_PORCH_HACK; y < MIN(cliprect->max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
 	{
-		for (sx = 0; sx < 128; sx++)
+		for (int sx = 0; sx < 128; sx++)
 		{
-			UINT8 data = state->videoram[addr++];
-			UINT16 dot = (state->hrc[data >> 4] << 8) | state->hrc[data & 0x0f];
+			UINT8 data = m_video_ram[addr++];
+			UINT16 dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
 
-			for (pixel = 0; pixel < 4; pixel++)
+			for (int pixel = 0; pixel < 4; pixel++)
 			{
-				int x = 109 + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
+				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
 				if (BIT(dot, 15) || *BITMAP_ADDR16(bitmap, y, x) == 0)
 				{
@@ -421,81 +459,81 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 	}
 }
 
-/* Video Start */
 
-static VIDEO_START(abc806)
+//-------------------------------------------------
+//  VIDEO_START( abc806 )
+//-------------------------------------------------
+
+void abc806_state::video_start()
 {
-	abc806_state *state = machine->driver_data<abc806_state>();
-
-	int i;
-
-	/* initialize variables */
-	for (i = 0; i < 16; i++)
+	// initialize variables
+	for (int i = 0; i < 16; i++)
 	{
-		state->hrc[i] = 0;
+		m_hrc[i] = 0;
 	}
 
-	state->sync = 10;
-	state->d_vsync = 1;
-	state->vsync = 1;
-	state->_40 = 1;
+	m_sync = 10;
+	m_d_vsync = 1;
+	m_vsync = 1;
+	m_40 = 1;
 
-	/* find devices */
-	state->mc6845 = machine->device(MC6845_TAG);
+	// find memory regions
+	m_char_rom = memory_region(machine, MC6845_TAG);
+	m_rad_prom = memory_region(machine, "rad");
+	m_hru2_prom = memory_region(machine, "hru2");
 
-	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
-	state->rad_prom = memory_region(machine, "rad");
-	state->hru2_prom = memory_region(machine, "hru2");
+	// allocate memory
+	m_char_ram = auto_alloc_array(machine, UINT8, ABC806_CHAR_RAM_SIZE);
+	m_color_ram = auto_alloc_array(machine, UINT8, ABC806_ATTR_RAM_SIZE);
 
-	/* allocate memory */
-	state->charram = auto_alloc_array(machine, UINT8, ABC806_CHAR_RAM_SIZE);
-	state->colorram = auto_alloc_array(machine, UINT8, ABC806_ATTR_RAM_SIZE);
-
-	/* register for state saving */
-	state_save_register_global_pointer(machine, state->charram, ABC806_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(machine, state->colorram, ABC806_ATTR_RAM_SIZE);
-	state_save_register_global_pointer(machine, state->videoram, ABC806_VIDEO_RAM_SIZE);
-	state_save_register_global(machine, state->txoff);
-	state_save_register_global(machine, state->_40);
-	state_save_register_global(machine, state->flshclk_ctr);
-	state_save_register_global(machine, state->flshclk);
-	state_save_register_global(machine, state->attr_data);
-	state_save_register_global(machine, state->hrs);
-	state_save_register_global_array(machine, state->hrc);
-	state_save_register_global(machine, state->sync);
-	state_save_register_global(machine, state->v50_addr);
-	state_save_register_global(machine, state->hru2_a8);
-	state_save_register_global(machine, state->vsync_shift);
-	state_save_register_global(machine, state->vsync);
-	state_save_register_global(machine, state->d_vsync);
+	// register for state saving
+	state_save_register_global_pointer(machine, m_char_ram, ABC806_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(machine, m_color_ram, ABC806_ATTR_RAM_SIZE);
+	state_save_register_global_pointer(machine, m_video_ram, ABC806_VIDEO_RAM_SIZE);
+	state_save_register_global(machine, m_txoff);
+	state_save_register_global(machine, m_40);
+	state_save_register_global(machine, m_flshclk_ctr);
+	state_save_register_global(machine, m_flshclk);
+	state_save_register_global(machine, m_attr_data);
+	state_save_register_global(machine, m_hrs);
+	state_save_register_global_array(machine, m_hrc);
+	state_save_register_global(machine, m_sync);
+	state_save_register_global(machine, m_v50_addr);
+	state_save_register_global(machine, m_hru2_a8);
+	state_save_register_global(machine, m_vsync_shift);
+	state_save_register_global(machine, m_vsync);
+	state_save_register_global(machine, m_d_vsync);
 }
 
-/* Video Update */
 
-static VIDEO_UPDATE( abc806 )
+//-------------------------------------------------
+//  VIDEO_UPDATE( abc806 )
+//-------------------------------------------------
+
+bool abc806_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	abc806_state *state = screen->machine->driver_data<abc806_state>();
+	// HACK expand visible area to workaround MC6845
+	screen.set_visible_area(0, 767, 0, 311);
 
-	/* expand visible area to workaround MC6845 */
-	screen->set_visible_area(0, 767, 0, 311);
+	// clear screen
+	bitmap_fill(&bitmap, &cliprect, 0);
 
-	/* clear screen */
-	bitmap_fill(bitmap, cliprect, 0);
-
-	if (!state->txoff)
+	if (!m_txoff)
 	{
-		/* draw text */
-		mc6845_update(state->mc6845, bitmap, cliprect);
+		// draw text
+		mc6845_update(m_crtc, &bitmap, &cliprect);
 	}
 
-	/* draw HR graphics */
-	abc806_hr_update(screen->machine, bitmap, cliprect);
+	// draw HR graphics
+	hr_update(&bitmap, &cliprect);
 
 	return 0;
 }
 
-/* Machine Drivers */
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( abc806_video )
+//-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc806_video )
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
@@ -511,6 +549,4 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(abc806)
-	MDRV_VIDEO_START(abc806)
-	MDRV_VIDEO_UPDATE(abc806)
 MACHINE_CONFIG_END

@@ -4,12 +4,31 @@
  *
  ****************************************************************************/
 
+/*
+
+    TODO:
+
+	- check compatibility with new MC6845
+
+*/
+
 #include "emu.h"
 #include "includes/abc80x.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
-/* MC6845 Row Update */
+
+
+// these are needed because the MC6845 emulation does
+// not position the active display area correctly
+#define HORIZONTAL_PORCH_HACK	121
+#define VERTICAL_PORCH_HACK		29
+
+
+
+//-------------------------------------------------
+//  MC6845_UPDATE_ROW( abc802_update_row )
+//-------------------------------------------------
 
 static MC6845_UPDATE_ROW( abc802_update_row )
 {
@@ -54,19 +73,16 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 	abc802_state *state =  device->machine->driver_data<abc802_state>();
 
-	int column;
 	int rf = 0, rc = 0, rg = 0;
 
-	/* prevent wraparound */
+	// prevent wraparound
 	if (y >= 240) return;
 
-	y += 29;
+	y += VERTICAL_PORCH_HACK;
 
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
-		int bit;
-
-		UINT8 code = state->charram[(ma + column) & 0x7ff];
+		UINT8 code = state->m_char_ram[(ma + column) & 0x7ff];
 		UINT16 address = code << 4;
 		UINT8 ra_latch = ra;
 		UINT8 data;
@@ -78,7 +94,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			ra_latch = 0x0f;
 		}
 
-		if ((state->flshclk && rf) || rc)
+		if ((state->m_flshclk && rf) || rc)
 		{
 			ra_latch = 0x0e;
 		}
@@ -88,7 +104,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			address |= 0x800;
 		}
 
-		data = state->char_rom[(address + ra_latch) & 0x1fff];
+		data = state->m_char_rom[(address + ra_latch) & 0x1fff];
 
 		if (data & ABC802_ATE)
 		{
@@ -98,22 +114,22 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			switch (attr)
 			{
 			case 0x00:
-				/* Row Graphic */
+				// Row Graphic
 				rg = value;
 				break;
 
 			case 0x01:
-				/* Row Flash */
+				// Row Flash
 				rf = value;
 				break;
 
 			case 0x02:
-				/* Row Clear */
+				// Row Clear
 				rc = value;
 				break;
 
 			case 0x03:
-				/* undefined */
+				// undefined
 				break;
 			}
 		}
@@ -121,11 +137,11 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 		{
 			data <<= 2;
 
-			if (state->mux80_40)
+			if (state->m_80_40_mux)
 			{
-				for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = 121 + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
+					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = BIT(data, 7) ^ ri;
 
 					*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -135,9 +151,9 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			}
 			else
 			{
-				for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
+				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = 121 + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
+					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = BIT(data, 7) ^ ri;
 
 					*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -152,29 +168,35 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( vs_w )
-{
-	abc802_state *driver_state = device->machine->driver_data<abc802_state>();
 
+//-------------------------------------------------
+//  vs_w - vertical sync write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc802_state::vs_w )
+{
 	if (!state)
 	{
-		/* flash clock */
-		if (driver_state->flshclk_ctr & 0x20)
+		// flash clock
+		if (m_flshclk_ctr & 0x20)
 		{
-			driver_state->flshclk = !driver_state->flshclk;
-			driver_state->flshclk_ctr = 0;
+			m_flshclk = !m_flshclk;
+			m_flshclk_ctr = 0;
 		}
 		else
 		{
-			driver_state->flshclk_ctr++;
+			m_flshclk_ctr++;
 		}
 	}
 
-	/* signal _DEW to DART */
-	z80dart_rib_w(driver_state->z80dart, !state);
+	// signal _DEW to DART
+	z80dart_rib_w(m_dart, !state);
 }
 
-/* MC6845 Interfaces */
+
+//-------------------------------------------------
+//  mc6845_interface crtc_intf
+//-------------------------------------------------
 
 static const mc6845_interface crtc_intf =
 {
@@ -186,44 +208,46 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(vs_w),
+	DEVCB_DRIVER_LINE_MEMBER(abc802_state, vs_w),
 	NULL
 };
 
-/* Video Start */
 
-static VIDEO_START( abc802 )
+//-------------------------------------------------
+//  VIDEO_START( abc802 )
+//-------------------------------------------------
+
+void abc802_state::video_start()
 {
-	abc802_state *state =  machine->driver_data<abc802_state>();
+	// find memory regions
+	m_char_rom = memory_region(machine, MC6845_TAG);
 
-	/* find devices */
-	state->mc6845 = machine->device(MC6845_TAG);
-
-	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
-
-	/* register for state saving */
-	state_save_register_global(machine, state->flshclk_ctr);
-	state_save_register_global(machine, state->flshclk);
-	state_save_register_global(machine, state->mux80_40);
+	// register for state saving
+	state_save_register_global(machine, m_flshclk_ctr);
+	state_save_register_global(machine, m_flshclk);
+	state_save_register_global(machine, m_80_40_mux);
 }
 
-/* Video Update */
 
-static VIDEO_UPDATE( abc802 )
+//-------------------------------------------------
+//  VIDEO_UPDATE( abc802 )
+//-------------------------------------------------
+
+bool abc802_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	abc802_state *state = screen->machine->driver_data<abc802_state>();
+	// HACK expand visible area to workaround MC6845
+	screen.set_visible_area(0, 767, 0, 311);
 
-	/* expand visible area to workaround MC6845 */
-	screen->set_visible_area(0, 767, 0, 311);
-
-	/* draw text */
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	// draw text
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 
 	return 0;
 }
 
-/* Machine Drivers */
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( abc802_video )
+//-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc802_video )
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
@@ -237,8 +261,5 @@ MACHINE_CONFIG_FRAGMENT( abc802_video )
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
 	MDRV_PALETTE_LENGTH(2)
-
 	MDRV_PALETTE_INIT(monochrome_amber)
-	MDRV_VIDEO_START(abc802)
-	MDRV_VIDEO_UPDATE(abc802)
 MACHINE_CONFIG_END
