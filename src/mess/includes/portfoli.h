@@ -23,7 +23,8 @@ public:
 		  m_lcdc(*this, HD61830_TAG),
 		  m_ppi(*this, M82C55A_TAG),
 		  m_uart(*this, M82C50A_TAG),
-		  m_speaker(*this, SPEAKER_TAG)
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_timer_tick(*this, TIMER_TICK_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,7 +32,7 @@ public:
 	required_device<running_device> m_ppi;
 	required_device<running_device> m_uart;
 	required_device<running_device> m_speaker;
-	timer_device *m_timer_tick;
+	required_device<timer_device> m_timer_tick;
 
 	virtual void machine_start();
 	virtual void machine_reset();

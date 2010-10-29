@@ -749,9 +749,6 @@ void portfolio_state::machine_start()
 	/* set CPU interrupt vector callback */
 	cpu_set_irq_callback(m_maincpu, portfolio_int_ack);
 
-	/* find devices */
-	m_timer_tick = machine->device<timer_device>(TIMER_TICK_TAG);
-
 	/* memory expansions */
 	switch (messram_get_size(machine->device("messram")))
 	{
