@@ -91,6 +91,7 @@ struct _messtest_command
 		struct
 		{
 			const char *mem_region;
+			const char *cpu_name;
 			offs_t start;
 			offs_t end;
 			const void *verify_data;
@@ -340,6 +341,10 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 		options_set_string(opts, OPTION_BIOS, current_testcase.bios, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_SKIP_GAMEINFO, TRUE, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_THROTTLE, FALSE, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_DEBUG, FALSE, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_DEBUG_INTERNAL, FALSE, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_WRITECONFIG, FALSE, OPTION_PRIORITY_CMDLINE);
+	
 	if (current_testcase.ram != 0)
 	{
 		options_set_int(opts, OPTION_RAMSIZE, current_testcase.ram, OPTION_PRIORITY_CMDLINE);
@@ -817,6 +822,7 @@ static void command_verify_memory(running_machine *machine)
 	const UINT8 *target_data = NULL;
 	size_t target_data_size = 0;
 	const char *region;
+	const char *cpu_name;
 
 	offset_start = current_command->u.verify_args.start;
 	offset_end = current_command->u.verify_args.end;
@@ -825,6 +831,8 @@ static void command_verify_memory(running_machine *machine)
 
 	if (offset_end == 0)
 		offset_end = offset_start + verify_data_size - 1;
+
+	cpu_name = current_command->u.verify_args.cpu_name;
 
 	/* what type of memory are we validating? */
 	region = current_command->u.verify_args.mem_region;
@@ -848,22 +856,43 @@ static void command_verify_memory(running_machine *machine)
 		report_message(MSG_FAILURE, "Invalid verify offset range (0x%x-0x%x)", offset_start, offset_end);
 		return;
 	}
-	if (offset_end >= target_data_size)
-	{
-		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Verify memory range out of bounds");
-		return;
+	
+	if (region) {
+		if (offset_end >= target_data_size)
+		{
+			state = STATE_ABORTED;
+			report_message(MSG_FAILURE, "Verify memory range out of bounds");
+			return;
+		}
+	} else {
+		if (cpu_name==NULL) {
+			state = STATE_ABORTED;
+			report_message(MSG_FAILURE, "If region is not defined then cpu must be");
+			return;
+		}
 	}
 
 	/* loop through the memory, verifying it byte by byte */
 	for (offset = offset_start; offset <= offset_end; offset++)
 	{
-		if (verify_data[i] != target_data[offset])
-		{
-			state = STATE_ABORTED;
-			report_message(MSG_FAILURE, "Failed verification step (region %s; 0x%x-0x%x)",
-				region, offset_start, offset_end);
-			break;
+		if (region) {
+			if (verify_data[i] != target_data[offset])
+			{
+				state = STATE_ABORTED;
+				report_message(MSG_FAILURE, "Failed verification step (region %s; 0x%x-0x%x)",
+					region, offset_start, offset_end);
+				break;
+			}
+		} else {
+			address_space *space = cputag_get_address_space(machine, cpu_name, ADDRESS_SPACE_PROGRAM);
+			
+			if (verify_data[i] != space->read_byte(offset))
+			{
+				state = STATE_ABORTED;
+				report_message(MSG_FAILURE, "Failed verification step (0x%x-0x%x)",
+					offset_start, offset_end);
+				break;
+			}
 		}
 		i = (i + 1) % verify_data_size;
 	}
@@ -1347,11 +1376,15 @@ static void node_memverify(xml_data_node *node)
 	if (!s2)
 		s2 = "0";
 
+	memset(&new_command, 0, sizeof(new_command));
+	new_command.command_type = MESSTEST_COMMAND_VERIFY_MEMORY;
+
 	attr_node = xml_get_attribute(node, "region");
 	new_command.u.verify_args.mem_region = attr_node ? attr_node->value : NULL;
 
-	memset(&new_command, 0, sizeof(new_command));
-	new_command.command_type = MESSTEST_COMMAND_VERIFY_MEMORY;
+	attr_node = xml_get_attribute(node, "cpu");
+	new_command.u.verify_args.cpu_name = attr_node ? attr_node->value : NULL;
+
 	new_command.u.verify_args.start = parse_offset(s1);
 	new_command.u.verify_args.end = parse_offset(s2);
 
