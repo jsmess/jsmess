@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/m6805/m6805.h"
 #include "includes/mac.h"
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"
@@ -326,11 +327,41 @@ static WRITE8_HANDLER ( mac_rbv_w )
 	}
 }
 
-static READ32_HANDLER(mac_lc3_id)
+static READ32_HANDLER(mac_read_id)
 {
-//  printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
+	mac_state *mac = space->machine->driver_data<mac_state>();
 
-	return 0xa55a0001;	// 25 MHz LC III
+	logerror("Mac read ID reg @ PC=%x\n", cpu_get_pc(space->cpu));
+
+	switch (mac->model)
+	{
+		case MODEL_MAC_LC_III:
+			return 0xa55a0001;	// 25 MHz LC III
+
+		case MODEL_MAC_LC_III_PLUS:
+			return 0xa55a0003;	// 33 MHz LC III+
+
+		case MODEL_MAC_POWERMAC_6100:
+			return 0xa55a3011;
+
+		case MODEL_MAC_POWERMAC_7100:
+			return 0xa55a3012;
+
+		case MODEL_MAC_POWERMAC_8100:
+			return 0xa55a3013;
+
+		case MODEL_MAC_PBDUO_210:
+			return 0xa55a1004;
+
+		case MODEL_MAC_PBDUO_230:
+			return 0xa55a1005;
+
+		case MODEL_MAC_PBDUO_250:
+			return 0xa55a1006;
+
+		default:
+			return 0;
+	}
 }
 
 // Portable/PB100 video
@@ -443,7 +474,7 @@ static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50028000, 0x50028003) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffff) AM_MIRROR(0x00f00000) 
 
-	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_lc3_id)
+	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
 
 	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_BASE_MEMBER(mac_state, rbv_vram)
 ADDRESS_MAP_END
@@ -505,6 +536,8 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pwrmac_map, ADDRESS_SPACE_PROGRAM, 64)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
+
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
@@ -514,8 +547,9 @@ static ADDRESS_MAP_START(pwrmac_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0x50006060, 0x50006067) AM_READ32(macii_scsi_drq_r,U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50012060, 0x50012067) AM_READ32(macii_scsi_drq_r,U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_READWRITE8(mac_asc_r, mac_asc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+
+	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, U64(0xffffffffffffffff))
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END

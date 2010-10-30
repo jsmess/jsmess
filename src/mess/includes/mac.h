@@ -54,6 +54,7 @@ typedef enum
 	MODEL_MAC_LC,		// LC class 68030 machines, generally using a V8 or compatible gate array
 	MODEL_MAC_LC_II,
 	MODEL_MAC_LC_III,
+	MODEL_MAC_LC_III_PLUS,
 	MODEL_MAC_CLASSIC_II,
 	MODEL_MAC_TV,
 	MODEL_MAC_COLOR_CLASSIC,
@@ -92,7 +93,9 @@ typedef enum
 	MODEL_MAC_PB190,
 	MODEL_MAC_PB190cs,
 
-	MODEL_MAC_POWERMAC_6100	// original PowerMac
+	MODEL_MAC_POWERMAC_6100,	// original-series PowerMacs
+	MODEL_MAC_POWERMAC_7100,
+	MODEL_MAC_POWERMAC_8100
 } model_t;
 
 // video parameters for classic Macs
@@ -291,6 +294,7 @@ public:
 
 // defined in machine/mac.c
 void mac_v8_resize(running_machine *machine, mac_state *mac);
+void mac_set_memory_overlay(running_machine *machine, int overlay);
 
 #endif /* MAC_H_ */
 

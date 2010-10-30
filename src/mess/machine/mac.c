@@ -63,9 +63,9 @@
         - What on earth are 0x700000-0x7fffff mapped to ?
 
      Egret version spotting:
-     341S0417 - 0x???? - Color Classic
-     341S0850 - 0x???? - LC, LC II
-     341S0851 - 0x0101 - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
+     341S0417 - 0x???? (?.??) - Color Classic
+     341S0850 - 0x???? (?.??) - LC, LC II
+     341S0851 - 0x0101 (1.01) - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
 
      Cuda version spotting:
      341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
@@ -74,6 +74,8 @@
      341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
      343S0788 - 0x???????? (?.??) - PMac x100 (typo - actually 341S0788?)
 
+     Caboose version spotting:
+     341S0853 - 0x0100 (1.00) - Quadra 950
 
 ****************************************************************************/
 
@@ -457,7 +459,7 @@ void mac_v8_resize(running_machine *machine, mac_state *mac)
 	}
 }
 
-static void set_memory_overlay(running_machine *machine, int overlay)
+void mac_set_memory_overlay(running_machine *machine, int overlay)
 {
 	offs_t memory_size;
 	UINT8 *memory_data;
@@ -486,14 +488,14 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		if (((mac->model >= MODEL_MAC_LC) && (mac->model <= MODEL_MAC_COLOR_CLASSIC) && (mac->model != MODEL_MAC_LC_III)) || (mac->model == MODEL_MAC_CLASSIC_II))
+		if (((mac->model >= MODEL_MAC_LC) && (mac->model <= MODEL_MAC_COLOR_CLASSIC) && ((mac->model != MODEL_MAC_LC_III) && (mac->model != MODEL_MAC_LC_III_PLUS))) || (mac->model == MODEL_MAC_CLASSIC_II))
 		{
 			mac->overlay = overlay;
 			mac_v8_resize(machine, mac);
 		}
-		else if (mac->model == MODEL_MAC_POWERMAC_6100)
+		else if ((mac->model >= MODEL_MAC_POWERMAC_6100) && (mac->model >= MODEL_MAC_POWERMAC_8100))
 		{
-			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+//			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((mac->model == MODEL_MAC_IICI) || (mac->model == MODEL_MAC_IISI))
 		{
@@ -515,7 +517,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		{
 			mac_install_memory(machine, 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if (mac->model == MODEL_MAC_LC_III)	// up to 36 MB
+		else if ((mac->model == MODEL_MAC_LC_III) || (mac->model == MODEL_MAC_LC_III_PLUS))	// up to 36 MB
 		{
 			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -527,7 +529,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		mac->overlay = overlay;
 
 		if (LOG_GENERAL)
-			logerror("set_memory_overlay: overlay=%i\n", overlay);
+			logerror("mac_set_memory_overlay: overlay=%i\n", overlay);
 	}
 }
 
@@ -2626,6 +2628,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_II_FDHD:
 		case MODEL_MAC_IIX:
 		case MODEL_MAC_POWERMAC_6100:
+		case MODEL_MAC_POWERMAC_7100:
+		case MODEL_MAC_POWERMAC_8100:
 			return 0x81;		// bit 0 must be set on most Macs to avoid attempting to boot from AppleTalk
 
 		case MODEL_MAC_SE30:
@@ -2757,7 +2761,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
      * first access to the ROM. */
 	if (mac->model < MODEL_MAC_SE)
 	{
-		set_memory_overlay(device->machine, (data & 0x10) >> 4);
+		mac_set_memory_overlay(device->machine, (data & 0x10) >> 4);
 	}
 }
 
@@ -3058,7 +3062,7 @@ MACHINE_RESET(mac)
 	if (mac->model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
 	{
 		mac->overlay = -1;	// insure no match
-		set_memory_overlay(machine, 1);
+		mac_set_memory_overlay(machine, 1);
 	}
 
 	/* setup videoram */
@@ -3129,7 +3133,7 @@ static STATE_POSTLOAD( mac_state_load )
 
 	overlay = mac->overlay;
 	mac->overlay = -1;
-	set_memory_overlay(machine, overlay);
+	mac_set_memory_overlay(machine, overlay);
 }
 
 
@@ -3143,28 +3147,28 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
-				set_memory_overlay(machine, 0);		// kill the overlay
+				mac_set_memory_overlay(machine, 0);		// kill the overlay
 			}
 		}
 		else if ((mac->model == MODEL_MAC_SE) || (mac->model == MODEL_MAC_CLASSIC))
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
-				set_memory_overlay(machine, 0);		// kill the overlay
+				mac_set_memory_overlay(machine, 0);		// kill the overlay
 			}
 		}
 		else if ((mac->model == MODEL_MAC_LC) || (mac->model == MODEL_MAC_LC_II) || (mac->model == MODEL_MAC_CLASSIC_II))
 		{
 			if ((address >= 0xa00000) && (address <= 0xafffff))
 			{
-				set_memory_overlay(machine, 0);		// kill the overlay
+				mac_set_memory_overlay(machine, 0);		// kill the overlay
 			}
 		}
 		else
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
-				set_memory_overlay(machine, 0);		// kill the overlay
+				mac_set_memory_overlay(machine, 0);		// kill the overlay
 			}
 		}
 	}
@@ -3194,12 +3198,12 @@ static void mac_driver_init(running_machine *machine, model_t model)
 	}
 
 	mac->overlay = -1;
-	set_memory_overlay(machine, 1);
+	mac_set_memory_overlay(machine, 1);
 
 	memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
-	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->model >= MODEL_MAC_II) && (mac->model <= MODEL_MAC_SE30)) ||
+	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->model >= MODEL_MAC_II) && (mac->model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
 		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, *machine));
@@ -3229,6 +3233,7 @@ MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
 MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
 MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
 MAC_DRIVER_INIT(maclc3, MODEL_MAC_LC_III)
+MAC_DRIVER_INIT(maclc3plus, MODEL_MAC_LC_III_PLUS)
 MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
 MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
 MAC_DRIVER_INIT(macii, MODEL_MAC_II)
@@ -3236,6 +3241,8 @@ MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
 MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
 MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
 MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
+MAC_DRIVER_INIT(macpm7100, MODEL_MAC_POWERMAC_7100)
+MAC_DRIVER_INIT(macpm8100, MODEL_MAC_POWERMAC_8100)
 MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
 MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 
