@@ -707,7 +707,7 @@ static GFXDECODE_START( pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
-static const sc61860_cpu_core config =
+static const sc61860_cpu_core pc1401_config =
 {
 	pc1401_reset, pc1401_brk, NULL,
 	pc1401_ina, pc1401_outa,
@@ -719,7 +719,7 @@ static MACHINE_CONFIG_START( pc1401, pocketc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(pc1401_config)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
