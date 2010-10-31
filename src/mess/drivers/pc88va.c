@@ -141,12 +141,214 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
+/* TODO: this is either a result of an hand-crafted ROM or the JIS stuff is really attribute related ... */
+static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
+{
+	if(jis1 >= 0x00 && jis1 < 0x28)
+		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
+	else if(jis1 >= 0x28 && jis1 < 0x30)
+		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
+	else if(jis1 >= 0x30 && jis1 < 0x3f)
+		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
+	else if(jis1 >= 0x40 && jis1 < 0x50)
+		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
+	else if(x == 0 && y == 0 && jis1 != 0) // debug stuff, to be nuked in the end
+		printf("%02x\n",jis1);
+
+	return 0;
+}
+
+static void draw_text(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT8 *tvram = memory_region(machine, "tvram");
+	UINT8 *kanji = memory_region(machine, "kanji");
+	int xi,yi;
+	int x,y;
+	int res_x,res_y;
+	UINT16 lr_half_gfx;
+	UINT8 jis1,jis2;
+	UINT32 count;
+	UINT32 tile_num;
+	UINT16 attr;
+	UINT8 attr_mode;
+	UINT8 fg_col,bg_col,secret,reverse,blink,dwidc,dwid,uline,hline;
+	UINT8 screen_fg_col,screen_bg_col;
+
+	count = (tvram[tsp.tvram_vreg_offset+0] | tvram[tsp.tvram_vreg_offset+1] << 8);
+
+	attr_mode = tvram[tsp.tvram_vreg_offset+0xa] & 0x1f;
+	/* Note: bug in docs has the following two reversed */
+	screen_fg_col = (tvram[tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
+	screen_bg_col = tvram[tsp.tvram_vreg_offset+0xb] & 0x0f;
+
+	for(y=0;y<13;y++)
+	{
+		for(x=0;x<80;x++)
+		{
+			jis1 = (tvram[count+0] & 0x7f) + 0x20;
+			jis2 = tvram[count+1] & 0x7f;
+			lr_half_gfx = ((tvram[count+1] & 0x80) >> 7);
+
+			tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
+
+			attr = (tvram[count+tsp.attr_offset] & 0x00ff);
+
+			fg_col = bg_col = reverse = blink = secret = dwidc = dwid = uline = hline = 0;
+
+			switch(attr_mode)
+			{
+				/*
+				xxxx ---- foreground color
+				---- xxxx background color
+				*/
+				case 0:
+					fg_col = (attr & 0xf0) >> 4;
+					bg_col = (attr & 0x0f) >> 0;
+					break;
+				/*
+				xxxx ---- foreground color
+				---- x--- horizontal line
+				---- -x-- reverse
+				---- --x- blink
+				---- ---x secret (hide text)
+				background color is defined by screen control table values
+				*/
+				case 1:
+					fg_col = (attr & 0xf0) >> 4;
+					bg_col = screen_bg_col;
+					hline = (attr & 0x08) >> 3;
+					reverse = (attr & 0x04) >> 2;
+					blink = (attr & 0x02) >> 1;
+					secret = (attr & 0x01) >> 0;
+					break;
+				/*
+				x--- ---- dwidc
+				-x-- ---- dwid
+				--x- ---- uline
+				---x ---- hline
+				---- -x-- reverse
+				---- --x- blink
+				---- ---x secret (hide text)
+				background and foreground colors are defined by screen control table values
+				*/
+				case 2:
+					fg_col = screen_fg_col;
+					bg_col = screen_bg_col;
+					dwidc = (attr & 0x80) >> 7;
+					dwid = (attr & 0x40) >> 6;
+					uline = (attr & 0x20) >> 5;
+					hline = (attr & 0x10) >> 4;
+					reverse = (attr & 0x04) >> 2;
+					blink = (attr & 0x02) >> 1;
+					secret = (attr & 0x01) >> 0;
+					break;
+				/*
+				---- x--- mixes between mode 0 and 2
+
+				xxxx 1--- foreground color
+				---- 1xxx background color
+				2)
+				x--- 0--- dwidc
+				-x-- 0--- dwid
+				--x- 0--- uline
+				---x 0--- hline
+				---- 0x-- reverse
+				---- 0-x- blink
+				---- 0--x secret (hide text)
+				background and foreground colors are defined by screen control table values
+				*/
+				case 3:
+					{
+						if(attr & 0x8)
+						{
+							fg_col = (attr & 0xf0) >> 4;
+							bg_col = (attr & 0x07) >> 0;
+						}
+						else
+						{
+							fg_col = screen_fg_col;
+							bg_col = screen_bg_col;
+							dwidc = (attr & 0x80) >> 7;
+							dwid = (attr & 0x40) >> 6;
+							uline = (attr & 0x20) >> 5;
+							hline = (attr & 0x10) >> 4;
+							reverse = (attr & 0x04) >> 2;
+							blink = (attr & 0x02) >> 1;
+							secret = (attr & 0x01) >> 0;
+						}
+					}
+					break;
+				/*
+				x--- ---- blink
+				-xxx ---- background color
+				---- xxxx foreground color
+				*/
+				case 4:
+					fg_col = (attr & 0x0f) >> 0;
+					bg_col = (attr & 0x70) >> 4;
+					blink = (attr & 0x80) >> 7;
+					break;
+				/*
+				x--- ---- blink
+				-xxx ---- background color
+				---- xxxx foreground color
+				hline is enabled if foreground color is 1 or 9
+				*/
+				case 5:
+					fg_col = (attr & 0x0f) >> 0;
+					bg_col = (attr & 0x70) >> 4;
+					blink = (attr & 0x80) >> 7;
+					if((fg_col & 7) == 1)
+						hline = 1;
+					break;
+				default:
+					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
+					return;
+			}
+
+			for(yi=0;yi<16;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int pen;
+
+					res_x = x*8+xi;
+					res_y = y*16+yi;
+
+					if((res_x)>machine->primary_screen->visible_area().max_x || (res_y)>machine->primary_screen->visible_area().max_y)
+						continue;
+
+					pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
+
+					if(reverse)
+						pen = pen & 1 ? bg_col : fg_col;
+					else
+						pen = pen & 1 ? fg_col : bg_col;
+
+					if(secret) { pen = 0; } //hide text
+
+					if(pen != -1) //transparent
+						*BITMAP_ADDR32(bitmap, res_y, res_x) = machine->pens[pen];
+				}
+			}
+
+			count+=2;
+			count&=0xffff;
+		}
+	}
+}
+
 static VIDEO_UPDATE( pc88va )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
+	{
+		draw_text(screen->machine,bitmap,cliprect);
+	}
+
 	if(tsp.spr_on)
 		draw_sprites(screen->machine,bitmap,cliprect);
+
 
 	return 0;
 }
@@ -1136,6 +1338,8 @@ static MACHINE_RESET( pc88va )
 		for(i=0;i<32;i++)
 			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
 	}
+
+	tsp.tvram_vreg_offset = 0;
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )
