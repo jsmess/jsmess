@@ -164,22 +164,39 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( mc1000 )
+	PORT_START("JOYA") /* Player 1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    /* = 'I' */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  /* = 'Q' */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  /* = 'Y' */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) /* = '1' */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )        /* = '9' */
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("JOYB") /* Player 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)        /* = '@' */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)    /* = 'H' */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)  /* = 'P' */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)  /* = 'X' */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) /* = '0' */
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("ROW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('@')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('@')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
@@ -238,7 +255,17 @@ static INPUT_PORTS_START( mc1000 )
 
 	PORT_START("MODIFIERS")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+
+	PORT_START("JOYAKEYMAP")
+	PORT_CONFNAME( 0x01, 0x00, "JOYSTICK A (P1) keyboard mapping" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
+
+	PORT_START("JOYBKEYMAP")
+	PORT_CONFNAME( 0x01, 0x00, "JOYSTICK B (P2) keyboard mapping" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
 	PORT_INCLUDE( m6847_artifacting )
 INPUT_PORTS_END
@@ -294,15 +321,25 @@ static READ8_DEVICE_HANDLER( keydata_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine, "ROW0");
-	if (!BIT(state->keylatch, 1)) data &= input_port_read(device->machine, "ROW1");
+	if (!BIT(state->keylatch, 0))
+	{
+	                              data &= input_port_read(device->machine, "ROW0");
+		if (input_port_read(device->machine, "JOYBKEYMAP"))
+	                              data &= input_port_read(device->machine, "JOYB");
+	}
+	if (!BIT(state->keylatch, 1))
+	{
+	                              data &= input_port_read(device->machine, "ROW1");
+		if (input_port_read(device->machine, "JOYAKEYMAP"))
+	                              data &= input_port_read(device->machine, "JOYA");
+	}
 	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine, "ROW2");
 	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine, "ROW3");
 	if (!BIT(state->keylatch, 4)) data &= input_port_read(device->machine, "ROW4");
 	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine, "ROW5");
 	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine, "ROW6");
 	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine, "ROW7");
-
+	
 	data = (input_port_read(device->machine, "MODIFIERS") & 0xc0) | (data & 0x3f);
 
 	if (cassette_input(state->cassette) < +0.0)	data &= 0x7f;
@@ -378,20 +415,53 @@ static MACHINE_RESET( mc1000 )
 
 /* Machine Driver */
 
+/*
+ 
+ Interrupt generator:
+ NE555 chip in astable circuit.
+ 
+  +---------*---*---o V+
+  |         |   |
+ +-+        |   |
+ | |309K    |   |
+ | |R17     |8  |4
+ +-+      +-------+
+  |      7|       |3
+  *-------|       |-------> /INT (Z80)
+  |       |       |
+  |       |       |
+ +-+R16  2| IC 28 |
+ | |1K +--|       |
+ | |   |  |  555  |
+ +-+   |  |       |
+  |    | 6|       |5
+  *----*—-|       |---+
+  |       |       |   |
+ ---C30   +-------+  ---C29
+ ---103       |1     ---103
+ _|_         _|_     _|_
+ ///         ///     ///
+ 
+ Calculated properties:
+ 
+ * 99.74489795918367 Duty Cycle Percentage
+ * 368.1126130105722 Frequency in Hertz
+ * 0.00000693 Seconds Low
+ * 0.0027096299999999998 Seconds High
+ 
+ */
+
+#define MC1000_NE555_FREQ       (368) /* Hz */
+#define MC1000_NE555_DUTY_CYCLE (99.745) /* % */
+
 static TIMER_DEVICE_CALLBACK( ne555_tick )
 {
 	mc1000_state *state = timer.machine->driver_data<mc1000_state>();
 
-	if (state->ne555_int == ASSERT_LINE)
-	{
-		state->ne555_int = CLEAR_LINE;
-	}
-	else
-	{
-		state->ne555_int = ASSERT_LINE;
-	}
+	// (state->ne555_int not needed anymore and can be done with?)
+	state->ne555_int = param;
 
-	cputag_set_input_line(timer.machine, Z80_TAG, INPUT_LINE_IRQ0, state->ne555_int);
+	cputag_set_input_line(timer.machine, Z80_TAG, INPUT_LINE_IRQ0, param);
 }
 
 static const cassette_config mc1000_cassette_config =
@@ -421,28 +491,34 @@ static const mc6847_interface mc1000_mc6847_intf =
 static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, 3579545)
-    MDRV_CPU_PROGRAM_MAP(mc1000_mem)
-    MDRV_CPU_IO_MAP(mc1000_io)
+	MDRV_CPU_ADD(Z80_TAG, Z80, 3579545)
+	MDRV_CPU_PROGRAM_MAP(mc1000_mem)
+	MDRV_CPU_IO_MAP(mc1000_io)
 
-    MDRV_MACHINE_START(mc1000)
-    MDRV_MACHINE_RESET(mc1000)
+	MDRV_MACHINE_START(mc1000)
+	MDRV_MACHINE_RESET(mc1000)
 
-	MDRV_TIMER_ADD_PERIODIC("ne555", ne555_tick, HZ(60))
+	/* timers */
+	MDRV_TIMER_ADD_PERIODIC("ne555clear", ne555_tick, HZ(MC1000_NE555_FREQ))
+	MDRV_TIMER_PARAM(CLEAR_LINE)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_TIMER_ADD_PERIODIC("ne555assert", ne555_tick, HZ(MC1000_NE555_FREQ))
+	MDRV_TIMER_START_DELAY(HZ(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
+	MDRV_TIMER_PARAM(ASSERT_LINE)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-    MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16)
 
-    MDRV_VIDEO_UPDATE(mc1000)
+	MDRV_VIDEO_UPDATE(mc1000)
 
-    MDRV_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
-    MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MDRV_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
 	MDRV_MC6847_CHAR_ROM(mc1000_get_char_rom)
 
 	/* sound hardware */
