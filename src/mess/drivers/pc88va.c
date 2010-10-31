@@ -17,9 +17,12 @@
 //#include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/pic8259.h"
+#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 
 static UINT16 *palram;
 static UINT16 bank_reg;
+static UINT16 screen_ctrl_reg;
 static struct
 {
 	UINT16 tvram_vreg_offset;
@@ -513,7 +516,7 @@ static READ16_HANDLER( sys_port4_r )
 
 	sw1 = (input_port_read(space->machine, "DSW") & 1) ? 2 : 0;
 
-	return vrtc | sw1;
+	return vrtc | sw1 | 0xc0;
 }
 
 static READ16_HANDLER( bios_bank_r )
@@ -585,10 +588,34 @@ static READ8_HANDLER( hdd_status_r )
 	return 0x20;
 }
 
-static READ8_HANDLER( fdc_r )
+static READ8_HANDLER( pc88va_fdc_r )
 {
-	return mame_rand(space->machine);
+	switch(offset*2)
+	{
+		case 0x00: return 0; // FDC mode register
+		case 0x02: return 0; // FDC control port 0
+		case 0x04: return 0; // FDC control port 1
+		case 0x06: return 0; // FDC control port 2
+		case 0x08: return upd765_status_r(space->machine->device("upd765"), 0);
+		case 0x0a: return upd765_data_r(space->machine->device("upd765"), 0);
+	}
+
+	return 0xff;
 }
+
+static WRITE8_HANDLER( pc88va_fdc_w )
+{
+	switch(offset*2)
+	{
+		case 0x00: break; // FDC mode register
+		case 0x02: break; // FDC control port 0
+		case 0x04: break; // FDC control port 1
+		case 0x06: break; // FDC control port 2
+		case 0x08: break; // UPD765 status
+		case 0x0a: upd765_data_w(space->machine->device("upd765"), 0,data); break;
+	}
+}
+
 
 static READ16_HANDLER( sysop_r )
 {
@@ -599,10 +626,20 @@ static READ16_HANDLER( sysop_r )
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
 
+static READ16_HANDLER( screen_ctrl_r )
+{
+	return screen_ctrl_reg;
+}
+
+static WRITE16_HANDLER( screen_ctrl_w )
+{
+	screen_ctrl_reg = data;
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
-//	AM_RANGE(0x0020, 0x0021) RS-232C
+	AM_RANGE(0x0020, 0x0021) AM_NOP // RS-232C
 //	AM_RANGE(0x0030, 0x0030) (R) DSW1 (W) Text Control Port 0
 //	AM_RANGE(0x0031, 0x0031) (R) DSW2 (W) System Port 1
 //	AM_RANGE(0x0032, 0x0032) (R) ? (W) System Port 2
@@ -617,7 +654,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0071, 0x0071) Expansion ROM select (*)
 //	AM_RANGE(0x0078, 0x0078) Memory offset increment (*)
 //	AM_RANGE(0x0080, 0x0081) HDD related
-	AM_RANGE(0x0082, 0x0083) AM_READ8(hdd_status_r,0xff)// HDD control, byte access 7-0
+	AM_RANGE(0x0082, 0x0083) AM_READ8(hdd_status_r,0x00ff)// HDD control, byte access 7-0
 //	AM_RANGE(0x00bc, 0x00bf) d8255 1
 //	AM_RANGE(0x00e2, 0x00e3) Expansion RAM selection (*)
 //	AM_RANGE(0x00e4, 0x00e4) 8214 IRQ control (*)
@@ -626,7 +663,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x00ec, 0x00ed) ? (*)
 	AM_RANGE(0x00fc, 0x00ff) AM_DEVREADWRITE8("d8255_2", i8255a_r,i8255a_w,0xffff) // d8255 2, FDD
 
-//	AM_RANGE(0x0100, 0x0101) Screen Control Register
+	AM_RANGE(0x0100, 0x0101) AM_READWRITE(screen_ctrl_r,screen_ctrl_w) // Screen Control Register
 //	AM_RANGE(0x0102, 0x0103) Graphic Screen Control Register
 //	AM_RANGE(0x0106, 0x0107) Palette Control Register
 //	AM_RANGE(0x0108, 0x0109) Direct Color Control Register
@@ -657,15 +694,15 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
 //	AM_RANGE(0x01a0, 0x01a7) TCU (timer counter unit)
 //	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
-	AM_RANGE(0x01b0, 0x01bb) AM_READ8(fdc_r,0xffff)// FDC related (765)
+	AM_RANGE(0x01b0, 0x01bb) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
 //	AM_RANGE(0x01c0, 0x01c1) ?
 	AM_RANGE(0x01c6, 0x01c7) AM_WRITENOP // ???
 	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8("d8255_3", i8255a_r,i8255a_w,0xff00) //i8255 3 (byte access)
 //	AM_RANGE(0x01d0, 0x01d1) Expansion RAM bank selection
-//	AM_RANGE(0x0200, 0x021f) Frame buffer 0 control parameter
-//	AM_RANGE(0x0220, 0x023f) Frame buffer 1 control parameter
-//	AM_RANGE(0x0240, 0x025f) Frame buffer 2 control parameter
-//	AM_RANGE(0x0260, 0x027f) Frame buffer 3 control parameter
+	AM_RANGE(0x0200, 0x021f) AM_RAM // Frame buffer 0 control parameter
+	AM_RANGE(0x0220, 0x023f) AM_RAM // Frame buffer 1 control parameter
+	AM_RANGE(0x0240, 0x025f) AM_RAM // Frame buffer 2 control parameter
+	AM_RANGE(0x0260, 0x027f) AM_RAM // Frame buffer 3 control parameter
 	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_BASE(&palram) // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //	AM_RANGE(0x0500, 0x05ff) GVRAM
@@ -1024,9 +1061,30 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
 };
 
+static void pc88va_fdc_interrupt(running_machine *machine, int state)
+{
+	pic8259_ir3_w(machine->device( "pic8259_slave"), state);
+}
+
+
+static running_device *pc88va_get_device(running_machine *machine)
+{
+	return machine->device("upd765");
+}
+
+static const struct pc_fdc_interface pc88va_fdc_interface =
+{
+	pc88va_fdc_interrupt,
+	NULL,
+	NULL,
+	pc88va_get_device
+};
+
 static MACHINE_START( pc88va )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
+
+	pc_fdc_init(machine, &pc88va_fdc_interface);
 }
 
 static MACHINE_RESET( pc88va )
@@ -1052,6 +1110,20 @@ static INTERRUPT_GEN( pc88va_vrtc_irq )
 {
 	pic8259_ir2_w(device->machine->device("pic8259_master"), 1);
 }
+
+/* TODO */
+static const floppy_config pc88va_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
 
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
@@ -1086,6 +1158,9 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MDRV_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
+
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
 
 MACHINE_CONFIG_END
 
