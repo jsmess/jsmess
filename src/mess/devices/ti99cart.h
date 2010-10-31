@@ -35,4 +35,7 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w );
 #define MDRV_TI99_CARTRIDGE_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TI99_MULTICART, 0)
 
+#define MDRV_TI99_GROMPORT_ADD(_tag, _databus, _crubus, _ready) \
+	MDRV_DEVICE_ADD(_tag, TI99_MULTICART, 0)
+
 #endif /* __TI99CART_H__ */

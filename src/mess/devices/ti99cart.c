@@ -6,11 +6,63 @@
 
     Michael Zapf, 2009
 
+Console cartridge port
+
+    Vss  36||35  GND
+  ROMG*  34||33  Vss  ROMG* is low if addr in >6000-7FFF
+    WE*  32||31  GR   High = GROM ready 
+     A4  30||29  -5V     
+     A5  28||27  GRC  GROMCLK (or CPUCLK) from the VDP 9918A 
+     A6  26||25  DBIN 
+     A3  24||23  A14
+     A7  22||21  GS*  Low if addr in >9800-9FFF 
+     A8  20||19  +5V
+     A9  18||17  D0
+    A10  16||15  D1 
+    A11  14||13  D2   
+    A12  12||11  D3
+    A13  10||9   D4
+ A15/OUT  8||7   D5
+   CRUIN  6||5   D6
+ CRUCLK*  4||3   D7 
+     GND  2||1   RESET (Active high)
+
+ 1  RESET   <   Resets the system (active high) 
+    D0 ... D7:  Data bus (D0 = most significant bit) 
+    A3 ... A15: Address bus (A15 shared with CRUOUT signal, A3 most significant)
+ 4  CRUCLK* >   Inversion of TMS9900 CRUCLOCK pin 
+ 6  CRUIN   <   CRU input to TMS9900 
+21  GS*     >   Grom select. Active low is addr in >9800-9FFF. Internal 2.2K pull-up to +5V.
+25  DBIN    >   Active high = read memory. Internal 3.3K pull-up to +5V 
+27  GRC     >   GROM clock: 447.7 kHz signal from the VPD (or 3.5 MHz, jumper-selected). 1K pull-up to +5V.
+29  VDD         -5 Volts power supply 
+31  GR      <   Active high = GROM ready. 4.7K pull-up. Masked by GS* in the console before it reaches the CPU.
+32  WE*     >   Active low = write enable (derived from TMS9900 WE*) 
+33  VSS         Pseudo-ground (-0.72 V; purpose unclear)
+34  ROMG*   >   Active low if addr in >6000-7FFF 
+
+Notes:
+
+* There is no RESET line from the console to the cartridges. The RESET line used
+  here is intended to reset the console when a cartridge is plugged in
+* The cartridge port's data bus must be connected to the 16/8 databus multiplex
+* GR is connected to the console's READY* line and is used by GROMs which are
+  comparably slow devices. During their processing time the main CPU is 
+  suspended. (This is not yet implemented). 
+* A3-A15 offer a space for 8 KiB ROM. The ROMG* line gets active (low) when
+  A0-A2 is 011 (bin), so we get addresses 0x6000 - 0x7fff.
+* Some cartridges use special circuitry which allows for more than 8 KiB by 
+  switching banks.
+* A15 is shared with the CRUOUT line. During CRUCLK* being active, the line is
+  CRUOUT, else A15.
+* A15 is a constructed signal that is created by the 16/8 databus multiplexer.
+  The 9900 CPU only has a word-oriented addressing and does not offer an A15
+  line.
+
 *********************************************************************/
 #include "emu.h"
 #include "ti99cart.h"
 #include "cartslot.h"
-#include "machine/ti99_4x.h"
 #include "multcart.h"
 
 typedef int assmfct(running_device *);
@@ -3149,6 +3201,8 @@ static int cartridge_gram_kracker_readg(running_device *cartsys)
 
 /*
     Writes to the GRAM space of the GRAM Kracker.
+	FIXME: The real GK seems to not wrap at the GROM boundary (at least for
+	writing). Also check for reading.
 */
 static void cartridge_gram_kracker_writeg(running_device *cartsys, UINT8 data)
 {
