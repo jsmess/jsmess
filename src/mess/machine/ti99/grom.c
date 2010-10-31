@@ -181,7 +181,7 @@ READ8Z_DEVICE_HANDLER( ti99grom_rz )
 */
 READ8_DEVICE_HANDLER( ti99grom_r )
 {
-	UINT8 reply;
+	UINT8 reply = 0;
 	ti99grom_rz(device, offset, &reply); 
 	return reply;
 }

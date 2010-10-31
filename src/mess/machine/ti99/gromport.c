@@ -1081,8 +1081,8 @@ static int disassemble_gramkracker(running_device *cartslot)
 	running_device *cartsys = cartslot->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
-	int slotnumber = get_index_from_tagname(cartslot)-1;
-	assert(slotnumber>=0 && slotnumber<NUMBER_OF_CARTRIDGE_SLOTS);
+	//int slotnumber = get_index_from_tagname(cartslot)-1;
+	//assert(slotnumber>=0 && slotnumber<NUMBER_OF_CARTRIDGE_SLOTS);
 
 	cartslots->gk_slot = -1;
 	cartslots->gk_guest_slot = -1;

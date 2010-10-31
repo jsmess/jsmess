@@ -88,7 +88,7 @@ INLINE tn_ide_state *get_safe_token(running_device *device)
 static READ8Z_DEVICE_HANDLER( cru_rz )
 {
 	tn_ide_state *card = get_safe_token(device); 
-	UINT8 reply;
+	UINT8 reply = 0;
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		int bit = (offset >> 4) & 7;
