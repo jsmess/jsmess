@@ -110,6 +110,11 @@ extern const via6522_interface mac_via6522_intf;
 extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
 
+void mac_scc_irq(running_device *device, int status);
+void mac_scsi_irq(running_machine *machine, int state);
+void mac_asc_irq(running_device *device, int state);
+void mac_fdc_set_enable_lines(running_device *device, int enable_mask);
+
 MACHINE_START( macscsi );
 MACHINE_START( mac );
 MACHINE_RESET( mac );
@@ -135,38 +140,9 @@ DRIVER_INIT(macpm6100);
 DRIVER_INIT(macprtb);
 DRIVER_INIT(macpb100);
 
-READ16_HANDLER ( mac_via_r );
-WRITE16_HANDLER ( mac_via_w );
-READ16_HANDLER ( mac_via2_r );
-WRITE16_HANDLER ( mac_via2_w );
-READ16_HANDLER ( mac_autovector_r );
-WRITE16_HANDLER ( mac_autovector_w );
-READ16_HANDLER ( mac_iwm_r );
-WRITE16_HANDLER ( mac_iwm_w );
-READ16_HANDLER ( mac_scc_r );
-WRITE16_HANDLER ( mac_scc_w );
-WRITE16_HANDLER ( mac_scc_2_w );
-READ16_HANDLER ( macplus_scsi_r );
-WRITE16_HANDLER ( macplus_scsi_w );
-WRITE16_HANDLER ( macii_scsi_w );
-READ32_HANDLER (macii_scsi_drq_r);
-WRITE32_HANDLER (macii_scsi_drq_w);
 NVRAM_HANDLER( mac );
-void mac_scc_irq(running_device *device, int status);
-void mac_scc_mouse_irq( running_machine *machine, int x, int y );
-void mac_fdc_set_enable_lines(running_device *device, int enable_mask);
-
-void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
-
-void mac_scsi_irq(running_machine *machine, int state);
-
-void mac_asc_irq(running_device *device, int state);
-
-void mac_set_via2_interrupt(running_machine *machine, int value);
 
 /*----------- defined in video/mac.c -----------*/
-
-extern UINT32 *mac_se30_vram;
 
 VIDEO_START( mac );
 VIDEO_UPDATE( mac );
@@ -182,12 +158,8 @@ VIDEO_RESET(macrbv);
 
 void mac_set_screen_buffer( int buffer );
 
-extern UINT32 *mac_cb264_vram;
 VIDEO_START( mac_cb264 );
 VIDEO_UPDATE( mac_cb264 );
-READ32_HANDLER( mac_cb264_r );
-WRITE32_HANDLER( mac_cb264_w );
-WRITE32_HANDLER( mac_cb264_ramdac_w );
 INTERRUPT_GEN( mac_cb264_vbl );
 
 /*----------- defined in audio/mac.c -----------*/
@@ -206,95 +178,167 @@ class mac_state : public driver_device
 {
 public:
 	mac_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		m_maincpu(*this, "maincpu"),
+		m_via1(*this, "via6522_0"),
+		m_via2(*this, "via6522_1"),
+		m_asc(*this, "asc"),
+		m_ram(*this, "messram")
+	 { }
 
-	model_t model;
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via1;
+	optional_device<via6522_device> m_via2;
+	optional_device<asc_device> m_asc;
+	required_device<running_device> m_ram;
 
-	UINT32 overlay;
-	int drive_select;
-	int scsiirq_enable;
+	virtual void machine_start();
+	virtual void machine_reset();
 
-	UINT32 mac_via2_vbl;
-	UINT32 mac_se30_vbl_enable;
-	UINT8 mac_nubus_irq_state;
+	model_t m_model;
+
+	UINT32 m_overlay;
+	int m_drive_select;
+	int m_scsiirq_enable;
+
+	UINT32 m_via2_vbl;
+	UINT32 m_se30_vbl_enable;
+	UINT8 m_nubus_irq_state;
 
 	/* used to store the reply to most keyboard commands */
-	int keyboard_reply;
+	int m_keyboard_reply;
 
 	/* Keyboard communication in progress? */
-	int kbd_comm;
-	int kbd_receive;
+	int m_kbd_comm;
+	int m_kbd_receive;
 	/* timer which is used to time out inquiry */
-	emu_timer *inquiry_timeout;
+	emu_timer *m_inquiry_timeout;
 
-	int kbd_shift_reg;
-	int kbd_shift_count;
+	int m_kbd_shift_reg;
+	int m_kbd_shift_count;
 
 	/* keyboard matrix to detect transition */
-	int key_matrix[7];
+	int m_key_matrix[7];
 
 	/* keycode buffer (used for keypad/arrow key transition) */
-	int keycode_buf[2];
-	int keycode_buf_index;
+	int m_keycode_buf[2];
+	int m_keycode_buf_index;
 
-	int mouse_bit_x;
-	int mouse_bit_y;
+	int m_mouse_bit_x;
+	int m_mouse_bit_y;
 
 
 	/* state of rTCEnb and rTCClk lines */
-	UINT8 rtc_rTCEnb;
-	UINT8 rtc_rTCClk;
+	UINT8 m_rtc_rTCEnb;
+	UINT8 m_rtc_rTCClk;
 
 	/* serial transmit/receive register : bits are shifted in/out of this byte */
-	UINT8 rtc_data_byte;
+	UINT8 m_rtc_data_byte;
 	/* serial transmitted/received bit count */
-	UINT8 rtc_bit_count;
+	UINT8 m_rtc_bit_count;
 	/* direction of the current transfer (0 : VIA->RTC, 1 : RTC->VIA) */
-	UINT8 rtc_data_dir;
+	UINT8 m_rtc_data_dir;
 	/* when rtc_data_dir == 1, state of rTCData as set by RTC (-> data bit seen by VIA) */
-	UINT8 rtc_data_out;
+	UINT8 m_rtc_data_out;
 
 	/* set to 1 when command in progress */
-	UINT8 rtc_cmd;
+	UINT8 m_rtc_cmd;
 
 	/* write protect flag */
-	UINT8 rtc_write_protect;
+	UINT8 m_rtc_write_protect;
 
 	/* internal seconds register */
-	UINT8 rtc_seconds[/*8*/4];
+	UINT8 m_rtc_seconds[/*8*/4];
 	/* 20-byte long PRAM, or 256-byte long XPRAM */
-	UINT8 rtc_ram[256];
+	UINT8 m_rtc_ram[256];
 	/* current extended address and RTC state */
-	UINT8 rtc_xpaddr;
-	UINT8 rtc_state;
+	UINT8 m_rtc_xpaddr;
+	UINT8 m_rtc_state;
 
 	// Mac ADB state
-	INT32 adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[257];
-	INT32 adb_state, adb_command, adb_send, adb_timer_ticks, adb_extclock, adb_direction;
-	INT32 adb_listenreg, adb_listenaddr, adb_last_talk, adb_srq_switch;
-	INT32 adb_streaming, adb_stream_ptr;
+	INT32 m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
+	INT32 m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
+	INT32 m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
+	INT32 m_adb_streaming, m_adb_stream_ptr;
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
-	UINT8 pm_data_send, pm_data_recv, pm_ack, pm_req, pm_cmd[32], pm_out[32], pm_dptr, pm_sptr, pm_slen, pm_state;
-	emu_timer *pmu_send_timer;
+	UINT8 m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;
+	emu_timer *m_pmu_send_timer;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
-	emu_timer *mac6015_timer;
+	emu_timer *m_6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 rbv_regs[256], rbv_ier, rbv_ifr, rbv_type, rbv_montype;
-	UINT32 rbv_colors[3], rbv_count, rbv_clutoffs, rbv_immed10wr;
-	UINT32 rbv_palette[256];
-	UINT32 *rbv_vram;
-	UINT8 sonora_vctl[4];
+	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype;
+	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
+	UINT32 m_rbv_palette[256];
+	UINT32 *m_rbv_vram;
+	UINT8 m_sonora_vctl[4];
+
+	UINT32 *m_se30_vram, *m_cb264_vram;
+
+	UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
+	UINT32 m_cb264_palette[256], m_cb264_colors[3], m_cb264_count, m_cb264_clutoffs;
 
 	// Egret/Caboose/Cuda stuff
-	UINT8 egregs[0x20];
-};
+	UINT8 m_egregs[0x20];
 
-// defined in machine/mac.c
-void mac_v8_resize(running_machine *machine, mac_state *mac);
-void mac_set_memory_overlay(running_machine *machine, int overlay);
+	// interrupts
+	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
+
+	// defined in machine/mac.c
+	void v8_resize(running_machine *machine);
+	void set_memory_overlay(running_machine *machine, int overlay);
+	void scc_mouse_irq( running_machine *machine, int x, int y );
+	void nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
+	void set_scc_interrupt(running_machine *machine, int value);
+	void set_via_interrupt(running_machine *machine, int value);
+	void set_via2_interrupt(running_machine *machine, int value);
+	void field_interrupts(running_machine *machine);
+	void rtc_write_rTCEnb(int data);
+	void rtc_shift_data(int data);
+	void vblank_irq(running_machine *machine);
+	void rtc_incticks();
+
+	DECLARE_READ16_MEMBER ( mac_via_r );
+	DECLARE_WRITE16_MEMBER ( mac_via_w );
+	DECLARE_READ16_MEMBER ( mac_via2_r );
+	DECLARE_WRITE16_MEMBER ( mac_via2_w );
+	DECLARE_READ16_MEMBER ( mac_autovector_r );
+	DECLARE_WRITE16_MEMBER ( mac_autovector_w );
+	DECLARE_READ16_MEMBER ( mac_iwm_r );
+	DECLARE_WRITE16_MEMBER ( mac_iwm_w );
+	DECLARE_READ16_MEMBER ( mac_scc_r );
+	DECLARE_WRITE16_MEMBER ( mac_scc_w );
+	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
+	DECLARE_READ16_MEMBER ( macplus_scsi_r );
+	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
+	DECLARE_WRITE16_MEMBER ( macii_scsi_w );
+	DECLARE_READ32_MEMBER (macii_scsi_drq_r);
+	DECLARE_WRITE32_MEMBER (macii_scsi_drq_w);
+
+	DECLARE_READ32_MEMBER( rbv_ramdac_r );
+	DECLARE_WRITE32_MEMBER( rbv_ramdac_w );
+	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
+	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
+	DECLARE_READ8_MEMBER ( mac_rbv_r );
+	DECLARE_WRITE8_MEMBER ( mac_rbv_w );
+
+	DECLARE_READ32_MEMBER(mac_read_id);
+
+	DECLARE_READ16_MEMBER(mac_config_r);
+
+	DECLARE_READ32_MEMBER( mac_cb264_r );
+	DECLARE_WRITE32_MEMBER( mac_cb264_w );
+	DECLARE_WRITE32_MEMBER( mac_cb264_ramdac_w );
+
+private:
+	int has_adb();
+	void rtc_init();
+	void rtc_execute_cmd(int data);
+	void adb_reset(running_machine *machine);
+	void adb_vblank(running_machine *machine);
+};
 
 #endif /* MAC_H_ */
 

@@ -6,7 +6,10 @@
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
+#include "sound/asc.h"
 #include "includes/mac.h"
 #include "streams.h"
 #include "devices/messram.h"
@@ -70,7 +73,7 @@ static STREAM_UPDATE( mac_sound_update )
 	mac_sound *token = get_token(device);
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	if ((mac->model == MODEL_MAC_PORTABLE) || (mac->model == MODEL_MAC_PB100))
+	if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
