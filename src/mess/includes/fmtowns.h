@@ -139,7 +139,7 @@ class towns_state : public driver_device
 	running_device* messram;
 	running_device* cdrom;
 	running_device* cdda;
-	running_device* scsibus;
+	class fmscsi_device* scsi;
 	running_device* hd0;
 	running_device* hd1;
 	running_device* hd2;

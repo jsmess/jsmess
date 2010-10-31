@@ -128,7 +128,7 @@
 #include "machine/nvram.h"
 #include "devices/harddriv.h"
 #include "machine/scsi.h"
-#include "machine/scsibus.h"
+#include "machine/fm_scsi.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
@@ -323,7 +323,7 @@ static READ8_HANDLER(towns_dma1_r)
 	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_1;
 
-	logerror("DMA#1: read register %i\n",offset);
+//	logerror("DMA#1: read register %i\n",offset);
 	return upd71071_r(dev,offset);
 }
 
@@ -332,7 +332,7 @@ static WRITE8_HANDLER(towns_dma1_w)
 	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_1;
 
-	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
+//	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
 }
 
@@ -370,7 +370,8 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 {
-	upd71071_dmarq(device, state, 0);
+	towns_state* tstate = device->machine->driver_data<towns_state>();
+	upd71071_dmarq(tstate->dma_1, state, 0);
 }
 
 static READ8_HANDLER(towns_floppy_r)
@@ -1763,23 +1764,32 @@ static TIMER_CALLBACK(rtc_second)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-// info from Toshiya Takeda's e-FMR50 source (the Towns uses the same controller?)
-// 0xc30 = Data register
-// 0xc32 = Status register (read)
-//         bit 7 = REQ
-//         bit 6 = IO
-//         bit 5 = MSG
-//         bit 4 = CD
-//         bit 3 = BUSY
-//         bit 1 = INT
-//         bit 0 = PERR
-// 0xc32 = Control register (write)
-//         bit 7 = WEN
-//         bit 6 = IMSK
-//         bit 4 = ATN
-//         bit 2 = SEL
-//         bit 1 = DMAE
-//         bit 0 = RST
+static UINT16 towns_scsi_dma_r(running_machine* machine)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	return state->scsi->fmscsi_data_r();
+}
+
+static void towns_scsi_dma_w(running_machine* machine, UINT16 data)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	state->scsi->fmscsi_data_w(data & 0xff);
+}
+
+WRITE_LINE_DEVICE_HANDLER( towns_scsi_irq )
+{
+	towns_state* tstate = device->machine->driver_data<towns_state>();
+	pic8259_ir0_w(tstate->pic_slave, state);
+	if(IRQ_LOG)
+		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( towns_scsi_drq )
+{
+	towns_state* tstate = device->machine->driver_data<towns_state>();
+	upd71071_dmarq(tstate->dma_1,state,1);  // SCSI HDs use channel 1
+}
+/*
 static READ8_HANDLER(towns_scsi_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
@@ -1788,6 +1798,7 @@ static READ8_HANDLER(towns_scsi_r)
 	switch(offset)
 	{
 	case 0x00:
+		set_scsi_line(state->scsibus,SCSI_LINE_ACK,0);
 		return scsi_data_r(state->scsibus);
 	case 0x02:
 		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_REQ)) ? 0x00 : 0x80;
@@ -1807,15 +1818,13 @@ static WRITE8_HANDLER(towns_scsi_w)
 	{
 	case 0x00:
 		scsi_data_w(state->scsibus,data);
-		set_scsi_line(state->scsibus,SCSI_LINE_ACK,0);
 		logerror("SCSI data write %02x\n",data);
 		break;
 	case 0x02:
 		set_scsi_line(state->scsibus,SCSI_LINE_SEL,data & 0x04);
+		set_scsi_line(state->scsibus,SCSI_LINE_RESET,data & 0x01);
 		if(data & 0x01)
-		{
-			set_scsi_line(state->scsibus,SCSI_LINE_RESET,data & 0x01);
-		}
+			init_scsibus(state->scsibus);
 		logerror("SCSI control write %02x\n",data);
 		break;
 	}
@@ -1860,7 +1869,7 @@ void towns_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
 	}
 
 }
-
+*/
 // Volume ports - I/O ports 0x4e0-0x4e3
 // 0x4e0 = input volume level
 // 0x4e1 = input channel select
@@ -2088,7 +2097,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // SCSI controller
-  AM_RANGE(0x0c30,0x0c33) AM_READWRITE8(towns_scsi_r,towns_scsi_w,0xffffffff)
+  AM_RANGE(0x0c30,0x0c33) AM_DEVREADWRITE8_MODERN("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
@@ -2331,7 +2340,6 @@ static DRIVER_INIT( towns )
 	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)machine->device("dma_1"));
 
 	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
-	init_scsibus(machine->device("scsibus"));
 }
 
 static DRIVER_INIT( marty )
@@ -2354,7 +2362,7 @@ static MACHINE_RESET( towns )
 	state->messram = machine->device("messram");
 	state->cdrom = machine->device("cdrom");
 	state->cdda = machine->device("cdda");
-	state->scsibus = machine->device("scsibus");
+	state->scsi = machine->device<fmscsi_device>("scsi");
 	state->hd0 = machine->device("harddisk0");
 	state->hd1 = machine->device("harddisk1");
 	state->hd2 = machine->device("harddisk2");
@@ -2443,9 +2451,9 @@ static const floppy_config towns_floppy_config =
 static const upd71071_intf towns_dma_config =
 {
 	"maincpu",
-	1000000,
-	{ towns_fdc_dma_r, 0, 0, towns_cdrom_dma_r },
-	{ towns_fdc_dma_w, 0, 0, 0 }
+	4000000,
+	{ towns_fdc_dma_r, towns_scsi_dma_r, 0, towns_cdrom_dma_r },
+	{ towns_fdc_dma_w, towns_scsi_dma_w, 0, 0 }
 };
 
 static const ym3438_interface ym3438_intf =
@@ -2458,7 +2466,7 @@ static const rf5c68_interface rf5c68_intf =
 	towns_pcm_irq
 };
 
-static const SCSIConfigTable towns_scsi_device_table =
+static const SCSIConfigTable towns_scsi_devtable =
 {
 	5,                                      /* 5 SCSI devices */
 	{
@@ -2470,10 +2478,11 @@ static const SCSIConfigTable towns_scsi_device_table =
 	}
 };
 
-static const SCSIBus_interface towns_scsi_config =
+static const FMSCSIinterface towns_scsi_config =
 {
-    &towns_scsi_device_table,
-    &towns_scsi_linechange
+	&towns_scsi_devtable,
+	DEVCB_LINE(towns_scsi_irq),
+	DEVCB_LINE(towns_scsi_drq)
 };
 
 static const gfx_layout fnt_chars_16x16 =
@@ -2550,7 +2559,7 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MDRV_HARDDISK_ADD("harddisk2")
 	MDRV_HARDDISK_ADD("harddisk3")
 	MDRV_HARDDISK_ADD("harddisk4")
-	MDRV_SCSIBUS_ADD("scsibus",towns_scsi_config)
+	MDRV_FMSCSI_ADD("scsi",towns_scsi_config)
 
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)

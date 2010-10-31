@@ -425,8 +425,8 @@ READ8_HANDLER(towns_video_440_r)
 		case 0x12:
 			logerror("SPR: reading register %i (0x452) [%02x]\n",state->video.towns_sprite_sel,state->video.towns_sprite_reg[state->video.towns_sprite_sel]);
 			return state->video.towns_sprite_reg[state->video.towns_sprite_sel];
-		default:
-			logerror("VID: read port %04x\n",offset+0x440);
+		//default:
+			//logerror("VID: read port %04x\n",offset+0x440);
 	}
 	return 0x00;
 }
@@ -475,7 +475,7 @@ READ8_HANDLER(towns_video_5c8_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 
-	logerror("VID: read port %04x\n",offset+0x5c8);
+	//logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
 	{
 		case 0x00:  // 0x5c8 - disable TVRAM?
