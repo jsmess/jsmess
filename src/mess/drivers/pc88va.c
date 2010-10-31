@@ -17,12 +17,15 @@
 //#include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/pc_fdc.h"
 #include "machine/upd765.h"
 
 static UINT16 *palram;
 static UINT16 bank_reg;
 static UINT16 screen_ctrl_reg;
+static UINT8 timer3_io_reg;
+static emu_timer *t3_mouse_timer;
 static struct
 {
 	UINT16 tvram_vreg_offset;
@@ -636,6 +639,32 @@ static WRITE16_HANDLER( screen_ctrl_w )
 	screen_ctrl_reg = data;
 }
 
+static TIMER_CALLBACK( t3_mouse_callback )
+{
+	if(timer3_io_reg & 0x80)
+	{
+		pic8259_ir5_w(machine->device("pic8259_slave"), 1);
+		timer_adjust_oneshot(t3_mouse_timer, ATTOTIME_IN_HZ(120 >> (timer3_io_reg & 3)), 0);
+	}
+}
+
+static WRITE8_HANDLER( timer3_ctrl_reg_w )
+{
+	/*
+	x--- ---- MINTEN (TCU irq enable)
+	---- --xx general purpose timer 3 interval (120, 60, 30, 15)
+	*/
+	timer3_io_reg = data;
+
+	if(data & 0x80)
+		timer_adjust_oneshot(t3_mouse_timer, ATTOTIME_IN_HZ(120 >> (timer3_io_reg & 3)), 0);
+	else
+	{
+		pic8259_ir5_w(space->machine->device("pic8259_slave"), 0);
+		timer_adjust_oneshot(t3_mouse_timer, attotime_never, 0);
+	}
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -692,8 +721,8 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
 	AM_RANGE(0x0198, 0x0199) AM_WRITE(backupram_wp_1_w) //Backup RAM write inhibit
 	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
-//	AM_RANGE(0x01a0, 0x01a7) TCU (timer counter unit)
-//	AM_RANGE(0x01a8, 0x01a9) General-purpose timer 3 control port
+	AM_RANGE(0x01a0, 0x01a7) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0x00ff)// vTCU (timer counter unit)
+	AM_RANGE(0x01a8, 0x01a9) AM_WRITE8(timer3_ctrl_reg_w,0x00ff) // General-purpose timer 3 control port
 	AM_RANGE(0x01b0, 0x01bb) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
 //	AM_RANGE(0x01c0, 0x01c1) ?
 	AM_RANGE(0x01c6, 0x01c7) AM_WRITENOP // ???
@@ -1085,6 +1114,9 @@ static MACHINE_START( pc88va )
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
 
 	pc_fdc_init(machine, &pc88va_fdc_interface);
+
+	t3_mouse_timer = timer_alloc(machine, t3_mouse_callback, 0);
+	timer_adjust_oneshot(t3_mouse_timer, attotime_never, 0);
 }
 
 static MACHINE_RESET( pc88va )
@@ -1125,6 +1157,35 @@ static const floppy_config pc88va_floppy_config =
 };
 
 
+static WRITE_LINE_DEVICE_HANDLER( pc88va_pit_out0_changed )
+{
+	pic8259_ir0_w(device->machine->device("pic8259_master"), 1);
+}
+
+static const struct pit8253_config pc88va_pit8253_config =
+{
+	{
+		{
+			/* general purpose timer 1 */
+			8000000,
+			DEVCB_NULL,
+			DEVCB_LINE(pc88va_pit_out0_changed)
+		},
+		{
+			/* BEEP frequency setting */
+			8000000,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			/* RS232C baud rate setting  */
+			8000000,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -1161,6 +1222,9 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
+
+    MDRV_PIT8253_ADD("pit8253",pc88va_pit8253_config)
+
 
 MACHINE_CONFIG_END
 
