@@ -16,6 +16,7 @@
 #include "cpu/nec/nec.h"
 //#include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
+#include "machine/pic8259.h"
 
 static UINT16 *palram;
 static UINT16 bank_reg;
@@ -648,7 +649,8 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //	AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
 //	AM_RANGE(0x0160, 0x016f) DMA Controller
-//	AM_RANGE(0x0184, 0x018b) IRQ Controller
+	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // ICU, also controls 8214 emulation
 //	AM_RANGE(0x0190, 0x0191) System Port 5
 //	AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
 	AM_RANGE(0x0198, 0x0199) AM_WRITE(backupram_wp_1_w) //Backup RAM write inhibit
@@ -870,25 +872,6 @@ static INPUT_PORTS_START( pc88va )
 //	PORT_DIPSETTING(    0x03, "???" )
 INPUT_PORTS_END
 
-static MACHINE_RESET( pc88va )
-{
-	UINT8 *ROM00 = memory_region(machine, "rom00");
-	UINT8 *ROM10 = memory_region(machine, "rom10");
-
-	memory_set_bankptr(machine, "rom10_bank", &ROM10[0x00000]);
-	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
-
-	bank_reg = 0x4100;
-	backupram_wp = 1;
-
-	/* default palette */
-	{
-		UINT8 i;
-		for(i=0;i<32;i++)
-			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
-	}
-}
-
 static const gfx_layout pc88va_chars_8x8 =
 {
 	8,8,
@@ -1014,11 +997,68 @@ static I8255A_INTERFACE( r232c_ctrl_intf )
 	DEVCB_HANDLER(r232_ctrl_portc_w)						/* Port C write */
 };
 
+static IRQ_CALLBACK(pc88va_irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge( device->machine->device( "pic8259_slave" ));
+	if (r==0)
+	{
+		r = pic8259_acknowledge( device->machine->device( "pic8259_master" ) );
+	}
+	return r;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
+}
+
+static const struct pic8259_interface pc88va_pic8259_master_config =
+{
+	DEVCB_LINE(pc88va_pic_irq)
+};
+
+static const struct pic8259_interface pc88va_pic8259_slave_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
+};
+
+static MACHINE_START( pc88va )
+{
+	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
+}
+
+static MACHINE_RESET( pc88va )
+{
+	UINT8 *ROM00 = memory_region(machine, "rom00");
+	UINT8 *ROM10 = memory_region(machine, "rom10");
+
+	memory_set_bankptr(machine, "rom10_bank", &ROM10[0x00000]);
+	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
+
+	bank_reg = 0x4100;
+	backupram_wp = 1;
+
+	/* default palette */
+	{
+		UINT8 i;
+		for(i=0;i<32;i++)
+			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
+	}
+}
+
+static INTERRUPT_GEN( pc88va_vrtc_irq )
+{
+	pic8259_ir2_w(device->machine->device("pic8259_master"), 1);
+}
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc88va_map)
 	MDRV_CPU_IO_MAP(pc88va_io_map)
+	MDRV_CPU_VBLANK_INT("screen",pc88va_vrtc_irq)
 
 	#if 0
 	MDRV_CPU_ADD("subcpu", Z80, 8000000)        /* 8 MHz */
@@ -1038,11 +1078,14 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_VIDEO_START( pc88va )
 	MDRV_VIDEO_UPDATE( pc88va )
 
+	MDRV_MACHINE_START( pc88va )
 	MDRV_MACHINE_RESET( pc88va )
 
 	MDRV_I8255A_ADD( "d8255_2", fdd_intf )
 	MDRV_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
 
+	MDRV_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
 MACHINE_CONFIG_END
 
