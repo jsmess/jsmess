@@ -18,7 +18,6 @@
 #include "machine/i8255a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/pc_fdc.h"
 #include "machine/upd765.h"
 
 static UINT16 *palram;
@@ -1292,30 +1291,9 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
 };
 
-static void pc88va_fdc_interrupt(running_machine *machine, int state)
-{
-	pic8259_ir3_w(machine->device( "pic8259_slave"), state);
-}
-
-
-static running_device *pc88va_get_device(running_machine *machine)
-{
-	return machine->device("upd765");
-}
-
-static const struct pc_fdc_interface pc88va_fdc_interface =
-{
-	pc88va_fdc_interrupt,
-	NULL,
-	NULL,
-	pc88va_get_device
-};
-
 static MACHINE_START( pc88va )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
-
-	pc_fdc_init(machine, &pc88va_fdc_interface);
 
 	t3_mouse_timer = timer_alloc(machine, t3_mouse_callback, 0);
 	timer_adjust_oneshot(t3_mouse_timer, attotime_never, 0);
@@ -1390,6 +1368,22 @@ static const struct pit8253_config pc88va_pit8253_config =
 	}
 };
 
+
+static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
+{
+	pic8259_ir3_w(device->machine->device( "pic8259_slave"), state);
+};
+
+
+static const struct upd765_interface pc88va_upd765_interface =
+{
+	DEVCB_LINE(pc88va_upd765_interrupt),
+	NULL, //DRQ, TODO
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,NULL, NULL, NULL}
+};
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -1424,7 +1418,7 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MDRV_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
-	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc88va_upd765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
 
     MDRV_PIT8253_ADD("pit8253",pc88va_pit8253_config)
