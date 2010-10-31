@@ -157,41 +157,41 @@ Known Issues (MZ, 2009-04-26)
 - Extended Basic II gets stuck with OLD MINIMEM. MiniMemory may be incompatible
   due to the different memory layout. SAVE/OLD only works if the machine is
   neither reset nor restarted.
-*/
+
+  ROM file contents:
+  0000-1fff ROM0				0x0000 (logical address)
+  2000-3fff ROM1                0xffa000 - 0xffbfff
+  4000-5fff DSR1				0xff4000 (TTS)
+  6000-7fff ROM1a               0xffc000 - 0xffdfff
+  8000-9fff DSR2				0xff4000 (missing; Hexbus?)
+  */
 
 #include "emu.h"
-
-#include "machine/ti99_4x.h"
-#include "machine/tms9901.h"
-#include "audio/spchroms.h"
-#include "devices/ti99_peb.h"
-#include "machine/994x_ser.h"
-#include "machine/99_dsk.h"
-#include "machine/99_ide.h"
 #include "cpu/tms9900/tms9900.h"
-#include "devices/flopdrv.h"
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
-#include "machine/smartmed.h"
 #include "sound/sn76496.h"
-#include "sound/tms5220.h"
+//#include "video/tms9928a.h"
 #include "sound/wave.h"
-#include "devices/harddriv.h"
-#include "machine/idectrl.h"
-#include "machine/smc92x4.h"
-#include "machine/mm58274c.h"
-#include "devices/ti99cart.h"
-#include "machine/rtc65271.h"
-#include "formats/ti99_dsk.h"
-#include "devices/ti99_hd.h"
+#include "machine/tms9901.h"
+#include "devices/cassette.h"
+
+#include "machine/ti99/tiboard.h"
+
+#include "machine/ti99/videowrp.h"
+#include "machine/ti99/speech8.h"
+
+#include "machine/ti99/peribox.h"
+#include "machine/ti99/crubus.h"
+#include "machine/ti99/mapper8.h"
+#include "machine/ti99/grom.h"
+#include "machine/ti99/gromport.h"
+#include "machine/ti99/mecmouse.h"
 
 /*
     Memory map - see description above
 */
 
 static ADDRESS_MAP_START(ti99_8_memmap, ADDRESS_SPACE_PROGRAM, 8)
-	/* There is a mapper device involved, so we need to handle the range mapping in a bit more complicated way. */
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(ti99_8_r, ti99_8_w)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("mapper", ti99_mapper8_r, ti99_mapper8_w )
 ADDRESS_MAP_END
 
 
@@ -200,38 +200,26 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(ti99_8_cru_map, ADDRESS_SPACE_IO, 8)
-//  AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)     /* SuperSpace cartridge */
-	AM_RANGE(0x0100, 0x02ff) AM_DEVREAD("per_exp_box", ti99_8_peb_cru_r)
+	AM_RANGE(0x0000, 0x02ff) AM_DEVREAD("crubus", ti99_crubus_r )
 
-//      AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)    /* SuperSpace cartridge */
-	AM_RANGE(0x0800, 0x17ff) AM_DEVWRITE("per_exp_box", ti99_8_peb_cru_w)
-
+	AM_RANGE(0x0000, 0x17ff) AM_DEVWRITE("crubus", ti99_crubus_w )
 ADDRESS_MAP_END
-
 
 /* ti99/8 : 54-key keyboard */
 static INPUT_PORTS_START(ti99_8)
-	PORT_START( "SPEECH" )
-	PORT_CONFNAME( 0x01, 0x01, "Speech synthesizer" )
-		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-
 	PORT_START( "DISKCTRL" )
 	PORT_CONFNAME( 0x07, 0x00, "Disk controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//      PORT_CONFSETTING(    0x04, "Corcomp" )
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -241,16 +229,6 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-
-	/* Flash setting is used to flash an empty HSGPL DSR ROM */
-	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) PORT_CHANGED( hsgpl_changed, NULL)
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, "Flash" )
-		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "P-Code card" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "HCI" )
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
@@ -264,34 +242,6 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
-		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
-
-	/* GRAM Kracker Support */
-	PORT_START( "GKSWITCH1" )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)1)
-		PORT_DIPSETTING(    0x00, "GK Off" )
-		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
-
-	PORT_START( "GKSWITCH2" )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)2)
-		PORT_DIPSETTING(    0x00, "GRAM 0" )
-		PORT_DIPSETTING(    0x01, "Op Sys" )
-
-	PORT_START( "GKSWITCH3" )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)3)
-		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
-		PORT_DIPSETTING(    0x01, "TI BASIC" )
-
-	PORT_START( "GKSWITCH4" )
-	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)4)
-		PORT_DIPSETTING(    0x00, "Bank 1" )
-		PORT_DIPSETTING(    0x01, "W/P" )
-		PORT_DIPSETTING(    0x02, "Bank 2" )
-
-	PORT_START( "GKSWITCH5" )
-	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)5)
-		PORT_DIPSETTING(    0x00, "Loader On" )
-		PORT_DIPSETTING(    0x01, "Loader Off" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -490,20 +440,6 @@ static GFXDECODE_START( ti99_8 )
 GFXDECODE_END
 
 
-/*
-    TMS5220 speech synthesizer
-*/
-static const tms5220_interface ti99_8_tms5220interface =
-{
-	DEVCB_NULL,					/* no IRQ callback */
-	DEVCB_NULL,					/* no Ready callback */
-	spchroms_read,				/* speech ROM read handler */
-	spchroms_load_address,		/* speech ROM load address handler */
-	spchroms_read_and_branch	/* speech ROM read and branch handler */
-};
-
-
-
 static const TMS9928a_interface tms9118_interface =
 {
 	TMS99x8A,
@@ -512,11 +448,6 @@ static const TMS9928a_interface tms9118_interface =
 	tms9901_set_int2
 };
 
-static MACHINE_START(ti99_8_60hz)
-{
-	ti99_common_init(machine, &tms9118_interface);
-}
-
 static const TMS9928a_interface tms9129_interface =
 {
 	TMS9929A,
@@ -524,11 +455,6 @@ static const TMS9928a_interface tms9129_interface =
 	13, 13,
 	tms9901_set_int2
 };
-
-static MACHINE_START(ti99_8_50hz)
-{
-	ti99_common_init(machine, &tms9129_interface);
-}
 
 static const struct tms9995reset_param ti99_8_processor_config =
 {
@@ -540,23 +466,68 @@ static const struct tms9995reset_param ti99_8_processor_config =
 	1	/* MP9537 mask */
 };
 
-static const mm58274c_interface floppy_mm58274c_interface =
+/*
+	Format: 
+	Name, mode, stop, mask, select, write, read8z function, write8 function
+	
+	Multiple devices may have the same select pattern; as in the real hardware,
+	care must be taken that only one device actually responds. In the case of
+	GROMs, each chip has an internal address counter and an ID, and the chip
+	only responds when the ID and the most significant 3 bits match.
+*/
+static const mapper8_dev_config mapper_devices[] =
 {
-	1,	/*  mode 24*/
-	0   /*  first day of week */
+	// TI-99/8 mode
+	{ SRAMNAME,			0, 1, 0xf800, 0xf000, 0x0000, NULL, 			NULL }, 
+	{ "soundgen",   	0, 1, 0xfff0, 0xf800, 0x0000, NULL,         	sn76496_w },
+	{ "video",			0, 1, 0xfffd, 0xf810, 0x0000, ti8_tms991x_rz,	ti8_tms991x_w },
+	{ "speech",   		0, 1, 0xfff0, 0xf820, 0x0000, ti998spch_rz, 	ti998spch_w },
+	{ "grom_0", 	    0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz, 		ti99grom_w },
+	{ "grom_1",  		0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
+	{ "grom_2",			0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,  	ti99grom_w },
+	{ "gromport",   	0, 0, 0xfff1, 0xf830, 0x0400, gromportg_rz,		gromportg_w, },
+//	{ "grom_tts_0",		2, 0, 0xfff1, 0xf840, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
+//	{ "grom_pcode1_0", 	2, 0, 0xfff1, 0xf850, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
+//	{ "grom_pcode2_0", 	2, 0, 0xfff1, 0xf860, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
+	{ "mapper",   		0, 1, 0xfff0, 0xf870, 0x0000, NULL,			ti99_mapreg_w },
+
+	// TI-99/4A mode
+	// GROM: 1001 1000 0000 xxa0
+	{ ROM0NAME,			1, 1, 0xe000, 0x0000, 0x0000, NULL, 			NULL },
+	{ "grom_0",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
+	{ "grom_1",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
+	{ "grom_2",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
+	{ "gromport",   	1, 0, 0xfff1, 0x9800, 0x0400, gromportg_rz,		gromportg_w, },
+	
+	{ "mapper",   		1, 1, 0xfff0, 0x8810, 0x0000, NULL,			 	ti99_mapreg_w },
+	{ "soundgen",   	1, 1, 0xfff0, 0x8400, 0x0000, NULL,      		sn76496_w },
+	{ "video",			1, 1, 0xfffd, 0x8800, 0x0400, ti8_tms991x_rz, 	ti8_tms991x_w },
+	{ "speech",   		1, 1, 0xfff0, 0x9000, 0x0400, ti998spch_rz, 	ti998spch_w },
+	{ SRAMNAME,			1, 1, 0xf800, 0x8000, 0x0000, NULL,				NULL }, // write at the end; soundgen must be found earlier 
+
+	// Physical (need to pack this into here as well)
+	{ DRAMNAME, 		3, 1, 0xff0000, 0x000000, 0x000000, NULL, NULL },
+	{ "mapper",			3, 1, 0xffe000, 0xff4000, 0x000000, ti998dsr_rz, NULL },   // DSR
+	{ "gromport", 		3, 1, 0xffe000, 0xff6000, 0x000000, gromportr_rz, gromportr_w  },
+	{ "gromport", 		3, 1, 0xffe000, 0xff8000, 0x000000, gromportr_rz, gromportr_w  },
+	{ ROM1NAME, 		3, 1, 0xffe000, 0xffa000, 0x000000, NULL, NULL },
+	{ ROM1ANAME, 		3, 1, 0xffe000, 0xffc000, 0x000000, NULL, NULL },
+	{ INTSNAME, 		3, 1, 0xfffff0, 0xffe000, 0x000000, NULL, NULL },	
+
+	{ NULL, 0, 0, 0, 0, 0, NULL, NULL  }
 };
 
-static const floppy_config ti99_8_floppy_config =
+static const cruconf_device cru_devices[] = 
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(ti99),
-	NULL
+	{ "mapper", 	0xfff0, 0x2700, NULL, mapper8c_w },
+	{ "gromport", 	0xf800, 0x0800, gromportc_rz, gromportc_w },				// Check: Is this really limited?
+	{ "peribox",  	0x0000, 0x0000, ti99_peb_cru_rz, ti99_peb_cru_w },    // Peribox needs all addresses
+	{ NULL, 		0, 0, NULL, NULL }
 };
+
+MACHINE_RESET( ti99_8 )
+{
+}
 
 static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
 	/* basic machine hardware */
@@ -567,52 +538,39 @@ static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
 	MDRV_CPU_IO_MAP(ti99_8_cru_map)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
-	MDRV_MACHINE_START( ti99_8_60hz )
 	MDRV_MACHINE_RESET( ti99_8 )
 
-	/* For HSGPL */
-	MDRV_NVRAM_HANDLER( ti99 )
-
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9118_interface)	
+
 	MDRV_GFXDECODE(ti99_8)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(ti99_8_tms5220interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	/* devices */
-	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+	MDRV_TISPEECH_ADD("speech")
 
-	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt
-	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
-
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-
-	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+	MDRV_TI998_BOARD_ADD( "ti_board" )
+	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)
+	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
 
-	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
+	MDRV_CRUBUS_ADD( "crubus", cru_devices)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MDRV_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
+	MDRV_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
+	MDRV_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
-	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
-	MDRV_SMARTMEDIA_ADD("smartmedia")
-	MDRV_TI99_4_RS232_CARD_ADD("rs232")
+	MDRV_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
+	MDRV_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
 
@@ -625,48 +583,38 @@ static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
 	MDRV_CPU_IO_MAP(ti99_8_cru_map)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
-	MDRV_MACHINE_START( ti99_8_50hz )
 	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9129_interface)	
+
 	MDRV_GFXDECODE(ti99_8)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(ti99_8_tms5220interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	/* devices */
-	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
-	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	// MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
-	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
-
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-
-	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+	MDRV_TISPEECH_ADD("speech")
+	
+	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)
+	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
 
-	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MDRV_CRUBUS_ADD( "crubus", cru_devices)
 
-	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
-	MDRV_SMARTMEDIA_ADD("smartmedia")
-	MDRV_TI99_4_RS232_CARD_ADD("rs232")
+	MDRV_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
+	MDRV_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
+	MDRV_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
+
+	MDRV_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
+	MDRV_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
 /*
@@ -674,34 +622,17 @@ MACHINE_CONFIG_END
 */
 ROM_START(ti99_8)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_8,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("998rom.bin", 0x0000, 0x8000, CRC(b7a06ffd) SHA1(17dc8529fa808172fc47089982efb0bf0548c80c))		/* system ROMs */
 
 	/*GROM memory space*/
 	ROM_REGION(0x10000, region_grom, 0)
 	ROM_LOAD("998grom.bin", 0x0000, 0x6000, CRC(c63806bc) SHA1(cbfa8b04b4aefbbd9a713c54267ad4dd179c13a3))	/* system GROMs */
 
-	/*DSR ROM space*/
-	ROM_REGION(region_dsr_len, region_dsr, 0)
-	ROM_LOAD_OPTIONAL("disk.bin", offset_fdc_dsr, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
-#if HAS_99CCFDC
-	ROM_LOAD_OPTIONAL("ccfdc.bin", offset_ccfdc_dsr, 0x4000, BAD_DUMP CRC(f69cc69d)) /* CorComp disk DSR ROM */
-#endif
-	ROM_LOAD_OPTIONAL("bwg.bin", offset_bwg_dsr, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
-	ROM_LOAD_OPTIONAL("hfdc.bin", offset_hfdc_dsr, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
-	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
-
-	/* HSGPL memory space */
-	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
-
-	/*TMS5220 ROM space*/
-	ROM_REGION(0x8000, region_speech_rom, 0)
-	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, BAD_DUMP CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
-
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,		0,	ti99_8_60hz,ti99_8,	ti99_8,		"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
-COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,		"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )
+COMP(	1983,	ti99_8,		0,		0,	ti99_8_60hz,ti99_8,	0,		"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
+COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	0,		"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )

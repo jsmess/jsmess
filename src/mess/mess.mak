@@ -131,6 +131,7 @@ CPUS += SCMP
 #CPUS += MN10200
 CPUS += COSMAC
 CPUS += UNSP
+CPUS += COSMAC
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1531,21 +1532,39 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_VIDEO)/ti85.o		\
 	$(MESS_MACHINE)/ti85.o		\
 	$(MESS_DRIVERS)/ti89.o		\
-	$(MESS_DEVICES)/ti99cart.o	\
 	$(MESS_MACHINE)/tms9901.o	\
 	$(MESS_MACHINE)/tms9902.o	\
-	$(MESS_MACHINE)/ti99_4x.o	\
 	$(MESS_MACHINE)/990_hd.o	\
 	$(MESS_MACHINE)/990_tap.o	\
 	$(MESS_MACHINE)/ti990.o		\
-	$(MESS_MACHINE)/994x_ser.o	\
-	$(MESS_MACHINE)/99_dsk.o	\
-	$(MESS_MACHINE)/99_ide.o	\
-	$(MESS_MACHINE)/99_hsgpl.o	\
-	$(MESS_MACHINE)/99_usbsm.o	\
-	$(MESS_MACHINE)/ti99pcod.o	\
+	$(MESS_MACHINE)/at29040a.o	\
+	$(MESS_MACHINE)/ti99/hsgpl.o	\
+	$(MESS_MACHINE)/ti99/p_code.o	\
+	$(MESS_MACHINE)/ti99/crubus.o	\
+	$(MESS_MACHINE)/ti99/datamux.o	\
+	$(MESS_MACHINE)/ti99/peribox.o	\
+	$(MESS_MACHINE)/ti99/grom.o	\
+	$(MESS_MACHINE)/ti99/gromport.o	\
+	$(MESS_MACHINE)/ti99/ti32kmem.o	\
+	$(MESS_MACHINE)/ti99/samsmem.o	\
+	$(MESS_MACHINE)/ti99/myarcmem.o	\
+	$(MESS_MACHINE)/ti99/ti_fdc.o	\
+	$(MESS_MACHINE)/ti99/hfdc.o	\
+	$(MESS_MACHINE)/ti99/bwg.o	\
+	$(MESS_MACHINE)/ti99/ti_rs232.o	\
+	$(MESS_MACHINE)/ti99/tn_usbsm.o	\
+	$(MESS_MACHINE)/ti99/tn_ide.o	\
+	$(MESS_MACHINE)/ti99/spchsyn.o  \
+	$(MESS_MACHINE)/ti99/evpc.o  	\
+	$(MESS_MACHINE)/ti99/videowrp.o \
+	$(MESS_MACHINE)/ti99/mapper8.o  \
+	$(MESS_MACHINE)/ti99/speech8.o  \
+	$(MESS_MACHINE)/ti99/mecmouse.o  \
+	$(MESS_MACHINE)/ti99/handset.o  \
+	$(MESS_MACHINE)/ti99/sgcpu.o  \
+	$(MESS_MACHINE)/ti99/genboard.o  \
+	$(MESS_MACHINE)/ti99/tiboard.o  \
 	$(MESS_MACHINE)/strata.o	\
-	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_DRIVERS)/ti990_4.o	\
 	$(MESS_DRIVERS)/ti99_4x.o	\
@@ -1554,7 +1573,6 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_DRIVERS)/tm990189.o	\
 	$(MESS_DRIVERS)/ti99_8.o	\
 	$(MESS_DEVICES)/ti99_hd.o	\
-	$(MESS_DEVICES)/ti99_peb.o	\
 	$(MESS_VIDEO)/911_vdt.o		\
 	$(MESS_VIDEO)/733_asr.o		\
 	$(MESS_DRIVERS)/ti990_10.o	\

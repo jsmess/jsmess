@@ -199,50 +199,32 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#include "sound/sn76496.h"
-#include "sound/tms5220.h"
 #include "deprecat.h"
-#include "video/v9938.h"
 #include "includes/geneve.h"
-#include "machine/ti99_4x.h"
+#include "machine/ti99/genboard.h"
 #include "machine/tms9901.h"
-#include "machine/tms9902.h"
-#include "audio/spchroms.h"
-#include "devices/ti99_peb.h"
-#include "machine/994x_ser.h"
-#include "machine/99_dsk.h"
-#include "machine/99_ide.h"
-#include "devices/flopdrv.h"
-#include "machine/smartmed.h"
-#include "devices/harddriv.h"
-#include "machine/idectrl.h"
-#include "machine/smc92x4.h"
-#include "machine/mm58274c.h"
-#include "machine/rtc65271.h"
-#include "formats/ti99_dsk.h"
-#include "devices/ti99_hd.h"
+#include "machine/ti99/videowrp.h"
+#include "sound/sn76496.h"
+#include "machine/ti99/peribox.h"
 
 /*
     memory map
 */
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(geneve_r, geneve_w)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("geneve_board", geneve_r, geneve_w)
 ADDRESS_MAP_END
-
 
 /*
     CRU map
 */
-
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("per_exp_box", geneve_peb_cru_r)
+	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("geneve_board", geneve_cru_r)
 
 	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("geneve_board", geneve_cru_w)
 ADDRESS_MAP_END
-
 
 /*
     Input ports, used by machine code for keyboard and joystick emulation.
@@ -453,44 +435,26 @@ static INPUT_PORTS_START(geneve)
 
 INPUT_PORTS_END
 
-
-
-
-static const tms5220_interface geneve_tms5220interface =
+DRIVER_INIT( genmod )
 {
-	DEVCB_NULL,					/* no IRQ callback */
-	DEVCB_NULL,					/* no Ready callback */
-#if 1
-	spchroms_read,				/* speech ROM read handler */
-	spchroms_load_address,		/* speech ROM load address handler */
-	spchroms_read_and_branch	/* speech ROM read and branch handler */
-#endif
-};
+	/*has_genmod = TRUE;*/
+}
 
-static const mm58274c_interface geneve_mm58274c_interface =
+DRIVER_INIT( geneve )
 {
-	1,	/*  mode 24*/
-	0   /*  first day of week */
-};
+	/*has_genmod = FALSE;*/
+}
 
-
-static const mm58274c_interface floppy_mm58274c_interface =
+MACHINE_START( geneve )
 {
-	1,	/*  mode 24*/
-	0   /*  first day of week */
-};
+}
 
-static const floppy_config geneve_floppy_config =
+/*
+    Reset the machine.
+*/
+MACHINE_RESET( geneve )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(ti99),
-	NULL
-};
+}
 
 static MACHINE_CONFIG_START( geneve_60hz, driver_device )
 	/* basic machine hardware */
@@ -504,52 +468,21 @@ static MACHINE_CONFIG_START( geneve_60hz, driver_device )
 	MDRV_MACHINE_RESET( geneve )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)	/* or 50Hz */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-
-	MDRV_PALETTE_LENGTH(512)
-
-	MDRV_PALETTE_INIT(v9938)
-	MDRV_VIDEO_START(geneve)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)	
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
-	MDRV_SOUND_CONFIG(geneve_tms5220interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	/* devices */
-	MDRV_PBOX_ADD( "per_exp_box", FALSE, inta_callback, intb_callback )
+	/* Peripheral Box. Take the same as the TI-99/4A. */
+	MDRV_PBOXGEN_ADD( "peribox", board_inta, board_intb, board_ready )
 
-/*  MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-
-    MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
-
-	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_geneve)
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99)
-
-	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
-
-	MDRV_FLOPPY_4_DRIVES_ADD(geneve_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
-
-	MDRV_SMARTMEDIA_ADD("smartmedia")
-
-	MDRV_TI99_4_RS232_CARD_ADD("rs232")
+	MDRV_GENEVE_BOARD_ADD("geneve_board")
 MACHINE_CONFIG_END
-
 
 /*
     ROM loading
@@ -562,40 +495,12 @@ ROM_START(geneve)
 	ROM_REGION(region_cpu1_len_geneve, "maincpu", 0)
 	ROM_LOAD("genbt100.bin", offset_rom_geneve, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
 	ROM_LOAD_OPTIONAL("genbt090.bin", offset_altrom_geneve, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
-
-	/*DSR ROM space*/
-	ROM_REGION(region_dsr_len, region_dsr, 0)
-	ROM_LOAD_OPTIONAL("disk.bin", offset_fdc_dsr, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
-#if HAS_99CCFDC
-	ROM_LOAD_OPTIONAL("ccfdc.bin", offset_ccfdc_dsr, 0x4000, BAD_DUMP CRC(f69cc69d)) /* CorComp disk DSR ROM */
-#endif
-	ROM_LOAD_OPTIONAL("bwg.bin", offset_bwg_dsr, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
-	ROM_LOAD_OPTIONAL("hfdc.bin", offset_hfdc_dsr, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
-	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
-
-	/*TMC0285 ROM space*/
-	ROM_REGION(0x8000, region_speech_rom, 0)
-	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
 ROM_START(genmod)
 	/*CPU memory space*/
 	ROM_REGION(region_cpu1_len_geneve, "maincpu", 0)
 	ROM_LOAD("gnmbt100.bin", offset_rom_geneve, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
-
-	/*DSR ROM space*/
-	ROM_REGION(region_dsr_len, region_dsr, 0)
-	ROM_LOAD_OPTIONAL("disk.bin", offset_fdc_dsr, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
-#if HAS_99CCFDC
-	ROM_LOAD_OPTIONAL("ccfdc.bin", offset_ccfdc_dsr, 0x4000, BAD_DUMP CRC(f69cc69d)) /* CorComp disk DSR ROM */
-#endif
-	ROM_LOAD_OPTIONAL("bwg.bin", offset_bwg_dsr, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
-	ROM_LOAD_OPTIONAL("hfdc.bin", offset_hfdc_dsr, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
-	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
-
-	/*TMC0285 ROM space*/
-	ROM_REGION(0x8000, region_speech_rom, 0)
-	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */

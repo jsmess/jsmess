@@ -46,7 +46,6 @@ MESS_LAYOUT = $(MESSOBJ)/layout
 MESS_MACHINE = $(MESSOBJ)/machine
 MESS_VIDEO = $(MESSOBJ)/video
 
-
 OBJDIRS += \
 	$(EMU_AUDIO) \
 	$(EMU_MACHINE) \
@@ -64,6 +63,9 @@ OBJDIRS += \
 	$(MESS_MACHINE) \
 	$(MESS_VIDEO) \
 
+# System-specific directories
+
+OBJDIRS += $(MESS_MACHINE)/ti99 \
 
 #-------------------------------------------------
 # MESS core objects

@@ -73,36 +73,37 @@ typedef struct _smc92x4_interface
 
 	/* Get the currently selected floppy disk. This is determined by the
        circuitry on the controller board, not within the controller itself.
+       The device is this controller.
     */
-	running_device *(*current_floppy)(void);
+	running_device *(*current_floppy)(running_device *device);
 
 	/* Callback to read the contents of the external RAM via the data bus.
        Note that the address must be set and automatically increased
        by external circuitry. */
-	UINT8 (*dma_read_callback)(void);
+	UINT8 (*dma_read_callback)(running_device *device);
 
 	/* Callback to write the contents of the external RAM via the data bus.
        Note that the address must be set and automatically increased
        by external circuitry. */
-	void (*dma_write_callback)(UINT8 data);
+	void (*dma_write_callback)(running_device *device, UINT8 data);
 
 	/* Preliminary MFM hard disk interface. Gets next id. */
-	void (*mfmhd_get_next_id)(int head, chrn_id_hd *id);
+	void (*mfmhd_get_next_id)(running_device *device, int head, chrn_id_hd *id);
 
 	/* Preliminary MFM hard disk interface. Performs a seek. */
-	void (*mfmhd_seek)(int direction);
+	void (*mfmhd_seek)(running_device *device, int direction);
 
 	/* Preliminary MFM hard disk interface. Reads a sector. */
-	void (*mfmhd_read_sector)(int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
+	void (*mfmhd_read_sector)(running_device *device, int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
 
 	/* Preliminary MFM hard disk interface. Writes a sector. */
-	void (*mfmhd_write_sector)(int cylinder, int head, int sector, UINT8 *buf, int sector_length);
+	void (*mfmhd_write_sector)(running_device *device, int cylinder, int head, int sector, UINT8 *buf, int sector_length);
 
 	/* Preliminary MFM hard disk interface. Reads a track. */
-	void (*mfmhd_read_track)(int head, UINT8 **buffer, int *data_count);
+	void (*mfmhd_read_track)(running_device *device, int head, UINT8 **buffer, int *data_count);
 
 	/* Preliminary MFM hard disk interface. Writes a track. */
-	void (*mfmhd_write_track)(int head, UINT8 *buffer, int data_count);
+	void (*mfmhd_write_track)(running_device *device, int head, UINT8 *buffer, int data_count);
 } smc92x4_interface;
 
 void smc92x4_reset(running_device *device);
