@@ -143,7 +143,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 /* TODO: this is either a result of an hand-crafted ROM or the JIS stuff is really attribute related ... */
 static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 {
-	if(jis1 >= 0x00 && jis1 < 0x28)
+	if(jis1 < 0x28)
 		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
 	else if(jis1 >= 0x28 && jis1 < 0x30)
 		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
