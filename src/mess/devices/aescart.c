@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "aescart.h"
 #include "cartslot.h"
-#include "machine/ti99_4x.h"
 #include "multcart.h"
 #include "includes/neogeo.h"
 
