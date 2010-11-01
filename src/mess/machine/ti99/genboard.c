@@ -11,7 +11,6 @@
 #include "sound/sn76496.h"
 #include "machine/mm58274c.h"
 #include "peribox.h"
-#include "includes/geneve.h"
 
 #define KEYQUEUESIZE 256
 #define MAXKEYMSGLENGTH 10
@@ -47,11 +46,11 @@ typedef struct _genboard_state
 	int 	keyAutoRepeatTimer;
 
 	/* Mode flags */
-	int		palvideo;   		// bit 5 +
-	int		capslock;			// bit 7 +
-	int		keyboard_clock;		// bit 8 +
-	int		keep_keybuf;		// bit 9 keyclear -
-	int		zero_wait;			// bit 15
+	int		palvideo;
+	int		capslock;
+	int		keyboard_clock;
+	int		keep_keybuf;
+	int		zero_wait;
 
 	/* GROM simulation */
 	int		grom_address;
@@ -64,12 +63,12 @@ typedef struct _genboard_state
 	UINT8	*eprom;
 
 	/* Mapper */
-	int 	geneve_mode;	    	// +
-	int		direct_mode;	    	// mapmode -
-	int		cartridge_size_8K;  	// +
-	int		cartridge_secondpage;   // +
-	int		cartridge6_writable;    // protect -
-	int		cartridge7_writable;    // protect -
+	int 	geneve_mode;
+	int		direct_mode;
+	int		cartridge_size_8K;
+	int		cartridge_secondpage;
+	int		cartridge6_writable;
+	int		cartridge7_writable;
 	int		map[8];
 
 	int		line_count;
@@ -90,16 +89,16 @@ static const UINT8 keyboard_mf1_code[0xe] =
 	0x1c,	/* keypad enter */
 	0x1d,	/* right control */
 	0x38,	/* alt gr */
-	/* extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
-    for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
-    any Geneve program would take advantage of these. */
+	// extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
+	// for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
+	// any Geneve program would take advantage of these. */
 
-	/* extended key that is equivalent to a non-extended key
-    with shift off */
+	// extended key that is equivalent to a non-extended key
+	// with shift off
 	0x35,	/* pad slash */
 
-	/* extended keys that are equivalent to non-extended keys
-    with numlock off */
+	// extended keys that are equivalent to non-extended keys
+	// with numlock off
 	0x47,	/* home */
 	0x48,	/* up */
 	0x49,	/* page up */
@@ -1248,7 +1247,7 @@ static DEVICE_RESET( genboard )
 
 	if (input_port_read(device->machine, "BOOTROM")==0)
 	{
-		board->eprom = memory_region(device->machine, "maincpu") + offset_altrom_geneve;
+		board->eprom = memory_region(device->machine, "maincpu") + 0x4000;
 	}
 }
 

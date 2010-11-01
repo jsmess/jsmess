@@ -86,7 +86,8 @@
 /*
     Determines whether we are using 80 track drives. This variable is
     necessary unless we get information about the dip
-    switch settings. It is set from 99_dsk.c, currenly the only client.
+    switch settings. It is set by the disk controller implementations
+    (bwg, hfdc, ti_fdc).
 */
 static int use_80_track_drives = FALSE;
 
@@ -114,7 +115,8 @@ struct ti99dsk_tag
     need to be able to emulate 40 track drives and 80 track drives.
     This is set in the configuration, but the format has no direct access.
     So as a preliminary solution we use this global function which sets the
-    flag. This function is called by the controllers defined in 99_dsk.
+    flag. This function is called by the disk controller implementations
+    (bwg, hfdc, ti_fdc).
 */
 void ti99_set_80_track_drives(int use80)
 {
@@ -126,14 +128,14 @@ void ti99_set_80_track_drives(int use80)
 #if 0
 static void dump_contents(UINT8 *buffer, int length)
 {
-        for (int i=0; i < length; i+=16)
-        {
-                for (int j=0; j < 16; j+=2)
-                {
-                        printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
-                }
-                printf("\n");
-        }
+	for (int i=0; i < length; i+=16)
+	{
+		for (int j=0; j < 16; j+=2)
+		{
+			printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
+		}
+		printf("\n");
+	}
 }
 #endif
 

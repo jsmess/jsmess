@@ -200,7 +200,6 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "deprecat.h"
-#include "includes/geneve.h"
 #include "machine/ti99/genboard.h"
 #include "machine/tms9901.h"
 #include "machine/ti99/videowrp.h"
@@ -468,7 +467,7 @@ static MACHINE_CONFIG_START( geneve_60hz, driver_device )
 	MDRV_MACHINE_RESET( geneve )
 
 	/* video hardware */
-	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)	
+	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -492,15 +491,16 @@ MACHINE_CONFIG_END
 
 ROM_START(geneve)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_geneve, "maincpu", 0)
-	ROM_LOAD("genbt100.bin", offset_rom_geneve, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
-	ROM_LOAD_OPTIONAL("genbt090.bin", offset_altrom_geneve, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
+	ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
 ROM_END
 
 ROM_START(genmod)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_geneve, "maincpu", 0)
-	ROM_LOAD("gnmbt100.bin", offset_rom_geneve, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("gnmbt100.bin", 0x0000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
+	ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
