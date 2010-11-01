@@ -154,6 +154,7 @@ const game_driver * const drivers[] =
 	DRIVER( shmc1200 )
 	DRIVER( cm1200 )
 	DRIVER( apollo80 )
+	DRIVER( d6800 )		/* Dream 6800 */
 
 	/* Ensoniq */
 	DRIVER( esq1 )	/* 1986 ESQ-1 Digital Wave Synthesizer */

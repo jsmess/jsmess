@@ -1685,6 +1685,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/codata.o	\
 	$(MESS_DRIVERS)/cosmicos.o	\
 	$(MESS_DRIVERS)/czk80.o		\
+	$(MESS_DRIVERS)/d6800.o		\
 	$(MESS_DRIVERS)/d6809.o		\
 	$(MESS_DRIVERS)/dm7000.o	\
 	$(MESS_DRIVERS)/dolphin.o	\
