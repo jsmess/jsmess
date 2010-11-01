@@ -81,7 +81,7 @@ typedef struct _ti99grom_config
 {
 	int						writeable;
 	int 					ident;
-	const char 				*region;
+	const char				*region;
 	UINT8					*(*get_memory)(running_device *device);
 	offs_t					offset;
 	int 					size;
@@ -107,7 +107,7 @@ DECLARE_LEGACY_DEVICE( GROM, ti99grom );
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready) 
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
 
 #define MDRV_GROM_ADD_P(_tag, _id, _memptr, _offset, _size, _ready)	\
 	MDRV_DEVICE_ADD(_tag, GROM, 0)	\
@@ -118,8 +118,8 @@ DECLARE_LEGACY_DEVICE( GROM, ti99grom );
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready) 
-	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
+
 #define MDRV_GRAM_ADD(_tag, _id, _region, _offset, _size, _rollover, _ready)		\
 	MDRV_DEVICE_ADD(_tag, GROM, 0)								\
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, TRUE)	\
@@ -128,6 +128,6 @@ DECLARE_LEGACY_DEVICE( GROM, ti99grom );
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) 	\
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size)	\
 	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, _rollover) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready) 
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
 
 

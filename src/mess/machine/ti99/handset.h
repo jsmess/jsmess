@@ -8,7 +8,7 @@
 
 typedef struct _ti99_handset_config
 {
-	const char 				*sysintf;
+	const char				*sysintf;
 } ti99_handset_config;
 
 

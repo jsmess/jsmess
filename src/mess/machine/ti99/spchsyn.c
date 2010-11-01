@@ -1,14 +1,14 @@
 /*
     TI-99 Speech synthesizer
-    
+
     We emulate the Speech Synthesizer plugged onto a P-Box adapter. The original
-    Speech Synthesizer device was provided as a box to be plugged into the 
+    Speech Synthesizer device was provided as a box to be plugged into the
     right side of the console. In order to be used with Geneve and SGCPU, the
     speech synthesizer must be moved into the Peripheral Box.
-    
-    The Speech Synthesizer used for the TI was the TMS5200, aka TMC0285, a 
+
+    The Speech Synthesizer used for the TI was the TMS5200, aka TMC0285, a
     predecessor of the TMS5220 which was used in other commercial products.
-    
+
     Note that this adapter also contains the speech roms.
 */
 #include "emu.h"
@@ -20,18 +20,18 @@
 #define TMS5220_ADDRESS_MASK 0x3FFFFUL	/* 18-bit mask for tms5220 address */
 #define speech_region "speech_region"
 
-typedef ti99_pebcard_config ti99_speech_config; 
+typedef ti99_pebcard_config ti99_speech_config;
 
 typedef struct _ti99_speech_state
 {
-	running_device 			*vsp;
-	UINT8 					*speechrom_data;		/* pointer to speech ROM data */
+	running_device			*vsp;
+	UINT8					*speechrom_data;		/* pointer to speech ROM data */
 	int 					load_pointer;			/* which 4-bit nibble will be affected by load address */
 	int 					ROM_bits_count;				/* current bit position in ROM */
-	UINT32 					speechROMaddr;				/* 18 bit pointer in ROM */
+	UINT32					speechROMaddr;				/* 18 bit pointer in ROM */
 	UINT32					speechROMlen;			/* length of data pointed by speechrom_data, from 0 to 2^18 */
 	ti99_peb_connect		lines;
-	
+
 } ti99_speech_state;
 
 INLINE ti99_speech_state *get_safe_token(running_device *device)
@@ -48,7 +48,7 @@ INLINE ti99_speech_state *get_safe_token(running_device *device)
 static int ti99_spchroms_read(running_device *vspdev, int count)
 {
 	running_device *device = vspdev->owner();
-	ti99_speech_state *adapter = get_safe_token(device); 
+	ti99_speech_state *adapter = get_safe_token(device);
 
 	int val;
 
@@ -91,7 +91,7 @@ static int ti99_spchroms_read(running_device *vspdev, int count)
 static void ti99_spchroms_load_address(running_device *vspdev, int data)
 {
 	running_device *device = vspdev->owner();
-	ti99_speech_state *adapter = get_safe_token(device); 
+	ti99_speech_state *adapter = get_safe_token(device);
 	// tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
 	// This code does not care about this.
 	adapter->speechROMaddr = ((adapter->speechROMaddr & ~(0xf << adapter->load_pointer))
@@ -106,7 +106,7 @@ static void ti99_spchroms_load_address(running_device *vspdev, int data)
 static void ti99_spchroms_read_and_branch(running_device *vspdev)
 {
 	running_device *device = vspdev->owner();
-	ti99_speech_state *adapter = get_safe_token(device); 
+	ti99_speech_state *adapter = get_safe_token(device);
 	// tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
 	// there is a bus contention.  This code does not care about this. */
 	if (adapter->speechROMaddr < adapter->speechROMlen-1)
@@ -129,26 +129,26 @@ static void ti99_spchroms_read_and_branch(running_device *vspdev)
 */
 static READ8Z_DEVICE_HANDLER( speech_rz )
 {
-	ti99_speech_state *adapter = get_safe_token(device); 
-	
-	if ((offset & 0xfc01)==0x9000) 		
+	ti99_speech_state *adapter = get_safe_token(device);
+
+	if ((offset & 0xfc01)==0x9000)
 	{
-		cpu_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */		
+		cpu_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(adapter->vsp, offset) & 0xff;
 	}
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE8_DEVICE_HANDLER( speech_w )
 {
-	ti99_speech_state *adapter = get_safe_token(device); 
+	ti99_speech_state *adapter = get_safe_token(device);
 
-	if ((offset & 0xfc01)==0x9400) 
+	if ((offset & 0xfc01)==0x9400)
 	{
 		cpu_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
-		
+
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
 		/* it were the case, we would need to store the value on the bus, */
@@ -158,17 +158,17 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 			attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(adapter->vsp));
 			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 			logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
-			
+
 			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
 			timer_set(device->machine, attotime_zero, NULL, 0, NULL);
-		}		
+		}
 		tms5220_data_w(adapter->vsp, offset, data);
 	}
 }
 
 /**************************************************************************/
 
-static ti99_peb_card speech_adapter_card = 
+static ti99_peb_card speech_adapter_card =
 {
 	speech_rz, speech_w,			// memory access read/write
 	NULL, NULL,						// CRU access (none here)
@@ -194,19 +194,19 @@ static DEVICE_RESET( ti99_speech )
 	ti99_speech_state *adapter = (ti99_speech_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the adapter */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "SPEECH"))
 	{
 		int success = mount_card(peb, device, &speech_adapter_card, get_pebcard_config(device)->slot);
-		if (!success) 
+		if (!success)
 		{
 			logerror("speech: Could not mount the speech synthesizer\n");
 			return;
 		}
-		
+
 		astring *region = new astring();
-		astring_assemble_3(region, device->tag(), ":", speech_region);	
-		
+		astring_assemble_3(region, device->tag(), ":", speech_region);
+
 		adapter->speechrom_data = memory_region(device->machine, astring_c(region));
 		adapter->speechROMlen = memory_region_length(device->machine, astring_c(region));
 		adapter->speechROMaddr = 0;

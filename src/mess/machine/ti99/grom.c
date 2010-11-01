@@ -2,21 +2,21 @@
 
     GROM emulation (aka TMC0430)
 
-    This is a preliminary implementation since it does not yet contain 
-    internal timing; instead, it directly accesses the processor to 
+    This is a preliminary implementation since it does not yet contain
+    internal timing; instead, it directly accesses the processor to
     simulate wait states
     When this will have become available, the file will be moved to the
     general circuit collection (emu/machine)
-    
-          +----+--+----+ 
-      AD7 |1    G    16| Vss              
+
+          +----+--+----+
+      AD7 |1    G    16| Vss
       AD6 |2    R    15| GR
       AD5 |3    O    14| Vdd
-      AD4 |4    M    13| GRC 
+      AD4 |4    M    13| GRC
       AD3 |5         12| M
       AD2 |6         11| MO
       AD1 |7         10| GS*
-      AD0 |8          9| Vcc 
+      AD0 |8          9| Vcc
           +------------+
 
     GR  = GROM Ready. Should be connected to processor's READY/HOLD*.
@@ -24,25 +24,25 @@
     M   = Direction. 1=read, 0=write
     MO  = Mode. 1=address counter access, 0=data access
     GS* = GROM select. 0=select, 1=deselect
-    
-    Every GROM has an internal ID which represents the high-order three 
+
+    Every GROM has an internal ID which represents the high-order three
     address bits. The address counter can be set to any value from 0
     to 0xffff; the GROM will only react if selected and if the current
     address counter's high-order bits match the ID of the chip.
-    Example: When the ID is 6, the GROM will react when the address 
+    Example: When the ID is 6, the GROM will react when the address
     counter contains a value from 0xc000 to 0xdfff.
-    
+
     Writable GROMs are called GRAMs. Although the TI-99 systems reserve a
-    port in the memory space, no one has ever seen a GRAM circuit in the wild. 
-    However, third-party products like HSGPL or GRAM Kracker simulate GRAMs 
-    using conventional RAM with some addressing circuitry, usually in a custom 
+    port in the memory space, no one has ever seen a GRAM circuit in the wild.
+    However, third-party products like HSGPL or GRAM Kracker simulate GRAMs
+    using conventional RAM with some addressing circuitry, usually in a custom
     chip.
-    
+
     CHECK: Reading the address increases the counter only once. The first access
     returns the MSB, the second (and all following accesses) return the LSB.
-    
+
     Michael Zapf, August 2010
-    
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -59,31 +59,31 @@ struct _ti99grom_state
 
 	/* GROM data buffer. */
 	UINT8 buffer;
-	
+
 	/* Internal flip-flop. Used when retrieving the address counter. */
 	UINT8 raddr_LSB;
 
 	/* Internal flip-flops. Used when writing the address counter.*/
 	UINT8 waddr_LSB;
-	
+
 	/* ID of this GROM. */
 	UINT8 ident;
-	
+
 	/* Pointer to the memory region contained in this GROM. */
 	UINT8 *memptr;
-	
+
 	/* GROM size. May be 0x1800 or 0x2000. */
-	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a 
+	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a
 	// specific byte pattern which is created by a logical OR of lower
 	// regions
 	int extended;
 
-	/* Determines whether this is a GRAM. */	
+	/* Determines whether this is a GRAM. */
 	int writable;
 
-	/* Determines whether there is a rollover at the end of the address space. */	
+	/* Determines whether there is a rollover at the end of the address space. */
 	int rollover;
-	
+
 	/* Ready callback. This line is usually connected to the READY pin of the CPU. */
 	devcb_resolved_write_line gromready;
 };
@@ -104,28 +104,28 @@ INLINE const ti99grom_config *get_config(running_device *device)
 }
 
 /*
-	Indicates whether this chip will react on the next read/write data 
-	access. We do not have a tri-state handling on the read handlers, so this
-	serves to avoid the read access.
+    Indicates whether this chip will react on the next read/write data
+    access. We do not have a tri-state handling on the read handlers, so this
+    serves to avoid the read access.
 */
-int is_selected(running_device *chip) 
+int is_selected(running_device *chip)
 {
 	ti99grom_state *grom = get_safe_token(chip);
 	return (((grom->address >> 13)&0x07)==grom->ident);
 }
 
 /*
-	Reading from the chip. Represents an access with M=1, GS*=0. The MO bit is
-	defined by the offset (0 or 1). This is the enhanced read function with 
-	Z state.
+    Reading from the chip. Represents an access with M=1, GS*=0. The MO bit is
+    defined by the offset (0 or 1). This is the enhanced read function with
+    Z state.
 */
 READ8Z_DEVICE_HANDLER( ti99grom_rz )
 {
 	ti99grom_state *grom = get_safe_token(device);
-		
+
 	if (offset & 2)
 	{
-		if (((grom->address >> 13)&0x07)!=grom->ident) 
+		if (((grom->address >> 13)&0x07)!=grom->ident)
 			return;
 
 		/* When reading, reset the hi/lo flag byte for writing. */
@@ -149,16 +149,16 @@ READ8Z_DEVICE_HANDLER( ti99grom_rz )
 	}
 	else
 	{
-		if (((grom->address >> 13)&0x07)==grom->ident) 
+		if (((grom->address >> 13)&0x07)==grom->ident)
 		{
 			/* GROMs are buffered. Data is retrieved from a buffer, */
 			/* while the buffer is replaced with the next cell content. */
 			*value = grom->buffer;
-			
+
 			/* Get next value, put it in buffer. Note that the GROM */
 			/* wraps at 8K boundaries. */
 			UINT16 addr = grom->address-(grom->ident<<13);
-			
+
 			if (!grom->extended && ((grom->address&0x1fff)>=0x1800))
 				grom->buffer = grom->memptr[addr-0x1000] | grom->memptr[addr-0x0800];
 			else
@@ -176,20 +176,20 @@ READ8Z_DEVICE_HANDLER( ti99grom_rz )
 }
 
 /*
-	Reading from the chip. Represents an access with M=1, GS*=0. The MO bit is
-	defined by the offset (0 or 1).
+    Reading from the chip. Represents an access with M=1, GS*=0. The MO bit is
+    defined by the offset (0 or 1).
 */
 READ8_DEVICE_HANDLER( ti99grom_r )
 {
 	UINT8 reply = 0;
-	ti99grom_rz(device, offset, &reply); 
+	ti99grom_rz(device, offset, &reply);
 	return reply;
 }
 
 
 /*
-	Writing to the chip. Represents an access with M=0, GS*=0. The MO bit is
-	defined by the offset (0 or 1).
+    Writing to the chip. Represents an access with M=0, GS*=0. The MO bit is
+    defined by the offset (0 or 1).
 */
 WRITE8_DEVICE_HANDLER( ti99grom_w )
 {
@@ -209,10 +209,10 @@ WRITE8_DEVICE_HANDLER( ti99grom_w )
 			/* Accept low byte (2nd write) */
 			grom->address = (grom->address & 0xFF00) | data;
 			/* Setting the address causes a new prefetch */
-			if (is_selected(device)) 
+			if (is_selected(device))
 			{
 				grom->buffer = grom->memptr[grom->address-(grom->ident<<13)];
-			}		
+			}
 			grom->waddr_LSB = FALSE;
 		}
 		else
@@ -235,11 +235,11 @@ WRITE8_DEVICE_HANDLER( ti99grom_w )
 				write_addr = ((grom->address + 0x1fff) & 0x1FFF) | (grom->address & 0xE000);
 			else
 				write_addr = (grom->address - 1) & 0xFFFF;
-			
+
 			// UINT16 addr = grom->address-(grom->ident<<13);
 			if (grom->extended || ((grom->address&0x1fff)<0x1800))
 				grom->memptr[write_addr-(grom->ident<<13)] = data;
-		}		
+		}
 		grom->raddr_LSB = grom->waddr_LSB = FALSE;
 	}
 
@@ -260,7 +260,7 @@ static DEVICE_START( ti99grom )
 
 	grom->writable = gromconf->writeable;
 	grom->ident = gromconf->ident;
-	
+
 	grom->extended = (gromconf->size==0x1800)? TRUE : FALSE;
 
 	grom->rollover = gromconf->rollover;
@@ -280,7 +280,7 @@ static DEVICE_RESET( ti99grom )
 	const ti99grom_config* gromconf = (const ti99grom_config*)get_config(device);
 	ti99grom_state *grom = get_safe_token(device);
 	grom->address = 0;
-	grom->raddr_LSB = FALSE; 
+	grom->raddr_LSB = FALSE;
 	grom->waddr_LSB = FALSE;
 	grom->buffer = 0;
 
@@ -291,7 +291,7 @@ static DEVICE_RESET( ti99grom )
 		grom->memptr = memory_region(device->machine, gromconf->region);
 
 	//  TODO: Check whether this may be 0 for console GROMs.
-	//	assert (grom->memptr!=NULL);
+	//  assert (grom->memptr!=NULL);
 
 	grom->memptr += gromconf->offset;
 

@@ -1,8 +1,8 @@
 /*
-	TI Standard Floppy Disk Controller
-	September 2010
-	
-	Michael Zapf
+    TI Standard Floppy Disk Controller
+    September 2010
+
+    Michael Zapf
 */
 #include "emu.h"
 #include "peribox.h"
@@ -24,7 +24,7 @@ typedef struct _ti99_fdc_state
 {
 	/* Holds the status of the DRQ and IRQ lines. */
 	int					DRQ_IRQ_status;
-	
+
 	/* When TRUE, card is accessible. Indicated by a LED. */
 	int					selected;
 
@@ -36,7 +36,7 @@ typedef struct _ti99_fdc_state
 
 	/* When TRUE the CPU is halted while DRQ/IRQ are true. */
 	int					hold;
-	
+
 	/* Indicates which drive has been selected. Values are 0, 1, 2, and 4. */
 	// 000 = no drive
 	// 001 = drive 1
@@ -48,17 +48,17 @@ typedef struct _ti99_fdc_state
 	int					SIDSEL;
 
 	/* count 4.23s from rising edge of motor_on */
-	emu_timer 			*motor_on_timer;
-	
+	emu_timer			*motor_on_timer;
+
 	/* Link to the FDC1771 controller on the board. */
-	running_device 		*controller;
+	running_device		*controller;
 
 	/* DSR ROM */
 	UINT8				*rom;
 
 	/* Callback lines to the main system. */
 	ti99_peb_connect	lines;
-	
+
 } ti99_fdc_state;
 
 /* Those defines are required because the WD17xx DEVICE_START implementation
@@ -81,21 +81,21 @@ INLINE ti99_fdc_state *get_safe_token(running_device *device)
 
     Emulation is faulty because the CPU is actually stopped in the midst of
     instruction, at the end of the memory access
-	
-	TODO: This has to be replaced by the proper READY handling that is already
-	prepared here. (Requires READY handling by the CPU.)
+
+    TODO: This has to be replaced by the proper READY handling that is already
+    prepared here. (Requires READY handling by the CPU.)
 */
 static void fdc_handle_hold(running_device *device)
 {
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 	line_state state;
-	
+
 	if (card->hold && (!card->DRQ_IRQ_status) && card->DVENA)
 		state = ASSERT_LINE;
 	else
 		state = CLEAR_LINE;
-	
-	// TODO: use READY 
+
+	// TODO: use READY
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
 }
 
@@ -123,7 +123,7 @@ static void set_all_geometries(running_device *device, floppy_type_t type)
 /*************************************************************************/
 
 /*
-    The CRU read handler. 
+    The CRU read handler.
     bit 0: HLD pin
     bit 1-3: drive n active
     bit 4: 0: motor strobe on
@@ -133,7 +133,7 @@ static void set_all_geometries(running_device *device, floppy_type_t type)
 */
 static READ8Z_DEVICE_HANDLER( cru_r )
 {
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
@@ -144,25 +144,22 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 			// deliver bits 0-7
 			// TODO: HLD pin
 			// The DVENA state is returned inverted
-			if (card->DVENA) reply |= ((card->DSEL)<<1); 
+			if (card->DVENA) reply |= ((card->DSEL)<<1);
 			else reply |= 0x10;
 			reply |= 0x40;
 			if (card->SIDSEL) reply |= 0x80;
 		}
 		*value = reply;
-		printf("fdc read cru %04x = %02x\n", offset, reply);
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 	int drive, drivebit;
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
-		printf("fdc write cru %04x = %02x\n", offset, data);
-
 		int bit = (offset >> 1) & 0x07;
 		switch (bit)
 		{
@@ -180,14 +177,14 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			}
 			card->strobe_motor = data;
 			break;
-			
+
 		case 2:
 			/* Set disk ready/hold (bit 2) */
 			// 0: ignore IRQ and DRQ
-			// 1: TMS9900 is stopped until IRQ or DRQ are set 
-			// OR the motor stops rotating - rotates for 4.23s after write 
-			// to CRU bit 1 
-			// This is not emulated and could cause the TI99 to lock up 
+			// 1: TMS9900 is stopped until IRQ or DRQ are set
+			// OR the motor stops rotating - rotates for 4.23s after write
+			// to CRU bit 1
+			// This is not emulated and could cause the TI99 to lock up
 			card->hold = data;
 			fdc_handle_hold(device);
 			break;
@@ -202,13 +199,13 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			/* Select drive X (bits 4-6) */
 			drive = bit-4;					/* drive # (0-2) */
 			drivebit = 1<<drive;
-			
+
 			if (data)
 			{
 				if (!(card->DSEL & drivebit))			/* select drive */
 				{
 					if (card->DSEL != 0)
-						logerror("ti_fdc: Multiple drives selected, %02x\n", card->DSEL);  
+						logerror("ti_fdc: Multiple drives selected, %02x\n", card->DSEL);
 					card->DSEL |= drivebit;
 					wd17xx_set_drive(card->controller, drive);
 					/*wd17xx_set_side(DSKside);*/
@@ -217,13 +214,13 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			else
 				card->DSEL &= ~drivebit;
 			break;
-			
+
 		case 7:
 			/* Select side of disk (bit 7) */
 			card->SIDSEL = data;
 			wd17xx_set_side(card->controller, data);
 			break;
-		}	
+		}
 	}
 }
 
@@ -232,11 +229,11 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_r )
 {
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000) 
+		if ((offset & 0xe000)==0x4000)
 		{
 			// only use the even addresses from 1ff0 to 1ff6.
 			// Note that data is inverted.
@@ -249,7 +246,6 @@ static READ8Z_DEVICE_HANDLER( data_r )
 				reply = card->rom[offset & 0x1fff];
 
 			*value = reply;
-			printf("fdc read %04x = %02x, %c\n", offset, *value, (char)*value);
 		}
 	}
 }
@@ -259,12 +255,11 @@ static READ8Z_DEVICE_HANDLER( data_r )
 */
 static WRITE8_DEVICE_HANDLER( data_w )
 {
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000) 
+		if ((offset & 0xe000)==0x4000)
 		{
-			printf("fdc write %04x = %02x\n", offset, data);
 			// only use the even addresses from 1ff8 to 1ffe.
 			// Note that data is inverted.
 			// 0101 1111 1111 1xx0
@@ -280,7 +275,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 {
 	running_device *carddev = device->owner();
-	ti99_fdc_state *card = get_safe_token(carddev); 
+	ti99_fdc_state *card = get_safe_token(carddev);
 
 	if (state)
 	{
@@ -300,7 +295,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( ti_fdc_drq_w )
 {
 	running_device *carddev = device->owner();
-	ti99_fdc_state *card = get_safe_token(carddev); 
+	ti99_fdc_state *card = get_safe_token(carddev);
 
 	if (state)
 		card->DRQ_IRQ_status |= fdc_DRQ;
@@ -316,7 +311,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_drq_w )
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	running_device *device = (running_device *)ptr;
-	ti99_fdc_state *card = get_safe_token(device); 
+	ti99_fdc_state *card = get_safe_token(device);
 	card->DVENA = 0;
 	fdc_handle_hold(device);
 }
@@ -329,20 +324,20 @@ const wd17xx_interface ti_wd17xx_interface =
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
 };
 
-static ti99_peb_card fdc_card = 
+static ti99_peb_card fdc_card =
 {
 	data_r,
 	data_w,
 	cru_r,
 	cru_w,
-	
-	NULL, NULL,	NULL, NULL	
+
+	NULL, NULL,	NULL, NULL
 };
 
 static DEVICE_START( ti99_fdc )
 {
 	ti99_fdc_state *card = (ti99_fdc_state*)downcast<legacy_device_base *>(device)->token();
-	
+
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
@@ -350,7 +345,7 @@ static DEVICE_START( ti99_fdc )
 	card->motor_on_timer = timer_alloc(device->machine, motor_on_timer_callback, (void *)device);
 
 	astring *region = new astring();
-	astring_assemble_3(region, device->tag(), ":", fdc_region);	
+	astring_assemble_3(region, device->tag(), ":", fdc_region);
 	card->rom = memory_region(device->machine, astring_c(region));
 	card->controller = device->subdevice("fd1771");
 }
@@ -367,7 +362,7 @@ static DEVICE_RESET( ti99_fdc )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_TIFDC)
 	{
-		running_device *peb = device->owner();	
+		running_device *peb = device->owner();
 		int success = mount_card(peb, device, &fdc_card, get_pebcard_config(device)->slot);
 		if (!success) return;
 

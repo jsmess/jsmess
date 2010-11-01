@@ -1,7 +1,7 @@
 /*
     SNUG HSGPL card emulation.
     Raphael Nabet, 2003.
-    
+
     Rewritten as device
     Michael Zapf, October 2010
 */
@@ -81,16 +81,16 @@
     Note: Writing only works for areas set up as RAM.  To write to the
         FEEPROMs, you must used the algorithm specified by their respective
         manufacturer.
-        
+
     FIXME: Crashes when a cartridge is plugged in
 */
 
 #define CRU_BASE 0x1B00
 
 #define RAMSIZE 		0x020000
-#define GRAMSIZE 		0x020000
+#define GRAMSIZE		0x020000
 #define FEEPROM_SIZE	0x80000
-#define FLROMSIZE 	4*(FEEPROM_SIZE+2) + 1
+#define FLROMSIZE	4*(FEEPROM_SIZE+2) + 1
 
 #define NVVERSION 0
 
@@ -102,9 +102,9 @@ typedef struct _hsgpl_state
 	UINT8	*ram6;
 	UINT8	*gram;
 	UINT8	*flashrom;
-	
+
 	int 	current_grom_port;
-	
+
 	int		dsr_enabled;
 	int		gram_enabled;
 	int		bank_enabled;
@@ -115,15 +115,15 @@ typedef struct _hsgpl_state
 	int		led_on;
 	int		mbx_enabled;
 	int		ram_enabled;
-	
+
 	int		flash_mode;
-	
+
 	int		current_bank;
-	
+
 	/* GROM emulation */
 	int		raddr_LSB, waddr_LSB;
 	int		grom_address;
-	
+
 } hsgpl_state;
 
 INLINE hsgpl_state *get_safe_token(running_device *device)
@@ -210,7 +210,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 
 	//activecpu_adjust_icount(-4);
 
-	// 1001 10bb bbbb bba0 
+	// 1001 10bb bbbb bba0
 	port = card->current_grom_port = (offset & 0x3fc) >> 2;
 
 	if (offset & 2)
@@ -237,7 +237,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 			{
 				*value = card->gram[card->grom_address + 0x10000*port];
 			}
-			else 
+			else
 			{
 				if (port < 8)
 				{
@@ -252,7 +252,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 					{
 						*value = at29c040a_r(card->gromb, card->grom_address + 0x10000*(port-8));
 					}
-					else 
+					else
 					{
 						if (port < 24)
 						{
@@ -265,7 +265,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 								/* The HSGPL manual says 32-47, but this is incorrect */
 								*value = at29c040a_r(card->rom6, card->grom_address + 0x10000*(port-24));
 							}
-							else 
+							else
 							{
 								if (port==32 || port==33)
 								{
@@ -289,7 +289,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 			}
 		}
 		// The address auto-increment should be done even when the card is
-		// offline		
+		// offline
 		card->grom_address++;
 		card->raddr_LSB = card->waddr_LSB = FALSE;
 	}
@@ -305,7 +305,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 
 	//activecpu_adjust_icount(-4);
 
-	// 1001 11bb bbbb bba0 
+	// 1001 11bb bbbb bba0
 	port = card->current_grom_port = (offset & 0x3fc) >> 2;
 
 	if (offset & 2)
@@ -325,7 +325,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 		}
 	}
 	else
-	{	
+	{
 		if (card->card_enabled)
 		{
 			/* write GPL data */
@@ -347,7 +347,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 						{
 							at29c040a_w(card->gromb, card->grom_address + 0x10000*(port-8), data);
 						}
-						else 
+						else
 						{
 							if (port < 24)
 							{
@@ -360,7 +360,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 									/* The HSGPL manual says 32-47, but this is incorrect */
 									at29c040a_w(card->rom6, card->grom_address + 0x10000*(port-24), data);
 								}
-								else 
+								else
 								{
 									if (port==32 || port==33)
 									{
@@ -397,17 +397,17 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_dsrspace_rz )
 	if (card->dsr_enabled)
 	{
 		*value = at29c040a_r(card->dsr, (offset-0x4000) + 0x2000 * card->dsr_page);
-//		logerror("hsgpl: read dsr %04x[%02x] -> %02x\n", offset, card->dsr_page, *value);
+//      logerror("hsgpl: read dsr %04x[%02x] -> %02x\n", offset, card->dsr_page, *value);
 	}
 }
-	
+
 static READ8Z_DEVICE_HANDLER ( hsgpl_cartspace_rz )
 {
 	hsgpl_state *card = get_safe_token(device);
 
 	if (!card->card_enabled || card->flash_mode)
 	{
-//		logerror("hsgpl cart read ignored (enable=%02x)\n", card->card_enabled); 		
+//      logerror("hsgpl cart read ignored (enable=%02x)\n", card->card_enabled);
 		return;
 	}
 
@@ -416,14 +416,14 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_cartspace_rz )
 	if ((port < 2) && (card->ram_enabled))
 	{
 		*value = card->ram6[(offset-0x6000) + 0x2000*card->current_bank + 0x8000*port];
-//		logerror("hsgpl cart ram read %04x -> %02x\n", offset, *value); 
+//      logerror("hsgpl cart ram read %04x -> %02x\n", offset, *value);
 		return;
 	}
 
 	if (port < 16)
 	{
 		*value = at29c040a_r(card->rom6, (offset-0x6000) + 0x2000*card->current_bank + 0x8000*port);
-//		logerror("hsgpl cart read %04x -> %02x\n", offset, *value); 
+//      logerror("hsgpl cart read %04x -> %02x\n", offset, *value);
 	}
 	else
 	{
@@ -441,20 +441,20 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_cartspace_rz )
 static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 {
 	hsgpl_state *card = get_safe_token(device);
-	
+
 	if (!card->card_enabled || card->flash_mode)
 	{
-		logerror("hsgpl cart write ignored: card_enabled=%02x\n", card->card_enabled); 		
+		logerror("hsgpl cart write ignored: card_enabled=%02x\n", card->card_enabled);
 		return;
 	}
-	
-	int port = card->current_grom_port;
-//	logerror("hsgpl cart write %04x -> %02x\n", offset, data); 		
 
-	if (card->bank_enabled) 
+	int port = card->current_grom_port;
+//  logerror("hsgpl cart write %04x -> %02x\n", offset, data);
+
+	if (card->bank_enabled)
 	{
 		card->current_bank = (offset>>1) & 3;
-//		logerror("hsgpl cart select bank %02x\n", card->current_bank); 		
+//      logerror("hsgpl cart select bank %02x\n", card->current_bank);
 		return;		/* right??? */
 	}
 
@@ -481,8 +481,8 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 			// feeprom is normally written to using GPL ports, and I don't know
 			// writing through >6000 page is enabled
 /*
-			at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
-			at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);
+            at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
+            at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);
 */
 			}
 			else
@@ -505,17 +505,17 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 */
 static READ8Z_DEVICE_HANDLER ( data_rz )
 {
-	if ((offset & 0xe000)==0x4000) 
+	if ((offset & 0xe000)==0x4000)
 	{
 		hsgpl_dsrspace_rz(device, offset, value);
 	}
-	
-	if ((offset & 0xe000)==0x6000) 
+
+	if ((offset & 0xe000)==0x6000)
 	{
 		hsgpl_cartspace_rz(device, offset, value);
 	}
-	
-	// 1001 1wbb bbbb bba0 
+
+	// 1001 1wbb bbbb bba0
 	if ((offset & 0xfc01)==0x9800)
 	{
 		hsgpl_grom_rz(device, offset, value);
@@ -527,25 +527,25 @@ static READ8Z_DEVICE_HANDLER ( data_rz )
 */
 static WRITE8_DEVICE_HANDLER ( data_w )
 {
-	if ((offset & 0xe000)==0x6000) 
+	if ((offset & 0xe000)==0x6000)
 	{
 		hsgpl_cartspace_w(device, offset, data);
 	}
-	
-	// 1001 1wbb bbbb bba0 
+
+	// 1001 1wbb bbbb bba0
 	if ((offset & 0xfc01)==0x9c00)
 	{
 		hsgpl_grom_w(device, offset, data);
 	}
 }
 
-static ti99_peb_card hsgpl_card = 
+static ti99_peb_card hsgpl_card =
 {
 	data_rz,
 	data_w,
 	NULL,
-	cru_w,	
-	NULL, NULL,	NULL, NULL	
+	cru_w,
+	NULL, NULL,	NULL, NULL
 };
 
 static DEVICE_START( hsgpl )
@@ -566,7 +566,7 @@ static DEVICE_STOP( hsgpl )
 	hsgpl_state *card = get_safe_token(device);
 	logerror("hsgpl: stop\n");
 	free(card->flashrom);
-	if (card->ram6) 
+	if (card->ram6)
 	{
 		free(card->ram6);
 		free(card->gram);
@@ -577,13 +577,13 @@ static DEVICE_RESET( hsgpl )
 {
 	logerror("hsgpl: reset\n");
 	hsgpl_state *card = get_safe_token(device);
-	
+
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH))
 	{
-		running_device *peb = device->owner();	
+		running_device *peb = device->owner();
 		int success = mount_card(peb, device, &hsgpl_card, get_pebcard_config(device)->slot);
-		if (!success) 
+		if (!success)
 		{
 			logerror("hsgpl: Failed to mount.\n");
 			return;
@@ -609,8 +609,8 @@ static DEVICE_RESET( hsgpl )
 		card->flash_mode = (input_port_read(device->machine, "EXTCARD") & EXT_HSGPL_FLASH);
 		if (card->flash_mode) logerror("hsgpl: flash mode\n");
 		else logerror("hsgpl: full mode\n");
-		
-		if (card->ram6==NULL) 
+
+		if (card->ram6==NULL)
 		{
 			card->ram6 = (UINT8*)malloc(RAMSIZE);
 			card->gram = (UINT8*)malloc(GRAMSIZE);
@@ -629,11 +629,11 @@ static DEVICE_NVRAM( hsgpl )
 	if (read_or_write==0)
 	{
 		logerror("hsgpl: device nvram load %s\n", astring_c(hsname));
-		
+
 		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_READ, &nvfile);
 		if (filerr != FILERR_NONE)
 		{
-			logerror("hsgpl: Could not restore NVRAM\n"); 
+			logerror("hsgpl: Could not restore NVRAM\n");
 			return;
 		}
 
@@ -643,7 +643,7 @@ static DEVICE_NVRAM( hsgpl )
 			mame_fclose(nvfile);
 			return;
 		}
-			
+
 		if (card->flashrom[0] != NVVERSION)
 		{
 			logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
@@ -656,17 +656,17 @@ static DEVICE_NVRAM( hsgpl )
 	{
 		logerror("hsgpl: device nvram save %s\n", astring_c(hsname));
 		// Check dirty flags
-		if (at29c040a_is_dirty(card->dsr) || 
+		if (at29c040a_is_dirty(card->dsr) ||
 			at29c040a_is_dirty(card->rom6) ||
 			at29c040a_is_dirty(card->groma) ||
 			at29c040a_is_dirty(card->gromb))
 		{
 			card->flashrom[0] = NVVERSION;
 			filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &nvfile);
-			
+
 			if (filerr != FILERR_NONE)
 			{
-				logerror("hsgpl: Could not save NVRAM\n"); 
+				logerror("hsgpl: Could not save NVRAM\n");
 			}
 			else
 			{
@@ -686,7 +686,7 @@ static DEVICE_NVRAM( hsgpl )
 }
 
 /*
-	Get the pointer to the memory data from the HSGPL card. Called by the FEEPROM.
+    Get the pointer to the memory data from the HSGPL card. Called by the FEEPROM.
 */
 static UINT8 *get_mem_ptr(running_device *device)
 {

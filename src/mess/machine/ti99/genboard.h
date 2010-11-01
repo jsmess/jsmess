@@ -19,6 +19,6 @@ WRITE_LINE_DEVICE_HANDLER( board_intb );
 WRITE_LINE_DEVICE_HANDLER( board_ready );
 
 #define MDRV_GENEVE_BOARD_ADD(_tag )			\
-	MDRV_DEVICE_ADD(_tag, GENBOARD, 0) 
-	
+	MDRV_DEVICE_ADD(_tag, GENBOARD, 0)
+
 #endif

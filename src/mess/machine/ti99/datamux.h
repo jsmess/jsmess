@@ -12,13 +12,13 @@ WRITE16_DEVICE_HANDLER( ti99_dmux_w );
 
 typedef struct _bus_device
 {
-	const char 				*name;
+	const char				*name;
 	UINT16					address_mask;
 	UINT16					select_pattern;
 	UINT16					write_select;
-	databus_read_function 	read;
-	databus_write_function 	write;
-	const char 				*setting;
+	databus_read_function	read;
+	databus_write_function	write;
+	const char				*setting;
 	UINT8					set;
 	UINT8					unset;
 } bus_device;

@@ -1,7 +1,7 @@
 /*
     TI-99 Mechatronic mouse with adapter
     Michael Zapf, October 2010
-    
+
     The Mechatronic mouse is connected to the joystick port and occupies
     both joystick select lines and the switch lines. From these five
     lines, left/right/down are used for the motion (i.e. 3 motion steps
@@ -40,7 +40,7 @@
     mecmouse_x_buf is the current step count reported to CRU
 
     Michael Zapf, 2008-01-22
-    
+
     2010-10-22 Rewriten as device
 */
 
@@ -57,7 +57,7 @@ typedef struct _ti99_mecmouse_state
 	int y_buf;
 	int last_mx;
 	int last_my;
-	
+
 } ti99_mecmouse_state;
 
 INLINE ti99_mecmouse_state *get_safe_token(running_device *device)
@@ -170,11 +170,11 @@ int mecmouse_get_values(running_device *device)
 	if ((buttons & 2)==0)
 		/* home button */
 		answer |= 0x80;
-	return answer; 
+	return answer;
 }
 
 /*
-	Variation for TI-99/8
+    Variation for TI-99/8
 */
 int mecmouse_get_values8(running_device *device, int mode)
 {
@@ -195,8 +195,8 @@ int mecmouse_get_values8(running_device *device, int mode)
 		if ((buttons & 2)==0)
 			/* home button */
 			answer |= 0x04;
-	}		
-	return answer; 
+	}
+	return answer;
 }
 
 /**************************************************************************/

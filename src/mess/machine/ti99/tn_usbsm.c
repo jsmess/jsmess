@@ -20,7 +20,7 @@
     either that the LSByte of a word is accessed first or that the MSByte of a word
     is accessed first.  The former is true with ti-99/4(a), the latter with the
     tms9995 CPU used by Geneve and ti-99/8.
-    
+
     TODO:
     * Test SmartMedia support
     * Implement USB controller and assorted USB devices
@@ -40,7 +40,7 @@
 
 #define CRU_BASE 0x1600
 
-typedef ti99_pebcard_config tn_usbsm_config; 
+typedef ti99_pebcard_config tn_usbsm_config;
 
 typedef struct _tn_usbsm_state
 {
@@ -53,13 +53,13 @@ typedef struct _tn_usbsm_state
 	int		tms9995_mode;
 
 	UINT8	input_latch;
-	
+
 	UINT8	output_latch;
 	UINT16	*ram;
-	
+
 	/* Callback lines to the main system. */
 	ti99_peb_connect	lines;
-	
+
 } tn_usbsm_state;
 
 enum
@@ -82,7 +82,7 @@ INLINE tn_usbsm_state *get_safe_token(running_device *device)
 static UINT16 usbsm_mem_16_r(running_device *device, offs_t offset)
 {
 	UINT16 reply = 0;
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
 	if (offset < 0x2800)
 	{	/* 0x4000-0x4fff range */
@@ -115,7 +115,7 @@ static UINT16 usbsm_mem_16_r(running_device *device, offs_t offset)
 */
 static void usbsm_mem_16_w(running_device *device, offs_t offset, UINT16 data)
 {
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
 	if (offset < 0x2800)
 	{	/* 0x4000-0x4fff range */
@@ -160,14 +160,14 @@ static void usbsm_mem_16_w(running_device *device, offs_t offset, UINT16 data)
 */
 static READ8Z_DEVICE_HANDLER( cru_rz )
 {
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		UINT8 reply = 0;
 		running_device *smartmedia = card->smartmedia;
 		offset &= 3;
-		
+
 		if (offset == 0)
 		{
 			// bit
@@ -176,14 +176,14 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 			// 2   >1x04   1: USB Host controller suspended.
 			// 3   >1x06   1: USB Device controller suspended.
 			// 4   >1x08   0: Strata FEEPROM is busy.
-			// 			   1: Strata FEEPROM is ready.
+			//             1: Strata FEEPROM is ready.
 			// 5   >1x0A   0: SmartMedia card is busy.
-			// 			   1: SmartMedia card absent or ready.
+			//             1: SmartMedia card absent or ready.
 			// 6   >1x0C   0: No SmartMedia card present.
-			// 			   1: A card is in the connector.
+			//             1: A card is in the connector.
 			// 7   >1x0E   0: SmartMedia card is protected.
-			// 			   1: Card absent or not protected.
-			
+			//             1: Card absent or not protected.
+
 			reply = 0x33;
 			if (!smartmedia_present(smartmedia))
 				reply |= 0xc0;
@@ -195,11 +195,11 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 }
 
 /*
-	CRU write
+    CRU write
 */
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
@@ -210,7 +210,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 0:
 			card->selected = data;
 			break;
-			
+
 		case 1:			/* enable I/O registers */
 		case 2:			/* enable interrupts */
 		case 3:			/* enable SmartMedia card */
@@ -236,7 +236,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			else
 				card->feeprom_page &= ~ (1 << (bit-5));
 			break;
-			
+
 		case 16:		/* SRAM page */
 		case 17:
 		case 18:
@@ -259,49 +259,49 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_rz )
 {
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		if (card->tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{	/* first read triggers 16-bit read cycle */
 			card->input_latch = usbsm_mem_16_r(device, offset >> 1);
 		}
-		
+
 		/* return latched input */
 		*value = (offset & 1) ? card->input_latch : (card->input_latch >> 8);
 	}
 }
 
 /*
-	Memory write. The controller is 16 bit, so we need to demultiplex again.
+    Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
 static WRITE8_DEVICE_HANDLER( data_w )
 {
-	tn_usbsm_state *card = get_safe_token(device); 
+	tn_usbsm_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		/* latch write */
 		if (offset & 1)
 			card->output_latch = (card->output_latch & 0xff00) | data;
 		else
 			card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
-		
+
 		if ((card->tms9995_mode)? (offset & 1) : (!(offset & 1)))
 		{	/* second write triggers 16-bit write cycle */
 			usbsm_mem_16_w(device, offset >> 1, card->output_latch);
-		}		
+		}
 	}
 }
 
 /**************************************************************************/
 
-static ti99_peb_card tn_usbsm_card = 
+static ti99_peb_card tn_usbsm_card =
 {
 	data_rz, data_w,				// memory access read/write
 	cru_rz, cru_w,					// CRU access
-	NULL, NULL,						// SENILA/B access 
+	NULL, NULL,						// SENILA/B access
 	NULL, NULL						// 16 bit access (none here)
 };
 
@@ -322,12 +322,12 @@ static DEVICE_RESET( tn_usbsm )
 	tn_usbsm_state *card = (tn_usbsm_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "HDCTRL") & HD_USB)
 	{
 		int success = mount_card(peb, device, &tn_usbsm_card, get_pebcard_config(device)->slot);
 		if (!success) return;
-		
+
 		card->feeprom_page = 0;
 		card->sram_page = 0;
 		card->cru_register = 0;

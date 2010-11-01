@@ -1,5 +1,5 @@
 /*
-    SNUG BwG Disk Controller 
+    SNUG BwG Disk Controller
     Based on WD1773
     Double Density, Double-sided
 
@@ -14,8 +14,8 @@
         <http://home.t-online.de/home/harald.glaab/snug/bwg.pdf>
 
     Michael Zapf, September 2010
-	
-	FIXME: IO error 50, CALLs ok
+
+    FIXME: IO error 50, CALLs ok
 */
 
 #include "emu.h"
@@ -39,7 +39,7 @@ typedef struct _ti99_bwg_state
 {
 	/* Holds the status of the DRQ and IRQ lines. */
 	int					DRQ_IRQ_status;
-	
+
 	/* When TRUE, card is accessible. Indicated by a LED. */
 	int					selected;
 
@@ -51,7 +51,7 @@ typedef struct _ti99_bwg_state
 
 	/* When TRUE the CPU is halted while DRQ/IRQ are true. */
 	int					hold;
-	
+
 	/* Indicates which drive has been selected. Values are 0, 1, 2, and 4. */
 	// 000 = no drive
 	// 001 = drive 1
@@ -64,18 +64,18 @@ typedef struct _ti99_bwg_state
 
 	/* ROM and RAM offset. */
 	int					rom_offset, ram_offset;
-	
+
 	/* Indicates whether the clock is mapped into the address space. */
 	int					rtc_enabled;
-	
+
 	/* count 4.23s from rising edge of motor_on */
-	emu_timer 			*motor_on_timer;
-	
+	emu_timer			*motor_on_timer;
+
 	/* Link to the FDC1771 controller on the board. */
-	running_device 		*controller;
+	running_device		*controller;
 
 	/* Link to the real-time clock on the board. */
-	running_device 		*clock;
+	running_device		*clock;
 
 	/* DSR ROM */
 	UINT8				*rom;
@@ -85,10 +85,10 @@ typedef struct _ti99_bwg_state
 
 	/* DIP swiches */
 	UINT8				dip1, dip2, dip34;
-	
+
 	/* Callback lines to the main system. */
 	ti99_peb_connect	lines;
-	
+
 } ti99_bwg_state;
 
 INLINE ti99_bwg_state *get_safe_token(running_device *device)
@@ -102,21 +102,21 @@ INLINE ti99_bwg_state *get_safe_token(running_device *device)
 
     Emulation is faulty because the CPU is actually stopped in the midst of
     instruction, at the end of the memory access
-	
-	TODO: This has to be replaced by the proper READY handling that is already
-	prepared here. (Requires READY handling by the CPU.)
+
+    TODO: This has to be replaced by the proper READY handling that is already
+    prepared here. (Requires READY handling by the CPU.)
 */
 static void bwg_handle_hold(running_device *device)
 {
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 	line_state state;
-	
+
 	if (card->hold && (!card->DRQ_IRQ_status) && card->DVENA)
 		state = ASSERT_LINE;
 	else
 		state = CLEAR_LINE;
-	
-	// TODO: use READY 
+
+	// TODO: use READY
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
 }
 
@@ -160,7 +160,7 @@ static void set_all_geometries(running_device *device, floppy_type_t type)
 static WRITE_LINE_DEVICE_HANDLER( ti_bwg_intrq_w )
 {
 	running_device *carddev = device->owner();
-	ti99_bwg_state *card = get_safe_token(carddev); 
+	ti99_bwg_state *card = get_safe_token(carddev);
 
 	if (state)
 	{
@@ -180,7 +180,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_bwg_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( ti_bwg_drq_w )
 {
 	running_device *carddev = device->owner();
-	ti99_bwg_state *card = get_safe_token(carddev); 
+	ti99_bwg_state *card = get_safe_token(carddev);
 
 	if (state)
 		card->DRQ_IRQ_status |= bwg_DRQ;
@@ -196,7 +196,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_bwg_drq_w )
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	running_device *device = (running_device *)ptr;
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 	card->DVENA = 0;
 	bwg_handle_hold(device);
 }
@@ -214,19 +214,19 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_bwg_ready )
 /*
     CRU read handler. *=inverted.
     bit 0: DSK4 connected*
-	bit 1: DSK1 connected*
-	bit 2: DSK2 connected*
-	bit 3: DSK3 connected*
-	bit 4: Dip 1
-	bit 5: Dip 2
-	bit 6: Dip 3
-	bit 7: Dip 4
+    bit 1: DSK1 connected*
+    bit 2: DSK2 connected*
+    bit 3: DSK3 connected*
+    bit 4: Dip 1
+    bit 5: Dip 2
+    bit 6: Dip 3
+    bit 7: Dip 4
 */
 static READ8Z_DEVICE_HANDLER( cru_r )
 {
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 	UINT8 reply = 0;
-	
+
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		if ((offset & 0x00ff)==0)
@@ -235,7 +235,7 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 			// If we want to do that properly, we need to check the actually
 			// available drives (not the images!). But why should we connect less?
 			reply = 0x00;
-			
+
 			// DIP switches. Note that a closed switch means 0
 			// xx01 1111   11 = nur dsk1; 10 = 1+2, 01=1/2/3, 00=1-4
 			if (card->dip1) reply |= 0x10;
@@ -250,7 +250,7 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 	int drive, drivebit;
 
 	if ((offset & 0xff00)==CRU_BASE)
@@ -277,10 +277,10 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 2:
 			/* Set disk ready/hold (bit 2) */
 			// 0: ignore IRQ and DRQ
-			// 1: TMS9900 is stopped until IRQ or DRQ are set 
-			// OR the motor stops rotating - rotates for 4.23s after write 
-			// to CRU bit 1 
-			// This is not emulated and could cause the TI99 to lock up 
+			// 1: TMS9900 is stopped until IRQ or DRQ are set
+			// OR the motor stops rotating - rotates for 4.23s after write
+			// to CRU bit 1
+			// This is not emulated and could cause the TI99 to lock up
 			card->hold = data;
 			bwg_handle_hold(device);
 			break;
@@ -293,13 +293,13 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			/* Select drive 3 (DSK4) (bit 8) */
 			drive = (bit == 8) ? 3 : (bit - 4);		/* drive # (0-3) */
 			drivebit = 1<<drive;
-			
+
 			if (data)
 			{
 				if (!(card->DSEL & drivebit))			/* select drive */
 				{
 					if (card->DSEL != 0)
-						logerror("ti99/BwG: Multiple drives selected, %02x\n", card->DSEL);  
+						logerror("ti99/BwG: Multiple drives selected, %02x\n", card->DSEL);
 					card->DSEL |= drivebit;
 					wd17xx_set_drive(card->controller, drive);
 				}
@@ -307,7 +307,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			else
 				card->DSEL &= ~drivebit;
 			break;
-						
+
 		case 7:
 			/* Select side of disk (bit 7) */
 			card->SIDE = data;
@@ -334,12 +334,12 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			else
 				card->ram_offset = 0x0000;
 			break;
-			
+
 		case 14:
 			/* Override FDC with RTC (active high) */
 			card->rtc_enabled = data;
 			break;
-			
+
 		case 15:
 			/* EPROM A14 */
 			if (data)
@@ -347,7 +347,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			else
 				card->rom_offset &= ~0x4000;
 			break;
-			
+
 		case 3:
 		case 9:
 		case 12:
@@ -359,24 +359,24 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 
 /*
     Read a byte
-	4000 - 5bff: ROM (4 banks)
-	
-	rtc disabled:
-	5c00 - 5fef: RAM
-	5ff0 - 5fff: Controller (f0 = status, f2 = track, f4 = sector, f6 = data) 
+    4000 - 5bff: ROM (4 banks)
 
-	rtc enabled:
-	5c00 - 5fdf: RAM
-	5fe0 - 5fff: Clock (even addr)
+    rtc disabled:
+    5c00 - 5fef: RAM
+    5ff0 - 5fff: Controller (f0 = status, f2 = track, f4 = sector, f6 = data)
+
+    rtc enabled:
+    5c00 - 5fdf: RAM
+    5fe0 - 5fff: Clock (even addr)
 */
 
 static READ8Z_DEVICE_HANDLER( data_r )
 {
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000) 
+		if ((offset & 0xe000)==0x4000)
 		{
 			// 010x xxxx xxxx xxxx
 			if ((offset & 0x1c00)==0x1c00)
@@ -398,7 +398,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 				{
 					if ((offset & 0x03f9)==0x03f0)
 					{
-						// .... ..11 1111 0xx0 
+						// .... ..11 1111 0xx0
 						// Note that the value is inverted again on the board,
 						// so we can drop the inversion
 						*value = wd17xx_r(card->controller, (offset >> 1)&0x03);
@@ -419,23 +419,23 @@ static READ8Z_DEVICE_HANDLER( data_r )
 
 /*
     Write a byte
-	4000 - 5bff: ROM, ignore write (4 banks)
-	
-	rtc disabled:
-	5c00 - 5fef: RAM
-	5ff0 - 5fff: Controller (f8 = command, fa = track, fc = sector, fe = data) 
+    4000 - 5bff: ROM, ignore write (4 banks)
 
-	rtc enabled:
-	5c00 - 5fdf: RAM
-	5fe0 - 5fff: Clock (even addr)	
+    rtc disabled:
+    5c00 - 5fef: RAM
+    5ff0 - 5fff: Controller (f8 = command, fa = track, fc = sector, fe = data)
+
+    rtc enabled:
+    5c00 - 5fdf: RAM
+    5fe0 - 5fff: Clock (even addr)
 */
 static WRITE8_DEVICE_HANDLER( data_w )
 {
-	ti99_bwg_state *card = get_safe_token(device); 
+	ti99_bwg_state *card = get_safe_token(device);
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000) 
+		if ((offset & 0xe000)==0x4000)
 		{
 			// 010x xxxx xxxx xxxx
 			if ((offset & 0x1c00)==0x1c00)
@@ -445,7 +445,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 				{
 					if ((offset & 0x03e1)==0x03e0)
 					{
-						// .... ..11 111x xxx0 
+						// .... ..11 111x xxx0
 						mm58274c_w(card->clock, (offset & 0x001e) >> 1, data);
 					}
 					else
@@ -457,7 +457,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 				{
 					if ((offset & 0x03f9)==0x03f8)
 					{
-						// .... ..11 1111 1xx0 
+						// .... ..11 1111 1xx0
 						// Note that the value is inverted again on the board,
 						// so we can drop the inversion
 						wd17xx_w(card->controller, (offset >> 1)&0x03, data);
@@ -475,7 +475,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 static DEVICE_START( ti99_bwg )
 {
 	ti99_bwg_state *card = (ti99_bwg_state*)downcast<legacy_device_base *>(device)->token();
-	
+
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
@@ -484,7 +484,7 @@ static DEVICE_START( ti99_bwg )
 	card->controller = device->subdevice("wd1773");
 	card->clock = device->subdevice("mm58274c");
 	astring *region = new astring();
-	astring_assemble_3(region, device->tag(), ":", bwg_region);		
+	astring_assemble_3(region, device->tag(), ":", bwg_region);
 	card->rom = memory_region(device->machine, astring_c(region));
 	card->ram = NULL;
 }
@@ -496,13 +496,13 @@ static DEVICE_STOP( ti99_bwg )
 	if (card->ram) free(card->ram);
 }
 
-static ti99_peb_card bwg_card = 
+static ti99_peb_card bwg_card =
 {
 	data_r,
 	data_w,
 	cru_r,
-	cru_w,	
-	NULL, NULL,	NULL, NULL	
+	cru_w,
+	NULL, NULL,	NULL, NULL
 };
 
 static DEVICE_RESET( ti99_bwg )
@@ -512,17 +512,17 @@ static DEVICE_RESET( ti99_bwg )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_BWG)
 	{
-		running_device *peb = device->owner();	
+		running_device *peb = device->owner();
 		int success = mount_card(peb, device, &bwg_card, get_pebcard_config(device)->slot);
 		if (!success) return;
-				
+
 		// Allocate 2 KiB for on-board buffer memory (6116 chip)
-		if (card->ram==NULL) 
+		if (card->ram==NULL)
 		{
 			card->ram = (UINT8*)malloc(2048);
 			memset(card->ram, 0, 2048);
 		}
-		
+
 		card->dip1 = input_port_read(device->machine, "BWGDIP1");
 		card->dip2 = input_port_read(device->machine, "BWGDIP2");
 		card->dip34 = input_port_read(device->machine, "BWGDIP34");
@@ -531,7 +531,7 @@ static DEVICE_RESET( ti99_bwg )
 		card->SIDE = 0;
 		card->DVENA = 0;
 		card->strobe_motor = 0;
-				
+
 		ti99_set_80_track_drives(FALSE);
 
 		floppy_type_t flop = FLOPPY_STANDARD_5_25_DSDD_40;
@@ -541,8 +541,8 @@ static DEVICE_RESET( ti99_bwg )
 		card->ram_offset = 0;
 		card->rom_offset = 0;
 		card->rtc_enabled = 0;
-		
-		wd17xx_dden_w(card->controller, CLEAR_LINE);	// Correct?	
+
+		wd17xx_dden_w(card->controller, CLEAR_LINE);	// Correct?
 	}
 }
 

@@ -5,12 +5,12 @@
 #include "peribox.h"
 #include "ti32kmem.h"
 
-typedef ti99_pebcard_config ti99_mem32k_config; 
+typedef ti99_pebcard_config ti99_mem32k_config;
 
 typedef struct _ti99_mem32k_state
 {
 	UINT8 *memory;
-	
+
 } ti99_mem32k_state;
 
 INLINE ti99_mem32k_state *get_safe_token(running_device *device)
@@ -24,7 +24,7 @@ INLINE ti99_mem32k_state *get_safe_token(running_device *device)
 */
 static READ8Z_DEVICE_HANDLER( mem32k_rz )
 {
-	ti99_mem32k_state *card = get_safe_token(device); 
+	ti99_mem32k_state *card = get_safe_token(device);
 
 	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
 	{
@@ -36,11 +36,11 @@ static READ8Z_DEVICE_HANDLER( mem32k_rz )
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE8_DEVICE_HANDLER( mem32k_w )
 {
-	ti99_mem32k_state *card = get_safe_token(device); 
+	ti99_mem32k_state *card = get_safe_token(device);
 
 	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
 	{
@@ -53,7 +53,7 @@ static WRITE8_DEVICE_HANDLER( mem32k_w )
 
 /**************************************************************************/
 
-static ti99_peb_card ti32k_card = 
+static ti99_peb_card ti32k_card =
 {
 	mem32k_rz, mem32k_w,			// memory access read/write
 	NULL, NULL,						// CRU access (none here)
@@ -78,7 +78,7 @@ static DEVICE_RESET( ti99_mem32k )
 	ti99_mem32k_state *card = (ti99_mem32k_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "RAM")==RAM_TI32_EXT)
 	{
 		int success = mount_card(peb, device, &ti32k_card, get_pebcard_config(device)->slot);

@@ -1,7 +1,7 @@
 /*
     SNUG HSGPL card emulation.
     Raphael Nabet, 2003.
-    
+
     Rewritten as device
     Michael Zapf, 2010
 */

@@ -1,9 +1,9 @@
 /*
-    SNUG Enhanced Video Processor Card (evpc) 
+    SNUG Enhanced Video Processor Card (evpc)
 
-	Michael Zapf	
-	Rewritten as device
-	October 2010
+    Michael Zapf
+    Rewritten as device
+    October 2010
 */
 /* device interface */
 #ifndef __EVPC__

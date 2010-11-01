@@ -1,20 +1,20 @@
 /*
     TI-99 Myarc memory expansion
-	
-	Note that the DSR part is still missing
-	TODO: Test this device with some emulated program!
+
+    Note that the DSR part is still missing
+    TODO: Test this device with some emulated program!
 */
 #include "emu.h"
 #include "peribox.h"
 #include "myarcmem.h"
 
-typedef ti99_pebcard_config ti99_myarcmem_config; 
+typedef ti99_pebcard_config ti99_myarcmem_config;
 
 typedef struct _ti99_myarcmem_state
 {
-	int 	bank;	
-	UINT8 	*memory;
-	
+	int 	bank;
+	UINT8	*memory;
+
 } ti99_myarcmem_state;
 
 INLINE ti99_myarcmem_state *get_safe_token(running_device *device)
@@ -27,16 +27,16 @@ INLINE ti99_myarcmem_state *get_safe_token(running_device *device)
 #define MYARCMEM_CRU_BASE2 0x1900
 
 /*
-	CRU write (is there a read?)
+    CRU write (is there a read?)
 */
 static WRITE8_DEVICE_HANDLER( myarcmem_cru_w )
 {
-	ti99_myarcmem_state *card = get_safe_token(device); 
+	ti99_myarcmem_state *card = get_safe_token(device);
 	if (((offset & 0xff00)==MYARCMEM_CRU_BASE1)||((offset & 0xff00)==MYARCMEM_CRU_BASE2))
 	{
-		if ((offset & 0x001e)==0) 
+		if ((offset & 0x001e)==0)
 		{
-			logerror("Activate Myarc memory expansion DSR ROM. Not available.\n");	
+			logerror("Activate Myarc memory expansion DSR ROM. Not available.\n");
 		}
 		else
 		{
@@ -49,7 +49,7 @@ static WRITE8_DEVICE_HANDLER( myarcmem_cru_w )
 			{
 				card->bank |= mask;
 			}
-		}		
+		}
 	}
 }
 
@@ -58,7 +58,7 @@ static WRITE8_DEVICE_HANDLER( myarcmem_cru_w )
 */
 static READ8Z_DEVICE_HANDLER( myarcmem_rz )
 {
-	ti99_myarcmem_state *card = get_safe_token(device); 
+	ti99_myarcmem_state *card = get_safe_token(device);
 	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
 	{
 		if (offset < 0xa000)
@@ -69,11 +69,11 @@ static READ8Z_DEVICE_HANDLER( myarcmem_rz )
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE8_DEVICE_HANDLER( myarcmem_w )
 {
-	ti99_myarcmem_state *card = get_safe_token(device); 
+	ti99_myarcmem_state *card = get_safe_token(device);
 	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
 	{
 		if (offset < 0xa000)
@@ -85,7 +85,7 @@ static WRITE8_DEVICE_HANDLER( myarcmem_w )
 
 /**************************************************************************/
 
-static ti99_peb_card myarcmem_card = 
+static ti99_peb_card myarcmem_card =
 {
 	myarcmem_rz, myarcmem_w,			// memory access read/write
 	NULL, myarcmem_cru_w,			// CRU access (no read here)
@@ -110,12 +110,12 @@ static DEVICE_RESET( ti99_myarcmem )
 	ti99_myarcmem_state *card = (ti99_myarcmem_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "RAM")==RAM_MYARC512)
 	{
 		int success = mount_card(peb, device, &myarcmem_card, get_pebcard_config(device)->slot);
 		if (!success) return;
-		
+
 		if (card->memory==NULL)
 		{
 			// Allocate 512 KiB

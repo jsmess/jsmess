@@ -1,21 +1,21 @@
 /*
     TI-99 SuperAMS Memory Expansion Card. Uses a 74LS612 memory mapper.
-	
-	TODO: Test this device with some emulated program!
+
+    TODO: Test this device with some emulated program!
 */
 #include "emu.h"
 #include "peribox.h"
 #include "samsmem.h"
 
-typedef ti99_pebcard_config ti99_samsmem_config; 
+typedef ti99_pebcard_config ti99_samsmem_config;
 
 typedef struct _ti99_samsmem_state
 {
-	UINT8 	mapper[16];
-	int 	map_mode;	
+	UINT8	mapper[16];
+	int 	map_mode;
 	int		access_mapper;
-	UINT8 	*memory;
-	
+	UINT8	*memory;
+
 } ti99_samsmem_state;
 
 INLINE ti99_samsmem_state *get_safe_token(running_device *device)
@@ -27,12 +27,12 @@ INLINE ti99_samsmem_state *get_safe_token(running_device *device)
 #define SAMS_CRU_BASE 0x1e00
 
 /*
-	CRU write (there is no read here)
+    CRU write (there is no read here)
 */
 static WRITE8_DEVICE_HANDLER( samsmem_cru_w )
 {
-	ti99_samsmem_state *card = get_safe_token(device); 
-	if ((offset & 0xff00)==SAMS_CRU_BASE) 
+	ti99_samsmem_state *card = get_safe_token(device);
+	if ((offset & 0xff00)==SAMS_CRU_BASE)
 	{
 		if ((offset & 0x000e)==0) card->access_mapper = data;
 		if ((offset & 0x000e)==2) card->map_mode = data;
@@ -41,12 +41,12 @@ static WRITE8_DEVICE_HANDLER( samsmem_cru_w )
 
 /*
     Memory read. The SAMS card has two address areas: The memory is at locations
-	0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
-	(only even addresses).
+    0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
+    (only even addresses).
 */
 static READ8Z_DEVICE_HANDLER( samsmem_rz )
 {
-	ti99_samsmem_state *card = get_safe_token(device); 
+	ti99_samsmem_state *card = get_safe_token(device);
 	UINT32 address = 0;
 
 	if (card->access_mapper && ((offset & 0xe000)==0x4000))
@@ -54,24 +54,24 @@ static READ8Z_DEVICE_HANDLER( samsmem_rz )
 		// select the mapper circuit
 		*value = card->mapper[(offset>>1)&0x000f];
 	}
-		
+
 	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
 	{
 		// select memory expansion
 		if (card->map_mode)
 			address = (card->mapper[offset>>12] << 12) + (offset & 0x0fff);
 		else // transparent mode
-			address = offset; 
-		*value = card->memory[address]; 		
-	}	
+			address = offset;
+		*value = card->memory[address];
+	}
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE8_DEVICE_HANDLER( samsmem_w )
 {
-	ti99_samsmem_state *card = get_safe_token(device); 
+	ti99_samsmem_state *card = get_safe_token(device);
 	UINT32 address = 0;
 
 	if (card->access_mapper && ((offset & 0xe000)==0x4000))
@@ -85,14 +85,14 @@ static WRITE8_DEVICE_HANDLER( samsmem_w )
 		if (card->map_mode)
 			address = (card->mapper[offset>>12] << 12) + (offset & 0x0fff);
 		else // transparent mode
-			address = offset; 
-		card->memory[address] = data; 
-	}	
+			address = offset;
+		card->memory[address] = data;
+	}
 }
 
 /**************************************************************************/
 
-static ti99_peb_card samsmem_card = 
+static ti99_peb_card samsmem_card =
 {
 	samsmem_rz, samsmem_w,			// memory access read/write
 	NULL, samsmem_cru_w,			// CRU access (no read here)
@@ -117,7 +117,7 @@ static DEVICE_RESET( ti99_samsmem )
 	ti99_samsmem_state *card = (ti99_samsmem_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "RAM")==RAM_SUPERAMS1024)
 	{
 		int success = mount_card(peb, device, &samsmem_card, get_pebcard_config(device)->slot);

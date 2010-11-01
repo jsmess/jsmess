@@ -1,8 +1,8 @@
 /*
     TI-99 P-Code Card emulation.
     Michael Zapf, July 2009
-	
-	Revised July 2010
+
+    Revised July 2010
 */
 
 #ifndef __PCODEN__

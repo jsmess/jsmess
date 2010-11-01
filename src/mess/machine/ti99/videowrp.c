@@ -1,6 +1,6 @@
 /*
     TI-99/4(A) and /8 Video subsystem
-	This device actually wraps the naked video chip implementation 
+    This device actually wraps the naked video chip implementation
 
     EVPC (Enhanced Video Processor Card) from SNUG
     based on v9938 (may also be equipped with v9958)
@@ -16,7 +16,7 @@
 
 typedef struct _ti99_video_state
 {
-	address_space 	*space;
+	address_space	*space;
 	running_device	*cpu;
 	int				chip;
 } ti99_video_state;
@@ -42,8 +42,8 @@ INLINE const ti99_video_config *get_config(running_device *device)
 */
 READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -60,8 +60,8 @@ READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 */
 READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* read VDP status */
@@ -74,12 +74,12 @@ READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
 }
 
 /*
-	Memory read (EVPC)
+    Memory read (EVPC)
 */
 READ16_DEVICE_HANDLER( ti_v9938_r16 )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -92,12 +92,12 @@ READ16_DEVICE_HANDLER( ti_v9938_r16 )
 }
 
 /*
-	Memory write
+    Memory write
 */
 WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* write VDP address */
@@ -110,12 +110,12 @@ WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 }
 
 /*
-	Memory write (TI-99/8)
+    Memory write (TI-99/8)
 */
 WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* write VDP address */
@@ -128,12 +128,12 @@ WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
 }
 
 /*
-	Memory write (EVPC)
+    Memory write (EVPC)
 */
 WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	switch (offset & 3)
 	{
@@ -157,12 +157,12 @@ WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
 }
 
 /*
-	Video write (Geneve)
+    Video write (Geneve)
 */
 WRITE8_DEVICE_HANDLER ( gen_v9938_w )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
 
 	switch (offset & 6)
 	{
@@ -186,13 +186,13 @@ WRITE8_DEVICE_HANDLER ( gen_v9938_w )
 }
 
 /*
-    Video read (Geneve). 
+    Video read (Geneve).
 */
 READ8Z_DEVICE_HANDLER( gen_v9938_rz )
 {
-	ti99_video_state *video = get_safe_token(device); 
-//	cpu_adjust_icount(video->cpu, -4);
-		
+	ti99_video_state *video = get_safe_token(device);
+//  cpu_adjust_icount(video->cpu, -4);
+
 	if (offset & 2)
 	{	/* read VDP status */
 		*value = v9938_0_status_r(video->space, 0);
@@ -205,14 +205,14 @@ READ8Z_DEVICE_HANDLER( gen_v9938_rz )
 
 READ16_DEVICE_HANDLER ( ti_video_rnop )
 {
-	ti99_video_state *video = get_safe_token(device); 
+	ti99_video_state *video = get_safe_token(device);
 	cpu_adjust_icount(video->cpu, -4);
 	return 0;
 }
 
 WRITE16_DEVICE_HANDLER ( ti_video_wnop )
 {
-	ti99_video_state *video = get_safe_token(device); 
+	ti99_video_state *video = get_safe_token(device);
 	cpu_adjust_icount(video->cpu, -4);
 }
 /**************************************************************************/
@@ -220,7 +220,7 @@ WRITE16_DEVICE_HANDLER ( ti_video_wnop )
 
 void video_update_mouse( running_device *device, int delta_x, int delta_y, int buttons)
 {
-	ti99_video_state *video = get_safe_token(device); 
+	ti99_video_state *video = get_safe_token(device);
 	// TODO: V9938 to be devicified
 	if (video->chip==TI_V9938)
 		v9938_update_mouse_state(0, delta_x, delta_y, buttons & 3);
@@ -231,9 +231,9 @@ void video_update_mouse( running_device *device, int delta_x, int delta_y, int b
 
 static DEVICE_START( ti99_video )
 {
-	ti99_video_state *video = get_safe_token(device); 
+	ti99_video_state *video = get_safe_token(device);
 	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
-	
+
 	video->cpu = device->machine->device("maincpu");
 	video->space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -246,7 +246,7 @@ static DEVICE_START( ti99_video )
 		running_machine *machine = device->machine;
 		VIDEO_START_CALL(generic_bitmapped);
 		v9938_init(machine, 0, *machine->primary_screen, machine->generic.tmpbitmap,
-			MODEL_V9938, 0x20000, conf->callback);	/* v38 with 128 kb of video RAM */		
+			MODEL_V9938, 0x20000, conf->callback);	/* v38 with 128 kb of video RAM */
 	}
 }
 

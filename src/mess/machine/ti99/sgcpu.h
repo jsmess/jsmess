@@ -19,8 +19,8 @@ WRITE_LINE_DEVICE_HANDLER( card_ready );
 DECLARE_LEGACY_DEVICE( SGCPU, sgcpu );
 
 #define MDRV_SGCPUB_ADD(_tag )			\
-	MDRV_DEVICE_ADD(_tag, SGCPU, 0) 
+	MDRV_DEVICE_ADD(_tag, SGCPU, 0)
 
 extern const tms9901_interface tms9901_wiring_ti99_4p;
-	
+
 #endif

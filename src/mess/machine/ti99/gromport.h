@@ -15,7 +15,7 @@
 typedef struct _ti99_multicart_config
 {
 	write_line_device_func	ready;
-	
+
 } ti99_multicart_config;
 
 typedef struct _gromport_callback
@@ -41,6 +41,6 @@ DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_MULTICART, ti99_multicart);
 
 #define MDRV_TI99_GROMPORT_ADD(_tag, _ready) \
 	MDRV_DEVICE_ADD(_tag, TI99_MULTICART, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_multicart_config, ready, _ready) 
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_multicart_config, ready, _ready)
 
 #endif /* __TI99CART_H__ */

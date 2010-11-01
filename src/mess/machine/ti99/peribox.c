@@ -24,7 +24,7 @@
     June 2010: Reimplemented using device structure (MZ) (obsoletes 99_peb.c)
 
 Slots:
-	
+
           REAR
      +8V  1||2   +8V
      GND  3||4   READY
@@ -35,7 +35,7 @@ Slots:
    HOLD* 13||14  IAQHDA
  SENILA* 15||16  SENILB*
   INTA*  17||18  INTB*
-     D7  19||20  GND  
+     D7  19||20  GND
      D5  21||22  D6
      D3  23||24  D4
      D1  25||26  D2
@@ -44,11 +44,11 @@ Slots:
     A12  31||32  A13
     A10  33||34  A11
      A8  35||36  A9
-     A6  37||38  A7   
+     A6  37||38  A7
      A4  39||40  A5
      A2  41||42  A3
      A0  43||44  A1
-    AMB  45||46  AMA 
+    AMB  45||46  AMA
     GND  47||48  AMC
     GND  49||50  CLKOUT*
 CRUCLK*  51||52  DBIN
@@ -60,23 +60,23 @@ CRUCLK*  51||52  DBIN
 
         < from box to console
         > from console into box
- 
+
 READYA  <    System ready (goes to READY, 10K pull-up to +5V) A low level puts the cpu on hold.
-RESET*  >    System reset (active low) 
-SCLK    nc   System clock (not connected in interface card) 
-LCP*    nc   CPU indicator 1=TI99 0=2nd generation (not connected in interface card) 
+RESET*  >    System reset (active low)
+SCLK    nc   System clock (not connected in interface card)
+LCP*    nc   CPU indicator 1=TI99 0=2nd generation (not connected in interface card)
 BOOTPG* nc   ?
-AUDIO   <    Input audio (to AUDIOIN in console) 
-RDBENA* <    Active low: enable flex cable data bus drivers (1K pull-up) 
-PCBEN   H    PCB enable for burn-in (always High) 
-HOLD*   H    Active low CPU hold request (always High) 
-IAQHDA  nc   IAQ [or] HOLDA (logical or) 
-SENILA* H(>) Interrupt level A sense enable (always High) 
-SENILB* H(>) Interrupt level B sense enable (always High) 
-INTA*   <    Interrupt level A (active low, goes to EXTINT*) 
-INTB*   nc   Interrupt level B (not used) 
-LOAD*   nc   Unmaskable interrupt (not carried by interface cable/card) 
-D0-D7   <>   Data bus (D0 most significant) 
+AUDIO   <    Input audio (to AUDIOIN in console)
+RDBENA* <    Active low: enable flex cable data bus drivers (1K pull-up)
+PCBEN   H    PCB enable for burn-in (always High)
+HOLD*   H    Active low CPU hold request (always High)
+IAQHDA  nc   IAQ [or] HOLDA (logical or)
+SENILA* H(>) Interrupt level A sense enable (always High)
+SENILB* H(>) Interrupt level B sense enable (always High)
+INTA*   <    Interrupt level A (active low, goes to EXTINT*)
+INTB*   nc   Interrupt level B (not used)
+LOAD*   nc   Unmaskable interrupt (not carried by interface cable/card)
+D0-D7   <>   Data bus (D0 most significant)
 A0-A15  >    Address bus (A0 most sig; A15 also used as CRUOUT)
 AMA/B/C H    Extra address bits (always high for TI-99/4x)
 CLKOUT* >    Inverted PHI3 clock, from TIM9904 clock generator
@@ -84,28 +84,28 @@ CRUCLK* >    Inverted CRU clock, from TMS9900 CRUCLK pin
 DBIN    >    Active high = read memory. Drives the data bus buffers.
 WE*     >    Write Enable pulse (derived from TMS9900 WE* pin)
 CRUIN   <    CRU input bit to TMS9900
-MEMEN*  >    Memory access enable (active low) 
+MEMEN*  >    Memory access enable (active low)
 
 
 The obscure SENILx lines:
 
-With SENILA* going low, a value shall be put on the data bus, 
-representing the interrupt status bits. It can also be used to determine 
-the source of the interrupt: The RS232 card (in its standard configuration) 
-uses the data bus bits 0 and 1 for its two UARTs, while in the second 
-configuration, it uses bits 4 and 5. Still note that the TI-99/4x does not make 
+With SENILA* going low, a value shall be put on the data bus,
+representing the interrupt status bits. It can also be used to determine
+the source of the interrupt: The RS232 card (in its standard configuration)
+uses the data bus bits 0 and 1 for its two UARTs, while in the second
+configuration, it uses bits 4 and 5. Still note that the TI-99/4x does not make
 use of SENILA*.
 
 SENILB* / INTB* was planned to be used with disk controllers. The PHP1240 disk
 controller puts the value of INTB* on D0 when SENILB* gets active (low) which
-reflects the INTRQ output pin of the WD1771. This signal is not used, however. 
+reflects the INTRQ output pin of the WD1771. This signal is not used, however.
 Instead, the disk controller combines DRQ and IRQ and makes use of a READY/HOLD
 control of the CPU.
 
-Obviously, SENILA* and SENILB* should never be active at the same time, and 
-neither should any memory access to a card be active at the same time, for in 
+Obviously, SENILA* and SENILB* should never be active at the same time, and
+neither should any memory access to a card be active at the same time, for in
 both cases, data bus lines may be set to different levels simultaneously. One
-possible application case is to turn off all cards in the box, lower SENILA*, 
+possible application case is to turn off all cards in the box, lower SENILA*,
 and then do a read access in the memory area of any card in the P-Box (e.g.
 0x4000-0x5fff). Another possiblity is that the currently active card simply
 does not respond to a certain memory access, and in this case the status bits
@@ -113,7 +113,7 @@ can be read.
 
 Also note that the SENILx lines access all cards in parallel, meaning that there
 must be an agreement which cards may use which bits on the data bus. The lines
-do not depend on the card being active at that time. 
+do not depend on the card being active at that time.
 */
 
 #include "emu.h"
@@ -150,8 +150,8 @@ static const floppy_config ti99_4_floppy_config =
 
 typedef struct _ti99_peb_slot
 {
-	running_device 		*card;
-	ti99_peb_card 		*intf;
+	running_device		*card;
+	ti99_peb_card		*intf;
 } ti99_peb_slot;
 
 typedef struct _ti99_peb_state
@@ -165,10 +165,10 @@ typedef struct _ti99_peb_state
 	UINT32					ready_state;
 
 	int						highest;
-	
+
 	// Callback to the main system
 	ti99_peb_connect		lines;
-	
+
 } ti99_peb_state;
 
 INLINE ti99_peb_state *get_safe_token(running_device *device)
@@ -227,24 +227,24 @@ static WRITE_LINE_DEVICE_HANDLER( ready )
 }
 
 /*
-	Declares the callbacks above that are called from the cards. This instance
-	is passed to the cards with MDRV_PBOXCARD_ADD and must be handled as a
-	static_config.
+    Declares the callbacks above that are called from the cards. This instance
+    is passed to the cards with MDRV_PBOXCARD_ADD and must be handled as a
+    static_config.
 */
-const peb_callback_if peb_callback = 
-{ 
-	DEVCB_LINE( inta ), 
-	DEVCB_LINE( intb ), 
-	DEVCB_LINE( ready ) 
+const peb_callback_if peb_callback =
+{
+	DEVCB_LINE( inta ),
+	DEVCB_LINE( intb ),
+	DEVCB_LINE( ready )
 };
 
 /*
-	Mount the PEB card. Although possible, this is not done by the box itself;
-	instead, the card must call this function on the box. The advantage is
-	that we can assign the same slot to different cards which are selected
-	by dip switches. Only the card which is selected will register itself; the
-	other cards are stillborn.
-	Returns TRUE when the card could be mounted.
+    Mount the PEB card. Although possible, this is not done by the box itself;
+    instead, the card must call this function on the box. The advantage is
+    that we can assign the same slot to different cards which are selected
+    by dip switches. Only the card which is selected will register itself; the
+    other cards are stillborn.
+    Returns TRUE when the card could be mounted.
 */
 int mount_card(running_device *device, running_device *cardptr, ti99_peb_card *cardintf, int slotindex)
 {
@@ -265,7 +265,7 @@ int mount_card(running_device *device, running_device *cardptr, ti99_peb_card *c
 		}
 	}
 	else
-		logerror("ti99_peb: Invalid slot number %d\n", slotindex); 
+		logerror("ti99_peb: Invalid slot number %d\n", slotindex);
 	return FALSE;
 }
 
@@ -324,7 +324,7 @@ WRITE8_DEVICE_HANDLER( ti99_peb_cru_w )
 }
 
 /*
-	For SGCPU
+    For SGCPU
 */
 READ16Z_DEVICE_HANDLER( ti99_peb_data16_rz )
 {
@@ -338,7 +338,7 @@ READ16Z_DEVICE_HANDLER( ti99_peb_data16_rz )
 }
 
 /*
-	For SGCPU
+    For SGCPU
 */
 WRITE16_DEVICE_HANDLER( ti99_peb_data16_w )
 {
@@ -352,9 +352,9 @@ WRITE16_DEVICE_HANDLER( ti99_peb_data16_w )
 }
 
 /*
-	SENILx
-	TODO: Check whether device is the correct pointer (seems to be wrong here,
-	the device is usually the caller)
+    SENILx
+    TODO: Check whether device is the correct pointer (seems to be wrong here,
+    the device is usually the caller)
 */
 WRITE_LINE_DEVICE_HANDLER( ti99_peb_senila )
 {
@@ -389,7 +389,7 @@ static DEVICE_START( ti99_peb )
 
 	for (int slotindex=0; slotindex < MAXSLOTS; slotindex++)
 		unmount_card(device, slotindex);
-	
+
 	/* Resolve the callbacks to the console */
 	devcb_write_line inta = DEVCB_LINE(pebconf->inta);
 	devcb_write_line intb = DEVCB_LINE(pebconf->intb);
@@ -409,8 +409,8 @@ static DEVICE_RESET( ti99_peb )
 {
 	ti99_peb_state *peb = get_safe_token(device);
 	logerror("ti99_peb: reset\n");
-	peb->inta_state = 0;	
-	peb->intb_state = 0;	
+	peb->inta_state = 0;
+	peb->intb_state = 0;
 	peb->ready_state = 0;
 	peb->highest = 0;
 	for (int i=0; i < MAXSLOTS; i++) unmount_card(device, i);
@@ -422,113 +422,113 @@ static DEVICE_RESET( ti99_peb )
 	MDRV_DEVICE_CONFIG( peb_callback )
 
 /*
-	We're emulating a "super box" with more than 8 slots. The original
-	box had 8 slots, but that's a bit too limiting.
-	This may become organized differently in future versions; for now
-	we'll go this way.
-	
-	Slot 0 is the "Flex cable interface" / SGCPU / Geneve
-	We assign the same slot number for some cards that cannot be used
-	in parallel anyway. The config switch will determine which one to use.
-	Future works:	
-	// WHTech SCSI controller 
-	// MDRV_PBOXCARD_ADD("SCSI", 4, scsi_intf)
+    We're emulating a "super box" with more than 8 slots. The original
+    box had 8 slots, but that's a bit too limiting.
+    This may become organized differently in future versions; for now
+    we'll go this way.
 
-	// Horizon Ramdisk
-	// MDRV_PBOXCARD_ADD("HRD", 10, ramdisk_intf)
-*/ 
+    Slot 0 is the "Flex cable interface" / SGCPU / Geneve
+    We assign the same slot number for some cards that cannot be used
+    in parallel anyway. The config switch will determine which one to use.
+    Future works:
+    // WHTech SCSI controller
+    // MDRV_PBOXCARD_ADD("SCSI", 4, scsi_intf)
+
+    // Horizon Ramdisk
+    // MDRV_PBOXCARD_ADD("HRD", 10, ramdisk_intf)
+*/
 
 static MACHINE_CONFIG_FRAGMENT( ti99_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 ) 
-	MDRV_PBOXCARD_ADD( "mem_sams1m", 	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512", 	MYARCMEM, 1 )  
-	MDRV_PBOXCARD_ADD( "speech", 		TISPEECH, 2 )  
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 ) 
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  8 )
-	
+	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti994a_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 ) 
-	MDRV_PBOXCARD_ADD( "mem_sams1m", 	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512", 	MYARCMEM, 1 )  
-	MDRV_PBOXCARD_ADD( "speech", 		TISPEECH, 2 )  
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 ) 
-	MDRV_PBOXCARD_ADD( "p_code_card", 	PCODEN,   6 )
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  8 )
-	
+	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MDRV_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti99ev_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 ) 
-	MDRV_PBOXCARD_ADD( "mem_sams1m", 	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512", 	MYARCMEM, 1 )  
-	MDRV_PBOXCARD_ADD( "speech", 		TISPEECH, 2 )  
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 ) 
-	MDRV_PBOXCARD_ADD( "p_code_card", 	PCODEN,   6 )
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  8 )
-	MDRV_PBOXCARD_ADD( "evpc", 			EVPC,	  9 )
-	
+	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MDRV_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+	MDRV_PBOXCARD_ADD( "evpc",			EVPC,	  9 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( ti998_peb )
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 1 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  2 )
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  3 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  8 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  8 )
-	
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 1 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  2 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  3 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti99sg_peb )
-	MDRV_PBOXCARD_ADD( "speech", 		TISPEECH, 1 )  
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 2 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  3 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    4 ) 
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  6 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  7 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  7 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  7 )
-	MDRV_PBOXCARD_ADD( "evpc", 			EVPC,	  8 )
-		
+	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
+	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    4 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  7 )
+	MDRV_PBOXCARD_ADD( "evpc",			EVPC,	  8 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( geneve_peb )
-	MDRV_PBOXCARD_ADD( "speech", 		TISPEECH, 1 )  
-	MDRV_PBOXCARD_ADD( "usbsmart", 		USBSMART, 2 )
-	MDRV_PBOXCARD_ADD( "ide", 			TNIDE, 	  3 )
-	MDRV_PBOXCARD_ADD( "rs232_card", 	TIRS232,  6 )
-	MDRV_PBOXCARD_ADD( "ti_fdc", 		TIFDC, 	  7 )
-	MDRV_PBOXCARD_ADD( "hfdc", 			HFDC, 	  7 )
-	MDRV_PBOXCARD_ADD( "bwg", 			BWG, 	  7 )
-		
+	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
+	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
+	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
+	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
+	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
+	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
+	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  7 )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END

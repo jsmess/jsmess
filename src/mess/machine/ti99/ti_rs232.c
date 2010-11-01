@@ -1,17 +1,17 @@
 /*
     TI-99 RS232 and Parallel interface card
-	Currently this emulation does not interact with the serial interface
-	on the host computer. Planned for a later release.
-	As most serial applications require a feedback from the receiver's side
-	the serial interface implementation will usually *not* work.
-	
-	TI99 RS232 card ('rs232')
-	TMS9902 ('rs232:tms9902_0')
-	TMS9902 ('rs232:tms9902_1')
-	TI99 RS232 attached serial device ('rs232:serdev0')
-	TI99 RS232 attached serial device ('rs232:serdev1')
-	TI99 PIO attached parallel device ('rs232:piodev')
-	
+    Currently this emulation does not interact with the serial interface
+    on the host computer. Planned for a later release.
+    As most serial applications require a feedback from the receiver's side
+    the serial interface implementation will usually *not* work.
+
+    TI99 RS232 card ('rs232')
+    TMS9902 ('rs232:tms9902_0')
+    TMS9902 ('rs232:tms9902_1')
+    TI99 RS232 attached serial device ('rs232:serdev0')
+    TI99 RS232 attached serial device ('rs232:serdev1')
+    TI99 PIO attached parallel device ('rs232:piodev')
+
 */
 #include "emu.h"
 #include "peribox.h"
@@ -27,14 +27,14 @@
 // Second card: Change CRU base to 0x1500
 // #define CRU_BASE 0x1500
 
-typedef ti99_pebcard_config ti_rs232_config; 
+typedef ti99_pebcard_config ti_rs232_config;
 
 typedef struct _ti_rs232_state
 {
 	running_device *uart0, *uart1, *serdev0, *serdev1, *piodev;
 
 	int 	selected;
-	
+
 	// PIO flags
 	int pio_direction;		// a.k.a. PIOOC pio in output mode if 0
 	int pio_handshakeout;
@@ -50,18 +50,18 @@ typedef struct _ti_rs232_state
 	int pio_readable;
 	int pio_writable;
 	int pio_write;			// 1 if image is to be written to
-		
-	UINT8 	*rom;
-	
+
+	UINT8	*rom;
+
 	/* Keeps the state of the SENILA line. */
 	UINT8	senila;
-	
+
 	/* Keeps the value put on the bus when SENILA becomes active. */
-	UINT8 	ila;
-	
+	UINT8	ila;
+
 	/* Callback lines to the main system. */
 	ti99_peb_connect	lines;
-	
+
 } ti_rs232_state;
 
 INLINE ti_rs232_state *get_safe_token(running_device *device)
@@ -110,7 +110,7 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 	{
 		tms9902 = image.device().siblingdevice("tms9902_0");
 	}
-	else if (devnumber==1) 
+	else if (devnumber==1)
 	{
 		tms9902 = image.device().siblingdevice("tms9902_1");
 	}
@@ -119,7 +119,7 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 		logerror("ti99/rs232: Could not find device tag number\n");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	if (image)
 	{
 		tms9902_set_cts(tms9902, 1);
@@ -140,7 +140,7 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 static DEVICE_IMAGE_LOAD( ti99_piodev )
 {
 	running_device *carddev = image.device().owner();
-	ti_rs232_state *card = get_safe_token(carddev); 
+	ti_rs232_state *card = get_safe_token(carddev);
 
 	/* tell whether the image is writable */
 	card->pio_readable = !image.has_been_created();
@@ -161,7 +161,7 @@ static DEVICE_IMAGE_LOAD( ti99_piodev )
 static DEVICE_IMAGE_UNLOAD( ti99_piodev )
 {
 	running_device *carddev = image.device().owner();
-	ti_rs232_state *card = get_safe_token(carddev); 
+	ti_rs232_state *card = get_safe_token(carddev);
 
 	card->pio_writable = 0;
 	card->pio_handshakein = 1;	/* receiver not ready */
@@ -175,7 +175,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_piodev )
 */
 static READ8Z_DEVICE_HANDLER( cru_rz )
 {
-	ti_rs232_state *card = get_safe_token(device); 
+	ti_rs232_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
@@ -195,7 +195,7 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 			if (card->cts2)
 				reply |= 0x40;
 			if (card->led)
-				reply |= 0x80;			
+				reply |= 0x80;
 			*value = reply;
 			return;
 		}
@@ -213,11 +213,11 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 }
 
 /*
-	CRU write
+    CRU write
 */
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	ti_rs232_state *card = get_safe_token(device); 
+	ti_rs232_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
@@ -239,11 +239,11 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 0:
 			card->selected = data;
 			break;
-			
+
 		case 1:
 			card->pio_direction = data;
 			break;
-			
+
 		case 2:
 			if (data != card->pio_handshakeout)
 			{
@@ -284,23 +284,23 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 				}
 			}
 			break;
-			
+
 		case 3:
 			card->pio_spareout = data;
 			break;
-			
+
 		case 4:
 			card->flag0 = data;
 			break;
-			
+
 		case 5:
 			card->cts1 = data;
 			break;
-			
+
 		case 6:
 			card->cts2 = data;
 			break;
-			
+
 		case 7:
 			card->led = data;
 			break;
@@ -314,7 +314,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_rz )
 {
-	ti_rs232_state *card = get_safe_token(device); 
+	ti_rs232_state *card = get_safe_token(device);
 
 	if (card->senila)
 	{
@@ -328,7 +328,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 		// lines are there.
 		card->ila = 0;
 	}
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
@@ -342,13 +342,13 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE8_DEVICE_HANDLER( data_w )
 {
-	ti_rs232_state *card = get_safe_token(device); 
+	ti_rs232_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		if ((offset & 0x1001)==0x1000)
 		{
@@ -365,24 +365,24 @@ static WRITE8_DEVICE_HANDLER( data_w )
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
 	running_device *carddev = device->owner();
-	ti_rs232_state *card = get_safe_token(carddev); 
-	if (INT) 
-		card->ila |= SENILA_0_BIT; 
+	ti_rs232_state *card = get_safe_token(carddev);
+	if (INT)
+		card->ila |= SENILA_0_BIT;
 	else
-		card->ila &= ~SENILA_0_BIT; 
-		
+		card->ila &= ~SENILA_0_BIT;
+
 	devcb_call_write_line(&card->lines.inta, INT);
 }
 
 static TMS9902_INT_CALLBACK( int_callback_1 )
 {
 	running_device *carddev = device->owner();
-	ti_rs232_state *card = get_safe_token(carddev); 
-	if (INT) 
-		card->ila |= SENILA_1_BIT; 
+	ti_rs232_state *card = get_safe_token(carddev);
+	if (INT)
+		card->ila |= SENILA_1_BIT;
 	else
-		card->ila &= ~SENILA_1_BIT; 
-	
+		card->ila &= ~SENILA_1_BIT;
+
 	devcb_call_write_line(&card->lines.inta, INT);
 }
 
@@ -434,16 +434,16 @@ static const tms9902_interface tms9902_params_1 =
 };
 
 
-static ti99_peb_card tirs232_card = 
+static ti99_peb_card tirs232_card =
 {
 	data_rz, data_w,				// memory access read/write
 	cru_rz, cru_w,					// CRU access
-	senila, NULL,					// SENILA/B access 
+	senila, NULL,					// SENILA/B access
 	NULL, NULL						// 16 bit access (none here)
 };
 
 /*
-	Defines the serial serdev.
+    Defines the serial serdev.
 */
 DEVICE_GET_INFO( ti99_rs232_serdev )
 {
@@ -456,7 +456,7 @@ DEVICE_GET_INFO( ti99_rs232_serdev )
 		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                               break;
 
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_rs232_serdev );              break;
-//		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_rs232_serdev );			break;
+//      case DEVINFO_FCT_RESET:                     info->reset = DEVICE_RESET_NAME( ti99_rs232_serdev );           break;
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( ti99_rs232_serdev );    break;
 		case DEVINFO_STR_NAME:		                strcpy( info->s, "TI99 RS232 attached serial device");	                         break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Peripheral expansion");	                         break;
@@ -468,7 +468,7 @@ DEVICE_GET_INFO( ti99_rs232_serdev )
 }
 
 /*
-	Defines the PIO (parallel IO) serdev
+    Defines the PIO (parallel IO) serdev
 */
 DEVICE_GET_INFO( ti99_piodev )
 {
@@ -503,7 +503,7 @@ static DEVICE_START( ti_rs232 )
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 
 	astring *region = new astring();
-	astring_assemble_3(region, device->tag(), ":", ser_region);	
+	astring_assemble_3(region, device->tag(), ":", ser_region);
 	card->rom = memory_region(device->machine, astring_c(region));
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// READY and INTB are not used
@@ -523,7 +523,7 @@ static DEVICE_RESET( ti_rs232 )
 	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "SERIAL")==SERIAL_TI)
 	{
 		int success = mount_card(peb, device, &tirs232_card, get_pebcard_config(device)->slot);
@@ -545,7 +545,7 @@ static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 	MDRV_DEVICE_ADD("serdev0", TI99_RS232, 0)
 	MDRV_DEVICE_ADD("serdev1", TI99_RS232, 0)
-	MDRV_DEVICE_ADD("piodev", TI99_PIO, 0)	
+	MDRV_DEVICE_ADD("piodev", TI99_PIO, 0)
 MACHINE_CONFIG_END
 
 ROM_START( ti_rs232 )

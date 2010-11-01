@@ -1,7 +1,7 @@
 /*
-    SNUG BwG Disk Controller 
-	Based on WD1770
-	Double Density, Double-sided
+    SNUG BwG Disk Controller
+    Based on WD1770
+    Double Density, Double-sided
     Michael Zapf, September 2010
 */
 

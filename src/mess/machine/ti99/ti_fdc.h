@@ -1,7 +1,7 @@
 /*
-    TI-99 Standard Floppy Disk Controller Card 
-	Based on WD1771
-	Single Density, Double-sided
+    TI-99 Standard Floppy Disk Controller Card
+    Based on WD1771
+    Single Density, Double-sided
     Michael Zapf, September 2010
 */
 

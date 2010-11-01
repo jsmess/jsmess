@@ -6,14 +6,14 @@ typedef void (*mapper_write_function)(device_t *device, offs_t offset, UINT8 val
 
 typedef struct _mapper8_dev_config
 {
-	const char 				*name;
+	const char				*name;
 	int						mode;
 	int						stop;
 	UINT32					address_mask;
 	UINT32					select_pattern;
 	UINT32					write_select;
-	mapper_read_function 	read;
-	mapper_write_function 	write;
+	mapper_read_function	read;
+	mapper_write_function	write;
 } mapper8_dev_config;
 
 #define SRAMNAME "SRAM"

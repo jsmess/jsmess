@@ -23,48 +23,48 @@ typedef struct _ti99_peb_config
 } ti99_peb_config;
 
 /*
-	Callback interface. The callback functions are in the console and are
-	accessed from the PEB.
+    Callback interface. The callback functions are in the console and are
+    accessed from the PEB.
 */
 
 #define MAXSLOTS 16
 
 /*
-	This interface is used by the PEB to communicate with the expansion cards.
-	It actually forwards the accesses from the main system.
+    This interface is used by the PEB to communicate with the expansion cards.
+    It actually forwards the accesses from the main system.
 */
 typedef struct _ti99_peb_card_interface
 {
-	void 			(*card_read_data)(running_device *card, offs_t offset, UINT8 *value); 
+	void			(*card_read_data)(running_device *card, offs_t offset, UINT8 *value);
 	void			(*card_write_data)(running_device *card, offs_t offset, UINT8 value);
 
-	void 			(*card_read_cru)(running_device *card, offs_t offset, UINT8 *value); 
+	void			(*card_read_cru)(running_device *card, offs_t offset, UINT8 *value);
 	void			(*card_write_cru)(running_device *card, offs_t offset, UINT8 value);
 
 	void			(*senila)(running_device *card, int value);
-	void 			(*senilb)(running_device *card, int value);
+	void			(*senilb)(running_device *card, int value);
 
 	/* For SGCPU only ("expansion bus") */
 	void			(*card_read_data16)(running_device *card, offs_t offset, UINT16 *value);
-	void			(*card_write_data16)(running_device *card, offs_t offset, UINT16 value);	
-	
+	void			(*card_write_data16)(running_device *card, offs_t offset, UINT16 value);
+
 } ti99_peb_card;
 
 /*
-	Called from the expansion cards. These are the callbacks from the cards to 
-	the PEB (which forwards them to the main system).
-*/	
+    Called from the expansion cards. These are the callbacks from the cards to
+    the PEB (which forwards them to the main system).
+*/
 typedef struct _peb_callback_if
 {
-	devcb_write_line 	inta;
-	devcb_write_line 	intb;
-	devcb_write_line 	ready;
-	
+	devcb_write_line	inta;
+	devcb_write_line	intb;
+	devcb_write_line	ready;
+
 } peb_callback_if;
 
 /*
-	Used to call back the main system. Also imported by the cards. 
-	This structure holds the resolved callbacks within the PEB and the cards.
+    Used to call back the main system. Also imported by the cards.
+    This structure holds the resolved callbacks within the PEB and the cards.
 */
 typedef struct _peb_connect
 {
@@ -75,8 +75,8 @@ typedef struct _peb_connect
 } ti99_peb_connect;
 
 /*
-	Accessor functions from the console. Note that we make use of the enhanced
-	read handler.
+    Accessor functions from the console. Note that we make use of the enhanced
+    read handler.
 */
 READ8Z_DEVICE_HANDLER( ti99_peb_data_rz );
 WRITE8_DEVICE_HANDLER( ti99_peb_data_w );
@@ -89,14 +89,14 @@ WRITE_LINE_DEVICE_HANDLER( ti99_peb_senilb );
 
 
 /*
-	For SGCPU only. Actually the SGCPU uses an external cable to add the 
-	8 data lines that are not included in the PEB
+    For SGCPU only. Actually the SGCPU uses an external cable to add the
+    8 data lines that are not included in the PEB
 */
 READ16Z_DEVICE_HANDLER( ti99_peb_data16_rz );
 WRITE16_DEVICE_HANDLER( ti99_peb_data16_w );
 
 /*
-	Value passed to the cards
+    Value passed to the cards
 */
 typedef struct _ti99_pebcard_config
 {
@@ -110,7 +110,7 @@ INLINE const ti99_pebcard_config *get_pebcard_config(running_device *device)
 }
 
 /*
-	Management functions
+    Management functions
 */
 int mount_card(running_device *device, running_device *cardptr, ti99_peb_card *card, int slotindex);
 void unmount_card(running_device *device, int slotindex);
@@ -128,36 +128,36 @@ DECLARE_LEGACY_DEVICE( PBOXGEN, geneve_peb );
 	MDRV_DEVICE_ADD(_tag, PBOX4, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
 #define MDRV_PBOX4A_ADD(_tag, _inta, _intb, _ready)			\
 	MDRV_DEVICE_ADD(_tag, PBOX4A, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
 #define MDRV_PBOXEV_ADD(_tag, _inta, _intb, _ready)			\
 	MDRV_DEVICE_ADD(_tag, PBOXEV, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
-	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+
 #define MDRV_PBOX8_ADD(_tag, _inta, _intb, _ready)			\
 	MDRV_DEVICE_ADD(_tag, PBOX8, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
 #define MDRV_PBOXSG_ADD(_tag, _inta, _intb, _ready)			\
 	MDRV_DEVICE_ADD(_tag, PBOXSG, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
 #define MDRV_PBOXGEN_ADD(_tag, _inta, _intb, _ready)			\
 	MDRV_DEVICE_ADD(_tag, PBOXGEN, 0)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	
-	
+	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+
 #endif /* __PBOX__ */

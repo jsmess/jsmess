@@ -1,12 +1,12 @@
 /*
-	SNUG Enhanced Video Processor Card (evpc) 
+    SNUG Enhanced Video Processor Card (evpc)
     based on v9938 (may also be equipped with v9958)
     Can be used with TI-99/4A as an add-on card; internal VDP must be removed
 
     The SGCPU ("TI-99/4P") only runs with EVPC.
-	Michael Zapf	
-	Rewritten as device
-	October 2010
+    Michael Zapf
+    Rewritten as device
+    October 2010
 */
 #include "emu.h"
 #include "peribox.h"
@@ -21,7 +21,7 @@ typedef ti99_pebcard_config ti99_evpc_config;
 
 typedef struct _evpc_palette
 {
-	UINT8 		read_index, write_index, mask;
+	UINT8		read_index, write_index, mask;
 	int 		read;
 	int 		state;
 	struct { UINT8 red, green, blue; } color[0x100];
@@ -31,13 +31,13 @@ typedef struct _evpc_palette
 typedef struct _ti99_evpc_state
 {
 	int 					selected;
-	UINT8 					*dsrrom;
+	UINT8					*dsrrom;
 	int 					RAMEN;
 	int 					dsr_page;
-	UINT8 					*novram;	/* NOVRAM area */
+	UINT8					*novram;	/* NOVRAM area */
 	evpc_palette			palette;
 	ti99_peb_connect		lines;
-	
+
 } ti99_evpc_state;
 
 INLINE ti99_evpc_state *get_safe_token(running_device *device)
@@ -95,7 +95,7 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 */
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	ti99_evpc_state *card = get_safe_token(device); 
+	ti99_evpc_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -105,38 +105,38 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 0:
 			card->selected = data;
 			break;
-			
+
 		case 1:
 			if (data)
 				card->dsr_page |= 1;
 			else
 				card->dsr_page &= ~1;
 			break;
-			
+
 		case 2:
 			break;
-			
+
 		case 3:
 			card->RAMEN = data;
 			break;
-			
+
 		case 4:
 			if (data)
 				card->dsr_page |= 4;
 			else
 				card->dsr_page &= ~4;
 			break;
-			
+
 		case 5:
 			if (data)
 				card->dsr_page |= 2;
 			else
 				card->dsr_page &= ~2;
 			break;
-			
+
 		case 6:
 			break;
-			
+
 		case 7:
 			break;
 		}
@@ -151,16 +151,16 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_rz )
 {
-	ti99_evpc_state *card = get_safe_token(device); 
+	ti99_evpc_state *card = get_safe_token(device);
 
 	if (card->selected)
 	{
-		if (card->dsrrom==NULL) 
+		if (card->dsrrom==NULL)
 		{
 			logerror("evpc: no dsrrom\n");
 			return;
 		}
-			
+
 		if ((offset & 0xe000)==0x4000)
 		{
 			if ((offset & 0x1ff0)==0x1ff0)
@@ -172,7 +172,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 					/* Palette Read Address Register */
 					*value = card->palette.write_index;
 					break;
-					
+
 				case 2:
 					/* Palette Read Color Value */
 					if (card->palette.read)
@@ -197,7 +197,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 						}
 					}
 					break;
-					
+
 				case 4:
 					/* Palette Read Pixel Mask */
 					*value = card->palette.mask;
@@ -260,7 +260,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 					card->palette.state = 0;
 					card->palette.read = 0;
 					break;
-					
+
 				case 10:
 					/* Palette Write Color Value */
 					logerror("EVPC palette color write\n");
@@ -287,13 +287,13 @@ static WRITE8_DEVICE_HANDLER( data_w )
 						//evpc_palette.dirty = 1;
 					}
 					break;
-					
+
 				case 12:
 					/* Palette Write Pixel Mask */
 					logerror("EVPC palette mask write\n");
 					card->palette.mask = data;
 					break;
-					
+
 				case 14:
 					/* Palette Write Address Register for Color Value */
 					logerror("EVPC palette address write (for read access)\n");
@@ -318,21 +318,21 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	}
 }
 
-static ti99_peb_card evpc_card = 
+static ti99_peb_card evpc_card =
 {
 	data_rz,
 	data_w,
 	cru_rz,
 	cru_w,
-	
-	NULL, NULL,	NULL, NULL	
+
+	NULL, NULL,	NULL, NULL
 };
 
 static DEVICE_START( ti99_evpc )
 {
-	ti99_evpc_state *card = get_safe_token(device); 
+	ti99_evpc_state *card = get_safe_token(device);
 	card->novram = (UINT8*)malloc(256); // need that already now for NVRAM handling
-	
+
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
@@ -341,29 +341,29 @@ static DEVICE_START( ti99_evpc )
 static DEVICE_STOP( ti99_evpc )
 {
 	logerror("ti99_evpc: stop\n");
-	ti99_evpc_state *card = get_safe_token(device); 
+	ti99_evpc_state *card = get_safe_token(device);
 	free(card->novram);
 }
 
 static DEVICE_RESET( ti99_evpc )
 {
 	logerror("ti99_evpc: reset\n");
-	ti99_evpc_state *card = get_safe_token(device); 
+	ti99_evpc_state *card = get_safe_token(device);
 	astring *region = new astring();
 
 	/* If the card is selected in the menu, register the card */
-	running_device *peb = device->owner();	
+	running_device *peb = device->owner();
 	int success = mount_card(peb, device, &evpc_card, get_pebcard_config(device)->slot);
-	if (!success) 
+	if (!success)
 	{
 		logerror("evpc: Could not mount card.\n");
 		return;
 	}
 	card->RAMEN = 0;
 	card->dsr_page = 0;
-	
-	astring_assemble_3(region, device->tag(), ":", evpc_region);	
-	
+
+	astring_assemble_3(region, device->tag(), ":", evpc_region);
+
 	card->dsrrom = memory_region(device->machine, astring_c(region));
 }
 
@@ -378,7 +378,7 @@ static DEVICE_NVRAM( ti99_evpc )
 	if (read_or_write==0)
 	{
 		logerror("evpc: device nvram load %s\n", astring_c(hsname));
-		
+
 		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_READ, &nvfile);
 		if (filerr == FILERR_NONE)
 		{
@@ -391,7 +391,7 @@ static DEVICE_NVRAM( ti99_evpc )
 	{
 		logerror("evpc: device nvram save %s\n", astring_c(hsname));
 		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &nvfile);
-		
+
 		if (filerr == FILERR_NONE)
 		{
 			if (mame_fwrite(nvfile, card->novram, 256) != 256)

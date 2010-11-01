@@ -1,14 +1,14 @@
 /***************************************************************************
-	
-	SGCPU board
-	including decoder/mapper
-	
-	This component implements the address decoder and mapper logic from the
-	SGCPU expansion card (inofficially called TI-99/4P).
-		
-	Michael Zapf, October 2010
-	
-	TODO: Check for wait states
+
+    SGCPU board
+    including decoder/mapper
+
+    This component implements the address decoder and mapper logic from the
+    SGCPU expansion card (inofficially called TI-99/4P).
+
+    Michael Zapf, October 2010
+
+    TODO: Check for wait states
 ***************************************************************************/
 
 #include "emu.h"
@@ -34,10 +34,10 @@ typedef struct _sgcpu_state
 
 	/* AMS RAM (1 Mib) */
 	UINT16 *ram;
-	
+
 	/* Scratch pad ram (1 KiB) */
 	UINT16 *scratchpad;
-	
+
 	/* True if SGCPU DSR is enabled */
 	int internal_dsr;
 
@@ -56,19 +56,19 @@ typedef struct _sgcpu_state
 	UINT8	lowbyte;
 	UINT8	highbyte;
 	UINT8	latch;
-		
+
 	/* Mapper registers */
 	UINT8 mapper[16];
-	
+
 	running_device *cpu;
 	running_device *soundchip;
 	running_device *video;
 	running_device *cassette;
 	running_device *peribox;
-	
+
 	int keyCol;
 	int alphaLockLine;
-	
+
 } sgcpu_state;
 
 
@@ -88,29 +88,29 @@ INLINE sgcpu_state *get_safe_token(running_device *device)
 #define SAMS_CRU_BASE 0x1e00
 
 /*
-	CRU write (there is no read here)
+    CRU write (there is no read here)
 */
 WRITE8_DEVICE_HANDLER( sgcpu_cru_w )
 {
 	sgcpu_state *sgcpu = get_safe_token(device);
 	int addroff = (offset + 0x0400)<<1;
 
-	if ((addroff & 0xff00)==MAP_CRU_BASE) 
+	if ((addroff & 0xff00)==MAP_CRU_BASE)
 	{
 		if ((addroff & 0x000e)==0) sgcpu->internal_dsr = data;
 		if ((addroff & 0x000e)==2) sgcpu->internal_rom6 = data;
-		if ((addroff & 0x000e)==4) 
+		if ((addroff & 0x000e)==4)
 		{
 			ti99_peb_senila(sgcpu->peribox, data);
 		}
-		if ((addroff & 0x000e)==6) 
+		if ((addroff & 0x000e)==6)
 		{
 			ti99_peb_senilb(sgcpu->peribox, data);
 		}
 		// TODO: more CRU bits? 8=Fast timing / a=KBENA
 		return;
 	}
-	if ((addroff & 0xff00)==SAMS_CRU_BASE) 
+	if ((addroff & 0xff00)==SAMS_CRU_BASE)
 	{
 		if ((addroff & 0x000e)==0) sgcpu->access_mapper = data;
 		if ((addroff & 0x000e)==2) sgcpu->map_mode = data;
@@ -133,12 +133,12 @@ READ8_DEVICE_HANDLER( sgcpu_cru_r )
 
 /*
     Memory read. The SAMS card has two address areas: The memory is at locations
-	0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
-	(only even addresses).
+    0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
+    (only even addresses).
 */
 static READ16_DEVICE_HANDLER( sgcpu_samsmem_r )
 {
-	sgcpu_state *sgcpu = get_safe_token(device); 
+	sgcpu_state *sgcpu = get_safe_token(device);
 	UINT32 address = 0;
 	int addroff = offset << 1;
 
@@ -146,27 +146,27 @@ static READ16_DEVICE_HANDLER( sgcpu_samsmem_r )
 	if (sgcpu->map_mode)
 		address = (sgcpu->mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
 	else // transparent mode
-		address = addroff; 
-	
-	return sgcpu->ram[address>>1]; 		
+		address = addroff;
+
+	return sgcpu->ram[address>>1];
 }
 
 /*
-	Memory write
+    Memory write
 */
 static WRITE16_DEVICE_HANDLER( sgcpu_samsmem_w )
 {
-	sgcpu_state *sgcpu = get_safe_token(device); 
+	sgcpu_state *sgcpu = get_safe_token(device);
 	UINT32 address = 0;
 	int addroff = offset << 1;
-	
+
 	// select memory expansion
 	if (sgcpu->map_mode)
 		address = (sgcpu->mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
 	else // transparent mode
-		address = addroff; 
-	
-	COMBINE_DATA(&sgcpu->ram[address>>1]); 
+		address = addroff;
+
+	COMBINE_DATA(&sgcpu->ram[address>>1]);
 }
 
 /***************************************************************************
@@ -182,18 +182,18 @@ static READ16_DEVICE_HANDLER( sgcpu_datamux_r )
 
 	ti99_peb_data_rz(sgcpu->peribox, addroff+1, &sgcpu->latch);
 	sgcpu->lowbyte = sgcpu->latch;
-		
+
 	// Takes three cycles
 	cpu_adjust_icount(sgcpu->cpu, -3);
 
 	ti99_peb_data_rz(sgcpu->peribox, addroff, &hbyte);
 	sgcpu->highbyte = hbyte;
-	
+
 	// Takes three cycles
 	cpu_adjust_icount(sgcpu->cpu, -3);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
-//	printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
+//  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
 	return (hbyte<<8) | sgcpu->latch ;
 }
 
@@ -204,18 +204,18 @@ static READ16_DEVICE_HANDLER( sgcpu_datamux_r )
 static WRITE16_DEVICE_HANDLER( sgcpu_datamux_w )
 {
 	sgcpu_state *sgcpu = get_safe_token(device);
-	UINT16 addroff = (offset << 1);			
-//	printf("write address = %04x, value = %04x, memmask = %4x\n", addroff, data, mem_mask);
-	
+	UINT16 addroff = (offset << 1);
+//  printf("write address = %04x, value = %04x, memmask = %4x\n", addroff, data, mem_mask);
+
 	// read more about the datamux in datamux.c
-	
+
 	// byte-only transfer, high byte
 	// we use the previously read low byte to complete
 	if (mem_mask == 0xff00)
 		data = data | sgcpu->lowbyte;
-	
-	// byte-only transfer, low byte 	
-	// we use the previously read high byte to complete 	
+
+	// byte-only transfer, low byte
+	// we use the previously read high byte to complete
 	if (mem_mask == 0x00ff)
 		data = data | (sgcpu->highbyte << 8);
 
@@ -224,10 +224,10 @@ static WRITE16_DEVICE_HANDLER( sgcpu_datamux_w )
 
 	// Takes three cycles
 	cpu_adjust_icount(sgcpu->cpu,-3);
-	
+
 	// Write to the PEB
 	ti99_peb_data_w(sgcpu->peribox, addroff, (data>>8) & 0xff);
-	
+
 	// Takes three cycles
 	cpu_adjust_icount(sgcpu->cpu,-3);
 }
@@ -237,13 +237,13 @@ static WRITE16_DEVICE_HANDLER( sgcpu_datamux_w )
 */
 READ16_DEVICE_HANDLER( sgcpu_r )
 {
-	sgcpu_state *sgcpu = get_safe_token(device); 
+	sgcpu_state *sgcpu = get_safe_token(device);
 	if (sgcpu->cpu == NULL) return 0;
 
 	int addroff = offset << 1;
 	UINT16 zone = addroff & 0xe000;
 	UINT16 value = 0;
-	
+
 	if (zone==0x0000)
 	{
 		// ROM0
@@ -255,12 +255,12 @@ READ16_DEVICE_HANDLER( sgcpu_r )
 		value = sgcpu_samsmem_r(device, offset, mem_mask);
 		return value;
 	}
-	
+
 	if (zone==0x4000)
 	{
 		if (sgcpu->internal_dsr)
 		{
-			value = sgcpu->dsr[(addroff & 0x1fff)>>1];		
+			value = sgcpu->dsr[(addroff & 0x1fff)>>1];
 			return value;
 		}
 		else
@@ -272,7 +272,7 @@ READ16_DEVICE_HANDLER( sgcpu_r )
 			}
 		}
 	}
-	
+
 	if (zone==0x6000 && sgcpu->internal_rom6)
 	{
 		if (sgcpu->rom6_bank==0)
@@ -301,11 +301,11 @@ READ16_DEVICE_HANDLER( sgcpu_r )
 		// Video: 8800, 8802
 		if ((addroff & 0xfffd)==0x8800)
 		{
-			value = ti_v9938_r16(sgcpu->video, offset, mem_mask); 
+			value = ti_v9938_r16(sgcpu->video, offset, mem_mask);
 			return value;
 		}
 	}
-	
+
 	// If we are here, check the peribox via the datamux
 	// catch-all for unmapped zones
 	value = sgcpu_datamux_r(device, offset, mem_mask);
@@ -317,14 +317,14 @@ READ16_DEVICE_HANDLER( sgcpu_r )
 */
 WRITE16_DEVICE_HANDLER( sgcpu_w )
 {
-	sgcpu_state *sgcpu = get_safe_token(device); 
+	sgcpu_state *sgcpu = get_safe_token(device);
 	if (sgcpu->cpu == NULL) return;
 
-//	cpu_adjust_icount(sgcpu->cpu, -4);
-	
+//  cpu_adjust_icount(sgcpu->cpu, -4);
+
 	int addroff = offset << 1;
 	UINT16 zone = addroff & 0xe000;
-	
+
 	if (zone==0x0000)
 	{
 		// ROM0
@@ -337,7 +337,7 @@ WRITE16_DEVICE_HANDLER( sgcpu_w )
 		sgcpu_samsmem_w(device, offset, data, mem_mask);
 		return;
 	}
-	
+
 	if (zone==0x4000)
 	{
 		if (sgcpu->internal_dsr)
@@ -383,17 +383,17 @@ WRITE16_DEVICE_HANDLER( sgcpu_w )
 			return;
 		}
 	}
-	
+
 	// If we are here, check the peribox via the datamux
 	// catch-all for unmapped zones
 	sgcpu_datamux_w(device, offset, data, mem_mask);
 }
 
 /***************************************************************************
-	Control lines
+    Control lines
 ****************************************************************************/
 /*
-	Handles the EXTINT line. This one is directly connected to the 9901.
+    Handles the EXTINT line. This one is directly connected to the 9901.
 */
 WRITE_LINE_DEVICE_HANDLER( card_extint )
 {
@@ -419,7 +419,7 @@ void tms9901_sg_set_int2(running_machine *machine, int state)
 }
 
 /***************************************************************************
-	Keyboard/tape control
+    Keyboard/tape control
 ****************************************************************************/
 static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
@@ -456,10 +456,10 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_0 )
 	int answer;
 
 	answer = ((input_port_read(device->machine, keynames[sgcpu->keyCol >> 1]) >> ((sgcpu->keyCol & 1) * 8)) << 3) & 0xF8;
-	
+
 	if (sgcpu->alphaLockLine == FALSE)
 		answer &= ~(input_port_read(device->machine, "ALPHA") << 3);
-	
+
 	return answer;
 }
 
@@ -602,24 +602,24 @@ const tms9901_interface tms9901_wiring_ti99_4p =
 
 static DEVICE_START( sgcpu )
 {
-//	// printf("Starting mapper\n");
+//  // printf("Starting mapper\n");
 	sgcpu_state *sgcpu = get_safe_token(device);
 	sgcpu->cpu = device->machine->device("maincpu");
 	sgcpu->peribox = device->machine->device("peribox");
 	sgcpu->soundchip = device->machine->device("soundgen");
 	sgcpu->video = device->machine->device("video");
 	sgcpu->cassette = device->machine->device("cassette");
-	
+
 	assert(sgcpu->cpu && sgcpu->peribox && sgcpu->soundchip && sgcpu->video && sgcpu->cassette);
-	
+
 	sgcpu->ram = (UINT16*)malloc(0x080000);
 	sgcpu->scratchpad = (UINT16*)malloc(0x0400);
-	
+
 	UINT16 *rom = (UINT16*)memory_region(device->machine, "maincpu");
 	sgcpu->rom0  = rom + 0x2000;
-	sgcpu->dsr   = rom + 0x6000;	
-	sgcpu->rom6a = rom + 0x3000;	
-	sgcpu->rom6b = rom + 0x7000;	
+	sgcpu->dsr   = rom + 0x6000;
+	sgcpu->rom6a = rom + 0x3000;
+	sgcpu->rom6b = rom + 0x7000;
 }
 
 static DEVICE_STOP( sgcpu )

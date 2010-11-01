@@ -39,7 +39,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt );
 	MDRV_DEVICE_CONFIG_DATA32( tiboard_config, mode, TI994A)
 
 #define MDRV_TI998_BOARD_ADD(_tag )			\
-	MDRV_DEVICE_ADD(_tag, TIBOARD, 0) 	\
+	MDRV_DEVICE_ADD(_tag, TIBOARD, 0)	\
 	MDRV_DEVICE_CONFIG_DATA32( tiboard_config, mode, TI998)
 
 #endif

@@ -1,7 +1,7 @@
 /*
     Myarc Hard and Floppy Disk Controller
-	Based on SMC9234
-	High Density, Double-sided
+    Based on SMC9234
+    High Density, Double-sided
     Michael Zapf, September 2010
 */
 

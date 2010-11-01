@@ -1,5 +1,5 @@
 /*
-	TI-99 CRU Bus    	
+    TI-99 CRU Bus
 */
 
 #include "emu.h"
@@ -10,7 +10,7 @@
 typedef struct _crubus_dev
 {
 	/* The device. */
-	running_device 		*device;
+	running_device		*device;
 
 	/* Read access. */
 	cru_read_function	cru_read;
@@ -19,7 +19,7 @@ typedef struct _crubus_dev
 	cru_write_function	cru_write;
 
 	/* Address bits involved. The CRU makes use of the address bus. */
-	UINT16			address_mask; 
+	UINT16			address_mask;
 
 	/* Value of the address bits which are involved for selecting for read. */
 	UINT16			select;
@@ -44,7 +44,7 @@ void cru_mount_device(running_device *device, running_device *crudev, UINT16 add
 {
 	crubus_state *crubus = get_safe_token(device);
 	int index = crubus->devindex++;
-//	logerror("register cru device %lx\n", (long unsigned int)crudev);
+//  logerror("register cru device %lx\n", (long unsigned int)crudev);
 	if (index < MAXCRU)
 	{
 		if (crubus->component[index].device == NULL)
@@ -66,7 +66,7 @@ READ8_DEVICE_HANDLER( ti99_crubus_r )
 {
 	crubus_state *crubus = get_safe_token(device);
 	UINT8 reply = 0;
-	
+
 	for (int i=0; i < MAXCRU; i++)
 	{
 		crubus_dev *crudev = &crubus->component[i];
@@ -76,7 +76,7 @@ READ8_DEVICE_HANDLER( ti99_crubus_r )
 			{
 				if (((offset<<4) & crudev->address_mask)==crudev->select)
 				{
-					// CRU read is implemented as an 8-bit read access. 
+					// CRU read is implemented as an 8-bit read access.
 					// We shift the address for the sake of readability
 					// Each read access returns 8 consecutive CRU bits
 					// Shift 4 = addr*8*2
@@ -85,7 +85,7 @@ READ8_DEVICE_HANDLER( ti99_crubus_r )
 			}
 		}
 	}
-//	printf("cru read %04x = %02x\n", offset<<4, reply);	
+//  printf("cru read %04x = %02x\n", offset<<4, reply);
 
 	return reply;
 }
@@ -94,7 +94,7 @@ WRITE8_DEVICE_HANDLER( ti99_crubus_w )
 {
 	crubus_state *crubus = get_safe_token(device);
 
-//	printf("cru write %04x = %02x\n", offset<<1, data);	
+//  printf("cru write %04x = %02x\n", offset<<1, data);
 	for (int i=0; i < MAXCRU; i++)
 	{
 		crubus_dev *crudev = &crubus->component[i];
@@ -104,7 +104,7 @@ WRITE8_DEVICE_HANDLER( ti99_crubus_w )
 			{
 				if (((offset<<1) & crudev->address_mask)==crudev->select)
 				{
-					// CRU write is implemented as a 1-bit access 
+					// CRU write is implemented as a 1-bit access
 					crudev->cru_write(crudev->device, offset<<1, data);
 				}
 			}
@@ -122,9 +122,9 @@ static DEVICE_START( crubus )
 	int done=FALSE;
 	cruconf_device *cons = (cruconf_device*)device->baseconfig().static_config();
 	crubus_state *crubus = get_safe_token(device);
-	
+
 	logerror("start CRU bus\n");
-	
+
 	crubus->devindex = 0;
 
 	while (!done)

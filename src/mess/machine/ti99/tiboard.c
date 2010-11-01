@@ -1,8 +1,8 @@
 /***************************************************************************
-	TI-99/4(A) and TI-99/8 main board
-		
-	Michael Zapf, October 2010
-	TODO: Find out whether device can be determined more easily in CRU functions
+    TI-99/4(A) and TI-99/8 main board
+
+    Michael Zapf, October 2010
+    TODO: Find out whether device can be determined more easily in CRU functions
 ***************************************************************************/
 
 #include "emu.h"
@@ -18,21 +18,21 @@ typedef struct _tiboard_state
 {
 	/* Mode: Which console do we have? */
 	int				mode;
-	
+
 	/* Keyboard support */
 	int				keyCol;
 	int				alphaLockLine;
-	
-	/* Devices */
-	running_device 	*cpu;
-	running_device 	*video;
-	running_device  *tms9901;
-	running_device 	*peribox;
-	running_device 	*sound;
 
-	running_device 	*handset;
-	running_device 	*mecmouse;
-	running_device 	*gromport;
+	/* Devices */
+	running_device	*cpu;
+	running_device	*video;
+	running_device  *tms9901;
+	running_device	*peribox;
+	running_device	*sound;
+
+	running_device	*handset;
+	running_device	*mecmouse;
+	running_device	*gromport;
 
 } tiboard_state;
 
@@ -57,7 +57,7 @@ INLINE const tiboard_config *get_config(running_device *device)
 }
 
 /****************************************************************************
-	TMS9901 and attached devices handling
+    TMS9901 and attached devices handling
 ****************************************************************************/
 /*
     VBL interrupt  (mmm...  actually, it happens when the beam enters the lower
@@ -68,11 +68,11 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 	running_device *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
-	TMS9928A_interrupt(device->machine);	
+	TMS9928A_interrupt(device->machine);
 
-	if (board->handset != NULL) 
+	if (board->handset != NULL)
 		ti99_handset_task(board->handset);
-	if (board->mecmouse != NULL) 
+	if (board->mecmouse != NULL)
 		mecmouse_poll(board->mecmouse);
 }
 
@@ -210,10 +210,10 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0a )
 		answer = mecmouse_get_values(board->mecmouse);
 	else
 		answer = ((input_port_read(device->machine, keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) << 3) & 0xF8;
-	
+
 	if (board->alphaLockLine == FALSE)
 		answer &= ~(input_port_read(device->machine, "ALPHA") << 3);
-	
+
 	return answer;
 }
 
@@ -241,8 +241,8 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	}
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	//	if (cassette_input(device->machine->device("cassette1")) > 0)
-	//		answer |= 8;
+	//  if (cassette_input(device->machine->device("cassette1")) > 0)
+	//      answer |= 8;
 
 	return answer;
 }
@@ -257,7 +257,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 	running_device *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
-	if (board->handset != NULL) 
+	if (board->handset != NULL)
 		if (ti99_handset_get_clock(board->handset)) return 2;
 	return 0;
 }
@@ -308,10 +308,10 @@ static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 	tiboard_state *board = get_safe_token(dev);
 
 	int index=5;
-	
+
 	if (board->mode==TI994A)
 		index=6;
-	
+
 	if (data)
 		board->keyCol |= 1 << (offset-2);
 	else
@@ -600,7 +600,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 };
 
 /*
-	Handles the EXTINT line. This one is directly connected to the 9901.
+    Handles the EXTINT line. This one is directly connected to the 9901.
 */
 WRITE_LINE_DEVICE_HANDLER( console_extint )
 {
@@ -620,7 +620,7 @@ WRITE_LINE_DEVICE_HANDLER( console_ready )
 /***************************************************************************
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
-	
+
 static DEVICE_START( tiboard )
 {
 	tiboard_state *board = get_safe_token(device);
@@ -639,7 +639,7 @@ static DEVICE_RESET( tiboard )
 	tiboard_state *board = get_safe_token(device);
 	const tiboard_config* conf = (const tiboard_config*)get_config(device);
 	board->mode = conf->mode;
-	
+
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	board->keyCol = 0;
 	board->alphaLockLine = 0;
@@ -650,22 +650,22 @@ static DEVICE_RESET( tiboard )
 	{
 		/* reset handset */
 		tms9901_set_single_int(board->tms9901, 12, 0);
-		
+
 		if (input_port_read(device->machine, "HCI") & HCI_IR)
 			board->handset = device->siblingdevice("handset");
 	}
 
 	if (input_port_read(device->machine, "HCI") & HCI_MECMOUSE)
 		board->mecmouse = device->siblingdevice("mecmouse");
-	
+
 	if (board->mode != TI998)
 	{
-		set_gk_switches(board->gromport, 1, input_port_read(device->machine, "GKSWITCH1"));  
-		set_gk_switches(board->gromport, 2, input_port_read(device->machine, "GKSWITCH2"));  
-		set_gk_switches(board->gromport, 3, input_port_read(device->machine, "GKSWITCH3"));  
-		set_gk_switches(board->gromport, 4, input_port_read(device->machine, "GKSWITCH4"));  
+		set_gk_switches(board->gromport, 1, input_port_read(device->machine, "GKSWITCH1"));
+		set_gk_switches(board->gromport, 2, input_port_read(device->machine, "GKSWITCH2"));
+		set_gk_switches(board->gromport, 3, input_port_read(device->machine, "GKSWITCH3"));
+		set_gk_switches(board->gromport, 4, input_port_read(device->machine, "GKSWITCH4"));
 		set_gk_switches(board->gromport, 5, input_port_read(device->machine, "GKSWITCH5"));
-	}	
+	}
 }
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

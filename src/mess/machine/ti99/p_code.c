@@ -69,8 +69,8 @@
     present called "pcode_r0.bin" (4 KiB), "pcode_r1.bin" (8KiB),
     "pcode_g0.bin" (64 KiB). The switch is turned off by default. Check the
     switch position if the Master Title Screen does not appear as expected.
-	
-	September 2010: Rewritten as device
+
+    September 2010: Rewritten as device
 */
 #include "emu.h"
 #include "peribox.h"
@@ -90,18 +90,18 @@ typedef struct _ti99_pcoden_state
 	int selected;
 
 	int bank_select; // 0 or 1
-	
-	// Pointer to the pcode ROM data. We have three sections of the ROM code: 
+
+	// Pointer to the pcode ROM data. We have three sections of the ROM code:
 	// 4K from one chip, 2 banks with 4K each from the second chip.
 	UINT8 *rom0;
 	UINT8 *rom1;
 	UINT8 *rom2;
 	UINT8 *grom;
-		
+
 	running_device *gromdev[8];
 
 	ti99_peb_connect		lines;
-	
+
 } ti99_pcoden_state;
 
 INLINE ti99_pcoden_state *get_safe_token(running_device *device)
@@ -123,15 +123,15 @@ INLINE ti99_pcoden_state *get_safe_token(running_device *device)
 */
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	ti99_pcoden_state *card = get_safe_token(device); 
+	ti99_pcoden_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==PCODE_CRU_BASE)
 	{
 		int addr = offset & 0x00ff;
-		
+
 		if (addr==0)
 			card->selected = data;
-		
+
 		if (addr==0x80) // Bit 4 is on address line 8
 			card->bank_select = data;
 	}
@@ -142,19 +142,19 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_r )
 {
-	ti99_pcoden_state *card = get_safe_token(device); 
+	ti99_pcoden_state *card = get_safe_token(device);
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000) 
+		if ((offset & 0xe000)==0x4000)
 		{
 			if ((offset & 0xfffd)==GROMBASE)
 			{
 				for (int i=0; i < 8; i++)
-					ti99grom_rz(card->gromdev[i], offset, value); 
+					ti99grom_rz(card->gromdev[i], offset, value);
 				return;
 			}
-			
+
 			if (offset < 0x5000)
 			{
 				/* Accesses ROM 4732 (4K) */
@@ -181,25 +181,25 @@ static WRITE8_DEVICE_HANDLER( data_w )
 		if ((offset & 0xfffd)==(GROMBASE|0x0400))
 		{
 			for (int i=0; i < 8; i++)
-				ti99grom_w(card->gromdev[i], offset, data); 
+				ti99grom_w(card->gromdev[i], offset, data);
 		}
 	}
 }
 
-static ti99_peb_card pcode_ncard = 
+static ti99_peb_card pcode_ncard =
 {
 	data_r,
 	data_w,
 	NULL,
 	cru_w,
-	
-	NULL, NULL,	NULL, NULL	
+
+	NULL, NULL,	NULL, NULL
 };
 
 static DEVICE_START( ti99_pcoden )
 {
 	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device)->token();
-	
+
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&pcode->lines.ready, &topeb->ready, device);
@@ -218,20 +218,20 @@ static DEVICE_RESET( ti99_pcoden )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "EXTCARD") & EXT_PCODE)
 	{
-		running_device *peb = device->owner();	
+		running_device *peb = device->owner();
 		int success = mount_card(peb, device, &pcode_ncard, get_pebcard_config(device)->slot);
 		if (!success) return;
-		
+
 		astring *region = new astring();
-		astring_assemble_3(region, device->tag(), ":", pcode_region);	
-		
+		astring_assemble_3(region, device->tag(), ":", pcode_region);
+
 		pcode->rom0 = memory_region(device->machine, astring_c(region));
 		pcode->rom1 = pcode->rom0 + 0x1000;
 		pcode->rom2 = pcode->rom0 + 0x2000;
 		pcode->grom = pcode->rom0 + 0x3000;
-		pcode->bank_select = 0;	
+		pcode->bank_select = 0;
 		pcode->selected = 0;
-	
+
 		astring *gromname = new astring();
 		for (int i=0; i < 8; i++)
 		{
@@ -250,7 +250,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
 }
 
 /*
-	Get the pointer to the GROM data from the P-Code card. Called by the GROM.
+    Get the pointer to the GROM data from the P-Code card. Called by the GROM.
 */
 static UINT8 *get_grom_ptr(running_device *device)
 {

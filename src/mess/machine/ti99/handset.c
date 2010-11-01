@@ -16,8 +16,8 @@
     joysticks), according to which was currently active.
 
     Originally written by R. Nabet
-    
-    Michael Zapf    
+
+    Michael Zapf
     2010-10-24 Rewriten as device
 */
 
@@ -33,11 +33,11 @@ typedef struct _ti99_handset_state
 	int 		buflen;
 	int 		clock;
 	int 		ack;
-	UINT8 		previous_joy[MAX_HANDSETS];
-	UINT8 		previous_key[MAX_HANDSETS];
+	UINT8		previous_joy[MAX_HANDSETS];
+	UINT8		previous_key[MAX_HANDSETS];
 
 	emu_timer		*timer;
-	running_device 	*console9901;
+	running_device	*console9901;
 
 } ti99_handset_state;
 
@@ -79,13 +79,13 @@ int ti99_handset_poll_bus(running_device *device)
 int ti99_handset_get_clock(running_device *device)
 {
 	ti99_handset_state *handset = get_safe_token(device);
-	return handset->clock;	
+	return handset->clock;
 }
 
 int ti99_handset_get_int(running_device *device)
 {
 	ti99_handset_state *handset = get_safe_token(device);
-	return handset->buflen==3;	
+	return handset->buflen==3;
 }
 
 /*
@@ -104,7 +104,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	handset->clock = !handset->clock;
 	handset->buf >>= 4;
 	handset->buflen--;
-	
+
 	tms9901_set_single_int(handset->console9901, 12, 0);
 
 	if (handset->buflen == 1)
@@ -154,7 +154,7 @@ static void ti99_handset_post_message(running_device *device, int message)
 	handset->clock = 1;
 	handset->buf = ~message;
 	handset->buflen = 3;
-	
+
 	tms9901_set_single_int(handset->console9901, 12, 1);
 }
 
@@ -310,9 +310,9 @@ void ti99_handset_task(running_device *device)
 {
 	int i;
 	ti99_handset_state *handset = get_safe_token(device);
-	
+
 	if (handset->buflen == 0)
-	{	
+	{
 		/* poll every handset */
 		for (i=0; i < MAX_HANDSETS; i++)
 			if (ti99_handset_poll_joystick(device, i)) return;

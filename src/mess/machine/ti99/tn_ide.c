@@ -18,8 +18,8 @@
 
     Rewritten as device
     Michael Zapf, September 2010
-    
-    FIXME: idecont assumes that there is only one drive that is called 
+
+    FIXME: idecont assumes that there is only one drive that is called
     "harddisk" at the root level
 */
 #include "emu.h"
@@ -32,7 +32,7 @@
 
 #define CRU_BASE 0x1000
 
-typedef ti99_pebcard_config tn_ide_config; 
+typedef ti99_pebcard_config tn_ide_config;
 
 enum
 {	/* 0xff for 2 mbytes, 0x3f for 512kbytes, 0x03 for 32 kbytes */
@@ -62,17 +62,17 @@ typedef struct _tn_ide_state
 	int 	sram_enable_dip;
 	int 	cru_register;
 	int		cur_page;
-	
+
 	int		tms9995_mode;
-	
-	UINT8 	input_latch;
-	UINT8 	output_latch;
-	
+
+	UINT8	input_latch;
+	UINT8	output_latch;
+
 	UINT8	*ram;
-	
+
 	/* Callback lines to the main system. */
 	ti99_peb_connect	lines;
-	
+
 } tn_ide_state;
 
 INLINE tn_ide_state *get_safe_token(running_device *device)
@@ -87,12 +87,12 @@ INLINE tn_ide_state *get_safe_token(running_device *device)
 */
 static READ8Z_DEVICE_HANDLER( cru_rz )
 {
-	tn_ide_state *card = get_safe_token(device); 
+	tn_ide_state *card = get_safe_token(device);
 	UINT8 reply = 0;
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		int bit = (offset >> 4) & 7;
-		
+
 		if (bit==0)
 		{
 			reply = card->cru_register & 0x30;
@@ -109,11 +109,11 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 }
 
 /*
-	CRU write
+    CRU write
 */
 static WRITE8_DEVICE_HANDLER( cru_w )
 {
-	tn_ide_state *card = get_safe_token(device); 
+	tn_ide_state *card = get_safe_token(device);
 
 	if ((offset & 0xff00)==CRU_BASE)
 	{
@@ -122,11 +122,11 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		{
 		case 0:			/* turn card on: handled by core */
 			card->selected = data;
-			
+
 		case 1:			/* enable SRAM or registers in 0x4000-0x40ff */
 			card->sram_enable = data;
 			break;
-			
+
 		case 2:			/* enable SRAM page switching */
 		case 3:			/* force SRAM page 0 */
 		case 4:			/* enable SRAM in 0x6000-0x7000 ("RAMBO" mode) */
@@ -137,10 +137,10 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 				card->cru_register |= 1 << bit;
 			else
 				card->cru_register &= ~(1 << bit);
-			
+
 			if (bit == 6)
 				devcb_call_write_line(&card->lines.inta, (card->cru_register & cru_reg_int_en) && card->ide_irq);
-			
+
 			if ((bit == 6) || (bit == 7))
 				if ((card->cru_register & cru_reg_int_en) && !(card->cru_register & cru_reg_reset))
 					card->ide->reset();
@@ -154,13 +154,13 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 */
 static READ8Z_DEVICE_HANDLER( data_rz )
 {
-	tn_ide_state *card = get_safe_token(device); 
+	tn_ide_state *card = get_safe_token(device);
 	UINT8 reply = 0;
 
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		int addr = offset & 0x1fff;
-	
+
 		if ((addr <= 0xff) && (card->sram_enable == card->sram_enable_dip))
 		{	/* registers */
 			switch ((addr >> 5) & 0x3)
@@ -186,7 +186,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 				{	/* first read triggers 16-bit read cycle */
 					card->input_latch = (! (addr & 0x10)) ? ide_bus_r(card->ide, 0, (addr >> 1) & 0x7) : 0;
 				}
-				
+
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
@@ -197,7 +197,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 				{	/* first read triggers 16-bit read cycle */
 					card->input_latch = (! (addr & 0x10)) ? ide_bus_r(card->ide, 1, (addr >> 1) & 0x7) : 0;
 				}
-				
+
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
@@ -217,21 +217,21 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 }
 
 /*
-	Memory write. The controller is 16 bit, so we need to demultiplex again.
+    Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
 static WRITE8_DEVICE_HANDLER( data_w )
 {
-	tn_ide_state *card = get_safe_token(device); 
+	tn_ide_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected) 
+	if (((offset & 0xe000)==0x4000) && card->selected)
 	{
 		if (card->cru_register & cru_reg_page_switching)
 		{
 			card->cur_page = (offset >> 1) & page_mask;
 		}
-		
+
 		int addr = offset & 0x1fff;
-		
+
 		if ((addr <= 0xff) && (card->sram_enable == card->sram_enable_dip))
 		{	/* registers */
 			switch ((addr >> 5) & 0x3)
@@ -253,18 +253,18 @@ static WRITE8_DEVICE_HANDLER( data_w )
 					rtc65271_rtc_w(card->rtc, 0, data);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
-/*	
-				if (addr & 1)
-					card->output_latch = (card->output_latch & 0xff00) | data;
-				else
-					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+/*
+                if (addr & 1)
+                    card->output_latch = (card->output_latch & 0xff00) | data;
+                else
+                    card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
 */
 				/* latch write - bytes are swapped in 2004 IDE card */
 				if (addr & 1)
 					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
 				else
 					card->output_latch = (card->output_latch & 0xff00) | data;
-				
+
 				if (card->tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{	/* second write triggers 16-bit write cycle */
 					ide_bus_w(card->ide, 0, (addr >> 1) & 0x7, card->output_latch);
@@ -272,17 +272,17 @@ static WRITE8_DEVICE_HANDLER( data_w )
 				break;
 			case 3:		/* IDE registers set 2 (CS3Fx) */
 /*
-				if (addr & 1)
-					card->output_latch = (card->output_latch & 0xff00) | data;
-				else
-					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+                if (addr & 1)
+                    card->output_latch = (card->output_latch & 0xff00) | data;
+                else
+                    card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
 */
 				/* latch write - bytes are swapped in 2004 IDE card */
 				if (addr & 1)
 					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
 				else
 					card->output_latch = (card->output_latch & 0xff00) | data;
-				
+
 				if (card->tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{	/* second write triggers 16-bit write cycle */
 					ide_bus_w(card->ide, 1, (addr >> 1) & 0x7, card->output_latch);
@@ -305,11 +305,11 @@ static WRITE8_DEVICE_HANDLER( data_w )
 
 /**************************************************************************/
 
-static ti99_peb_card tn_ide_card = 
+static ti99_peb_card tn_ide_card =
 {
 	data_rz, data_w,				// memory access read/write
 	cru_rz, cru_w,					// CRU access
-	NULL, NULL,						// SENILA/B access 
+	NULL, NULL,						// SENILA/B access
 	NULL, NULL						// 16 bit access (none here)
 };
 
@@ -342,7 +342,7 @@ static DEVICE_START( tn_ide )
 	tn_ide_state *card = get_safe_token(device);
 	card->rtc = device->subdevice("ide_rtc");
 	card->ide = device->subdevice("ide");
-	
+
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 
@@ -358,12 +358,12 @@ static DEVICE_RESET( tn_ide )
 {
 	tn_ide_state *card = get_safe_token(device);
 	running_device *peb = device->owner();
-	
+
 	if (input_port_read(device->machine, "HDCTRL") & HD_IDE)
 	{
 		int success = mount_card(peb, device, &tn_ide_card, get_pebcard_config(device)->slot);
 		if (!success) return;
-		
+
 		card->cur_page = 0;
 		card->sram_enable = 0;
 		card->cru_register = 0;
