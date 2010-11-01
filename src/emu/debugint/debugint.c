@@ -889,7 +889,7 @@ static void debugint_exit(running_machine &machine)
 	}
 	if (debug_font != NULL)
 	{
-		render_font_free(debug_font);
+		machine.render().font_free(debug_font);
 		debug_font = NULL;
 	}
 
@@ -899,7 +899,7 @@ void debugint_init(running_machine *machine)
 {
 	unicode_char ch;
 	int chw;
-	debug_font = render_font_alloc(*machine, "ui.bdf"); //ui_get_font();
+	debug_font = machine->render().font_alloc("ui.bdf"); //ui_get_font(machine);
 	debug_font_width = 0;
 	debug_font_height = 15;
 
@@ -912,7 +912,7 @@ void debugint_init(running_machine *machine)
 
 	for (ch=0;ch<=127;ch++)
 	{
-		chw = render_font_get_char_width(debug_font, debug_font_height, debug_font_aspect, ch);
+		chw = debug_font->char_width(debug_font_height, debug_font_aspect, ch);
 		if (chw>debug_font_width)
 			debug_font_width = chw;
 	}
@@ -1439,7 +1439,7 @@ static void update_views(void)
 }
 
 
-void debugint_wait_for_debugger(running_device *device, int firststop)
+void debugint_wait_for_debugger(running_device &device, bool firststop)
 {
 
 	if (firststop && list == NULL)
@@ -1447,28 +1447,28 @@ void debugint_wait_for_debugger(running_device *device, int firststop)
 		DView *dv;
 		render_target *target;
 
-		target = &device->machine->render().ui_target();
+		target = &device.machine->render().ui_target();
 
 		//set_view_by_name(target, "Debug");
 
-		dv = dview_alloc(target, device->machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
+		dv = dview_alloc(target, device.machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		dv->editor.active = TRUE;
-		dv->editor.container = &device->machine->render().ui_container();
-		dv = dview_alloc(target, device->machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
-		dv = dview_alloc(target, device->machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+		dv->editor.container = &device.machine->render().ui_container();
+		dv = dview_alloc(target, device.machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+		dv = dview_alloc(target, device.machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(dv, "Console");
 		dv->editor.active = TRUE;
-		dv->editor.container = &device->machine->render().ui_container();
+		dv->editor.container = &device.machine->render().ui_container();
 		set_focus_view(dv);
 	}
 
-	followers_set_cpu(device);
+	followers_set_cpu(&device);
 
-	//ui_update_and_render(device->machine, &device->machine->render().ui_container()());
+	//ui_update_and_render(device.machine, &device.machine->render().ui_container()());
 	update_views();
-	osd_update(device->machine, FALSE);
-	handle_menus(device->machine);
-	handle_mouse(device->machine);
+	device.machine->osd().update(false);
+	handle_menus(device.machine);
+	handle_mouse(device.machine);
 	//osd_sleep(osd_ticks_per_second()/60);
 
 }

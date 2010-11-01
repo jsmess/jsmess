@@ -976,7 +976,8 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	options_set_string(mame_opts, OPTION_GAMENAME, drivers[nGameIndex]->name, OPTION_PRIORITY_CMDLINE);
 	// Time the game run.
 	time(&start);
-	mame_execute(mame_opts);
+	windows_osd_interface osd;
+	mame_execute(osd, mame_opts);
 	// Calc the duration
 	time(&end);
 	elapsedtime = end - start;

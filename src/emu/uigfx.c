@@ -242,7 +242,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->total_colors();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
 	const rgb_t *raw_color = palette_entry_list_raw(machine->palette);
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
@@ -253,7 +253,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 
 	/* add a half character padding for the box */
 	chheight = ui_get_line_height(*machine);
-	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
+	chwidth = ui_font->char_width(chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -273,7 +273,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 	cellboxbounds.y0 += 3.0f * chheight;
 
 	/* figure out the title and expand the outer box to fit */
-	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
+	titlewidth = ui_font->string_width(chheight, machine->render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -287,7 +287,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 	for (x = 0; title[x] != 0; x++)
 	{
 		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
+		x0 += ui_font->char_width(chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* compute the cell size */
@@ -328,7 +328,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 			sprintf(buffer, "%5X", state->palette.offset + y * state->palette.count);
 			for (x = 4; x >= 0; x--)
 			{
-				x0 -= render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), buffer[x]);
+				x0 -= ui_font->char_width(chheight, machine->render().ui_aspect(), buffer[x]);
 				container->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, buffer[x]);
 			}
 		}
@@ -427,7 +427,7 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 
 static void gfxset_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	int set = state->gfxset.set;
 	gfx_element *gfx = machine->gfx[set];
 	float fullwidth, fullheight;
@@ -449,7 +449,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 
 	/* add a half character padding for the box */
 	chheight = ui_get_line_height(*machine);
-	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
+	chwidth = ui_font->char_width(chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -514,7 +514,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	/* figure out the title and expand the outer box to fit */
 	for (x = 0; x < MAX_GFX_ELEMENTS && machine->gfx[x] != NULL; x++) ;
 	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width, gfx->height, state->gfxset.color[set]);
-	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
+	titlewidth = ui_font->string_width(chheight, machine->render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -528,7 +528,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	for (x = 0; title[x] != 0; x++)
 	{
 		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
+		x0 += ui_font->char_width(chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* draw the top column headers */
@@ -565,7 +565,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 			sprintf(buffer, "%5X", state->gfxset.offset[set] + y * xcells);
 			for (x = 4; x >= 0; x--)
 			{
-				x0 -= render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), buffer[x]);
+				x0 -= ui_font->char_width(chheight, machine->render().ui_aspect(), buffer[x]);
 				container->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, buffer[x]);
 			}
 		}
@@ -840,7 +840,7 @@ static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, i
 
 static void tilemap_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	float chwidth, chheight;
 	render_bounds mapboxbounds;
 	render_bounds boxbounds;
@@ -861,7 +861,7 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 
 	/* add a half character padding for the box */
 	chheight = ui_get_line_height(*machine);
-	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
+	chwidth = ui_font->char_width(chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -908,7 +908,7 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 
 	/* figure out the title and expand the outer box to fit */
 	sprintf(title, "TMAP %d/%d %dx%d OFFS %d,%d", state->tilemap.which, tilemap_count(machine) - 1, mapwidth, mapheight, state->tilemap.xoffs, state->tilemap.yoffs);
-	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
+	titlewidth = ui_font->string_width(chheight, machine->render().ui_aspect(), title);
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
 		boxbounds.x0 = 0.5f - 0.5f * (titlewidth + chwidth);
@@ -924,7 +924,7 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 	for (x = 0; title[x] != 0; x++)
 	{
 		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
+		x0 += ui_font->char_width(chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* update the bitmap */

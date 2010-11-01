@@ -138,7 +138,7 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const machine_config &_config, core_options &options, bool exit_to_game_select)
+running_machine::running_machine(const machine_config &_config, osd_interface &osd, core_options &options, bool exit_to_game_select)
 	: m_regionlist(m_respool),
 	  m_devicelist(m_respool),
 	  config(&_config),
@@ -168,7 +168,6 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  input_data(NULL),
 	  input_port_data(NULL),
 	  ui_input_data(NULL),
-	  cheat_data(NULL),
 	  debugcpu_data(NULL),
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
@@ -176,6 +175,7 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  m_logerror_list(NULL),
 	  m_scheduler(*this),
 	  m_options(options),
+	  m_osd(osd),
 	  m_basename(_config.gamedrv().name),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
 	  m_paused(false),
@@ -190,6 +190,7 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  m_saveload_searchpath(NULL),
 	  m_rand_seed(0x9d14abd7),
 	  m_driver_device(NULL),
+	  m_cheat(NULL),
 	  m_render(NULL),
 	  m_debug_view(NULL)
 {
@@ -273,7 +274,6 @@ void running_machine::start()
 	state_save_allow_registration(this, true);
 	palette_init(this);
 	m_render = auto_alloc(this, render_manager(*this));
-	ui_init(this);
 	generic_machine_init(this);
 	generic_video_init(this);
 	generic_sound_init(this);
@@ -284,7 +284,8 @@ void running_machine::start()
 	m_soft_reset_timer = timer_alloc(this, static_soft_reset, NULL);
 
 	// init the osd layer
-	osd_init(this);
+	m_osd.init(*this);
+	ui_init(this);
 
 	// initialize the base time (needed for doing record/playback)
 	time(&m_base_time);
@@ -343,8 +344,7 @@ void running_machine::start()
 		schedule_load("auto");
 
 	// set up the cheat engine
-	if (options_get_bool(&m_options, OPTION_CHEAT))
-		cheat_init(this);
+	m_cheat = auto_alloc(this, cheat_manager(*this));
 
 	// disallow save state registrations starting here
 	state_save_allow_registration(this, false);
