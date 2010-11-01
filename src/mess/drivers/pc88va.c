@@ -799,7 +799,9 @@ static READ8_HANDLER( pc88va_fdc_r )
 		case 0x00: return 0; // FDC mode register
 		case 0x02: return 0; // FDC control port 0
 		case 0x04: return 0; // FDC control port 1
-		case 0x06: return 0; // FDC control port 2
+		/* ---x ---- RDY: (0) Busy (1) Ready */
+		case 0x06: // FDC control port 2
+			return 0;
 		case 0x08: return upd765_status_r(space->machine->device("upd765"), 0);
 		case 0x0a: return upd765_data_r(space->machine->device("upd765"), 0);
 	}
@@ -811,10 +813,34 @@ static WRITE8_HANDLER( pc88va_fdc_w )
 {
 	switch(offset*2)
 	{
-		case 0x00: break; // FDC mode register
-		case 0x02: break; // FDC control port 0
-		case 0x04: break; // FDC control port 1
-		case 0x06: break; // FDC control port 2
+		/*
+		---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
+		*/
+		case 0x00: // FDC mode register
+			break;
+		/*
+		--x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
+		---x ---- DS1: Prohibition of the drive selection of FDC (0) Permission (1) Prohibition
+		---- xx-- TD1/TD0: Drive 1/0 track density (0) 48 TPI (1) 96 TPI
+		---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
+		*/
+		case 0x02: // FDC control port 0
+			break;
+		/*
+		---- x--- PCM: ?
+		---- --xx M1/M0: Drive 1/0 motor control (0) Motor OFF (1) Motor ON
+		*/
+		case 0x04: // FDC control port 1
+			break;
+		/*
+		x--- ---- FDCRST: FDC Reset
+		-xx- ---- FDCFRY FRYCEN: FDC force ready control
+		---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
+		---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
+		---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
+		*/
+		case 0x06:
+			break; // FDC control port 2
 		case 0x08: break; // UPD765 status
 		case 0x0a: upd765_data_w(space->machine->device("upd765"), 0,data); break;
 	}
