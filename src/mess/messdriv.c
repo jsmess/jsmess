@@ -1800,5 +1800,6 @@ const game_driver * const drivers[] =
 	DRIVER( pc4 )
 	DRIVER( pofo )
 	DRIVER( homez80 )
+	DRIVER( tek4705 )
 
 #endif /* DRIVER_RECURSIVE */

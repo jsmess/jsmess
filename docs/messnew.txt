@@ -15,6 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers:
 -----------------
 - Dream 6800 [Robbbert]
+- Tektronix 4705 [Lord Nightmare, Balrog, Curt Coder]
 
 
 
