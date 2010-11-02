@@ -7,13 +7,14 @@
 	http://www.best-electronics-ca.com/portfoli.htm
 	http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
-	Undumped cartridges:
+
+	Undumped Atari cartridges:
 
 	Utility-Card				HPC-701
 	Finance-Card				HPC-702
 	Science-Card				HPC-703	
 	File Manager / Tutorial		HPC-704
-	PowerBasic					HPC-705
+	PowerBASIC					HPC-705
 	Instant Spell				HPC-709
 	Hyperlist					HPC-713
 	Bridge Baron				HPC-724
@@ -22,6 +23,38 @@
 	Astrologer					HPC-728	
 	Stock Tracker				HPC-729	
 	Chess						HPC-750
+	
+
+	Undumped 3rd party cartridges:
+
+	Adcalc						AAC-1000
+	Alpha Paging Interface		SAMpage
+	Business Contacts and Information Manager		BCIM
+	Checkwriter
+	Colossal Cave Adventure
+	Drug Interactions
+	Dynapulse										200M-A
+	Form Letters
+	FORTH programming system						UTIL
+	FX-3 DUAT Flight Software
+	FX-4 Flight Planner
+	Graphics Screens
+	Marine Device Interface							CM380 UMPIRE
+	Message Mover (Mac)								MSG-PKG6
+	Message Mover (PC)								MSG-PKG5
+	Micro Hedge
+	Micro-Roentgen Radiation Monitor				RM-60
+	Patient Management
+	PBase
+	PDD2 Utilities
+	Pharmaceuticals
+	Physician's Reference I
+	PIPELINE Fuel Management
+	REACT
+	Stocks Games
+	Terminal+
+	Timekeeper
+	TIMEPAC-5
 
 */
 
