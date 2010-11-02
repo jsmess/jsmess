@@ -357,7 +357,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	uistate = (cassette_state)(cassette_get_state(device) & CASSETTE_MASK_UISTATE);
 
 	/* choose a location on the screen */
-	x = 0.0f;
+	x = 0.2f;
 	y = 0.5f;
 
 	dev = device->machine->m_devicelist.first(CASSETTE );
