@@ -301,7 +301,80 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 	}
 }
 
+class test_osd_interface : public osd_interface
+{
+public:
+	// construction/destruction
+	test_osd_interface();
+	virtual ~test_osd_interface();
+	
+	// general overridables
+	virtual void init(running_machine &machine);
+	virtual void update(bool skip_redraw);
 
+	// debugger overridables
+//	virtual void init_debugger();
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	
+	// audio overridables
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
+
+	// input overridables
+	virtual void customize_input_type_list(input_type_desc *typelist);
+	
+	// font overridables
+	virtual osd_font font_open(const char *name, int &height);
+	virtual void font_close(osd_font font);
+	virtual bitmap_t *font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+};
+	
+test_osd_interface::test_osd_interface()
+{
+}
+
+test_osd_interface::~test_osd_interface()
+{
+}
+
+void test_osd_interface::init(running_machine &machine)
+{
+	// call our parent
+	osd_interface::init(machine);
+}
+
+osd_font test_osd_interface::font_open(const char *_name, int &height)
+{
+	return NULL;
+}
+
+void test_osd_interface::font_close(osd_font font)
+{
+}
+
+bitmap_t *test_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	return NULL;
+}
+
+void test_osd_interface::update(bool skip_redraw)
+{
+}
+
+void test_osd_interface::wait_for_debugger(running_device &device, bool firststop)
+{
+}
+void test_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+{
+}
+
+void test_osd_interface::set_mastervolume(int attenuation)
+{
+}
+
+void test_osd_interface::customize_input_type_list(input_type_desc *typelist)
+{
+}
 
 static messtest_result_t run_test(int flags, messtest_results *results)
 {
@@ -383,7 +456,8 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_DEBUG, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_LOG, mame_null_output_callback, NULL, NULL, NULL);
-	mame_execute(opts);
+	test_osd_interface osd;
+	mame_execute(osd, opts);
 	real_run_time = ((double) (clock() - begin_time)) / CLOCKS_PER_SEC;
 
 	/* what happened? */
