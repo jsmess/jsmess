@@ -130,8 +130,8 @@ Notes:
     Relevant IC's shown.
 
     4116    - Motorola MCM4116AC25 1Kx8 RAM
-	PROM0	- some kind of PROM "HRU I"
-	PROM1	- some kind of PROM "HRU II"
+	PROM0	- Philips 82S123 32x8 Bipolar PROM "HRU I"
+	PROM1	- Philips 82S131 512x4 Bipolar PROM "HRU II"
 
 
 UNI-800 PCB Layout
@@ -155,7 +155,7 @@ Notes:
     Relevant IC's shown.
 
     4164    - Hitachi HM4864P-2 64Kx1 RAM
-	PROM0	- some kind of PROM ".800 1.2"
+	PROM0	- Philips 82S129 256x4 Bipolar PROM ".800 1.2"
 	CN1		- 2x6 pin PCB header
 	CN2		- 2x10 pin PCB header
 	CN3		- 2x10 pin PCB header
@@ -1810,26 +1810,26 @@ MACHINE_CONFIG_END
 
 ROM_START( abc800c )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
-	ROM_LOAD( "abc c-1.1m", 0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 1-1.1l", 0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 2-1.1k", 0x2000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 3-1.1j", 0x3000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 4-1.2m", 0x4000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 5-1.2l", 0x5000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 6-1.2k", 0x6000, 0x1000, NO_DUMP )
+	ROM_LOAD( "abc c-1.1m", 0x0000, 0x1000, CRC(37009d29) SHA1(a1acd817ff8c2ed93935a163c5cf3d83d8bd6fb5) )
+	ROM_LOAD( "abc 1-1.1l", 0x1000, 0x1000, CRC(ff15a28d) SHA1(bb4523ab1d190bc787f1923567b86795f66c26e2) )
+	ROM_LOAD( "abc 2-1.1k", 0x2000, 0x1000, CRC(6ff2f528) SHA1(32d1639769c4a20b7a45c44f4c6993f77397f7a1) )
+	ROM_LOAD( "abc 3-1.1j", 0x3000, 0x1000, CRC(9a43c47a) SHA1(964eb28e3d9779d1b13e0e938495133bbdb3aed3) )
+	ROM_LOAD( "abc 4-1.2m", 0x4000, 0x1000, CRC(ba18db9c) SHA1(0c4543766fe9b10bee333f3f832f6f2209e449f8) )
+	ROM_LOAD( "abc 5-1.2l", 0x5000, 0x1000, CRC(abbeb026) SHA1(44ebe417e3fa8d7878c23b56782aac8b443f1bfc) )
+	ROM_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3) ) // 1981-01-12
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
 	ROM_REGION( 0x400, I8048_TAG, 0 )
 	ROM_LOAD( "8048-132.z9", 0x0000, 0x0400, CRC(05c4dce5) SHA1(1824c5d304bbd09f97056cfa408e1b18b5219ba2) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) ) // copied from p2000t driver
+	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) ) // copied from p2000t driver, missing Swedish characters
 
 	ROM_REGION( 0x20, "hru", 0 )
-	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) )
 
 	ROM_REGION( 0x200, "hru2", 0 )
-	ROM_LOAD( "hru ii.3a", 0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+	ROM_LOAD( "hru ii.3a", 0x0000, 0x0200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) )
 ROM_END
 
 
@@ -1858,10 +1858,13 @@ ROM_START( abc800m )
 	ROM_LOAD( "vum se.7c", 0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 
 	ROM_REGION( 0x20, "hru", 0 )
-	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) )
 
 	ROM_REGION( 0x200, "hru2", 0 )
-	ROM_LOAD( "hru ii.3a", 0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+	ROM_LOAD( "hru ii.3a", 0x0000, 0x0200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) )
+
+	ROM_REGION( 0x100, "uni800", 0 )
+	ROM_LOAD( ".800 1.2.bin", 0x0000, 0x0100, CRC(df4897f8) SHA1(0c641f4cf321f0003da3fbd435edb138a9b949b4) )
 ROM_END
 
 
@@ -2084,7 +2087,7 @@ static DRIVER_INIT( abc806 )
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
-COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_NO_SOUND )

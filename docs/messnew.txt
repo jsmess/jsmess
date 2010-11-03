@@ -15,13 +15,13 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers:
 -----------------
 - Dream 6800 [Robbbert]
-- Tektronix 4705 [Lord Nightmare, Balrog, Curt Coder]
+- Tektronix 4107A/4109A [Lord Nightmare, Balrog, Curt Coder]
 
 
 
 System Driver Changes:
 ----------------------
-(none)
+- [ABC800C] Added Color version ROMs. [Ola Andersson]
 
 
 
