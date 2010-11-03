@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Tektronix 4705
+    Tektronix 4107A/4109A
 
     Skeleton driver.
 
@@ -20,58 +20,58 @@
 #define I80188_TAG "i80188"
 #define SCREEN_TAG "screen"
 
-class tek4705_state : public driver_device
+class tek4107a_state : public driver_device
 {
 public:
-	tek4705_state(running_machine &machine, const driver_device_config_base &config)
+	tek4107a_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tek4705_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tek4107a_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tek4705_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tek4107a_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_PORTS_START( tek4705 )
+static INPUT_PORTS_START( tek4107a )
 INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_START( tek4705 )
+static VIDEO_START( tek4107a )
 {
 }
 
-static VIDEO_UPDATE( tek4705 )
+static VIDEO_UPDATE( tek4107a )
 {
 	return 0;
 }
 
 /* Machine Initialization */
 
-static MACHINE_START( tek4705 )
+static MACHINE_START( tek4107a )
 {
 }
 
-static MACHINE_RESET( tek4705 )
+static MACHINE_RESET( tek4107a )
 {
 }
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tek4705, tek4705_state )
+static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
     /* basic machine hardware */
 	MDRV_CPU_ADD(I80188_TAG, I80188, 21000000)
-    MDRV_CPU_PROGRAM_MAP(tek4705_mem)
-    MDRV_CPU_IO_MAP(tek4705_io)
+    MDRV_CPU_PROGRAM_MAP(tek4107a_mem)
+    MDRV_CPU_IO_MAP(tek4107a_io)
 
-    MDRV_MACHINE_START(tek4705)
-    MDRV_MACHINE_RESET(tek4705)
+    MDRV_MACHINE_START(tek4107a)
+    MDRV_MACHINE_RESET(tek4107a)
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -83,13 +83,13 @@ static MACHINE_CONFIG_START( tek4705, tek4705_state )
 
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(tek4705)
-    MDRV_VIDEO_UPDATE(tek4705)
+	MDRV_VIDEO_START(tek4107a)
+    MDRV_VIDEO_UPDATE(tek4107a)
 MACHINE_CONFIG_END
 
 /* ROMs */
 
-ROM_START( tek4705 )
+ROM_START( tek4107a )
 	ROM_REGION( 0x40000, I80188_TAG, 0 )
 	ROM_LOAD16_BYTE( "160-3283-02 v8.2.u60",  0x00000, 0x8000, CRC(2a821db6) SHA1(b4d8b74bd9fe43885dcdc4efbdd1eebb96e32060) )
 	ROM_LOAD16_BYTE( "160-3284-02 v8.2.u160", 0x00001, 0x8000, CRC(ee567b01) SHA1(67b1b0648cfaa28d57473bcc45358ff2bf986acf) )
@@ -104,7 +104,10 @@ ROM_START( tek4705 )
 	ROM_LOAD( "160-3087 v1.0.u855", 0x0000, 0x1000, CRC(97479528) SHA1(e9e15f1f64b3b6bd139accd51950bae71fdc2193) )
 ROM_END
 
+#define rom_tek4109a rom_tek4107a
+
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1985, tek4705,	0,			0,		tek4705,	tek4705,	0,		"Tektronix",	"Tektronix 4705",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, tek4107a,	0,			0,		tek4107a,	tek4107a,	0,		"Tektronix",	"Tektronix 4107A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, tek4109a,	tek4107a,	0,		tek4107a,	tek4107a,	0,		"Tektronix",	"Tektronix 4109A",	GAME_NOT_WORKING | GAME_NO_SOUND )
