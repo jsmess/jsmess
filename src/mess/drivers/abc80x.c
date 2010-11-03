@@ -1624,18 +1624,21 @@ void abc806_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc800 )
+//  MACHINE_CONFIG( abc800c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800, abc800_state )
+static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	// basic machine hardware
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc800m_mem)
-	MDRV_CPU_IO_MAP(abc800m_io)
+	MDRV_CPU_PROGRAM_MAP(abc800c_mem)
+	MDRV_CPU_IO_MAP(abc800c_io)
 
 	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
 	MDRV_CPU_IO_MAP(abc800_keyboard_io)
+
+	// video hardware
+	MDRV_FRAGMENT_ADD(abc800c_video)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1667,24 +1670,42 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc800m )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( abc800m, abc800 )
+static MACHINE_CONFIG_START( abc800m, abc800m_state )
+	// basic machine hardware
+	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MDRV_CPU_CONFIG(abc800_daisy_chain)
+	MDRV_CPU_PROGRAM_MAP(abc800m_mem)
+	MDRV_CPU_IO_MAP(abc800m_io)
+	
+	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
+	MDRV_CPU_IO_MAP(abc800_keyboard_io)
+
 	// video hardware
 	MDRV_FRAGMENT_ADD(abc800m_video)
-MACHINE_CONFIG_END
 
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(abc800)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( abc800c )
-//-------------------------------------------------
+	// peripheral hardware
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MDRV_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
-static MACHINE_CONFIG_DERIVED( abc800c, abc800 )
-	// basic machine hardware
-	MDRV_CPU_MODIFY(Z80_TAG)
-	MDRV_CPU_PROGRAM_MAP(abc800c_mem)
-	MDRV_CPU_IO_MAP(abc800c_io)
+	// ABC bus
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
 
-	// video hardware
-	MDRV_FRAGMENT_ADD(abc800c_video)
+	// internal ram
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 

@@ -62,8 +62,6 @@ public:
 		  m_ctc(*this, Z80CTC_TAG),
 		  m_dart(*this, Z80DART_TAG),
 		  m_sio(*this, Z80SIO_TAG),
-		  m_crtc(*this, MC6845_TAG),
-		  m_trom(*this, SAA5052_TAG),
 		  m_discrete(*this, "discrete"),
 		  m_ram(*this, "messram")
 	{ }
@@ -72,14 +70,14 @@ public:
 	required_device<running_device> m_ctc;
 	required_device<running_device> m_dart;
 	required_device<running_device> m_sio;
-	optional_device<running_device> m_crtc;
-	optional_device<running_device> m_trom;
 	required_device<running_device> m_discrete;
 	required_device<running_device> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
+	virtual void video_start();
+
 	void bankswitch();
 
 	DECLARE_READ8_MEMBER( pling_r );
@@ -116,6 +114,35 @@ public:
 	int m_sio_txcb;
 };
 
+class abc800m_state : public abc800_state
+{
+public:
+	abc800m_state(running_machine &machine, const driver_device_config_base &config)
+		: abc800_state(machine, config),
+		  m_crtc(*this, MC6845_TAG)
+	{ }
+
+	required_device<running_device> m_crtc;
+
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
+};
+
+class abc800c_state : public abc800_state
+{
+public:
+	abc800c_state(running_machine &machine, const driver_device_config_base &config)
+		: abc800_state(machine, config),
+		  m_trom(*this, SAA5052_TAG)
+	{ }
+
+	required_device<running_device> m_trom;
+
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
+};
 
 // ======================> abc802_state
 
