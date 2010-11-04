@@ -1844,7 +1844,7 @@ ROM_START( abc800c )
 	ROM_LOAD( "8048-132.z9", 0x0000, 0x0400, CRC(05c4dce5) SHA1(1824c5d304bbd09f97056cfa408e1b18b5219ba2) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) ) // copied from p2000t driver, missing Swedish characters
+	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
 
 	ROM_REGION( 0x20, "hru", 0 )
 	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) )
