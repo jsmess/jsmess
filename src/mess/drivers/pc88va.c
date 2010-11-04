@@ -23,6 +23,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
+#include "sound/2203intf.h"
 
 static UINT16 *palram;
 static UINT16 bank_reg;
@@ -976,18 +977,31 @@ static WRITE16_HANDLER( video_pri_w )
 	COMBINE_DATA(&video_pri_reg[offset]);
 }
 
+static READ8_HANDLER( backupram_dsw_r )
+{
+	UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
+
+	if(offset == 0)
+		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;
+
+	return knj_ram[(0x50000 + 0x1fc6) / 2] & 0xff;
+}
+
+static WRITE8_HANDLER( sys_port1_w )
+{
+	// ...
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 	AM_RANGE(0x0020, 0x0021) AM_NOP // RS-232C
-//	AM_RANGE(0x0030, 0x0030) (R) DSW1 (W) Text Control Port 0
-//	AM_RANGE(0x0031, 0x0031) (R) DSW2 (W) System Port 1
+	AM_RANGE(0x0030, 0x0031) AM_READWRITE8(backupram_dsw_r,sys_port1_w,0xffff) // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
 //	AM_RANGE(0x0032, 0x0032) (R) ? (W) System Port 2
 //	AM_RANGE(0x0034, 0x0034) GVRAM Control Port 1
 //	AM_RANGE(0x0035, 0x0035) GVRAM Control Port 2
 	AM_RANGE(0x0040, 0x0041) AM_READ(sys_port4_r) // (R) System Port 4 (W) System port 3 (strobe port)
-//	AM_RANGE(0x0044, 0x0045) YM2203
-//	AM_RANGE(0x0046, 0x0047) YM2203 mirror
+	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x0002) AM_DEVREADWRITE8("ym", ym2203_r,ym2203_w,0xffff)
 //	AM_RANGE(0x005c, 0x005c) (R) GVRAM status
 //	AM_RANGE(0x005c, 0x005f) (W) GVRAM selection
 //	AM_RANGE(0x0070, 0x0070) ? (*)
@@ -1493,6 +1507,19 @@ static const struct upd765_interface pc88va_upd765_interface =
 	{FLOPPY_0,NULL, NULL, NULL}
 };
 
+static const ym2203_interface pc88va_ym2203_intf =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	NULL
+};
+
 static MACHINE_CONFIG_START( pc88va, driver_device )
 
 	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -1532,7 +1559,13 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 
     MDRV_PIT8253_ADD("pit8253",pc88va_pit8253_config)
 
-
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
+	MDRV_SOUND_CONFIG(pc88va_ym2203_intf)
+	MDRV_SOUND_ROUTE(0, "mono", 0.25)
+	MDRV_SOUND_ROUTE(1, "mono", 0.25)
+	MDRV_SOUND_ROUTE(2, "mono", 0.50)
+	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
