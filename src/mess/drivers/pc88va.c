@@ -9,6 +9,9 @@
 	TODO:
 	- Does this system have one or two CPUs? I'm prone to think that the V30 does all the job
 	  and then enters into z80 compatible mode for PC-8801 emulation.
+	- What exact kind of garbage happens if you try to enable both direct and palette color
+	  modes to a graphic layer?
+	- What is exactly supposed to be a "bus slot"?
 
 ********************************************************************************************/
 
@@ -38,6 +41,7 @@ static struct
 	UINT8 blink;
 	UINT16 cur_pos_x,cur_pos_y;
 }tsp;
+static UINT16 video_pri_reg[2];
 
 static UINT8 backupram_wp;
 
@@ -143,9 +147,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 /* TODO: this is either a result of an hand-crafted ROM or the JIS stuff is really attribute related ... */
 static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 {
-	if(jis1 < 0x28)
-		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
-	else if(jis1 >= 0x28 && jis1 < 0x30)
+	if(jis1 < 0x30)
 		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
 	else if(jis1 >= 0x30 && jis1 < 0x3f)
 		return ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
@@ -301,7 +303,7 @@ static void draw_text(running_machine *machine, bitmap_t *bitmap, const rectangl
 						hline = 1;
 					break;
 				default:
-					popmessage("Illegal text tilemap attribute mode %02x",attr_mode);
+					popmessage("Illegal text tilemap attribute mode %02x, contact MESSdev",attr_mode);
 					return;
 			}
 
@@ -339,15 +341,53 @@ static void draw_text(running_machine *machine, bitmap_t *bitmap, const rectangl
 
 static VIDEO_UPDATE( pc88va )
 {
+	UINT8 pri,cur_pri_lv;
+	UINT32 screen_pri;
 	bitmap_fill(bitmap, cliprect, 0);
 
+	/*
+	video_pri_reg[0]
+	xxxx ---- ---- ---- priority 3
+	---- xxxx ---- ---- priority 2
+	---- ---- xxxx ---- priority 1
+	---- ---- ---- xxxx priority 0
+	video_pri_reg[1]
+	---- ---- xxxx ---- priority 5
+	---- ---- ---- xxxx priority 4
+
+	Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
+	*/
+
+	screen_pri = (video_pri_reg[1] & 0x00f0) >> 4; // priority 5
+	screen_pri|= (video_pri_reg[1] & 0x000f) << 4; // priority 4
+	screen_pri|= (video_pri_reg[0] & 0xf000) >> 4; // priority 3
+	screen_pri|= (video_pri_reg[0] & 0x0f00) << 4; // priority 2
+	screen_pri|= (video_pri_reg[0] & 0x00f0) << 12; // priority 1
+	screen_pri|= (video_pri_reg[0] & 0x000f) << 20; // priority 0
+
+	for(pri=0;pri<6;pri++)
 	{
-		draw_text(screen->machine,bitmap,cliprect);
+		cur_pri_lv = (screen_pri >> (pri*4)) & 0xf;
+
+		if(cur_pri_lv & 8) // enable layer
+		{
+			if(pri <= 1) // (direct color mode, priority 5 and 4)
+			{
+				// 8 = graphic 0
+				// 9 = graphic 1
+			}
+			else
+			{
+				switch(cur_pri_lv & 3) // (palette color mode)
+				{
+					case 0: draw_text(screen->machine,bitmap,cliprect); break;
+					case 1: if(tsp.spr_on) { draw_sprites(screen->machine,bitmap,cliprect); } break;
+					case 2: /* A = graphic 0 */ break;
+					case 3: /* B = graphic 1 */ break;
+				}
+			}
+		}
 	}
-
-	if(tsp.spr_on)
-		draw_sprites(screen->machine,bitmap,cliprect);
-
 
 	return 0;
 }
@@ -892,6 +932,11 @@ static WRITE8_HANDLER( timer3_ctrl_reg_w )
 	}
 }
 
+static WRITE16_HANDLER( video_pri_w )
+{
+	COMBINE_DATA(&video_pri_reg[offset]);
+}
+
 static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //	AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -921,8 +966,7 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 
 	AM_RANGE(0x0100, 0x0101) AM_READWRITE(screen_ctrl_r,screen_ctrl_w) // Screen Control Register
 //	AM_RANGE(0x0102, 0x0103) Graphic Screen Control Register
-//	AM_RANGE(0x0106, 0x0107) Palette Control Register
-//	AM_RANGE(0x0108, 0x0109) Direct Color Control Register
+	AM_RANGE(0x0106, 0x0109) AM_WRITE(video_pri_w) // Palette Control Register (priority) / Direct Color Control Register (priority)
 //	AM_RANGE(0x010a, 0x010b) Picture Mask Mode Register
 //	AM_RANGE(0x010c, 0x010d) Color Palette Mode Register
 //	AM_RANGE(0x010e, 0x010f) Backdrop Color Register
