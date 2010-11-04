@@ -50,11 +50,14 @@ static MACHINE_CONFIG_START( phunsy, driver_device )
 	
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	/* Display (page 12 of pdf)
+	   - 8Mhz clock
+	   - 64 6 pixel characters on a line.
+	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
+	   - 313 line display of which 256 are displayed.
+	*/
+	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
