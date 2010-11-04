@@ -33,7 +33,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Added UTF-8 constants for Swedish/Finnish keyboard accented
+  characters, and cursor key arrows. Refactored drivers to
+  use these constants. [Curt Coder]
 
 
 
