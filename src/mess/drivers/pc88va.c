@@ -5,6 +5,7 @@
 	A follow up of the regular PC-8801. It can also run PC-8801 software in compatible mode
 
 	preliminary driver by Angelo Salese
+	Special thanks to Fujix for his documentation translation help
 
 	TODO:
 	- Does this system have one or two CPUs? I'm prone to think that the V30 does all the job
@@ -40,6 +41,8 @@ static struct
 	UINT8 h_line_pos;
 	UINT8 blink;
 	UINT16 cur_pos_x,cur_pos_y;
+	UINT8 curn;
+	UINT8 curn_blink;
 }tsp;
 static UINT16 video_pri_reg[2];
 
@@ -345,6 +348,9 @@ static VIDEO_UPDATE( pc88va )
 	UINT32 screen_pri;
 	bitmap_fill(bitmap, cliprect, 0);
 
+	if(tsp.disp_on == 0) // don't bother if we are under DSPOFF command
+		return 0;
+
 	/*
 	video_pri_reg[0]
 	xxxx ---- ---- ---- priority 3
@@ -541,7 +547,7 @@ static WRITE8_HANDLER( idp_command_w )
 		case DSPON:  cmd = DSPON; buf_size = 3;  buf_index = 0; break;
 
 		/* 0x13 - DSPOFF: set DiSPlay OFF */
-		case DSPOFF: tsp.disp_on = 0; break;
+		case DSPOFF: cmd = DSPOFF; tsp.disp_on = 0; break;
 
 		/* 0x14 - DSPDEF: set DiSPlay DEFinitions */
 		case DSPDEF: cmd = DSPDEF; buf_size = 6; buf_index = 0; break;
@@ -559,23 +565,36 @@ static WRITE8_HANDLER( idp_command_w )
 		case EMUL:   cmd = EMUL;   buf_size = 4; buf_index = 0; break;
 
 		/* 0x88 - EXIT: ??? */
-		case EXIT: break;
+		case EXIT:   cmd = EXIT; break;
 
 		/* 0x82 - SPRON: set SPRite ON */
-		case SPRON:   cmd = SPRON;  buf_size = 3; buf_index = 0; break;
+		case SPRON:  cmd = SPRON;  buf_size = 3; buf_index = 0; break;
 
 		/* 0x83 - SPROFF: set SPRite OFF */
-		case SPROFF:  tsp.spr_on = 0; break;
+		case SPROFF: cmd = SPROFF; tsp.spr_on = 0; break;
 
 		/* 0x85 - SPRSW: ??? */
-		case SPRSW:   cmd = SPRSW;  buf_size = 1; buf_index = 0; break;
+		case SPRSW:  cmd = SPRSW;  buf_size = 1; buf_index = 0; break;
 
 		/* 0x81 - SPROV: set SPRite OVerflow information */
-		case 0x81: /* ... */ break;
+		/*
+		-x-- ---- Sprite Over flag
+		--x- ---- Sprite Collision flag
+		---x xxxx First sprite that caused Sprite Over event
+		*/
+		case SPROV:  cmd = SPROV; /* TODO: where it returns the info? */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		default:   cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(space->cpu),data); break;
 	}
+}
+
+static void tsp_sprite_enable(running_machine *machine, UINT32 spr_offset, UINT8 sw_bit)
+{
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	space->write_word(spr_offset, space->read_word(spr_offset) & ~0x200);
+	space->write_word(spr_offset, space->read_word(spr_offset) | (sw_bit & 0x200));
 }
 
 /* TODO: very preliminary, needs something showable first */
@@ -642,9 +661,9 @@ static void execute_dspdef_cmd(running_machine *machine)
 	/*
 	[0] attr offset (lo word)
 	[1] attr offset (hi word)
-	[2] pitch
+	[2] pitch (character code interval x 16, i.e. 0x20 = 2 bytes
 	[3] line height
-	[4] h line position
+	[4] hline vertical position
 	[5] blink number
 	*/
 	tsp.attr_offset = buf_ram[0] | buf_ram[1] << 8;
@@ -658,20 +677,26 @@ static void execute_curdef_cmd(running_machine *machine)
 {
 	/*
 	xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
-	---- --x- [0] (bit in sprite def)
+	---- --x- [0] show cursor bit (actively modifies the spriteram entry)
 	---- ---x [0] Blink Enable
 	*/
 
 	/* TODO: needs basic sprite emulation */
+	tsp.curn = (buf_ram[0] & 0xf8);
+	tsp.curn_blink = (buf_ram[0] & 1);
+
+	tsp_sprite_enable(machine, 0xa0000 + tsp.spr_offset + tsp.curn, (buf_ram[0] & 2) << 8);
 }
 
 static void execute_actscr_cmd(running_machine *machine)
 {
 	/*
-	xxxx xxxx [0] param * 32 (???)
+	This command assigns a strip where the cursor is located.
+	xxxx xxxx [0] strip ID * 32 (???)
 	*/
 
 	/* TODO: no idea about this command */
+	//printf("ACTSCR: %02x\n",buf_ram[0]);
 }
 
 static void execute_curs_cmd(running_machine *machine)
@@ -689,7 +714,15 @@ static void execute_curs_cmd(running_machine *machine)
 
 static void execute_emul_cmd(running_machine *machine)
 {
+	/*
+	[0] Emulate target strip ID x 32
+	[1] The number of chars
+	[2] The number of attributes
+	[3] The number of lines
+	*/
+
 	// TODO: this starts 3301 video emulation
+	//popmessage("Warning: TSP executes EMUL command, contact MESSdev");
 }
 
 static void execute_spron_cmd(running_machine *machine)
@@ -697,9 +730,9 @@ static void execute_spron_cmd(running_machine *machine)
 	/*
 	[0] Sprite Table Offset (hi word)
 	[1] (unknown / reserved)
-	xxxx x--- [2] HSPN: some kind of Sprite Over register
-	---- --x- [2] MG: ???
-	---- ---x [2] GR: ???
+	xxxx x--- [2] HSPN: Maximum number of sprites in one raster (num + 1) for Sprite Over
+	---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
+	---- ---x [2] GR: 1 to enable the group collision detection
 	*/
 	tsp.spr_offset = buf_ram[0] << 8;
 	tsp.spr_on = 1;
@@ -708,7 +741,13 @@ static void execute_spron_cmd(running_machine *machine)
 
 static void execute_sprsw_cmd(running_machine *machine)
 {
-	/* TODO: no idea about this command, some kind of manual sprite switch? */
+	/*
+	Toggle an individual sprite in the sprite ram entry
+	[0] xxxx x--- target sprite number
+	[0] ---- --x- sprite off/on switch
+	*/
+
+	tsp_sprite_enable(machine, 0xa0000 + tsp.spr_offset + (buf_ram[0] & 0xf8), (buf_ram[0] & 2) << 8);
 }
 
 static WRITE8_HANDLER( idp_param_w )
