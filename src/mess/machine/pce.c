@@ -1306,7 +1306,7 @@ static TIMER_CALLBACK( pce_cd_cdda_fadeout_callback )
 	{
 		pce_cd.cdda_volume = 0.0;
 		cdda_set_volume(machine->device("cdda"), 0.0);
-		timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, NULL);
+		timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, 0);
 	}
 	else
 	{
@@ -1323,7 +1323,7 @@ static TIMER_CALLBACK( pce_cd_cdda_fadein_callback )
 	{
 		pce_cd.cdda_volume = 100.0;
 		cdda_set_volume(machine->device("cdda"), 100.0);
-		timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, NULL);
+		timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, 0);
 	}
 	else
 	{
@@ -1340,7 +1340,7 @@ static TIMER_CALLBACK( pce_cd_adpcm_fadeout_callback )
 	{
 		pce_cd.adpcm_volume = 0.0;
 		msm5205_set_volume(machine->device("msm5205"), 0.0);
-		timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, NULL);
+		timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, 0);
 	}
 	else
 	{
@@ -1357,7 +1357,7 @@ static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback )
 	{
 		pce_cd.adpcm_volume = 100.0;
 		msm5205_set_volume(machine->device("msm5205"), 100.0);
-		timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, NULL);
+		timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, 0);
 	}
 	else
 	{
@@ -1496,49 +1496,49 @@ WRITE8_HANDLER( pce_cd_intf_w )
 					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, ATTOTIME_IN_USEC(100), 100);
 					pce_cd.adpcm_volume = 0.0;
 					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, ATTOTIME_IN_USEC(100), 100);
-					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, NULL);
-					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, 0);
+					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, 0);
 					break;
 				case 0x01: //CD-DA enable (100 msecs)
 					pce_cd.cdda_volume = 0.0;
 					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, ATTOTIME_IN_USEC(100), 100);
-					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime_never, 0);
 					break;
 				case 0x08: //CD-DA short (1500 msecs) fade out / ADPCM enable
 					pce_cd.cdda_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(1500), 1500);
 					pce_cd.adpcm_volume = 0.0;
 					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, ATTOTIME_IN_USEC(100), 100);
-					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, NULL);
-					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, 0);
+					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, 0);
 					break;
 				case 0x09: //CD-DA long (5000 msecs) fade out
 					pce_cd.cdda_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(5000), 5000);
-					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, 0);
 					break;
 				case 0x0a: //ADPCM long (5000 msecs) fade out
 					pce_cd.adpcm_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, ATTOTIME_IN_USEC(5000), 5000);
-					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, 0);
 					break;
 				case 0x0c: //CD-DA short (1500 msecs) fade out / ADPCM enable
 					pce_cd.cdda_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(1500), 1500);
 					pce_cd.adpcm_volume = 0.0;
 					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, ATTOTIME_IN_USEC(100), 100);
-					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, NULL);
-					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, 0);
+					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime_never, 0);
 					break;
 				case 0x0d: //CD-DA short (1500 msecs) fade out
 					pce_cd.cdda_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, ATTOTIME_IN_USEC(1500), 1500);
-					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime_never, 0);
 					break;
 				case 0x0e: //ADPCM short (1500 msecs) fade out
 					pce_cd.adpcm_volume = 100.0;
 					timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, ATTOTIME_IN_USEC(1500), 1500);
-					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, NULL);
+					timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime_never, 0);
 					break;
 				default:
 					popmessage("CD-DA / ADPCM Fade effect mode %02x, contact MESSdev",data & 0x0f);
