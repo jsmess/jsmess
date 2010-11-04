@@ -1802,5 +1802,6 @@ const game_driver * const drivers[] =
 	DRIVER( homez80 )
 	DRIVER( tek4107a )
 	DRIVER( tek4109a )
+	DRIVER( phunsy )
 
 #endif /* DRIVER_RECURSIVE */
