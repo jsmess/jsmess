@@ -746,7 +746,7 @@ static PALETTE_INIT( psion )
 static const gfx_layout psion_charlayout =
 {
 	5, 8,					/* 5 x 8 characters */
-	224,					/* 224 characters */
+	256,					/* 256 characters */
 	1,						/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	{ 3, 4, 5, 6, 7},
@@ -755,7 +755,7 @@ static const gfx_layout psion_charlayout =
 };
 
 static GFXDECODE_START( psion )
-	GFXDECODE_ENTRY( "chargen", 0x0000, psion_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -903,8 +903,8 @@ ROM_START( psioncm )
 	ROM_SYSTEM_BIOS(0, "v24", "CM v2.4")
 	ROMX_LOAD( "24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(1))
 
-    ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+    ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionla )
@@ -912,8 +912,8 @@ ROM_START( psionla )
 	ROM_SYSTEM_BIOS(0, "v33", "LA v3.3")
 	ROMX_LOAD( "33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionp350 )
@@ -923,8 +923,8 @@ ROM_START( psionp350 )
 	ROM_SYSTEM_BIOS(1, "v38", "POS350 v3.8")
 	ROMX_LOAD( "38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(2))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionlam )
@@ -932,8 +932,8 @@ ROM_START( psionlam )
 	ROM_SYSTEM_BIOS(0, "v37", "LA v3.7")
 	ROMX_LOAD( "37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionlz64 )
@@ -941,8 +941,8 @@ ROM_START( psionlz64 )
 	ROM_SYSTEM_BIOS(0, "v44", "LZ64 v4.4")
 	ROMX_LOAD( "44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionlz64s )
@@ -950,8 +950,8 @@ ROM_START( psionlz64s )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ64 v4.6")
 	ROMX_LOAD( "46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionlz )
@@ -959,8 +959,8 @@ ROM_START( psionlz )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ v4.6")
 	ROMX_LOAD( "46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 ROM_START( psionp464 )
@@ -968,8 +968,8 @@ ROM_START( psionp464 )
 	ROM_SYSTEM_BIOS(0, "v46", "POS464 v4.6")
 	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(1))
 
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-	ROM_LOAD( "chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 /* Driver */

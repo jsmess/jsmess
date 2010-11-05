@@ -109,11 +109,10 @@ hd44780_device::hd44780_device( running_machine &_machine, const hd44780_device_
 
 void hd44780_device::device_start()
 {
-	busy_timer = timer_alloc(&m_machine,  bf_clear, this);
+	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
+	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
 
-	timer_pulse(&m_machine, ATTOTIME_IN_MSEC(500), this, 0, blink_timer);
-
-	chargen = memory_region(&m_machine, "chargen");
+	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(500), 0, ATTOTIME_IN_MSEC(500));
 
 	state_save_register_device_item( this, 0, ac);
 	state_save_register_device_item( this, 0, ac_mode);
@@ -163,6 +162,48 @@ void hd44780_device::device_reset()
 }
 
 
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+void hd44780_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case BUSY_TIMER:
+			if (data_bus_flag)
+			{
+				int new_ac = ac + direction;
+
+				ac = (new_ac < 0) ? 0 : ((new_ac > 0x7f) ? 0x7f : new_ac);
+
+				if (ac_mode == 0)
+				{
+					cursor_pos = ac;
+
+					// display is shifted only after a write
+					if (shift_on && data_bus_flag == 1)
+						disp_shift += direction;
+				}
+
+				data_bus_flag = 0;
+			}
+
+			busy_flag = 0;
+			break;
+
+		case BLINKING_TIMER:
+			blink = !blink;
+			break;
+	}
+}
+
+void hd44780_device::set_busy_flag(UINT16 usec)
+{
+	busy_flag = 1;
+
+	timer_adjust_oneshot( m_busy_timer, ATTOTIME_IN_USEC( usec ), 0 );
+}
+
 //**************************************************************************
 //  device interface
 //**************************************************************************
@@ -207,7 +248,7 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 						else
 						{
 							//draw CGROM characters
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(chargen[(ddram[char_pos]-0x20)*8+y], 4-x);
+							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(ddram[char_pos]*8+y), 4-x);
 						}
 
 				// if is the correct position draw cursor and blink
@@ -337,72 +378,5 @@ UINT8 hd44780_device::data_read(offs_t offset)
 	return data;
 }
 
-
-//**************************************************************************
-//  internal helpers
-//**************************************************************************
-
-void hd44780_device::set_busy_flag(UINT16 usec)
-{
-	busy_flag = 1;
-
-	timer_adjust_oneshot( busy_timer, ATTOTIME_IN_USEC( usec ), 0 );
-}
-
-TIMER_CALLBACK( hd44780_device::bf_clear )
-{
-	hd44780_device *hd44780 = reinterpret_cast<hd44780_device *>(ptr);
-
-	if (hd44780->data_bus_flag)
-	{
-		int new_ac = hd44780->ac + hd44780->direction;
-
-		hd44780->ac = (new_ac < 0) ? 0 : ((new_ac > 0x7f) ? 0x7f : new_ac);
-
-		if (hd44780->ac_mode == 0)
-		{
-			hd44780->cursor_pos = hd44780->ac;
-
-			// display is shifted only after a write
-			if (hd44780->shift_on && hd44780->data_bus_flag == 1)
-				hd44780->disp_shift += hd44780->direction;
-		}
-
-		hd44780->data_bus_flag = 0;
-	}
-
-	hd44780->busy_flag = 0;
-}
-
-TIMER_CALLBACK( hd44780_device::blink_timer )
-{
-	hd44780_device *hd44780 = reinterpret_cast<hd44780_device *>(ptr);
-
-	hd44780->blink = ~hd44780->blink;
-}
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE8_DEVICE_HANDLER( hd44780_control_w )
-{
-	downcast<hd44780_device *>( device )->control_write( offset, data );
-}
-
-WRITE8_DEVICE_HANDLER( hd44780_data_w )
-{
-	downcast<hd44780_device *>( device )->data_write( offset, data );
-}
-
-READ8_DEVICE_HANDLER( hd44780_control_r )
-{
-	return downcast<hd44780_device *>( device )->control_read( offset );
-}
-
-READ8_DEVICE_HANDLER( hd44780_data_r )
-{
-	return downcast<hd44780_device *>( device )->data_read( offset );
-}
-
+// devices
 const device_type HD44780 = hd44780_device_config::static_alloc_device_config;

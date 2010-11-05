@@ -190,7 +190,7 @@ static PALETTE_INIT( polgar )
 static const gfx_layout polgar_charlayout =
 {
     5, 8,                   /* 5 x 8 characters */
-    224,                    /* 224 characters */
+    256,                    /* 256 characters */
     1,                      /* 1 bits per pixel */
     { 0 },                  /* no bitplanes */
     { 3, 4, 5, 6, 7},
@@ -199,7 +199,7 @@ static const gfx_layout polgar_charlayout =
 };
 
 static GFXDECODE_START( polgar )
-    GFXDECODE_ENTRY( "chargen", 0x0000, polgar_charlayout, 0, 1 )
+    GFXDECODE_ENTRY( "hd44780", 0x0000, polgar_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -432,8 +432,8 @@ MACHINE_CONFIG_END
 ROM_START(milano)    
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("milano.bin", 0x0000, 0x10000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083))
- ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
- ROM_LOAD( "m_chargen.bin",    0x0000, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "m_chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(4c64fc7d) SHA1(123a87b2dc7efd7afcd8e27eb9bc74f54a8f1bc9))
 ROM_END
 
 */
@@ -441,8 +441,8 @@ ROM_END
 ROM_START(polgar) //polgar
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("polgar.bin", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
-	ROM_REGION( 0x00700, "chargen", ROMREGION_ERASE )
-  ROM_LOAD( "m_chargen.bin",    0x0000, 0x0700,  CRC(b497af5c) SHA1(0bddebf91dac868ffbdd7f514253943635d7fe9a))
+	ROM_REGION( 0x00800, "hd44780", ROMREGION_ERASE )
+	ROM_LOAD( "m_chargen.bin",    0x0100, 0x0700,  BAD_DUMP CRC(b497af5c) SHA1(0bddebf91dac868ffbdd7f514253943635d7fe9a))
 ROM_END
 
 
