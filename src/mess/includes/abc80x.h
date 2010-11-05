@@ -282,13 +282,10 @@ public:
 
 
 //**************************************************************************
-//	THESE SHOULD BE MEMBER FUNCTIONS
+//	MACHINE CONFIGURATION
 //**************************************************************************
 
 /*----------- defined in video/abc800.c -----------*/
-
-WRITE8_HANDLER( abc800_hrs_w );
-WRITE8_HANDLER( abc800_hrc_w );
 
 MACHINE_CONFIG_EXTERN(abc800m_video);
 MACHINE_CONFIG_EXTERN(abc800c_video);
