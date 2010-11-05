@@ -9,18 +9,38 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 
+
+class phunsy_state : public driver_device
+{
+public:
+	phunsy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+};
+
+
 static ADDRESS_MAP_START(phunsy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM // Video RAM
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM	AM_BASE_MEMBER( phunsy_state, video_ram ) // Video RAM
 	AM_RANGE( 0x1800, 0x1fff) AM_RAM // Banked ROM
-	AM_RANGE( 0x4000, 0xffff) AM_RAM // Bankek RAM
+	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
+
+
+static READ8_HANDLER( phunsy_sense_r )
+{
+	return 0;
+}
+
 
 static ADDRESS_MAP_START( phunsy_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( phunsy_sense_r)
 ADDRESS_MAP_END
+
 
 /* Input ports */
 INPUT_PORTS_START( phunsy )
@@ -28,19 +48,91 @@ INPUT_PORTS_END
 
 
 static MACHINE_RESET(phunsy) 
-{	
+{
+	memory_set_bankptr( machine, "bank2", memory_region(machine, "ram_4000") );
 }
+
+
+static PALETTE_INIT( phunsy )
+{
+	for ( int i = 0; i < 8; i++ )
+	{
+		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
+
+		palette_set_color_rgb( machine, i, j, j, j );
+	}
+}
+
 
 static VIDEO_START( phunsy )
 {
 }
 
+
 static VIDEO_UPDATE( phunsy )
 {
+	phunsy_state *state = screen->machine->driver_data<phunsy_state>();
+	UINT8	*gfx = memory_region( screen->machine, "gfx" );
+	UINT8	*v = state->video_ram;
+
+	for ( int h = 0; h < 32; h++ )
+	{
+		for ( int w = 0; w < 64; w++ )
+		{
+			UINT8 c = *v;
+
+			if ( c & 0x80 )
+			{
+				UINT8 grey = ( c >> 4 ) & 0x07;
+				/* Graphics mode */
+				for ( int i = 0; i < 4; i++ )
+				{
+					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + i, w * 6 );
+
+					p[0] = ( c & 0x01 ) ? grey : 0;
+					p[1] = ( c & 0x01 ) ? grey : 0;
+					p[2] = ( c & 0x01 ) ? grey : 0;
+					p[3] = ( c & 0x02 ) ? grey : 0;
+					p[4] = ( c & 0x02 ) ? grey : 0;
+					p[5] = ( c & 0x02 ) ? grey : 0;
+				}
+				for ( int i = 0; i < 4; i++ )
+				{
+					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + 4 + i, w * 6 );
+
+					p[0] = ( c & 0x04 ) ? grey : 0;
+					p[1] = ( c & 0x04 ) ? grey : 0;
+					p[2] = ( c & 0x04 ) ? grey : 0;
+					p[3] = ( c & 0x08 ) ? grey : 0;
+					p[4] = ( c & 0x08 ) ? grey : 0;
+					p[5] = ( c & 0x08 ) ? grey : 0;
+				}
+			}
+			else
+			{
+				/* ASCII mode */
+				for ( int i = 0; i < 8; i++ )
+				{
+					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + i, w * 6 );
+					UINT8 pat = gfx[ c * 8 + i];
+
+					p[0] = ( pat & 0x20 ) ? 7 : 0;
+					p[1] = ( pat & 0x10 ) ? 7 : 0;
+					p[2] = ( pat & 0x08 ) ? 7 : 0;
+					p[3] = ( pat & 0x04 ) ? 7 : 0;
+					p[4] = ( pat & 0x02 ) ? 7 : 0;
+					p[5] = ( pat & 0x01 ) ? 7 : 0;
+				}
+			}
+
+			v++;
+		}
+	}
     return 0;
 }
 
-static MACHINE_CONFIG_START( phunsy, driver_device )
+
+static MACHINE_CONFIG_START( phunsy, phunsy_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(phunsy_mem)
@@ -58,8 +150,8 @@ static MACHINE_CONFIG_START( phunsy, driver_device )
 	*/
 	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_PALETTE_LENGTH(8)
+    MDRV_PALETTE_INIT(phunsy)
 
     MDRV_VIDEO_START(phunsy)
     MDRV_VIDEO_UPDATE(phunsy)
@@ -73,7 +165,11 @@ ROM_START( phunsy )
 	ROM_LOAD( "dass.bin",        0x0800, 0x0800, CRC(13380140) SHA1(a999201cb414abbf1e10a7fcc1789e3e000a5ef1))
 	ROM_LOAD( "pdcr.bin",        0x1000, 0x0800, CRC(74bf9d0a) SHA1(8d2f673615215947f033571f1221c6aa99c537e9))
 	ROM_LOAD( "labhnd.bin",      0x1800, 0x0800, CRC(1d5a106b) SHA1(a20d09e32e21cf14db8254cbdd1d691556b473f0))
-	ROM_REGION( 0x0080, "gfx", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "ph_char1.bin", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
+	ROM_LOAD( "ph_char2.bin", 0x0200, 0x0200, CRC(3d5786d3) SHA1(8cf87d83be0b5e4becfa9fd6e05b01250a2feb3b))
+	/* 16 x 16KB RAM banks */
+	ROM_REGION( 0x40000, "ram_4000", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
