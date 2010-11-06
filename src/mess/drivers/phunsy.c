@@ -19,9 +19,10 @@ public:
 	phunsy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8	data_out;
-	UINT8	keyboard_input;
+	UINT8		*video_ram;
+	UINT8		data_out;
+	UINT8		keyboard_input;
+	UINT16		old_in[3];
 	emu_timer	*kb_timer;
 };
 
@@ -52,7 +53,12 @@ static WRITE8_HANDLER( phunsy_data_w )
 	{
 		state->keyboard_input |= 0x80;
 	}
+
 	/* b3 - speaker output */
+	if ( data & 0x08 )
+	{
+	}
+
 	/* b4 - -REV MDCR output */
 	/* b5 - -FWD MDCR output */
 	/* b6 - -WCD MDCR output */
@@ -109,20 +115,88 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_START( phunsy )
 	PORT_START( "IN0" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Spacebar")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("-")
+
+	PORT_START( "IN1" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("B")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("D")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("G")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("H")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_NAME("I")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("J")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("L")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("M")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("N")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("O")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME("P")
+
+	PORT_START( "IN2" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Q")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("R")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("S")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("T")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("U")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_NAME("V")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_NAME("W")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("X")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Y")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Z")
 INPUT_PORTS_END
 
 
 static TIMER_CALLBACK( phunsy_kb_scan )
 {
-	phunsy_state *state = machine->driver_data<phunsy_state>();
-	UINT8 data;
-
-	data = input_port_read( machine, "IN0" );
-
-	if ( data & 0x01 )
+	static const char *ports[3] = { "IN0", "IN1", "IN2" };
+	static const UINT8 kb_decode[3][16] =
 	{
-		state->keyboard_input = 0x61;
+		{
+			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+			0x39, 0x30, 0x20, 0x0D, 0x2D, 0xFF, 0xFF, 0xFF
+		},
+		{
+			0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+			0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50
+		},
+		{
+			0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
+			0x59, 0x5a, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+		},
+	};
+	phunsy_state *state = machine->driver_data<phunsy_state>();
+
+	for ( int j = 0; j < 3; j++ )
+	{
+		UINT16 x = 1;
+		UINT16 data = input_port_read( machine, ports[j] );
+
+		for ( int i = 0; i < 16; i++ )
+		{
+			/* Key pressed? */
+			if ( ! ( state->old_in[j] & x ) && ( data & x ) )
+			{
+				if ( kb_decode[j][i] != 0xFF )
+					state->keyboard_input = kb_decode[j][i];
+			}
+			x <<= 1;
+		}
+		state->old_in[j] = data;
 	}
 }
 
@@ -140,7 +214,11 @@ static MACHINE_RESET(phunsy)
 	phunsy_state *state = machine->driver_data<phunsy_state>();
 
 	memory_set_bankptr( machine, "bank2", memory_region(machine, "ram_4000") );
+
 	state->keyboard_input = 0xFF;
+	state->old_in[0] = 0;
+	state->old_in[1] = 0;
+	state->old_in[2] = 0;
 
 	timer_adjust_periodic( state->kb_timer, machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period() );
 }
@@ -204,6 +282,11 @@ static VIDEO_UPDATE( phunsy )
 			else
 			{
 				/* ASCII mode */
+				if ( ! ( c & 0x20 ) )
+				{
+					c ^= 0x40;
+				}
+
 				for ( int i = 0; i < 8; i++ )
 				{
 					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + i, w * 6 );
