@@ -10,6 +10,9 @@
 #include "cpu/s2650/s2650.h"
 
 
+#define LOG	1
+
+
 class phunsy_state : public driver_device
 {
 public:
@@ -17,6 +20,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *video_ram;
+	UINT8	data_out;
 	UINT8	keyboard_input;
 	emu_timer	*kb_timer;
 };
@@ -36,19 +40,56 @@ static WRITE8_HANDLER( phunsy_data_w )
 {
 	phunsy_state *state = space->machine->driver_data<phunsy_state>();
 
+	if (LOG)
+		logerror("%s: phunsy_data_w %02x\n", cpuexec_describe_context(space->machine), data);
+
+	state->data_out = data;
+
+	/* b0 - TTY out */
+	/* b1 - select MDCR / keyboard */
+	/* b2 - Clear keyboard strobe signal */
 	if ( data & 0x04 )
 	{
-		/* Keybaord strobe received, ready to receive key data */
 		state->keyboard_input |= 0x80;
 	}
+	/* b3 - speaker output */
+	/* b4 - -REV MDCR output */
+	/* b5 - -FWD MDCR output */
+	/* b6 - -WCD MDCR output */
+	/* b7 - WDA MDCR output */
 }
 
 
 static READ8_HANDLER( phunsy_data_r )
 {
 	phunsy_state *state = space->machine->driver_data<phunsy_state>();
+	UINT8 data;
 
-	return state->keyboard_input;
+	if (LOG)
+		logerror("%s: phunsy_data_r\n", cpuexec_describe_context(space->machine));
+
+	if ( state->data_out & 0x02 )
+	{
+		/* MDCR selected */
+		/* b0 - TTY input */
+		/* b1 - SK1 switch input */
+		/* b2 - SK2 switch input */
+		/* b3 - -WEN MDCR input */
+		/* b4 - -CIP MDCR input */
+		/* b5 - -BET MDCR input */
+		/* b6 - RDA MDCR input */
+		/* b7 - RDC MDCR input */
+		data = 0xFF;
+	}
+	else
+	{
+		/* Keyboard selected */
+		/* b0-b6 - ASCII code from keyboard */
+		/* b7    - strobe signal */
+		data = state->keyboard_input;
+	}
+
+	return data;
 }
 
 
