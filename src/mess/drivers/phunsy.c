@@ -17,6 +17,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *video_ram;
+	UINT8	keyboard_input;
+	emu_timer	*kb_timer;
 };
 
 
@@ -30,6 +32,26 @@ static ADDRESS_MAP_START(phunsy_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
+static WRITE8_HANDLER( phunsy_data_w )
+{
+	phunsy_state *state = space->machine->driver_data<phunsy_state>();
+
+	if ( data & 0x04 )
+	{
+		/* Keybaord strobe received, ready to receive key data */
+		state->keyboard_input |= 0x80;
+	}
+}
+
+
+static READ8_HANDLER( phunsy_data_r )
+{
+	phunsy_state *state = space->machine->driver_data<phunsy_state>();
+
+	return state->keyboard_input;
+}
+
+
 static READ8_HANDLER( phunsy_sense_r )
 {
 	return 0;
@@ -38,18 +60,48 @@ static READ8_HANDLER( phunsy_sense_r )
 
 static ADDRESS_MAP_START( phunsy_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )
 	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( phunsy_sense_r)
 ADDRESS_MAP_END
 
 
 /* Input ports */
 INPUT_PORTS_START( phunsy )
+	PORT_START( "IN0" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
 INPUT_PORTS_END
+
+
+static TIMER_CALLBACK( phunsy_kb_scan )
+{
+	phunsy_state *state = machine->driver_data<phunsy_state>();
+	UINT8 data;
+
+	data = input_port_read( machine, "IN0" );
+
+	if ( data & 0x01 )
+	{
+		state->keyboard_input = 0x61;
+	}
+}
+
+
+static DRIVER_INIT( phunsy )
+{
+	phunsy_state *state = machine->driver_data<phunsy_state>();
+
+	state->kb_timer = timer_alloc( machine, phunsy_kb_scan, NULL );
+}
 
 
 static MACHINE_RESET(phunsy) 
 {
+	phunsy_state *state = machine->driver_data<phunsy_state>();
+
 	memory_set_bankptr( machine, "bank2", memory_region(machine, "ram_4000") );
+	state->keyboard_input = 0xFF;
+
+	timer_adjust_periodic( state->kb_timer, machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period() );
 }
 
 
@@ -175,5 +227,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, phunsy,  0,       0, 	phunsy, 	phunsy, 	 0,  	   	 "J.F.P. Philipse",   "PHUNSY",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, phunsy,  0,       0, 	phunsy, 	phunsy, 	 phunsy,  	   	 "J.F.P. Philipse",   "PHUNSY",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
