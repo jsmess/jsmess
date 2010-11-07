@@ -890,13 +890,14 @@ const game_driver * const drivers[] =
 	DRIVER( sc80 )
 
 	/* Microbee Systems */
-	DRIVER( mbee )	  /* Microbee 16 Standard or Plus    */
+	DRIVER( mbee )		/* Microbee 16 Standard or Plus    */
 	DRIVER( mbeeic )	/* Microbee 32 IC      */
 	DRIVER( mbeepc )	/* Microbee 32 PC      */
-	DRIVER( mbeepc85 )  /* Microbee 32 PC85  */
-	DRIVER( mbeepc85b )  /* Microbee 32 PC85 (Business version) */
-	DRIVER( mbeepc85s )  /* Microbee 32 PC85 (Swedish) */
-	DRIVER( mbeeppc )   /* Microbee 32 PPC85    */
+	DRIVER( mbeepc85 )	/* Microbee 32 PC85  */
+	DRIVER( mbeepc85b )	/* Microbee 32 PC85 (Business version) */
+	DRIVER( mbeepc85s )	/* Microbee 32 PC85 (Swedish) */
+	DRIVER( mbeeppc )	/* Microbee 32 PPC85    */
+	DRIVER( mbeett )	/* Microbee Teleterm */
 	DRIVER( mbee56 )	/* Microbee 56K (CP/M)    */
 	DRIVER( mbee64 )	/* Microbee 64K (CP/M)    */
 	DRIVER( mbee128 )	/* Microbee 128K (CP/M)    */

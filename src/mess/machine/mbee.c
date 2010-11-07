@@ -149,12 +149,16 @@ static UINT8 mbee256_q_pos;
 
 static TIMER_CALLBACK( mbee256_kbd )
 {
-    /* Keyboard scanner is a '3870' chip. Its speed of operation is determined by a 15k resistor on
+    /* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
     pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
     line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
     port 18 will clear this line, and read the key scancode. It will also signal the 3870 that the key
-    data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no data sheet
-    available, the following is a guess. */
+    data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no rom dump
+    available, the following is a guess.
+
+    The 3870 (MK3870) 8-bit microcontroller is a single chip implementation of Fairchild F8 (Mostek 3850).
+    It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
+    of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
 
 	UINT8 i, j;
 	UINT8 pressed[15];
@@ -566,8 +570,19 @@ MACHINE_RESET( mbee256 )
 	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
 	mbee256_q_pos = 0;
 	mbee256_50_w(mem,0,0); // set banks to default
-	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(machine, "boot", 8); // boot time
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+}
+
+MACHINE_RESET( mbeett )
+{
+	UINT8 i;
+	mbee_rtc = machine->device<mc146818_device>("rtc");
+	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
+	mbee256_q_pos = 0;
+	machine_reset_common(machine);
+	memory_set_bank(machine, "boot", 1);
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 }
 
 INTERRUPT_GEN( mbee_interrupt )
@@ -723,6 +738,26 @@ DRIVER_INIT( mbee256 )
 	memory_configure_bank(machine, "boot", 8, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
 	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800], 0x0000); // rom
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
+	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
+
+	mbee_size = 0x8000;
+}
+
+DRIVER_INIT( mbeett )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
+
+	RAM = memory_region(machine, "telcomrom");
+	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
+
+	RAM = memory_region(machine, "pakrom");
+	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
+
+	memory_set_bank(machine, "pak", 5);
+	memory_set_bank(machine, "telcom", 0);
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
