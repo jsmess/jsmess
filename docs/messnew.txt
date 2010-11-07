@@ -37,7 +37,10 @@ Source Changes:
 - Added UTF-8 constants for Swedish/Finnish keyboard accented
   characters, and cursor key arrows. Refactored drivers to
   use these constants. [Curt Coder]
-
+- Rewrite of the system architecture of all systems of the TI-99 
+  family (TI-99/4(A)/8, SGCPU, Geneve), now more closely
+  representing the real hardware. Using device structures for
+  all hardware parts now. Redundant code removed. [Michael Zapf]
 
 
 0.140
