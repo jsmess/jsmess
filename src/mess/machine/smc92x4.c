@@ -2173,6 +2173,7 @@ void smc92x4_set_timing(running_device *device, int realistic)
 {
 	smc92x4_state *w = get_safe_token(device);
 	w->use_real_timing = realistic;
+	logerror("smc92x4: use realistic timing: %02x\n", realistic);
 }
 
 /***************************************************************************

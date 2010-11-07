@@ -539,7 +539,7 @@ static READ8Z_DEVICE_HANDLER( read_cart_minimem )
 	ti99_pcb_t *pcb = get_safe_pcb_token(device);
 	cartridge_t *cartridge = pcb->cartridge;
 
-	if ((offset & 0xf000)==0x6000)
+	if ((offset & 0x1000)==0x0000)
 	{
 		*value = (cartridge->rom_ptr==NULL)? 0 : (cartridge->rom_ptr)[offset & 0x0fff];
 	}
@@ -557,7 +557,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_minimem )
 	ti99_pcb_t *pcb = get_safe_pcb_token(device);
 	cartridge_t *cartridge = pcb->cartridge;
 
-	if (offset < 0x7000)
+	if ((offset & 0x1000)==0x0000)
 	{
 		logerror("Write access to cartridge ROM at address %04x ignored", offset);
 	}
@@ -570,7 +570,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_minimem )
 		}
 		else
 		{
-			(cartridge->ram_ptr)[offset-0x7000] = data;
+			(cartridge->ram_ptr)[offset & 0x0fff] = data;
 		}
 	}
 }
@@ -788,7 +788,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_mbx )
 	if ((offset & 0x1c00)==0x0c00)
 	{
 		if (cartridge->ram_ptr == NULL)	return;
-		cartridge->ram_ptr[offset - 0x6c00] = data;
+		cartridge->ram_ptr[offset & 0x03ff] = data;
 	}
 }
 

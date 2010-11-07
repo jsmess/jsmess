@@ -145,26 +145,50 @@ Keyboard interface:
     - P0-P3: column select
     - INT6*-INT11*: row inputs (int6* is only used for joystick fire)
 
-
-Known Issues (MZ, 2009-04-26)
-- Extended Basic II does not start when a floppy controller is present
-- Multiple cartridges are not shown in the startup screen; only one
-  cartridge is presented. The slots are scanned, though. Need to check whether
-  this is a bug of the operating system or of the emulation.
-- Emulation speed must be checked. I have inserted adjust_icounts, but I need to
-  check whether the console experienced those delays actually. Unfortunately,
-  there is almost no real hardware available.
-- Extended Basic II gets stuck with OLD MINIMEM. MiniMemory may be incompatible
-  due to the different memory layout. SAVE/OLD only works if the machine is
-  neither reset nor restarted.
-
-  ROM file contents:
+ROM file contents:
   0000-1fff ROM0				0x0000 (logical address)
   2000-3fff ROM1                0xffa000 - 0xffbfff
   4000-5fff DSR1				0xff4000 (TTS)
   6000-7fff ROM1a               0xffc000 - 0xffdfff
   8000-9fff DSR2				0xff4000 (missing; Hexbus?)
-  */
+
+===========================================================================
+Known Issues (MZ, 2010-11-07)
+
+  KEEP IN MIND THAT TEXAS INSTRUMENTS NEVER RELEASED THE TI-99/8 AND THAT 
+  THERE ARE ONLY A FEW PROTOTYPES OF THE TI-99/8 AVAILABLE. ALL SOFTWARE 
+  MUST BE ASSUMED TO HAVE REMAINED IN A PRELIMINARY STATE.
+
+- Extended Basic II does not start when a floppy controller is present. This is
+  a problem of the prototypical XB II which we cannot solve. It seems as if only
+  hexbus devices are properly supported, but we currently do not have an 
+  emulation for those. Thus you can currently only use cassette to load and
+  save programs. You MUST turn off the floppy controller support in the 
+  configuration before you enter XB II. Other cartridges (like Editor/Assembler)
+  seem to be not affected by this problem and can make use of the floppy 
+  controllers.
+    Technical detail: The designers of XB II seem to have decided to put PABs
+    (Peripheral access block; contains pointers to buffers, the file name, and 
+    the access modes) into CPU RAM instead of the traditional storage in VDP
+    RAM. The existing peripheral cards are hard-coded to interpret the given 
+    pointer to the PAB as pointing to a VDP RAM address. That is, as soon as 
+    the card is found, control is passed to the DSR (device service routine),
+    the file name will not be found, and control returns with an error. It seems
+    as if XB II does not properly handle this situation and may lock up 
+    (sometimes it starts up, but file access is still not possible).
+
+- Multiple cartridges are not shown in the startup screen; only one
+  cartridge is presented. You have to manually select the cartridges with the
+  dip switch.
+  
+- Emulation speed may still be incorrect.
+  
+- SAVE and OLD MINIMEM do not work properly in XB II. It seems as if the
+  mapper shadows the NVRAM of the cartridge. You will lose the contents when
+  you turn off the machine.
+===========================================================================
+
+*/
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
@@ -242,6 +266,23 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
+		
+	PORT_START( "BWGDIP1" )
+	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "6 ms")
+		PORT_DIPSETTING( 0x01, "20 ms")
+
+	PORT_START( "BWGDIP2" )
+	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "Hide")
+		PORT_DIPSETTING( 0x01, "Show")
+		
+	PORT_START( "BWGDIP34" )
+	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "DSK1 only")
+		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
+		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
+		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
