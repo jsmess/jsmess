@@ -52,6 +52,21 @@ static VIDEO_UPDATE( tek4107a )
 	return 0;
 }
 
+static const gfx_layout tek4107a_charlayout =
+{
+	8, 15,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8 },
+	16*8
+};
+
+static GFXDECODE_START( tek4107a )
+	GFXDECODE_ENTRY( "chargen", 0x0000, tek4107a_charlayout, 0, 1 )
+GFXDECODE_END
+
 /* Machine Initialization */
 
 static MACHINE_START( tek4107a )
@@ -81,10 +96,15 @@ static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(64)
 	MDRV_VIDEO_START(tek4107a)
     MDRV_VIDEO_UPDATE(tek4107a)
+	MDRV_GFXDECODE(tek4107a)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tek4109a, tek4107a )
+    /* video hardware */
+	MDRV_PALETTE_LENGTH(4096)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -105,6 +125,7 @@ ROM_START( tek4107a )
 ROM_END
 
 ROM_START( tek4109a )
+	// another set with 160-32xx-03 v10.5 labels exists: http://picasaweb.google.com/glen.slick/Tektronix4107A#5300179291078507810
 	ROM_REGION( 0x40000, I80188_TAG, 0 )
 	ROM_LOAD16_BYTE( "160-3283-02 v8.2.u60",  0x00000, 0x8000, CRC(2a821db6) SHA1(b4d8b74bd9fe43885dcdc4efbdd1eebb96e32060) )
 	ROM_LOAD16_BYTE( "160-3284-02 v8.2.u160", 0x00001, 0x8000, CRC(ee567b01) SHA1(67b1b0648cfaa28d57473bcc45358ff2bf986acf) )
@@ -123,4 +144,4 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
 COMP( 1983, tek4107a,	0,			0,		tek4107a,	tek4107a,	0,		"Tektronix",	"Tektronix 4107A",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1983, tek4109a,	tek4107a,	0,		tek4107a,	tek4107a,	0,		"Tektronix",	"Tektronix 4109A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, tek4109a,	tek4107a,	0,		tek4109a,	tek4107a,	0,		"Tektronix",	"Tektronix 4109A",	GAME_NOT_WORKING | GAME_NO_SOUND )
