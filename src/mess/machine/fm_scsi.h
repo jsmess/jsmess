@@ -93,6 +93,7 @@ private:
     // internal device state goes here
     const fmscsi_device_config &m_config;
     static const device_timer_id TIMER_TRANSFER = 0;
+    static const device_timer_id TIMER_PHASE = 1;
 
     void fmscsi_rescan(void);
     int get_scsi_cmd_len(UINT8 cbyte);
@@ -114,6 +115,7 @@ private:
     UINT8 m_target;
     UINT8 m_buffer[512];
     emu_timer* m_transfer_timer;
+    emu_timer* m_phase_timer;
 };
 
 extern const device_type FMSCSI;
