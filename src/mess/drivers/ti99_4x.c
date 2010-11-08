@@ -49,7 +49,7 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8800, 0x8bff) AM_DEVREADWRITE("video", ti_tms991x_r16, ti_video_wnop)	/*vdp read*/
 	AM_RANGE(0x8C00, 0x8fff) AM_DEVREADWRITE("video", ti_video_rnop, ti_tms991x_w16)	/*vdp write*/
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("datamux_16_8", ti99_dmux_r, ti99_dmux_w) 
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("datamux_16_8", ti99_dmux_r, ti99_dmux_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8800, 0x8bff) AM_DEVREADWRITE("video", ti_v9938_r16, ti_video_wnop)	/*vdp read*/
 	AM_RANGE(0x8C00, 0x8fff) AM_DEVREADWRITE("video", ti_video_rnop, ti_v9938_w16)	/*vdp write*/
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("datamux_16_8", ti99_dmux_r, ti99_dmux_w) 
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("datamux_16_8", ti99_dmux_r, ti99_dmux_w)
 ADDRESS_MAP_END
 
 /*
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED( gk_changed )
 {
 	running_device *cartsys = field->port->machine->device("gromport");
-	set_gk_switches(cartsys, (UINT8)((UINT64)param&0x07), newval);  
+	set_gk_switches(cartsys, (UINT8)((UINT64)param&0x07), newval);
 }
 
 /* TI99/4a: 48-key keyboard, plus two optional joysticks (2 shift keys) */
@@ -121,7 +121,7 @@ static INPUT_PORTS_START(ti99_4a)
 
 	/* Flash setting is used to flash an empty HSGPL DSR ROM */
 	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) 
+	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, "Flash" )
 		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -179,7 +179,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
 		PORT_DIPSETTING( 0x00, "Hide")
 		PORT_DIPSETTING( 0x01, "Show")
-		
+
 	PORT_START( "BWGDIP34" )
 	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
 		PORT_DIPSETTING( 0x00, "DSK1 only")
@@ -746,16 +746,16 @@ static const TMS9928a_interface tms9929a_interface =
 };
 
 /*
-	Format: 
-	Name, address bus mask, select pattern, write select bit(s), read8z function, write8 function, Condition name, bits which must be set, bits which must not be set
-	
-	Multiple devices may have the same select pattern; as in the real hardware,
-	care must be taken that only one device actually responds. In the case of
-	GROMs, each chip has an internal address counter and an ID, and the chip
-	only responds when the ID and the most significant 3 bits match.
-	If the HSGPL extension is active, the console GROMs should be removed. In
-	reality, the chips should be pulled out of their sockets. Here we simulate
-	this by a condition.
+    Format:
+    Name, address bus mask, select pattern, write select bit(s), read8z function, write8 function, Condition name, bits which must be set, bits which must not be set
+
+    Multiple devices may have the same select pattern; as in the real hardware,
+    care must be taken that only one device actually responds. In the case of
+    GROMs, each chip has an internal address counter and an ID, and the chip
+    only responds when the ID and the most significant 3 bits match.
+    If the HSGPL extension is active, the console GROMs should be removed. In
+    reality, the chips should be pulled out of their sockets. Here we simulate
+    this by a condition.
 */
 static const bus_device dmux_devices[] =
 {
@@ -769,7 +769,7 @@ static const bus_device dmux_devices[] =
 	{ NULL, 0, 0, 0, NULL, NULL, 0, 0  }
 };
 
-static const cruconf_device cru_devices[] = 
+static const cruconf_device cru_devices[] =
 {
 	{ "gromport", 0xf800, 0x0800, gromportc_rz, gromportc_w },				// Check: Is this really limited?
 	{ "peribox",  0x0000, 0x0000, ti99_peb_cru_rz, ti99_peb_cru_w },    // Peribox needs all addresses
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, driver_device )
 	// MDRV_SCREEN_REFRESH_RATE(60)
 	// MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918_interface)
 	MDRV_GFXDECODE(ti99)
 
 	/* sound hardware */
@@ -812,26 +812,26 @@ static MACHINE_CONFIG_START( ti99_4_60hz, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_TI994_BOARD_ADD( "ti_board" )
-	
+
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4)
 
 	MDRV_CRUBUS_ADD( "crubus", cru_devices )
 	MDRV_DMUX_ADD( "datamux_16_8", dmux_devices )
-	
+
 	MDRV_GROM_ADD( "console_grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
 	MDRV_GROM_ADD( "console_grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
 	MDRV_GROM_ADD( "console_grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	
+
 	MDRV_PBOX4_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
-	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )	
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 
 	MDRV_MECMOUSE_ADD( "mecmouse" )
-	MDRV_HANDSET_ADD( "handset", "tms9901" ) 
+	MDRV_HANDSET_ADD( "handset", "tms9901" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4_50hz, driver_device )
@@ -845,10 +845,10 @@ static MACHINE_CONFIG_START( ti99_4_50hz, driver_device )
 	MDRV_MACHINE_RESET( ti99_4 )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9929_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9929_interface)
 
 	MDRV_GFXDECODE(ti99)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("soundgen", SN94624, 3579545/8)	/* 3.579545 MHz */
@@ -870,14 +870,14 @@ static MACHINE_CONFIG_START( ti99_4_50hz, driver_device )
 	MDRV_GROM_ADD( "console_grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	
+
 	MDRV_PBOX4_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
-	
+
 	MDRV_MECMOUSE_ADD( "mecmouse" )
-	MDRV_HANDSET_ADD( "handset", "tms9901" ) 
+	MDRV_HANDSET_ADD( "handset", "tms9901" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4a_60hz, driver_device )
@@ -891,9 +891,9 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, driver_device )
 	MDRV_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918a_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918a_interface)
 	MDRV_GFXDECODE(ti99a)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("soundgen", SN94624, 3579545/8)	/* 3.579545 MHz */
@@ -915,7 +915,7 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, driver_device )
 	MDRV_GROM_ADD( "console_grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	
+
 	MDRV_PBOX4A_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
@@ -931,13 +931,13 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, driver_device )
 	MDRV_CPU_PROGRAM_MAP(memmap)
 	MDRV_CPU_IO_MAP(cru_map)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
-	
+
 	MDRV_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9929a_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9929a_interface)
 	MDRV_GFXDECODE(ti99a)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("soundgen", SN94624, 3579545/8)	/* 3.579545 MHz */
@@ -947,10 +947,10 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_TI994A_BOARD_ADD( "ti_board" )
-	
+
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4a)
-	
+
 	MDRV_CRUBUS_ADD( "crubus", cru_devices )
 	MDRV_DMUX_ADD( "datamux_16_8", dmux_devices )
 
@@ -959,7 +959,7 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, driver_device )
 	MDRV_GROM_ADD( "console_grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	
+
 	MDRV_PBOX4A_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, driver_device )
 	MDRV_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_set_int2)	
+	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_set_int2)
 
 	MDRV_GFXDECODE(ti99b)
 
@@ -1003,7 +1003,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_TI994A_BOARD_ADD( "ti_board" )
-	
+
 	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4a)
 
 	MDRV_CRUBUS_ADD( "crubus", cru_devices )

@@ -174,7 +174,7 @@ static void mapper_mount_logical_device(running_device *mapperdev, running_devic
 			mapper->logcomp[index].write_select = write_sel;
 			mapper->logcomp[index].read_byte = read;
 			mapper->logcomp[index].write_byte = write;
-			// printf("registering the device at logical position %d, device %lx\n", index, busdevice);
+			logerror("ti99_8: registering a device at logical position %d\n", index);
 		}
 	}
 	else
@@ -197,7 +197,7 @@ static void mapper_mount_physical_device(running_device *mapperdev, running_devi
 			mapper->physcomp[index].select = address_bits;
 			mapper->physcomp[index].read_byte = read;
 			mapper->physcomp[index].write_byte = write;
-			// printf("registering the device at physical position %d, device %lx\n", index, busdevice);
+			logerror("ti99_8: registering a device at physical position %d\n", index);
 		}
 	}
 	else
@@ -214,7 +214,6 @@ static int check_logically_addressed_r( device_t *device, offs_t offset, UINT8 *
 {
 	mapper8_state *mapper = get_safe_token(device);
 	int found = FALSE;
-	// printf("ti99_8: read access %04x ... ", offset);
 	// Look for components responding to the logical address
 	for (int i=0; i < MAXLOGDEV; i++)
 	{
@@ -229,7 +228,6 @@ static int check_logically_addressed_r( device_t *device, offs_t offset, UINT8 *
 					if (adev->device == MAP8_SRAM)
 					{
 						*value = mapper->sram[offset & ~adev->address_mask];
-						// printf("sram");
 						found = TRUE;
 					}
 					else
@@ -238,7 +236,6 @@ static int check_logically_addressed_r( device_t *device, offs_t offset, UINT8 *
 						{
 							// Starts at 0000
 							*value = mapper->rom[offset & ~adev->address_mask];
-							// printf("rom0");
 							found = TRUE;
 						}
 						else
@@ -246,7 +243,6 @@ static int check_logically_addressed_r( device_t *device, offs_t offset, UINT8 *
 							// device
 							if (adev->read_byte != NULL)
 							{
-								// printf("device ");
 								adev->read_byte(adev->device, offset, value);
 								found = TRUE;
 							}
@@ -265,7 +261,6 @@ static int check_logically_addressed_w( device_t *device, offs_t offset, UINT8 d
 	mapper8_state *mapper = get_safe_token(device);
 	int found = FALSE;
 
-	// printf("ti99_8: write access %04x ... ", offset);
 	for (int i=0; i < MAXLOGDEV; i++)
 	{
 		log_addressed_device *adev = &mapper->logcomp[i];
@@ -279,21 +274,18 @@ static int check_logically_addressed_w( device_t *device, offs_t offset, UINT8 d
 					if (adev->device == MAP8_SRAM)
 					{
 						mapper->sram[offset & ~adev->address_mask] = data;
-						// printf("sram");
 						found = TRUE;
 					}
 					else
 					{
 						if (adev->device == MAP8_ROM0)
 						{
-							// printf("rom0 (ignored)");
 							found = TRUE;
 						}
 						else
 						{
 							if (adev->write_byte != NULL)
 							{
-								// printf("device ");
 								adev->write_byte(adev->device, offset, data);
 								found = TRUE;
 							}
@@ -323,11 +315,9 @@ READ8_DEVICE_HANDLER( ti99_mapper8_r )
 
 	if (!found)
 	{
-		// printf(" not logical ...");
 		// In that case, the address decoder could not find a suitable device.
 		// This means the logical address is transformed by the mapper.
 		UINT32	pas_address = mapper->pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
-		// printf("%08x ", pas_address);
 
 		// So now let's do the same as above with physical addresses
 		for (int i=0; i < MAXPHYSDEV; i++)
@@ -340,8 +330,6 @@ READ8_DEVICE_HANDLER( ti99_mapper8_r )
 					if (adev->device == MAP8_DRAM)
 					{
 						value = mapper->dram[pas_address & ~adev->address_mask];
-						found = TRUE;
-						// printf("dram");
 					}
 					else
 					{
@@ -349,8 +337,6 @@ READ8_DEVICE_HANDLER( ti99_mapper8_r )
 						{
 							// Starts at 2000 in the image, 8K
 							value = mapper->rom[0x2000 + (pas_address & 0x1fff)];
-							found = TRUE;
-							// printf("rom1");
 						}
 						else
 						{
@@ -358,47 +344,30 @@ READ8_DEVICE_HANDLER( ti99_mapper8_r )
 							{
 								// Starts at 6000 in the image, 8K
 								value = mapper->rom[0x6000 + (pas_address & 0x1fff)];
-								found = TRUE;
-								// printf("rom1a");
 							}
 							else
 							{
 								if (adev->device == MAP8_INTS)
 								{
 									// Interrupt sense
-									// printf("ti99_8: ILSENSE not implemented.\n");
-									// printf("sense");
-									found = TRUE;
+									logerror("ti99_8: ILSENSE not implemented.\n");
 								}
 								else
 								{
-									// only one option left: cartridge port (aka grom port)
+									// devices
 									if (adev->read_byte != NULL)
 									{
-										// printf("pdevice ");
 										adev->read_byte(adev->device, pas_address, &value);
-										found = TRUE;
 									}
 								}
 							}
 						}
 					}
+					if (adev->stop) break;
 				}
 			}
-			if (found && adev->stop) break;
-		}
-
-		if (!found)
-		{
-			// Still not found? Then we route the physical address to the I/O port
-			// which has the peribox attached
-			// printf("not mapped ... ioport");
-			if (mapper->ioport!=NULL)
-				ti99_peb_data_rz(mapper->ioport, pas_address, &value);
-			// printf("ti99_8: io read %04x = %02x\n", offset, value);
 		}
 	}
-	// printf(" %02x\n", value);
 
 	return value;
 }
@@ -412,14 +381,12 @@ WRITE8_DEVICE_HANDLER( ti99_mapper8_w )
 	int found = FALSE;
 	if (mapper->sram==NULL)
 		return;
-//  // printf("ti99_8: write %04x = %02x\n", offset, data);
 
 	// Look for components responding to the logical address
 	found = check_logically_addressed_w(device, offset, data);
 
 	if (!found)
 	{
-		// printf(" not logical ...");
 		// In that case, the address decoder could not find a suitable device.
 		// This means the logical address is transformed by the mapper.
 		UINT32 pas_address = mapper->pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
@@ -435,52 +402,35 @@ WRITE8_DEVICE_HANDLER( ti99_mapper8_w )
 					if (adev->device == MAP8_DRAM)
 					{
 						mapper->dram[pas_address & ~adev->address_mask] = data;
-						// printf("dram base %08x", pas_address);
-						found = TRUE;
 					}
 					else
 					{
 						if (adev->device == MAP8_ROM1 || adev->device == MAP8_ROM1A)
 						{
-							// printf("rom1 (ignored)");
-							found = TRUE;
+							logerror("ti99_8: write to rom1 ignored\n");
 						}
 						else
 						{
 							if (adev->device == MAP8_INTS)
 							{
 								// Interrupt sense
-								// printf("ilsense (ignored)");
-								found = TRUE;
+								logerror("ti99_8: write to ilsense ignored\n");
 							}
 							else
 							{
-								// only one option left: cartridge port (aka grom port)
+								// cartridge port (aka grom port) or peribox
 								if (adev->write_byte != NULL)
 								{
-									// printf("pdevice ");
 									adev->write_byte(adev->device, pas_address, data);
-									found = TRUE;
 								}
 							}
 						}
 					}
+					if (adev->stop) break;
 				}
 			}
-			if (found && adev->stop) break;
-		}
-
-		if (!found)
-		{
-			// Still not found? Then we route the physical address to the I/O port
-			// which has the peribox attached
-			// printf("not mapped ... ioport");
-			if (mapper->ioport!=NULL)
-				ti99_peb_data_w(mapper->ioport, pas_address, data);
-			// printf("ti99_8: io write %04x = %02x\n", offset, data);
 		}
 	}
-	// printf(" %02x\n", data);
 }
 
 /*
@@ -498,7 +448,6 @@ WRITE8_DEVICE_HANDLER( ti99_mapreg_w )
 		int bankindx = (data & 0x0e)>>1;
 		if (data & 1)
 		{
-			// printf("mapper8: load from sram bank %02x", bankindx);
 			// Load from SRAM
 			for (int i=0; i < 16; i++)
 			{
@@ -508,13 +457,11 @@ WRITE8_DEVICE_HANDLER( ti99_mapreg_w )
 					+ (mapper->sram[i*4 + ptr+1] << 16)
 					+ (mapper->sram[i*4 + ptr+2] << 8)
 					+ (mapper->sram[i*4 + ptr+3]);
-//              // printf(" values (%04x) %02x %02x %02x %02x, ", i*4+ptr, mapper->sram[i*4 + ptr], mapper->sram[i*4 + ptr+1], mapper->sram[i*4 + ptr+2], mapper->sram[i*4 + ptr+3]);
 			}
 		}
 		else
 		{
 			// Store in SRAM
-			// printf("mapper8: copy to sram bank %02x", bankindx);
 			for (int i=0; i < 16; i++)
 			{
 				int ptr = (bankindx << 6);
@@ -540,12 +487,6 @@ READ8Z_DEVICE_HANDLER( ti998dsr_rz )
 		//  Starts at 0x4000 in the image
 		*value = mapper->rom[0x4000 + (offset & 0x1fff)];
 	}
-	else
-	{
-		if (mapper->ioport!=NULL)
-			ti99_peb_data_rz(mapper->ioport, 0x4000 + (offset & 0x1fff), value);
-//      printf("ti99_8: io1 read %04x = %02x\n", offset, *value);
-	}
 }
 
 
@@ -564,7 +505,7 @@ WRITE8_DEVICE_HANDLER( mapper8c_w )
 		if (addr==2)
 		{
 			// TODO
-			// printf("ti-99/8: Hardware reset via CRU\n");
+			logerror("ti99_8: Hardware reset via CRU not implemented\n");
 		}
 	}
 }
@@ -573,14 +514,12 @@ WRITE8_DEVICE_HANDLER( mapper8_CRUS_w )
 {
 	mapper8_state *mapper = get_safe_token(device);
 	mapper->CRUS = data;
-	// printf("ti99_8: CRUS = %02x\n", data);
 }
 
 WRITE8_DEVICE_HANDLER( mapper8_PTGEN_w )
 {
 	mapper8_state *mapper = get_safe_token(device);
 	mapper->PTGEN = data;
-	// printf("ti99_8: PTGEN = %02x\n", data);
 }
 
 /***************************************************************************
@@ -589,11 +528,14 @@ WRITE8_DEVICE_HANDLER( mapper8_PTGEN_w )
 
 static DEVICE_START( mapper8 )
 {
-//  // printf("Starting mapper\n");
+	logerror("ti99_8: Starting mapper\n");
 	mapper8_state *mapper = get_safe_token(device);
 	mapper->sram = (UINT8*)malloc(SRAM_SIZE);
 	mapper->dram = (UINT8*)malloc(DRAM_SIZE);
 	mapper->rom = memory_region(device->machine, "maincpu");
+
+	memset(mapper->sram, 0x00, SRAM_SIZE);
+	memset(mapper->dram, 0x00, DRAM_SIZE);
 
 	int i = 0;
 	int done=FALSE;
@@ -627,7 +569,6 @@ static DEVICE_START( mapper8 )
 		{
 			for (int j=1; (j < 7) && (dev == NULL); j++)
 			{
-				// printf("%s, %s\n", cons[i].name, list[j-1]);
 				if (strcmp(cons[i].name, list[j-1])==0)
 					dev = (void *)j;
 			}
@@ -658,7 +599,7 @@ static DEVICE_START( mapper8 )
 
 static DEVICE_STOP( mapper8 )
 {
-	// printf("Stopping mapper\n");
+	logerror("ti99_8: Stopping mapper\n");
 	mapper8_state *mapper = get_safe_token(device);
 	free(mapper->sram);
 	free(mapper->dram);
@@ -666,7 +607,7 @@ static DEVICE_STOP( mapper8 )
 
 static DEVICE_RESET( mapper8 )
 {
-	// printf("Resetting mapper\n");
+	logerror("ti99_8: Resetting mapper\n");
 	mapper8_state *mapper = get_safe_token(device);
 
 	mapper->dsr_selected = FALSE;

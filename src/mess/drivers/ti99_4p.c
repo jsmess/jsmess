@@ -112,7 +112,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
 	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x03, 0x02, "HSGPL extension" ) 
+	PORT_CONFNAME( 0x03, 0x02, "HSGPL extension" )
 		PORT_CONFSETTING(    0x01, "Flash" )
 		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
@@ -129,12 +129,12 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_CONFSETTING( 0x01, "Realistic")
 
 	PORT_START( "EVPC-SW1" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 ) 
+	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
 		PORT_DIPSETTING(    0x00, "PAL" )
 		PORT_DIPSETTING(    0x01, "NTSC" )
 
 	PORT_START( "EVPC-SW3" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 ) 
+	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
 		PORT_DIPSETTING(    0x00, DEF_STR( International ))
 		PORT_DIPSETTING(    0x01, DEF_STR( German ))
 
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, driver_device )
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4p_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	/* video hardware */
-	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)	
+	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
 
 	MDRV_MACHINE_START( ti99_4p )
 	MDRV_MACHINE_RESET( ti99_4p )

@@ -146,43 +146,43 @@ Keyboard interface:
     - INT6*-INT11*: row inputs (int6* is only used for joystick fire)
 
 ROM file contents:
-  0000-1fff ROM0				0x0000 (logical address)
+  0000-1fff ROM0                0x0000 (logical address)
   2000-3fff ROM1                0xffa000 - 0xffbfff
-  4000-5fff DSR1				0xff4000 (TTS)
+  4000-5fff DSR1                0xff4000 (TTS)
   6000-7fff ROM1a               0xffc000 - 0xffdfff
-  8000-9fff DSR2				0xff4000 (missing; Hexbus?)
+  8000-9fff DSR2                0xff4000 (missing; Hexbus?)
 
 ===========================================================================
 Known Issues (MZ, 2010-11-07)
 
-  KEEP IN MIND THAT TEXAS INSTRUMENTS NEVER RELEASED THE TI-99/8 AND THAT 
-  THERE ARE ONLY A FEW PROTOTYPES OF THE TI-99/8 AVAILABLE. ALL SOFTWARE 
+  KEEP IN MIND THAT TEXAS INSTRUMENTS NEVER RELEASED THE TI-99/8 AND THAT
+  THERE ARE ONLY A FEW PROTOTYPES OF THE TI-99/8 AVAILABLE. ALL SOFTWARE
   MUST BE ASSUMED TO HAVE REMAINED IN A PRELIMINARY STATE.
 
 - Extended Basic II does not start when a floppy controller is present. This is
   a problem of the prototypical XB II which we cannot solve. It seems as if only
-  hexbus devices are properly supported, but we currently do not have an 
+  hexbus devices are properly supported, but we currently do not have an
   emulation for those. Thus you can currently only use cassette to load and
-  save programs. You MUST turn off the floppy controller support in the 
+  save programs. You MUST turn off the floppy controller support in the
   configuration before you enter XB II. Other cartridges (like Editor/Assembler)
-  seem to be not affected by this problem and can make use of the floppy 
+  seem to be not affected by this problem and can make use of the floppy
   controllers.
     Technical detail: The designers of XB II seem to have decided to put PABs
-    (Peripheral access block; contains pointers to buffers, the file name, and 
+    (Peripheral access block; contains pointers to buffers, the file name, and
     the access modes) into CPU RAM instead of the traditional storage in VDP
-    RAM. The existing peripheral cards are hard-coded to interpret the given 
-    pointer to the PAB as pointing to a VDP RAM address. That is, as soon as 
+    RAM. The existing peripheral cards are hard-coded to interpret the given
+    pointer to the PAB as pointing to a VDP RAM address. That is, as soon as
     the card is found, control is passed to the DSR (device service routine),
     the file name will not be found, and control returns with an error. It seems
-    as if XB II does not properly handle this situation and may lock up 
+    as if XB II does not properly handle this situation and may lock up
     (sometimes it starts up, but file access is still not possible).
 
 - Multiple cartridges are not shown in the startup screen; only one
   cartridge is presented. You have to manually select the cartridges with the
   dip switch.
-  
+
 - Emulation speed may still be incorrect.
-  
+
 - SAVE and OLD MINIMEM do not work properly in XB II. It seems as if the
   mapper shadows the NVRAM of the cartridge. You will lose the contents when
   you turn off the machine.
@@ -266,7 +266,7 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
-		
+
 	PORT_START( "BWGDIP1" )
 	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
 		PORT_DIPSETTING( 0x00, "6 ms")
@@ -276,7 +276,7 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
 		PORT_DIPSETTING( 0x00, "Hide")
 		PORT_DIPSETTING( 0x01, "Show")
-		
+
 	PORT_START( "BWGDIP34" )
 	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
 		PORT_DIPSETTING( 0x00, "DSK1 only")
@@ -508,29 +508,29 @@ static const struct tms9995reset_param ti99_8_processor_config =
 };
 
 /*
-	Format: 
-	Name, mode, stop, mask, select, write, read8z function, write8 function
-	
-	Multiple devices may have the same select pattern; as in the real hardware,
-	care must be taken that only one device actually responds. In the case of
-	GROMs, each chip has an internal address counter and an ID, and the chip
-	only responds when the ID and the most significant 3 bits match.
+    Format:
+    Name, mode, stop, mask, select, write, read8z function, write8 function
+
+    Multiple devices may have the same select pattern; as in the real hardware,
+    care must be taken that only one device actually responds. In the case of
+    GROMs, each chip has an internal address counter and an ID, and the chip
+    only responds when the ID and the most significant 3 bits match.
 */
 static const mapper8_dev_config mapper_devices[] =
 {
 	// TI-99/8 mode
-	{ SRAMNAME,			0, 1, 0xf800, 0xf000, 0x0000, NULL, 			NULL }, 
+	{ SRAMNAME,			0, 1, 0xf800, 0xf000, 0x0000, NULL, 			NULL },
 	{ "soundgen",   	0, 1, 0xfff0, 0xf800, 0x0000, NULL,         	sn76496_w },
 	{ "video",			0, 1, 0xfffd, 0xf810, 0x0000, ti8_tms991x_rz,	ti8_tms991x_w },
-	{ "speech",   		0, 1, 0xfff0, 0xf820, 0x0000, ti998spch_rz, 	ti998spch_w },
-	{ "grom_0", 	    0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz, 		ti99grom_w },
-	{ "grom_1",  		0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
+	{ "speech", 		0, 1, 0xfff0, 0xf820, 0x0000, ti998spch_rz, 	ti998spch_w },
+	{ "grom_0", 	    0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
+	{ "grom_1", 		0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
 	{ "grom_2",			0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,  	ti99grom_w },
 	{ "gromport",   	0, 0, 0xfff1, 0xf830, 0x0400, gromportg_rz,		gromportg_w, },
-//	{ "grom_tts_0",		2, 0, 0xfff1, 0xf840, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
-//	{ "grom_pcode1_0", 	2, 0, 0xfff1, 0xf850, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
-//	{ "grom_pcode2_0", 	2, 0, 0xfff1, 0xf860, 0x0000, 0, 0, ti99grom_rz,  	ti99grom_w },  // up to 6 GROMs; no good dumps known
-	{ "mapper",   		0, 1, 0xfff0, 0xf870, 0x0000, NULL,			ti99_mapreg_w },
+//  { "grom_tts_0",     2, 0, 0xfff1, 0xf840, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
+//  { "grom_pcode1_0",  2, 0, 0xfff1, 0xf850, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
+//  { "grom_pcode2_0",  2, 0, 0xfff1, 0xf860, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
+	{ "mapper", 		0, 1, 0xfff0, 0xf870, 0x0000, NULL,			ti99_mapreg_w },
 
 	// TI-99/4A mode
 	// GROM: 1001 1000 0000 xxa0
@@ -539,30 +539,31 @@ static const mapper8_dev_config mapper_devices[] =
 	{ "grom_1",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
 	{ "grom_2",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
 	{ "gromport",   	1, 0, 0xfff1, 0x9800, 0x0400, gromportg_rz,		gromportg_w, },
-	
-	{ "mapper",   		1, 1, 0xfff0, 0x8810, 0x0000, NULL,			 	ti99_mapreg_w },
-	{ "soundgen",   	1, 1, 0xfff0, 0x8400, 0x0000, NULL,      		sn76496_w },
-	{ "video",			1, 1, 0xfffd, 0x8800, 0x0400, ti8_tms991x_rz, 	ti8_tms991x_w },
-	{ "speech",   		1, 1, 0xfff0, 0x9000, 0x0400, ti998spch_rz, 	ti998spch_w },
-	{ SRAMNAME,			1, 1, 0xf800, 0x8000, 0x0000, NULL,				NULL }, // write at the end; soundgen must be found earlier 
+
+	{ "mapper", 		1, 1, 0xfff0, 0x8810, 0x0000, NULL,				ti99_mapreg_w },
+	{ "soundgen",   	1, 1, 0xfff0, 0x8400, 0x0000, NULL,     		sn76496_w },
+	{ "video",			1, 1, 0xfffd, 0x8800, 0x0400, ti8_tms991x_rz,	ti8_tms991x_w },
+	{ "speech", 		1, 1, 0xfff0, 0x9000, 0x0400, ti998spch_rz, 	ti998spch_w },
+	{ SRAMNAME,			1, 1, 0xf800, 0x8000, 0x0000, NULL,				NULL }, // write at the end; soundgen must be found earlier
 
 	// Physical (need to pack this into here as well)
 	{ DRAMNAME, 		3, 1, 0xff0000, 0x000000, 0x000000, NULL, NULL },
-	{ "mapper",			3, 1, 0xffe000, 0xff4000, 0x000000, ti998dsr_rz, NULL },   // DSR
-	{ "gromport", 		3, 1, 0xffe000, 0xff6000, 0x000000, gromportr_rz, gromportr_w  },
-	{ "gromport", 		3, 1, 0xffe000, 0xff8000, 0x000000, gromportr_rz, gromportr_w  },
+	{ "mapper",			3, 0, 0xffe000, 0xff4000, 0x000000, ti998dsr_rz, NULL },   // DSR
+	{ "gromport",		3, 1, 0xffe000, 0xff6000, 0x000000, gromportr_rz, gromportr_w  },
+	{ "gromport",		3, 1, 0xffe000, 0xff8000, 0x000000, gromportr_rz, gromportr_w  },
 	{ ROM1NAME, 		3, 1, 0xffe000, 0xffa000, 0x000000, NULL, NULL },
-	{ ROM1ANAME, 		3, 1, 0xffe000, 0xffc000, 0x000000, NULL, NULL },
-	{ INTSNAME, 		3, 1, 0xfffff0, 0xffe000, 0x000000, NULL, NULL },	
+	{ ROM1ANAME,		3, 1, 0xffe000, 0xffc000, 0x000000, NULL, NULL },
+	{ INTSNAME, 		3, 1, 0xfffff0, 0xffe000, 0x000000, NULL, NULL },
+	{ "peribox",		3, 1, 0x000000, 0x000000, 0x000000, ti99_peb_data_rz, ti99_peb_data_w },
 
 	{ NULL, 0, 0, 0, 0, 0, NULL, NULL  }
 };
 
-static const cruconf_device cru_devices[] = 
+static const cruconf_device cru_devices[] =
 {
 	{ "mapper", 	0xfff0, 0x2700, NULL, mapper8c_w },
-	{ "gromport", 	0xf800, 0x0800, gromportc_rz, gromportc_w },				// Check: Is this really limited?
-	{ "peribox",  	0x0000, 0x0000, ti99_peb_cru_rz, ti99_peb_cru_w },    // Peribox needs all addresses
+	{ "gromport",	0xf800, 0x0800, gromportc_rz, gromportc_w },				// Check: Is this really limited?
+	{ "peribox",	0x0000, 0x0000, ti99_peb_cru_rz, ti99_peb_cru_w },    // Peribox needs all addresses
 	{ NULL, 		0, 0, NULL, NULL }
 };
 
@@ -582,7 +583,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
 	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9118_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9118_interface)
 
 	MDRV_GFXDECODE(ti99_8)
 
@@ -627,7 +628,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
 	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9129_interface)	
+	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9129_interface)
 
 	MDRV_GFXDECODE(ti99_8)
 
@@ -639,7 +640,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_TISPEECH_ADD("speech")
-	
+
 	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
