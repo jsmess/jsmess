@@ -22,9 +22,21 @@ public:
 	UINT8		*video_ram;
 	UINT8		data_out;
 	UINT8		keyboard_input;
+	UINT8		q_bank;
+	UINT8		u_bank;
 	UINT16		old_in[3];
+	UINT8		ram_1800[0x800];
 	emu_timer	*kb_timer;
 };
+
+
+static WRITE8_HANDLER( phunsy_1800_w )
+{
+	phunsy_state *state = space->machine->driver_data<phunsy_state>();
+
+	if ( state->u_bank == 0 )
+		state->ram_1800[offset] = data;
+}
 
 
 static ADDRESS_MAP_START(phunsy_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -32,9 +44,37 @@ static ADDRESS_MAP_START(phunsy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
 	AM_RANGE( 0x1000, 0x17ff) AM_RAM	AM_BASE_MEMBER( phunsy_state, video_ram ) // Video RAM
-	AM_RANGE( 0x1800, 0x1fff) AM_RAM // Banked ROM
+	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( phunsy_ctrl_w )
+{
+	phunsy_state *state = space->machine->driver_data<phunsy_state>();
+
+	if (LOG)
+		logerror("%s: phunsy_ctrl_w %02x\n", cpuexec_describe_context(space->machine), data);
+
+	state->u_bank = data >> 4;
+	state->q_bank = data & 0x0F;
+
+	switch( state->u_bank )
+	{
+	case 0x00:	/* RAM */
+		memory_set_bankptr( space->machine, "bank1", state->ram_1800 );
+		break;
+	case 0x01:	/* MDCR program */
+	case 0x02:	/* Disassembler */
+	case 0x03:	/* Label handler */
+		memory_set_bankptr( space->machine, "bank1", memory_region(space->machine, "maincpu") + ( 0x800 * state->u_bank ) );
+		break;
+	default:	/* Not used */
+		break;
+	}
+
+	memory_set_bankptr( space->machine, "bank2", memory_region(space->machine, "ram_4000") + 0x4000 * state->q_bank );
+}
 
 
 static WRITE8_HANDLER( phunsy_data_w )
@@ -107,6 +147,7 @@ static READ8_HANDLER( phunsy_sense_r )
 
 static ADDRESS_MAP_START( phunsy_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( S2650_CTRL_PORT, S2650_CTRL_PORT ) AM_WRITE( phunsy_ctrl_w )
 	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )
 	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( phunsy_sense_r)
 ADDRESS_MAP_END
@@ -213,8 +254,11 @@ static MACHINE_RESET(phunsy)
 {
 	phunsy_state *state = machine->driver_data<phunsy_state>();
 
+	memory_set_bankptr( machine, "bank1", state->ram_1800 );
 	memory_set_bankptr( machine, "bank2", memory_region(machine, "ram_4000") );
 
+	state->u_bank = 0;
+	state->q_bank = 0;
 	state->keyboard_input = 0xFF;
 	state->old_in[0] = 0;
 	state->old_in[1] = 0;
@@ -338,8 +382,8 @@ MACHINE_CONFIG_END
 ROM_START( phunsy )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "phunsy_bios.bin", 0x0000, 0x0800, CRC(a789e82e) SHA1(b1c130ab2b3c139fd16ddc5dc7bdcaf7a9957d02))
-	ROM_LOAD( "dass.bin",        0x0800, 0x0800, CRC(13380140) SHA1(a999201cb414abbf1e10a7fcc1789e3e000a5ef1))
-	ROM_LOAD( "pdcr.bin",        0x1000, 0x0800, CRC(74bf9d0a) SHA1(8d2f673615215947f033571f1221c6aa99c537e9))
+	ROM_LOAD( "pdcr.bin",        0x0800, 0x0800, CRC(74bf9d0a) SHA1(8d2f673615215947f033571f1221c6aa99c537e9))
+	ROM_LOAD( "dass.bin",        0x1000, 0x0800, CRC(13380140) SHA1(a999201cb414abbf1e10a7fcc1789e3e000a5ef1))
 	ROM_LOAD( "labhnd.bin",      0x1800, 0x0800, CRC(1d5a106b) SHA1(a20d09e32e21cf14db8254cbdd1d691556b473f0))
 	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "ph_char1.bin", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
