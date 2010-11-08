@@ -18,7 +18,7 @@
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-//#include "cpu/z80/z80.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -1064,14 +1064,26 @@ static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 // (*) are specific N88 V1 / V2 ports
 
-#if 0
+/* FDC subsytem CPU */
 static ADDRESS_MAP_START( pc88va_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc88va_z80_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0xf0, 0xf0) // Interrupt Opcode Port
+//	AM_RANGE(0xf4, 0xf4) // Drive Control Port
+//	AM_RANGE(0xf8, 0xf8) // (R) Terminal Count Port (W) Motor Control Port
+//	AM_RANGE(0xfa, 0xfa) // FDC Status Register
+//	AM_RANGE(0xfb, 0xfb) // FDC Data Register
+	// 0xfc - 0xff there's a i8255 mapped, bidiretional handshake port
+//	AM_RANGE(0xfc, 0xfc) // (R) Data input port from main CPU
+//	AM_RANGE(0xfd, 0xfd) // (W) Data input port to main CPU
+	AM_RANGE(0xfe, 0xfe) AM_NOP // Handshake Control Port
+//	AM_RANGE(0xff, 0xff) // Mode Set / Bit Control
 ADDRESS_MAP_END
-#endif
+
 
 /* TODO: active low or active high? */
 static INPUT_PORTS_START( pc88va )
@@ -1527,11 +1539,9 @@ static MACHINE_CONFIG_START( pc88va, driver_device )
 	MDRV_CPU_IO_MAP(pc88va_io_map)
 	MDRV_CPU_VBLANK_INT("screen",pc88va_vrtc_irq)
 
-	#if 0
-	MDRV_CPU_ADD("subcpu", Z80, 8000000)        /* 8 MHz */
+	MDRV_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc88va_z80_map)
 	MDRV_CPU_IO_MAP(pc88va_z80_io_map)
-	#endif
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1572,7 +1582,8 @@ MACHINE_CONFIG_END
 ROM_START( pc88va )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "subcpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
 
 	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
 	ROM_LOAD( "varom00.rom",   0x00000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )
@@ -1581,9 +1592,6 @@ ROM_START( pc88va )
 	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
 	ROM_LOAD( "varom1.rom",    0x00000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
 
-	ROM_REGION( 0x2000, "sub", 0 )		// not sure what this should do...
-	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
-
 	/* No idea of the proper size: it has never been dumped */
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
@@ -1591,7 +1599,6 @@ ROM_START( pc88va )
 	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "vafont.rom", 0x00000, 0x50000, BAD_DUMP CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) ) // should be splitted
 
-	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 
