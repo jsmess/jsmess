@@ -1776,6 +1776,7 @@ const game_driver * const drivers[] =
 	DRIVER( lkageb )	/* bootleg */
 	DRIVER( lkageb2 )	/* bootleg */
 	DRIVER( lkageb3 )	/* bootleg */
+	DRIVER( bygone )	/* prototype ? A53 (c) 1985 Taito Corporation */
 	DRIVER( msisaac )	/* A34 (c) 1985 Taito Corporation */
 	DRIVER( retofinv )	/* A37 (c) 1985 Taito Corporation */
 	DRIVER( retofinv1 )	/* bootleg */
@@ -4682,7 +4683,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gundmct )	/* 2001.03 Mobile Suit Gundam: Federation vs. Zeon (cartridge) */
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
-						/* 2001.05 Zero Gunner 2 */
+	DRIVER( zerogu2 )	/* 2001.05 Zero Gunner 2 */
 	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
@@ -4845,7 +4846,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.03 The Rumble Fish 2 */
 	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
-						/* 2005.10 The King of Fighters XI */
+	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 						/* 2006.02 Metal Slug 6 */
 	DRIVER( xtrmhnt2 )			/* 2006.09 Extreme Hunting 2 Tournament Edition */
@@ -8335,6 +8336,7 @@ Other Sun games
 	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( cafedoll )	/* 1993 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
+	DRIVER( janptrsp )	/* 1997 Dynax */
 	DRIVER( sprtmtch )	/* "31" (c) 1989 Dynax + Fabtek license */
 	DRIVER( maya )		/* (c) 1994 Promat */
 	DRIVER( mayaa )		/* (c) 1994 Promat */
@@ -8342,7 +8344,8 @@ Other Sun games
 	DRIVER( blktouch )	/* (c) Yang Gi Co Ltd. */
 	DRIVER( mcnpshnt )	/* "33" Mahjong Campus Hunting 1990 Dynax */
 	DRIVER( 7jigen )	/* "37" 7jigen no Youseitachi 1990 Dynax */
-	DRIVER( neruton )	/* "45" Neruton Haikujiradan 1990 Dynax */
+	DRIVER( neruton )	/* "45" Mahjong Neruton Haikujiradan 1990 Dynax */
+	DRIVER( nerutona )	/* "45" Mahjong Neruton Haikujiradan 1990 Dynax */
 	DRIVER( mjcomv1 )	/* 1991 Dynax */
 	DRIVER( shpeng )	/* (c) 1995 WSAC Systems */
 	DRIVER( tenkai )	/* 1991 Dynax */
@@ -8682,6 +8685,8 @@ Other Sun games
 	DRIVER( stonebal )	/* (c) 1994 */
 	DRIVER( stonebal2 )	/* (c) 1994 */
 
+	DRIVER( shtstar )	/* (c) 1994 Nova */
+
 	/* Dynamo games */
 	DRIVER( skeetsht )	/* (c) 1991 */
 	DRIVER( toursol )	/* (c) 1995 Dynamo */
@@ -8764,6 +8769,7 @@ Other Sun games
 	DRIVER( mgprem11 )	/* (c) 1995 */
 	DRIVER( lasstixx )	/* (c) 1995 */
 	DRIVER( mgnumber )	/* (c) 1995 */
+	DRIVER( odeontw2 )	/* (c) 1999 */
 
 	/* American Laser Games */
 	DRIVER( alg_bios )
@@ -9241,6 +9247,7 @@ Other Sun games
 	DRIVER( pitbossma )	/* (c) 1994 Merit */
 	DRIVER( pbst30 )	/* (c) 1994 Merit */
 	DRIVER( pbst30b )	/* (c) 1993 Merit */
+	DRIVER( megat2 )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
 	DRIVER( megat3a )	/* (c) 1996 Merit */
 	DRIVER( megat3ca )	/* (c) 1996 Merit */
@@ -9331,6 +9338,7 @@ Other Sun games
 	DRIVER( royalcrdd )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcrde )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcrdf )	/* (c) 1991 Evona Electronic */
+	DRIVER( royalcrdt )	/* (c) 1991 TAB-Austria orig */
 	DRIVER( royalcrdp )	/* (c) 1993 Digital Dreams */
 	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
 	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */
@@ -10460,6 +10468,7 @@ Other Sun games
 
 	/* Blitz System Inc. */
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
+	DRIVER( megadpkrb )	/* (c) 1990 Blitz System Inc */
 
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )

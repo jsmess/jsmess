@@ -304,7 +304,7 @@ Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  A54SX32   
 
 
 837-14114-01  171-8132B (C) Sega 2000
-|----------------------------------------------------------|
+|---------------------------------------------------------|
 |      IC11  IC10  IC9                  ----CN2----       -|
 |      21/22 19/20 17/18            IC44 IC45              |
 |                                            IC27          |
@@ -342,10 +342,13 @@ Derby Owners Club 2                     840-0083C  22306B  11 (128Mb)  315-6319A
 Derby Owners Club World Edition (Rev C) 840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not populated
 Derby Owners Club World Edition (Rev D) 840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not populated  2 MaskROM are different from Rev C
 Giga Wing 2                             841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM
+Mobile Suit Gundam: Fed. VS Zeon (cart) 841-0017C  23638   10 (128Mb)  ?          ?         ?
 Moero Justice Gakuen / Project Justice  841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM
 Samba de Amigo Ver.2000                 840-0047C  23600    ? (128Mb)  315-6319A  315-6213  317-0295-COM
 The King of Route 66 (Rev A)            840-0087C  23819A   ? (128Mb)  ?          ?         ?
-Wave Runner GP                          840-0064B  24059    6 (128Mb)  315-6319A  315-6213  not populated
+Virtua Striker 3 (Rev B)                840-0061C  23663B  11 (128Mb)  ?          315-6213  ?
+Virtua Striker 3 (Rev C)                840-0061C  23663C  11 (128Mb)  ?          315-6213  ?
+Wave Runner GP                          840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not populated
 Wild Riders                             840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM
 WWF Royal Rumble                        840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
 Zero Gunner 2                           841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM
@@ -4492,24 +4495,25 @@ ROM_START( kick4csh )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x8800000, "user1", ROMREGION_ERASEFF)
+	ROM_REGION( 0x9000084, "user1", ROMREGION_ERASEFF)
         ROM_LOAD( "epr-24212.ic11",   0x0000000, 0x400000, CRC(935453e8) SHA1(b34b3ac976229cba941843ffac9db420068999de) )
-        ROM_LOAD32_WORD( "opr-24213a.ic17s", 0x0800000, 0x800000, CRC(2ea4810b) SHA1(67e6c4b246993ca775120d145e1b129cd743b358) )
-        ROM_LOAD32_WORD( "opr-24214a.ic18",  0x0800002, 0x800000, CRC(0f574308) SHA1(699be7296650dcdb955048f2f5696a3b6d117afc) )
-        ROM_LOAD32_WORD( "opr-24215a.ic19s", 0x1800000, 0x800000, CRC(e7fcb265) SHA1(ef05e330206adb0ebdba6df2ff7aaeb570c0c7e4) )
-        ROM_LOAD32_WORD( "opr-24216a.ic20",  0x1800002, 0x800000, CRC(5101acc8) SHA1(2fbb4c8a450ecd070e2f18792a510e2cd4f7decb) )
-        ROM_LOAD32_WORD( "opr-24224a.ic21s", 0x2800000, 0x800000, CRC(a5480237) SHA1(a250a45750d3d63428bf73c85cd510e4252da2c9) )
-        ROM_LOAD32_WORD( "opr-24225a.ic22",  0x2800002, 0x800000, CRC(6b7e2856) SHA1(5b4a107ad654510b8282f4afe0c3856ca5a0fdf0) )
-        ROM_LOAD32_WORD( "opr-24226a.ic23s", 0x3800000, 0x800000, CRC(5a7b85fa) SHA1(9b7ef6bbff01e83f14513d8ea42cdb66b74303d0) )
-        ROM_LOAD32_WORD( "opr-24227a.ic24",  0x3800002, 0x800000, CRC(2b174c17) SHA1(9990268baf0091aef6cb3953b4da7fc2525d95af) )
-        ROM_LOAD32_WORD( "opr-24228a.ic25s", 0x4800000, 0x800000, CRC(92690697) SHA1(5de562751305a385b929702fc3b3dfa4883be23b) )
-        ROM_LOAD32_WORD( "opr-24229a.ic26",  0x4800002, 0x800000, CRC(fc3a6fbb) SHA1(1da1c011028c5b860a3d30e77a8dbdaabe997b63) )
-        ROM_LOAD32_WORD( "opr-24230a.ic27s", 0x5800000, 0x800000, CRC(40da73c4) SHA1(c48e5d119f3f5c40cf78f6cc7fb5b62b153743a1) )
-        ROM_LOAD32_WORD( "opr-24231a.ic28",  0x5800002, 0x800000, CRC(d04e33ec) SHA1(f7ed569bac47056955cb67f4ce0c1d36960f0c63) )
-        ROM_LOAD32_WORD( "opr-24232a.ic29",  0x6800000, 0x800000, CRC(3bec96c6) SHA1(d228959dec168af1a1800e9b0f03692a68f10b99) )
-        ROM_LOAD32_WORD( "opr-24233a.ic30s", 0x6800002, 0x800000, CRC(fc5bffec) SHA1(a6d63d80d11536c96d873c4ce492837ed83e3c9e) )
-        ROM_LOAD32_WORD( "opr-24234a.ic31",  0x7800000, 0x800000, BAD_DUMP CRC(0dc58105) SHA1(524cad7019ba87db5ea13c3370082885fb09dd08) )
-        ROM_LOAD32_WORD( "opr-24235a.ic32s", 0x7800002, 0x800000, BAD_DUMP CRC(1c55e3eb) SHA1(17a23c28d866b12f6249d513aea201edb2c43a68) )
+        ROM_LOAD32_WORD( "opr-24213a.ic17s", 0x1000000, 0x800000, CRC(e24affe1) SHA1(5b4efbf9cdde8e49c26edba69b515d79b9b7acea) )
+        ROM_LOAD32_WORD( "opr-24214a.ic18",  0x1000002, 0x800000, CRC(19bc5bca) SHA1(1c16ac929757a0c46456938bd9ccec7438130c66) )
+        ROM_LOAD32_WORD( "opr-24215a.ic19s", 0x2000000, 0x800000, CRC(fed7750e) SHA1(61af9799a73ddc80e6763d44b23cbf8db497f144) )
+        ROM_LOAD32_WORD( "opr-24216a.ic20",  0x2000002, 0x800000, CRC(635e5365) SHA1(e22f3fb0ac03963596e36592bfce791b0ee183e9) )
+        ROM_LOAD32_WORD( "opr-24224a.ic21s", 0x3000000, 0x800000, CRC(a86b9368) SHA1(d73b8250700d368d3b194170b507a1ec1c818287) )
+        ROM_LOAD32_WORD( "opr-24225a.ic22",  0x3000002, 0x800000, CRC(dbdebe45) SHA1(916897ea376175b48652efb58cdf22350d2a64cf) )
+        ROM_LOAD32_WORD( "opr-24226a.ic23s", 0x4000000, 0x800000, CRC(43edd5a1) SHA1(0992c355d3d7d86dfe425de4b823fa4b64c0ee46) )
+        ROM_LOAD32_WORD( "opr-24227a.ic24",  0x4000002, 0x800000, CRC(0e75009a) SHA1(f897ba64b6c6d98a080ee45a6a5f10cd6a764d61) )
+        ROM_LOAD32_WORD( "opr-24228a.ic25s", 0x5000000, 0x800000, CRC(e1343e87) SHA1(8ea4eb85b9cbc1d1ef59c661357fc3dd473143d0) )
+        ROM_LOAD32_WORD( "opr-24229a.ic26",  0x5000002, 0x800000, CRC(cca7f957) SHA1(8e2035c5d96fef849cf7517219dd6f1ae1e0f84b) )
+        ROM_LOAD32_WORD( "opr-24230a.ic27s", 0x6000000, 0x800000, CRC(71f52068) SHA1(c21d2ce2fa2e83d0048cc52c8c7dbece11780e2f) )
+        ROM_LOAD32_WORD( "opr-24231a.ic28",  0x6000002, 0x800000, CRC(16f3a1f1) SHA1(c3893d536ac0c16793accaa5aeb166fef4035630) )
+        ROM_LOAD32_WORD( "opr-24232a.ic29",  0x7000000, 0x800000, CRC(4cdbd372) SHA1(745645c959689d4f2234aba37694e851b272528d) )
+        ROM_LOAD32_WORD( "opr-24233a.ic30s", 0x7000002, 0x800000, CRC(70d638c6) SHA1(ef8bd9860a587dc76f3915047a5e408ab9f1f9b6) )
+        ROM_LOAD32_WORD( "opr-24234a.ic31",  0x8000000, 0x800000, CRC(f78deb2a) SHA1(7103333c7f388545ebba8e8bb9443ec5ea90589b) )
+	ROM_LOAD32_WORD( "opr-24235a.ic32s", 0x8000002, 0x800000, CRC(a2bb0d26) SHA1(bafd66250f8ad472eaa179bd73edc0dc22b681f5) )
+	ROM_LOAD( "25lc040.ic13s", 0x9000000, 0x000084, CRC(19d77c96) SHA1(1d82af6b11f7fde93a3c4dd3561f1f2ab74c8d65) )
 ROM_END
 
 ROM_START( wrungp )
@@ -4575,6 +4579,20 @@ ROM_START( puyoda )
         ROM_LOAD( "mpr-22203.ic18", 0x9000000, 0x800000, CRC(881d6316) SHA1(c7a26404759afac346c63e39b35bf408f1a897a6) )
         ROM_LOAD( "mpr-22204.ic19", 0x9800000, 0x800000, CRC(2c5e5140) SHA1(7887fc19459dc85ca78256e0c50c762eea001e51) )
         ROM_LOAD( "mpr-22205.ic20", 0xa000000, 0x800000, CRC(7d523ae5) SHA1(7495082b7e83b6ee8f47660baba4c604d8ba2ff1) )
+ROM_END
+
+ROM_START( zerogu2 )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x5800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr23689.bin", 0x0000000, 0x0400000, CRC(ba42267c) SHA1(e8166e33cc2a4d9b2c57410235f531651b2e7f8a) )
+        ROM_LOAD( "mpr23684.ic1", 0x0800000, 0x1000000, CRC(035aec98) SHA1(47ea834ca88aca3a72d2e7ef715a64603c40eacd) )
+        ROM_LOAD( "mpr23685.ic2", 0x1800000, 0x1000000, CRC(d878ff99) SHA1(577be93d43f6113b91cf0967b710c6cf45131713) )
+        ROM_LOAD( "mpr23686.ic3", 0x2800000, 0x1000000, CRC(a61b4d49) SHA1(842c54ad4e8192e491152ae5bb08daf5dd6b8c6c) )
+        ROM_LOAD( "mpr23687.ic4", 0x3800000, 0x1000000, CRC(e125439a) SHA1(07e7339f3f53aeb0ebddf7a8ac3eb6d8f3fe9de6) )
+        ROM_LOAD( "mpr23688.ic5", 0x4800000, 0x1000000, CRC(38412edf) SHA1(9cae06cf46e134531f47e64deedace449664f69a) )
 ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
@@ -4738,12 +4756,12 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0043C */ GAME( 2000, crackndj, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Crackin' DJ", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044C */ GAME( 2001, csmash,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044C */ GAME( 2001, csmasho,  csmash,   naomi,    naomi,    naomi,    ROT0, "Sega",  "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0064C */ GAME( 2001, wrungp,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0083C */ GAME( 2001, derbyoc2, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club II (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0084C */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Power Smash 2 / Virtua Tennis 2 (cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088C */ GAME( 2001, derbyocw, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098C */ GAME( 2001, shootopl, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128C */ GAME( 2001, shootpl,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 00??C */ GAME( 2001, wrungp,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140C */ GAME( 2004, kick4csh, naomi,    naomi,    naomi,    kick4csh, ROT0, "Sega",  "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* 841-xxxxx ("Licensed by Sega" games)*/
@@ -4764,6 +4782,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0015C */ GAME( 2000, pjustic,  naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0016C */ GAME( 2000, deathcox, naomi,    naomi,    naomi,    naomi,    ROT0, "Ecole",           "Death Crimson OX (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017C */ GAME( 2001, gundmct,  naomi,    naomi,    naomi,    naomi,    ROT0, "Banpresto",       "Mobile Suit Gundam: Federation vs. Zeon (2001-02-08)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* ????? */ GAME( 2001, zerogu2,  naomi,    naomi,    naomi,    naomi,    ROT0, "Psikyo",          "Zero Gunner 2", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* HMG016007 */ GAME( 2001, hmgeo,    naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",      "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* Games with incomplete dumps */
@@ -6003,7 +6022,7 @@ ROM_START( vstrik3c )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-23663.ic22",  0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
+	ROM_LOAD( "epr-23663c.ic22",0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
 	ROM_LOAD( "mpr-23652.ic1",  0x0800000, 0x1000000, CRC(992758a2) SHA1(5e2a25c520c1795128e5026fc00d355c24852ded) )
 	ROM_LOAD( "mpr-23653.ic2",  0x1800000, 0x1000000, CRC(e210e932) SHA1(2f6f0a31c3e98b21f1ff3af1680e50b3535b130f) )
 	ROM_LOAD( "mpr-23654.ic3",  0x2800000, 0x1000000, CRC(91335971) SHA1(fc7599b836fb7995dd7da940e64b08b3c09cb180) )
@@ -6514,6 +6533,7 @@ static const UINT32 vfurlong_key = 0xa547a;
 static const UINT32 salmankt_key = 0x34b74;
 static const UINT32 maxspeed_key = 0x28dd6;
 static const UINT32 ftspeed_key  = 0x0762f;
+static const UINT32 kofxi_key    = 0xa4be3;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6554,6 +6574,7 @@ AW_DRIVER_INIT(xtrmhnt2)
 AW_DRIVER_INIT(dolphin)
 AW_DRIVER_INIT(rumblef)
 AW_DRIVER_INIT(ngbc)
+AW_DRIVER_INIT(kofxi)
 AW_DRIVER_INIT(kofnw)
 AW_DRIVER_INIT(kov7sprt)
 AW_DRIVER_INIT(ggisuka)
@@ -6682,8 +6703,15 @@ ROM_START( ngbc )
 	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
-	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-	ROM_LOAD( "ax3301p01.fmem1", 0x000000, 0x800000, CRC(f7e24e67) SHA1(8eef26d44b294faa509304b1b04f4d801337bc99) )
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD( "ax3301p01.fmem1", 0x0000000, 0x0800000, CRC(6dd78275) SHA1(72d4cab58dbcebd666db21aeef190378ef447580) )
+        ROM_LOAD( "ax3301m01.mrom1", 0x1000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
+        ROM_LOAD( "ax3301m01.mrom2", 0x3000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
+        ROM_LOAD( "ax3301m01.mrom3", 0x5000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
+        ROM_LOAD( "ax3301m01.mrom4", 0x7000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
+        ROM_LOAD( "ax3301m01.mrom5", 0x9000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
+        ROM_LOAD( "ax3301m01.mrom6", 0xb000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
+        ROM_LOAD( "ax3301m01.mrom7", 0xd000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
 ROM_END
 
 ROM_START( kofnw )
@@ -6803,6 +6831,21 @@ ROM_START( ftspeed )
         ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) )
 ROM_END
 
+ROM_START( kofxi )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax3201p01.fmem1", 0x0000000, 0x0800000, CRC(6dbdd71b) SHA1(cce3897b104f5d923d8136485fc80eb9717ff4b5) )
+        ROM_LOAD( "ax3201m01.mrom1", 0x1000000, 0x2000000, CRC(7f9d6af9) SHA1(001064ad1b8c3408efe799dc766c2728dc6512a9) )
+        ROM_LOAD( "ax3202m01.mrom2", 0x3000000, 0x2000000, CRC(1ae40afa) SHA1(9ee7957c86cc3a71e6971ddcd906a82c5b1e16f1) )
+        ROM_LOAD( "ax3203m01.mrom3", 0x5000000, 0x2000000, CRC(8c5e3bfd) SHA1(b5443e2a1b88642cc57c5287a3122376c2d48de9) )
+        ROM_LOAD( "ax3204m01.mrom4", 0x7000000, 0x2000000, CRC(ba97f80c) SHA1(36f672fe833e13f0bab036b02c39123066327e20) )
+        ROM_LOAD( "ax3205m01.mrom5", 0x9000000, 0x2000000, CRC(3c747067) SHA1(54b7ff73d618e2e4e40c125c6cfe99016e69ad1a) )
+        ROM_LOAD( "ax3206m01.mrom6", 0xb000000, 0x2000000, CRC(cb81e5f5) SHA1(07faee02a58ac9c600ab3cdd525d22c16b35222d) )
+        ROM_LOAD( "ax3207m01.mrom7", 0xd000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -6818,6 +6861,7 @@ GAME( 2004, ftspeed,  awbios,   aw,    aw,    ftspeed,  ROT0, "Sammy",				 "Fast
 GAME( 2004, kov7sprt, awbios,   aw,    aw,    kov7sprt, ROT0, "Sammy / IGS",			 "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw,    aw,    vfurlong, ROT0, "Sammy",			         "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw,    aw,    ngbc,     ROT0, "Sammy / SNK Playmore",            "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, kofxi,    awbios,   aw,    aw,    kofxi,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, fotns,    awbios,   aw,    aw,    fotns,    ROT0, "Sega / Arc System Works",         "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnw,    awbios,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnwj,   kofnw,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

@@ -5005,7 +5005,7 @@ static TIMER_CALLBACK( segacd_hock_callback )
 
 	if(hock_cmd)
 	{
-//		segacd_cdd.ctrl &= ~4; // clear HOCK flag
+//      segacd_cdd.ctrl &= ~4; // clear HOCK flag
 
 		segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
 		segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
@@ -5545,7 +5545,7 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
 				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
 				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
-				segacd_cdd.buffer[4] = (track_num % 10) | (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x80 : 0x00);
+				segacd_cdd.buffer[4] = ((track_num) % 10) | (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x80 : 0x00);
 
 				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
 
@@ -5558,8 +5558,6 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 
 	hock_cmd = 1;
 }
-
-#endif
 
 static void segacd_cdd_seek(running_machine *machine)
 {
@@ -5579,7 +5577,7 @@ static void segacd_cdd_seek(running_machine *machine)
 
 	track_num = cdrom_get_track(segacd.cd, frame);
 	segacd.current_frame = frame;
-//	printf("%02x %02x %02x %02x\n",m,s,f,track_num);
+//  printf("%02x %02x %02x %02x\n",m,s,f,track_num);
 
 	segacd_cdd.ctrl &= 0xfeff;
 	segacd_cdd.ctrl |= (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x000 : 0x100);
@@ -5592,6 +5590,8 @@ static void segacd_cdd_seek(running_machine *machine)
 
 	hock_cmd = 1;
 }
+
+#endif
 
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {

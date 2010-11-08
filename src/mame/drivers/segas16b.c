@@ -1776,10 +1776,9 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 	{
 		case 0x0000/2:
 			if (((state->mj_last_val ^ data) & 4) && (data & 4))
-			{
 				state->mj_input_num = (state->mj_input_num + 1) % 6;
-				state->mj_last_val = data;
-			}
+
+			state->mj_last_val = data;
 			break;
 	}
 	standard_io_w(space, offset, data, mem_mask);
@@ -4872,6 +4871,7 @@ ROM_END
     Golden Axe (Japan), Sega System 16B
     CPU: FD1094 (317-0121)
     ROM Board: 171-5704
+    Sega ID# for ROM board: 834-7002-04
 */
 ROM_START( goldnaxej )
 	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */

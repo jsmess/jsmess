@@ -131,7 +131,6 @@ CPUS += SCMP
 #CPUS += MN10200
 CPUS += COSMAC
 CPUS += UNSP
-CPUS += COSMAC
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
