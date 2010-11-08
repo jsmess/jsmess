@@ -7,11 +7,14 @@
         - 5x10 chars
         - dump internal CGROM
 
+		HACKS:
+		- A00 10 bit chars are tacked onto recreated chrrom at $700 (until internal rom is dumped)
+		- A00/A02 drawing selected by sizeof romfile, A02 is $800, A00 is $860
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "video/hd44780.h"
-
 
 //**************************************************************************
 //  device configuration
@@ -25,7 +28,6 @@ hd44780_device_config::hd44780_device_config( const machine_config &mconfig, con
 	device_config( mconfig, static_alloc_device_config, "HD44780", tag, owner, clock)
 {
 }
-
 
 //-------------------------------------------------
 //  static_alloc_device_config - allocate a new
@@ -130,6 +132,7 @@ void hd44780_device::device_start()
 	state_save_register_device_item( this, 0, blink);
 	state_save_register_device_item_array( this, 0, ddram);
 	state_save_register_device_item_array( this, 0, cgram);
+
 }
 
 
@@ -141,7 +144,7 @@ void hd44780_device::device_reset()
 {
 	busy_flag = 0;
 
-	memset(ddram, 0, ARRAY_LENGTH(ddram));
+	memset(ddram, 0x20, ARRAY_LENGTH(ddram)); // can't use 0 here as it would show CGRAM instead of blank space on a soft reset
 	memset(cgram, 0, ARRAY_LENGTH(cgram));
 	ac = 0;
 	ac_mode = 0;
@@ -152,7 +155,7 @@ void hd44780_device::device_reset()
 	shift_on = 0;
 	blink_on = 0;
 	direction = 1;
-	data_len = 1;
+	data_len = -1; // must not be 0 or 1 on intial start to pick up first 4/8 bit mode change
 	n_line = 0;
 	char_size = 0;
 	disp_shift = 0;
@@ -237,7 +240,6 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 							char_pos -= line_size;
 					}
 				}
-
 				for (int y=0; y<8; y++)
 					for (int x=0; x<5; x++)
 						if (ddram[char_pos] <= 0x10)
@@ -248,7 +250,15 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 						else
 						{
 							//draw CGROM characters
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(ddram[char_pos]*8+y), 4-x);
+							if (region()->bytes() <= 0x800) {
+								*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(ddram[char_pos]*8+y), 4-x);
+							} else {
+								if(ddram[char_pos] < 0xe0) {
+									*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(ddram[char_pos]*8+y), 4-x);
+								} else {
+									*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(0x700+((ddram[char_pos]-0xe0)*11)+y), 4-x);
+								}
+							}
 						}
 
 				// if is the correct position draw cursor and blink
@@ -272,28 +282,31 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 
 void hd44780_device::control_write(offs_t offset, UINT8 data)
 {
-	if (BIT(data, 7))
+	if (BIT(data, 7)) // Set DDRAM Address
 	{
 		ac_mode = 0;
 		ac = data & 0x7f;
-		if (data != 0x81)
+		if (data != 0x81) // not in datasheet spec
 			cursor_pos = ac;
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 6))
+	else if (BIT(data, 6)) // Set CGRAM Address
 	{
 		ac_mode = 1;
 		ac = data & 0x3f;
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 5))
+	else if (BIT(data, 5)) // Function Set
 	{
+		// datasheet says you can't change char size after first function set without altering 4/8 bit mode
+		if (BIT(data, 4) != data_len) {
+			char_size = BIT(data, 2);
+		}
 		data_len = BIT(data, 4);
 		n_line = BIT(data, 3);
-		char_size = BIT(data, 2);
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 4))
+	else if (BIT(data, 4)) // Cursor or display shift
 	{
 		UINT8 direct = (BIT(data, 2)) ? +1 : -1;
 
@@ -307,7 +320,7 @@ void hd44780_device::control_write(offs_t offset, UINT8 data)
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 3))
+	else if (BIT(data, 3)) // Display on/off Control
 	{
 		display_on = BIT(data, 2);
 		cursor_on = BIT(data, 1);
@@ -315,7 +328,7 @@ void hd44780_device::control_write(offs_t offset, UINT8 data)
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 2))
+	else if (BIT(data, 2)) // Entry Mode set
 	{
 		direction = (BIT(data, 1)) ? +1 : -1;
 
@@ -323,16 +336,16 @@ void hd44780_device::control_write(offs_t offset, UINT8 data)
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 1))
+	else if (BIT(data, 1)) // return home
 	{
 		ac = 0;
 		cursor_pos = 0;
-		ac_mode = 0;
+		ac_mode = 0; // datasheet does not specifically say this but mephisto won't run without it
 		direction = 1;
 		disp_shift = 0;
 		set_busy_flag(1520);
 	}
-	else if (BIT(data, 0))
+	else if (BIT(data, 0)) // clear display
 	{
 		ac = 0;
 		cursor_pos = 0;
@@ -340,7 +353,8 @@ void hd44780_device::control_write(offs_t offset, UINT8 data)
 		direction = 1;
 		disp_shift = 0;
 		memset(ddram, 0x20, ARRAY_LENGTH(ddram));
-		memset(cgram, 0x20, ARRAY_LENGTH(cgram));
+		// nothing in datasheet says to clear CGRAM
+		// memset(cgram, 0x20, ARRAY_LENGTH(cgram));
 		set_busy_flag(1520);
 	}
 }
@@ -352,11 +366,16 @@ UINT8 hd44780_device::control_read(offs_t offset)
 
 void hd44780_device::data_write(offs_t offset, UINT8 data)
 {
+	static int lastac = 0;
+	if (lastac != ac_mode) {
+		lastac = ac_mode;
+	}
+
 	if (ac_mode == 0)
 		ddram[ac] = data;
-	else
+	else {
 		cgram[ac] = data;
-
+		}
 	data_bus_flag = 1;
 
 	set_busy_flag(41);
@@ -368,8 +387,9 @@ UINT8 hd44780_device::data_read(offs_t offset)
 
 	if (ac_mode == 0)
 		data = ddram[ac];
-	else
+	else {
 		data = cgram[ac];
+	}
 
 	data_bus_flag = 2;
 
