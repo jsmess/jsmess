@@ -29,7 +29,7 @@ public:
 		: driver_device(machine, config) { }
 
 	running_device *mc6847;
-	running_device *ef9345;
+	ef9345_device *ef9345;
 	running_device *dac;
 	running_device *cassette;
 
@@ -175,7 +175,7 @@ static VIDEO_UPDATE( alice32 )
 {
 	mc10_state *state = screen->machine->driver_data<mc10_state>();
 
-	video_update_ef9345(state->ef9345, bitmap, cliprect);
+	state->ef9345->video_update(bitmap, cliprect);
 
 	return 0;
 }
@@ -184,7 +184,7 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 {
 	mc10_state *state = timer.machine->driver_data<mc10_state>();
 
-	ef9345_scanline(state->ef9345, (UINT16)param);
+	state->ef9345->update_scanline((UINT16)param);
 }
 
 /***************************************************************************
@@ -229,7 +229,7 @@ static DRIVER_INIT( alice32 )
 	mc10->keyboard_strobe = 0x00;
 
 	/* find devices */
-	mc10->ef9345 = machine->device("ef9345");
+	mc10->ef9345 = machine->device<ef9345_device>("ef9345");
 	mc10->dac = machine->device("dac");
 	mc10->cassette = machine->device("cassette");
 
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( alice32_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
 	AM_RANGE(0x9000, 0xafff) AM_NOP /* unused */
-	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_r, ef9345_w)
+	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE_MODERN("ef9345", ef9345_device, data_r, data_w)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(alice32_bfff_r, alice32_bfff_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
@@ -515,11 +515,9 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-
-static const ef9345_config alice32_ef9345_config =
+static const ef9345_interface alice32_ef9345_config =
 {
-	"screen",			/* screen we are acting on */
-	"ef9345"			/* charset */
+	"screen"			/* screen we are acting on */
 };
 
 static MACHINE_CONFIG_START( alice32, mc10_state )
