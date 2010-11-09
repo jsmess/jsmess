@@ -74,196 +74,29 @@ Notes:
 
 */
 
-/* Core includes */
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/abc80.h"
-
-/* Components */
 #include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "sound/sn76477.h"
+#include "devices/cassette.h"
+#include "devices/flopdrv.h"
+#include "devices/messram.h"
+#include "devices/printer.h"
 #include "machine/abcbus.h"
 #include "machine/abc830.h"
+#include "machine/rs232.h"
+#include "machine/z80pio.h"
+#include "sound/sn76477.h"
+#include "includes/abc80.h"
 
-/* Devices */
-#include "devices/flopdrv.h"
-#include "devices/cassette.h"
-#include "devices/printer.h"
-#include "devices/messram.h"
 
-/* Read/Write Handlers */
 
-static WRITE8_DEVICE_HANDLER( abc80_sound_w )
-{
-	/*
+//**************************************************************************
+//	KEYBOARD HACK
+//**************************************************************************
 
-        Bit Name     Description
-
-        0  SYSENA   1 On, 0 Off (inverted)
-        1  EXTVCO   00 High freq, 01 Low freq
-        2  VCOSEL   10 SLF cntrl, 11 SLF ctrl
-        3  MIXSELB  000 VCO, 001 Noise, 010 SLF
-        4  MIXSELA  011 VCO+Noise, 100 SLF+Noise, 101 SLF+VCO
-        5  MIXSELC  110 SLF+VCO+Noise, 111 Quiet
-        6  ENVSEL2  00 VCO, 01 Rakt igenom
-        7  ENVSEL1  10 Monovippa, 11 VCO alt.pol.
-
-    */
-
-	sn76477_enable_w(device, !BIT(data, 0));
-
-	sn76477_vco_voltage_w(device, BIT(data, 1) ? 2.5 : 0);
-	sn76477_vco_w(device, BIT(data, 2));
-
-	sn76477_mixer_b_w(device, BIT(data, 3));
-	sn76477_mixer_a_w(device, BIT(data, 4));
-	sn76477_mixer_c_w(device, BIT(data, 5));
-
-	sn76477_envelope_2_w(device, BIT(data, 6));
-	sn76477_envelope_1_w(device, BIT(data, 7));
-}
-
-/* Keyboard HACK */
-
-static const UINT8 abc80_keycodes[7*4][8] =
-{
-	/* unshifted */
-	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
-	{ 0x39, 0x30, 0x2B, 0x60, 0x3C, 0x71, 0x77, 0x65 },
-	{ 0x72, 0x74, 0x79, 0x75, 0x69, 0x6F, 0x70, 0x7D },
-	{ 0x7E, 0x0D, 0x61, 0x73, 0x64, 0x66, 0x67, 0x68 },
-	{ 0x6A, 0x6B, 0x6C, 0x7C, 0x7B, 0x27, 0x08, 0x7A },
-	{ 0x78, 0x63, 0x76, 0x62, 0x6E, 0x6D, 0x2C, 0x2E },
-	{ 0x2D, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
-
-	/* shift */
-	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
-	{ 0x29, 0x3d, 0x3f, 0x40, 0x3e, 0x51, 0x57, 0x45 },
-	{ 0x52, 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x5d },
-	{ 0x5e, 0x0d, 0x41, 0x53, 0x44, 0x46, 0x47, 0x48 },
-	{ 0x4a, 0x4b, 0x4c, 0x5c, 0x5b, 0x2a, 0x08, 0x5a },
-	{ 0x58, 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3b, 0x3a },
-	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
-
-	/* control */
-	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
-	{ 0x39, 0x30, 0x2b, 0x00, 0x7f, 0x11, 0x17, 0x05 },
-	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1d },
-	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
-	{ 0x0a, 0x0b, 0x0c, 0x1c, 0x1b, 0x27, 0x08, 0x1a },
-	{ 0x18, 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x2c, 0x2e },
-	{ 0x2d, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
-
-	/* control-shift */
-	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
-	{ 0x29, 0x3d, 0x3f, 0x00, 0x7f, 0x11, 0x17, 0x05 },
-	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x1f, 0x00, 0x1d },
-	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
-	{ 0x0a, 0x1b, 0x1c, 0x1c, 0x1b, 0x2a, 0x08, 0x1a },
-	{ 0x18, 0x03, 0x16, 0x02, 0x1e, 0x1d, 0x3b, 0x3a },
-	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
-};
-
-static TIMER_CALLBACK( keyboard_data_clear )
-{
-	abc80_state *state = machine->driver_data<abc80_state>();
-
-	state->key_data = 0;
-}
-
-static void abc80_keyboard_scan(running_machine *machine)
-{
-	abc80_state *state = machine->driver_data<abc80_state>();
-
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
-	int table = 0, row, col;
-
-	if (input_port_read(machine, "ROW7") & 0x07)
-	{
-		/* shift, upper case */
-		table |= 0x01;
-	}
-
-	if (input_port_read(machine, "ROW7") & 0x08)
-	{
-		/* ctrl */
-		table |= 0x02;
-	}
-
-	/* clear key strobe */
-	state->key_strobe = 0;
-
-	/* scan keyboard */
-	for (row = 0; row < 7; row++)
-	{
-		UINT8 data = input_port_read(machine, keynames[row]);
-
-		for (col = 0; col < 8; col++)
-		{
-			if (BIT(data, col))
-			{
-				UINT8 keydata = abc80_keycodes[row + (table * 7)][col];
-
-				/* set key strobe */
-				state->key_strobe = 1;
-
-				if (state->key_data != keydata)
-				{
-					UINT8 pio_data = 0x80 | keydata;
-
-					/* latch key data */
-					state->key_data = keydata;
-
-					z80pio_pa_w(state->z80pio, 0, pio_data);
-					return;
-				}
-			}
-		}
-	}
-
-	if (!state->key_strobe && state->key_data)
-	{
-		z80pio_pa_w(state->z80pio, 0, state->key_data);
-		timer_set(machine, ATTOTIME_IN_MSEC(50), NULL, 0, keyboard_data_clear);
-	}
-}
-
-static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
-{
-	abc80_keyboard_scan(timer.machine);
-}
-
-/* Memory Maps */
-
-static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x73ff) AM_ROM
-	AM_RANGE(0x7400, 0x77ff) AM_RAM AM_BASE_MEMBER(abc80_state, video_80_ram)
-	AM_RANGE(0x7800, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(abc80_state, video_ram)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SN76477_TAG, abc80_sound_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-ADDRESS_MAP_END
-
-/* Input Ports */
-
-static INPUT_PORTS_START( abc80 )
+static INPUT_PORTS_START( fake_keyboard )
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -343,13 +176,208 @@ static INPUT_PORTS_START( abc80 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static const UINT8 abc80_keycodes[7*4][8] =
+{
+	/* unshifted */
+	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
+	{ 0x39, 0x30, 0x2B, 0x60, 0x3C, 0x71, 0x77, 0x65 },
+	{ 0x72, 0x74, 0x79, 0x75, 0x69, 0x6F, 0x70, 0x7D },
+	{ 0x7E, 0x0D, 0x61, 0x73, 0x64, 0x66, 0x67, 0x68 },
+	{ 0x6A, 0x6B, 0x6C, 0x7C, 0x7B, 0x27, 0x08, 0x7A },
+	{ 0x78, 0x63, 0x76, 0x62, 0x6E, 0x6D, 0x2C, 0x2E },
+	{ 0x2D, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	/* shift */
+	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
+	{ 0x29, 0x3d, 0x3f, 0x40, 0x3e, 0x51, 0x57, 0x45 },
+	{ 0x52, 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x5d },
+	{ 0x5e, 0x0d, 0x41, 0x53, 0x44, 0x46, 0x47, 0x48 },
+	{ 0x4a, 0x4b, 0x4c, 0x5c, 0x5b, 0x2a, 0x08, 0x5a },
+	{ 0x58, 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3b, 0x3a },
+	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	/* control */
+	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
+	{ 0x39, 0x30, 0x2b, 0x00, 0x7f, 0x11, 0x17, 0x05 },
+	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1d },
+	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
+	{ 0x0a, 0x0b, 0x0c, 0x1c, 0x1b, 0x27, 0x08, 0x1a },
+	{ 0x18, 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x2c, 0x2e },
+	{ 0x2d, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	/* control-shift */
+	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
+	{ 0x29, 0x3d, 0x3f, 0x00, 0x7f, 0x11, 0x17, 0x05 },
+	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x1f, 0x00, 0x1d },
+	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
+	{ 0x0a, 0x1b, 0x1c, 0x1c, 0x1b, 0x2a, 0x08, 0x1a },
+	{ 0x18, 0x03, 0x16, 0x02, 0x1e, 0x1d, 0x3b, 0x3a },
+	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
+};
+
+static TIMER_CALLBACK( keyboard_data_clear )
+{
+	abc80_state *state = machine->driver_data<abc80_state>();
+
+	state->m_key_data = 0;
+}
+
+static void abc80_keyboard_scan(running_machine *machine)
+{
+	abc80_state *state = machine->driver_data<abc80_state>();
+
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
+	int table = 0, row, col;
+
+	if (input_port_read(machine, "ROW7") & 0x07)
+	{
+		/* shift, upper case */
+		table |= 0x01;
+	}
+
+	if (input_port_read(machine, "ROW7") & 0x08)
+	{
+		/* ctrl */
+		table |= 0x02;
+	}
+
+	/* clear key strobe */
+	state->m_key_strobe = 0;
+
+	/* scan keyboard */
+	for (row = 0; row < 7; row++)
+	{
+		UINT8 data = input_port_read(machine, keynames[row]);
+
+		for (col = 0; col < 8; col++)
+		{
+			if (BIT(data, col))
+			{
+				UINT8 keydata = abc80_keycodes[row + (table * 7)][col];
+
+				/* set key strobe */
+				state->m_key_strobe = 1;
+
+				if (state->m_key_data != keydata)
+				{
+					UINT8 pio_data = 0x80 | keydata;
+
+					/* latch key data */
+					state->m_key_data = keydata;
+
+					z80pio_pa_w(state->m_pio, 0, pio_data);
+					return;
+				}
+			}
+		}
+	}
+
+	if (!state->m_key_strobe && state->m_key_data)
+	{
+		z80pio_pa_w(state->m_pio, 0, state->m_key_data);
+		timer_set(machine, ATTOTIME_IN_MSEC(50), NULL, 0, keyboard_data_clear);
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
+{
+	abc80_keyboard_scan(timer.machine);
+}
+
+
+
+//**************************************************************************
+//	SOUND
+//**************************************************************************
+
+//-------------------------------------------------
+//  vco_voltage_w - CSG VCO voltage select
+//-------------------------------------------------
+
+static WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
+{
+	sn76477_vco_voltage_w(device, state ? 2.5 : 0);
+}
+
+
+
+//**************************************************************************
+//	ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( abc80_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( abc80_mem, ADDRESS_SPACE_PROGRAM, 8, abc80_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
+	AM_RANGE(0x7000, 0x73ff) AM_ROM
+	AM_RANGE(0x7400, 0x77ff) AM_RAM AM_BASE(m_video_80_ram)
+	AM_RANGE(0x7800, 0x7bff) AM_ROM
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( abc80_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( abc80_io, ADDRESS_SPACE_IO, 8, abc80_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x17)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c4_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
+	AM_RANGE(0x07, 0x07) AM_DEVREAD_LEGACY(ABCBUS_TAG, abcbus_rst_r)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//	INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( abc80 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( abc80 )
+	PORT_INCLUDE(fake_keyboard)
+
+	PORT_START("SN76477")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_enable_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, vco_voltage_w)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_vco_w)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_b_w)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_a_w)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_c_w)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_2_w)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_1_w)
 
 	PORT_INCLUDE(luxor_55_10828)
 INPUT_PORTS_END
 
-/* Sound Interface */
 
-static const sn76477_interface abc80_sn76477_interface =
+
+//**************************************************************************
+//	DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  sn76477_interface csg_intf
+//-------------------------------------------------
+
+static const sn76477_interface csg_intf =
 {
 	RES_K(47),		//  4  noise_res        R26 47k
 	RES_K(330),		//  5  filter_res       R24 330k
@@ -369,26 +397,32 @@ static const sn76477_interface abc80_sn76477_interface =
 	RES_K(330)		// 24  oneshot_res      R25 330k
 };
 
-/* Interrupt Generators */
+
+//-------------------------------------------------
+//  INTERRUPT_GEN( abc80_nmi_interrupt )
+//-------------------------------------------------
 
 static INTERRUPT_GEN( abc80_nmi_interrupt )
 {
 	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-/* Z80 PIO */
+
+//-------------------------------------------------
+//  Z80PIO_INTERFACE( pio_intf )
+//-------------------------------------------------
 
 static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
 	abc80_state *state = timer.machine->driver_data<abc80_state>();
 
 	/* toggle ASTB every other video line */
-	state->z80pio_astb = !state->z80pio_astb;
+	state->m_pio_astb = !state->m_pio_astb;
 
-	z80pio_astb_w(state->z80pio, state->z80pio_astb);
+	z80pio_astb_w(state->m_pio, state->m_pio_astb);
 }
 
-static READ8_DEVICE_HANDLER( pio_pa_r )
+READ8_MEMBER( abc80_state::pio_pa_r )
 {
 	/*
 
@@ -407,12 +441,10 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 
     */
 
-	abc80_state *state = device->machine->driver_data<abc80_state>();
-
-	return (state->key_strobe << 7) | state->key_data;
+	return (m_key_strobe << 7) | m_key_data;
 };
 
-static READ8_DEVICE_HANDLER( pio_pb_r )
+READ8_MEMBER( abc80_state::pio_pb_r )
 {
 	/*
 
@@ -429,13 +461,24 @@ static READ8_DEVICE_HANDLER( pio_pb_r )
 
     */
 
+	UINT8 data = 0;
+	
+	/* serial receive */
+	data |= rs232_rd_r(m_rs232);
+
+	/* clear to send */
+	data |= rs232_cts_r(m_rs232) << 1;
+
+	/* data connection detect */
+	data |= rs232_dcd_r(m_rs232) << 2;
+
 	/* cassette data */
-	UINT8 data = (cassette_input(device) > +1.0) << 7;
+	data |= (cassette_input(m_cassette) > +1.0) << 7;
 
 	return data;
 };
 
-static WRITE8_DEVICE_HANDLER( pio_pb_w )
+WRITE8_MEMBER( abc80_state::pio_pb_w )
 {
 	/*
 
@@ -452,23 +495,34 @@ static WRITE8_DEVICE_HANDLER( pio_pb_w )
 
     */
 
+	/* transmit */
+	rs232_td_w(m_rs232, m_pio, BIT(data, 3));
+
+	/* request to send */
+	rs232_rts_w(m_rs232, BIT(data, 4));
+
 	/* cassette motor */
-	cassette_change_state(device, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(m_cassette, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data */
-	cassette_output(device, BIT(data, 6) ? -1.0 : +1.0);
+	cassette_output(m_cassette, BIT(data, 6) ? -1.0 : +1.0);
 };
 
 static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_HANDLER(pio_pa_r),						/* port A read callback */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pa_r),		/* port A read callback */
 	DEVCB_NULL,										/* port A write callback */
 	DEVCB_NULL,										/* portA ready active callback */
-	DEVCB_DEVICE_HANDLER(CASSETTE_TAG, pio_pb_r),	/* port B read callback */
-	DEVCB_DEVICE_HANDLER(CASSETTE_TAG, pio_pb_w),	/* port B write callback */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_r),		/* port B read callback */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_w),		/* port B write callback */
 	DEVCB_NULL										/* portB ready active callback */
 };
+
+
+//-------------------------------------------------
+//  Z80PIO_INTERFACE( pio_intf )
+//-------------------------------------------------
 
 static const z80_daisy_config abc80_daisy_chain[] =
 {
@@ -476,7 +530,10 @@ static const z80_daisy_config abc80_daisy_chain[] =
 	{ NULL }
 };
 
-/* Cassette */
+
+//-------------------------------------------------
+//  cassette_config abc80_cassette_config
+//-------------------------------------------------
 
 static const cassette_config abc80_cassette_config =
 {
@@ -486,7 +543,10 @@ static const cassette_config abc80_cassette_config =
 	NULL
 };
 
-/* ABC BUS */
+
+//-------------------------------------------------
+//  ABCBUS_DAISY( abcbus_daisy )
+//-------------------------------------------------
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
@@ -494,49 +554,64 @@ static ABCBUS_DAISY( abcbus_daisy )
 	{ NULL }
 };
 
-/* Machine Initialization */
 
-static MACHINE_START( abc80 )
+//-------------------------------------------------
+//  RS232_INTERFACE( rs232_intf )
+//-------------------------------------------------
+
+static RS232_INTERFACE( rs232_intf )
 {
-	abc80_state *state = machine->driver_data<abc80_state>();
+	Z80PIO_TAG,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
+
+
+//**************************************************************************
+//	MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( abc80 )
+//-------------------------------------------------
+
+void abc80_state::machine_start()
+{
 	/* configure RAM expansion */
-	if (messram_get_size(machine->device("messram")) == 16*1024)
+	if (messram_get_size(m_ram) == 16 * 1024)
 	{
-		memory_unmap_readwrite(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		memory_unmap_readwrite(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
 
-	/* find devices */
-	state->z80pio = machine->device(Z80PIO_TAG);
-
 	/* register for state saving */
-	state_save_register_global(machine, state->key_data);
-	state_save_register_global(machine, state->key_strobe);
-	state_save_register_global(machine, state->z80pio_astb);
+	state_save_register_global(machine, m_key_data);
+	state_save_register_global(machine, m_key_strobe);
+	state_save_register_global(machine, m_pio_astb);
 }
 
-/* Machine Drivers */
+
+
+//**************************************************************************
+//	MACHINE DRIVERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( abc80 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_START( abc80, abc80_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
-	MDRV_CPU_PROGRAM_MAP(abc80_map)
-	MDRV_CPU_IO_MAP(abc80_io_map)
+	MDRV_CPU_PROGRAM_MAP(abc80_mem)
+	MDRV_CPU_IO_MAP(abc80_io)
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, abc80_nmi_interrupt)
-
-	MDRV_MACHINE_START(abc80)
-
-	/* keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
-
-	/* Z80PIO */
-	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
-
-	/* Luxor Conkort 55-10828 */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC830_PIO_ADD("luxor_55_10828", ABCBUS_TAG, DRIVE_MPI_51)
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(abc80_video)
@@ -544,13 +619,21 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76477_TAG, SN76477, 0)
-	MDRV_SOUND_CONFIG(abc80_sn76477_interface)
+	MDRV_SOUND_CONFIG(csg_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	/* keyboard */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
 
-	/* cassette */
+	/* Luxor Conkort 55-10828 */
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MDRV_ABC830_PIO_ADD("luxor_55_10828", ABCBUS_TAG, DRIVE_MPI_51)
+
+	/* devices */
+	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
+	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
+	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
 
 	/* internal ram */
@@ -559,7 +642,15 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
-/* ROMs */
+
+
+//**************************************************************************
+//	ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( abc80 )
+//-------------------------------------------------
 
 ROM_START( abc80 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
@@ -599,7 +690,11 @@ ROM_START( abc80 )
 	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // "64 40057-01" 82S129 256x4 address decoder
 ROM_END
 
-/* Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME                    FLAGS */
-COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
+
+//**************************************************************************
+//	SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
+COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      "Luxor Datorer AB",					"ABC 80",	GAME_SUPPORTS_SAVE )

@@ -50,35 +50,56 @@
 #define SN76477_TAG		"g8"
 #define ABCBUS_TAG		"abcbus"
 #define CASSETTE_TAG	"cassette"
+#define RS232_TAG		"rs232"
 
 class abc80_state : public driver_device
 {
 public:
 	abc80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_pio(*this, Z80PIO_TAG),
+		  m_rs232(*this, RS232_TAG),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_ram(*this, "messram")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<running_device> m_pio;
+	required_device<running_device> m_rs232;
+	required_device<running_device> m_cassette;
+	required_device<running_device> m_ram;
+
+	virtual void machine_start();
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+
+	DECLARE_READ8_MEMBER( pio_pa_r );
+	DECLARE_READ8_MEMBER( pio_pb_r );
+	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
 	/* keyboard state */
-	int key_data;
-	int key_strobe;
-	int z80pio_astb;
+	int m_key_data;
+	int m_key_strobe;
+	int m_pio_astb;
 
 	/* video state */
-	UINT8 *video_ram;
-	UINT8 *video_80_ram;
-	tilemap_t *tx_tilemap;
-	int blink;
-	int char_bank;
-	int char_row;
+	UINT8 *m_video_ram;
+	UINT8 *m_video_80_ram;
+	tilemap_t *m_tx_tilemap;
+	int m_blink;
+	int m_char_bank;
+	int m_char_row;
 
 	/* memory regions */
-	const UINT8 *char_rom;		/* character generator ROM */
-	const UINT8 *hsync_prom;	/* horizontal sync PROM */
-	const UINT8 *vsync_prom;	/* horizontal sync PROM */
-	const UINT8 *line_prom;		/* line address PROM */
-	const UINT8 *attr_prom;		/* character attribute PROM */
-
-	/* devices */
-	running_device *z80pio;
+	const UINT8 *m_char_rom;		/* character generator ROM */
+	const UINT8 *m_hsync_prom;	/* horizontal sync PROM */
+	const UINT8 *m_vsync_prom;	/* horizontal sync PROM */
+	const UINT8 *m_line_prom;		/* line address PROM */
+	const UINT8 *m_attr_prom;		/* character attribute PROM */
 };
 
 /*----------- defined in video/abc80.c -----------*/
