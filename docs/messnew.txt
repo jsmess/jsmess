@@ -18,7 +18,7 @@ Skeleton drivers:
 - Dream 6800 [Robbbert]
 - Tektronix 4107A/4109A [Lord Nightmare, Balrog, Curt Coder]
 - PHUNSY (Philipse Universal System)
-
+- Omnibyte OB68K1A
 
 System Driver Changes:
 ----------------------
