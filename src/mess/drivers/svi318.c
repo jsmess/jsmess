@@ -289,9 +289,13 @@ static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("svi318_cart")
 	MDRV_CARTSLOT_START(svi318_cart)
 	MDRV_CARTSLOT_LOAD(svi318_cart)
 	MDRV_CARTSLOT_UNLOAD(svi318_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list","svi318_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( svi318, driver_device )
@@ -480,70 +484,84 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( svi318 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi318n  )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi328 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi328n )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( sv328p80 )
-	ROM_REGION (0x10000, "maincpu",0)
-	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
-	ROM_REGION( 0x1000, "gfx1", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_SYSTEM_BIOS(0, "english", "English Character Set")
-	ROMX_LOAD ("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
+	ROMX_LOAD("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
-	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+	ROMX_LOAD("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( sv328n80 )
-	ROM_REGION (0x10000, "maincpu",0)
-	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
-	ROM_REGION( 0x1000, "gfx1", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_SYSTEM_BIOS(0, "english", "English Character Set")
-	ROMX_LOAD ("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
+	ROMX_LOAD("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
-	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+	ROMX_LOAD("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT     COMPANY         FULLNAME                    FLAGS */
-COMP( 1983, svi318,     0,      0,      svi318,     svi318, svi318,  "Spectravideo", "SVI-318 (PAL)",            0 )
-COMP( 1983, svi318n,    svi318, 0,      svi318n,    svi318, svi318,  "Spectravideo", "SVI-318 (NTSC)",           0 )
-COMP( 1983, svi328,     svi318, 0,      svi328,     svi328, svi318,  "Spectravideo", "SVI-328 (PAL)",            0 )
-COMP( 1983, svi328n,    svi318, 0,      svi328n,    svi328, svi318,  "Spectravideo", "SVI-328 (NTSC)",           0 )
-COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318, "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE        INPUT   INIT     COMPANY         FULLNAME                    FLAGS */
+COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318,  "Spectravideo", "SVI-318 (PAL)",            0 )
+COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318,  "Spectravideo", "SVI-318 (NTSC)",           0 )
+COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318,  "Spectravideo", "SVI-328 (PAL)",            0 )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318,  "Spectravideo", "SVI-328 (NTSC)",           0 )
+COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )

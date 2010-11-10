@@ -112,28 +112,33 @@ DEVICE_START( svi318_cart )
 
 DEVICE_IMAGE_LOAD( svi318_cart )
 {
-	UINT8 *p;
+	UINT8 *p = memory_region(image.device().machine, "user1");
 	UINT32 size;
 
-	size = MAX(0x8000,image.length());
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
 
-	p = (UINT8*)image.image_malloc(size);
-	if (!p)
-		return IMAGE_INIT_FAIL;
-
-	pcart_rom_size = size;
-	memset(p, 0xff, size);
-
-	size = image.length();
-	if (image.fread( p, size) != size)
+	if (size > 0x8000)
+		logerror("Cart image %s larger than expected. Please report the issue.\n", image.filename());
+		
+	if (image.software_entry() == NULL)
 	{
-		logerror ("can't read file %s\n", image.filename() );
-		return IMAGE_INIT_FAIL;
+		if (image.fread(p, size) != size)
+		{
+			logerror("Can't read file %s\n", image.filename());
+			return IMAGE_INIT_FAIL;
+		}
 	}
+	else
+		memcpy(p, image.get_software_region("rom"), size);
 
-	if (svi318_verify_cart(p)==IMAGE_VERIFY_FAIL)
+	if (svi318_verify_cart(p) == IMAGE_VERIFY_FAIL)
 		return IMAGE_INIT_FAIL;
+
 	pcart = p;
+	pcart_rom_size = size;
 
 	return IMAGE_INIT_PASS;
 }
