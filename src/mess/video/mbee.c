@@ -142,7 +142,7 @@ WRITE8_HANDLER( mbee256_1c_w )
 
 READ8_HANDLER( mbeeppc_low_r )
 {
-	if (mbee_1c & 16)
+	if ((mbee_1c & 0x1f) == 0x10)
 		return attribram[offset];
 	else
 	if (mbee_0b & 1)

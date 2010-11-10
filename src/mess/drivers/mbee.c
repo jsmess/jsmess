@@ -88,6 +88,8 @@
 
     - Disk system doesn't work because of fdc problems.
 
+    - Teleterm: keyboard is problematic, and cursor doesn't show.
+
 
 ***************************************************************************/
 
