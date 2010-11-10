@@ -28,7 +28,7 @@ and probably many more exist
 
 codes: "color of the cart"-"game number". colors: White, Blue and Red.
 
-W-011 世界棒球賽 -> G-1011 Champion Baseball
+W-011 世界棒球賽 -> G-1011 Champion Baseball [dumped]
 W-012 辛巴達 -> G-1012 Sindbad Mystery
 W-020 迷魂車 -> G-1020 Pacar
 W-022 蜜蜂二代 -> G-1022 Sega Galaga
@@ -170,11 +170,36 @@ R-066 超級坦克 -> C-66 Super Tank
 	<software name="champbas">
 		<!-- Serial: G-1011 - Alt Title: チャンピオンベースボール -->
 		<description>Champion Baseball (Jpn)</description>
+        <!-- according to Bock this comes from Small Boxed cart -->
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="champion baseball (japan).bin" size="16384" crc="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" offset="000000" />
+				<rom name="champion baseball [16k].bin" size="16384" crc="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champbasa" cloneof="champbas">
+		<description>Champion Baseball (Jpn, Older)</description>
+        <!-- only 16k out of 40k are the game data, according to Bock this comes from Big Boxed cart (older than the Small Boxed cart above) -->
+		<year>1983</year>
+		<publisher>Sega / Alpha Denshi</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="champion baseball [40k].bin" size="40960" crc="c0c16fa7" sha1="85e5c2f354b9110e5f7c7dfcc7ab9814598b7956" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champbast" cloneof="champbas">
+		<!-- Serial: W-011 - Alt Title: Shìjiè Bàngqiú Sài ~ 世界棒球賽 -->
+		<description>Champion Baseball (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="champion baseball [16k] (tw).bin" size="16384" crc="677e6878" sha1="b674ea2ea50f45b20c60d9dec5bf2e88e2b1cba5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -337,22 +362,12 @@ R-066 超級坦克 -> C-66 Super Tank
 	<software name="congo">
 		<!-- Serial: G-1007 - Alt Title: コンゴ・ボンゴ -->
 		<description>Congo Bongo (Euro, Jpn)</description>
+        <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="congo bongo (japan, europe).bin" size="32768" crc="b09e2e6d" sha1="01b65ecfb5307bff0d8222f266b9d641b6a203db" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="congo1" cloneof="congo">
-		<description>Congo Bongo (Euro, Jpn, Alt)</description>
-		<year>1983</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="congo bongo (japan, europe) (alt).bin" size="32768" crc="dc4383cc" sha1="96dd55a63bae0abc666fe317d50612116100d7b1" offset="000000" />
+				<rom name="congo bongo.bin" size="24576" crc="5a24c7cf" sha1="47aba6a295e5695db4c3aaa1dea8ad8ac961b5f9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -659,6 +674,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	<software name="mahjong">
 		<!-- Serial: G-1004 - Alt Title: 麻雀 -->
 		<description>Mahjong (Jpn)</description>
+        <!-- This version has smaller 1983 and Japanese instructions in the title screen -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -668,26 +684,51 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="mahjonga" cloneof="mahjong">
+		<description>Mahjong (Jpn, Alt)</description>
+        <!-- This version has bigger 1983 and English instructions in the title screen -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="mahjong [big 1983].bin" size="24576" crc="1c137cab" sha1="81015cea7e5ff08bd7d20953a702d47efdb8c11c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monacogp">
-	<!-- 16kb of data + 16kb of trash + 8kb of data -->
-		<description>Monaco GP (Jpn)</description>
+		<!-- Serial: G-1017 & C-17 - Alt Title: モナコ GP -->
+		<description>Monaco GP (Jpn, v2)</description>
+		<!-- This is a later version with bug fixes -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="40960">
-				<rom name="monaco gp [24k].bin" size="40960" crc="8572d73a" sha1="bea768b27c09bec805f0c70545d2f1435e3a3ddf" offset="000000" />
+				<rom name="monaco gp [32k] [v2].bin" size="32768" crc="02e5d66a" sha1="694228631d09ed06c8850fd164c6d99b12ff173d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="monacogpa" cloneof="monacogp">
-		<!-- Serial: G-1017 & C-17 - Alt Title: モナコ GP -->
-		<description>Monaco GP (Jpn, Alt)</description>
+		<description>Monaco GP (Jpn, v1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="monaco gp [32k].bin" size="32768" crc="da2d57f3" sha1="4ca8182b8f7c798d7222295978e2556ff115b848" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monacogpb" cloneof="monacogp">
+		<description>Monaco GP (Jpn, v0)</description>
+        <!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts 
+        (afterwards only the 32k was used, even in carts with "24k" advertise on the box) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="monaco gp [24k].bin" size="40960" crc="8572d73a" sha1="bea768b27c09bec805f0c70545d2f1435e3a3ddf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -706,12 +747,35 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="nsub">
 		<!-- Serial: G-1003 - Alt Title: N-サブ -->
-		<description>N-Sub (Euro)</description>
+		<description>N-Sub (Euro?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="n-sub (europe) (1988).bin" size="16384" crc="09196fc5" sha1="32a263110434288d3720e2370241d1e93b3f07a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsuba">
+		<description>N-Sub (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="n-sub [16k].bin" size="16384" crc="652bbd1e" sha1="2640e267441bf25463a19273c46f3edb5e459496" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsubb">
+		<description>N-Sub (Jpn, Alt)</description>
+        <!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="n-sub [40k].bin" size="40960" crc="b377d6e1" sha1="aa3eae849553a5a176762466b101f312b8b968e4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -895,6 +959,17 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="segaflipa" cloneof="segaflip">
+		<description>Sega Flipper (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="sega flipper [40k map].bin" size="40960" crc="fd76ad99" sha1="d713dcbd79a3db8f1ef2cfb27da31a286fff16d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="segagala">
 		<!-- Serial: G-1022 - Alt Title: セガ・ギャラガ -->
 		<description>Sega-Galaga (Jpn)</description>
@@ -918,7 +993,7 @@ R-066 超級坦克 -> C-66 Super Tank
 			</dataarea>
 		</part>
 	</software>
-
+    
 	<software name="shinnyus">
 		<!-- Serial: G-1041 - Alt Title: Konami no Shinnyushain Tooru Kun ~ コナミの新入社員とおるくん (on the game box) -->
 		<description>Shinnyushain Tooru Kun (Jpn)</description>
@@ -1224,13 +1299,62 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="chuhis1n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn)</description>
+        <!-- Serial: E-104 - Alt Title: 中学必修英作文(中学一年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp).bin" size="40960" crc="975106b6" sha1="ebc8544bf8a36840a639bb7a2698f984429f4762" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan4j">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn)</description>
+        <!-- Serial: E-106 - Alt Title: 楽しい算数 (小学四年上) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 4-nen jou) (jp).bin" size="16384" crc="573e04dd" sha1="59c7c6d0e373f78961a0e501a533ea271b15abdb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nihonshi">
-		<description>Nihonshi Nenpyu (Jpn)</description>
-		<year>198?</year>
+		<description>Nihonshi Nenpyou (Jpn)</description>
+        <!-- Serial: E-108 - Alt Title: 日本史年表 -->
+		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="nihonshi.bin" size="16384" crc="22f4f92a" sha1="972cf86f8f627c7b8e1ac9c5a837bd4673be6e54" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sekaishi">
+		<description>Sekaishi Nenpyou ~ Monbushou Shidouyouryou Junkyo (Jpn)</description>
+        <!-- Serial: E-109 - Alt Title: 世界史年表 (文部省指導要領準拠) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="sekaishi nenpyou (jp).bin" size="16384" crc="3274ee48" sha1="388fdff0cf2ad276e07a419239710632c376e1db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan4g">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Ge (Jpn)</description>
+        <!-- Serial: E-113 - Alt Title: 楽しい算数 (小学四年下) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 4-nen ge) (jp).bin" size="16384" crc="5fde25bb" sha1="5500a59f4474833687e7d2d7bbd09cf0fb925684" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

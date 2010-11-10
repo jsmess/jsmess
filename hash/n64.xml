@@ -1149,6 +1149,17 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="calspeedp" cloneof="calspeed">
+		<description>California Speed (Euro, Prototype)</description>
+		<year>1999?</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216" layout="region32_be">
+				<rom name="california speed (euro, proto).bin" size="16777216" crc="8ef396fb" sha1="b9244f898e302ca06c04caf5d595f3a70d65fce5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carmgedd">
 		<description>Carmageddon 64 (Euro, English / French / German / Spanish)</description>
 		<year>1999</year>
@@ -8173,6 +8184,28 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="sydney2k">
+		<description>Sydney 2000 (Euro, Prototype)</description>
+		<year>2000</year>
+		<publisher>Eidos</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="syd2k (eur).bin" size="33554432" crc="cb366589" sha1="f1ada6fbedf08754db14983678220cbf411da0b6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sydney2ku" cloneof="sydney2k">
+		<description>Sydney 2000 (USA, Prototype)</description>
+		<year>2000</year>
+		<publisher>Eidos</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="syd2k (usa).bin" size="33554432" crc="9b7b6f51" sha1="b9def914d6395b794418f0ccd846cbee123b27ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tarzan">
 		<description>Tarzan (Euro)</description>
 		<year>2000</year>
@@ -8224,6 +8257,17 @@ There appear to exist some undumped N64 protos
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912" layout="region32_be">
 				<rom name="taz express (europe) (en,fr,de,es,it,nl).bin" size="12582912" crc="85382541" sha1="fa61bd39f2a02bdf65fbe0b5730ff7c01f239b18" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tazexpru">
+		<description>Taz Express (USA, Prototype)</description>
+		<year>2000?</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="taz express (usa, proto).bin" size="33554432" crc="9e9b2ed5" sha1="285e448d8ccd707cfb401dd6496834e2e2bcb567" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

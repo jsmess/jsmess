@@ -10103,6 +10103,17 @@ Among undumped protos & special release
 		</part>
 	</software>
 
+	<software name="flintsmp" cloneof="flintsm">
+		<description>The Flintstones - The Treasure of Sierra Madrock (Prototype)</description>
+		<year>1994</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="flintstones, the - the treasure of sierra madrock (proto).sfc" size="1048576" crc="bfc15ed9" sha1="379212d62a273fe335726518dd0691b95155cee9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flyinher">
 		<!-- Serial: SHVC-B9 - Release Date: 1992-12-18 - Alt. Title: フライングヒーローぶぎゅる～の大冒険 -->
 		<description>Flying Hero - Bugyuru no Daibouken (Jpn)</description>
@@ -10571,7 +10582,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gaiasavr">
-		<!-- Serial:  - Release Date: 1994-01-28 -->
+		<!-- Serial: SHVC-G9 - Release Date: 1994-01-28 - Alt. Title: ガイアセイバー ヒーロー最大の作戦 -->
 		<description>Gaia Saver - Hero Saidai no Sakusen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -10595,7 +10606,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="galxyrob">
-		<!-- Serial:  - Release Date: 1994-03-11 -->
+		<!-- Serial: SJVC-XY - Release Date: 1994-03-11 - Alt. Title: ギャラクシーロボ -->
 		<description>Galaxy Robo (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
@@ -10631,7 +10642,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gambler2">
-		<!-- Serial:  - Release Date: 1994-03-18 -->
+		<!-- Serial: SHVC-8G - Release Date: 1994-03-18 - Alt. Title: ぎゅわんぶらあ自己中心派2 ドラポンクエスト -->
 		<description>Gambler Jikochuushinha 2 - Dorapon Quest (Jpn)</description>
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
@@ -10753,7 +10764,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="ggoemon3">
-		<!-- Serial:  - Release Date: 1994-12-16 -->
+		<!-- Serial: SHVC-2U - Release Date: 1994-12-16 - Alt. Title: がんばれゴエモン3 獅子重禄兵衛のからくり卍固め -->
 		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -10825,7 +10836,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gansopsl">
-		<!-- Serial:  - Release Date: 1994-11-25 -->
+		<!-- Serial: SHVC-O4 - Release Date: 1994-11-25 - Alt. Title: 元祖パチスロ日本一 -->
 		<description>Ganso Pachi-Slot Nihonichi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -10837,7 +10848,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gansopac">
-		<!-- Serial:  - Release Date: 1994-12-22 -->
+		<!-- Serial: SHVC-OY - Release Date: 1994-12-22 - Alt. Title: 元祖パチンコ王 -->
 		<description>Ganso Pachinko Ou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -10897,7 +10908,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="garousp" cloneof="fatfursp">
-		<!-- Serial:  - Release Date: 1994-07-29 -->
+		<!-- Serial: SHVC-3R - Release Date: 1994-07-29 - Alt. Title: 餓狼伝説 スペシャル -->
 		<description>Garou Densetsu Special (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -11055,7 +11066,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="genocid2">
-		<!-- Serial:  - Release Date: 1994-08-05 -->
+		<!-- Serial: SHVC-2I - Release Date: 1994-08-05 - Alt. Title: ジェノサイド 2 -->
 		<description>Genocide 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Kemco</publisher>
@@ -11137,7 +11148,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="ghostcha">
-		<!-- Serial:  - Release Date: 1994-09-23 -->
+		<!-- Serial: SHVC-ET - Release Date: 1994-09-23 - Alt. Title: ゴーストチェイサー 電精 -->
 		<description>Ghost Chaser Densei (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -11232,7 +11243,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gionbana">
-		<!-- Serial:  - Release Date: 1994-12-16 -->
+		<!-- Serial: SHVC-AHFJ - Release Date: 1994-12-16 - Alt. Title: 祗園花 -->
 		<description>Gionbana (Jpn)</description>
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
@@ -11244,7 +11255,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gogoack">
-		<!-- Serial:  - Release Date: 1994-12-23 -->
+		<!-- Serial: SHVC-ACKJ - Release Date: 1994-12-23 - Alt. Title: ゴーゴー アックマン -->
 		<description>Go Go Ackman (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -11339,7 +11350,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="godzilla">
-		<!-- Serial:  - Release Date: 1994-12-09 -->
+		<!-- Serial: SHVC-AG2J - Release Date: 1994-12-09 - Alt. Title: ゴジラ 怪獣大決戦 -->
 		<description>Godzilla - Kaijuu Daikessen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Toho</publisher>
@@ -11374,7 +11385,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gokuparo">
-		<!-- Serial:  - Release Date: 1994-11-25 -->
+		<!-- Serial: SHVC-AGPJ - Release Date: 1994-11-25 - Alt. Title: 極上パロディウス 過去の栄光を求めて -->
 		<description>Gokujou Parodius (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -11399,7 +11410,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gon">
-		<!-- Serial:  - Release Date: 1994-11-11 -->
+		<!-- Serial: SHVC-AHOJ - Release Date: 1994-11-11 - Alt. Title: ゴン -->
 		<description>Gon (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -11495,7 +11506,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="goofymax" cloneof="gooftrop">
-		<!-- Serial:  - Release Date: 1994-07-22 -->
+		<!-- Serial: SHVC-G6 - Release Date: 1994-07-22 - Alt. Title: グーフィーとマックス 海賊島の大冒険 -->
 		<description>Goofy to Max - Kaizokujima no Daibouken (Jpn)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -11507,7 +11518,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="powerinsj" cloneof="powerins">
-		<!-- Serial:  - Release Date: 1994-10-14 -->
+		<!-- Serial: SHVC-AGKJ - Release Date: 1994-10-14 - Alt. Title: 豪血寺一族 -->
 		<description>Gouketsuji Ichizoku (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -11590,7 +11601,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gp1rs" cloneof="gp1part2">
-		<!-- Serial:  - Release Date: 1994-11-18 -->
+		<!-- Serial: SHVC-AGRJ - Release Date: 1994-11-18 - Alt. Title: GP-1 RS -->
 		<description>GP-1 RS - Rapid Stream (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -11638,7 +11649,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gbattlg2">
-		<!-- Serial:  - Release Date: 1994-01-28 -->
+		<!-- Serial: SHVC-K8 - Release Date: 1994-01-28 - Alt. Title: ザ・グレイトバトル外伝2 祭だワッショイ -->
 		<description>The Great Battle Gaiden 2 - Matsuri da Wasshoi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -11685,7 +11696,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="gbattle4">
-		<!-- Serial:  - Release Date: 1994-12-17 -->
+		<!-- Serial: SHVC-4F - Release Date: 1994-12-17 - Alt. Title: ザ・グレイトバトルIV -->
 		<description>The Great Battle IV (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -11826,7 +11837,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="haganej" cloneof="hagane">
-		<!-- Serial:  - Release Date: 1994-11-18 -->
+		<!-- Serial: SHVC-AHGJ - Release Date: 1994-11-18 - Alt. Title: 鋼 -->
 		<description>Hagane (Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -11968,7 +11979,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hanakeij">
-		<!-- Serial:  - Release Date: 1994-11-18 -->
+		<!-- Serial: SHVC-AY4J - Release Date: 1994-11-18 - Alt. Title: 花の慶次 ―雲のかなたに― -->
 		<description>Hana no Keiji - Kumo no Kanata ni (Jpn)</description>
 		<year>1994</year>
 		<publisher>Yojigen</publisher>
@@ -11980,7 +11991,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hanafuda">
-		<!-- Serial:  - Release Date: 1994-12-16 -->
+		<!-- Serial: SHVC-IJ - Release Date: 1994-12-16 - Alt. Title: 花札王 -->
 		<description>Hanafuda Ou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -12028,7 +12039,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="haoutryu">
-		<!-- Serial:  - Release Date: 1994-12-22 -->
+		<!-- Serial: SHVC-UR - Release Date: 1994-12-22 - Alt. Title: 覇王大系リューナイト ロードオブパラディン -->
 		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Jpn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -12040,7 +12051,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="haoutryu1" cloneof="haoutryu">
-		<!-- Serial:  - Release Date: 1994-12-22 -->
+		<!-- Serial: SHVC-UR - Release Date: 1994-12-22 - Alt. Title: 覇王大系リューナイト ロードオブパラディン -->
 		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -12052,7 +12063,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="harapeko" cloneof="hungryd">
-		<!-- Serial:  - Release Date: 1994-10-19 -->
+		<!-- Serial: SHVC-ABKJ - Release Date: 1994-10-19 - Alt. Title: はらぺこバッカ -->
 		<description>Harapeko Bakka (Jpn)</description>
 		<year>1994</year>
 		<publisher>Magical</publisher>
@@ -12144,7 +12155,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hashhebe">
-		<!-- Serial:  - Release Date: 1994-12-22 -->
+		<!-- Serial: SHVC-AHHJ - Release Date: 1994-12-22 - Alt. Title: はしれへべれけ -->
 		<description>Hashire Hebereke (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -12168,7 +12179,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hattric2">
-		<!-- Serial:  - Release Date: 1994-07-29 -->
+		<!-- Serial: SHVC-2Y - Release Date: 1994-07-29 - Alt. Title: ハットトリックヒーロー2 -->
 		<description>Hat Trick Hero 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
@@ -12228,7 +12239,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hebereke">
-		<!-- Serial:  - Release Date: 1994-08-31 -->
+		<!-- Serial: SHVC-O3 - Release Date: 1994-08-31 - Alt. Title: へべれけのおいしいパズルはいりませんか -->
 		<description>Hebereke no Oishii Puzzle wa Irimasenka (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -12311,7 +12322,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="popsmash">
-		<!-- Serial:  - Release Date: 1994-04-28 -->
+		<!-- Serial: SHVC-QQ - Release Date: 1994-04-28 - Alt. Title: 平成イヌ物語バウ ポップンスマッシュ！！ -->
 		<description>Heisei Inu Monogatari Bow - Pop'n Smash!! (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -12395,7 +12406,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hellopac" cloneof="pacman2">
-		<!-- Serial:  - Release Date: 1994-08-26 -->
+		<!-- Serial: SHVC-PN - Release Date: 1994-08-26 - Alt. Title: ハロー！パックマン -->
 		<description>Hello! Pac-Man (Jpn)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
@@ -12419,7 +12430,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="herakl4">
-		<!-- Serial:  - Release Date: 1994-10-21 -->
+		<!-- Serial: SHVC-4E - Release Date: 1994-10-21 - Alt. Title: ヘラクレスの栄光IV 神々からの贈り物 -->
 		<description>Herakles no Eikou IV - Kamigami Kara no Okurimono (Jpn)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
@@ -12467,7 +12478,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hiouden">
-		<!-- Serial:  - Release Date: 1994-02-11 -->
+		<!-- Serial: SHVC-HR - Release Date: 1994-02-11 - Alt. Title: 緋王伝 魔物達との誓い -->
 		<description>Hiouden - Mamono-tachi to no Chikai (Jpn)</description>
 		<year>1994</year>
 		<publisher>Wolf Team</publisher>
@@ -12503,7 +12514,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hisspac1">
-		<!-- Serial:  - Release Date: 1994-10-21 -->
+		<!-- Serial: SHVC-AHPJ - Release Date: 1994-10-21 - Alt. Title: 必殺パチンココレクション -->
 		<description>Hissatsu Pachinko Collection (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -12551,7 +12562,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="his777f1">
-		<!-- Serial:  - Release Date: 1994-01-14 -->
+		<!-- Serial: SHVC-IH - Release Date: 1994-01-14 - Alt. Title: 必勝スリーセブンファイター パチスロ竜宮伝説 -->
 		<description>Hisshou 777 Fighter - Pachi-Slot Ryuuguu Densetsu (Jpn)</description>
 		<year>1994</year>
 		<publisher>VAP</publisher>
@@ -12563,7 +12574,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="his777f2">
-		<!-- Serial:  - Release Date: 1994-08-19 -->
+		<!-- Serial: SHVC-72 - Release Date: 1994-08-19 - Alt. Title: 必勝スリーセブンファイター2 パチスロ○秘情報 -->
 		<description>Hisshou 777 Fighter II - Pachi-Slot Maruhi Jouhou (Jpn)</description>
 		<year>1994</year>
 		<publisher>VAP</publisher>
@@ -12587,7 +12598,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="hispslot">
-		<!-- Serial:  - Release Date: 1994-12-16 -->
+		<!-- Serial: SHVC-APNJ - Release Date: 1994-12-16 - Alt. Title: 必勝パチスロファン -->
 		<description>Hisshou Pachi-Slot Fun (Jpn)</description>
 		<year>1994</year>
 		<publisher>Planning Office WADA</publisher>
@@ -12753,7 +12764,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="honktmn2">
-		<!-- Serial:  - Release Date: 1994-10-21 -->
+		<!-- Serial: SHVC-AOXJ - Release Date: 1994-10-21 - Alt. Title: 本格麻雀 徹萬II -->
 		<description>Honkaku Mahjong - Tetsuman II (Jpn)</description>
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -12765,7 +12776,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="honkasho">
-		<!-- Serial:  - Release Date: 1994-12-22 -->
+		<!-- Serial: SHVC-AV3J - Release Date: 1994-12-22 - Alt. Title: 本格将棋 風雲児 龍王 -->
 		<description>Honkaku Shougi - Fuuunji Ryuuou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
@@ -12777,7 +12788,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="honkaigo">
-		<!-- Serial:  - Release Date: 1994-10-28 -->
+		<!-- Serial: SHVC-AKWJ - Release Date: 1994-10-28 - Alt. Title: 本格派囲碁 碁聖 -->
 		<description>Honkakuha Igo - Gosei (Jpn)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
@@ -12789,7 +12800,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="honkehan">
-		<!-- Serial:  - Release Date: 1994-09-22 -->
+		<!-- Serial: SHVC-87 - Release Date: 1994-09-22 - Alt. Title: 本家花札 -->
 		<description>Honke Hanafuda (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
@@ -13004,7 +13015,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="humangp3">
-		<!-- Serial:  - Release Date: 1994-09-30 -->
+		<!-- Serial: SHVC-AGXJ - Release Date: 1994-09-30 - Alt. Title: ヒューマングランプリ3 F1トリプルバトル -->
 		<description>Human Grand Prix III - F1 Triple Battle (Jpn)</description>
 		<year>1994</year>
 		<publisher>Human Entertainment</publisher>
@@ -13211,7 +13222,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="ideanohi">
-		<!-- Serial:  - Release Date: 1994-03-18 -->
+		<!-- Serial: SHVC-ID - Release Date: 1994-03-18 - Alt. Title: イデアの日 -->
 		<description>Idea no Hi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Shouei System</publisher>
@@ -13362,7 +13373,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="illvania">
-		<!-- Serial:  - Release Date: 1994-10-28 -->
+		<!-- Serial: SHVC-ARIJ - Release Date: 1994-10-28 - Alt. Title: イルバニアンの城 -->
 		<description>Illvanian no Shiro (Jpn)</description>
 		<year>1994</year>
 		<publisher>Clary</publisher>
@@ -13455,7 +13466,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="incredj" cloneof="incred">
-		<!-- Serial:  - Release Date: 1994-09-30 -->
+		<!-- Serial: SHVC-C7 - Release Date: 1994-09-30 - Alt. Title: クラッシュ・ダミー ～Dr.サブを救い出せ～ -->
 		<description>The Incredible Crash Dummies - Dr. Zabu o Sukuidase (Jpn)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -13724,7 +13735,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="itadaki2">
-		<!-- Serial:  - Release Date: 1994-02-26 -->
+		<!-- Serial: SHVC-I2 - Release Date: 1994-02-26 - Alt. Title: いただきストリート2 ネオンサインはバラ色に -->
 		<description>Itadaki Street 2 - Neon Sign wa Barairo ni (Jpn)</description>
 		<year>1994</year>
 		<publisher>Enix</publisher>
@@ -13771,7 +13782,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="itouhata">
-		<!-- Serial:  - Release Date: 1994-02-04 -->
+		<!-- Serial: SHVC-Q2 - Release Date: 1994-02-04 - Alt. Title: 伊藤果六段の将棋道場 -->
 		<description>Itou Hatasu Rokudan no Shougi Doujou (Jpn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>ASK Kodansha</publisher>
@@ -13783,7 +13794,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="itouhata1" cloneof="itouhata">
-		<!-- Serial:  - Release Date: 1994-02-04 -->
+		<!-- Serial: SHVC-Q2 - Release Date: 1994-02-04 - Alt. Title: 伊藤果六段の将棋道場 -->
 		<description>Itou Hatasu Rokudan no Shougi Doujou (Jpn)</description>
 		<year>1994</year>
 		<publisher>ASK Kodansha</publisher>
@@ -13841,7 +13852,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jlexct94" cloneof="sshotout">
-		<!-- Serial:  - Release Date: 1994-05-01 -->
+		<!-- Serial: SHVC-JL - Release Date: 1994-05-01 - Alt. Title: J.リーグエキサイトステージ'94 -->
 		<description>J.League Excite Stage '94 (Jpn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Epoch</publisher>
@@ -13853,7 +13864,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jlexct94a" cloneof="sshotout">
-		<!-- Serial:  - Release Date: 1994-05-01 -->
+		<!-- Serial: SHVC-JL - Release Date: 1994-05-01 - Alt. Title: J.リーグエキサイトステージ'94 -->
 		<description>J.League Excite Stage '94 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Epoch</publisher>
@@ -13925,7 +13936,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jlprime2">
-		<!-- Serial:  - Release Date: 1994-08-05 -->
+		<!-- Serial: SHVC-2H - Release Date: 1994-08-05 - Alt. Title: Jリーグサッカー プライムゴール2 -->
 		<description>J.League Soccer Prime Goal 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
@@ -13961,7 +13972,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jlssocr">
-		<!-- Serial:  - Release Date: 1994-03-18 -->
+		<!-- Serial: SHVC-VX - Release Date: 1994-03-18 - Alt. Title: Jリーグ スーパーサッカー -->
 		<description>J.League Super Soccer (Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -14241,7 +14252,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jigsaw" cloneof="pieces">
-		<!-- Serial:  - Release Date: 1994-07-22 -->
+		<!-- Serial: SHVC-Z5 - Release Date: 1994-07-22 - Alt. Title: ジグソーパ～ティ～ -->
 		<description>Jigsaw Party (Jpn)</description>
 		<year>1994</year>
 		<publisher>Hori</publisher>
@@ -14277,7 +14288,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jikkpw94">
-		<!-- Serial:  - Release Date: 1994-03-11 -->
+		<!-- Serial: SHVC-YX - Release Date: 1994-03-11 - Alt. Title: 実況パワフルプロ野球'94 -->
 		<description>Jikkyou Powerful Pro Yakyuu '94 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -14385,7 +14396,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jwsoccer">
-		<!-- Serial:  - Release Date: 1994-11-11 -->
+		<!-- Serial: SHVC-3U - Release Date: 1994-11-11 - Alt. Title: 実況ワールドサッカー パーフェクトイレブン -->
 		<description>Jikkyou World Soccer - Perfect Eleven (Jpn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -14397,7 +14408,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jwsoccera" cloneof="jwsoccer">
-		<!-- Serial:  - Release Date: 1994-11-11 -->
+		<!-- Serial: SHVC-3U - Release Date: 1994-11-11 - Alt. Title: 実況ワールドサッカー パーフェクトイレブン -->
 		<description>Jikkyou World Soccer - Perfect Eleven (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -14620,7 +14631,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jpsloth2">
-		<!-- Serial:  - Release Date: 1994-09-15 -->
+		<!-- Serial: SHVC-XU - Release Date: 1994-09-16 - Alt. Title: 実戦！パチスロ必勝法！2 -->
 		<description>Jissen! Pachi-Slot Hisshouhou! 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sammy Entertainment</publisher>
@@ -14947,7 +14958,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="junglej" cloneof="jungle">
-		<!-- Serial:  - Release Date: 1994-07-14 -->
+		<!-- Serial: SHVC-7K - Release Date: 1994-07-14 - Alt. Title: ジャングルブック -->
 		<description>The Jungle Book (Jpn)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
@@ -14982,7 +14993,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jungletc">
-		<!-- Serial:  - Release Date: 1994-09-18 -->
+		<!-- Serial: SHVC-5J - Release Date: 1994-09-18 - Alt. Title: ジャングルの王者ターちゃん 世界漫遊大格闘の巻 -->
 		<description>Jungle no Ouja Tar-chan - Sekaimanyuu Daikakutou no Maki (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -15096,7 +15107,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jparkj" cloneof="jpark">
-		<!-- Serial:  - Release Date: 1994-06-24 -->
+		<!-- Serial: SHVC-J8 - Release Date: 1994-06-24 - Alt. Title: ジュラシック・パーク -->
 		<description>Jurassic Park (Jpn)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -15235,7 +15246,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="jwpjoshi">
-		<!-- Serial:  - Release Date: 1994-12-23 -->
+		<!-- Serial: SHVC-AJWJ - Release Date: 1994-12-23 - Alt. Title: JWP女子プロレス ピュア・レッスル・クイーンズ -->
 		<description>JWP Joshi Pro Wrestling - Pure Wrestle Queens (Jpn)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -15281,7 +15292,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kabukimj">
-		<!-- Serial:  - Release Date: 1994-07-15 -->
+		<!-- Serial: SHVC-IF (R88V5949) - Release Date: 1994-07-15 - Alt. Title: 歌舞伎町 リーチ麻雀 東風戦 -->
 		<description>Kabuki Chou Reach Mahjong Tonpuusen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Pony Canyon</publisher>
@@ -15293,7 +15304,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kabukirc">
-		<!-- Serial:  - Release Date: 1994-03-04 -->
+		<!-- Serial: SHVC-QR - Release Date: 1994-03-04 - Alt. Title: カブキロックス -->
 		<description>Kabuki Rocks (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -15305,7 +15316,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kachiuma">
-		<!-- Serial:  - Release Date: 1994-05-27 -->
+		<!-- Serial: SHVC-4K - Release Date: 1994-05-27 - Alt. Title: 勝ち馬予想ソフト 馬券錬金術 -->
 		<description>Kachiuma Yosou Soft - Baken Renkinjutsu (Jpn)</description>
 		<year>1994</year>
 		<publisher>KSS</publisher>
@@ -15329,7 +15340,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kagaharl" cloneof="harley">
-		<!-- Serial:  - Release Date: 1994-10-28 -->
+		<!-- Serial: SHVC-HV - Release Date: 1994-10-28 - Alt. Title: 化学者ハリーの波乱万丈 -->
 		<description>Kagakusha Harley no Haran Banjou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Altron</publisher>
@@ -15341,7 +15352,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kaitetsu">
-		<!-- Serial:  - Release Date: 1994-09-20 -->
+		<!-- Serial: SHVC-66 - Release Date: 1994-09-20 - Alt. Title: デザエモン -->
 		<description>Kaite Tsukutte Asoberu Dezaemon (Jpn)</description>
 		<year>1994</year>
 		<publisher>Athena</publisher>
@@ -15378,7 +15389,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kamaita">
-		<!-- Serial:  - Release Date: 1994-11-25 -->
+		<!-- Serial: SHVC-EU - Release Date: 1994-11-25 - Alt. Title: かまいたちの夜 -->
 		<description>Kamaitachi no Yoru (Jpn)</description>
 		<year>1994</year>
 		<publisher>Chunsoft</publisher>
@@ -15414,7 +15425,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="karuraou" cloneof="skyblazr">
-		<!-- Serial:  - Release Date: 1994-02-18 -->
+		<!-- Serial: SHVC-OH (ESPG51) - Release Date: 1994-02-18 - Alt. Title: 迦楼羅王 -->
 		<description>Karura Ou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Epic / Sony Records</publisher>
@@ -15509,7 +15520,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="keeper">
-		<!-- Serial:  - Release Date: 1994-07-14 -->
+		<!-- Serial: SHVC-K9 - Release Date: 1994-07-14 - Alt. Title: キーパー -->
 		<description>Keeper (Jpn)</description>
 		<year>1994</year>
 		<publisher>Datam Polystar</publisher>
@@ -15545,7 +15556,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="keiba8s2">
-		<!-- Serial:  - Release Date: 1994-09-30 -->
+		<!-- Serial: SHVC-82 - Release Date: 1994-09-30 - Alt. Title: 馬エイトスペシャル2 ○秘 馬券購入術 -->
 		<description>Keiba Eight Special 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
@@ -15605,7 +15616,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="yaiba">
-		<!-- Serial:  - Release Date: 1994-03-25 -->
+		<!-- Serial: SHVC-YB - Release Date: 1994-03-25 - Alt. Title: 剣勇伝説 ヤイバ -->
 		<description>Kenyuu Densetsu Yaiba (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -15617,7 +15628,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kerokero">
-		<!-- Serial:  - Release Date: 1994-03-25 -->
+		<!-- Serial: SHVC-NE - Release Date: 1994-03-25 - Alt. Title: けろけろけろっぴの冒険日記 眠れる森のけろりーぬ -->
 		<description>Kero Kero Keroppi no Bouken Nikki - Nemureru Mori no Keroleen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Character Soft</publisher>
@@ -15708,7 +15719,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kidklownj" cloneof="kidklown">
-		<!-- Serial:  - Release Date: 1994-10-21 -->
+		<!-- Serial: SHVC-ZI - Release Date: 1994-10-21 - Alt. Title: キッドクラウンのクレイジーチェイス -->
 		<description>Kid Klown no Crazy Chase (Jpn)</description>
 		<year>1994</year>
 		<publisher>Kemco</publisher>
@@ -15720,7 +15731,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="ggundam">
-		<!-- Serial:  - Release Date: 1994-12-27 -->
+		<!-- Serial: SHVC-AGMJ - Release Date: 1994-12-27 - Alt. Title: 機動武闘伝Gガンダム -->
 		<description>Kidou Butouden G Gundam (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -15756,7 +15767,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="vgundam">
-		<!-- Serial:  - Release Date: 1994-03-11 -->
+		<!-- Serial: SHVC-VU - Release Date: 1994-03-11 - Alt. Title: 機動戦士Vガンダム -->
 		<description>Kidou Senshi V Gundam (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -15792,7 +15803,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="patlabor">
-		<!-- Serial:  - Release Date: 1994-04-22 -->
+		<!-- Serial: SHVC-PX - Release Date: 1994-04-22 - Alt. Title: 機動警察パトレイバー -->
 		<description>Kidoukeisatsu Patlabor (Jpn)</description>
 		<year>1994</year>
 		<publisher>BEC</publisher>
@@ -15816,7 +15827,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kikikait" cloneof="pocky2">
-		<!-- Serial:  - Release Date: 1994-06-17 -->
+		<!-- Serial: SHVC-3N - Release Date: 1994-06-17 - Alt. Title: 奇々怪界 月夜草子 -->
 		<description>Kiki KaiKai - Tsukiyo Soushi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Natsume</publisher>
@@ -15979,7 +15990,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kodj" cloneof="kod">
-		<!-- Serial:  - Release Date: 1994-03-04 -->
+		<!-- Serial: SHVC-EI - Release Date: 1994-03-04 - Alt. Title: ザ・キングオブドラゴンズ -->
 		<description>The King of Dragons (Jpn)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -16074,7 +16085,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kingyo">
-		<!-- Serial:  - Release Date: 1994-03-18 -->
+		<!-- Serial: SHVC-J7 - Release Date: 1994-03-18 - Alt. Title: きんぎょ注意報！ とびだせ！ゲーム学園 -->
 		<description>Kingyo Chuuihou! - Tobidase! Game Gakuen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -16098,7 +16109,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kirbybow" cloneof="kirbydc">
-		<!-- Serial:  - Release Date: 1994-09-21 -->
+		<!-- Serial: SHVC-CG - Release Date: 1994-09-21 - Alt. Title: カービィボウル -->
 		<description>Kirby Bowl (Jpn)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -16303,7 +16314,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kishinko">
-		<!-- Serial:  - Release Date: 1994-08-05 -->
+		<!-- Serial: SHVC-HD - Release Date: 1994-08-05 - Alt. Title: 鬼神降臨伝ONI -->
 		<description>Kishin Kourinden Oni (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -16338,7 +16349,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kotrj" cloneof="kotr">
-		<!-- Serial:  - Release Date: 1994-06-10 -->
+		<!-- Serial: SHVC-LO - Release Date: 1994-06-10 - Alt. Title: ナイツ オブ ザ ラウンド -->
 		<description>Knights of the Round (Jpn)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -16475,7 +16486,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kouryuuk" cloneof="risephnx">
-		<!-- Serial:  - Release Date: 1994-04-06 -->
+		<!-- Serial: SHVC-QG - Release Date: 1994-04-06 - Alt. Title: 項劉記 -->
 		<description>Kouryuuki (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -16499,7 +16510,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="koshien3">
-		<!-- Serial:  - Release Date: 1994-07-29 -->
+		<!-- Serial: SHVC-3V - Release Date: 1994-07-29 - Alt. Title: 甲子園3 -->
 		<description>Koushien 3 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Magical</publisher>
@@ -16547,7 +16558,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="koukish2">
-		<!-- Serial:  - Release Date: 1994-01-28 -->
+		<!-- Serial: SHVC-2Z - Release Date: 1994-01-28 - Alt. Title: 鋼鉄の騎士2 砂漠のロンメル軍団 -->
 		<description>Koutetsu no Kishi 2 - Sabaku no Rommel Gundan (Jpn)</description>
 		<year>1994</year>
 		<publisher>Asmik</publisher>
@@ -16629,7 +16640,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="kunioode">
-		<!-- Serial:  - Release Date: 1994-05-27 -->
+		<!-- Serial: SHVC-QO - Release Date: 1994-05-27 - Alt. Title: くにおのおでん -->
 		<description>Kunio no Oden (Jpn)</description>
 		<year>1994</year>
 		<publisher>Technos Japan</publisher>
@@ -16830,7 +16841,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="larrynix" cloneof="tnnbass">
-		<!-- Serial:  - Release Date: 1994-09-23 -->
+		<!-- Serial: SHVC-QJ (KIS-4) - Release Date: 1994-09-23 - Alt. Title: ラリー・ニクソン スーパー・バス・フィッシング -->
 		<description>Larry Nixon's Super Bass Fishing (Jpn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>King Records</publisher>
@@ -16842,7 +16853,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="larrynix1" cloneof="tnnbass">
-		<!-- Serial:  - Release Date: 1994-09-23 -->
+		<!-- Serial: SHVC-QJ (KIS-4) - Release Date: 1994-09-23 - Alt. Title: ラリー・ニクソン スーパー・バス・フィッシング -->
 		<description>Larry Nixon's Super Bass Fishing (Jpn)</description>
 		<year>1994</year>
 		<publisher>King Records</publisher>
@@ -16889,7 +16900,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="lastbatl">
-		<!-- Serial:  - Release Date: 1994-12-02 -->
+		<!-- Serial: SHVC-3T - Release Date: 1994-12-02 - Alt. Title: ザ・ラストバトル -->
 		<description>The Last Battle (Jpn)</description>
 		<year>1994</year>
 		<publisher>Teichiku</publisher>
@@ -36408,6 +36419,17 @@ Among undumped protos & special release
 		</part>
 	</software>
 
+	<software name="tonymeolp" cloneof="worldsoc">
+		<description>Tony Meola's Sidekicks Soccer (Prototype)</description>
+		<year>1993</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tony meola's sidekicks soccer (proto).sfc" size="1048576" crc="7a021e12" sha1="06fb1286af285b6d0b4323daeb58590c22e1119b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="topgear">
 		<description>Top Gear (Euro)</description>
 		<year>1992</year>
@@ -40341,6 +40363,17 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="zoop (usa).sfc" size="524288" crc="06f0e94c" sha1="051c767b843fc4112e0b06c2f81b65abbac9e7fc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoopp" cloneof="zoop">
+		<description>Zoop (Prototype 19950720)</description>
+		<year>1996</year>
+		<publisher>Viacom New Media</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="zoop (prototype).sfc" size="524288" crc="3758068a" sha1="eb271d8dc7f2ec04cddf1dd9cc7e24e51563d547" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

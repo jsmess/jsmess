@@ -5,7 +5,6 @@ Undumped protos:
   - Crazy Faces
 
 The following games existed according to VGRebirth
-  - Championship Hockey (Euro) by U.S. Gold
   - CJ Elephant Fugitive (Euro, USA) by Codemasters
   - FIFA 95 (USA) by Electronic Arts
   - NBA Jam T.E. (Jpn) by Acclaim
@@ -16,12 +15,9 @@ The following games existed according to VGRebirth
   - Super Golf (USA) by Sage's Creations
   - T2 (Jpn) by Acclaim
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
-  - Taito Chase H.Q. (USA) by Taito
   - Zool (Euro) by Gremlin Interactive
 
 A few games have been listed as rumored, but they might very well be fake (please let us know if you have any info):
-  - "Power Drive", 
-  - "Jungle Strike", 
   - "Outrunners", 
   - "Sports Illustrated Golf",
   - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
@@ -252,6 +248,18 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="alexkidd">
+        <!-- Alt. Title: Alex Kido (on the boxart) -->
+		<description>Alex Kidd in Miracle World (Tw, SMS Mode)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="alex kidd in miracle world [sms-gg] (tw).bin" size="131072" crc="6f8e46cf" sha1="da0bf41dc5fd68a191d0f02fb1213ffdb006d7b8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alien3">
 		<description>Alien 3 (Euro, USA)</description>
 		<year>1992</year>
@@ -463,6 +471,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="axbattlrp" cloneof="axbattlr">
+		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, Prototype v2.0)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ax battler - a legend of golden axe [v2.0] [proto].bin" size="262144" crc="3435ab54" sha1="fe0f433aebd6e3c4b61e4e155323fe6932369459" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: G-3306 - Developers: Aspect - Releases: 1991-11-01 (Jpn) -->
 	<software name="axbattlrj" cloneof="axbattlr">
 		<description>Ax Battler - Golden Axe Densetsu (Jpn, v1.5)</description>
@@ -498,7 +517,29 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="ayrtonp" cloneof="ayrton">
+		<description>Ayrton Senna's Super Monaco GP II (Euro, USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ayrton senna's super monaco gp ii (proto).bin" size="262144" crc="6afb8ec6" sha1="3467364272fea73d434aaa421b1f3f39f34d97b0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bakubaku">
+		<description>Baku Baku Animal (Euro)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="baku baku animal (europe).bin" size="262144" crc="10ac9374" sha1="5145967d0a3632cf6bb1a9d58b2ef04faecd40db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakubakuu" cloneof="bakubaku">
 		<description>Baku Baku Animal (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -516,7 +557,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="baku baku animal - sekai shiikugakari senshu-ken (japan).bin" size="262144" crc="10ac9374" sha1="5145967d0a3632cf6bb1a9d58b2ef04faecd40db" offset="000000" />
+				<rom name="baku baku animal - sekai shiikugakari senshu-ken (japan).bin" size="262144" crc="7174b802" sha1="270e071342adb41406568e171df4959656ed02bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1168,6 +1209,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="chmphcky">
+		<description>Championship Hockey (Euro)</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="championship hockey (euro).bin" size="262144" crc="e21d2a88" sha1="4b0bd83ee4fefc40c420413d044b91525b494f6b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chessmst">
 		<description>The Chessmaster (Euro, USA)</description>
 		<year>1991</year>
@@ -1477,6 +1529,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="chuckrckp" cloneof="chuckrck">
+		<description>Chuck Rock (World, Prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="chuck rock (proto).bin" size="262144" crc="cb3a1d23" sha1="17442f7b30d7882723bddcad38c9ada363fb7211" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chukrck2">
 		<description>Chuck Rock II - Son of Chuck (Euro)</description>
 		<year>1994</year>
@@ -1652,6 +1715,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="defenders of oasis (usa, europe).bin" size="524288" crc="e2791cc1" sha1="07c1167c3b6eea294a73272c256934406f48f9d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defoasisp" cloneof="defoasis">
+		<description>Defenders of Oasis (Euro, USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="defenders of oasis (proto).bin" size="262144" crc="c674eccc" sha1="76e1f94dbb8a12ba428767d2e70f00fe719fa449" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2069,6 +2143,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="f1 (usa, europe).bin" size="262144" crc="d0a93e00" sha1="b5a1985d671e8b9e0eed7922e6db695011071e99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1wce">
+		<description>F1 World Championship Edition (Euro)</description>
+		<year>1995</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="f1 - world championship edition (euro).bin" size="262144" crc="107092d0" sha1="a42a647923a5af940ef63ab27d3100c3da53e30b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2973,6 +3058,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="jungle book, the (usa).bin" size="262144" crc="30c09f31" sha1="f9da97db661f8ef7e7af87a83d23100c2fed4fb0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jstrike">
+		<description>Jungle Strike (USA)</description>
+		<year>1995</year>
+		<publisher>Black Pearl Software</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="jungle strike (usa).bin" size="524288" crc="d51642b0" sha1="f4a6cf19814a2b0046257f8dd1feeaf22fa6fd73" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4869,17 +4965,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="outruneu">
-		<description>Out Run Europa (Euro, USA, SMS Mode?)</description>
-		<year>1992</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="out run europa (usa, europe).bin" size="262144" crc="f037ec00" sha1="dd842a7294eee7badf4353fbe3e5d87dd570c671" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="outrun">
 		<description>Out Run (Euro, USA)</description>
 		<year>1991</year>
@@ -4887,6 +4972,29 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="out run.bin" size="131072" crc="9014b322" sha1="41d5f3f95ca8cd288842bad7bb5f7940c2baa86d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
+	<software name="outrneur">
+		<description>Out Run Europa (Euro, Bra, SMS Mode)</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="out run europa (euro).bin" size="262144" crc="01eab89d" sha1="0fb4200fa291fe57cd7be2ee73ac2d71ae3c005e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outrneuru" cloneof="outrneur">
+		<description>Out Run Europa (USA, SMS Mode)</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="out run europa (usa).bin" size="262144" crc="f037ec00" sha1="dd842a7294eee7badf4353fbe3e5d87dd570c671" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5182,6 +5290,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="popeye no beach volleyball (japan).bin" size="524288" crc="3ef66810" sha1="921e3922e1b550b6914fb06ba74d4661ef25a89e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdrive">
+		<description>Power Drive (Euro)</description>
+		<year>1994</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="power drive (europe).bin" size="524288" crc="ac369ae3" sha1="c523db9fcf30d7f8af5e5a298ba01f59d124ff72" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5667,13 +5786,24 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="segagame">
+	<software name="sega4in1">
 		<description>Sega Game Pack 4 in 1 (Euro)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sega game pack 4 in 1 (europe).bin" size="262144" crc="0924d2ec" sha1="02fa5c6c6f81f5f4e1d78eced5a37617888404d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sega4in1p" cloneof="sega4in1">
+		<description>Sega Game Pack 4 in 1 (Euro, Prototype)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sega game pack 4 in 1 (proto).bin" size="262144" crc="758a7123" sha1="db7ae3bd9ae0e421b4ebf8cf45df7780678f2a48" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5893,14 +6023,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
+	<!-- Id: T-60017 - Developers: Loriciel - Releases: 1991-04-26 (Jpn) - Alt. Title: スクウィーク -->
 	<software name="skweek" cloneof="slider">
 		<description>Skweek (Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="skweek (japan).bin" size="131072" crc="786dd67b" sha1="17794ed08c1df2ebc992c5686dc1072a75731e4d" offset="000000" />
+				<rom name="skweek (japan).bin" size="131072" crc="3d9c92c7" sha1="0788c35636abba46beb01acebfd1697cdb54161c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7375,24 +7505,24 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
-	<software name="chasehq">
-		<description>Taito Chase H.Q. (Jpn, SMS Mode)</description>
-		<year>1991</year>
-		<publisher>Taito</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="chase h.q. (j) [s][!].bin" size="131072" crc="44fbe8f6" sha1="cc8e0d3a9826348bbb90ebcc5021b4e2e909965f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chasehq1" cloneof="chasehq">
-		<description>Taito Chase H.Q. (Jpn, Alt, SMS Mode?)</description>
+	<software name="chasehqj" cloneof="chasehq">
+		<description>Taito Chase H.Q. (Jpn, SMS Mode?)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="taito chase h.q. (japan).bin" size="131072" crc="7bb81e3d" sha1="b757b45a07ae6530443862e0eca547e16c23b4a3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chasehq">
+		<description>Taito Chase H.Q. (USA, SMS Mode)</description>
+		<year>1991</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="chase h.q. [sms-gg].bin" size="131072" crc="c8381def" sha1="6d6209c642b854eaa43da81b311c04a7579d9a17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

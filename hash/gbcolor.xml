@@ -10616,6 +10616,17 @@
 		</part>
 	</software>
 
+	<software name="powrpfbhf" cloneof="powrpfbh">
+		<description>The Powerpuff Girls - Bulle Contre Lui (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="powerpuff girls, the - bulle contre lui (france).bin" size="2097152" crc="7085270c" sha1="5c1c53b9c002680c2da8b24aa31d4a247586263d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powrpfbhu" cloneof="powrpfbh">
 		<description>The Powerpuff Girls - Battle Him (USA, Rev. A)</description>
 		<year>19??</year>
@@ -10638,7 +10649,29 @@
 		</part>
 	</software>
 
-	<software name="powrpfpna" cloneof="powrpfpn">
+	<software name="powrpfpn">
+		<description>The Powerpuff Girls - Paint the Townsville Green (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="powerpuff girls, the - paint the townsville green (europe).bin" size="2097152" crc="98e4b0c4" sha1="e214ab665ffab3682b9833b4e4d0494fc53cd26f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpfpnf" cloneof="powrpfpn">
+		<description>The Powerpuff Girls - Panique a Townsville (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="powerpuff girls, the - panique a townsville (france).bin" size="2097152" crc="79a417db" sha1="978d68300b625d8e375571475b4f2c2c1a65fd60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpfpnua" cloneof="powrpfpn">
 		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10649,7 +10682,7 @@
 		</part>
 	</software>
 
-	<software name="powrpfpn">
+	<software name="powrpfpnu" cloneof="powrpfpn">
 		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. B)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10660,7 +10693,7 @@
 		</part>
 	</software>
 
-	<software name="powrpfpnb" cloneof="powrpfpn">
+	<software name="powrpfpnub" cloneof="powrpfpn">
 		<description>The Powerpuff Girls - Paint the Townsville Green (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14038,12 +14071,23 @@
 	</software>
 
 	<software name="tweenies">
-		<description>Tweenies - Doodles' Bones (Euro)</description>
+		<description>Tweenies - Doodles' Bones (Euro, English / German / Spanish / Italian)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tweenies - doodles' bones (europe) (en,de,es,it).bin" size="1048576" crc="9306edd0" sha1="d1ff6fd8772dbc2038af7220845e817396664ae3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tweeniesds" cloneof="tweenies">
+		<description>Tweenies - Doodles' Bones (Euro, English / Dutch / Swedish / Norwegian / Danish)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tweenies - doodles' bones (europe) (en,nl,sv,no,da).bin" size="1048576" crc="c7b61220" sha1="1e39a4ea0a8c7322a2e0653e522e0e486aa1ac36" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
