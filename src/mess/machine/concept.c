@@ -105,8 +105,8 @@ MACHINE_START(concept)
 }
 
 static void install_expansion_slot(int slot,
-									read8_space_func reg_read, write8_space_func reg_write,
-									read8_space_func rom_read, write8_space_func rom_write)
+	read8_space_func reg_read, write8_space_func reg_write,
+	read8_space_func rom_read, write8_space_func rom_write)
 {
 	expansion_slots[slot].reg_read = reg_read;
 	expansion_slots[slot].reg_write = reg_write;
@@ -120,20 +120,17 @@ VIDEO_START(concept)
 
 VIDEO_UPDATE(concept)
 {
+	/* resolution is 720*560 */
 	concept_state *state = screen->machine->driver_data<concept_state>();
 	UINT16 *videoram = state->videoram;
-	UINT16 *v;
 	int x, y;
 	UINT16 *line;
-	/* resolution is 720*560 */
-
-	v = videoram;
 
 	for (y = 0; y < 560; y++)
 	{
 		line = BITMAP_ADDR16(bitmap, 560-1-y, 0);
 		for (x = 0; x < 720; x++)
-			line[720-1-x] = (v[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
+			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 0 : 1;
 	}
 	return 0;
 }

@@ -49,11 +49,6 @@ ADDRESS_MAP_END
 
 /* init with simple, fixed, B/W palette */
 /* Is the palette black on white or white on black??? */
-static PALETTE_INIT( concept )
-{
-	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
-}
 
 static const mm58274c_interface concept_mm58274c_interface =
 {
@@ -137,7 +132,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MDRV_SCREEN_SIZE(720, 560)
 	MDRV_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(concept)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(concept)
 	MDRV_VIDEO_UPDATE(concept)
@@ -286,7 +281,7 @@ static INPUT_PORTS_START( concept )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ))
 		PORT_DIPSETTING(0x20, DEF_STR( On ))
 		PORT_DIPNAME(0xc0, 0x00, "Type of Boot")
-		PORT_DIPSETTING(0x00, "Prompt fo type of Boot")		// Documentation has 0x00 and 0xc0 reversed per boot PROM
+		PORT_DIPSETTING(0x00, "Prompt for type of Boot")		// Documentation has 0x00 and 0xc0 reversed per boot PROM
 		PORT_DIPSETTING(0x40, "Boot from Omninet")
 		PORT_DIPSETTING(0x80, "Boot from Local Disk")
 		PORT_DIPSETTING(0xc0, "Boot from Diskette")
@@ -334,4 +329,4 @@ ROM_START( concept )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,		0,		concept,  concept, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)
+COMP( 1982, concept,  0,	0,	concept,  concept, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)
