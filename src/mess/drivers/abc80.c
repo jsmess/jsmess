@@ -5,16 +5,18 @@ Luxor ABC 80
 PCB Layout
 ----------
 
+55 10470-02
+
           CN1               CN2                                                CN5
   SW1   |-----|  |------------------------|                                  |-----|
-|-------|-----|--|------------------------|--------------------------------------------|
+|-------|     |--|                        |----------------------------------|     |---|
 |                                                             CN3       CN4            |
 |                                                    7912                              |
 |            MC1488                                                                    |
 |   MC1489                                           7812                              |
-|            LS245                     8205                                            |
+|            LS245                     LS138                                           |
 |                                                   |-------|                          |
-|   |-----CN6-----|   LS241   LS241    8205   LS32  |SN76477| LS04    LM339            |
+|   |-----CN6-----|   LS241   LS241    LS138  LS32  |SN76477| LS04    LM339            |
 |                                                   |-------|                          |
 |   |--------------|  |------------|   PROM0  LS132   LS273   7406             LS08    |
 |   |   Z80A PIO   |  |    Z80A    |                                                   |
@@ -39,13 +41,12 @@ Notes:
     PROM3-4 - Philips Semiconductors N82S131 512x4 TTL Bipolar PROM
     4116    - Texas Instruments TMS4116-25 16Kx1 Dynamic RAM
     4045    - Texas Instruments TMS4045-15 1Kx4 General Purpose Static RAM with Multiplexed I/O
-    Z80A    -
-    Z80APIO -
+    Z80A    - Sharp LH0080A Z80A CPU
+    Z80APIO - SGS-Thomson Z8420AB1 Z80A PIO
     SN76477 - Texas Instruments SN76477N Complex Sound Generator
     74S263  - Texas Instruments SN74S263N Row Output Character Generator
     MC1488  - Texas Instruments MC1488 Quadruple Line Driver
     MC1489  - Texas Instruments MC1489 Quadruple Line Receiver
-    8205    - ?
     CN1     - RS-232 connector
     CN2     - ABC bus connector (DIN 41612)
     CN3     - video connector
@@ -55,6 +56,107 @@ Notes:
     SW1     - reset switch
     DIPSW1  -
     DIPSW2  -
+
+
+Keyboard PCB Layout
+-------------------
+
+KTC 65-01870-001 (dated 1978)
+PCB-002B
+
+    |---------------|
+|---|      CN1      |---------------------------------------------------|
+|                                                                       |
+|   LS06	LS04	LS04						LS06	LS00	LS123	|
+|	LS74					PROM		MCU				4051	900C	|
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    MCU         - General Instruments 30293B-013 20-04592-013 (?)
+	PROM		- Synertek N82S141N 512x8 bipolar PROM "053"
+	900C		- Interdesign 900C (?)
+    CN1         - keyboard data connector
+
+
+KTC A65-01870-001 (dated 1983)
+PCB-201C
+
+    |---------------|
+|---|      CN1      |---------------------------------------------------|
+|                                                                       |
+|   LS06	LS04	LS04								LS00	LS123	|
+|										MCU				4051	900C	|
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    MCU         - General Instruments 30293B-047 20-04592-047 (?)
+	900C		- Interdesign 900C (?)
+    CN1         - keyboard data connector
+
+
+DOS PCB Layout
+--------------
+
+55 10762-01
+
+|-----------------------------------|
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|   ROM3		ROM2                |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|				ROM1		ROM0    |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|           LS02			LS139   |
+|                                   |
+|                                   |
+|                                   |
+|   LS367	LS241	LS241           |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|--|-----------------------------|--|
+   |------------CON1-------------|
+
+Notes:
+    All IC's shown.
+
+    ROM0    - Synertek C55022 4Kx8 ROM "DOSDD80"
+	ROM1	- Motorola MCM2708C 1Kx8 EPROM "9704"
+	ROM2	- empty socket
+	ROM3	- empty socket
+    CON1    - ABC bus connector
 
 */
 
@@ -662,7 +764,7 @@ ROM_START( abc80 )
 	ROM_SYSTEM_BIOS( 1, "abcdos", "ABC-DOS" ) // Scandia Metric FD2
 	ROMX_LOAD("abcdos",    0x6000, 0x1000, CRC(2cb2192f) SHA1(a6b3a9587714f8db807c05bee6c71c0684363744), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "abcdosdd", "ABC-DOS DD" ) // ABC 830
-	ROMX_LOAD("abcdosdd",  0x6000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(3) )
+	ROMX_LOAD("dosdd80",  0x6000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "ufd20", "UFD-DOS v.20" ) // ABC 830
 	ROMX_LOAD("ufddos20",  0x6000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(4) )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
