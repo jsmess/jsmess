@@ -178,6 +178,7 @@ static MACHINE_CONFIG_START( cdimono1, cdi_state )
 
     MDRV_CDICDIC_ADD( "cdic" )
 	MDRV_CDROM_ADD( "cdrom" )
+	MDRV_CDROM_INTERFACE("cdi_cdrom")
     MDRV_CDISLAVE_ADD( "slave" )
 
 	/* sound hardware */
@@ -194,6 +195,8 @@ static MACHINE_CONFIG_START( cdimono1, cdi_state )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
 	MDRV_MK48T08_ADD( "mk48t08" )
+	
+	MDRV_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END
 
 /*************************

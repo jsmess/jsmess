@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cdi" description="CDI CD-ROM list">
+	<software name="frogfeas">
+		<description>Frog Feast</description>
+		<year>2000</year>
+		<publisher>????</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<dataarea name="cdrom" size="0">
+				<rom name="Frog Feast.chd" size="124700" crc="97a96d1f" sha1="f18634a157321e566c6809c6e106a2d6579c33ae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
