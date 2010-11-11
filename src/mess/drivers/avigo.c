@@ -859,6 +859,94 @@ static INPUT_PORTS_START(avigo)
 	PORT_BIT(0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+/* F4 Character Displayer */
+static const gfx_layout avigo_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout avigo_8_by_14 =
+{
+	8, 14,					/* 8 x 16 characters */
+	1024,					/* 1024 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*32					/* every char takes 32 bytes */
+};
+
+static const gfx_layout avigo_16_by_15 =
+{
+	16, 15,					/* 8 x 16 characters */
+	1024,					/* 1024 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+	/* y offsets */
+	{ 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout avigo_15_by_16 =
+{
+	15, 16,					/* 8 x 16 characters */
+	1024,					/* 1024 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	/* y offsets */
+	{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
+	16*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout avigo_8_by_8 =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	16*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout avigo_6_by_8 =
+{
+	6, 8,					/* 6 x 8 characters */
+	255,					/* 255 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	/* y offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	16*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( avigo )
+	GFXDECODE_ENTRY( "maincpu", 0x00000, avigo_charlayout, 0, 3 )
+	GFXDECODE_ENTRY( "maincpu", 0x18992, avigo_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x1c020, avigo_8_by_14, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x1c020, avigo_16_by_15, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x24020, avigo_15_by_16, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2c020, avigo_8_by_8, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2e020, avigo_6_by_8, 0, 1 )
+GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( avigo, driver_device )
@@ -880,7 +968,8 @@ static MACHINE_CONFIG_START( avigo, driver_device )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_GFXDECODE(avigo)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( avigo )
 
 	MDRV_VIDEO_START( avigo )
