@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/terminal.h"
 
 
 #define LOG	1
@@ -24,9 +25,7 @@ public:
 	UINT8		keyboard_input;
 	UINT8		q_bank;
 	UINT8		u_bank;
-	UINT16		old_in[3];
 	UINT8		ram_1800[0x800];
-	emu_timer	*kb_timer;
 };
 
 
@@ -155,98 +154,26 @@ ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( phunsy )
-	PORT_START( "IN0" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9")
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Spacebar")
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("-")
-
-	PORT_START( "IN1" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("B")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("D")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("G")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("H")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_NAME("I")
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("J")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("L")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("M")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("N")
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("O")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME("P")
-
-	PORT_START( "IN2" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Q")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("R")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("S")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("T")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("U")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_NAME("V")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_NAME("W")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("X")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Y")
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Z")
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK( phunsy_kb_scan )
+static WRITE8_DEVICE_HANDLER( phunsy_kbd_put )
 {
-	static const char *ports[3] = { "IN0", "IN1", "IN2" };
-	static const UINT8 kb_decode[3][16] =
-	{
-		{
-			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
-			0x39, 0x30, 0x20, 0x0D, 0x2D, 0xFF, 0xFF, 0xFF
-		},
-		{
-			0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-			0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50
-		},
-		{
-			0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
-			0x59, 0x5a, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-		},
-	};
-	phunsy_state *state = machine->driver_data<phunsy_state>();
+	phunsy_state *state = device->machine->driver_data<phunsy_state>();
 
-	for ( int j = 0; j < 3; j++ )
-	{
-		UINT16 x = 1;
-		UINT16 data = input_port_read( machine, ports[j] );
-
-		for ( int i = 0; i < 16; i++ )
-		{
-			/* Key pressed? */
-			if ( ! ( state->old_in[j] & x ) && ( data & x ) )
-			{
-				if ( kb_decode[j][i] != 0xFF )
-					state->keyboard_input = kb_decode[j][i];
-			}
-			x <<= 1;
-		}
-		state->old_in[j] = data;
-	}
+	state->keyboard_input = data;
 }
+
+
+static GENERIC_TERMINAL_INTERFACE( phunsy_terminal_intf )
+{
+	DEVCB_HANDLER(phunsy_kbd_put)
+};
 
 
 static DRIVER_INIT( phunsy )
 {
-	phunsy_state *state = machine->driver_data<phunsy_state>();
-
-	state->kb_timer = timer_alloc( machine, phunsy_kb_scan, NULL );
 }
 
 
@@ -260,11 +187,6 @@ static MACHINE_RESET(phunsy)
 	state->u_bank = 0;
 	state->q_bank = 0;
 	state->keyboard_input = 0xFF;
-	state->old_in[0] = 0;
-	state->old_in[1] = 0;
-	state->old_in[2] = 0;
-
-	timer_adjust_periodic( state->kb_timer, machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period() );
 }
 
 
@@ -354,14 +276,14 @@ static VIDEO_UPDATE( phunsy )
 
 static MACHINE_CONFIG_START( phunsy, phunsy_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
-    MDRV_CPU_PROGRAM_MAP(phunsy_mem)
-    MDRV_CPU_IO_MAP(phunsy_io)	
+	MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MDRV_CPU_PROGRAM_MAP(phunsy_mem)
+	MDRV_CPU_IO_MAP(phunsy_io)	
 
-    MDRV_MACHINE_RESET(phunsy)
+	MDRV_MACHINE_RESET(phunsy)
 	
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
@@ -369,12 +291,14 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	   - 313 line display of which 256 are displayed.
 	*/
 	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_PALETTE_LENGTH(8)
-    MDRV_PALETTE_INIT(phunsy)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(phunsy)
 
-    MDRV_VIDEO_START(phunsy)
-    MDRV_VIDEO_UPDATE(phunsy)
+	MDRV_VIDEO_START(phunsy)
+	MDRV_VIDEO_UPDATE(phunsy)
+
+	MDRV_GENERIC_TERMINAL_ADD("ascii_keyboard",phunsy_terminal_intf)
 MACHINE_CONFIG_END
 
 
