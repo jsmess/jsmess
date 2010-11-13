@@ -1514,23 +1514,14 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
  * ADB (Mac II-style)
  * *************************************************************************/
 
-// ADB mouse state
-static int adb_mouseaddr = 3;
-static int adb_lastmousex, adb_lastmousey, adb_lastbutton, adb_mouse_initialized;
-
-// ADB keyboard state
-static int adb_keybaddr = 2;
-static int adb_keybinitialized, adb_currentkeys[2], adb_modifiers;
-
 #if LOG_ADB
 static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
 
-static int mac_adb_pollkbd(running_machine *machine, int update)
+int mac_state::adb_pollkbd(running_machine *machine, int update)
 {
 	int i, j, keybuf, report, codes[2], result;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-	mac_state *mac = machine->driver_data<mac_state>();
 
 	codes[0] = codes[1] = 0x80;	// key up
 	report = result = 0;
@@ -1540,17 +1531,17 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 		keybuf = input_port_read(machine, keynames[i]);
 
 		// any changes in this row?
-		if ((keybuf != mac->m_key_matrix[i]) && (report < 2))
+		if ((keybuf != m_key_matrix[i]) && (report < 2))
 		{
 			// check each column bit
 			for (j=0; j<16; j++)
 			{
-				if (((keybuf ^ mac->m_key_matrix[i]) >> j) & 1)
+				if (((keybuf ^ m_key_matrix[i]) >> j) & 1)
 				{
-					// update mac->m_key_matrix
+					// update m_key_matrix
 					if (update)
 					{
-						mac->m_key_matrix[i] = (mac->m_key_matrix[i] & ~ (1 << j)) | (keybuf & (1 << j));
+						m_key_matrix[i] = (m_key_matrix[i] & ~ (1 << j)) | (keybuf & (1 << j));
 					}
 
 					codes[report] = (i<<4)|j;
@@ -1568,55 +1559,55 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 						{
 							if (codes[report] & 0x80)
 							{
-								adb_modifiers &= ~0x20;
+								m_adb_modifiers &= ~0x20;
 							}
 							else
 							{
-								adb_modifiers |= 0x20;
+								m_adb_modifiers |= 0x20;
 							}
 						}
 						if (((i<<4)|j) == 0x36)
 						{
 							if (codes[report] & 0x80)
 							{
-								adb_modifiers &= ~0x8;
+								m_adb_modifiers &= ~0x8;
 							}
 							else
 							{
-								adb_modifiers |= 0x08;
+								m_adb_modifiers |= 0x08;
 							}
 						}
 						if (((i<<4)|j) == 0x38)
 						{
 							if (codes[report] & 0x80)
 							{
-								adb_modifiers &= ~0x4;
+								m_adb_modifiers &= ~0x4;
 							}
 							else
 							{
-								adb_modifiers |= 0x04;
+								m_adb_modifiers |= 0x04;
 							}
 						}
 						if (((i<<4)|j) == 0x3a)
 						{
 							if (codes[report] & 0x80)
 							{
-								adb_modifiers &= ~0x2;
+								m_adb_modifiers &= ~0x2;
 							}
 							else
 							{
-								adb_modifiers |= 0x02;
+								m_adb_modifiers |= 0x02;
 							}
 						}
 						if (((i<<4)|j) == 0x37)
 						{
 							if (codes[report] & 0x80)
 							{
-								adb_modifiers &= ~0x1;
+								m_adb_modifiers &= ~0x1;
 							}
 							else
 							{
-								adb_modifiers |= 0x01;
+								m_adb_modifiers |= 0x01;
 							}
 						}
 					}
@@ -1641,26 +1632,26 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 //  printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
 
 	// figure out if there was a change
-	if ((adb_currentkeys[0] != codes[0]) || (adb_currentkeys[1] != codes[1]))
+	if ((m_adb_currentkeys[0] != codes[0]) || (m_adb_currentkeys[1] != codes[1]))
 	{
 		result = 1;
 
 		// if we want to update the current read, do so
 		if (update)
 		{
-			adb_currentkeys[0] = codes[0];
-			adb_currentkeys[1] = codes[1];
+			m_adb_currentkeys[0] = codes[0];
+			m_adb_currentkeys[1] = codes[1];
 		}
 	}
 
 	return result;
 }
 
-static int mac_adb_pollmouse(running_machine *machine)
+int mac_state::adb_pollmouse(running_machine *machine)
 {
 	int NewX, NewY, NewButton;
 
-	if (!adb_mouse_initialized)
+	if (!m_adb_mouse_initialized)
 	{
 		return 0;
 	}
@@ -1669,7 +1660,7 @@ static int mac_adb_pollmouse(running_machine *machine)
 	NewX = input_port_read(machine, "MOUSE2");
 	NewY = input_port_read(machine, "MOUSE1");
 
-	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey) || (NewButton != adb_lastbutton))
+	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
 		return 1;
 	}
@@ -1677,7 +1668,7 @@ static int mac_adb_pollmouse(running_machine *machine)
 	return 0;
 }
 
-static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
+void mac_state::adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
@@ -1686,9 +1677,9 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 	NewY = input_port_read(machine, "MOUSE1");
 
 	/* see if it moved in the x coord */
-	if (NewX != adb_lastmousex)
+	if (NewX != m_adb_lastmousex)
 	{
-		int diff = NewX - adb_lastmousex;
+		int diff = NewX - m_adb_lastmousex;
 
 		/* check for wrap */
 		if (diff > 0x80)
@@ -1697,13 +1688,13 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 			diff = -0x100-diff;
 
 		MouseCountX += diff;
-		adb_lastmousex = NewX;
+		m_adb_lastmousex = NewX;
 	}
 
 	/* see if it moved in the y coord */
-	if (NewY != adb_lastmousey)
+	if (NewY != m_adb_lastmousey)
 	{
-		int diff = NewY - adb_lastmousey;
+		int diff = NewY - m_adb_lastmousey;
 
 		/* check for wrap */
 		if (diff > 0x80)
@@ -1712,28 +1703,27 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 			diff = -0x100-diff;
 
 		MouseCountY += diff;
-		adb_lastmousey = NewY;
+		m_adb_lastmousey = NewY;
 	}
 
-	adb_lastbutton = input_port_read(machine, "MOUSE0") & 0x01;
+	m_adb_lastbutton = input_port_read(machine, "MOUSE0") & 0x01;
 
 	*MouseX = (UINT8)MouseCountX;
 	*MouseY = (UINT8)MouseCountY;
 }
 
-static void mac_adb_talk(running_machine *machine)
+void mac_state::adb_talk(running_machine *machine)
 {
 	int addr, reg;
-	mac_state *mac = machine->driver_data<mac_state>();
 
-	addr = (mac->m_adb_command>>4);
-	reg = (mac->m_adb_command & 3);
+	addr = (m_adb_command>>4);
+	reg = (m_adb_command & 3);
 
-//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", mac->m_adb_command, (mac->m_adb_command>>2)&3, addr, reg, adb_mouseaddr, adb_keybaddr);
+//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", mac->m_adb_command, (mac->m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
 
-	if (mac->m_adb_waiting_cmd)
+	if (m_adb_waiting_cmd)
 	{
-		switch ((mac->m_adb_command>>2)&3)
+		switch ((m_adb_command>>2)&3)
 		{
 			case 0:
 			case 1:
@@ -1743,8 +1733,8 @@ static void mac_adb_talk(running_machine *machine)
 						#if LOG_ADB
 						printf("ADB RESET: reg %x address %x\n", reg, addr);
 						#endif
-						mac->m_adb_direction = 0;
-						mac->m_adb_send = 0;
+						m_adb_direction = 0;
+						m_adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
@@ -1752,8 +1742,8 @@ static void mac_adb_talk(running_machine *machine)
 						printf("ADB FLUSH: reg %x address %x\n", reg, addr);
 						#endif
 
-						mac->m_adb_direction = 0;
-						mac->m_adb_send = 0;
+						m_adb_direction = 0;
+						m_adb_send = 0;
 						break;
 
 					default:	// reserved/unused
@@ -1766,10 +1756,10 @@ static void mac_adb_talk(running_machine *machine)
 				printf("ADB LISTEN: reg %x address %x\n", reg, addr);
 				#endif
 
-				mac->m_adb_direction = 1;	// input from Mac
-				mac->m_adb_listenreg = reg;
-				mac->m_adb_listenaddr = addr;
-				mac->m_adb_command = 0;
+				m_adb_direction = 1;	// input from Mac
+				m_adb_listenreg = reg;
+				m_adb_listenaddr = addr;
+				m_adb_command = 0;
 				break;
 
 			case 3: // talk
@@ -1778,10 +1768,10 @@ static void mac_adb_talk(running_machine *machine)
 				#endif
 
 				// keep track of what device the Mac last TALKed to
-				mac->m_adb_last_talk = addr;
+				m_adb_last_talk = addr;
 
-				mac->m_adb_direction = 0; 	// output to Mac
-				if (addr == adb_mouseaddr)
+				m_adb_direction = 0; 	// output to Mac
+				if (addr == m_adb_mouseaddr)
 				{
 					UINT8 mouseX, mouseY;
 
@@ -1793,35 +1783,35 @@ static void mac_adb_talk(running_machine *machine)
 					{
 						// read mouse
 						case 0:
-							if (mac->m_adb_srq_switch)
+							if (m_adb_srq_switch)
 							{
-								mac->m_adb_srq_switch = 0;
+								m_adb_srq_switch = 0;
 								mouseX = mouseY = 0;
 							}
 							else
 							{
-								mac_adb_accummouse(machine, &mouseX, &mouseY);
+								adb_accummouse(machine, &mouseX, &mouseY);
 							}
-							mac->m_adb_buffer[0] = (adb_lastbutton & 0x01) ? 0x00 : 0x80;
-							mac->m_adb_buffer[0] |= mouseX & 0x7f;
-							mac->m_adb_buffer[1] = mouseY & 0x7f;
-							mac->m_adb_datasize = 2;
+							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
+							m_adb_buffer[0] |= mouseX & 0x7f;
+							m_adb_buffer[1] = mouseY & 0x7f;
+							m_adb_datasize = 2;
 							break;
 
 						// get ID/handler
 						case 3:
-							mac->m_adb_buffer[0] = 0x60 | ((adb_mouseaddr<<8)&0xf);	// SRQ enable, no exceptional event
-							mac->m_adb_buffer[1] = 0x01;	// handler 1
-							mac->m_adb_datasize = 2;
+							m_adb_buffer[0] = 0x60 | ((m_adb_mouseaddr<<8)&0xf);	// SRQ enable, no exceptional event
+							m_adb_buffer[1] = 0x01;	// handler 1
+							m_adb_datasize = 2;
 
-							adb_mouse_initialized = 1;
+							m_adb_mouse_initialized = 1;
 							break;
 
 						default:
 							break;
 					}
 				}
-				else if (addr == adb_keybaddr)
+				else if (addr == m_adb_keybaddr)
 				{
 					#if LOG_ADB
 					printf("Talking to keyboard, register %x\n", reg);
@@ -1831,35 +1821,35 @@ static void mac_adb_talk(running_machine *machine)
 					{
 						// read keyboard
 						case 0:
-							if (mac->m_adb_srq_switch)
+							if (m_adb_srq_switch)
 							{
-								mac->m_adb_srq_switch = 0;
+								m_adb_srq_switch = 0;
 							}
 							else
 							{
-								mac_adb_pollkbd(machine, 1);
+								adb_pollkbd(machine, 1);
 							}
-//                          printf("keyboard = %02x %02x\n", adb_currentkeys[0], adb_currentkeys[1]);
-							mac->m_adb_buffer[0] = adb_currentkeys[1];
-							mac->m_adb_buffer[1] = adb_currentkeys[0];
-							mac->m_adb_datasize = 2;
+//                          printf("keyboard = %02x %02x\n", m_adb_currentkeys[0], m_adb_currentkeys[1]);
+							m_adb_buffer[0] = m_adb_currentkeys[1];
+							m_adb_buffer[1] = m_adb_currentkeys[0];
+							m_adb_datasize = 2;
 							break;
 
 						// read modifier keys
 						case 2:
-							mac_adb_pollkbd(machine, 1);
-							mac->m_adb_buffer[0] = adb_modifiers;	// nothing pressed
-							mac->m_adb_buffer[1] = 0;
-							mac->m_adb_datasize = 2;
+							adb_pollkbd(machine, 1);
+							m_adb_buffer[0] = m_adb_modifiers;	// nothing pressed
+							m_adb_buffer[1] = 0;
+							m_adb_datasize = 2;
 							break;
 
 						// get ID/handler
 						case 3:
-							mac->m_adb_buffer[0] = 0x60 | ((adb_keybaddr<<8)&0xf);	// SRQ enable, no exceptional event
-							mac->m_adb_buffer[1] = 0x01;	// handler 1
-							mac->m_adb_datasize = 2;
+							m_adb_buffer[0] = 0x60 | ((m_adb_keybaddr<<8)&0xf);	// SRQ enable, no exceptional event
+							m_adb_buffer[1] = 0x01;	// handler 1
+							m_adb_datasize = 2;
 
-							adb_keybinitialized = 1;
+							m_adb_keybinitialized = 1;
 							break;
 
 						default:
@@ -1871,38 +1861,38 @@ static void mac_adb_talk(running_machine *machine)
 					#if LOG_ADB
 					printf("ADB: talking to unconnected device\n");
 					#endif
-					mac->m_adb_buffer[0] = mac->m_adb_buffer[1] = 0;
-					mac->m_adb_datasize = 0;
+					m_adb_buffer[0] = m_adb_buffer[1] = 0;
+					m_adb_datasize = 0;
 				}
 				break;
 		}
 
-		mac->m_adb_waiting_cmd = 0;
+		m_adb_waiting_cmd = 0;
 	}
 	else
 	{
 		#if LOG_ADB
-		printf("Got LISTEN data %x for device %x reg %x\n", mac->m_adb_command, mac->m_adb_listenaddr, mac->m_adb_listenreg);
+		printf("Got LISTEN data %x for device %x reg %x\n", m_adb_command, m_adb_listenaddr, m_adb_listenreg);
 		#endif
 
-		if (mac->m_adb_listenaddr == adb_mouseaddr)
+		if (m_adb_listenaddr == m_adb_mouseaddr)
 		{
-			if ((mac->m_adb_listenreg == 3) && (mac->m_adb_command > 0) && (mac->m_adb_command < 16))
+			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
 				#if LOG_ADB
-				printf("MOUSE: moving to address %x\n", mac->m_adb_command);
+				printf("MOUSE: moving to address %x\n", m_adb_command);
 				#endif
-				adb_mouseaddr = mac->m_adb_command&0x0f;
+				m_adb_mouseaddr = m_adb_command&0x0f;
 			}
 		}
-		else if (mac->m_adb_listenaddr == adb_keybaddr)
+		else if (m_adb_listenaddr == m_adb_keybaddr)
 		{
-			if ((mac->m_adb_listenreg == 3) && (mac->m_adb_command > 0) && (mac->m_adb_command < 16))
+			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
 				#if LOG_ADB
-				printf("KEYBOARD: moving to address %x\n", mac->m_adb_command);
+				printf("KEYBOARD: moving to address %x\n", m_adb_command);
 				#endif
-				adb_keybaddr = mac->m_adb_command&0x0f;
+				m_adb_keybaddr = m_adb_command&0x0f;
 			}
 		}
 	}
@@ -1925,7 +1915,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 
 		if ((mac->m_adb_direction) && (ADB_IS_BITBANG))
 		{
-			mac_adb_talk(machine);
+			mac->adb_talk(machine);
 		}
 		else if (ADB_IS_EGRET)
 		{
@@ -2091,6 +2081,19 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
+static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, int extra)
+{
+	mac->m_adb_send = 0xaa;
+	mac->m_adb_buffer[4] = extra;
+	mac->m_adb_buffer[3] = type;
+	mac->m_adb_buffer[2] = flag;
+	mac->m_adb_buffer[1] = cmd;
+	mac->m_adb_state |= 1;
+	mac->m_adb_timer_ticks = 8;
+	mac->m_adb_datasize = 4;
+	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+}
+
 static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
 {
 	mac->m_adb_datasize = 4;
@@ -2239,6 +2242,14 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			mac_egret_response_std(mac, 1, 0, 0x0e);
 			break;
 
+		case 0x19: // set device list bitmap
+			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			printf("ADB: Egret set device list bitmap %02x%02x\n", mac->m_adb_buffer[2], mac->m_adb_buffer[3]);
+			#endif
+
+			mac_egret_response_std(mac, 1, 0, 0x19);
+			break;
+
 		case 0x1b: // set one-second interrupt
 			#if LOG_ADB || LOG_ADB_MCU_CMD 
 			if (mac->m_adb_buffer[2])
@@ -2344,18 +2355,37 @@ static void mac_egret_newaction(mac_state *mac, int state)
 							#if LOG_ADB || LOG_ADB_MCU_CMD 
 							printf("Egret: ADB Reset\n");
 							#endif
-							mac_egret_response_std(mac, 0, 0, 0);
+							mac_egret_response_adb(mac, 0, 0, 0, 0);
 							break;
 
 						case 1:		// flush
 							#if LOG_ADB || LOG_ADB_MCU_CMD 
-							printf("Egret: ADB Reset\n");
+							printf("Egret: ADB Flush\n");
 							#endif
-							mac_egret_response_std(mac, 1, 0, 0);
+							mac_egret_response_std(mac, 1, 1, 0);
 							break;
 
 						default:
-							printf("Egret: Unhandled ADB command %x\n", mac->m_adb_buffer[1]);
+							switch ((mac->m_adb_buffer[1]>>2)&3)
+							{
+								case 2:	// ADB listen
+									#if LOG_ADB || LOG_ADB_MCU_CMD 
+									printf("Egret: ADB listen to device %d\n", mac->m_adb_buffer[1]>>4);
+									#endif
+									mac_egret_response_adb(mac, 0, 2, 0, 0);
+									break;
+
+								case 3: // ADB talk
+									#if LOG_ADB || LOG_ADB_MCU_CMD 
+									printf("Egret: ADB talk to device %d\n", mac->m_adb_buffer[1]>>4);
+									#endif
+									mac_egret_response_adb(mac, 0, 2, 0, 0);
+									break;
+							}
+
+							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							printf("Egret: Unhandled ADB command %02x\n", mac->m_adb_buffer[1]);
+							#endif
 							mac->m_adb_datasize = 0;
 							break;
 
@@ -2478,15 +2508,15 @@ void mac_state::adb_vblank(running_machine *machine)
 {
 	if (m_adb_state == ADB_STATE_IDLE)
 	{
-		if (mac_adb_pollmouse(machine))
+		if (adb_pollmouse(machine))
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ
-			if (m_adb_last_talk == adb_mouseaddr)
+			if (m_adb_last_talk == m_adb_mouseaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
-				mac_adb_talk(machine);
+				adb_talk(machine);
 
 				m_adb_timer_ticks = 8;
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
@@ -2500,13 +2530,13 @@ void mac_state::adb_vblank(running_machine *machine)
 				m_adb_srq_switch = 1;
 			}
 		}
-		else if (mac_adb_pollkbd(machine, 0))
+		else if (adb_pollkbd(machine, 0))
 		{
-			if (m_adb_last_talk == adb_keybaddr)
+			if (m_adb_last_talk == m_adb_keybaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
-				mac_adb_talk(machine);
+				adb_talk(machine);
 
 				m_adb_timer_ticks = 8;
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
@@ -2545,15 +2575,15 @@ void mac_state::adb_reset(running_machine *machine)
 	m_adb_last_talk = -1;
 
 	// mouse
-	adb_mouseaddr = 3;
-	adb_lastmousex = adb_lastmousey = adb_lastbutton = 0;
-	adb_mouse_initialized = 0;
+	m_adb_mouseaddr = 3;
+	m_adb_lastmousex = m_adb_lastmousey = m_adb_lastbutton = 0;
+	m_adb_mouse_initialized = 0;
 
 	// keyboard
-	adb_keybaddr = 2;
-	adb_keybinitialized = 0;
-	adb_currentkeys[0] = adb_currentkeys[1] = 0x80;
-	adb_modifiers = 0;
+	m_adb_keybaddr = 2;
+	m_adb_keybinitialized = 0;
+	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0x80;
+	m_adb_modifiers = 0;
 	for (i=0; i<7; i++)
 	{
 		m_key_matrix[i] = 0;
@@ -3026,8 +3056,8 @@ void mac_state::machine_reset()
 	// stop 60.15 Hz timer
 	timer_adjust_oneshot(m_6015_timer, attotime_never, 0);
 
-	// start 60.15 Hz timer for IIci/IIsi (and eventually others)
-	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
+	// start 60.15 Hz timer for most systems
+	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
 	{
 		timer_adjust_periodic(m_6015_timer, ATTOTIME_IN_HZ(60.15), 0, ATTOTIME_IN_HZ(60.15));
 	}

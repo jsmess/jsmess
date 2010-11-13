@@ -324,6 +324,15 @@ VIDEO_START( macrbv )
 {
 }
 
+VIDEO_RESET(maceagle)
+{
+	mac_state *mac = machine->driver_data<mac_state>();
+
+	mac->m_rbv_montype = 32;
+	mac->m_rbv_palette[0xfe] = 0xffffff;
+	mac->m_rbv_palette[0xff] = 0;
+}
+
 VIDEO_RESET(macrbv)
 {
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -344,48 +353,36 @@ VIDEO_RESET(macrbv)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 
-	if (mac->m_model == MODEL_MAC_CLASSIC_II)
+	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
+	switch (mac->m_rbv_montype)
 	{
-		mac->m_rbv_montype = 32;
-		visarea.max_x = MAC_H_VIS-1;
-		visarea.max_y = MAC_V_VIS-1;
-	     	htotal = MAC_H_TOTAL;
-		vtotal = MAC_V_TOTAL;
-		framerate = 60.15;
-	}
-	else
-	{
-		mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
-		switch (mac->m_rbv_montype)
-		{
-			case 1:	// 15" portrait display
-				visarea.max_x = 640-1;
-				visarea.max_y = 870-1;
-			     	htotal = 832;
-				vtotal = 918;
-				framerate = 75.0;
-				break;
+		case 1:	// 15" portrait display
+			visarea.max_x = 640-1;
+			visarea.max_y = 870-1;
+		     	htotal = 832;
+			vtotal = 918;
+			framerate = 75.0;
+			break;
 
-			case 2: // 12" RGB
-				visarea.max_x = 512-1;
-				visarea.max_y = 384-1;
-			     	htotal = 640;
-				vtotal = 407;
-				framerate = 60.15;
-				break;
+		case 2: // 12" RGB
+			visarea.max_x = 512-1;
+			visarea.max_y = 384-1;
+		     	htotal = 640;
+			vtotal = 407;
+			framerate = 60.15;
+			break;
 
-			case 6: // 13" RGB
-			default:
-				visarea.max_x = 640-1;
-				visarea.max_y = 480-1;
-			     	htotal = 800;
-				vtotal = 525;
-				framerate = 59.94;
-				break;
-		}
+		case 6: // 13" RGB
+		default:
+			visarea.max_x = 640-1;
+			visarea.max_y = 480-1;
+		     	htotal = 800;
+			vtotal = 525;
+			framerate = 59.94;
+			break;
 	}
 
-//	printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
+//    	printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
 	machine->primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 }
 
@@ -432,12 +429,14 @@ VIDEO_UPDATE( macrbv )
 	UINT32 *scanline;
 	int x, y, hres, vres;
 	mac_state *mac = screen->machine->driver_data<mac_state>();
+	UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
 
 	switch (mac->m_rbv_montype)
 	{
 		case 32: // classic II built-in display
 			hres = MAC_H_VIS;
 			vres = MAC_V_VIS;
+			vram8 += 0x1f9a80;	// Classic II apparently doesn't use VRAM?
 			break;
 
 		case 1:	// 15" portrait display
@@ -461,7 +460,6 @@ VIDEO_UPDATE( macrbv )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram"));
 			UINT8 pixels;
 
 			for (y = 0; y < vres; y++)
@@ -486,7 +484,6 @@ VIDEO_UPDATE( macrbv )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
 			UINT8 pixels;
 
 			for (y = 0; y < vres; y++)
@@ -507,7 +504,6 @@ VIDEO_UPDATE( macrbv )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
 			UINT8 pixels;
 
 			for (y = 0; y < vres; y++)
@@ -527,7 +523,6 @@ VIDEO_UPDATE( macrbv )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
 			UINT8 pixels;
 			
 			for (y = 0; y < vres; y++)
@@ -578,21 +573,45 @@ VIDEO_UPDATE( macrbvvram )
 			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
 			UINT8 pixels;
 
-			for (y = 0; y < 480; y++)
-			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
-				for (x = 0; x < 640; x+=8)
-				{
-					pixels = vram8[(y * 80) + ((x/8)^3)];
 
-					*scanline++ = mac->m_rbv_palette[0xfe|(pixels>>7)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>6)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>5)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>4)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>3)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>2)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>1)&1)];
-					*scanline++ = mac->m_rbv_palette[0xfe|(pixels&1)];
+			if (mac->m_rbv_type == RBV_TYPE_SONORA)
+			{
+				for (y = 0; y < 480; y++)
+				{
+					scanline = BITMAP_ADDR32(bitmap, y, 0);
+					for (x = 0; x < 640; x+=8)
+					{
+						pixels = vram8[(y * 80) + ((x/8)^3)];
+
+						*scanline++ = mac->m_rbv_palette[0x7f|(pixels&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<1)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<2)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<3)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<4)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<5)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<6)&0x80)];
+						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<7)&0x80)];
+					}
+				}
+			}
+			else
+			{
+				for (y = 0; y < 480; y++)
+				{
+					scanline = BITMAP_ADDR32(bitmap, y, 0);
+					for (x = 0; x < 640; x+=8)
+					{
+						pixels = vram8[(y * 80) + ((x/8)^3)];
+
+						*scanline++ = mac->m_rbv_palette[0xfe|(pixels>>7)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>6)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>5)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>4)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>3)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>2)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|((pixels>>1)&1)];
+						*scanline++ = mac->m_rbv_palette[0xfe|(pixels&1)];
+					}
 				}
 			}
 		}

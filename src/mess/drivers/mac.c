@@ -121,6 +121,50 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 	}
 }
 
+WRITE32_MEMBER( mac_state::ariel_ramdac_w )	// this is for the "Ariel" style RAMDAC
+{
+	if (mem_mask == 0xff000000)
+	{
+		m_rbv_clutoffs = data>>24;
+		m_rbv_count = 0;
+	}
+	else if (mem_mask == 0x00ff0000)
+	{
+		m_rbv_colors[m_rbv_count++] = data>>16;
+
+		if (m_rbv_count == 3)
+		{
+			// for portrait display, force monochrome by using the blue channel
+			if (m_model != MODEL_MAC_CLASSIC_II)
+			{
+				// Color Classic has no MONTYPE so the safe read gets us 512x384, which is right
+				if (input_port_read_safe(space.machine, "MONTYPE", 2) == 1)
+				{
+					palette_set_color(space.machine, m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
+					m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
+					m_rbv_clutoffs++;
+					m_rbv_count = 0;
+				}
+				else
+				{
+					palette_set_color(space.machine, m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+					m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+					m_rbv_clutoffs++;
+					m_rbv_count = 0;
+				}
+			}
+		}
+	}
+	else if (mem_mask == 0x0000ff00)
+	{
+		// config reg
+//		printf("Ariel: %02x to config\n", (data>>8)&0xff);
+	}
+	else	// color key reg
+	{
+	}
+}
+
 READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 {
 	if (offset == 2)
@@ -133,6 +177,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 
 WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 {
+//	printf("Sonora: %02x to vctl %x\n", data, offset);
 	m_sonora_vctl[offset] = data;	
 }
 
@@ -154,15 +199,9 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 
 		if (offset == 0x10)
 		{
-			if (!m_rbv_immed10wr)
-			{
-				data &= ~0x38;
-				data |= (input_port_read_safe(space.machine, "MONTYPE", 2)<<3);
-			}
-			else
-			{
-				m_rbv_immed10wr = 0;
-			}
+			data &= ~0x38;
+			data |= (input_port_read_safe(space.machine, "MONTYPE", 2)<<3);
+//			printf("rbv_r montype: %02x (PC %x)\n", data, cpu_get_pc(space.cpu));
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
@@ -402,7 +441,7 @@ static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf12060, 0xf12063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
 	AM_RANGE(0xf14000, 0xf15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000) 
 	AM_RANGE(0xf16000, 0xf17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0xf24000, 0xf24003) AM_READWRITE(rbv_ramdac_r, rbv_ramdac_w)
+	AM_RANGE(0xf24000, 0xf24003) AM_READWRITE(rbv_ramdac_r, ariel_ramdac_w)
 	AM_RANGE(0xf26000, 0xf27fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff)	// VIA2 (V8)
 	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_BASE(m_rbv_vram)
 ADDRESS_MAP_END
@@ -412,9 +451,11 @@ static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000) 
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50024007) AM_WRITE( rbv_ramdac_w ) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE( ariel_ramdac_w ) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50028000, 0x50028003) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffff) AM_MIRROR(0x00f00000) 
 
@@ -742,6 +783,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(macv8)
+	MDRV_VIDEO_RESET(macrbv)
 	MDRV_VIDEO_UPDATE(macrbvvram)
 
 	MDRV_RAM_MODIFY("messram")
@@ -771,6 +813,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MDRV_CPU_VBLANK_INT("screen", mac_rbv_vbl)
 
 	MDRV_VIDEO_START(macsonora)
+	MDRV_VIDEO_RESET(macrbv)
 	MDRV_VIDEO_UPDATE(macrbvvram)
 
 	MDRV_RAM_MODIFY("messram")
@@ -850,7 +893,12 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MDRV_CPU_PROGRAM_MAP(maclc_map)
 
 	MDRV_VIDEO_START(macv8)
+	MDRV_VIDEO_RESET(maceagle)
 	MDRV_VIDEO_UPDATE(macrbv)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
+	MDRV_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 
 	MDRV_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, mac_asc_irq)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -874,7 +922,6 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MDRV_VIDEO_UPDATE(macrbv)
 
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
 	MDRV_SCREEN_SIZE(640, 870)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
@@ -897,7 +944,6 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MDRV_VIDEO_UPDATE(macrbv)
 
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
 	MDRV_SCREEN_SIZE(640, 870)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
@@ -925,6 +971,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(macsonora)
+	MDRV_VIDEO_RESET(macrbv)
 	MDRV_VIDEO_UPDATE(macrbv)
 
 	/* sound hardware */

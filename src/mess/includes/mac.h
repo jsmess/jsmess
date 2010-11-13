@@ -155,6 +155,7 @@ VIDEO_START( macsonora );
 VIDEO_UPDATE( macrbv );
 VIDEO_UPDATE( macrbvvram );
 VIDEO_RESET(macrbv);
+VIDEO_RESET(maceagle);
 
 void mac_set_screen_buffer( int buffer );
 
@@ -299,6 +300,7 @@ public:
 	void rtc_shift_data(int data);
 	void vblank_irq(running_machine *machine);
 	void rtc_incticks();
+	void adb_talk(running_machine *machine);
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -319,6 +321,7 @@ public:
 
 	DECLARE_READ32_MEMBER( rbv_ramdac_r );
 	DECLARE_WRITE32_MEMBER( rbv_ramdac_w );
+	DECLARE_WRITE32_MEMBER( ariel_ramdac_w );
 	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
 	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
 	DECLARE_READ8_MEMBER ( mac_rbv_r );
@@ -338,6 +341,18 @@ private:
 	void rtc_execute_cmd(int data);
 	void adb_reset(running_machine *machine);
 	void adb_vblank(running_machine *machine);
+	int adb_pollkbd(running_machine *machine, int update);
+	int adb_pollmouse(running_machine *machine);
+	void adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY );
+
+
+	// ADB mouse state
+	int m_adb_mouseaddr;
+	int m_adb_lastmousex, m_adb_lastmousey, m_adb_lastbutton, m_adb_mouse_initialized;
+
+	// ADB keyboard state
+	int m_adb_keybaddr;
+	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
 };
 
 #endif /* MAC_H_ */
