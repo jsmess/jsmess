@@ -5,7 +5,7 @@
  * TI99 and Geneve disk images
  * Sector Dump and Track Dump format
  *
- * used by TI-99/4, TI-99/4A, TI-99/8, TI-99/4P, and Geneve
+ * used by TI-99/4, TI-99/4A, TI-99/8, SGCPU ("TI-99/4P"), and Geneve
  *
  * The Sector Dump Format is also known as v9t9 (named after the first TI
  * emulator to use this format). It is a contiguous sequence of sector contents
@@ -63,10 +63,6 @@
  *
  * TODO: Link to imgtool. imgtool still uses its own format creation
  *
- * TODO: Test with diverse disks, inserted at the start and in the meantime
- *       Check delay
- *
- *
  * FIXME: If image is broken with good first track and defect higher tracks,
  *        tdf_guess_geometry fails to define a geometry. The guessing should
  *        always be done.
@@ -104,7 +100,7 @@ struct ti99dsk_tag
 	int heads;
 	int tracks;
 	int sectors;
-	int track_size;  /* Complete track; to be calculated */
+	int track_size;  // Complete track; to be calculated
 	int format;
 	int first_idam;
 	int dam_offset;
@@ -124,21 +120,6 @@ void ti99_set_80_track_drives(int use80)
 }
 
 #define TI99_DSK_TAG	"ti99dsktag"
-
-#if 0
-static void dump_contents(UINT8 *buffer, int length)
-{
-	for (int i=0; i < length; i+=16)
-	{
-		for (int j=0; j < 16; j+=2)
-		{
-			printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
-		}
-		printf("\n");
-	}
-}
-#endif
-
 #define TI99DSK_BLOCKNOTFOUND -1
 
 /*
@@ -174,8 +155,8 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
 */
 static int ti99_get_heads_per_disk(floppy_image *floppy)
 {
-/*  struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
-    return tag->heads; */
+//  struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
+//  return tag->heads;
 	return 2;
 }
 
@@ -187,8 +168,8 @@ static int ti99_get_tracks_per_disk(floppy_image *floppy)
 {
 	int drivetracks = 42;
 
-	/* This may fail on startup; therefore we use a special function in
-       99_dsk to explicitly set the geometry. */
+	// This may fail on startup; therefore we use a special function in
+	// in the floppy controller implementations to explicitly set the geometry.
 	if (use_80_track_drives)
 	{
 		drivetracks = 83;
@@ -296,17 +277,18 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	int totsecs;
 	typedef struct ti99_vib
 	{
-		char	name[10];		/* volume name (10 characters, pad with spaces) */
-		UINT8	totsecsMSB;		/* disk length in sectors (big-endian) (usually 360, 720 or 1440) */
+		char	name[10];		// volume name (10 characters, pad with spaces)
+		UINT8	totsecsMSB;		// disk length in sectors (big-endian) (usually 360, 720 or 1440)
 		UINT8	totsecsLSB;
-		UINT8	secspertrack;		/* sectors per track (usually 9 (FM) or 18 (MFM)) */
-		UINT8	id[3];			/* String "DSK" */
-		UINT8	protection;		/* 'P' if disk is protected, ' ' otherwise. */
-		UINT8	tracksperside;		/* tracks per side (usually 40) */
-		UINT8	sides;			/* sides (1 or 2) */
-		UINT8	density;		/* 0,1 (FM) or 2,3,4 (MFM) */
-		UINT8	res[36];		/* Empty for traditional disks, or up to 3 directory pointers */
-		UINT8	abm[200];		/* allocation bitmap: a 1 for each sector in use (sector 0 is LSBit of byte 0, sector 7 is MSBit of byte 0, sector 8 is LSBit of byte 1, etc.) */
+		UINT8	secspertrack;	// sectors per track (usually 9 (FM) or 18 (MFM))
+		UINT8	id[3];			// String "DSK"
+		UINT8	protection;		// 'P' if disk is protected, ' ' otherwise.
+		UINT8	tracksperside;	// tracks per side (usually 40)
+		UINT8	sides;			// sides (1 or 2)
+		UINT8	density;		// 0,1 (FM) or 2,3,4 (MFM)
+		UINT8	res[36];		// Empty for traditional disks, or up to 3 directory pointers
+		UINT8	abm[200];		// allocation bitmap: a 1 for each sector in use (sector 0 is LSBit of byte 0,
+								// sector 7 is MSBit of byte 0, sector 8 is LSBit of byte 1, etc.)
 	} ti99_vib;
 
 	ti99_vib vib;
@@ -323,25 +305,28 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 
 	file_size = (UINT32) size;
 
-	/* Read the Volume Information Block */
+	// Read the Volume Information Block
 	floppy_image_read(floppy, &vib, 0, sizeof(vib));
 
-	/* If we have read the sector successfully, let us parse it */
+	// If we have read the sector successfully, let us parse it
 	totsecs = (vib.totsecsMSB << 8) | vib.totsecsLSB;
 	geometry->secspertrack = vib.secspertrack;
 	if (geometry->secspertrack == 0)
-		/* Some images might be like this, because the original SSSD TI controller always assumes 9. */
+		// Some images might be like this, because the original SSSD
+		// TI controller always assumes 9.
 		geometry->secspertrack = 9;
 	geometry->tracksperside = vib.tracksperside;
 	if (geometry->tracksperside == 0)
-		/* Some images are like this, because the original SSSD TI controller always assumes 40. */
+		// Some images are like this, because the original SSSD TI controller
+		// always assumes 40.
 		geometry->tracksperside = 40;
 	geometry->sides = vib.sides;
 	if (geometry->sides == 0)
-		/* Some images are like this, because the original SSSD TI controller always assumes that tracks beyond 40 are on side 2. */
+		// Some images are like this, because the original SSSD TI controller
+		// always assumes that tracks beyond 40 are on side 2. */
 		geometry->sides = totsecs / (geometry->secspertrack * geometry->tracksperside);
 	geometry->density = vib.density;
-	/* check that the format makes sense */
+	// check that the format makes sense
 	if (((geometry->secspertrack * geometry->tracksperside * geometry->sides) == totsecs)
 		&& (geometry->density <= 4) && (totsecs >= 2) && (! memcmp(vib.id, "DSK", 3))
 		&& (file_size == totsecs*256))
@@ -351,14 +336,14 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	}
 	logerror("SDF/VIB not consistent; guessing format\n");
 
-	/* So that was not consistent. We guess the size from the file size
-       and assume that the VIB did not contain reliable data. For the
-       ambiguous case we choose the most common format.
-    */
+	// So that was not consistent. We guess the size from the file size
+	// and assume that the VIB did not contain reliable data. For the
+	// ambiguous case we choose the most common format.
+
 	switch (file_size)
 	{
 	case 1*40*9*256:
-		/* 90kbytes: SSSD */
+		// 90kbytes: SSSD
 	case 0:
 	/*default:*/
 		geometry->sides = 1;
@@ -368,9 +353,9 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 2*40*9*256:
-		/* 180kbytes: either DSSD or 18-sector-per-track SSDD.
-        We assume DSSD since DSSD is more common and is supported by
-        the original TI SD disk controller. */
+		// 180kbytes: either DSSD or 18-sector-per-track SSDD.
+		// We assume DSSD since DSSD is more common and is supported by
+		// the original TI SD disk controller.
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 9;
@@ -378,9 +363,9 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 1*40*16*256:
-		/* 160kbytes: 16-sector-per-track SSDD (standard format for TI
-        DD disk controller prototype, and the TI hexbus disk
-        controller?) */
+		// 160kbytes: 16-sector-per-track SSDD (standard format for TI
+		// DD disk controller prototype, and the TI hexbus disk
+		// controller?) */
 		geometry->sides = 1;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 16;
@@ -388,9 +373,9 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 2*40*16*256:
-		/* 320kbytes: 16-sector-per-track DSDD (standard format for TI
-        DD disk controller prototype, and TI hexbus disk
-        controller?) */
+		// 320kbytes: 16-sector-per-track DSDD (standard format for TI
+		// DD disk controller prototype, and TI hexbus disk
+		// controller?)
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 16;
@@ -398,9 +383,9 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 2*40*18*256:
-		/* 360kbytes: 18-sector-per-track DSDD (standard format for most
-        third-party DD disk controllers, but reportedly not supported by
-        the original TI DD disk controller prototype) */
+		//  360kbytes: 18-sector-per-track DSDD (standard format for most
+		// third-party DD disk controllers, but reportedly not supported by
+		// the original TI DD disk controller prototype)
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 18;
@@ -408,7 +393,7 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 2*80*18*256:
-		/* 720kbytes: 18-sector-per-track 80-track DSDD (Myarc only) */
+		// 720kbytes: 18-sector-per-track 80-track DSDD (Myarc only)
 		geometry->sides = 2;
 		geometry->tracksperside = 80;
 		geometry->secspertrack = 18;
@@ -416,7 +401,7 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	case 2*80*36*256:
-		/* 1.44Mbytes: DSHD (Myarc only) */
+		// 1.44Mbytes: DSHD (Myarc only)
 		geometry->sides = 2;
 		geometry->tracksperside = 80;
 		geometry->secspertrack = 36;
@@ -510,8 +495,8 @@ static floperr_t ti99_sdf_read_track(floppy_image *floppy, int head, int track, 
 	/* Determine from the image geometry whether we have FM or MFM */
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 
-	/* Do we have a 40 track disk in an 80 track drive? In that case we
-       double the "width" of the tracks. */
+	// Do we have a 40 track disk in an 80 track drive? In that case we
+	// double the "width" of the tracks. */
 	if (use_80_track_drives && tag->tracks<=40)
 	{
 		imgtrack = track / 2;
@@ -646,13 +631,12 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 	int imgtrack = track;
 
-	/* Find out if we are going to write an FM or MFM track. Caution: The
-    original TI controller is known to have a bug in the formatting
-    routine (using a MOVB instead of a MOV instruction when setting the
-    pointer to the track data), outputting false bytes at the
-    beginning of the track. So we don't rely on absolute positions
-    (neither does the controller).
-    */
+	// Find out if we are going to write an FM or MFM track. Note that the
+	// original TI controller is known to have a bug in the formatting
+	// routine (using a MOVB instead of a MOV instruction when setting the
+	// pointer to the track data), outputting false bytes at the
+	// beginning of the track. So we do not rely on absolute positions
+	// (and neither does the controller).
 	track_image = (UINT8*)buffer;
 
 	if (use_80_track_drives && tag->tracks<=40)
@@ -668,8 +652,8 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 
 	current_pos = find_block(track_image, 0, 100, 0x4e, leadin);
 
-	/* In case of defect formats, we continue as far as possible. This
-    may lead to sectors not being written. */
+	// In case of defect formats, we continue as far as possible. This
+	// may lead to sectors not being written. */
 	if (current_pos==TI99DSK_BLOCKNOTFOUND)
 	{
 		/* Not MFM, possibly FM image */
@@ -741,8 +725,8 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 			}
 			else
 			{
-				/* else the sector head data do not match the
-                current track and head. Ignore the sector. */
+				// else the sector head data do not match the
+				// current track and head. Ignore the sector.
 				logerror("Wrong track: wtrack=%d, imgtrack=%d, whead=%d, imghead=%d\n",wtrack,imgtrack, whead,head);
 			}
 		}
@@ -1125,10 +1109,10 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 	if (format==TI99_FM)
 	{
 //      printf("Trying FM\n");
-		/* We are seeking the lead-in and pre-id gap from
-        position 0 to position 50. This is just to make sure that
-        if there are bad bytes at the beginning (original TI controller)
-        we will skip them.*/
+		// We are seeking the lead-in and pre-id gap from
+		// position 0 to position 50. This is just to make sure that
+		// if there are bad bytes at the beginning (original TI controller)
+		// we will skip them.
 		current_pos = find_block(track, 0, 50, 0x00, 22);
 		if (current_pos==TI99DSK_BLOCKNOTFOUND)
 		{
@@ -1139,8 +1123,8 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 		{
 			current_pos += 22;
 			if (track[current_pos]==0xfe /* IDAM */ &&
-			    track[current_pos+4]==0x01 /* sector length, always 256 for TI */ &&
-		    	    track[current_pos+24]==0xfb) /* DAM */
+				track[current_pos+4]==0x01 /* sector length, always 256 for TI */ &&
+				track[current_pos+24]==0xfb) /* DAM */
 			{
 				/* We're pretty sure this is the beginning. */
 				*offset = current_pos;
@@ -1176,9 +1160,9 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 			{
 				current_pos += 10;
 				if (track[current_pos] == 0xa1 /* First sync */ &&
-				    track[current_pos+3] == 0xfe /* IDAM */ &&
-				    track[current_pos+44] == 0xa1 /* First sync */ &&
-				    track[current_pos+47] == 0xfb) /* DAM */
+					track[current_pos+3] == 0xfe /* IDAM */ &&
+					track[current_pos+44] == 0xa1 /* First sync */ &&
+					track[current_pos+47] == 0xfb) /* DAM */
 				{
 				/* We're pretty sure this is the beginning. */
 					*offset = current_pos + 3;
@@ -1246,8 +1230,8 @@ static floperr_t ti99_tdf_get_offset(floppy_image *floppy, int head, int imgtrac
 	if ((head < 0) || (head >= tag->heads) || (imgtrack < 0) || (imgtrack >= tag->tracks))
 		return FLOPPY_ERROR_SEEKERROR;
 
-	/* For head 0, tracks increase from 0 to tracks-1; then for head 1,
-       tracks also increase from 0 to tracks-1. */
+	// For head 0, tracks increase from 0 to tracks-1; then for head 1,
+	// tracks also increase from 0 to tracks-1. */
 	*offset = head * (tag->tracks * tag->track_size) +  imgtrack * tag->track_size;
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -1274,12 +1258,12 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
 
 	floppy_image_read(floppy, buffer, track_offset, buflen);
 
-	/* Rebuild the CRCs. PC99 did not store the CRC but put
-    F7F7 in its place.
-    The first CRC is at position IDAM + 5
-    The second CRC is at position IDAM + 0x119 (FM) or +0x12d (MFM)
-    All this is repeated for each sector in the track
-    */
+	// Rebuild the CRCs. PC99 did not store the CRC but put
+	// F7F7 in its place.
+	// The first CRC is at position IDAM + 5
+	// The second CRC is at position IDAM + 0x119 (FM) or +0x12d (MFM)
+	// All this is repeated for each sector in the track
+
 	if (determine_offset(tag->format, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
 		return FLOPPY_ERROR_SEEKERROR;
 
@@ -1289,9 +1273,8 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
 		byte = read_byte(tag->format, first_idam, track_data, i);
 		if (byte == TI99_IDAM)
 		{
-			/* Do we have a valid CRCs already? Then this image
-            already contains proper CRCs handling. Do not
-            recreate them. */
+			// Do we have a valid CRCs already? Then this image
+			// already contains proper CRCs handling. Do not recreate them.
 			if (track_data[i+5] != 0xf7 || track_data[i+6] != 0xf7)
 				return FLOPPY_ERROR_SUCCESS;
 
@@ -1349,9 +1332,9 @@ static floperr_t ti99_tdf_write_track(floppy_image *floppy, int head, int track,
 	if (err)
 		return err;
 
-	/* According to the TDF format, we don't need the CRC but replace it
-    with F7F7. For now we keep it and see whether PC99 can cope with
-    that. (Otherwise we would have to copy the const buffer). */
+	// According to the TDF format, we don't need the CRC but replace it
+	// with F7F7. For now we keep it and see whether PC99 can cope with
+	// that. (Otherwise we would have to copy the const buffer). */
 	floppy_image_write(floppy, buffer, offset + track_offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -1497,8 +1480,9 @@ static floperr_t ti99_tdf_write_sector(floppy_image *floppy, int head, int track
 
 	floppy_image_write(floppy, buffer, offset, SECTOR_SIZE);
 
-	/* Recalculate CRC */
-	crc = ccitt_crc16(0xffff, (UINT8*)buffer, SECTOR_SIZE);
+	// Recalculate CRC. We init the CRC with bf84 (DAM fb is
+	// already included; would be ffff without)
+	crc = ccitt_crc16(0xbf84, (UINT8*)buffer, SECTOR_SIZE);
 	crc_field[0] = (crc>>8) & 0xff;
 	crc_field[1] = (crc & 0xff);
 	floppy_image_write(floppy, crc_field, offset+SECTOR_SIZE, 2);
@@ -1597,8 +1581,9 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image *floppy, int head, i
 	/* Write the sector data at that position. */
 	floppy_image_write(floppy, buffer, offset, SECTOR_SIZE);
 
-	/* Recalculate CRC */
-	crc = ccitt_crc16(0xffff, (UINT8*)buffer, SECTOR_SIZE);
+	// Recalculate CRC. We init the CRC with bf84 (DAM fb is
+	// already included; would be ffff without)
+	crc = ccitt_crc16(0xbf84, (UINT8*)buffer, SECTOR_SIZE);
 	crc_field[0] = (crc>>8) & 0xff;
 	crc_field[1] = (crc & 0xff);
 	floppy_image_write(floppy, crc_field, offset+SECTOR_SIZE, 2);
@@ -1780,12 +1765,12 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		if (determine_offset(TI99_FM, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
 			logerror("IDAM not found. Unformatted disk.\n");
-			/* FM failed as well. Disk is not formatted. We assume
-               a format that fits into the space provided by the
-               file.
-               We only give a moderate vote in this case, so SDF
-               make take it.
-            */
+
+			// FM failed as well. Disk is not formatted. We assume
+			// a format that fits into the space provided by the file.
+			// We only give a moderate vote in this case, so SDF
+			// make take it.
+
 			free(track_data);
 			if (size < 130120 || size > 2078720)
 			{
@@ -1905,24 +1890,22 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	}
 	logerror("Determined %d sectors\n", idamcnt);
 
-	/* Now calculate the geometry
-       The track size, in theory, may change due to reformatting,
-       and it may also vary between tracks, but the TDF does not support
-       varying track lengths. So every track has the same length as track 0.
-       Also, we don't yet know whether the drive and the disk have the
-       same track count. For 80 track drives and 40 track disks, we need
-       double-stepping; this will be known as soon as the controller is
-       initialized; we need to check that in the access methods.
-    */
+	// Now calculate the geometry
+	// The track size, in theory, may change due to reformatting,
+	// and it may also vary between tracks, but the TDF does not support
+	// varying track lengths. So every track has the same length as track 0.
+	// Also, we don't yet know whether the drive and the disk have the
+	// same track count. For 80 track drives and 40 track disks, we need
+	// double-stepping; this will be known as soon as the controller is
+	// initialized; we need to check that in the access methods.
 
 	tracklength = idamcnt * totalseclen + trackadd;
 	/*offset = 0;*/
 
-	/* Read the last track. We assume that all tracks are properly
-       formatted; otherwise, the above calculations would already fail.
-       That is, the last track in the image tells us whether it is for
-       head 0 or for head 1.
-    */
+	// Read the last track. We assume that all tracks are properly
+	// formatted; otherwise, the above calculations would already fail.
+	// That is, the last track in the image tells us whether it is for
+	// head 0 or for head 1.
 
 	geometry->sides = 1;
 	floppy_image_read(floppy, track_data, size-tracklength, tracklength);
