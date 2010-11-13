@@ -665,7 +665,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macse, macplus )
 
 	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
+	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
