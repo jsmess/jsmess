@@ -1,4 +1,4 @@
-﻿0.141
+0.141
 
 New System Drivers Supported:
 -----------------------------
@@ -20,6 +20,8 @@ Skeleton drivers:
 - PHUNSY (Philipse Universal System)
 - Omnibyte OB68K1A
 
+
+
 System Driver Changes:
 ----------------------
 - [ABC80] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
@@ -27,6 +29,19 @@ System Driver Changes:
 - [ABC80] Added graphics PROMs. [Ola Andersson]
 
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
+
+- [SMS] Improved Light Phaser emulation and converted it to use timers 
+  that control when the beam will reach the aim area, to run the function
+  that checks if the pixel displayed is bright enough to activate the 
+  sensor. Details are written in source code. [Enik Land]
+
+- [SMS] Added an option to play SegaScope (3D-Glasses) games without a 
+  seizure: mount any game supporting 3-D in Master System I drivers, 
+  enter Driver Configuration menu and turn on SegaScope. At this point, 
+  a new option 'Binocular Hack' appears, which removes the flickering in 
+  one or both the lens screens (remember that you can enable lens views by 
+  selecting the Segascope views from the Video Options menu). The option 
+  is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
 
 
 

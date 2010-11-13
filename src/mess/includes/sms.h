@@ -71,9 +71,10 @@ DRIVER_INIT( smssdisp );
 DRIVER_INIT( gamegear );
 DRIVER_INIT( gamegeaj );
 
+VIDEO_START( sms1 );
+VIDEO_START( gamegear );
 VIDEO_UPDATE( sms1 );
 VIDEO_UPDATE( sms );
-VIDEO_START( gamegear );
 VIDEO_UPDATE( gamegear );
 
 #endif /* SMS_H_ */

@@ -43,9 +43,14 @@ struct _sms_driver_data {
 	UINT8 input_port0;
 	UINT8 input_port1;
 
-	bitmap_t         *tmp_bitmap;
-	bitmap_t         *prev_bitmap;
+	// for gamegear LCD persistence hack
+	bitmap_t *tmp_bitmap;
+	bitmap_t *prev_bitmap;
 
+	// for 3D glass binocular hack
+	bitmap_t *prevleft_bitmap;
+	bitmap_t *prevright_bitmap;
+	
 	/* Model identifiers */
 	UINT8 is_gamegear;
 	UINT8 is_region_japan;
@@ -1950,33 +1955,61 @@ static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
 			*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
 }
 
+VIDEO_START( sms1 )
+{
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
+	
+	sms_state.prevleft_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	sms_state.prevright_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	state_save_register_global_bitmap(machine, sms_state.prevleft_bitmap);
+	state_save_register_global_bitmap(machine, sms_state.prevright_bitmap);
+}
+
 VIDEO_UPDATE( sms1 )
 {
 	running_device *main_scr = screen->machine->device("screen");
 	running_device *left_lcd = screen->machine->device("left_lcd");
 	running_device *right_lcd = screen->machine->device("right_lcd");
 	running_device *smsvdp = screen->machine->device("sms_vdp");
-	UINT8 segascope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
+	UINT8 sscope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
+	UINT8 sscope_binocular_hack = input_port_read_safe(screen->machine, "SSCOPE_BINOCULAR", 0x00);
+	UINT8 occluded_view = 0;
 
-	if (screen == main_scr)
+	// without SuperScope, both LCDs for glasses go black
+	if ((screen != main_scr) && !sscope)
+		occluded_view = 1;
+
+	// with SuperScope, sscope_state 0 = left screen OFF, right screen ON
+	if (!(sms_state.sscope_state & 0x01) && (screen == left_lcd))
+		occluded_view = 1;
+
+	// with SuperScope, sscope_state 1 = left screen ON, right screen OFF
+	if ((sms_state.sscope_state & 0x01) && (screen == right_lcd))
+		occluded_view = 1;
+			
+	if (!occluded_view)
 	{
 		sms_vdp_update(smsvdp, bitmap, cliprect);
+
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// save a copy of current bitmap for the binocular hack
+		if (sscope && (screen == left_lcd) && (sscope_binocular_hack & 0x01))
+			copybitmap(sms_state.prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+		if (sscope && (screen == right_lcd) && (sscope_binocular_hack & 0x02))
+			copybitmap(sms_state.prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 	}
-	else if (screen == left_lcd)
+	else
 	{
-		/* We only need 2nd screen for SegaScope: if it's not selected return a black screen */
-		if (segascope && (sms_state.sscope_state & 0x01))
-			sms_vdp_update(smsvdp, bitmap, cliprect);	/* sscope_state 1 = left screen ON, right screen OFF */
-		else
-			sms_black_bitmap(screen, bitmap);			/* sscope_state 0 = left screen OFF, right screen ON */
-	}
-	else if (screen == right_lcd)
-	{
-		/* We only need 3rd screen for SegaScope: if it's not selected return a black screen */
-		if (!segascope || (sms_state.sscope_state & 0x01))
-			sms_black_bitmap(screen, bitmap);			/* sscope_state 1 = left screen ON, right screen OFF */
-		else                                
-			sms_vdp_update(smsvdp, bitmap, cliprect);	/* sscope_state 0 = left screen OFF, right screen ON */
+		sms_black_bitmap(screen, bitmap);
+
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// use the copied bitmap for the binocular hack
+		if (sscope && (screen == left_lcd) && (sscope_binocular_hack & 0x01))
+			copybitmap(bitmap, sms_state.prevleft_bitmap, 0, 0, 0, 0, cliprect);
+		if (sscope && (screen == right_lcd) && (sscope_binocular_hack & 0x02))
+			copybitmap(bitmap, sms_state.prevright_bitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	return 0;
@@ -1998,7 +2031,7 @@ VIDEO_START( gamegear )
 	
 	sms_state.prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	sms_state.tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state_save_register_global_bitmap(machine, sms_state.tmp_bitmap);
+	state_save_register_global_bitmap(machine, sms_state.prev_bitmap);
 }
 
 VIDEO_UPDATE( gamegear )
