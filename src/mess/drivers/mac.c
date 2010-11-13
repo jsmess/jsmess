@@ -631,7 +631,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
-	MDRV_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
+	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	/* devices */
 	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
-	MDRV_IWM_ADD("fdc", mac_iwm_interface)
+	MDRV_SWIM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
 
 	MDRV_SCC8530_ADD("scc", 7833600)
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	/* devices */
 	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
-	MDRV_IWM_ADD("fdc", mac_iwm_interface)
+	MDRV_SWIM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc", 7833600)
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	/* devices */
 	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
-	MDRV_IWM_ADD("fdc", mac_iwm_interface)
+	MDRV_SWIM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc", 7833600)
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	/* devices */
 	MDRV_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
-	MDRV_IWM_ADD("fdc", mac_iwm_interface)
+	MDRV_SWIM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc", 7833600)
