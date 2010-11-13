@@ -62,7 +62,7 @@ typedef enum
 {
 	APPLEFDC_APPLE2,	/* classic Apple II disk controller (pre-IWM) */
 	APPLEFDC_IWM,		/* Integrated Woz Machine */
-	APPLEFDC_SWIM		/* Steve Woz Integrated Machine (NYI) */
+	APPLEFDC_SWIM		/* Sander/Woz Integrated Machine */
 } applefdc_t;
 
 
@@ -308,10 +308,10 @@ static UINT8 applefdc_read_reg(running_device *device, int lines)
 			else
 			{
 				/*
-                 * Right now, this function assumes latch mode; which is always used for
-                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-                 * off
-                 */
+		                 * Right now, this function assumes latch mode; which is always used for
+		                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
+		                 * off
+		                 */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0x00)
@@ -361,10 +361,10 @@ static void applefdc_write_reg(running_device *device, UINT8 data)
 			else if (!iwm_enable2(device))
 			{
 				/*
-                 * Right now, this function assumes latch mode; which is always used for
-                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-                 * off
-                 */
+		                 * Right now, this function assumes latch mode; which is always used for
+		                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
+		                 * off
+		                 */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0)
@@ -534,7 +534,8 @@ READ8_DEVICE_HANDLER( applefdc_r )
 			break;
 
 		case APPLEFDC_SWIM:
-			fatalerror("NYI");
+			if ((offset & 1) == 0)
+				result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
 			break;
 	}
 	return result;
@@ -584,7 +585,8 @@ WRITE8_DEVICE_HANDLER( applefdc_w )
 			break;
 
 		case APPLEFDC_SWIM:
-			fatalerror("NYI");
+			if (offset & 1)
+				applefdc_write_reg(device, data);
 			break;
 	}
 }
