@@ -40,6 +40,9 @@ struct _sms_driver_data {
 	UINT8 input_port0;
 	UINT8 input_port1;
 
+	bitmap_t         *tmp_bitmap;
+	bitmap_t         *prev_bitmap;
+
 	/* Model identifiers */
 	UINT8 is_gamegear;
 	UINT8 is_region_japan;
@@ -1305,7 +1308,7 @@ DEVICE_START( sms_cart )
 	sms_state.current_cartridge = 0;
 
 	sms_state.bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
-	if (!sms_state.is_gamegear && ! sms_state.has_bios)
+	if (!sms_state.is_gamegear && !sms_state.has_bios)
 	{
 		sms_state.bios_port &= ~(IO_CARTRIDGE);
 		sms_state.bios_port |= IO_BIOS_ROM;
@@ -1780,6 +1783,17 @@ DRIVER_INIT( gamegeaj )
 
 
 /* This needs to be here to check if segascope has been enabled */
+static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
+{
+	const int width = screen->width();
+	const int height = screen->height();
+	int x, y;
+
+	for (y = 0; y < height; y++)
+		for (x = 0; x < width; x++)
+			*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+}
+
 VIDEO_UPDATE( sms1 )
 {
 	running_device *main_scr = screen->machine->device("screen");
@@ -1794,51 +1808,19 @@ VIDEO_UPDATE( sms1 )
 	}
 	else if (screen == left_lcd)
 	{
-		int width = screen->width();
-		int height = screen->height();
-		int x, y;
-
-		if (segascope)
-		{
-			if (sms_state.sscope_state & 0x01)  /* 1 = left screen ON, right screen OFF */
-				sms_vdp_update(smsvdp, bitmap, cliprect);
-			else                                /* 0 = left screen OFF, right screen ON */
-			{
-				for (y = 0; y < height; y++)
-					for (x = 0; x < width; x++)
-						*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
-			}
-		}
-		else	/* We only use the second screen for SegaScope, if it not selected return a black screen */
-		{
-			for (y = 0; y < height; y++)
-				for (x = 0; x < width; x++)
-					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
-		}
+		/* We only need 2nd screen for SegaScope: if it's not selected return a black screen */
+		if (segascope && (sms_state.sscope_state & 0x01))
+			sms_vdp_update(smsvdp, bitmap, cliprect);	/* sscope_state 1 = left screen ON, right screen OFF */
+		else
+			sms_black_bitmap(screen, bitmap);			/* sscope_state 0 = left screen OFF, right screen ON */
 	}
 	else if (screen == right_lcd)
 	{
-		int width = screen->width();
-		int height = screen->height();
-		int x, y;
-
-		if (segascope)
-		{
-			if (sms_state.sscope_state & 0x01)  /* 1 = left screen ON, right screen OFF */
-			{
-				for (y = 0; y < height; y++)
-					for (x = 0; x < width; x++)
-						*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
-			}
-			else                                /* 0 = left screen OFF, right screen ON */
-				sms_vdp_update(smsvdp, bitmap, cliprect);
-		}
-		else	/* We only use the third screen for SegaScope, if it not selected return a black screen */
-		{
-			for (y = 0; y < height; y++)
-				for (x = 0; x < width; x++)
-					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
-		}
+		/* We only need 3rd screen for SegaScope: if it's not selected return a black screen */
+		if (!segascope || (sms_state.sscope_state & 0x01))
+			sms_black_bitmap(screen, bitmap);			/* sscope_state 1 = left screen ON, right screen OFF */
+		else                                
+			sms_vdp_update(smsvdp, bitmap, cliprect);	/* sscope_state 0 = left screen OFF, right screen ON */
 	}
 
 	return 0;
@@ -1848,6 +1830,53 @@ VIDEO_UPDATE( sms )
 {
 	running_device *smsvdp = screen->machine->device("sms_vdp");
 	sms_vdp_update(smsvdp, bitmap, cliprect);
+
+	return 0;
+}
+
+VIDEO_START( gamegear )
+{
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
+	
+	sms_state.prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	sms_state.tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	state_save_register_global_bitmap(machine, sms_state.tmp_bitmap);
+}
+
+VIDEO_UPDATE( gamegear )
+{
+	running_device *smsvdp = screen->machine->device("sms_vdp");
+	int width = screen->width();
+	int height = screen->height();
+	int x, y;
+
+	sms_vdp_update(smsvdp, sms_state.tmp_bitmap, cliprect);
+
+	// HACK: fake LCD persistence effect 
+	// (it would be better to generalized this in the core, to be used for all LCD systems)
+	for (y = 0; y < height; y++)
+	{
+		UINT32 *line0 = BITMAP_ADDR32(sms_state.tmp_bitmap, y, 0);
+		UINT32 *line1 = BITMAP_ADDR32(sms_state.prev_bitmap, y, 0);
+		for (x = 0; x < width; x++)
+		{
+			UINT32 color0 = line0[x];
+			UINT32 color1 = line1[x];
+			UINT16 r0 = (color0 >> 16) & 0x000000ff;
+			UINT16 g0 = (color0 >>  8) & 0x000000ff;
+			UINT16 b0 = (color0 >>  0) & 0x000000ff;
+			UINT16 r1 = (color1 >> 16) & 0x000000ff;
+			UINT16 g1 = (color1 >>  8) & 0x000000ff;
+			UINT16 b1 = (color1 >>  0) & 0x000000ff;
+			UINT8 r = (UINT8)((r0 + r1) >> 1);
+			UINT8 g = (UINT8)((g0 + g1) >> 1);
+			UINT8 b = (UINT8)((b0 + b1) >> 1);
+			*BITMAP_ADDR32(bitmap, y, x) = (r << 16) | (g << 8) | b;
+		}
+	}
+	copybitmap(sms_state.prev_bitmap, sms_state.tmp_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

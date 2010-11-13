@@ -70,5 +70,7 @@ DRIVER_INIT( gamegeaj );
 
 VIDEO_UPDATE( sms1 );
 VIDEO_UPDATE( sms );
+VIDEO_START( gamegear );
+VIDEO_UPDATE( gamegear );
 
 #endif /* SMS_H_ */

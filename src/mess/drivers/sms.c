@@ -600,7 +600,8 @@ static MACHINE_CONFIG_START( gamegear, driver_device )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT(gamegear)
 
-	MDRV_VIDEO_UPDATE(sms)
+	MDRV_VIDEO_START(gamegear)
+	MDRV_VIDEO_UPDATE(gamegear)
 
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5378_intf)
 

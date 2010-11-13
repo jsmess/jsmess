@@ -116,9 +116,7 @@ struct _smsvdp_t
 	region_info            *VRAM;                    /* Pointer to VRAM */
 	region_info            *CRAM;                    /* Pointer to CRAM */
 	const UINT8      *sms_frame_timing;
-	bitmap_t         *prev_bitmap;
 	bitmap_t         *tmpbitmap;
-	int              prev_bitmap_saved;
 	UINT8            *collision_buffer;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
@@ -1444,41 +1442,7 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 UINT32 sms_vdp_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	screen_device *screen = screen_first(*device->machine);
-	int width = screen->width();
-	int height = screen->height();
-	int x, y;
-
-	if (IS_GAMEGEAR_VDP)
-	{
-		for (y = 0; y < height; y++)
-		{
-			UINT32 *line0 = BITMAP_ADDR32(smsvdp->tmpbitmap, y, 0);
-			UINT32 *line1 = BITMAP_ADDR32(smsvdp->prev_bitmap, y, 0);
-			for (x = 0; x < width; x++)
-			{
-				UINT32 color0 = line0[x];
-				UINT32 color1 = line1[x];
-				UINT16 r0 = (color0 >> 16) & 0x000000ff;
-				UINT16 g0 = (color0 >>  8) & 0x000000ff;
-				UINT16 b0 = (color0 >>  0) & 0x000000ff;
-				UINT16 r1 = (color1 >> 16) & 0x000000ff;
-				UINT16 g1 = (color1 >>  8) & 0x000000ff;
-				UINT16 b1 = (color1 >>  0) & 0x000000ff;
-				UINT8 r = (UINT8)((r0 + r1) >> 1);
-				UINT8 g = (UINT8)((g0 + g1) >> 1);
-				UINT8 b = (UINT8)((b0 + b1) >> 1);
-				*BITMAP_ADDR32(bitmap, y, x) = (r << 16) | (g << 8) | b;
-			}
-		}
-
-		copybitmap(smsvdp->prev_bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		copybitmap(bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
-	}
-
+	copybitmap(bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -1510,7 +1474,6 @@ static DEVICE_START( smsvdp )
 
 	/* Make temp bitmap for rendering */
 	smsvdp->tmpbitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
-	smsvdp->prev_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	smsvdp->smsvdp_display_timer = timer_alloc(device->machine, smsvdp_display_callback, smsvdp);
 	timer_adjust_periodic(smsvdp->smsvdp_display_timer, screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
@@ -1529,13 +1492,11 @@ static DEVICE_START( smsvdp )
 	state_save_register_device_item(device, 0, smsvdp->y_pixels);
 	state_save_register_device_item(device, 0, smsvdp->line_counter);
 	state_save_register_device_item(device, 0, smsvdp->hcounter);
-	state_save_register_device_item(device, 0, smsvdp->prev_bitmap_saved);
 	state_save_register_device_item_array(device, 0, smsvdp->reg);
 	state_save_register_device_item_array(device, 0, smsvdp->current_palette);
 	state_save_register_device_item_pointer(device, 0, smsvdp->line_buffer, 256 * 5);
 	state_save_register_device_item_pointer(device, 0, smsvdp->collision_buffer, SMS_X_PIXELS);
 	state_save_register_device_item_bitmap(device, 0, smsvdp->tmpbitmap);
-	state_save_register_device_item_bitmap(device, 0, smsvdp->prev_bitmap);
 }
 
 static DEVICE_RESET( smsvdp )
@@ -1561,7 +1522,6 @@ static DEVICE_RESET( smsvdp )
 	smsvdp->buffer = 0;
 	smsvdp->irq_state = 0;
 	smsvdp->line_counter = 0;
-	smsvdp->prev_bitmap_saved = 0;
 
 	/* for light gun input with "Hang-On & Safari Hunt", hcounter seems to
      need initialization to some value */
