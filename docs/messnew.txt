@@ -24,6 +24,8 @@ System Driver Changes:
 ----------------------
 - [ABC80] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
+- [ABC80] Added graphics PROMs. [Ola Andersson]
+
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
 
 
