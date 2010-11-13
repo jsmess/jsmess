@@ -19,6 +19,9 @@
 
 #define MAX_CARTRIDGES        16
 
+#define LGUN_RADIUS           6
+#define LGUN_X_INTERVAL       4
+
 typedef struct _sms_driver_data sms_driver_data;
 struct _sms_driver_data {
 	UINT8 bios_page_count;
@@ -74,7 +77,10 @@ struct _sms_driver_data {
 	UINT8 sports_pad_2_y;
 
 	/* Data needed for Light Phaser */
-	UINT16 lphaser_latch;
+	emu_timer *lphaser_1_timer;
+	emu_timer *lphaser_2_timer;
+	UINT8 lphaser_1_latch;
+	UINT8 lphaser_2_latch;
 	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
 
 	/* Data needed for SegaScope (3D glasses) */
@@ -161,33 +167,101 @@ static WRITE8_HANDLER( sms_input_write )
 	}
 }
 
-static TIMER_CALLBACK( lightgun_tick )
+/* FIXME: this function is a hack for Light Phaser emulation. Theoretically
+   sms_vdp_hcount_latch() should be used instead, but it returns incorrect
+   position for unknown reason (timing?) */
+static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos )
 {
-	/* is there a Light Phaser in P1 port? */
-	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f) == 0x01)
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
-	else
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);  /* disable crosshair */
-
-	/* is there a Light Phaser in P2 port? */
-	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
-	else
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);  /* disable crosshair */
+ 	running_device *smsvdp = machine->device("sms_vdp");
+	int hpos_tmp = hpos + sms_state.lphaser_x_offs;
+	UINT8 tmp = ((hpos_tmp - 46) >> 1) & 0xff;
+	
+	//printf ("sms_vdp_hcount_lphaser: hpos %3d hpos_tmp %3d => hcount %2X\n", hpos, hpos_tmp, tmp);
+ 	sms_vdp_hcount_latch_w(smsvdp, 0, tmp);
 }
 
 
-/* FIXME: this function is a hack. For Light Phaser X pos sms_vdp_hcount_latch
- function should be used instead, but emulation (timming?) needs to improve. */
-static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
+/*
+    Light Phaser (light gun) emulation notes:
+    - The sensor is activated based on color brightness of some individual
+      pixels being drawn by the beam, at circular area where the gun is aiming.
+    - Currently, brightness is calculated based only on single pixels.
+    - In general, after the trigger is pressed, games draw the next frame using
+      a light color pattern, to make sure sensor will be activated. If emulation
+      skips that frame, sensor may stay deactivated. Frameskip set to 0 (no skip) is
+      recommended to avoid problems.
+    - When sensor switches from off to on, a value is latched for HCount register
+      and a flag is set. The emulation uses the flag to avoid sequential latches and
+      to signal that TH line is activated when the status of the input port is read.
+      When the status is read, the flag is cleared, or else it is cleared later when
+      the Pause status is read (end of a frame). This is necessary because the
+      "Color & Switch Test" ROM only reads the TH bit after the VINT line.
+    - The gun test of "Color & Switch Test" is an example that requires checks
+      of sensor status independent of other events, like trigger press or TH bit
+      reads. Another example is the title screen of "Hang-On & Safari Hunt", where
+      the game only reads HCount register in a loop, expecting a latch by the gun.
+    - The whole procedure is managed by a timer callback, that always reschedule
+      itself to run in some intervals when the beam is at the circular area.
+*/
+static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int lgun_x, int lgun_y )
 {
-	UINT8 tmp = ((hpos - 46) >> 1) & 0xff;
+	const int r_x_r = LGUN_RADIUS * LGUN_RADIUS;
 	running_device *smsvdp = machine->device("sms_vdp");
+	screen_device *screen = screen_first(*machine);
+	const rectangle &visarea = screen->visible_area();
+	int beam_x = screen->hpos();
+	int beam_y = screen->vpos();
+	int dx, dy;
+	int result = 0;
+	int pos_changed = 0;
+	double dx_circ;
 
-	//printf ("sms_vdp_hcount_lphaser: hpos %3d => hcount %2X\n", hpos, tmp);
-	sms_vdp_hcount_latch_w(smsvdp, 0, tmp);
+    while (1)
+	{
+		dy = abs(beam_y - lgun_y);
+
+		if (dy > LGUN_RADIUS || beam_y < visarea.min_y || beam_y > visarea.max_y)
+		{
+			beam_y = lgun_y - LGUN_RADIUS;
+			if (beam_y < visarea.min_y)
+				beam_y = visarea.min_y;
+			dy = abs(beam_y - lgun_y);
+			pos_changed = 1;
+		}
+		/* step 1: r^2 = dx^2 + dy^2 */
+		/* step 2: dx^2 = r^2 - dy^2 */
+		/* step 3: dx = sqrt(r^2 - dy^2) */
+		dx_circ = ceil(sqrt(r_x_r - (dy * dy)));
+		dx = abs(beam_x - lgun_x);
+
+		if (dx > dx_circ || beam_x < visarea.min_x || beam_x > visarea.max_x)
+		{
+			if (beam_x > lgun_x)
+			{
+				beam_x = 0;
+				beam_y++;
+				continue;
+			}
+			beam_x = lgun_x - dx_circ;
+			if (beam_x < visarea.min_x)
+				beam_x = visarea.min_x;
+			pos_changed = 1;
+		}
+
+		if (!pos_changed)
+		{
+			result = sms_vdp_check_brightness(smsvdp, beam_x, beam_y);
+			/* next check at same line */
+			beam_x += LGUN_X_INTERVAL;
+			pos_changed = 1;
+		}
+		else
+			break;
+	}
+	timer_adjust_oneshot(timer, screen_first(*machine)->time_until_pos(beam_y, beam_x), 0);
+
+	return result;
 }
-
 
 static UINT8 sms_vdp_hcount( running_machine *machine )
 {
@@ -244,27 +318,101 @@ static UINT16 screen_vpos_nonscaled( screen_device *screen, int scaled_vpos )
 }
 
 
-static int lphaser_sensor_is_on( running_machine *machine, const char *tag_x, const char *tag_y )
+static void lphaser1_sensor_check( running_machine *machine )
 {
-	int x = screen_hpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_x));
-	int y = screen_vpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_y));
+	const int x = screen_hpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER0"));
+	const int y = screen_vpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER1"));
 
-	if (sms_vdp_area_brightness(machine->device("sms_vdp"), x, y, 60, 5) >= 0x7f)
+	if (lgun_bright_aim_area(machine, sms_state.lphaser_1_timer, x, y))
 	{
-		/* avoid latching hcount more than once in a line */
-		if (sms_state.lphaser_latch == 0)
+		if (sms_state.lphaser_1_latch == 0)
 		{
-			sms_state.lphaser_latch = 1;
-			//sms_vdp_hcount_latch(machine);
-			/* FIXME: sms_vdp_hcount_lphaser() is a hack necessary while normal latch gives too inconstant shot positions */
-			x += sms_state.lphaser_x_offs;
+			sms_state.lphaser_1_latch = 1;
 			sms_vdp_hcount_lphaser(machine, x);
 		}
-		return 1;
 	}
+}
 
-	sms_state.lphaser_latch = 0;
-	return 0;
+static void lphaser2_sensor_check( running_machine *machine )
+{
+	const int x = screen_hpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER2"));
+	const int y = screen_vpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER3"));
+	
+	if (lgun_bright_aim_area(machine, sms_state.lphaser_2_timer, x, y))
+	{
+		if (sms_state.lphaser_2_latch == 0)
+		{
+			sms_state.lphaser_2_latch = 1;
+			sms_vdp_hcount_lphaser(machine, x);
+		}
+	}
+}
+
+
+// at each frame we check if lightguns are enabled in one of the ports:
+// if so, we turn on crosshair and the lightgun timer
+static TIMER_CALLBACK( lightgun_tick )
+{
+	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f) == 0x01)
+	{
+		/* enable crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+		if (!timer_enabled(sms_state.lphaser_1_timer))
+			lphaser1_sensor_check(machine);
+	}
+	else
+	{
+		/* disable crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+		timer_enable(sms_state.lphaser_1_timer, 0);
+	}
+	
+	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
+	{
+		/* enable crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
+		if (!timer_enabled(sms_state.lphaser_2_timer))
+			lphaser2_sensor_check(machine);
+	}
+	else
+	{
+		/* disable crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
+		timer_enable(sms_state.lphaser_2_timer, 0);
+	}
+}
+
+
+static TIMER_CALLBACK( lphaser_1_callback )
+{
+	lphaser1_sensor_check(machine);
+}
+
+
+static TIMER_CALLBACK( lphaser_2_callback )
+{
+	lphaser2_sensor_check(machine);
+}
+
+
+INPUT_CHANGED( lgun1_changed )
+{
+	if (!sms_state.lphaser_1_timer ||
+		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0x0f) != 0x01)
+		return;
+	
+	if (newval != oldval)
+		lphaser1_sensor_check(field->port->machine);
+}
+
+INPUT_CHANGED( lgun2_changed )
+{
+	if (!sms_state.lphaser_2_timer ||
+		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0xf0) != 0x10)
+		return;
+	
+	if (newval != oldval)
+		lphaser2_sensor_check(field->port->machine);
 }
 
 
@@ -494,6 +642,10 @@ void sms_pause_callback( running_machine *machine )
 	{
 		sms_state.paused = 0;
 	}
+
+	/* clear Light Phaser latch flags for next frame */
+	sms_state.lphaser_1_latch = 0;
+	sms_state.lphaser_2_latch = 0;
 }
 
 READ8_HANDLER( sms_input_port_0_r )
@@ -532,17 +684,16 @@ READ8_HANDLER( sms_input_port_1_r )
 	}
 	else
 	{
-		if (sms_state.ctrl_reg & 0x02
-		    && (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0x0f) == 0x01
-		    && lphaser_sensor_is_on(space->machine, "LPHASER0", "LPHASER1"))
+		if (sms_state.ctrl_reg & 0x02 && sms_state.lphaser_1_latch)
 		{
 			sms_state.input_port1 &= ~0x40;
+			sms_state.lphaser_1_latch = 0;
 		}
-		if (sms_state.ctrl_reg & 0x08
-		    && (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0xf0) == 0x10
-		    && lphaser_sensor_is_on(space->machine, "LPHASER2", "LPHASER3"))
+			
+		if (sms_state.ctrl_reg & 0x08 && sms_state.lphaser_2_latch)
 		{
 			sms_state.input_port1 &= ~0x80;
+			sms_state.lphaser_2_latch = 0;
 		}
 	}
 
@@ -1585,6 +1736,10 @@ MACHINE_START( sms )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
 	sms_state.rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
 	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
+
+	sms_state.lphaser_1_timer = timer_alloc(machine, lphaser_1_callback , NULL);
+	sms_state.lphaser_2_timer = timer_alloc(machine, lphaser_2_callback , NULL);
+
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 }
@@ -1646,7 +1801,8 @@ MACHINE_RESET( sms )
 	sms_state.sports_pad_2_x = 0;
 	sms_state.sports_pad_2_y = 0;
 
-	sms_state.lphaser_latch = 0;
+	sms_state.lphaser_1_latch = 0;
+	sms_state.lphaser_2_latch = 0;
 
 	sms_state.sscope_state = 0;
 

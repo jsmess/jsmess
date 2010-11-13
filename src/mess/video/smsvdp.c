@@ -1341,54 +1341,25 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 }
 
 
-static UINT8 color_brightness(rgb_t color)
+// This is only used by Light Phaser. Should it be moved elsewhere?
+int sms_vdp_check_brightness(running_device *device, int x, int y)
 {
+	/* brightness of the lightgray color in the frame drawn by Light Phaser games */
+	const UINT8 sensor_min_brightness = 0x7f;
+
+	/* TODO: Check how Light Phaser behaves for border areas. For Gangster Town, should */
+	/* a shot at right border (HC~=0x90) really appear at active scr, near to left border? */
+	if (x < LBORDER_START + LBORDER_X_PIXELS || x >= LBORDER_START + LBORDER_X_PIXELS + 256)
+		return 0;
+	
+	smsvdp_t *smsvdp = get_safe_token(device);
+	rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x); 
+
 	/* reference: http://www.w3.org/TR/AERT#color-contrast */
 	UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
-	//printf ("color brightness: %2X\n", brightness);
-	return brightness;
-}
+	//printf ("color brightness: %2X for x %d y %d\n", brightness, x, y);
 
-
-UINT8 sms_vdp_area_brightness(running_device *device, int x, int y, int x_range, int y_range)
-{
-	int beam_x, beam_y;
-	int dx, dy;
-	int vint_line;
-	smsvdp_t *smsvdp;
-
-	if (x < LBORDER_START + LBORDER_X_PIXELS || x >= LBORDER_START + LBORDER_X_PIXELS + 256)
-	{
-		return 0x00;
-	}
-
-	smsvdp = get_safe_token(device);
-
-	beam_x = device->machine->primary_screen->hpos();
-	beam_y = device->machine->primary_screen->vpos();
-	dx = x - beam_x;
-	dy = y - beam_y;
-
-	if (abs(dy) <= y_range && abs(dx) <= x_range)
-	{
-		rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, beam_y, beam_x);
-		return color_brightness(color);
-	}
-
-	/* Color & Switch Test ROM check TH after the line where VINT    */
-	/* occurs (237 for NTSC/192 mode). Until details are not figured */
-	/* out, calculate VINT line and use it for this special case.    */
-	vint_line = smsvdp->sms_frame_timing[VERTICAL_BLANKING] + smsvdp->sms_frame_timing[TOP_BLANKING]
-	          + smsvdp->sms_frame_timing[TOP_BORDER] + smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V]
-	          + 1;
-
-	if (beam_y == vint_line + 1 && abs(dx) <= x_range)
-	{
-		rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x);
-		return color_brightness(color);
-	}
-
-	return 0x00;
+	return (brightness >= sensor_min_brightness) ? 1 : 0;
 }
 
 
