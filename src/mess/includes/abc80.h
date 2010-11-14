@@ -10,17 +10,11 @@
 #define ABC80_XTAL		11980800.0
 
 #define ABC80_HTOTAL	384
-#define ABC80_HBEND		0
-#define ABC80_HBSTART	312
+#define ABC80_HBEND		35
+#define ABC80_HBSTART	384
 #define ABC80_VTOTAL	312
-#define ABC80_VBEND		0
-#define ABC80_VBSTART	287
-
-#define ABC80_HDSTART	36 // unverified
-#define ABC80_VDSTART	23 // unverified
-
-#define ABC80_MODE_TEXT	0x07
-#define ABC80_MODE_GFX	0x17
+#define ABC80_VBEND		15
+#define ABC80_VBSTART	312
 
 #define ABC80_K5_HSYNC			0x01
 #define ABC80_K5_DH				0x02
@@ -30,7 +24,7 @@
 #define ABC80_K2_VSYNC			0x01
 #define ABC80_K2_DV				0x02
 #define ABC80_K2_FRAME_END		0x04
-#define ABC80_K2_FRAME_START	0x08
+#define ABC80_K2_FRAME_RESET	0x08
 
 #define ABC80_J3_BLANK			0x01
 #define ABC80_J3_TEXT			0x02
@@ -81,29 +75,27 @@ public:
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
-	/* keyboard state */
+	// keyboard state
 	int m_key_data;
 	int m_key_strobe;
 	int m_pio_astb;
 
-	/* video state */
+	// video state
 	UINT8 *m_video_ram;
 	UINT8 *m_video_80_ram;
-	tilemap_t *m_tx_tilemap;
+	UINT8 m_latch;
 	int m_blink;
-	int m_char_bank;
-	int m_char_row;
 
-	/* memory regions */
-	const UINT8 *m_char_rom;		/* character generator ROM */
-	const UINT8 *m_hsync_prom;	/* horizontal sync PROM */
-	const UINT8 *m_vsync_prom;	/* horizontal sync PROM */
-	const UINT8 *m_line_prom;		/* line address PROM */
-	const UINT8 *m_attr_prom;		/* character attribute PROM */
+	// memory regions
+	const UINT8 *m_char_rom;		// character generator ROM
+	const UINT8 *m_hsync_prom;		// horizontal sync PROM
+	const UINT8 *m_vsync_prom;		// horizontal sync PROM
+	const UINT8 *m_line_prom;		// line address PROM
+	const UINT8 *m_attr_prom;		// character attribute PROM
 };
 
-/*----------- defined in video/abc80.c -----------*/
+//----------- defined in video/abc80.c -----------
 
 MACHINE_CONFIG_EXTERN( abc80_video );
 
-#endif /* ABC80_H_ */
+#endif

@@ -501,16 +501,6 @@ static const sn76477_interface csg_intf =
 
 
 //-------------------------------------------------
-//  INTERRUPT_GEN( abc80_nmi_interrupt )
-//-------------------------------------------------
-
-static INTERRUPT_GEN( abc80_nmi_interrupt )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
-//-------------------------------------------------
 //  Z80PIO_INTERFACE( pio_intf )
 //-------------------------------------------------
 
@@ -713,7 +703,6 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MDRV_CPU_PROGRAM_MAP(abc80_mem)
 	MDRV_CPU_IO_MAP(abc80_io)
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, abc80_nmi_interrupt)
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(abc80_video)
