@@ -13,6 +13,13 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_version.h>
 
+#ifdef SDLMAME_UNIX
+#ifndef SDLMAME_MACOSX
+#include <SDL_ttf.h>
+#include <fontconfig/fontconfig.h>
+#endif
+#endif
+
 // standard includes
 #ifdef MESS
 #include <unistd.h>
@@ -280,6 +287,16 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
+	#ifdef SDLMAME_UNIX
+	#ifndef SDLMAME_MACOSX
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf failed: %s\n", TTF_GetError());
+	}
+	FcInit();
+	#endif
+	#endif
+
 	#ifdef SDLMAME_OS2
 	MorphToPM();
 	#endif
@@ -317,6 +334,13 @@ int main(int argc, char *argv[])
 
 	// already called...
 	//SDL_Quit();
+
+	#ifdef SDLMAME_UNIX
+	#ifndef SDLMAME_MACOSX
+	TTF_Quit();
+	FcFini();
+	#endif
+	#endif
 
 	exit(res);
 
@@ -596,3 +620,285 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
+
+#ifdef SDLMAME_UNIX
+#ifdef SDLMAME_MACOSX
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	return (osd_font)NULL;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	return (bitmap_t *)NULL;
+}
+#else
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	TTF_Font *font = (TTF_Font *)NULL;
+	int style = 0;
+	FcConfig *config;
+	FcPattern *pat;
+	FcObjectSet *os;
+	FcFontSet *fontset;
+	FcValue val;
+	bool bakedstyles = false;
+
+	// accept qualifiers from the name
+	astring name(_name);
+
+	if (name == "default")
+	{
+		name = "Liberation Sans";
+	}
+
+	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
+	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
+	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
+	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
+
+	// first up, try it as a filename
+	font = TTF_OpenFont(name.cstr(), 120);
+
+	// if that didn't work, crank up the FontConfig database
+	if (!font)
+	{
+		config = FcConfigGetCurrent();
+		pat = FcPatternCreate();
+		os = FcObjectSetCreate();
+		FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr()); 
+
+		// try and get a font with the requested styles baked-in
+		if (bold)
+		{
+			if (italic)
+			{
+				FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold Italic");
+			}
+			else
+			{
+				FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold");
+			}
+		}
+		else if (italic)
+		{
+			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Italic");
+		}
+		else
+		{
+			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
+		}
+
+		FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
+
+		FcObjectSetAdd(os, FC_FILE);
+		fontset = FcFontList(config, pat, os);
+
+		for (int i = 0; i < fontset->nfont; i++)
+		{
+			if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
+			{
+				continue;
+			}
+
+			if (val.type != FcTypeString)
+			{
+				continue;
+			}
+
+			mame_printf_verbose("Matching font: %s\n", val.u.s);
+			font = TTF_OpenFont((const char*)val.u.s, 120);
+
+			if (font)
+			{
+				bakedstyles = true;
+				break;
+			}
+		}	
+
+		// didn't get a font above?  try again with no baked-in styles
+		if (!font)
+		{
+			FcPatternDestroy(pat);
+			FcFontSetDestroy(fontset);
+
+			pat = FcPatternCreate();
+			FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr()); 
+			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
+			FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
+			fontset = FcFontList(config, pat, os);
+
+			for (int i = 0; i < fontset->nfont; i++)
+			{
+				if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
+				{
+					continue;
+				}
+
+				if (val.type != FcTypeString)
+				{
+					continue;
+				}
+
+				mame_printf_verbose("Matching unstyled font: %s\n", val.u.s);
+				font = TTF_OpenFont((const char*)val.u.s, 120);
+
+				if (font)
+				{
+					break;
+				}
+			}
+		}
+
+		FcPatternDestroy(pat);
+		FcObjectSetDestroy(os);
+		FcFontSetDestroy(fontset);
+	}
+
+	if (!font)
+	{
+		printf("WARNING: Couldn't find/open TrueType font %s, using MAME default\n", name.cstr());
+		return NULL;
+	}
+
+	// apply styles
+	if (!bakedstyles)
+	{
+		style |= bold ? TTF_STYLE_BOLD : 0;
+		style |= italic ? TTF_STYLE_ITALIC : 0;
+	}
+	style |= underline ? TTF_STYLE_UNDERLINE : 0;
+	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
+	TTF_SetFontStyle(font, style);
+
+	height = TTF_FontLineSkip(font);
+
+	return (osd_font)font;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+	TTF_Font *ttffont;
+
+	ttffont = (TTF_Font *)font;
+
+	TTF_CloseFont(ttffont);
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	TTF_Font *ttffont;
+	bitmap_t *bitmap = (bitmap_t *)NULL;
+	SDL_Surface *drawsurf;
+	SDL_Color fcol = { 0xff, 0xff, 0xff };
+	char ustr[16];
+
+	ttffont = (TTF_Font *)font;
+	
+	memset(ustr, 0, sizeof(ustr));
+	utf8_from_uchar(ustr, 1, chnum);
+	drawsurf = TTF_RenderUTF8_Solid(ttffont, ustr, fcol);
+
+	// was nothing returned?
+	if (drawsurf)
+	{
+		// allocate a MAME destination bitmap
+		bitmap = auto_alloc(&machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
+
+		// copy the rendered character image into it
+		for (int y = 0; y < bitmap->height; y++)
+		{
+			UINT32 *dstrow = BITMAP_ADDR32(bitmap, y, 0);
+			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
+		
+			srcrow += (y * drawsurf->pitch);
+
+			for (int x = 0; x < drawsurf->w; x++)
+			{
+				dstrow[x] = srcrow[x] ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+			}
+		}
+
+		// what are these?
+		xoffs = yoffs = 0;
+		width = drawsurf->w;
+
+		SDL_FreeSurface(drawsurf);
+	}
+
+	return bitmap;
+}
+#endif	// not OSX
+#else	// not UNIX
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	return (osd_font)NULL;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	return (bitmap_t *)NULL;
+}
+#endif
