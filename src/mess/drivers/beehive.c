@@ -6,18 +6,24 @@
 
     This is a conventional computer terminal using a serial link.
 
+    The character gen rom is not dumped. Using the one from 'c10'
+    for the moment.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+static const UINT8 *FNT;
+static const UINT8 *videoram;
+
 static ADDRESS_MAP_START(beehive_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
-	AM_RANGE( 0x1800, 0xffff ) AM_RAM
+	AM_RANGE( 0x1800, 0xffff ) AM_RAM AM_REGION("maincpu", 0x1800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( beehive_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( beehive_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -32,11 +38,60 @@ static MACHINE_RESET(beehive)
 
 static VIDEO_START( beehive )
 {
+	FNT = memory_region(machine, "chargen");
+	videoram = memory_region(machine, "maincpu")+0x81fa;
 }
 
+/* This system appears to have inline attribute bytes of unknown meaning.
+    Currently they are ignored. */
 static VIDEO_UPDATE( beehive )
 {
-    return 0;
+	//static UINT8 framecnt=0;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x,xx;
+
+	//framecnt++;
+
+	for (y = 0; y < 25; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			xx = ma;
+			for (x = ma; x < ma + 80; x++)
+			{
+				gfx = 0;
+				if (ra < 9)
+				{
+					chr = videoram[xx++];
+
+				//	/* Take care of flashing characters */
+				//	if ((chr < 0x80) && (framecnt & 0x08))
+				//		chr |= 0x80;
+
+					if (chr & 0x80)  // ignore attribute bytes
+						x--;
+					else
+					{
+						gfx = FNT[(chr<<4) | ra ];
+
+						/* Display a scanline of a character */
+						*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+						*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+					}
+				}
+			}
+		}
+		ma+=106;
+	}
+	return 0;
 }
 
 static MACHINE_CONFIG_START( beehive, driver_device )
@@ -52,8 +107,8 @@ static MACHINE_CONFIG_START( beehive, driver_device )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(640, 250)
+    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
@@ -68,7 +123,9 @@ ROM_START( beehive )
 	ROM_LOAD( "dm3270-2.rom", 0x0800, 0x0800, CRC(4d3476b7) SHA1(627ad42029ca6c8574cda8134d047d20515baf53) )
 	ROM_LOAD( "dm3270-3.rom", 0x1000, 0x0800, CRC(dbf15833) SHA1(ae93117260a259236c50885c5cecead2aad9b3c4) )
 
-	/* character generator not dumped */
+	/* character generator not dumped, using the one from 'c10' for now */
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, NO_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */
