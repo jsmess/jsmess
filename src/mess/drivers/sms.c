@@ -401,7 +401,7 @@ static MACHINE_CONFIG_FRAGMENT( gg_cartslot )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gamegear")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sms_ntsc_base, driver_device )
+static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
@@ -507,7 +507,7 @@ static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
 	MDRV_SMSSDISP_CARTSLOT_ADD("cart16")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sms_pal_base, driver_device )
+static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
@@ -591,7 +591,7 @@ static MACHINE_CONFIG_DERIVED( sms2_fm, sms2_ntsc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gamegear, driver_device )
+static MACHINE_CONFIG_START( gamegear, sms_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem)
