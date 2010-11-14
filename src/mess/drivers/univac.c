@@ -7,19 +7,48 @@
 
     25/05/2009 Skeleton driver [Robbbert].
 
+    The terminal has 2 screens selectable by the operator with the Fn + 1-2
+    buttons. Thus the user can have two sessions open at once, to different
+    mainframes or applications.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+static const UINT8 *FNT;
+static UINT8 uts20_screen;
+
+static WRITE8_HANDLER( uts20_43_w )
+{
+	uts20_screen = data & 1;
+}
+
+static READ8_HANDLER( uts20_vram_r )
+{
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	return RAM[offset | ((uts20_screen) ? 0xe000 : 0xc000)];
+}
+
+static WRITE8_HANDLER( uts20_vram_w )
+{
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	RAM[offset | ((uts20_screen) ? 0xe000 : 0xc000)] = data;
+}
+
+
 static ADDRESS_MAP_START(uts20_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x4fff ) AM_ROM
-	AM_RANGE( 0x5000, 0xffff ) AM_RAM
+	AM_RANGE( 0x5000, 0x7fff ) AM_RAM AM_REGION("maincpu", 0x5000)
+	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(uts20_vram_r,uts20_vram_w)
+	AM_RANGE( 0xa000, 0xffff ) AM_RAM AM_REGION("maincpu", 0xa000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uts20_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( uts20_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x43, 0x43 ) AM_WRITE(uts20_43_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -29,15 +58,60 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(uts20)
 {
+	uts20_screen = 0;
 }
 
 static VIDEO_START( uts20 )
 {
+	FNT = memory_region(machine, "chargen");
 }
 
 static VIDEO_UPDATE( uts20 )
 {
-    return 0;
+	static UINT8 framecnt=0;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *videoram = memory_region(screen->machine, "maincpu")+((uts20_screen) ? 0xe000 : 0xc000);
+
+	framecnt++;
+
+	for (y = 0; y < 25; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 80; x++)
+			{
+				gfx = 0;
+
+				if (ra < 9)
+				{
+					chr = videoram[x];
+
+					/* Take care of flashing characters */
+					if ((chr & 0x80) && (framecnt & 0x08))
+						chr = 0x20;
+
+					chr &= 0x7f;
+
+					gfx = FNT[(chr<<4) | ra ];
+				}
+
+				/* Display a scanline of a character */
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+			}
+		}
+		ma+=80;
+	}
+	return 0;
 }
 
 static MACHINE_CONFIG_START( uts20, driver_device )
@@ -53,14 +127,15 @@ static MACHINE_CONFIG_START( uts20, driver_device )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(640, 250)
+    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
     MDRV_VIDEO_START(uts20)
     MDRV_VIDEO_UPDATE(uts20)
 MACHINE_CONFIG_END
+
 
 /* ROM definition */
 ROM_START( uts20 )
@@ -71,10 +146,12 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20d.rom", 0x3000, 0x1000, CRC(76757cf7) SHA1(b0509d9a35366b21955f83ec3685163844c4dbf1) )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 
-	/* Character generator rom not dumped */
+	/* character generator not dumped, using the one from 'c10' for now */
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, NO_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 198?, uts20,  0,       0, 	uts20,	uts20,	 0, 		 "Sperry Univac",   "UTS-20", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, uts20,  0,       0, 	uts20,	uts20,	 0,		 "Sperry Univac",   "UTS-20", GAME_NOT_WORKING | GAME_NO_SOUND)
