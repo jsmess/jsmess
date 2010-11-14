@@ -236,7 +236,7 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 		/* step 1: r^2 = dx^2 + dy^2 */
 		/* step 2: dx^2 = r^2 - dy^2 */
 		/* step 3: dx = sqrt(r^2 - dy^2) */
-		dx_circ = ceil(sqrt(r_x_r - (dy * dy)));
+		dx_circ = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
 		dx = abs(beam_x - lgun_x);
 
 		if (dx > dx_circ || beam_x < visarea.min_x || beam_x > visarea.max_x)
