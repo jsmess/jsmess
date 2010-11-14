@@ -1789,87 +1789,8 @@ WRITE_LINE_DEVICE_HANDLER( towns_scsi_drq )
 	towns_state* tstate = device->machine->driver_data<towns_state>();
 	upd71071_dmarq(tstate->dma_1,state,1);  // SCSI HDs use channel 1
 }
-/*
-static READ8_HANDLER(towns_scsi_r)
-{
-	towns_state* state = space->machine->driver_data<towns_state>();
-	UINT8 ret = 0x00;
-//	logerror("scsi_r (offset %i) read\n",offset);
-	switch(offset)
-	{
-	case 0x00:
-		set_scsi_line(state->scsibus,SCSI_LINE_ACK,0);
-		return scsi_data_r(state->scsibus);
-	case 0x02:
-		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_REQ)) ? 0x00 : 0x80;
-		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_IO)) ? 0x00 : 0x40;
-		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_MSG)) ? 0x00 : 0x20;
-		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_CD)) ? 0x00 : 0x10;
-		ret |= (get_scsi_line(state->scsibus,SCSI_LINE_BSY)) ? 0x00 : 0x08;
-		return ret;
-	}
-	return 0x00;
-}
 
-static WRITE8_HANDLER(towns_scsi_w)
-{
-	towns_state* state = space->machine->driver_data<towns_state>();
-	switch(offset)
-	{
-	case 0x00:
-		scsi_data_w(state->scsibus,data);
-		logerror("SCSI data write %02x\n",data);
-		break;
-	case 0x02:
-		set_scsi_line(state->scsibus,SCSI_LINE_SEL,data & 0x04);
-		set_scsi_line(state->scsibus,SCSI_LINE_RESET,data & 0x01);
-		if(data & 0x01)
-			init_scsibus(state->scsibus);
-		logerror("SCSI control write %02x\n",data);
-		break;
-	}
-}
 
-void towns_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
-{
-	towns_state* tstate = device->machine->driver_data<towns_state>();
-
-	if(state == 0)
-	{
-		switch(line)
-		{
-		case SCSI_LINE_REQ:
-			break;
-		case SCSI_LINE_IO:
-			break;
-		case SCSI_LINE_MSG:
-			break;
-		case SCSI_LINE_CD:
-			break;
-		case SCSI_LINE_BSY:
-			break;
-		}
-	}
-	else
-	{
-		switch(line)
-		{
-		case SCSI_LINE_REQ:
-			set_scsi_line(tstate->scsibus,SCSI_LINE_ACK,1);
-			break;
-		case SCSI_LINE_IO:
-			break;
-		case SCSI_LINE_MSG:
-			break;
-		case SCSI_LINE_CD:
-			break;
-		case SCSI_LINE_BSY:
-			break;
-		}
-	}
-
-}
-*/
 // Volume ports - I/O ports 0x4e0-0x4e3
 // 0x4e0 = input volume level
 // 0x4e1 = input channel select

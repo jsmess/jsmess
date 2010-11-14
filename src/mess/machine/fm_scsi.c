@@ -25,6 +25,7 @@
 #include "emu.h"
 #include "fm_scsi.h"
 #include "machine/devhelpr.h"
+#include "debugger.h"
 
 /*
  *  Device config
@@ -186,12 +187,12 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 		if(m_result_index >= m_result_length)
 		{
 			// end of data transfer
-			set_phase(SCSI_PHASE_STATUS);
+			timer_adjust_oneshot(m_transfer_timer,attotime_never,0);  // stop timer
+			timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_USEC(10),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
 				devcb_call_write_line(&m_drq_func,0);
 			}
-			timer_adjust_periodic(m_transfer_timer,attotime_zero,0,attotime_never);  // stop timer
 			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 		}
 		return m_data;
@@ -209,7 +210,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 	{
 		m_data = 0;  // GOOD status
 		// no command complete message?
-		timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_BUS_FREE);
+		timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_MESSAGE_IN);
 		m_command_index = 0;
 		//set_input_line(FMSCSI_LINE_REQ,1);  // raise REQ yet again
 		return m_data;
@@ -255,25 +256,18 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
 				timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_STATUS);
 			else
-				timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),phase);
-
-			if(phase == SCSI_PHASE_STATUS)
-				set_input_line(FMSCSI_LINE_REQ,1);
-			if(phase == SCSI_PHASE_DATAIN)
-			{
-				// start transfer timer
-				timer_adjust_periodic(m_transfer_timer,attotime_zero,0,ATTOTIME_IN_HZ(3000000));  // arbitrary value for now
-				SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
-				m_result_index = 0;
-				logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
-			}
+				timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_USEC(800),phase);
 
 			logerror("FMSCSI: Command %02x sent, result length = %i\n",m_command[0],m_result_length);
 		}
 		else
 		{
-			set_input_line(FMSCSI_LINE_REQ,1);
+			timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_COMMAND);
 		}
+	}
+	if(m_phase == SCSI_PHASE_MESSAGE_OUT)
+	{
+		timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_STATUS);
 	}
 }
 
@@ -289,7 +283,7 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_CD,0);
 		set_input_line(FMSCSI_LINE_MSG,0);
 		set_input_line(FMSCSI_LINE_IO,0);
-		set_input_line(FMSCSI_LINE_REQ,0);
+		//set_input_line(FMSCSI_LINE_REQ,0);
 		break;
 	case SCSI_PHASE_COMMAND:
 		set_input_line(FMSCSI_LINE_BSY,1);
@@ -309,6 +303,11 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_MSG,0);
 		set_input_line(FMSCSI_LINE_IO,1);
 		set_input_line(FMSCSI_LINE_REQ,1);
+		// start transfer timer
+		timer_adjust_periodic(m_transfer_timer,attotime_zero,0,ATTOTIME_IN_HZ(3000000));  // arbitrary value for now
+		SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
+		m_result_index = 0;
+		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
 		break;
 	case SCSI_PHASE_DATAOUT:
 		set_input_line(FMSCSI_LINE_CD,0);
@@ -346,6 +345,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			{
 				set_input_line(FMSCSI_LINE_INT,1);
 				devcb_call_write_line(&m_irq_func,1);
+				logerror("FMSCSI: IRQ high\n");
 			}
 		}
 		if(state == 0 && (m_input_lines & FMSCSI_LINE_REQ))  // high to low
@@ -354,6 +354,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			{
 				set_input_line(FMSCSI_LINE_INT,0);
 				devcb_call_write_line(&m_irq_func,0);
+				logerror("FMSCSI: IRQ low\n");
 			}
 		}
 	}
@@ -392,7 +393,11 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 		}
 	}
 
-	// TODO: ATN functionality
+	if(line == FMSCSI_LINE_ATN)
+	{
+		if(state != 0)
+			timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_NSEC(800),SCSI_PHASE_MESSAGE_OUT);
+	}
 
 	if(state != 0)
 		m_output_lines |= line;
