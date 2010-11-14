@@ -23,9 +23,7 @@
 
     TODO:
 	- It doesn't boot up
-	- Find correct address of pia
 	- Cassette
-	- RTC (vertical pulse)
 	- CPU should freeze while screen is being drawn
 	- Confirm if screen is being drawn the right way
 	- Confirm keyboard configuration
@@ -43,6 +41,7 @@
 static UINT8 d6800_keylatch;
 static UINT8 d6800_keydown;
 static UINT8 d6800_screen;
+static UINT8 d6800_rtc;
 static running_device *d6800_cassette;
 static running_device *d6800_speaker;
 
@@ -59,7 +58,7 @@ public:
 /* Memory Maps */
 
 static ADDRESS_MAP_START( d6800_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x7c00) AM_RAM AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x8010, 0x8013) AM_MIRROR(0x3cec) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM
 ADDRESS_MAP_END
@@ -126,9 +125,16 @@ static VIDEO_UPDATE( d6800 )
 
 /* PIA6821 Interface */
 
+static INTERRUPT_GEN( d6800_interrupt )
+{
+	d6800_rtc = 1;
+}
+
 static READ_LINE_DEVICE_HANDLER( d6800_rtc_pulse )
 {
-	return 0;
+	UINT8 res = d6800_rtc;
+	d6800_rtc = 0;
+	return res;
 }
 
 static READ_LINE_DEVICE_HANDLER( d6800_keydown_r )
@@ -163,7 +169,7 @@ static WRITE8_DEVICE_HANDLER( d6800_cassette_w )
 	/*
 	Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
 	or 1200 Hz depending on the state of the transistor. This is controlled by
-	bit 0 of the PIA. Bit 6 controls the speaker.
+	bit 0 of the PIA. Bit 6 drives the speaker.
 	*/
 
 	speaker_level_w(d6800_speaker, (data & 0x40) ? 0 : 1);
@@ -248,6 +254,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MDRV_CPU_PROGRAM_MAP(d6800_map)
+	MDRV_CPU_VBLANK_INT("screen", d6800_interrupt)
 
 	MDRV_MACHINE_START(d6800)
 	MDRV_MACHINE_RESET(d6800)
