@@ -242,6 +242,24 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 		case 0x10: m_target = 4; break;
 		}
 	}
+	if(m_phase == SCSI_PHASE_DATAOUT)
+	{
+		m_buffer[m_result_index % 512] = m_data;
+		m_result_index++;
+		if(m_result_index % 512 == 0)
+			SCSIWriteData(m_SCSIdevices[m_target],m_buffer,512);  // write buffer to disc
+		if(m_result_index >= m_result_length)
+		{
+			// end of data transfer
+			timer_adjust_oneshot(m_transfer_timer,attotime_never,0);  // stop timer
+			timer_adjust_oneshot(m_phase_timer,ATTOTIME_IN_USEC(10),SCSI_PHASE_STATUS);
+			if(m_output_lines & FMSCSI_LINE_DMAE)
+			{
+				devcb_call_write_line(&m_drq_func,0);
+			}
+			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
+		}
+	}
 	if(m_phase == SCSI_PHASE_COMMAND)
 	{
 		m_command[m_command_index] = data;
@@ -314,6 +332,10 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_MSG,0);
 		set_input_line(FMSCSI_LINE_IO,0);
 		set_input_line(FMSCSI_LINE_REQ,1);
+		// start transfer timer
+		timer_adjust_periodic(m_transfer_timer,attotime_zero,0,ATTOTIME_IN_HZ(3000000));  // arbitrary value for now
+		m_result_index = 0;
+		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
 		break;
 	case SCSI_PHASE_MESSAGE_IN:
 		set_input_line(FMSCSI_LINE_CD,1);
