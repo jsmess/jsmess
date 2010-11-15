@@ -236,8 +236,6 @@ static MACHINE_START( d6800 )
 
 static MACHINE_RESET( d6800 )
 {
-	cpu_set_reg(machine->device("maincpu"), M6800_PC, 0xc000);
-	cpu_set_reg(machine->device("maincpu"), M6800_S, 0xff);
 }
 
 /* Machine Drivers */
