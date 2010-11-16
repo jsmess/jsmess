@@ -56,7 +56,7 @@ VIDEO_UPDATE( mekd2 )
 	UINT8 *videoram = state->videoram;
 	int width = screen->width();
     int x, y;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	//static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
     for (x = 0; x < 6; x++)
     {
@@ -86,7 +86,7 @@ VIDEO_UPDATE( mekd2 )
             int sx = width - 182 + x * 37;
             int color, code = layout[y][x];
 
-            color = (input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
+            color = 0; //(input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
 
             videoram[6 * 2 + code] = color;
             drawgfx_opaque (bitmap, NULL,
