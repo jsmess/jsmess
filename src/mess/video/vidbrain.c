@@ -15,11 +15,14 @@
 #include "includes/vidbrain.h"
 #include "cpu/f8/f8.h"
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+
+
+//**************************************************************************
+//	CONSTANTS / MACROS
+//**************************************************************************
 
 #define LOG 0
+
 
 // write-only registers
 #define REGISTER_COMMAND			0xf7
@@ -27,11 +30,13 @@
 #define REGISTER_FINAL_MODIFIER		0xf2
 #define REGISTER_Y_INTERRUPT		0xf0
 
+
 // read-only registers
 #define REGISTER_X_FREEZE			0xf8
 #define REGISTER_Y_FREEZE_LOW		0xf9
 #define REGISTER_Y_FREEZE_HIGH		0xfa
 #define REGISTER_CURRENT_Y_LOW		0xfb
+
 
 // read/write registers - RAM memory
 #define RAM_RP_LO					0x00	// cartridge pointer low order
@@ -44,6 +49,7 @@
 #define RAM_XY_HI_A					0x70	// Y value high order and X order list A
 #define RAM_XY_HI_B					0x80	// Y value high order and X order list B
 
+
 // command register bits
 #define COMMAND_YINT_H_O			0x80
 #define COMMAND_A_B					0x40
@@ -54,17 +60,32 @@
 #define COMMAND_FRZ					0x02
 #define COMMAND_X_ZM				0x01
 
-/***************************************************************************
-    READ/WRITE HANDLERS
-***************************************************************************/
 
-/*-------------------------------------------------
-    get_field_vpos - get scanline within field
--------------------------------------------------*/
+#define IS_CHANGED(_bit) \
+	((m_cmd & _bit) != (data & _bit))
 
-static int get_field_vpos(screen_device *screen)
+#define RAM(_offset) \
+	m_vlsi_ram[_offset + i]
+
+#define IS_VISIBLE(_y) \
+	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
+
+#define DRAW_PIXEL(_scanline, _dot) \
+	if (IS_VISIBLE(_scanline)) *BITMAP_ADDR16(&bitmap, (_scanline), _dot) = pixel;
+
+
+
+//**************************************************************************
+//	READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_field_vpos - get scanline within field
+//-------------------------------------------------
+
+int vidbrain_state::get_field_vpos()
 {
-	int vpos = screen->vpos();
+	int vpos = m_screen->vpos();
 	
 	if (vpos >= 262)
 	{
@@ -75,35 +96,35 @@ static int get_field_vpos(screen_device *screen)
 	return vpos;
 }
 
-/*-------------------------------------------------
-    get_field - get video field
--------------------------------------------------*/
 
-static int get_field(screen_device *screen)
+//-------------------------------------------------
+//  get_field - get video field
+//-------------------------------------------------
+
+int vidbrain_state::get_field()
 {
-	return screen->vpos() < 262;
+	return m_screen->vpos() < 262;
 }
 
-/*-------------------------------------------------
-    vidbrain_vlsi_r - video VLSI read
--------------------------------------------------*/
 
-READ8_HANDLER( vidbrain_vlsi_r )
+//-------------------------------------------------
+//  vlsi_r - video VLSI read
+//-------------------------------------------------
+
+READ8_MEMBER( vidbrain_state::vlsi_r )
 {
-	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
-
 	UINT8 data = 0xff;
 
 	switch (offset)
 	{
 	case REGISTER_X_FREEZE:
-		data = state->freeze_x;
+		data = m_freeze_x;
 
 		if (LOG) logerror("X-Freeze %02x\n", data);
 		break;
 
 	case REGISTER_Y_FREEZE_LOW:
-		data = state->freeze_y & 0xff;
+		data = m_freeze_y & 0xff;
 
 		if (LOG) logerror("Y-Freeze Low %02x\n", data);
 		break;
@@ -124,20 +145,20 @@ READ8_HANDLER( vidbrain_vlsi_r )
 
 		*/
 
-		data = (get_field(state->screen) << 7) | (BIT(get_field_vpos(state->screen), 8) << 1) | BIT(state->freeze_y, 8);
+		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
 
 		if (LOG) logerror("Y-Freeze High %02x\n", data);
 		break;
 
 	case REGISTER_CURRENT_Y_LOW:
-		data = get_field_vpos(state->screen) & 0xff;
+		data = get_field_vpos() & 0xff;
 
 		if (LOG) logerror("Current-Y Low %02x\n", data);
 		break;
 
 	default:
 		if (offset < 0x90)
-			data = state->vlsi_ram[offset];
+			data = m_vlsi_ram[offset];
 		else
 			if (LOG) logerror("Unknown VLSI read from %02x!\n", offset);
 	}
@@ -145,51 +166,49 @@ READ8_HANDLER( vidbrain_vlsi_r )
 	return data;
 }
 
-/*-------------------------------------------------
-    set_y_interrupt - set Y interrupt timer
--------------------------------------------------*/
 
-static void set_y_interrupt(vidbrain_state *state)
+//-------------------------------------------------
+//  set_y_interrupt - set Y interrupt timer
+//-------------------------------------------------
+
+void vidbrain_state::set_y_interrupt()
 {
-	int scanline = ((state->cmd & COMMAND_YINT_H_O) << 1) | state->y_int;
+	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
 
-	state->timer_y_odd->adjust(state->screen->time_until_pos(scanline, 0), 0, state->screen->frame_period());
-	state->timer_y_even->adjust(state->screen->time_until_pos(scanline + 262, 0), 0, state->screen->frame_period());
+	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline, 0), 0, m_screen->frame_period());
+	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262, 0), 0, m_screen->frame_period());
 }
 
-/*-------------------------------------------------
-    do_partial_update - update screen
--------------------------------------------------*/
 
-static void do_partial_update(vidbrain_state *state)
+//-------------------------------------------------
+//  do_partial_update - update screen
+//-------------------------------------------------
+
+void vidbrain_state::do_partial_update()
 {
-	int vpos = state->screen->vpos();
+	int vpos = m_screen->vpos();
 	
 	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
 	
-	state->screen->update_partial(vpos);
+	m_screen->update_partial(vpos);
 }
 
-/*-------------------------------------------------
-    vidbrain_vlsi_w - video VLSI write
--------------------------------------------------*/
 
-#define IS_CHANGED(_bit) \
-	((state->cmd & _bit) != (data & _bit))
+//-------------------------------------------------
+//  vlsi_w - video VLSI write
+//-------------------------------------------------
 
-WRITE8_HANDLER( vidbrain_vlsi_w )
+WRITE8_MEMBER( vidbrain_state::vlsi_w )
 {
-	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
-
 	switch (offset)
 	{
 	case REGISTER_Y_INTERRUPT:
 		if (LOG) logerror("Y-Interrupt %02x\n", data);
 
-		if (state->y_int != data)
+		if (m_y_int != data)
 		{
-			state->y_int = data;
-			set_y_interrupt(state);
+			m_y_int = data;
+			set_y_interrupt();
 		}
 		break;
 
@@ -211,8 +230,8 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 
 		if (LOG) logerror("Final Modifier %02x\n", data);
 
-		do_partial_update(state);
-		state->fmod = data & 0x1f;
+		do_partial_update();
+		m_fmod = data & 0x1f;
 		break;
 
 	case REGISTER_BACKGROUND:
@@ -233,8 +252,8 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 
 		if (LOG) logerror("Background %02x\n", data);
 
-		do_partial_update(state);
-		state->bg = data & 0x1f;
+		do_partial_update();
+		m_bg = data & 0x1f;
 		break;
 
 	case REGISTER_COMMAND:
@@ -257,32 +276,34 @@ WRITE8_HANDLER( vidbrain_vlsi_w )
 		
 		if (IS_CHANGED(COMMAND_YINT_H_O))
 		{
-			set_y_interrupt(state);
+			set_y_interrupt();
 		}
 
 		if (IS_CHANGED(COMMAND_A_B) || IS_CHANGED(COMMAND_Y_ZM) || IS_CHANGED(COMMAND_X_ZM))
 		{
-			do_partial_update(state);
+			do_partial_update();
 		}
 
-		state->cmd = data;
+		m_cmd = data;
 		break;
 
 	default:
 		if (offset < 0x90)
-			state->vlsi_ram[offset] = data;
+			m_vlsi_ram[offset] = data;
 		else
 			logerror("Unknown VLSI write %02x to %02x!\n", data, offset);
 	}
 }
 
-/***************************************************************************
-    VIDEO
-***************************************************************************/
 
-/*-------------------------------------------------
-    PALETTE_INIT( vidbrain )
--------------------------------------------------*/
+
+//**************************************************************************
+//	VIDEO
+//**************************************************************************
+
+//-------------------------------------------------
+//  PALETTE_INIT( vidbrain )
+//-------------------------------------------------
 
 static PALETTE_INIT( vidbrain )
 {
@@ -304,55 +325,40 @@ static PALETTE_INIT( vidbrain )
 	}
 }
 
-/*-------------------------------------------------
-    VIDEO_START( vidbrain )
--------------------------------------------------*/
 
-static VIDEO_START( vidbrain )
+//-------------------------------------------------
+//  VIDEO_START( vidbrain )
+//-------------------------------------------------
+
+void vidbrain_state::video_start()
 {
-	vidbrain_state *state = machine->driver_data<vidbrain_state>();
-	
-	/* register for state saving */
-	state_save_register_global_array(machine, state->vlsi_ram);
-	state_save_register_global(machine, state->y_int);
-	state_save_register_global(machine, state->fmod);
-	state_save_register_global(machine, state->bg);
-	state_save_register_global(machine, state->cmd);
-	state_save_register_global(machine, state->freeze_x);
-	state_save_register_global(machine, state->freeze_y);
-	state_save_register_global(machine, state->field);
-
-	/* get the devices */
-	state->screen = machine->device<screen_device>(SCREEN_TAG);
-	state->timer_y_odd = machine->device<timer_device>(TIMER_Y_ODD_TAG);
-	state->timer_y_even = machine->device<timer_device>(TIMER_Y_EVEN_TAG);
+	// register for state saving
+	state_save_register_global_array(machine, m_vlsi_ram);
+	state_save_register_global(machine, m_y_int);
+	state_save_register_global(machine, m_fmod);
+	state_save_register_global(machine, m_bg);
+	state_save_register_global(machine, m_cmd);
+	state_save_register_global(machine, m_freeze_x);
+	state_save_register_global(machine, m_freeze_y);
+	state_save_register_global(machine, m_field);
 }
 
-/*-------------------------------------------------
-    VIDEO_UPDATE( vidbrain )
--------------------------------------------------*/
 
-#define RAM(_offset) \
-	state->vlsi_ram[_offset + i]
+//-------------------------------------------------
+//  VIDEO_UPDATE( vidbrain )
+//-------------------------------------------------
 
-#define IS_VISIBLE(_y) \
-	((_y >= cliprect->min_y) && (_y <= cliprect->max_y))
-
-#define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) *BITMAP_ADDR16(bitmap, (_scanline), _dot) = pixel;
-
-static VIDEO_UPDATE( vidbrain )
+bool vidbrain_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	vidbrain_state *state = screen->machine->driver_data<vidbrain_state>();
-	address_space *program = cputag_get_address_space(screen->machine, F3850_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	if (!(state->cmd & COMMAND_ENB))
+	if (!(m_cmd & COMMAND_ENB))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
 		return 0;
 	}
 
-	bitmap_fill(bitmap, cliprect, state->bg);
+	bitmap_fill(&bitmap, &cliprect, m_bg);
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -366,8 +372,8 @@ static VIDEO_UPDATE( vidbrain )
 		int xord_b = RAM(RAM_Y_LO_B) & 0x0f;
 		int y_a = ((RAM(RAM_XY_HI_A) & 0x80) << 1) | RAM(RAM_Y_LO_A);
 		int y_b = ((RAM(RAM_XY_HI_B) & 0x80) << 1) | RAM(RAM_Y_LO_B);
-		int y = (state->cmd & COMMAND_A_B) ? y_a : y_b;
-		int xord = (state->cmd & COMMAND_A_B) ? xord_a : xord_b;
+		int y = (m_cmd & COMMAND_A_B) ? y_a : y_b;
+		int xord = (m_cmd & COMMAND_A_B) ? xord_a : xord_b;
 
 		if (LOG) logerror("Object %u rp %04x color %u dx %u dy %u xcopy %u x %u y %u xord %u\n", i, rp, color, dx, dy, xcopy, x, y, xord);
 
@@ -382,13 +388,13 @@ static VIDEO_UPDATE( vidbrain )
 
 				for (int bit = 0; bit < 8; bit++)
 				{
-					int pixel = ((BIT(data, 7) ? color : state->bg) ^ state->fmod) & 0x1f;
+					int pixel = ((BIT(data, 7) ? color : m_bg) ^ m_fmod) & 0x1f;
 
-					if (state->cmd & COMMAND_Y_ZM)
+					if (m_cmd & COMMAND_Y_ZM)
 					{
 						int scanline = y + (sy * 2);
 
-						if (state->cmd & COMMAND_X_ZM)
+						if (m_cmd & COMMAND_X_ZM)
 						{
 							int dot = (x * 2) + (sx * 16) + (bit * 2);
 
@@ -409,7 +415,7 @@ static VIDEO_UPDATE( vidbrain )
 					{
 						int scanline = y + sy;
 
-						if (state->cmd & COMMAND_X_ZM)
+						if (m_cmd & COMMAND_X_ZM)
 						{
 							int dot = (x * 2) + (sx * 16) + (bit * 2);
 
@@ -437,58 +443,60 @@ static VIDEO_UPDATE( vidbrain )
 	return 0;
 }
 
-/*-------------------------------------------------
-    gfx_layout vidbrain_charlayout
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  gfx_layout vidbrain_charlayout
+//-------------------------------------------------
 
 static const gfx_layout vidbrain_charlayout =
 {
-	8, 7,					/* 8 x 7 characters */
-	59,						/* 59 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
+	8, 7,
+	59,
+	1,
+	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
 	{ STEP8(0,8) },
-	8*7					/* every char takes 7 bytes */
+	8*7
 };
 
-/*-------------------------------------------------
-    GFXDECODE( vidbrain )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  GFXDECODE( vidbrain )
+//-------------------------------------------------
 
 static GFXDECODE_START( vidbrain )
 	GFXDECODE_ENTRY( F3850_TAG, 0x2010, vidbrain_charlayout, 0, 1 )
 GFXDECODE_END
 
-/*-------------------------------------------------
-    TIMER_DEVICE_CALLBACK( scanline_tick )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  TIMER_DEVICE_CALLBACK( y_int_tick )
+//-------------------------------------------------
 
 static TIMER_DEVICE_CALLBACK( y_int_tick )
 {
 	vidbrain_state *state = timer.machine->driver_data<vidbrain_state>();
 
-	if ((state->cmd & COMMAND_INT) && !(state->cmd & COMMAND_FRZ))
+	if ((state->m_cmd & COMMAND_INT) && !(state->m_cmd & COMMAND_FRZ))
 	{
-		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->screen->vpos());
-//		f3853_set_external_interrupt_in_line(state->smi, 1);
-		state->ext_int_latch = 1;
-		vidbrain_interrupt_check(timer.machine);
+		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->m_screen->vpos());
+//		f3853_set_external_interrupt_in_line(state->m_smi, 1);
+		state->m_ext_int_latch = 1;
+		state->interrupt_check();
 	}
 }
 
-/***************************************************************************
-    MACHINE CONFIGURATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    MACHINE_CONFIG_FRAGMENT( vidbrain_video )
--------------------------------------------------*/
+
+//**************************************************************************
+//	MACHINE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( vidbrain_video )
+//-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( vidbrain_video )
-    /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 320, 525, 0, 243)
@@ -497,9 +505,6 @@ MACHINE_CONFIG_FRAGMENT( vidbrain_video )
 
     MDRV_PALETTE_LENGTH(32)
     MDRV_PALETTE_INIT(vidbrain)
-
-    MDRV_VIDEO_START(vidbrain)
-    MDRV_VIDEO_UPDATE(vidbrain)
 
 	MDRV_TIMER_ADD(TIMER_Y_ODD_TAG, y_int_tick)
 	MDRV_TIMER_ADD(TIMER_Y_EVEN_TAG, y_int_tick)

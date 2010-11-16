@@ -15,47 +15,64 @@ class vidbrain_state : public driver_device
 {
 public:
 	vidbrain_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, F3850_TAG),
+		  m_discrete(*this, DISCRETE_TAG),
+		  m_screen(*this, SCREEN_TAG),
+		  m_timer_y_odd(*this, TIMER_Y_ODD_TAG),
+		  m_timer_y_even(*this, TIMER_Y_EVEN_TAG)
+	{ }
 
-	/* F3853 SMI state */
-	UINT16 vector;
-	int int_enable;
-	int ext_int_latch;
-	int timer_int_latch;
+	required_device<cpu_device> m_maincpu;
+	required_device<running_device> m_discrete;
+	required_device<screen_device> m_screen;
+	required_device<timer_device> m_timer_y_odd;
+	required_device<timer_device> m_timer_y_even;
 
-	/* keyboard state */
-	UINT8 keylatch;
-	int joy_enable;
+	virtual void machine_start();
 
-	/* video state */
-	UINT8 vlsi_ram[0x90];
-	UINT8 y_int;
-	UINT8 fmod;
-	UINT8 bg;
-	UINT8 cmd;
-	UINT8 freeze_x;
-	UINT16 freeze_y;
-	int field;
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	/* sound state */
-	int sound_clk;
+	DECLARE_WRITE8_MEMBER( keyboard_w );
+	DECLARE_READ8_MEMBER( keyboard_r );
+	DECLARE_WRITE8_MEMBER( sound_w );
+	DECLARE_WRITE8_MEMBER( f3853_w );
+	DECLARE_READ8_MEMBER( vlsi_r );
+	DECLARE_WRITE8_MEMBER( vlsi_w );
 
-	/* devices */
-	running_device *discrete;
-	screen_device *screen;
-	timer_device *timer_y_odd;
-	timer_device *timer_y_even;
+	void interrupt_check();
+	int get_field_vpos();
+	int get_field();
+	void set_y_interrupt();
+	void do_partial_update();
+
+	// F3853 SMI state
+	UINT16 m_vector;
+	int m_int_enable;
+	int m_ext_int_latch;
+	int m_timer_int_latch;
+
+	// keyboard state
+	UINT8 m_keylatch;
+	int m_joy_enable;
+
+	// video state
+	UINT8 m_vlsi_ram[0x90];
+	UINT8 m_y_int;
+	UINT8 m_fmod;
+	UINT8 m_bg;
+	UINT8 m_cmd;
+	UINT8 m_freeze_x;
+	UINT16 m_freeze_y;
+	int m_field;
+
+	// sound state
+	int m_sound_clk;
 };
 
-/*----------- defined in driver/vidbrain.c -----------*/
+//----------- defined in video/vidbrain.c -----------
 
-void vidbrain_interrupt_check(running_machine *machine);
-
-/*----------- defined in video/vidbrain.c -----------*/
-
-READ8_HANDLER( vidbrain_vlsi_r );
-WRITE8_HANDLER( vidbrain_vlsi_w );
-
-MACHINE_CONFIG_EXTERN(vidbrain_video);
+MACHINE_CONFIG_EXTERN( vidbrain_video );
 
 #endif
