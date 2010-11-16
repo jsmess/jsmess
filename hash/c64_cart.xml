@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="c64_cart" description="Commodore 64 Cartridge">
+	<software name="vw64">
+    <!--
+      |===========================|
+      |=|      LS10    LS122  C   |
+      |=|                  R      |
+      |=|                         |
+      |=|                         |
+      |=|      ROM0  ROM1  ROM2   |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |===========================|
+      
+      ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
+      ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
+      ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
+      R       - 56K
+      C       - 47uF
+      
+      data and address lines are scrambled:
+      data = BITSWAP8(7,6,0,5,1,4,2,3)
+      address = BITSWAP16(15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
+      EXROM:GND
+      GAME:after reset GND for 1.1844s (74LS122 tW=0.45*R*C) then goes to Vcc
+      -->
+    <description>VizaWrite 64</description>
+		<year>1984</year>
+		<publisher>Viza Software</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<dataarea name="rom" size="0x6000">
+				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241" offset="0x0000" />
+        <rom name="2" size="0x2000" crc="32f2a5df" sha1="5f3e5d416eab59a75ba64131588861991fa571a5" offset="0x2000" />
+        <rom name="3" size="0x2000" crc="ef80b1e7" sha1="80392a04bc9ca2fea006653a507f6f5338a10beb" offset="0x4000" />
+      </dataarea>
+		</part>
+  </software>
+  
+  <software name="tdos12">
+    <!-- 
+     -->
+    <description>Triton QD TDOS 1.2</description>
+    <year>198?</year>
+    <publisher>Radofin</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x2000">
+        <rom name="tdos 1.2" size="0x2000" crc="97311f3f" sha1="9ba758050ae77aa9ea189e4472fbf7fdde422615" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cs64">
+    <!-- 
+      |===========================|
+      |=|                         |
+      |=|         VLSI            |
+      |=|                         |
+      |=|                         |
+      |=|         ROM             |
+      |=|                         |
+      |=|                         |
+      |=|         SP0256          |
+      |===========================|
+      
+      VLSI   - General Instruments LA05-164
+      ROM    - General Instruments R09864CS-2030 8Kx8 ROM "778R01"
+      SP0256 - General Instruments SP0256A-AL2 Speech Synthesizer
+     -->
+    <description>Currah Speech 64</description>
+    <year>1984</year>
+    <publisher>Currah</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x2000">
+        <rom name="778r01" size="0x2000" crc="e3f8abd0" sha1="dc9fc1ffb033531abec03b1a06a8d5064dd0ce61" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tl64">
+    <!--
+      Alkatresz oldal
+      |===========================|
+      |=|                         |
+      |=|            ROM          |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |=|            LS00         |
+      |===========================|
+      
+      ROM   - NEC D2764D 8Kx8 EPROM
+      LS00  - Russian K155LA3 (74LS00 equivalent)
+      
+     -->
+    <description>Tapeload-64 v2.1</description>
+    <year>1991</year>
+    <publisher>JTC</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x2000">
+        <rom name="unlabeled" size="0x2000" crc="e7894c43" sha1="bf76930b7073afe0dff134c9ea925f0b08a262d8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="epyxfast">
+    <description>FastLoad</description>
+    <year>1984</year>
+    <publisher>Epyx</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x2000">
+        <rom name="fastload.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+  
+  <software name="ps64">
+    <!-- 
+      |===========================|
+      |=|                         |
+      |=|                      SW1|
+      |=|       SC02              |
+      |=|                         |
+      |=|                      CN1|
+      |=|       ROM        LF347  |
+      |=|                         |
+      |=|                         |
+      |===========================|
+      
+      SC02  - Votrax SSI-263AP Speech Synthesizer (mapped at 0xde00-0xde04)
+      ROM   - Hynix Semiconductor HY27C64D-20 8Kx8 EPROM
+      LF347 - National Instruments LF347N JFET Operational Amplifier
+      SW1   - Module on/off switch
+      CN1   - connector to C64 video/audio port
+     -->
+    <description>PS-64 puhemoduli v2.0 (Finnish)</description>
+    <year>1988</year>
+    <publisher>Koulun erityispalvelu</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x2000">
+        <rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+  
+  <software name="pagefox">
+    <!-- 
+      |===========================|
+      |=|                         |
+      |=|     RAM         LS11    |
+      |=|                         |
+      |=|                 LS139   |
+      |=|     ROM0                |
+      |=|                 LS273   |
+      |=|                         |
+      |=|     ROM1        LS00    |
+      |===========================|
+      
+      RAM   - NEC D43256-12L 32Kx8 RAM
+      ROM0  - SGS M27256-2FI 32Kx8 EPROM
+      ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
+     -->
+    <description>Pagefox (Finnish)</description>
+    <year>1987</year>
+    <publisher>Scanntronik</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x10000">
+        <rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42" offset="0x0000" />
+        <rom name="u2.bin" size="0x8000" crc="3dc43ab1" sha1="1a21771e7bf61ca1771de450c8230bd5ac46b1c6" offset="0x8000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="calceasy">
+    <description>Calc Result Easy</description>
+    <year>1985</year>
+    <publisher>Handic Software</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x6000">
+        <rom name="calc_rom1.bin" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
+        <rom name="calc_rom2.bin" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x2000" />
+      </dataarea>
+    </part>
+  </software>
+  
+  <software name="sshelp64">
+    <!--
+      SC041/1
+      |===========================|
+      |=|             LS00        |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |=|        ROM0    ROM1     |
+      |=|                         |
+      |=|                         |
+      |=|                         |
+      |===========================|
+
+      ROM0  - Texas Instruments TMS2532JL-45 8Kx8 EPROM "SHELP-$8.BA1"
+      ROM1  - Texas Instruments TMS2532JL-45 8Kx8 EPROM "SHELP-$9.BA2"
+     -->
+    <description>Stack Super Help 64</description>
+    <year>19??</year>
+    <publisher>?</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x4000">
+        <rom name="shelp-$8.ba1" size="0x2000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
+        <rom name="shelp-$9.ba2" size="0x2000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x2000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gscard">
+    <description>Game Saver Card v1.6</description>
+    <year>198?</year>
+    <publisher>?</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="savecart.bin" size="0x8000" crc="9da23b4a" sha1="e9004aa7a4fc8913420d05ed3e671d5d0931b54a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+  
+  <software name="multiscr">
+    <!-- 
+     -->
+    <description>Multiscreen (Australia)</description>
+    <year>198?</year>
+    <publisher>?</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x1c000">
+        <rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x00000" />
+        <rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x04000" />
+        <rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x0c000" />
+        <rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
+      </dataarea>
+      <dataarea name="rom_6802" size="0x2000">
+        <rom name="io-1.bin" size="0x1000" crc="35be02a8" sha1="5912bc3d8e0c0949c1e66c19116d6b71c7574e46" offset="0x0000" />
+        <rom name="io-2.bin" size="0x1000" crc="76a9ac6d" sha1="87e7335e626bdb73498b46c28c7baab72df38d1f" offset="0x1000" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

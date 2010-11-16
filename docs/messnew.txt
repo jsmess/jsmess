@@ -32,6 +32,9 @@ System Driver Changes:
 
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
 
+- [C64] Added known good dumps softlist for cartridges. Not hooked up
+  to driver code yet. [Curt Coder]
+
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
