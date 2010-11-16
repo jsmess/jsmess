@@ -144,7 +144,7 @@ private:
 	int m_cp;						// cursor position
 
     int m_blink;					// blink counter
-	bool m_cursor;					// cursor visible
+	int m_cursor;					// cursor visible
 
 	const hd61830_device_config &m_config;
 };

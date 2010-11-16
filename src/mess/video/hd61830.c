@@ -187,9 +187,11 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 hd61830_device::hd61830_device(running_machine &_machine, const hd61830_device_config &config)
     : device_t(_machine, config),
 	  device_memory_interface(_machine, config, *this),
+	  m_bf(false),
+	  m_blink(0),
       m_config(config)
 {
-	m_bf = false;
+
 }
 
 
