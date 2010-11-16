@@ -21,6 +21,7 @@
 
 static UINT8 specimx_color;
 UINT8 *specimx_colorram;
+static running_device *specimx_audio;
 
 static int specialist_8255_porta;
 static int specialist_8255_portb;
@@ -210,21 +211,21 @@ WRITE8_HANDLER( specimx_select_bank )
 
 static WRITE_LINE_DEVICE_HANDLER( specimx_pit8253_out0_changed )
 {
-	specimx_set_input( device->machine, 0, state );
+	specimx_set_input( specimx_audio, 0, state );
 }
 
 
 
 static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out1_changed)
 {
-	specimx_set_input( device->machine, 1, state );
+	specimx_set_input( specimx_audio, 1, state );
 }
 
 
 
 static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out2_changed)
 {
-	specimx_set_input( device->machine, 2, state );
+	specimx_set_input( specimx_audio, 2, state );
 }
 
 
@@ -252,6 +253,7 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
+	specimx_audio = machine->device("custom");
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
@@ -275,7 +277,7 @@ MACHINE_RESET( specimx )
 
 READ8_HANDLER ( specimx_disk_ctrl_r )
 {
-  return 0xff;
+	return 0xff;
 }
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )

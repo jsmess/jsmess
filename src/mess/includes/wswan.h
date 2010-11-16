@@ -88,27 +88,27 @@ struct VDP
 extern struct VDP wswan_vdp;
 extern UINT8 ws_portram[256];
 
-extern NVRAM_HANDLER( wswan );
-extern MACHINE_START( wswan );
-extern MACHINE_START( wscolor );
-extern MACHINE_RESET( wswan );
-extern READ8_HANDLER( wswan_port_r );
-extern WRITE8_HANDLER( wswan_port_w );
-extern READ8_HANDLER( wswan_sram_r );
-extern WRITE8_HANDLER( wswan_sram_w );
-extern DEVICE_START(wswan_cart);
-extern DEVICE_IMAGE_LOAD(wswan_cart);
+NVRAM_HANDLER( wswan );
+MACHINE_START( wswan );
+MACHINE_START( wscolor );
+MACHINE_RESET( wswan );
+READ8_HANDLER( wswan_port_r );
+WRITE8_HANDLER( wswan_port_w );
+READ8_HANDLER( wswan_sram_r );
+WRITE8_HANDLER( wswan_sram_w );
+DEVICE_START(wswan_cart);
+DEVICE_IMAGE_LOAD(wswan_cart);
 
 
 /*----------- defined in video/wswan.c -----------*/
 
-extern void wswan_refresh_scanline( running_machine *machine );
+void wswan_refresh_scanline( running_machine *machine );
 
 
 /*----------- defined in audio/wswan.c -----------*/
 
 DECLARE_LEGACY_SOUND_DEVICE(WSWAN, wswan_sound);
 
-WRITE8_HANDLER( wswan_sound_port_w );
+WRITE8_DEVICE_HANDLER( wswan_sound_port_w );
 
 #endif /* WSWAN_H_ */

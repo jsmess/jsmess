@@ -4,38 +4,49 @@
 #include "streams.h"
 #include "includes/channelf.h"
 
-static sound_stream *channel;
-static int sound_mode;
-static int incr;
-static float decay_mult;
-static int envelope;
-static UINT32 sample_counter = 0;
-static int forced_ontime;           //  added for improved sound
-static int min_ontime;              //  added for improved sound
 
 static const int max_amplitude = 0x7fff;
 
-
-
-void channelf_sound_w(running_machine *machine, int mode)
+typedef struct _channelf_sound_state channelf_sound_state;
+struct _channelf_sound_state
 {
-	if (mode == sound_mode)
+	sound_stream *channel;
+	int sound_mode;
+	int incr;
+	float decay_mult;
+	int envelope;
+	UINT32 sample_counter;
+	int forced_ontime;           //  added for improved sound
+	int min_ontime;              //  added for improved sound
+};
+
+INLINE channelf_sound_state *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == CHANNELF);
+	return (channelf_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
+
+void channelf_sound_w(running_device *device, int mode)
+{
+	channelf_sound_state *state = get_safe_token(device);
+	if (mode == state->sound_mode)
 		return;
 
-    stream_update(channel);
-	sound_mode = mode;
+	stream_update(state->channel);
+	state->sound_mode = mode;
 
-    switch(mode)
-    {
+	switch(mode)
+	{
 		case 0:
-			envelope = 0;
-			forced_ontime = 0;     //  added for improved sound
+			state->envelope = 0;
+			state->forced_ontime = 0;     //  added for improved sound
 			break;
 		case 1:
 		case 2:
 		case 3:
-			envelope = max_amplitude;
-			forced_ontime = min_ontime;   //  added for improved sound
+			state->envelope = max_amplitude;
+			state->forced_ontime = state->min_ontime;   //  added for improved sound
 			break;
 	}
 }
@@ -44,11 +55,12 @@ void channelf_sound_w(running_machine *machine, int mode)
 
 static STREAM_UPDATE( channelf_sh_update )
 {
+	channelf_sound_state *state = get_safe_token(device);
 	UINT32 mask = 0, target = 0;
 	stream_sample_t *buffer = outputs[0];
 	stream_sample_t *sample = buffer;
 
-	switch( sound_mode )
+	switch( state->sound_mode )
 	{
 		case 0: /* sound off */
 			memset(buffer,0,sizeof(*buffer)*samples);
@@ -70,14 +82,14 @@ static STREAM_UPDATE( channelf_sh_update )
 
 	while (samples-- > 0)
 	{
-		if ((forced_ontime > 0) || ((sample_counter & mask) == target))   //  change made for improved sound
-			*sample++ = envelope;
+		if ((state->forced_ontime > 0) || ((state->sample_counter & mask) == target))   //  change made for improved sound
+			*sample++ = state->envelope;
 		else
 			*sample++ = 0;
-		sample_counter += incr;
-		envelope *= decay_mult;
-		if (forced_ontime > 0)          //  added for improved sound
-			forced_ontime -= 1;		//  added for improved sound
+		state->sample_counter += state->incr;
+		state->envelope *= state->decay_mult;
+		if (state->forced_ontime > 0)          //  added for improved sound
+			state->forced_ontime -= 1;		//  added for improved sound
 	}
 }
 
@@ -85,9 +97,10 @@ static STREAM_UPDATE( channelf_sh_update )
 
 static DEVICE_START(channelf_sound)
 {
+	channelf_sound_state *state = get_safe_token(device);
 	int rate;
 
-	channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
+	state->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
 	rate = device->machine->sample_rate;
 
 	/*
@@ -109,18 +122,18 @@ static DEVICE_START(channelf_sound)
      */
 
 	/* This is the proper value to add per sample */
-	incr = 65536.0/(rate/1000.0/2.0);
+	state->incr = 65536.0/(rate/1000.0/2.0);
 
 	//  added for improved sound
 	/* This is the minimum forced ontime, in samples */
-	min_ontime = rate/1000*2;  /* approx 2ms - estimated, not verified on HW */
+	state->min_ontime = rate/1000*2;  /* approx 2ms - estimated, not verified on HW */
 
-	/* This was measured, decay envelope with half life of ~9ms */
+	/* This was measured, decay state->envelope with half life of ~9ms */
 	/* (this is decay multiplier per sample) */
-	decay_mult = exp((-0.693/9e-3)/rate);
+	state->decay_mult = exp((-0.693/9e-3)/rate);
 
 	/* initial conditions */
-	envelope = 0;
+	state->envelope = 0;
 }
 
 
@@ -128,6 +141,9 @@ DEVICE_GET_INFO( channelf_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(channelf_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(channelf_sound);	break;
 

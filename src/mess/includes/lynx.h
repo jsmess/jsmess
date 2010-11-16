@@ -43,10 +43,9 @@ MACHINE_CONFIG_EXTERN( lynx_cartslot );
 DECLARE_LEGACY_SOUND_DEVICE(LYNX, lynx_sound);
 DECLARE_LEGACY_SOUND_DEVICE(LYNX2, lynx2_sound);
 
-void lynx_audio_reset(void);
-void lynx_audio_write(int offset, UINT8 data);
-UINT8 lynx_audio_read(int offset);
-void lynx_audio_count_down(running_machine *machine, int nr);
+void lynx_audio_write(running_device *device, int offset, UINT8 data);
+UINT8 lynx_audio_read(running_device *device, int offset);
+void lynx_audio_count_down(running_device *device, int nr);
 
 
 #endif /* LYNX_H_ */

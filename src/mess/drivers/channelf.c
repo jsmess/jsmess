@@ -130,7 +130,7 @@ static WRITE8_HANDLER( channelf_port_0_w )
 
 	latch[0] = data;
 
-    if (data & 0x20)
+	if (data & 0x20)
 	{
 		offs = channelf_row_reg*128+channelf_col_reg;
 		if (videoram[offs] != channelf_val_reg)
@@ -141,20 +141,20 @@ static WRITE8_HANDLER( channelf_port_0_w )
 static WRITE8_HANDLER( channelf_port_1_w )
 {
 	latch[1] = data;
-    channelf_val_reg = ((data ^ 0xff) >> 6) & 0x03;
+	channelf_val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
 static WRITE8_HANDLER( channelf_port_4_w )
 {
-    latch[2] = data;
-    channelf_col_reg = (data | 0x80) ^ 0xff;
+	latch[2] = data;
+	channelf_col_reg = (data | 0x80) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_port_5_w )
 {
-    latch[3] = data;
-	channelf_sound_w(space->machine, (data>>6)&3);
-    channelf_row_reg = (data | 0xc0) ^ 0xff;
+	latch[3] = data;
+	channelf_sound_w(space->machine->device("custom"), (data>>6)&3);
+	channelf_row_reg = (data | 0xc0) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_2102A_w )  /* SKR */

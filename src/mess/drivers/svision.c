@@ -25,6 +25,8 @@
 #define BANK svision_reg[0x26]
 
 static UINT8 *svision_reg;
+static running_device *svision_sound;
+static int *dma_finished;
 
 static struct
 {
@@ -75,7 +77,7 @@ static TIMER_CALLBACK(svision_pet_timer)
 void svision_irq(running_machine *machine)
 {
 	int irq = svision.timer_shot && (BANK & 2);
-	irq = irq || (svision_dma.finished && (BANK & 4));
+	irq = irq || (*dma_finished && (BANK & 4));
 
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -110,7 +112,7 @@ static READ8_HANDLER(svision_r)
 			data &= ~3;
 			if (svision.timer_shot)
 				data|=1;
-			if (svision_dma.finished)
+			if (*dma_finished)
 				data|=2;
 			break;
 		case 0x24:
@@ -118,7 +120,7 @@ static READ8_HANDLER(svision_r)
 			svision_irq( space->machine );
 			break;
 		case 0x25:
-			svision_dma.finished = FALSE;
+			*dma_finished = FALSE;
 			svision_irq( space->machine );
 			break;
 		default:
@@ -158,16 +160,16 @@ static WRITE8_HANDLER(svision_w)
 			timer_reset(svision.timer1, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
-			svision_soundport_w(space->machine, svision_channel + 0, offset & 3, data);
+			svision_soundport_w(svision_sound, 0, offset & 3, data);
 			break;
 		case 0x14: case 0x15: case 0x16: case 0x17:
-			svision_soundport_w(space->machine, svision_channel + 1, offset & 3, data);
+			svision_soundport_w(svision_sound, 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(space, offset - 0x18, data);
+			svision_sounddma_w(svision_sound, offset - 0x18, data);
 			break;
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(space, offset - 0x28, data);
+			svision_noise_w(svision_sound, offset - 0x28, data);
 			break;
 		default:
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)), offset, data);
@@ -433,17 +435,14 @@ static INTERRUPT_GEN( svision_frame_int )
 	if (BANK&1)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
-	if (svision_channel->count)
-		svision_channel->count--;
-	if (svision_channel[1].count)
-		svision_channel[1].count--;
-	if (svision_noise.count)
-		svision_noise.count--;
+	svision_sound_decrement(svision_sound);
 }
 
 static DRIVER_INIT( svision )
 {
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
+	svision_sound = machine->device("custom");
+	dma_finished = svision_dma_finished(svision_sound);
 	svision_pet.on = FALSE;
 	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x1c000);
 }
@@ -451,6 +450,7 @@ static DRIVER_INIT( svision )
 static DRIVER_INIT( svisions )
 {
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
+	svision_sound = machine->device("custom");
 	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x1c000);
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	svision_pet.on = TRUE;
@@ -504,7 +504,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 static MACHINE_RESET( svision )
 {
 	svision.timer_shot = FALSE;
-	svision_dma.finished = FALSE;
+	*dma_finished = FALSE;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 }
 
@@ -512,7 +512,7 @@ static MACHINE_RESET( svision )
 static MACHINE_RESET( tvlink )
 {
 	svision.timer_shot = FALSE;
-	svision_dma.finished = FALSE;
+	*dma_finished = FALSE;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 	tvlink.palette_on = FALSE;
 

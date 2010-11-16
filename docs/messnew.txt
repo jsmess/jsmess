@@ -32,6 +32,8 @@ System Driver Changes:
 
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
 
+- [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
+
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
   that control when the beam will reach the aim area, to run the function
   that checks if the pixel displayed is bright enough to activate the 

@@ -9,15 +9,16 @@
 #include "devices/cartslot.h"
 #include "hash.h"
 
-static UINT16 lynx_granularity = 1;
+static UINT16 lynx_granularity;
 static int lynx_line;
 static int lynx_line_y;
 static int sign_AB = 0, sign_CD = 0;
 
 static UINT32 lynx_palette[0x10];
 
-static int rotate = 0;
+static int rotate0 = 0;
 static int lynx_rotate;
+static running_device *lynx_audio;
 
 #define MATH_A		0x55
 #define MATH_B		0x54
@@ -664,7 +665,7 @@ static void lynx_blit_lines(void)
 
 			y = blitter.y;
 			flip++;
-		    continue;
+			continue;
 		}
 
 		for ( ; (hi < blitter.height); hi += 0x100, y += ydir)
@@ -1168,7 +1169,7 @@ typedef struct {
 	UINT8 data[0x100];
 } MIKEY;
 
-static MIKEY mikey={ { 0 } };
+static MIKEY mikey;
 
 
 static UINT8 lynx_read_vram(UINT16 address)
@@ -1197,9 +1198,9 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 ; B1    1 EQU flip screen
 ; B0    1 EQU video DMA enabled
 */
+static int lynx_height, lynx_width;
 static void lynx_draw_lines(running_machine *machine, int newline)
 {
-	static int height = -1, width = -1;
 	int h,w;
 	int x, yend;
 	UINT16 j; // clipping needed!
@@ -1289,11 +1290,11 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 	if (newline == -1)
 	{
 		lynx_line_y = 0;
-		if ((w != width) || (h != height))
+		if ((w != lynx_width) || (h != lynx_height))
 		{
-			width = w;
-			height = h;
-			machine->primary_screen->set_visible_area(0, width - 1, 0, height - 1);
+			lynx_width = w;
+			lynx_height = h;
+			machine->primary_screen->set_visible_area(0, w - 1, 0, h - 1);
 		}
 	}
 }
@@ -1387,7 +1388,7 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 		lynx_timer_count_down( machine, 7 );
 		break;
 	case 7:
-		lynx_audio_count_down( machine, 0 );
+		lynx_audio_count_down( lynx_audio, 0 );
 		break;
 	}
 }
@@ -1553,7 +1554,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	{
 		mikey.data[0x81] |= 0x10;
 		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
-    }
+	}
 }
 
 static  READ8_HANDLER(lynx_uart_r)
@@ -1633,7 +1634,7 @@ static READ8_HANDLER( mikey_read )
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		value = lynx_audio_read(offset);
+		value = lynx_audio_read(lynx_audio, offset);
 		break;
 
 	case 0x80:
@@ -1701,7 +1702,7 @@ static WRITE8_HANDLER( mikey_write )
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		lynx_audio_write(offset, data);
+		lynx_audio_write(lynx_audio, offset, data);
 		return;
 
 	case 0x80:
@@ -1836,8 +1837,6 @@ static void lynx_reset(running_machine &machine)
 
 	lynx_uart_reset();
 
-	lynx_audio_reset();
-
 	// hack to allow current object loading to work
 #if 1
 	lynx_timer_write( 0, 0, 160 );
@@ -1863,6 +1862,11 @@ MACHINE_START( lynx )
 	memory_configure_bank(machine, "bank3", 1, 1, lynx_mem_fe00, 0);
 	memory_configure_bank(machine, "bank4", 0, 1, memory_region(machine, "maincpu") + 0x01fa, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, lynx_mem_fffa, 0);
+
+	lynx_audio = machine->device("custom");
+	lynx_height = -1;
+	lynx_width = -1;
+	lynx_granularity = 1;
 
 	memset(&suzy, 0, sizeof(suzy));
 
@@ -1919,27 +1923,27 @@ int lynx_verify_cart (char *header, int kind)
 
 INTERRUPT_GEN( lynx_frame_int )
 {
-    lynx_rotate = rotate;
-    if ((input_port_read(device->machine, "ROTATION") & 0x03) != 0x03)
+	lynx_rotate = rotate0;
+	if ((input_port_read(device->machine, "ROTATION") & 0x03) != 0x03)
 		lynx_rotate=input_port_read(device->machine, "ROTATION") & 0x03;
 }
 
 void lynx_crc_keyword(device_image_interface &image)
 {
-    const char *info = NULL;
+	const char *info = NULL;
 
 	if (strcmp(image.extrainfo(), ""))
-	    info = image.extrainfo();
+		info = image.extrainfo();
 
-    rotate = 0;
+	rotate0 = 0;
 
-    if (info)
+	if (info)
 	{
 		if(strcmp(info, "ROTATE90DEGREE") == 0)
-			rotate = 1;
+			rotate0 = 1;
 		else if (strcmp(info, "ROTATE270DEGREE") == 0)
-			rotate = 2;
-    }
+			rotate0 = 2;
+	}
 }
 
 static DEVICE_IMAGE_LOAD( lynx_cart )

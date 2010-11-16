@@ -25,16 +25,16 @@ extern UINT8 channelf_val_reg;
 extern UINT8 channelf_row_reg;
 extern UINT8 channelf_col_reg;
 
-extern PALETTE_INIT( channelf );
-extern VIDEO_START( channelf );
-extern VIDEO_UPDATE( channelf );
+PALETTE_INIT( channelf );
+VIDEO_START( channelf );
+VIDEO_UPDATE( channelf );
 
 
 /*----------- defined in audio/channelf.c -----------*/
 
 DECLARE_LEGACY_SOUND_DEVICE(CHANNELF, channelf_sound);
 
-void channelf_sound_w(running_machine *machine, int mode);
+void channelf_sound_w(running_device *device, int mode);
 
 
 #endif /* CHANNELF_H_ */

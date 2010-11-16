@@ -86,7 +86,7 @@ static MACHINE_CONFIG_START( lynx, driver_device )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("lynx", LYNX, 0)
+	MDRV_SOUND_ADD("custom", LYNX, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -102,7 +102,7 @@ static MACHINE_CONFIG_DERIVED( lynx2, lynx )
 	MDRV_DEVICE_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_DEVICE_REMOVE("lynx")
-	MDRV_SOUND_ADD("lynx2", LYNX2, 0)
+	MDRV_SOUND_ADD("custom", LYNX2, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

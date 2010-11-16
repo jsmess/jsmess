@@ -887,7 +887,7 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			wswan_sound_port_w( space, offset, data );
+			wswan_sound_port_w( space->machine->device("custom"), offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios
