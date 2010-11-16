@@ -107,7 +107,7 @@ struct _upd71071_t
 	emu_timer* timer[4];
 	int in_progress[4];
 	int transfer_size[4];
-	int base[4];
+	int base;
 	const upd71071_intf* intf;
 };
 
@@ -134,7 +134,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 				dmac->reg.address_current[channel]++;
 			if(dmac->reg.count_current[channel] == 0)
 			{
-				if(dmac->reg.mode_control[channel] & 0x10)
+				if(dmac->reg.mode_control[channel] & 0x10)  // auto-initialise
 				{
 					dmac->reg.address_current[channel] = dmac->reg.address_base[channel];
 					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
@@ -154,7 +154,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 				dmac->reg.address_current[channel]++;
 			if(dmac->reg.count_current[channel] == 0)
 			{
-				if(dmac->reg.mode_control[channel] & 0x10)
+				if(dmac->reg.mode_control[channel] & 0x10)  // auto-initialise
 				{
 					dmac->reg.address_current[channel] = dmac->reg.address_base[channel];
 					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
@@ -176,7 +176,7 @@ void upd71071_soft_reset(running_device* device)
 
 	// Does not change base/current address, count, or buswidth
 	dmac->selected_channel = 0;
-	dmac->base[0] = 0;
+	dmac->base = 0;
 	for(x=0;x<4;x++)
 		dmac->reg.mode_control[x] = 0;
 	dmac->reg.device_control = 0;
@@ -252,41 +252,41 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 	{
 		case 0x01:  // Channel
 			ret = (1 << dmac->selected_channel);
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret |= 0x10;
 			break;
 		case 0x02:  // Count (low)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = dmac->reg.count_base[dmac->selected_channel] & 0xff;
 			else
 				ret = dmac->reg.count_current[dmac->selected_channel] & 0xff;
 			break;
 		case 0x03:  // Count (high)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = (dmac->reg.count_base[dmac->selected_channel] >> 8) & 0xff;
 			else
 				ret = (dmac->reg.count_current[dmac->selected_channel] >> 8) & 0xff;
 			break;
 		case 0x04:  // Address (low)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = dmac->reg.address_base[dmac->selected_channel] & 0xff;
 			else
 				ret = dmac->reg.address_current[dmac->selected_channel] & 0xff;
 			break;
 		case 0x05:  // Address (mid)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = (dmac->reg.address_base[dmac->selected_channel] >> 8) & 0xff;
 			else
 				ret = (dmac->reg.address_current[dmac->selected_channel] >> 8) & 0xff;
 			break;
 		case 0x06:  // Address (high)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = (dmac->reg.address_base[dmac->selected_channel] >> 16) & 0xff;
 			else
 				ret = (dmac->reg.address_current[dmac->selected_channel] >> 16) & 0xff;
 			break;
 		case 0x07:  // Address (highest)
-			if(dmac->base[dmac->selected_channel] != 0)
+			if(dmac->base != 0)
 				ret = (dmac->reg.address_base[dmac->selected_channel] >> 24) & 0xff;
 			else
 				ret = (dmac->reg.address_current[dmac->selected_channel] >> 24) & 0xff;
@@ -335,49 +335,55 @@ static WRITE8_DEVICE_HANDLER(upd71071_write)
 			break;
 		case 0x01:  // Channel
 			dmac->selected_channel = data & 0x03;
-			dmac->base[dmac->selected_channel] = data & 0x04;
+			dmac->base = data & 0x04;
 			logerror("DMA: Channel selected [%02x]\n",data);
 			break;
 		case 0x02:  // Count (low)
 			dmac->reg.count_base[dmac->selected_channel] =
 				(dmac->reg.count_base[dmac->selected_channel] & 0xff00) | data;
-			dmac->reg.count_current[dmac->selected_channel] =
-				(dmac->reg.count_current[dmac->selected_channel] & 0xff00) | data;
+			if(dmac->base == 0)
+				dmac->reg.count_current[dmac->selected_channel] =
+					(dmac->reg.count_current[dmac->selected_channel] & 0xff00) | data;
 			logerror("DMA: Channel %i Counter set [%04x]\n",dmac->selected_channel,dmac->reg.count_base[dmac->selected_channel]);
 			break;
 		case 0x03:  // Count (high)
 			dmac->reg.count_base[dmac->selected_channel] =
 				(dmac->reg.count_base[dmac->selected_channel] & 0x00ff) | (data << 8);
-			dmac->reg.count_current[dmac->selected_channel] =
-				(dmac->reg.count_current[dmac->selected_channel] & 0x00ff) | (data << 8);
+			if(dmac->base == 0)
+				dmac->reg.count_current[dmac->selected_channel] =
+					(dmac->reg.count_current[dmac->selected_channel] & 0x00ff) | (data << 8);
 			logerror("DMA: Channel %i Counter set [%04x]\n",dmac->selected_channel,dmac->reg.count_base[dmac->selected_channel]);
 			break;
 		case 0x04:  // Address (low)
 			dmac->reg.address_base[dmac->selected_channel] =
 				(dmac->reg.address_base[dmac->selected_channel] & 0xffffff00) | data;
-			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0xffffff00) | data;
+			if(dmac->base == 0)
+				dmac->reg.address_current[dmac->selected_channel] =
+					(dmac->reg.address_current[dmac->selected_channel] & 0xffffff00) | data;
 			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x05:  // Address (mid)
 			dmac->reg.address_base[dmac->selected_channel] =
 				(dmac->reg.address_base[dmac->selected_channel] & 0xffff00ff) | (data << 8);
-			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0xffff00ff) | (data << 8);
+			if(dmac->base == 0)
+				dmac->reg.address_current[dmac->selected_channel] =
+					(dmac->reg.address_current[dmac->selected_channel] & 0xffff00ff) | (data << 8);
 			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x06:  // Address (high)
 			dmac->reg.address_base[dmac->selected_channel] =
 				(dmac->reg.address_base[dmac->selected_channel] & 0xff00ffff) | (data << 16);
-			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0xff00ffff) | (data << 16);
+			if(dmac->base == 0)
+				dmac->reg.address_current[dmac->selected_channel] =
+					(dmac->reg.address_current[dmac->selected_channel] & 0xff00ffff) | (data << 16);
 			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x07:  // Address (highest)
 			dmac->reg.address_base[dmac->selected_channel] =
 				(dmac->reg.address_base[dmac->selected_channel] & 0x00ffffff) | (data << 24);
-			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0x00ffffff) | (data << 24);
+			if(dmac->base == 0)
+				dmac->reg.address_current[dmac->selected_channel] =
+					(dmac->reg.address_current[dmac->selected_channel] & 0x00ffffff) | (data << 24);
 			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x08:  // Device control (low)
