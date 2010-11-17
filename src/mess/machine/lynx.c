@@ -1866,7 +1866,6 @@ MACHINE_START( lynx )
 	lynx_audio = machine->device("custom");
 	lynx_height = -1;
 	lynx_width = -1;
-	lynx_granularity = 1;
 
 	memset(&suzy, 0, sizeof(suzy));
 
