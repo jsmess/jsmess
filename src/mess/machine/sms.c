@@ -268,7 +268,7 @@ static void lphaser2_sensor_check( running_machine *machine )
 }
 
 
-// at each frame we check if lightguns are enabled in one of the ports:
+// at each input port read we check if lightguns are enabled in one of the ports:
 // if so, we turn on crosshair and the lightgun timer
 static TIMER_CALLBACK( lightgun_tick )
 {
@@ -1927,7 +1927,6 @@ DRIVER_INIT( gamegeaj )
 }
 
 
-/* This needs to be here to check if segascope has been enabled */
 static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
 {
 	const int width = screen->width();
@@ -1959,15 +1958,15 @@ VIDEO_UPDATE( sms1 )
 	UINT8 sscope_binocular_hack = input_port_read_safe(screen->machine, "SSCOPE_BINOCULAR", 0x00);
 	UINT8 occluded_view = 0;
 
-	// without SuperScope, both LCDs for glasses go black
+	// without SegaScope, both LCDs for glasses go black
 	if ((screen != state->main_scr) && !sscope)
 		occluded_view = 1;
 
-	// with SuperScope, sscope_state 0 = left screen OFF, right screen ON
+	// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
 	if (!(state->sscope_state & 0x01) && (screen == state->left_lcd))
 		occluded_view = 1;
 
-	// with SuperScope, sscope_state 1 = left screen ON, right screen OFF
+	// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
 	if ((state->sscope_state & 0x01) && (screen == state->right_lcd))
 		occluded_view = 1;
 			
@@ -2026,7 +2025,7 @@ VIDEO_UPDATE( gamegear )
 	sms_vdp_update(state->vdp, state->tmp_bitmap, cliprect);
 
 	// HACK: fake LCD persistence effect 
-	// (it would be better to generalized this in the core, to be used for all LCD systems)
+	// (it would be better to generalize this in the core, to be used for all LCD systems)
 	for (y = 0; y < height; y++)
 	{
 		UINT32 *line0 = BITMAP_ADDR32(state->tmp_bitmap, y, 0);
