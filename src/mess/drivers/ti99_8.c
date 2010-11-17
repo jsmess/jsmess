@@ -641,6 +641,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
 
 	MDRV_TISPEECH_ADD("speech")
 
+	MDRV_TI998_BOARD_ADD( "ti_board" )
 	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
