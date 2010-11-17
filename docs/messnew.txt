@@ -9,7 +9,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- Ausbaufaehiger Mikrocomputer mit dem U 880 [Curt Coder]
 
 
 
@@ -31,6 +31,9 @@ System Driver Changes:
 - [ABC80] Refactored video to work like real hardware. [Curt Coder]
 
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
+
+- [AMU880] Refactored driver to define ADDRESS_MAP_MODERN, and fixed
+  keyboard. [Curt Coder]
 
 - [C64] Added known good dumps softlist for cartridges. Not hooked up
   to driver code yet. [Curt Coder]

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Ausbauf?higer Mikrocomputer mit dem U 880
+    Ausbaufaehiger Mikrocomputer mit dem U 880
     electronica Band 227/228
 
 ****************************************************************************/
@@ -9,13 +9,16 @@
 
     TODO:
 
-    - keyboard repeat is too fast
+    - keyboard repeat
+	- shift lock is not PORT_TOGGLE, instead RS flipflop
     - tone generator
-    - cassette (Z80SIO)
+    - cassette serial clock
     - eprom programmer
     - power off
 
 */
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/huebler.h"
@@ -23,27 +26,47 @@
 #include "cpu/z80/z80daisy.h"
 #include "devices/cassette.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "devices/messram.h"
 
 /* Keyboard */
 
+void amu880_state::scan_keyboard()
+{
+	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
+
+	UINT8 data = input_port_read(machine, keynames[m_key_a8 ? m_key_d6 : m_key_d7]);
+
+	int a8 = (data & 0x0f) == 0x0f;
+
+	if (m_key_a8 && !a8)
+	{
+		m_key_d7 = m_key_d6;
+		m_key_a4 = !(BIT(data, 1) & BIT(data, 3));
+		m_key_a5 = !(BIT(data, 2) & BIT(data, 3));
+	}
+
+	m_key_a8 = a8;
+
+	m_key_d6++;
+
+	if (m_key_d6 == 16)
+	{
+		m_key_d6 = 0;
+	}
+}
+
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
 	amu880_state *state = timer.machine->driver_data<amu880_state>();
 
-	state->key_y++;
-
-	if (state->key_y == 16)
-	{
-		state->key_y = 0;
-	}
+	state->scan_keyboard();
 }
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER( amu880_state::keyboard_r )
 {
 	/*
 
@@ -57,53 +80,38 @@ static READ8_HANDLER( keyboard_r )
 
     */
 
-	amu880_state *state = space->machine->driver_data<amu880_state>();
-
-	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
-
-	UINT8 data = input_port_read(space->machine, keynames[state->key_y]);
-	UINT8 special = input_port_read(space->machine, "SPECIAL");
-	UINT16 address;
-
+	UINT8 special = input_port_read(machine, "SPECIAL");
+	
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
-	int a8 = (data & 0x0f) == 0x0f;
 	int ab0 = BIT(offset, 0);
+	
+	UINT16 address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
-	if (!a8)
-	{
-		int a4 = BIT(data, 1) & BIT(data, 3);
-		int a5 = BIT(data, 2) & BIT(data, 3);
-
-		state->keylatch = (!a5 << 5) | (!a4 << 4) | state->key_y;
-	}
-
-	address = (ab0 << 9) | (a8 << 8) | (ctrl << 7) | (shift << 6) | state->keylatch;
-
-	return state->keyboard_rom[address];
+	return m_kb_rom[address];
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( amu880_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( amu880_mem, ADDRESS_SPACE_PROGRAM, 8, amu880_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(amu880_state, video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xf000, 0xfbff) AM_ROM
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amu880_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( amu880_io, ADDRESS_SPACE_IO, 8, amu880_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_WRITE(power_off_w)
 //  AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_WRITE(tone_off_w)
 //  AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_WRITE(tone_on_w)
 	AM_RANGE(0x08, 0x09) AM_MIRROR(0x02) AM_READ(keyboard_r)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -213,18 +221,14 @@ INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_START( amu880 )
+void amu880_state::video_start()
 {
-	amu880_state *state = machine->driver_data<amu880_state>();
-
-	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
+	// find memory regions
+	m_char_rom = memory_region(machine, "chargen");
 }
 
-static VIDEO_UPDATE( amu880 )
+bool amu880_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	amu880_state *state = screen->machine->driver_data<amu880_state>();
-
 	int y, sx, x, line;
 
 	for (y = 0; y < 240; y++)
@@ -234,16 +238,16 @@ static VIDEO_UPDATE( amu880 )
 		for (sx = 0; sx < 64; sx++)
 		{
 			UINT16 videoram_addr = ((y / 10) * 64) + sx;
-			UINT8 videoram_data = state->video_ram[videoram_addr & 0x7ff];
+			UINT8 videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
 			UINT16 charrom_addr = ((videoram_data & 0x7f) << 3) | line;
-			UINT8 data = state->char_rom[charrom_addr & 0x3ff];
+			UINT8 data = m_char_rom[charrom_addr & 0x3ff];
 
 			for (x = 0; x < 6; x++)
 			{
 				int color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
 
-				*BITMAP_ADDR16(bitmap, y, (sx * 6) + x) = color;
+				*BITMAP_ADDR16(&bitmap, y, (sx * 6) + x) = color;
 
 				data <<= 1;
 			}
@@ -259,10 +263,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
-{
-}
-
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
 	/* cassette transmit/receive clock */
@@ -273,7 +273,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),	/* ZC/TO1 callback */
 	DEVCB_LINE(ctc_z2_w)	/* ZC/TO2 callback */
 };
 
@@ -303,19 +303,35 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-static void z80daisy_interrupt(running_device *device, int state)
+static READ_LINE_DEVICE_HANDLER( cassette_r )
 {
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
+	return cassette_input(device) < 0.0;
 }
 
-static const z80sio_interface sio_intf =
+static WRITE_LINE_DEVICE_HANDLER( cassette_w )
 {
-	z80daisy_interrupt,	/* interrupt handler */
-	NULL,				/* DTR changed handler */
-	NULL,				/* RTS changed handler */
-	NULL,				/* BREAK changed handler */
-	NULL,				/* transmit handler */
-	NULL				/* receive handler */
+	cassette_output(device, state ? -1.0 : +1.0);
+}
+
+static Z80DART_INTERFACE( sio_intf )
+{
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, cassette_r),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, cassette_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
 
 /* Z80 Daisy Chain */
@@ -331,19 +347,17 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 /* Machine Initialization */
 
-static MACHINE_START( amu880 )
+void amu880_state::machine_start()
 {
-	amu880_state *state = machine->driver_data<amu880_state>();
-
-	/* find devices */
-	state->cassette = machine->device(CASSETTE_TAG);
-
 	/* find memory regions */
-	state->keyboard_rom = memory_region(machine, "keyboard");
+	m_kb_rom = memory_region(machine, "keyboard");
 
 	/* register for state saving */
-	state_save_register_global(machine, state->key_y);
-	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, m_key_d6);
+	state_save_register_global(machine, m_key_d7);
+	state_save_register_global(machine, m_key_a4);
+	state_save_register_global(machine, m_key_a5);
+	state_save_register_global(machine, m_key_a8);
 }
 
 /* Machine Driver */
@@ -376,14 +390,11 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( amu880, amu880_state )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) /* U880D */
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
 	MDRV_CPU_PROGRAM_MAP(amu880_mem)
 	MDRV_CPU_IO_MAP(amu880_io)
 	MDRV_CPU_CONFIG(amu880_daisy_chain)
-
-	MDRV_MACHINE_START(amu880)
 
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(1500))
 
@@ -396,14 +407,11 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(amu880)
-	MDRV_VIDEO_UPDATE(amu880)
-
 	/* devices */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)
 	MDRV_Z80PIO_ADD(Z80PIO1_TAG, XTAL_10MHz/4, pio1_intf)
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf)
+	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_config)
 
@@ -438,4 +446,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880,	0,		0,		amu880,	amu880,	0,		"Militaerverlag der DDR",	"Ausbaufaehiger Mikrocomputer mit dem U 880",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, amu880,	0,		0,		amu880,	amu880,	0,		"Militaerverlag der DDR",	"Ausbaufaehiger Mikrocomputer mit dem U 880",	GAME_NO_SOUND )

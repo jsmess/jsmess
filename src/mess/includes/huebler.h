@@ -13,19 +13,35 @@ class amu880_state : public driver_device
 {
 public:
 	amu880_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_key_d6(0),
+		  m_key_d7(0),
+		  m_key_a8(1)
+	{ }
 
-	/* keyboard state */
-	int key_y;
-	int keylatch;
-	const UINT8 *keyboard_rom;
+	required_device<running_device> m_cassette;
 
-	/* video state */
-	UINT8 *video_ram;
-	const UINT8 *char_rom;
+	virtual void machine_start();
 
-	/* devices */
-	running_device *cassette;
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( keyboard_r );
+
+	void scan_keyboard();
+
+	// keyboard state
+	const UINT8 *m_kb_rom;
+	int m_key_d6;
+	int m_key_d7;
+	int m_key_a4;
+	int m_key_a5;
+	int m_key_a8;
+
+	// video state
+	UINT8 *m_video_ram;
+	const UINT8 *m_char_rom;
 };
 
 #endif
