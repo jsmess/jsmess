@@ -184,7 +184,7 @@ cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);  //INT
 }
      
 /* upd765 INT is connected to interrupt of Z80 */
-static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt )
+WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt )
 {
     INT_current_state = state;
     valid_interrupt(device->machine);
