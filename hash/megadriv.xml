@@ -19528,6 +19528,17 @@ Known undumped pirates
 		</part>
 	</software>
 
+	<software name="swamptng">
+		<description>Swamp Thing (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>NuVision</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="swamp thing proto.bin" size="4194304" crc="e6ebe9d5" sha1="bd020f2da03a11e982a4ebd809e101c357e96e30" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swordsod">
 		<description>Sword of Sodan (Euro, USA)</description>
 		<year>199?</year>
