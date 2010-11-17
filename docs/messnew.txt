@@ -57,6 +57,8 @@ System Driver Changes:
 
 - [VIDBRAIN] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
+- [XEROX820] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
+
 
 
 Imgtool Changes:

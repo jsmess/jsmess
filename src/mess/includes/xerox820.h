@@ -19,31 +19,80 @@ class xerox820_state : public driver_device
 {
 public:
 	xerox820_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_kbpio(*this, Z80KBPIO_TAG),
+		  m_ctc(*this, Z80CTC_TAG),
+		  m_fdc(*this, WD1771_TAG),
+		  m_ram(*this, "messram"),
+		  m_floppy0(*this, FLOPPY_0),
+		  m_floppy1(*this, FLOPPY_1)
+	{ }
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<running_device> m_kbpio;
+	required_device<running_device> m_ctc;
+	required_device<running_device> m_fdc;
+	required_device<running_device> m_ram;
+	required_device<running_device> m_floppy0;
+	required_device<running_device> m_floppy1;
+	
+	DECLARE_WRITE8_MEMBER( scroll_w );
+	//DECLARE_WRITE8_MEMBER( x120_system_w );
+	DECLARE_READ8_MEMBER( kbpio_pa_r );
+	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
+	DECLARE_READ8_MEMBER( kbpio_pb_r );
+	DECLARE_WRITE_LINE_MEMBER( intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
+
+	void scan_keyboard();
+	void bankswitch(int bank);
+	void set_floppy_parameters(size_t length);
+	void common_kbpio_pa_w(UINT8 data);
 
 	/* keyboard state */
-	int keydata;						/* keyboard data */
+	int m_keydata;						/* keyboard data */
 
 	/* video state */
-	UINT8 *video_ram;					/* video RAM */
-	UINT8 *char_rom;					/* character ROM */
-	UINT8 scroll;						/* vertical scroll */
-	UINT8 framecnt;
-	int ncset2;							/* national character set */
-	int vatt;							/* X120 video attribute */
-	int lowlite;						/* low light attribute */
-	int chrom;							/* character ROM index */
+	UINT8 *m_video_ram;					/* video RAM */
+	UINT8 *m_char_rom;					/* character ROM */
+	UINT8 m_scroll;						/* vertical scroll */
+	UINT8 m_framecnt;
+	int m_ncset2;						/* national character set */
+	int m_vatt;							/* X120 video attribute */
+	int m_lowlite;						/* low light attribute */
+	int m_chrom;						/* character ROM index */
 
 	/* floppy state */
-	int fdc_irq;						/* interrupt request */
-	int fdc_drq;						/* data request */
-	int _8n5;							/* 5.25" / 8" drive select */
-	int dsdd;							/* double sided disk detect */
+	int m_fdc_irq;						/* interrupt request */
+	int m_fdc_drq;						/* data request */
+	int m_8n5;							/* 5.25" / 8" drive select */
+	int m_dsdd;							/* double sided disk detect */
+};
 
-	/* devices */
-	running_device *kbpio;
-	running_device *z80ctc;
-	running_device *wd1771;
+class xerox820ii_state : public xerox820_state
+{
+public:
+	xerox820ii_state(running_machine &machine, const driver_device_config_base &config)
+		: xerox820_state(machine, config)
+	{ }
+	
+	virtual void machine_reset();
+
+	DECLARE_WRITE8_MEMBER( bell_w );
+	DECLARE_WRITE8_MEMBER( slden_w );
+	DECLARE_WRITE8_MEMBER( chrom_w );
+	DECLARE_WRITE8_MEMBER( lowlite_w );
+	DECLARE_WRITE8_MEMBER( sync_w );
+	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
+
+	void bankswitch(int bank);
 };
 
 #endif
