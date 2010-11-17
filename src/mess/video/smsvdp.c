@@ -1493,10 +1493,7 @@ static DEVICE_RESET( smsvdp )
 	smsvdp->buffer = 0;
 	smsvdp->irq_state = 0;
 	smsvdp->line_counter = 0;
-
-	/* for light gun input with "Hang-On & Safari Hunt", hcounter seems to
-     need initialization to some value */
-	smsvdp->hcounter = 0x40;
+	smsvdp->hcounter = 0;
 
 	for (i = 0; i < 0x20; i++)
 		smsvdp->current_palette[i] = 0;
