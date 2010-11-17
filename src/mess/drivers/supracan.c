@@ -642,7 +642,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 	int ex;
 	int ey;
 	UINT16 *dest;
-	UINT8* destflags;
+//	UINT8* destflags;
 //  UINT8 *pri;
 	//const UINT16 *src;
 	//const UINT8 *maskptr;
@@ -713,7 +713,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 				cy += incxy;
 				x++;
 				dest++;
-				destflags++;
+//				destflags++;
 //              pri++;
 			}
 
