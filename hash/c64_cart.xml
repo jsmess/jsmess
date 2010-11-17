@@ -214,7 +214,7 @@
      -->
     <description>Stack Super Help 64</description>
     <year>19??</year>
-    <publisher>?</publisher>
+    <publisher>&lt;unknown&gt;</publisher>
 
     <part name="cart" interface="c64_cart">
       <dataarea name="rom" size="0x4000">
@@ -227,7 +227,7 @@
   <software name="gscard">
     <description>Game Saver Card v1.6</description>
     <year>198?</year>
-    <publisher>?</publisher>
+    <publisher>&lt;unknown&gt;</publisher>
 
     <part name="cart" interface="c64_cart">
       <dataarea name="rom" size="0x8000">
@@ -241,7 +241,7 @@
      -->
     <description>Multiscreen (Australia)</description>
     <year>198?</year>
-    <publisher>?</publisher>
+    <publisher>&lt;unknown&gt;</publisher>
 
     <part name="cart" interface="c64_cart">
       <dataarea name="rom" size="0x1c000">
