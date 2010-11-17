@@ -676,8 +676,19 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		if (image.fread( ptr, size) != size)
+
+		if (image.fread(ptr, size) != size)
 			return IMAGE_INIT_FAIL;
+
+		// if size < 0x200000, then mirror the image up to 0x200000
+		if (size == 0x100000)
+			memcpy(ptr + 0x100000, ptr, size);
+		else if(size == 0x080000)
+		{
+			memcpy(ptr + 0x000000, ptr, size);
+			memcpy(ptr + 0x100000, ptr, size);
+			memcpy(ptr + 0x180000, ptr, size);
+		}
 	}
 	else
 	{
