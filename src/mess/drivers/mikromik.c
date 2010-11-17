@@ -451,17 +451,10 @@ static I8237_INTERFACE( mm1_dma8237_intf )
 
 /* uPD765 Interface */
 
-static UPD765_DMA_REQUEST( drq_w )
-{
-	mm1_state *driver_state = device->machine->driver_data<mm1_state>();
-
-	i8237_dreq3_w(driver_state->m_dmac, state);
-}
-
 static const upd765_interface fdc_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
-	drq_w,
+	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq3_w),
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

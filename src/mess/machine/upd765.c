@@ -85,6 +85,7 @@ typedef struct _upd765_t upd765_t;
 struct _upd765_t
 {
 	devcb_resolved_write_line	out_int_func;
+	devcb_resolved_write_line	out_drq_func;
 
 	unsigned long	sector_counter;
 	/* version of fdc to emulate */
@@ -657,8 +658,8 @@ static void upd765_change_flags(running_device *device,unsigned int flags, unsig
 		devcb_call_write_line(&fdc->out_int_func, (fdc->upd765_flags & UPD765_INT) ? 1 : 0);
 
 	/* if DRQ changed, call the handler */
-	if ((changed_flags & UPD765_DMA_DRQ) && fdc->intf->dma_drq)
-		fdc->intf->dma_drq(device,(fdc->upd765_flags & UPD765_DMA_DRQ) ? 1 : 0, fdc->FDC_main & (1<<6));
+	if (changed_flags & UPD765_DMA_DRQ)
+		devcb_call_write_line(&fdc->out_drq_func, (fdc->upd765_flags & UPD765_DMA_DRQ) ? 1 : 0);
 }
 
 
@@ -2326,6 +2327,7 @@ static void common_start(running_device *device, int device_type)
 	fdc->data_buffer = auto_alloc_array(device->machine, char, 32*1024);
 
 	devcb_resolve_write_line(&fdc->out_int_func, &fdc->intf->out_int_func, device);
+	devcb_resolve_write_line(&fdc->out_drq_func, &fdc->intf->out_drq_func, device);
 
 	// register for state saving
 	//state_save_register_item(device->machine, "upd765", device->tag(), 0, upd765->number);

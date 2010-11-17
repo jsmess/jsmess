@@ -744,7 +744,7 @@ READ8_HANDLER( pc8801fd_upd765_tc )
 const upd765_interface pc8801_fdc_interface =
 {
 	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

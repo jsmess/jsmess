@@ -753,7 +753,7 @@ static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
 static const struct upd765_interface sf7000_upd765_interface =
 {
 	DEVCB_LINE(sf7000_fdc_interrupt),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{ FLOPPY_0, NULL, NULL, NULL }

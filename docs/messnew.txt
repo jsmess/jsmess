@@ -79,6 +79,9 @@ Source Changes:
   representing the real hardware. Using device structures for
   all hardware parts now. Redundant code removed. [Michael Zapf]
 
+- Refactored the UPD765 DRQ line to use devcb. The read_write parameter is 
+  not present on the real chip, and no driver was using it. [Curt Coder]
+
 
 
 0.140

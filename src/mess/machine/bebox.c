@@ -414,7 +414,7 @@ static void bebox_fdc_interrupt(running_machine *machine, int state)
 }
 
 
-static void bebox_fdc_dma_drq(running_machine *machine, int state, int read_)
+static void bebox_fdc_dma_drq(running_machine *machine, int state)
 {
 	if ( bebox_devices.dma8237_1 ) {
 		i8237_dreq2_w(bebox_devices.dma8237_1, state);

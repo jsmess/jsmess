@@ -296,7 +296,7 @@ static WRITE_LINE_DEVICE_HANDLER( compis_fdc_int )
 	}
 }
 
-static UPD765_DMA_REQUEST( compis_fdc_dma_drq )
+static WRITE_LINE_DEVICE_HANDLER( compis_fdc_dma_drq )
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
 	if (input_port_read(device->machine, "DSW1") && state)
@@ -308,7 +308,7 @@ static UPD765_DMA_REQUEST( compis_fdc_dma_drq )
 const upd765_interface compis_fdc_interface =
 {
 	DEVCB_LINE(compis_fdc_int),
-	compis_fdc_dma_drq,
+	DEVCB_LINE(compis_fdc_dma_drq),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}

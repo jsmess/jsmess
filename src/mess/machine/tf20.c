@@ -270,7 +270,7 @@ static UPD7201_INTERFACE( tf20_upd7201_intf )
 static const upd765_interface tf20_upd765a_intf =
 {
 	DEVCB_CPU_INPUT_LINE("tf20", INPUT_LINE_IRQ0),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}

@@ -1311,7 +1311,7 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_fdc_interrupt )
 static const upd765_interface nc200_upd765_interface=
 {
     DEVCB_LINE(nc200_fdc_interrupt),
-    NULL,
+    DEVCB_NULL,
     NULL,
     UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, NULL, NULL, NULL }

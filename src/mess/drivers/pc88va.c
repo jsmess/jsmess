@@ -1513,7 +1513,7 @@ static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 static const struct upd765_interface pc88va_upd765_interface =
 {
 	DEVCB_LINE(pc88va_upd765_interrupt),
-	NULL, //DRQ, TODO
+	DEVCB_NULL, //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,NULL, NULL, NULL}

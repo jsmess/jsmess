@@ -76,7 +76,7 @@ static WRITE_LINE_DEVICE_HANDLER( microdec_irq_w )
 static const struct upd765_interface microdec_upd765_interface =
 {
 	DEVCB_LINE(microdec_irq_w), /* interrupt */
-	NULL,						/* DMA request */
+	DEVCB_NULL,					/* DMA request */
 	NULL,	/* image lookup */
 	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

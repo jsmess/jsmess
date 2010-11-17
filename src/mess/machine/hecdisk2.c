@@ -41,7 +41,7 @@ static emu_timer *INT_timer;
 
 
 /* Callback uPD request */
-UPD765_DMA_REQUEST( disk2_fdc_dma_irq );
+static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq );
 
 UINT8 Disk2memory[0x10000];  /* Memory space for Disk II unit*/
 UINT8 Mem_RNMI =0xff;
@@ -86,7 +86,7 @@ HECTOR SYSTEM CP/M 2.2 Disk
 const upd765_interface disk2_upd765_interface =
 {
 	DEVCB_LINE(disk2_fdc_interrupt),
-	disk2_fdc_dma_irq,
+	DEVCB_LINE(disk2_fdc_dma_irq),
     NULL,  //	disk2_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,  //NOT_
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
@@ -184,13 +184,13 @@ cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);  //INT
 }
      
 /* upd765 INT is connected to interrupt of Z80 */
-WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt )
 {
     INT_current_state = state;
     valid_interrupt(device->machine);
 }
 /* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization*/
-UPD765_DMA_REQUEST( disk2_fdc_dma_irq )
+static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq )
 {
      NMI_current_state = state;                  
      valid_interrupt(device->machine);

@@ -136,7 +136,7 @@ static I8255A_INTERFACE( amstrad_ppi8255_interface )
 static const upd765_interface amstrad_upd765_interface =
 {
 	DEVCB_NULL,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
@@ -146,7 +146,7 @@ static const upd765_interface amstrad_upd765_interface =
 static const upd765_interface aleste_8272_interface =
 {
 	DEVCB_LINE(aleste_interrupt),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

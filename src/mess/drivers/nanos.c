@@ -432,7 +432,7 @@ static Z80PIO_INTERFACE( nanos_z80pio_intf )
 static const upd765_interface nanos_upd765_interface =
 {
 	DEVCB_NULL,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}

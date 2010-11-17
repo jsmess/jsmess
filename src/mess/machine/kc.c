@@ -206,7 +206,7 @@ static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_interrupt )
 }
 
 /* callback for /DRQ output from FDC */
-static UPD765_DMA_REQUEST( kc85_fdc_dma_drq )
+static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_dma_drq )
 {
 	kc85_disc_hw_input_gate &=~(1<<7);
 	if (state)
@@ -216,7 +216,7 @@ static UPD765_DMA_REQUEST( kc85_fdc_dma_drq )
 const upd765_interface kc_fdc_interface=
 {
 	DEVCB_LINE(kc85_fdc_interrupt),
-	kc85_fdc_dma_drq,
+	DEVCB_LINE(kc85_fdc_dma_drq),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}

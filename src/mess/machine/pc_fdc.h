@@ -27,7 +27,7 @@
 struct pc_fdc_interface
 {
 	void (*pc_fdc_interrupt)(running_machine*,int);
-	void (*pc_fdc_dma_drq)(running_machine*,int,int);
+	void (*pc_fdc_dma_drq)(running_machine*,int);
 	running_device *(*get_image)(running_machine*, int floppy_index);
 	running_device *(*get_device)(running_machine*);
 };

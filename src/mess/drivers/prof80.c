@@ -1009,10 +1009,10 @@ static void prof80_fdc_index_callback(running_device *controller, running_device
 static const struct upd765_interface prof80_upd765_interface =
 {
 	DEVCB_NULL,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* PPI8255 Interface */

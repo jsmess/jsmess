@@ -40,7 +40,6 @@ struct pc_fdc
 	int tc_state;
 	/* stored dma drq state */
 	int dma_state;
-	int dma_read;
 	/* stored int state */
 	int int_state;
 
@@ -57,13 +56,13 @@ static struct pc_fdc *fdc;
 static TIMER_CALLBACK( watchdog_timeout );
 
 static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt );
-static UPD765_DMA_REQUEST(pc_fdc_hw_dma_drq);
+static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq );
 static UPD765_GET_IMAGE ( pc_fdc_get_image);
 
 const upd765_interface pc_fdc_upd765_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
-	pc_fdc_hw_dma_drq,
+	DEVCB_LINE(pc_fdc_hw_dma_drq),
 	pc_fdc_get_image,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -72,7 +71,7 @@ const upd765_interface pc_fdc_upd765_connected_interface =
 const upd765_interface pc_fdc_upd765_connected_1_drive_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
-	pc_fdc_hw_dma_drq,
+	DEVCB_LINE(pc_fdc_hw_dma_drq),
 	pc_fdc_get_image,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, NULL, NULL, NULL}
@@ -82,7 +81,7 @@ const upd765_interface pc_fdc_upd765_connected_1_drive_interface =
 const upd765_interface pc_fdc_upd765_not_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
-	pc_fdc_hw_dma_drq,
+	DEVCB_LINE(pc_fdc_hw_dma_drq),
 	pc_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -202,17 +201,16 @@ void pc_fdc_dack_w(running_machine *machine, int data)
 
 
 
-static UPD765_DMA_REQUEST( pc_fdc_hw_dma_drq )
+static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq )
 {
 	fdc->dma_state = state;
-	fdc->dma_read = read_write;
 
 	/* if dma is not enabled, drqs are masked */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)==0)
 		return;
 
 	if (fdc->fdc_interface.pc_fdc_dma_drq)
-		fdc->fdc_interface.pc_fdc_dma_drq(device->machine,state, read_write);
+		fdc->fdc_interface.pc_fdc_dma_drq(device->machine, state);
 }
 
 
@@ -287,7 +285,7 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	/* changing the DMA enable bit, will affect the dma drq state
     from reaching us - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_hw_dma_drq(pc_get_device(machine), fdc->dma_state, fdc->dma_read);
+	pc_fdc_hw_dma_drq(pc_get_device(machine), fdc->dma_state);
 
 	/* changing the DMA enable bit, will affect the irq state
     from reaching us - if dma is enabled this will send it through

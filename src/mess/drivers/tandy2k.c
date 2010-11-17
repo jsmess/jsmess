@@ -734,7 +734,7 @@ static const floppy_config tandy2k_floppy_config =
 
 /* Intel 8272 Interface */
 
-static UPD765_DMA_REQUEST( busdmarq0_w )
+static WRITE_LINE_DEVICE_HANDLER( busdmarq0_w )
 {
 	dma_request(device->machine, 0, state);
 }
@@ -742,7 +742,7 @@ static UPD765_DMA_REQUEST( busdmarq0_w )
 static const struct upd765_interface i8272_intf =
 {
 	DEVCB_DEVICE_LINE(I8259A_0_TAG, pic8259_ir4_w),
-	busdmarq0_w,
+	DEVCB_LINE(busdmarq0_w),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

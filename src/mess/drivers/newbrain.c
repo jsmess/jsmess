@@ -1307,7 +1307,7 @@ static WRITE_LINE_DEVICE_HANDLER( newbrain_fdc_interrupt )
 static const upd765_interface newbrain_upd765_interface =
 {
 	DEVCB_LINE(newbrain_fdc_interrupt),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

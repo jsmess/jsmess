@@ -57,7 +57,7 @@ DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 static const struct upd765_interface elwro800jr_upd765_interface =
 {
 	DEVCB_NULL,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

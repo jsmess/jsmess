@@ -152,7 +152,7 @@ static void pcw_update_interrupt_counter(void)
 static const upd765_interface pcw_upd765_interface =
 {
 	DEVCB_LINE(pcw_fdc_interrupt),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

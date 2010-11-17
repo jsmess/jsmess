@@ -182,8 +182,8 @@ static READ8_HANDLER (floppy_r)
 
 static const struct upd765_interface pyldin_upd765_interface =
 {
-	DEVCB_NULL,						/* interrupt */
-	NULL,						/* DMA request */
+	DEVCB_NULL,					/* interrupt */
+	DEVCB_NULL,					/* DMA request */
 	pyldin_upd765_get_image,	/* image lookup */
 	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}

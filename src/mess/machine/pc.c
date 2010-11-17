@@ -1088,7 +1088,7 @@ static void pc_fdc_interrupt(running_machine *machine, int state)
 	}
 }
 
-static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
+static void pc_fdc_dma_drq(running_machine *machine, int state)
 {
 	pc_state *st = machine->driver_data<pc_state>();
 	i8237_dreq2_w( st->dma8237, state);

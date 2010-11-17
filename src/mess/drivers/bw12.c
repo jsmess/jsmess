@@ -451,7 +451,7 @@ static UPD765_GET_IMAGE( bw12_upd765_get_image )
 static const struct upd765_interface bw12_upd765_interface =
 {
 	DEVCB_LINE(bw12_upd765_interrupt),	/* interrupt */
-	NULL,								/* DMA request */
+	DEVCB_NULL,							/* DMA request */
 	bw12_upd765_get_image,				/* image lookup */
 	UPD765_RDY_PIN_CONNECTED,			/* ready pin */
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

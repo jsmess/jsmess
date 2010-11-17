@@ -37,9 +37,6 @@ typedef enum
 #define UPD765_DAM_DELETED_DATA 0x0f8
 #define UPD765_DAM_DATA 0x0fb
 
-typedef void (*upd765_dma_drq_func)(running_device *device, int state,int read_write);
-#define UPD765_DMA_REQUEST(name)	void name(running_device *device, int state,int read_write )
-
 typedef running_device *(*upd765_get_image_func)(running_device *device, int floppy_index);
 #define UPD765_GET_IMAGE(name)	running_device *name(running_device *device, int floppy_index )
 
@@ -50,7 +47,7 @@ typedef struct upd765_interface
 	devcb_write_line out_int_func;
 
 	/* dma data request */
-	upd765_dma_drq_func dma_drq;
+	devcb_write_line out_drq_func;
 
 	/* image lookup */
 	upd765_get_image_func get_image;

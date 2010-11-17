@@ -1114,7 +1114,7 @@ static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 	upd765_dack_w(fdc, 0, data);
 }
 
-static UPD765_DMA_REQUEST ( fdc_drq )
+static WRITE_LINE_DEVICE_HANDLER ( fdc_drq )
 {
 	x68k_sys.fdc.drq_state = state;
 }
@@ -2045,7 +2045,7 @@ static const hd63450_intf dmac_interface =
 static const upd765_interface fdc_interface =
 {
 	DEVCB_LINE(fdc_irq),
-	fdc_drq,
+	DEVCB_LINE(fdc_drq),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}

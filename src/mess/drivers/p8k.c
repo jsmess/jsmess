@@ -323,17 +323,10 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 	z80pio_pb_w(z80pio, 0, (state) ? 0x10 : 0x00);
 }
 
-static UPD765_DMA_REQUEST( p8k_i8272_drq_w )
-{
-	running_device *z80dma = device->machine->device("z80dma");
-
-	z80dma_rdy_w(z80dma, state);
-}
-
 static const struct upd765_interface p8k_i8272_intf =
 {
 	DEVCB_LINE(p8k_i8272_irq_w),
-	p8k_i8272_drq_w,
+	DEVCB_DEVICE_LINE("z80dma", z80dma_rdy_w),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

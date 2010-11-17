@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 static const upd765_interface pf10_upd765a_intf =
 {
 	DEVCB_NULL, /* interrupt line */
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED, /* ??? */
 	{NULL, NULL, NULL, NULL}

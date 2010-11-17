@@ -182,7 +182,7 @@ static WRITE_LINE_DEVICE_HANDLER( sord_fd5_fdc_interrupt )
 static const struct upd765_interface sord_fd5_upd765_interface=
 {
 	DEVCB_LINE(sord_fd5_fdc_interrupt),
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}

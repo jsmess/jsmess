@@ -149,17 +149,15 @@ static WRITE_LINE_DEVICE_HANDLER(qx10_upd765_interrupt)
 	pic8259_ir6_w(driver_state->pic8259_master, state);
 };
 
-static UPD765_DMA_REQUEST( drq_w )
+static WRITE_LINE_DEVICE_HANDLER( drq_w )
 {
-	qx10_state *driver_state = device->machine->driver_data<qx10_state>();
-	//logerror("DMA Request from upd765: %d\n", state);
-	i8237_dreq0_w(driver_state->dma8237_1, !state);
+	i8237_dreq0_w(device, !state);
 }
 
 static const struct upd765_interface qx10_upd765_interface =
 {
 	DEVCB_LINE(qx10_upd765_interrupt),
-	drq_w,
+	DEVCB_DEVICE_LINE("8237dma_1", drq_w),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,NULL, NULL, NULL}

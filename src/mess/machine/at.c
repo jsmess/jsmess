@@ -425,7 +425,7 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 }
 
 
-static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
+static void at_fdc_dma_drq(running_machine *machine, int state)
 {
 	at_state *st = machine->driver_data<at_state>();
 	i8237_dreq2_w( st->dma8237_1, state);
