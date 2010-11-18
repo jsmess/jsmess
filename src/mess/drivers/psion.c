@@ -975,11 +975,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		0)
-COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		0)
-COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	0)
-COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	0)
-COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	0)
-COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	0)
-COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		0)
-COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	0)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_IMPERFECT_GRAPHICS)
+COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_IMPERFECT_GRAPHICS)
+COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_IMPERFECT_GRAPHICS)
+COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_IMPERFECT_GRAPHICS)
+COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_IMPERFECT_GRAPHICS)

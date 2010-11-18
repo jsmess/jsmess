@@ -211,7 +211,7 @@ READ8_HANDLER( mz800_bank_1_r )
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in ram from 0x1000 to 0x1fff */
-	memory_install_readwrite_bank(spc, 0x1000, 0x1fff, 0x1000, 0, "bank2");
+	memory_install_readwrite_bank(spc, 0x1000, 0x1fff, 0, 0, "bank2");
 	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000);
 
 	if (mz->mz700_mode)
