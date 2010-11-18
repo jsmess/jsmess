@@ -20,13 +20,14 @@
 	Information and programs can be found at http://chip8.com/?page=78
 
 
+	To change the large numbers at the bottom, start in debug mode, enter
+	some data at memory 6 and 7, then G to run.
+
 
     TODO:
-	- It doesn't boot up
 	- Cassette
 	- CPU should freeze while screen is being drawn
-	- Confirm if screen is being drawn the right way
-	- Confirm keyboard configuration
+	- Keyboard (should work but it doesn't)
 */
 
 #include "emu.h"
@@ -59,7 +60,7 @@ public:
 
 static ADDRESS_MAP_START( d6800_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x8010, 0x8013) AM_MIRROR(0x3cec) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
+	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM
 ADDRESS_MAP_END
 
@@ -71,24 +72,28 @@ static INPUT_PORTS_START( d6800 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
 	PORT_START("LINE1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
 	PORT_START("LINE2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
 	PORT_START("LINE3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
@@ -161,7 +166,7 @@ static READ8_DEVICE_HANDLER( d6800_cassette_r )
 	knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
 	*/
 
-	return 0;
+	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( d6800_cassette_w )
@@ -177,16 +182,16 @@ static WRITE8_DEVICE_HANDLER( d6800_cassette_w )
 
 static READ8_DEVICE_HANDLER( d6800_keyboard_r )
 {
-	UINT8 data = 0x0f;
+	UINT8 data = 0xff;
 
 	if (!BIT(d6800_keylatch, 4)) data &= input_port_read(device->machine, "LINE0");
 	if (!BIT(d6800_keylatch, 5)) data &= input_port_read(device->machine, "LINE1");
 	if (!BIT(d6800_keylatch, 6)) data &= input_port_read(device->machine, "LINE2");
 	if (!BIT(d6800_keylatch, 7)) data &= input_port_read(device->machine, "LINE3");
 
-	d6800_keydown = (data==0x0f) ? 0 : 1;
+	d6800_keydown = (data==0xff) ? 0 : 1;
 
-	return d6800_keylatch | data;
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( d6800_keyboard_w )
