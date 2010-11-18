@@ -59,6 +59,8 @@ System Driver Changes:
 
 - [XEROX820] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
+- [XOR100] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
+
 
 
 Imgtool Changes:
