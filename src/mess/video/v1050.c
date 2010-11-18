@@ -20,41 +20,33 @@
 
 /* Video RAM Access */
 
-READ8_HANDLER( v1050_attr_r )
+READ8_MEMBER( v1050_state::attr_r )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
-
-	return state->attr;
+	return m_attr;
 }
 
-WRITE8_HANDLER( v1050_attr_w )
+WRITE8_MEMBER( v1050_state::attr_w )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
-
-	state->attr = data;
+	m_attr = data;
 }
 
-READ8_HANDLER( v1050_videoram_r )
+READ8_MEMBER( v1050_state::videoram_r )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
-
 	if (offset >= 0x2000)
 	{
-		state->attr = (state->attr & 0xfc) | (state->attr_ram[offset] & 0x03);
+		m_attr = (m_attr & 0xfc) | (m_attr_ram[offset] & 0x03);
 	}
 
-	return state->video_ram[offset];
+	return m_video_ram[offset];
 }
 
-WRITE8_HANDLER( v1050_videoram_w )
+WRITE8_MEMBER( v1050_state::videoram_w )
 {
-	v1050_state *state = space->machine->driver_data<v1050_state>();
+	m_video_ram[offset] = data;
 
-	state->video_ram[offset] = data;
-
-	if (offset >= 0x2000 && BIT(state->attr, 2))
+	if (offset >= 0x2000 && BIT(m_attr, 2))
 	{
-		state->attr_ram[offset] = state->attr & 0x03;
+		m_attr_ram[offset] = m_attr & 0x03;
 	}
 }
 
@@ -69,8 +61,8 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 	for (column = 0; column < x_count; column++)
 	{
 		UINT16 address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
-		UINT8 data = state->video_ram[address & V1050_VIDEORAM_MASK];
-		UINT8 attr = (state->attr & 0xfc) | (state->attr_ram[address] & 0x03);
+		UINT8 data = state->m_video_ram[address & V1050_VIDEORAM_MASK];
+		UINT8 attr = (state->m_attr & 0xfc) | (state->m_attr_ram[address] & 0x03);
 
 		for (bit = 0; bit < 8; bit++)
 		{
@@ -96,13 +88,14 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( v1050_vsync_changed )
+WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 {
-	cputag_set_input_line(device->machine, M6502_TAG, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	v1050_set_int(device->machine, INT_VSYNC, state);
+	cpu_set_input_line(m_subcpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+
+	set_interrupt(INT_VSYNC, state);
 }
 
-static const mc6845_interface v1050_mc6845_intf =
+static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
 	8,
@@ -112,7 +105,7 @@ static const mc6845_interface v1050_mc6845_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(v1050_vsync_changed),
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state, crtc_vs_w),
 	NULL
 };
 
@@ -127,28 +120,21 @@ static PALETTE_INIT( v1050 )
 
 /* Video Start */
 
-static VIDEO_START( v1050 )
+void v1050_state::video_start()
 {
-	v1050_state *state = machine->driver_data<v1050_state>();
-
-	/* find devices */
-	state->mc6845 = machine->device(H46505_TAG);
-
 	/* allocate memory */
-	state->attr_ram = auto_alloc_array(machine, UINT8, V1050_VIDEORAM_SIZE);
+	m_attr_ram = auto_alloc_array(machine, UINT8, V1050_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->attr);
-	state_save_register_global_pointer(machine, state->attr_ram, V1050_VIDEORAM_SIZE);
+	state_save_register_global(machine, m_attr);
+	state_save_register_global_pointer(machine, m_attr_ram, V1050_VIDEORAM_SIZE);
 }
 
 /* Video Update */
 
-static VIDEO_UPDATE( v1050 )
+bool v1050_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	v1050_state *state = screen->machine->driver_data<v1050_state>();
-
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 
 	return 0;
 }
@@ -156,7 +142,7 @@ static VIDEO_UPDATE( v1050 )
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( v1050_video )
-	MDRV_MC6845_ADD(H46505_TAG, H46505, XTAL_15_36MHz/8, v1050_mc6845_intf)
+	MDRV_MC6845_ADD(H46505_TAG, H46505, XTAL_15_36MHz/8, crtc_intf)
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -168,7 +154,4 @@ MACHINE_CONFIG_FRAGMENT( v1050_video )
 
 	MDRV_PALETTE_LENGTH(3)
     MDRV_PALETTE_INIT(v1050)
-
-	MDRV_VIDEO_START(v1050)
-	MDRV_VIDEO_UPDATE(v1050)
 MACHINE_CONFIG_END

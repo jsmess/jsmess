@@ -55,6 +55,8 @@ System Driver Changes:
   selecting the Segascope views from the Video Options menu). The option 
   is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
 
+- [V1050] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
+
 - [VIDBRAIN] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
 - [XEROX820] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
