@@ -7,6 +7,10 @@
     Great info at http://www.goliathindustries.com/vb/
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
+    TODO:
+    - finish V810 irq support;
+    - understand irqs on this HW;
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -150,7 +154,7 @@ static READ16_HANDLER( vip_r )
 
 	switch(offset << 1) {
 		case 0x00:	//INTPND
-					return state->vip_regs.INTPND;
+					return state->vip_regs.INTPND & state->vip_regs.INTENB;
 		case 0x02:	//INTENB
 					return state->vip_regs.INTENB;
 		case 0x04:	//INTCLR
@@ -221,9 +225,12 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		case 0x02:	//INTENB
 					state->vip_regs.INTENB = data;
+					printf("%04x ENB\n",data);
 					break;
 		case 0x04:	//INTCLR
 					state->vip_regs.INTPND &= ~data;
+					//cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
+					//printf("%04x ACK\n",data);
 					break;
 		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
@@ -699,12 +706,24 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	return IMAGE_INIT_PASS;
 }
 
+INTERRUPT_GEN( vboy_interrupt )
+{
+	vboy_state *state = device->machine->driver_data<vboy_state>();
+
+	if(state->vip_regs.INTENB)
+	{
+		cputag_set_input_line(device->machine, "maincpu", 4, ASSERT_LINE);
+		state->vip_regs.INTPND |= 0x4000;
+	}
+}
+
 static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", V810, XTAL_20MHz )
 	MDRV_CPU_PROGRAM_MAP(vboy_mem)
 	MDRV_CPU_IO_MAP(vboy_io)
+	MDRV_CPU_VBLANK_INT("3dleft", vboy_interrupt)
 
 	MDRV_MACHINE_RESET(vboy)
 
