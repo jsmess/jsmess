@@ -225,11 +225,11 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		case 0x02:	//INTENB
 					state->vip_regs.INTENB = data;
-					printf("%04x ENB\n",data);
+					//printf("%04x ENB\n",data);
 					break;
 		case 0x04:	//INTCLR
 					state->vip_regs.INTPND &= ~data;
-					//cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
 					//printf("%04x ACK\n",data);
 					break;
 		case 0x20:	//DPSTTS
@@ -712,7 +712,7 @@ INTERRUPT_GEN( vboy_interrupt )
 
 	if(state->vip_regs.INTENB)
 	{
-		cputag_set_input_line(device->machine, "maincpu", 4, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 4, HOLD_LINE);
 		state->vip_regs.INTPND |= 0x4000;
 	}
 }
