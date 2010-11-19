@@ -378,6 +378,8 @@ static READ8_HANDLER(towns_floppy_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* fdc = state->fdc;
+	device_image_interface* image;
+	UINT8 ret;
 
 	switch(offset)
 	{
@@ -391,10 +393,28 @@ static READ8_HANDLER(towns_floppy_r)
 			return wd17xx_data_r(fdc,offset/2);
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
-			if(state->towns_selected_drive < 1 || state->towns_selected_drive > 2)
-				return 0x01;
-			else
-				return 0x07;
+			ret = 0x80;  // always set
+			switch(state->towns_selected_drive)
+			{
+			case 1:
+				ret |= 0x0c;
+				image = dynamic_cast<device_image_interface*>(space->machine->device("floppy0"));
+				if(image->exists())
+					ret |= 0x03;
+				break;
+			case 2:
+				ret |= 0x0c;
+				image = dynamic_cast<device_image_interface*>(space->machine->device("floppy1"));
+				if(image->exists())
+					ret |= 0x03;
+				break;
+			case 3:
+			case 4:
+			case 0:
+			default:
+				break;
+			}
+			return ret;
 		case 0x0e: // DRVCHG
 			logerror("FDC: read from offset 0x0e\n");
 			return 0x00;
