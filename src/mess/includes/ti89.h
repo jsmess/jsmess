@@ -21,16 +21,14 @@
 	EPROM
  };
 
-/***************************************************************************
-+    FUNCTION PROTOTYPES
-+***************************************************************************/
+/*----------- defined in drivers/ti89.c -----------*/
 
 WRITE16_HANDLER ( ti68k_io_w );
 READ16_HANDLER ( ti68k_io_r );
 WRITE16_HANDLER ( ti68k_io2_w );
 READ16_HANDLER ( ti68k_io2_r );
-WRITE16_HANDLER ( flash_w );
-READ16_HANDLER ( rom_r );
+static WRITE16_HANDLER ( flash_w );
+static READ16_HANDLER ( rom_r );
 
 static TIMER_CALLBACK( ti68k_timer_callback );
 static INPUT_CHANGED( ti68k_on_key );

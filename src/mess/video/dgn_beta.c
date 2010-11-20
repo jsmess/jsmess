@@ -120,12 +120,12 @@ static int beta_DE      = 0;
 //static BETA_VID_MODES VIDMODE = TEXT_40x25;
 
 /* Debugging variables */
-static int LogRegWrites	= 1;	// Log register writes to debug console.
-static int BoxColour	= 1;
-static int BoxMinX		= 100;
-static int BoxMinY		= 100;
-static int BoxMaxX		= 500;
-static int BoxMaxY		= 500;
+static int LogRegWrites;	// Log register writes to debug console.
+static int BoxColour;
+static int BoxMinX;
+static int BoxMinY;
+static int BoxMaxX;
+static int BoxMaxY;
 static int HSyncMin		= 0;
 static int VSyncMin		= 0;
 static int DEPos		= 0;
@@ -141,19 +141,19 @@ static void execute_beta_vid_limits(running_machine *machine, int ref, int param
 static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[]);
 
 static bitmap_t	*bit;
-static int MinAddr	    = 0xFFFF;
-static int MaxAddr	    = 0x0000;
-static int MinX	        = 0xFFFF;
-static int MaxX	        = 0x0000;
-static int MinY	        = 0xFFFF;
-static int MaxY	        = 0x0000;
+static int MinAddr;
+static int MaxAddr;
+static int MinX;
+static int MaxX;
+static int MinY;
+static int MaxY;
 
 static int VidAddr		= 0;	// Last address reg written
 
-static void beta_Set_RA(int offset, int data);
+static void beta_Set_RA(running_machine *machine, int offset, int data);
 static void beta_Set_HSync(running_machine *machine, int offset, int data);
 static void beta_Set_VSync(running_machine *machine, int offset, int data);
-static void beta_Set_DE(int offset, int data);
+static void beta_Set_DE(running_machine *machine, int offset, int data);
 
 static const struct m6845_interface beta_m6845_interface = {
 	0,		        // Memory Address register
@@ -234,7 +234,7 @@ void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 }
 
 // called when the 6845 changes the character row
-static void beta_Set_RA(int offset, int data)
+static void beta_Set_RA(running_machine *machine, int offset, int data)
 {
 	beta_6845_RA=data;
 }
@@ -297,7 +297,7 @@ static void beta_Set_VSync(running_machine *machine, int offset, int data)
 	dgn_beta_frame_interrupt(machine, data);
 }
 
-static void beta_Set_DE(int offset, int data)
+static void beta_Set_DE(running_machine *machine, int offset, int data)
 {
 	beta_DE = data;
 
@@ -336,6 +336,18 @@ void dgnbeta_init_video(running_machine *machine)
 		debug_console_register_command(machine, "beta_vid_clkmax", CMDFLAG_NONE, 0, 0, 1, execute_beta_vid_clkmax);
 	}
 	LogRegWrites=0;
+	BoxColour=1;
+	BoxMinX		= 100;
+	BoxMinY		= 100;
+	BoxMaxX		= 500;
+	BoxMaxY		= 500;
+
+	MinAddr	    = 0xFFFF;
+	MaxAddr	    = 0x0000;
+	MinX	        = 0xFFFF;
+	MaxX	        = 0x0000;
+	MinY	        = 0xFFFF;
+	MaxY	        = 0x0000;
 }
 
 void dgnbeta_video_reset(running_machine *machine)
@@ -720,7 +732,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 	{
 		m6845_address_w(offset,data);
 		VidAddr=data;				        /* Record reg being written to */
-    }
+	}
 	if (LogRegWrites)
 		RegLog(space->machine, offset,data);
 }

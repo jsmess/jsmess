@@ -112,7 +112,7 @@ enum
 	PID_NONE = 0xff
 };
 
-static UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
+static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
 //**************************************************************************
 //	INTERRUPTS
@@ -746,7 +746,7 @@ static const ins8250_interface i8250_intf =
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-static centronics_interface centronics_intf =
+static const centronics_interface centronics_intf =
 {
 	TRUE,
 	DEVCB_NULL,

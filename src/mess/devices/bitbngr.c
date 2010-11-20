@@ -83,7 +83,7 @@ INLINE const bitbanger_config *get_config(running_device *device)
     native_output - outputs data to a file
 -------------------------------------------------*/
 
-void native_output(running_device *bitbanger, UINT8 data)
+static void native_output(running_device *bitbanger, UINT8 data)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(bitbanger);
 	if (image->exists())
@@ -97,7 +97,7 @@ void native_output(running_device *bitbanger, UINT8 data)
     native_input - inputs data from a file
 -------------------------------------------------*/
 
-UINT32 native_input(running_device *bitbanger, void *buffer, UINT32 length)
+static UINT32 native_input(running_device *bitbanger, void *buffer, UINT32 length)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(bitbanger);
 	if (image->exists())
@@ -173,7 +173,7 @@ const char *bitbanger_tune_string(running_device *device)
 /*-------------------------------------------------
     bitbanger_tune_value
 -------------------------------------------------*/
-float bitbanger_tune_value(running_device *device)
+static float bitbanger_tune_value(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
    float tunes[] = {0.97, 0.9825, 0.985, 0.9875, 0.99, 0.9925, 0.995, 0.9975, 1.0,
@@ -187,7 +187,7 @@ float bitbanger_tune_value(running_device *device)
     bitbanger_baud_value
 -------------------------------------------------*/
 
-UINT32 bitbanger_baud_value(running_device *device)
+static UINT32 bitbanger_baud_value(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
    float bauds[] = { 150.0, 300.0, 600.0, 1200.0, 2400.0, 4800.0, 9600.0,

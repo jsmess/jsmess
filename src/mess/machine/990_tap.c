@@ -110,7 +110,7 @@ static const UINT16 w_mask[8] =
 	0xf3ff		/* Don't overwrite reserved bits */
 };
 
-int tape_get_id(running_device *image)
+static int tape_get_id(running_device *image)
 {
 	int drive =0;
 	if (strcmp(image->tag(), "tape0") == 0) drive = 0;

@@ -168,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 
 /**************************************************************************/
 
-static ti99_peb_card speech_adapter_card =
+static const ti99_peb_card speech_adapter_card =
 {
 	speech_rz, speech_w,			// memory access read/write
 	NULL, NULL,						// CRU access (none here)

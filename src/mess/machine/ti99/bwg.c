@@ -496,7 +496,7 @@ static DEVICE_STOP( ti99_bwg )
 	if (card->ram) free(card->ram);
 }
 
-static ti99_peb_card bwg_card =
+static const ti99_peb_card bwg_card =
 {
 	data_r,
 	data_w,

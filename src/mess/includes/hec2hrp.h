@@ -64,7 +64,7 @@ public:
 /*----------- defined in machine/hec2hrp.c -----------*/
 
 /* Sound function*/
-extern sn76477_interface hector_sn76477_interface;
+extern const sn76477_interface hector_sn76477_interface;
 
 /* Protoype of memory Handler*/
 extern WRITE8_HANDLER( hector_switch_bank_w );
@@ -105,9 +105,6 @@ extern UINT8 hector_videoram[0x04000];
 
 /* Color status*/
 extern UINT8 hector_color[4];
-
-/* Sound function*/
-extern sn76477_interface hector_sn76477_interface;
 
 // state Hector's port
 extern UINT8 hector_port_a;

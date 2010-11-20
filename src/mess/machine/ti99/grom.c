@@ -108,7 +108,7 @@ INLINE const ti99grom_config *get_config(running_device *device)
     access. We do not have a tri-state handling on the read handlers, so this
     serves to avoid the read access.
 */
-int is_selected(running_device *chip)
+static int is_selected(running_device *chip)
 {
 	ti99grom_state *grom = get_safe_token(chip);
 	return (((grom->address >> 13)&0x07)==grom->ident);

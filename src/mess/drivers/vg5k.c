@@ -65,7 +65,7 @@ public:
 };
 
 
-READ8_HANDLER( printer_r )
+static READ8_HANDLER( printer_r )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 
@@ -73,7 +73,7 @@ READ8_HANDLER( printer_r )
 }
 
 
-WRITE8_HANDLER( printer_w )
+static WRITE8_HANDLER( printer_w )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 
@@ -81,7 +81,7 @@ WRITE8_HANDLER( printer_w )
 }
 
 
-WRITE8_HANDLER ( ef9345_offset_w )
+static WRITE8_HANDLER ( ef9345_offset_w )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 
@@ -89,7 +89,7 @@ WRITE8_HANDLER ( ef9345_offset_w )
 }
 
 
-READ8_HANDLER ( ef9345_io_r )
+static READ8_HANDLER ( ef9345_io_r )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 
@@ -97,7 +97,7 @@ READ8_HANDLER ( ef9345_io_r )
 }
 
 
-WRITE8_HANDLER ( ef9345_io_w )
+static WRITE8_HANDLER ( ef9345_io_w )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 
@@ -105,7 +105,7 @@ WRITE8_HANDLER ( ef9345_io_w )
 }
 
 
-READ8_HANDLER ( cassette_r )
+static READ8_HANDLER ( cassette_r )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 	double level;
@@ -116,7 +116,7 @@ READ8_HANDLER ( cassette_r )
 }
 
 
-WRITE8_HANDLER ( cassette_w )
+static WRITE8_HANDLER ( cassette_w )
 {
 	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
 

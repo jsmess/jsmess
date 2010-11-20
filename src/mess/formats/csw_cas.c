@@ -24,6 +24,7 @@ Offset  Value   Type    Description
 
 #include "emu.h"
 #include "zlib.h"
+#include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 
 
@@ -318,8 +319,6 @@ static const struct CassetteFormat csw_cassette_format = {
 	csw_cassette_load,
 	NULL
 };
-
-extern const struct CassetteFormat uef_cassette_format;
 
 CASSETTE_FORMATLIST_START(csw_cassette_formats)
 	CASSETTE_FORMAT(csw_cassette_format)

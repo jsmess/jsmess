@@ -260,7 +260,7 @@ void set_board( void )
 		m_board[i]=start_board[i];
 }
 
-void clear_board( void )
+static void clear_board( void )
 {
 	int i;
 	for (i=0;i<64;i++)

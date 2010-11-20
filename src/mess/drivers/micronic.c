@@ -135,30 +135,30 @@ static UINT8 keypad_r (running_machine *machine)
 	return data;
 }
 
-READ8_HANDLER( kp_r )
+static READ8_HANDLER( kp_r )
 {
 	return  keypad_r(space->machine);
 }
 
-READ8_HANDLER( status_flag_r )
+static READ8_HANDLER( status_flag_r )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	return  state->status_flag;
 }
 
-WRITE8_HANDLER( status_flag_w )
+static WRITE8_HANDLER( status_flag_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->status_flag = data;
 }
 
-WRITE8_HANDLER( kp_matrix_w )
+static WRITE8_HANDLER( kp_matrix_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->kp_matrix = data;
 }
 
-WRITE8_HANDLER( beep_w )
+static WRITE8_HANDLER( beep_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	UINT16 frequency = 0;
@@ -188,12 +188,12 @@ WRITE8_HANDLER( beep_w )
 	beep_set_frequency(state->speaker, frequency);
 }
 
-READ8_HANDLER( irq_flag_r )
+static READ8_HANDLER( irq_flag_r )
 {
 	return (input_port_read(space->machine, "BACKBATTERY")<<4) | (input_port_read(space->machine, "MAINBATTERY")<<3) | (keypad_r(space->machine) ? 0 : 1);
 }
 
-WRITE8_HANDLER( bank_select_w )
+static WRITE8_HANDLER( bank_select_w )
 {
 	if (data < 2)
 	{
@@ -207,7 +207,7 @@ WRITE8_HANDLER( bank_select_w )
 	}
 }
 
-WRITE8_HANDLER( lcd_contrast_w )
+static WRITE8_HANDLER( lcd_contrast_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 
@@ -219,7 +219,7 @@ WRITE8_HANDLER( lcd_contrast_w )
     RTC-146818
 ***************************************************************************/
 
-void set_146818_periodic_irq(running_machine *machine, UINT8 data)
+static void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 {
 	micronic_state *state = machine->driver_data<micronic_state>();
 
@@ -248,7 +248,7 @@ void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 	timer_adjust_periodic(state->rtc_periodic_irq, timer_per, 0, timer_per);
 }
 
-WRITE8_HANDLER( rtc_address_w )
+static WRITE8_HANDLER( rtc_address_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->rtc_address = data;
@@ -256,7 +256,7 @@ WRITE8_HANDLER( rtc_address_w )
 	rtc->write(*space, 0, data);
 }
 
-READ8_HANDLER( rtc_data_r )
+static READ8_HANDLER( rtc_data_r )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	UINT8 data = 0;
@@ -274,7 +274,7 @@ READ8_HANDLER( rtc_data_r )
 	return data;
 }
 
-WRITE8_HANDLER( rtc_data_w )
+static WRITE8_HANDLER( rtc_data_w )
 {
 	micronic_state *state = space->machine->driver_data<micronic_state>();
 	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");

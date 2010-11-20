@@ -92,7 +92,7 @@ static WRITE8_DEVICE_HANDLER( samsmem_w )
 
 /**************************************************************************/
 
-static ti99_peb_card samsmem_card =
+static const ti99_peb_card samsmem_card =
 {
 	samsmem_rz, samsmem_w,			// memory access read/write
 	NULL, samsmem_cru_w,			// CRU access (no read here)

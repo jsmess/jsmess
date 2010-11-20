@@ -32,7 +32,6 @@
 int pet_font;
 UINT8 *pet_memory;
 UINT8 *superpet_memory;
-UINT8 *pet_videoram;
 static UINT8 *pet80_bank1_base;
 static int pet_keyline_select;
 

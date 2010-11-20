@@ -305,7 +305,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 
 /**************************************************************************/
 
-static ti99_peb_card tn_ide_card =
+static const ti99_peb_card tn_ide_card =
 {
 	data_rz, data_w,				// memory access read/write
 	cru_rz, cru_w,					// CRU access

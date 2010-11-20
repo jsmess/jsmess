@@ -22,7 +22,7 @@
 #define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine->primary_screen->vpos(), _comment); } while (0)
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine->primary_screen->vpos()); } while (0)
 
-static UINT8 zx_tape_bit = 0x80;
+static UINT8 zx_tape_bit;
 
 static WRITE8_HANDLER( zx_ram_w )
 {

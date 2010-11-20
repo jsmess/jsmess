@@ -31,6 +31,12 @@
 
 #include "includes/rmnimbus.h"
 
+static void sio_interrupt(running_device *device, int state);
+//static WRITE8_DEVICE_HANDLER( sio_dtr_w );
+static WRITE8_DEVICE_HANDLER( sio_serial_transmit );
+static int sio_serial_receive( running_device *device, int channel );
+
+
 /*-------------------------------------------------------------------------*/
 /* Defines, constants, and global variables                                */
 /*-------------------------------------------------------------------------*/
@@ -107,7 +113,7 @@ struct intr_state
 	UINT16	timer;
 	UINT16	dma[2];
 	UINT16	ext[4];
-    UINT16  ext_vector[2]; // external vectors, when in cascade mode
+	UINT16  ext_vector[2]; // external vectors, when in cascade mode
 };
 
 static struct i186_state
@@ -121,7 +127,7 @@ static struct i186_state
 
 /* Z80 SIO */
 
-const z80sio_interface sio_intf =
+const z80sio_interface nimbus_sio_intf =
 {
 	sio_interrupt,			/* interrupt handler */
 	0, //sio_dtr_w,             /* DTR changed handler */
@@ -131,11 +137,11 @@ const z80sio_interface sio_intf =
 	sio_serial_receive		/* receive handler */
 };
 
-struct keybord_state
+static struct keyboard_state
 {
-    UINT8       keyrows[NIMBUS_KEYROWS];
-    emu_timer   *keyscan_timer;
-    UINT8       queue[KEYBOARD_QUEUE_SIZE];
+	UINT8       keyrows[NIMBUS_KEYROWS];
+	emu_timer   *keyscan_timer;
+	UINT8       queue[KEYBOARD_QUEUE_SIZE];
 	UINT8       head;
 	UINT8       tail;
 } keyboard;
@@ -147,7 +153,7 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w );
 
 const wd17xx_interface nimbus_wd17xx_interface =
 {
-    DEVCB_LINE_GND,
+	DEVCB_LINE_GND,
 	DEVCB_LINE(nimbus_fdc_intrq_w),
 	DEVCB_LINE(nimbus_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
@@ -179,7 +185,7 @@ static struct _ipc_interface
     UINT8   int_8f_pending;
 } ipc_interface;
 
-static UINT16 def_config[16] =
+static const UINT16 def_config[16] =
 {
     0x0280, 0x017F, 0xE822, 0x8129,
     0x0329, 0x0000, 0x0000, 0x0000,
@@ -188,13 +194,13 @@ static UINT16 def_config[16] =
 };
 
 /* Memory controler */
-UINT8 mcu_reg080;
+static UINT8 mcu_reg080;
 
 /* IO Unit */
-UINT8 iou_reg092;
+static UINT8 iou_reg092;
 
 /* Sound */
-UINT8 last_playmode;
+static UINT8 last_playmode;
 
 /* Mouse/Joystick */
 
@@ -218,7 +224,7 @@ typedef struct
 } _mouse_joy_state;
 
 static _mouse_joy_state nimbus_mouse;
-UINT8 ay8910_a;
+static UINT8 ay8910_a;
 
 static void drq_callback(running_machine *machine, int which);
 static void nimbus_recalculate_ints(running_machine *machine);
@@ -237,28 +243,27 @@ static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 s
 
 static void nimbus_bank_memory(running_machine *machine);
 static void memory_reset(running_machine *machine);
-static void fdc_reset(void);
+static void fdc_reset(running_machine *machine);
 static void set_disk_int(running_machine *machine, int state);
 static void hdc_reset(running_machine *machine);
 static void hdc_ctrl_write(running_machine *machine, UINT8 data);
 static void hdc_post_rw(running_machine *machine);
 static void hdc_drq(running_machine *machine);
 
-static void keyboard_reset(void);
+static void keyboard_reset(running_machine *machine);
 static TIMER_CALLBACK(keyscan_callback);
 
 static void pc8031_reset(running_machine *machine);
-static void iou_reset(void);
+static void iou_reset(running_machine *machine);
 static void sound_reset(running_machine *machine);
 
 static void mouse_js_reset(running_machine *machine);
 static TIMER_CALLBACK(mouse_callback);
 
 #define num_ioports 0x80
-static UINT16   IOPorts[num_ioports];
+static UINT16 IOPorts[num_ioports];
 
-UINT8 nextkey;
-UINT8 sio_int_state;
+static UINT8 sio_int_state;
 
 /*************************************
  *
@@ -913,7 +918,7 @@ static void nimbus_cpu_reset(running_machine *machine)
     logerror("CPU reset done\n");
 }
 
-READ16_HANDLER( i186_internal_port_r )
+READ16_HANDLER( nimbus_i186_internal_port_r )
 {
 	int temp, which;
 
@@ -1089,7 +1094,7 @@ READ16_HANDLER( i186_internal_port_r )
  *
  *************************************/
 
-WRITE16_HANDLER( i186_internal_port_w )
+WRITE16_HANDLER( nimbus_i186_internal_port_w )
 {
 	int temp, which, data16 = data;
 
@@ -1292,14 +1297,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_w);
 			}
 			break;
 
@@ -1313,14 +1318,14 @@ MACHINE_RESET(nimbus)
 {
 	/* CPU */
 	nimbus_cpu_reset(machine);
-    iou_reset();
-    fdc_reset();
-    hdc_reset(machine);
-    keyboard_reset();
-    pc8031_reset(machine);
-    sound_reset(machine);
-    memory_reset(machine);
-    mouse_js_reset(machine);
+	iou_reset(machine);
+	fdc_reset(machine);
+	hdc_reset(machine);
+	keyboard_reset(machine);
+	pc8031_reset(machine);
+	sound_reset(machine);
+	memory_reset(machine);
+	mouse_js_reset(machine);
 }
 
 DRIVER_INIT(nimbus)
@@ -1746,7 +1751,7 @@ static void decode_subbios(running_device *device,offs_t pc)
     logerror("=======================================================================\n");
 }
 
-void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
+static void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
 {
     int             addr;
 
@@ -1905,8 +1910,8 @@ static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 s
 
 struct nimbus_meminfo
 {
-		offs_t	start;		/* start address of bank */
-		offs_t	end;		/* End address of bank */
+	offs_t	start;		/* start address of bank */
+	offs_t	end;		/* End address of bank */
 };
 
 static const struct nimbus_meminfo memmap[] =
@@ -1927,7 +1932,7 @@ typedef struct
     int     blocksize;
 } nimbus_block ;
 
-typedef nimbus_block    nimbus_blocks[3];
+typedef nimbus_block nimbus_blocks[3];
 
 static const nimbus_blocks ramblocks[] =
 {
@@ -2010,12 +2015,12 @@ static void nimbus_bank_memory(running_machine *machine)
     }
 }
 
-READ8_HANDLER( mcu_r )
+READ8_HANDLER( nimbus_mcu_r )
 {
     return mcu_reg080;
 }
 
-WRITE8_HANDLER( mcu_w )
+WRITE8_HANDLER( nimbus_mcu_w )
 {
     mcu_reg080=data;
 
@@ -2059,7 +2064,7 @@ WRITE16_HANDLER( nimbus_io_w )
 
 */
 
-static void keyboard_reset(void)
+static void keyboard_reset(running_machine *machine)
 {
     memset(keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
 
@@ -2139,7 +2144,7 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-void sio_interrupt(running_device *device, int state)
+static void sio_interrupt(running_device *device, int state)
 {
     if(LOG_SIO)
         logerror("SIO Interrupt state=%02X\n",state);
@@ -2154,18 +2159,20 @@ void sio_interrupt(running_device *device, int state)
     }
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_DEVICE_HANDLER( sio_dtr_w )
 {
 	if (offset == 1)
 	{
 	}
 }
+#endif
 
-WRITE8_DEVICE_HANDLER( sio_serial_transmit )
+static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 {
 }
 
-int sio_serial_receive( running_device *device, int channel )
+static int sio_serial_receive( running_device *device, int channel )
 {
 	if(channel==0)
     {
@@ -2177,7 +2184,7 @@ int sio_serial_receive( running_device *device, int channel )
 
 /* Floppy disk */
 
-static void fdc_reset(void)
+static void fdc_reset(running_machine *machine)
 {
     nimbus_drives.reg400=0;
     nimbus_drives.reg410_in=0;
@@ -2449,8 +2456,8 @@ static void pc8031_reset(running_machine *machine)
 
     memset(&ipc_interface,0,sizeof(ipc_interface));
 
-    if(!data_loaded(er59256))
-        preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
+    if(!er59256_data_loaded(er59256))
+        er59256_preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
 }
 
 
@@ -2464,7 +2471,7 @@ static void ipc_dumpregs()
 }
 #endif
 
-READ8_HANDLER( pc8031_r )
+READ8_HANDLER( nimbus_pc8031_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result;
@@ -2488,7 +2495,7 @@ READ8_HANDLER( pc8031_r )
     return result;
 }
 
-WRITE8_HANDLER( pc8031_w )
+WRITE8_HANDLER( nimbus_pc8031_w )
 {
 	int pc=cpu_get_pc(space->cpu);
 
@@ -2514,7 +2521,7 @@ WRITE8_HANDLER( pc8031_w )
 
 /* 8031/8051 Peripheral controler 8031/8051 side */
 
-READ8_HANDLER( pc8031_iou_r )
+READ8_HANDLER( nimbus_pc8031_iou_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result = 0;
@@ -2539,7 +2546,7 @@ READ8_HANDLER( pc8031_iou_r )
     return result;
 }
 
-WRITE8_HANDLER( pc8031_iou_w )
+WRITE8_HANDLER( nimbus_pc8031_iou_w )
 {
 	int pc=cpu_get_pc(space->cpu);
 
@@ -2578,7 +2585,7 @@ WRITE8_HANDLER( pc8031_iou_w )
     }
 }
 
-READ8_HANDLER( pc8031_port_r )
+READ8_HANDLER( nimbus_pc8031_port_r )
 {
 	running_device *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
@@ -2595,7 +2602,7 @@ READ8_HANDLER( pc8031_port_r )
     return result;
 }
 
-WRITE8_HANDLER( pc8031_port_w )
+WRITE8_HANDLER( nimbus_pc8031_port_w )
 {
 	running_device *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
@@ -2612,7 +2619,7 @@ WRITE8_HANDLER( pc8031_port_w )
 
 
 /* IO Unit */
-READ8_HANDLER( iou_r )
+READ8_HANDLER( nimbus_iou_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result=0;
@@ -2628,7 +2635,7 @@ READ8_HANDLER( iou_r )
     return result;
 }
 
-WRITE8_HANDLER( iou_w )
+WRITE8_HANDLER( nimbus_iou_w )
 {
 	int pc=cpu_get_pc(space->cpu);
     running_device *msm5205 = space->machine->device(MSM5205_TAG);
@@ -2643,7 +2650,7 @@ WRITE8_HANDLER( iou_w )
     }
 }
 
-static void iou_reset(void)
+static void iou_reset(running_machine *machine)
 {
     iou_reg092=0x00;
 }
@@ -2676,7 +2683,7 @@ static void sound_reset(running_machine *machine)
     ay8910_a=0;
 }
 
-READ8_HANDLER( sound_ay8910_r )
+READ8_HANDLER( nimbus_sound_ay8910_r )
 {
 	running_device *ay8910 = space->machine->device(AY8910_TAG);
     UINT8   result=0;
@@ -2687,7 +2694,7 @@ READ8_HANDLER( sound_ay8910_r )
     return result;
 }
 
-WRITE8_HANDLER( sound_ay8910_w )
+WRITE8_HANDLER( nimbus_sound_ay8910_w )
 {
 	int pc=cpu_get_pc(space->cpu);
 	running_device *ay8910 = space->machine->device(AY8910_TAG);
@@ -2703,7 +2710,7 @@ WRITE8_HANDLER( sound_ay8910_w )
 
 }
 
-WRITE8_HANDLER( sound_ay8910_porta_w )
+WRITE8_HANDLER( nimbus_sound_ay8910_porta_w )
 {
     running_device *msm5205 = space->machine->device(MSM5205_TAG);
 
@@ -2713,7 +2720,7 @@ WRITE8_HANDLER( sound_ay8910_porta_w )
     ay8910_a=data;
 }
 
-WRITE8_HANDLER( sound_ay8910_portb_w )
+WRITE8_HANDLER( nimbus_sound_ay8910_portb_w )
 {
     running_device *msm5205 = space->machine->device(MSM5205_TAG);
 
@@ -2887,7 +2894,7 @@ static TIMER_CALLBACK(mouse_callback)
     state->intstate_y=intstate_y;
 }
 
-READ8_HANDLER( mouse_js_r )
+READ8_HANDLER( nimbus_mouse_js_r )
 {
 	/*
 
@@ -2903,25 +2910,25 @@ READ8_HANDLER( mouse_js_r )
         7       ?? always reads 1
 
     */
-    UINT8   result;
+	UINT8   result;
 //  int     pc=cpu_get_pc(space->machine->device(MAINCPU_TAG));
 
-    _mouse_joy_state *state = &nimbus_mouse;
+	_mouse_joy_state *state = &nimbus_mouse;
 
 	if (input_port_read(space->machine, "config") & 0x01)
 	{
-        result=state->reg0a4;
-        //logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
-    }
+		result=state->reg0a4;
+		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
+	}
 	else
 	{
 		result=input_port_read_safe(space->machine, JOYSTICK0_TAG, 0xff);
 	}
 
-    return result;
+	return result;
 }
 
-WRITE8_HANDLER( mouse_js_w )
+WRITE8_HANDLER( nimbus_mouse_js_w )
 {
 }
 

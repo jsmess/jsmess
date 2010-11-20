@@ -186,7 +186,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	}
 }
 
-static ti99_peb_card pcode_ncard =
+static const ti99_peb_card pcode_ncard =
 {
 	data_r,
 	data_w,

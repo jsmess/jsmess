@@ -633,7 +633,7 @@ const smc92x4_interface ti99_smc92x4_interface =
 	hfdc_harddisk_write_track
 };
 
-static ti99_peb_card hfdc_card =
+static const ti99_peb_card hfdc_card =
 {
 	data_r,
 	data_w,

@@ -44,16 +44,16 @@ static emu_timer *INT_timer;
 static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq );
 
 UINT8 Disk2memory[0x10000];  /* Memory space for Disk II unit*/
-UINT8 Mem_RNMI =0xff;
+//UINT8 Mem_RNMI =0xff;
 /* Buffer of the 74374 (IC1 and IC4) linked to the Hector port */
 UINT8 disk2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
 UINT8 disk2_data_w_ready=0x0; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
 UINT8 disk2_data_read=0;    /* Data send by Hector to Disk 2 when PC2=true */
 UINT8 disk2_data_write=0;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
-UINT8 disk2_RNMI = 0;		/* State of I/O 50 D5 = authorization for INT / NMI */
+static UINT8 disk2_RNMI = 0;		/* State of I/O 50 D5 = authorization for INT / NMI */
 static int NMI_current_state=0;
 static int INT_current_state=0;
-static int Time_arq = 4000; 
+static const int Time_arq = 4000; 
 
 /* Fonctionnement du uPD765 : 
 
@@ -139,7 +139,7 @@ data = Disk2memory[offset];
 return data;
 }
 
-void valid_interrupt( running_machine *machine)
+static void valid_interrupt( running_machine *machine)
 {
 /* Called at each rising state of INT / NMI and RNMI ! */
 
@@ -150,7 +150,7 @@ if ((disk2_RNMI ==0x00) && (NMI_current_state!=0))
     {    
 		cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, CLEAR_LINE); // NMI...
 		timer_adjust_oneshot(DMA_timer, ATTOTIME_IN_NSEC(Time_arq), 0 );
-        Time_arq = 4000; //  6900us for next step !
+        /*Time_arq = 4000;*/ //  6900us for next step !
         NMI_current_state=0; /* clear the current request*/
 	}
 

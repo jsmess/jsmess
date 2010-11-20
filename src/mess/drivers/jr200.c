@@ -250,7 +250,7 @@ static WRITE8_HANDLER( jr200_border_col_w )
 	jr200_border_col = data;
 }
 
-emu_timer *timer_d;
+static emu_timer *timer_d;
 
 static TIMER_CALLBACK(timer_d_callback)
 {

@@ -1221,7 +1221,7 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
  *
  *************************************************************************/
 
-WRITE8_HANDLER ( char_ram_w )
+static WRITE8_HANDLER ( char_ram_w )
 {
 	UINT8 *gfx = memory_region(space->machine, "gfx1");
 	logerror("write char ram %04x %02x\n",offset,data);
@@ -1231,17 +1231,17 @@ WRITE8_HANDLER ( char_ram_w )
 	gfx[offset + 0x1800] = data;
 }
 
-WRITE16_HANDLER( char_ram_16le_w ) { write16le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
-WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
+static WRITE16_HANDLER( char_ram_16le_w ) { write16le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
+static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
 
-READ8_HANDLER ( char_ram_r )
+static READ8_HANDLER ( char_ram_r )
 {
 	UINT8 *gfx = memory_region(space->machine, "gfx1");
 	return gfx[offset];
 }
 
-READ16_HANDLER( char_ram_16le_r ) { return read16le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
-READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
+static READ16_HANDLER( char_ram_16le_r ) { return read16le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
+static READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
 
 static READ8_HANDLER( pc_cga8_r )
 {

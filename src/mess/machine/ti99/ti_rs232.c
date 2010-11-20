@@ -408,7 +408,7 @@ static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
 		logerror("ti99/rs232: serdev1 not found\n");
 }
 
-WRITE_LINE_DEVICE_HANDLER( senila )
+static WRITE_LINE_DEVICE_HANDLER( senila )
 {
 	// put the value on the data bus. We store it in a state variable.
 	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
@@ -434,7 +434,7 @@ static const tms9902_interface tms9902_params_1 =
 };
 
 
-static ti99_peb_card tirs232_card =
+static const ti99_peb_card tirs232_card =
 {
 	data_rz, data_w,				// memory access read/write
 	cru_rz, cru_w,					// CRU access

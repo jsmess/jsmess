@@ -49,7 +49,6 @@ extern const pia6821_interface petb_pia0;
 extern const pia6821_interface pet_pia1;
 
 extern UINT8 *pet_memory;
-extern UINT8 *pet_videoram;
 extern UINT8 *superpet_memory;
 
 WRITE8_HANDLER(cbm8096_w);

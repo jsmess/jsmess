@@ -76,7 +76,7 @@ ADDRESS_MAP_END
     Input ports, used by machine code for TI keyboard and joystick emulation.
 */
 
-INPUT_CHANGED( gk_changed )
+static INPUT_CHANGED( gk_changed )
 {
 	running_device *cartsys = field->port->machine->device("gromport");
 	set_gk_switches(cartsys, (UINT8)((UINT64)param&0x07), newval);

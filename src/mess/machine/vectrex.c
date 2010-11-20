@@ -353,9 +353,6 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	}
 }
 
-extern UINT8 *gce_vectorram;
-extern size_t gce_vectorram_size;
-
 DRIVER_INIT(vectrex)
 {
 	int i;

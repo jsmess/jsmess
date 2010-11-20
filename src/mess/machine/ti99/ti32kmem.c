@@ -53,7 +53,7 @@ static WRITE8_DEVICE_HANDLER( mem32k_w )
 
 /**************************************************************************/
 
-static ti99_peb_card ti32k_card =
+static const ti99_peb_card ti32k_card =
 {
 	mem32k_rz, mem32k_w,			// memory access read/write
 	NULL, NULL,						// CRU access (none here)

@@ -40,7 +40,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 	}
 }
 
-static UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
+static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
 static void gba_machine_stop(running_machine &machine)
 {

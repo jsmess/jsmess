@@ -74,7 +74,7 @@ static int oldstate1000;        /* Edge state cassette*/
 
 
 /* joy map*/
-static UINT8 pot0 = 0x40, pot1 = 0x40;  /* State for joy resistor*/
+static UINT8 pot0, pot1;  /* State for joy resistor*/
 static UINT8 actions;					/* joy button off*/
 
 // Etat des ports Hector (8255)
@@ -701,7 +701,7 @@ void Update_Sound(address_space *space, UINT8 data)
     sn76477_enable_w(sn76477, Pin_Value[9][AU[14]]);
 }
 
-sn76477_interface hector_sn76477_interface =
+const sn76477_interface hector_sn76477_interface =
 {
 	RES_K(47),		/*  4  noise_res*/
 	RES_K(330),		/*  5  filter_res*/
@@ -741,6 +741,8 @@ void hec2hrx_reset(running_machine *machine, int hr)
 
 void hector_init(running_machine *machine)
 {
+	pot0 = pot1 = 0x40;
+
 	/* For Cassette synchro*/
 	Cassette_timer = timer_alloc(machine, Callback_CK, 0);
 	timer_adjust_periodic(Cassette_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_USEC(64));/* => real synchro scan speed for 15,624Khz*/

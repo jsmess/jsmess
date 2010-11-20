@@ -40,7 +40,7 @@ INLINE crubus_state *get_safe_token(running_device *device)
 	return (crubus_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-void cru_mount_device(running_device *device, running_device *crudev, UINT16 address_mask, UINT16 address_bits, cru_read_function cruread, cru_write_function cruwrite)
+static void cru_mount_device(running_device *device, running_device *crudev, UINT16 address_mask, UINT16 address_bits, cru_read_function cruread, cru_write_function cruwrite)
 {
 	crubus_state *crubus = get_safe_token(device);
 	int index = crubus->devindex++;

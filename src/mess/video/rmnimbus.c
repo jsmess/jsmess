@@ -31,7 +31,7 @@
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 
-UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
+static UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 
 #define WIDTH_MASK      0x07
 #define XOR_MASK        0x08
@@ -72,11 +72,11 @@ UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 #define IS_XOR          (vidregs[reg022]&XOR_MASK)
 
 
-UINT16  vidregs[NO_VIDREGS];
+static UINT16 vidregs[NO_VIDREGS];
 
-UINT8   bpp;            // Bits / pixel
-UINT16  pixel_mask;
-UINT8   hs_count;
+static UINT8   bpp;            // Bits / pixel
+static UINT16  pixel_mask;
+static UINT8   hs_count;
 
 static UINT32 debug_flags;
 

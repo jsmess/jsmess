@@ -539,7 +539,7 @@ static WRITE8_DEVICE_HANDLER ( data_w )
 	}
 }
 
-static ti99_peb_card hsgpl_card =
+static const ti99_peb_card hsgpl_card =
 {
 	data_rz,
 	data_w,

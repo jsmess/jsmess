@@ -171,7 +171,7 @@ READ16_HANDLER ( ti68k_io2_r )
 }
 
 
-WRITE16_HANDLER ( flash_w )
+static WRITE16_HANDLER ( flash_w )
 {
 	t68k_state *state = space->machine->driver_data<t68k_state>();
 	UINT16 *flash_base = (UINT16 *)memory_region(space->machine, "maincpu");
@@ -211,7 +211,7 @@ WRITE16_HANDLER ( flash_w )
 }
 
 
-READ16_HANDLER ( rom_r )
+static READ16_HANDLER ( rom_r )
 {
 	t68k_state *state = space->machine->driver_data<t68k_state>();
 	UINT16 *rom_base = (UINT16 *)memory_region(space->machine, "maincpu");
@@ -239,7 +239,7 @@ READ16_HANDLER ( rom_r )
 
 
 static TIMER_CALLBACK( ti68k_timer_callback )
- {
+{
 	t68k_state *state = machine->driver_data<t68k_state>();
 	static UINT64 timer;
 

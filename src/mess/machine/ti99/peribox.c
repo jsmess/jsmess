@@ -151,7 +151,7 @@ static const floppy_config ti99_4_floppy_config =
 typedef struct _ti99_peb_slot
 {
 	running_device		*card;
-	ti99_peb_card		*intf;
+	const ti99_peb_card	*intf;
 } ti99_peb_slot;
 
 typedef struct _ti99_peb_state
@@ -246,7 +246,7 @@ const peb_callback_if peb_callback =
     other cards are stillborn.
     Returns TRUE when the card could be mounted.
 */
-int mount_card(running_device *device, running_device *cardptr, ti99_peb_card *cardintf, int slotindex)
+int mount_card(running_device *device, running_device *cardptr, const ti99_peb_card *cardintf, int slotindex)
 {
 	ti99_peb_state *peb = get_safe_token(device);
 	if ((slotindex > 0) &&  (slotindex < MAXSLOTS))

@@ -69,7 +69,6 @@
 #define MAX_PACKET_SIZE 0x8000
 
 
-size_t g_count = 0;
 /*
   Each of the 8 waveforms have been sampled at 192Khz using period 0xFF,
   filtered, and each of the 32 levels have been calculated with averages on around 10 samples

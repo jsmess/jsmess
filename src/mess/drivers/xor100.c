@@ -426,7 +426,7 @@ static I8255A_INTERFACE( printer_8255_intf )
 	DEVCB_NULL
 };
 
-static centronics_interface xor100_centronics_intf =
+static const centronics_interface xor100_centronics_intf =
 {
 	0,
 	DEVCB_DEVICE_LINE(I8255A_TAG, i8255a_pc4_w),

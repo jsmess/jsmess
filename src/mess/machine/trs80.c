@@ -36,9 +36,9 @@ static UINT8 trs80_int=0;		/* interrupting devices */
 static UINT8 trs80_mask= 0;		/* interrupt mask */
 static UINT8 trs80_nmi_mask= 0;		/* nmi mask */
 static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
-static UINT8 trs80_tape_unit=1;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
-static UINT8 trs80_reg_load=1;		/* Controls what port EA will do */
-static UINT8 trs80_nmi_data=0xff;	/* Passes FDC int to NMI handler */
+static UINT8 trs80_tape_unit;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
+static UINT8 trs80_reg_load;		/* Controls what port EA will do */
+static UINT8 trs80_nmi_data;	/* Passes FDC int to NMI handler */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
@@ -895,6 +895,10 @@ READ8_HANDLER( trs80_keyboard_r )
 
 MACHINE_START( trs80 )
 {
+	trs80_tape_unit=1;
+	trs80_reg_load=1;
+	trs80_nmi_data=0xff;
+
 	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
 	trs80_printer = machine->device("centronics");

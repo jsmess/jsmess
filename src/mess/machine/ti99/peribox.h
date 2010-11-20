@@ -112,7 +112,7 @@ INLINE const ti99_pebcard_config *get_pebcard_config(running_device *device)
 /*
     Management functions
 */
-int mount_card(running_device *device, running_device *cardptr, ti99_peb_card *card, int slotindex);
+int mount_card(running_device *device, running_device *cardptr, const ti99_peb_card *card, int slotindex);
 void unmount_card(running_device *device, int slotindex);
 
 

@@ -9,7 +9,7 @@
 #include "includes/super80.h"
 
 
-static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
+static UINT16 vidpg;	/* Home position of video page being displayed */
 
 static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
@@ -285,6 +285,7 @@ VIDEO_UPDATE( super80m )
 
 VIDEO_START( super80 )
 {
+	vidpg = 0xfe00;
 	FNT = memory_region(machine, "gfx1");
 }
 

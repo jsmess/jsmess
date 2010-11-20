@@ -88,6 +88,6 @@ DECLARE_LEGACY_DEVICE(ER59256, er59256);
 
 void er59256_set_iobits(running_device *device, UINT8 newbits);
 UINT8 er59256_get_iobits(running_device *device);
-void preload_rom(running_device *device, UINT16 *rom_data, int count);
-UINT8 data_loaded(running_device *device);
+void er59256_preload_rom(running_device *device, const UINT16 *rom_data, int count);
+UINT8 er59256_data_loaded(running_device *device);
 #endif

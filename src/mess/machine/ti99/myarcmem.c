@@ -85,7 +85,7 @@ static WRITE8_DEVICE_HANDLER( myarcmem_w )
 
 /**************************************************************************/
 
-static ti99_peb_card myarcmem_card =
+static const ti99_peb_card myarcmem_card =
 {
 	myarcmem_rz, myarcmem_w,			// memory access read/write
 	NULL, myarcmem_cru_w,			// CRU access (no read here)

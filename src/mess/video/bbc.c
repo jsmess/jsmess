@@ -235,7 +235,7 @@ static void BBC_draw_teletext(running_machine *machine)
 
 
 static int VideoULA_DE=0;          // internal videoULA Display Enabled set by 6845 DE and the scanlines<8
-static int VideoULA_CR=7;		   // internal videoULA Cursor Enabled set by 6845 CR and then cleared after a number clock cycles
+static int VideoULA_CR;		   // internal videoULA Cursor Enabled set by 6845 CR and then cleared after a number clock cycles
 static int VideoULA_CR_counter=0;  // number of clock cycles left before the CR is disabled
 
 static int videoULA_Reg;
@@ -255,7 +255,7 @@ static int emulation_pixels_per_real_pixel;
 static int emulation_pixels_per_byte;
 
 static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
-static int emulation_cursor_size=1;
+static int emulation_cursor_size;
 static int cursor_state=0;
 
 static int videoULA_pallet0[16];// flashing colours A
@@ -264,9 +264,9 @@ static int *videoULA_pallet_lookup;// holds the pallet now being used.
 
 // this is the pixel position of the start of a scanline
 // -96 sets the screen display to the middle of emulated screen.
-static int x_screen_offset=-96;
+static int x_screen_offset;
 
-static int y_screen_offset=-8;
+static int y_screen_offset;
 
 
 
@@ -453,7 +453,7 @@ static void BBC_Set_Teletext_DE(void)
 }
 
 // called when the 6845 changes the character row
-static void BBC_Set_Character_Row(int offset, int data)
+static void BBC_Set_Character_Row(running_machine *machine, int offset, int data)
 {
 	BBC_Character_Row=data;
 	BBC_Set_VideoULA_DE();
@@ -510,7 +510,7 @@ static void BBC_Set_VSync(running_machine *machine, int offset, int data)
 }
 
 // called when the 6845 changes the Display Enabled
-static void BBC_Set_DE(int offset, int data)
+static void BBC_Set_DE(running_machine *machine, int offset, int data)
 {
 	BBC_DE=data;
 	BBC_Set_VideoULA_DE();
@@ -520,7 +520,7 @@ static void BBC_Set_DE(int offset, int data)
 
 
 // called when the 6845 changes the Cursor Enabled
-static void BBC_Set_CRE(int offset, int data)
+static void BBC_Set_CRE(running_machine *machine, int offset, int data)
 {
 	if (data&2) {
 		VideoULA_CR_counter=emulation_cursor_size;
@@ -670,53 +670,44 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
  * Initialize the BBC video emulation
  ************************************************************************/
 
-VIDEO_START( bbca )
+static void common_init(running_machine *machine)
 {
+	emulation_cursor_size = 1;
+	x_screen_offset = -96;
+	y_screen_offset = -8;
+
+	VideoULA_DE = 0;
+	VideoULA_CR = 7;
+	VideoULA_CR_counter = 0;
+
 	set_pixel_lookup();
-	bbc_set_video_memory_lookups(16);
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	BBC_Video_RAM= memory_region(machine, "maincpu");
-	vidmem_RAM=bbc_vidmem;
-	draw_function=*BBC_draw_hi_res;
+	BBC_Video_RAM = memory_region(machine, "maincpu");
+	vidmem_RAM = bbc_vidmem;
+	draw_function = *BBC_draw_hi_res;
+}
+
+VIDEO_START( bbca )
+{
+	common_init(machine);
+	bbc_set_video_memory_lookups(16);
 }
 
 VIDEO_START( bbcb )
 {
-	set_pixel_lookup();
-
-	m6845_config(&BBC6845);
-	saa505x_config(&BBCsaa5050);
-
-	BBC_Video_RAM= memory_region(machine, "maincpu");
-	vidmem_RAM=bbc_vidmem;
-	draw_function=*BBC_draw_hi_res;
+	common_init(machine);
 }
 
 VIDEO_START( bbcbp )
 {
-	/* need to set up the lookups to work with the BBC B plus memory */
-	set_pixel_lookup();
-
+	common_init(machine);
 	bbc_set_video_memory_lookups(32);
-	m6845_config(&BBC6845);
-	saa505x_config(&BBCsaa5050);
-
-	BBC_Video_RAM= memory_region(machine, "maincpu");
-	vidmem_RAM=bbc_vidmem;
-	draw_function=*BBC_draw_hi_res;
 }
 
 VIDEO_START( bbcm )
 {
-	/* need to set up the lookups to work with the BBC B plus memory */
-	set_pixel_lookup();
+	common_init(machine);
 	bbc_set_video_memory_lookups(32);
-	m6845_config(&BBC6845);
-	saa505x_config(&BBCsaa5050);
-
-	BBC_Video_RAM= memory_region(machine, "maincpu");
-	vidmem_RAM=bbc_vidmem;
-	draw_function=*BBC_draw_hi_res;
 }

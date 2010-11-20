@@ -11,7 +11,7 @@
 static UINT8 outa;
 UINT8 pc1403_portc;
 
-static int power=1; /* simulates pressed cce when mess is started */
+static int power; /* simulates pressed cce when mess is started */
 
 
 /*
@@ -177,6 +177,7 @@ DRIVER_INIT( pc1403 )
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
+	power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));

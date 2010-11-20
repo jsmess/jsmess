@@ -22,7 +22,7 @@
 static UINT8 outa,outb;
 UINT8 pc1401_portc;
 
-static int power = 1; /* simulates pressed cce when mess is started */
+static int power; /* simulates pressed cce when mess is started */
 
 void pc1401_outa(running_device *device, int data)
 {
@@ -244,5 +244,6 @@ DRIVER_INIT( pc1401 )
 	for (i=0; i<128; i++)
 		gfx[i]=i;
 
+	power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 }

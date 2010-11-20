@@ -558,7 +558,7 @@ void m6845_clock(running_machine *machine)
 		{
 			crtc.Scan_Line_Counter_Reset=True;
 		}
-		if (crtc.intf->out_RA_func) (crtc.intf->out_RA_func)(0,crtc.Scan_Line_Counter); /* call RA update */
+		if (crtc.intf->out_RA_func) (crtc.intf->out_RA_func)(machine,0,crtc.Scan_Line_Counter); /* call RA update */
 	}
 	/* end of vertical clock pulse */
 
@@ -605,7 +605,7 @@ void m6845_clock(running_machine *machine)
                         if (crtc.intf->out_HS_func) (crtc.intf->out_HS_func)(machine, 0,crtc.HSYNC); /* call HS update */
                 }
         }
-	if (crtc.intf->out_MA_func) (crtc.intf->out_MA_func)(0,crtc.Memory_Address);	/* call MA update */
+	if (crtc.intf->out_MA_func) (crtc.intf->out_MA_func)(machine,0,crtc.Memory_Address);	/* call MA update */
 
 
 
@@ -629,8 +629,8 @@ void m6845_clock(running_machine *machine)
 		{
 			crtc.Delay_Flags=crtc.Delay_Flags^Cursor_On_Flag;
 			crtc.Cursor_Delayed_Status=False;
-			if (crtc.intf->out_CR_func) (crtc.intf->out_CR_func)(0,crtc.Cursor_Delayed_Status); /* call CR update */
-			if (crtc.intf->out_CRE_func) (crtc.intf->out_CRE_func)(0,0); /* call CRE update */
+			if (crtc.intf->out_CR_func) (crtc.intf->out_CR_func)(machine,0,crtc.Cursor_Delayed_Status); /* call CR update */
+			if (crtc.intf->out_CRE_func) (crtc.intf->out_CRE_func)(machine,0,0); /* call CRE update */
 		}
 
 		/* cursor enabled delay */
@@ -643,8 +643,8 @@ void m6845_clock(running_machine *machine)
 				{
 					crtc.Delay_Flags=(crtc.Delay_Flags^Cursor_Start_Delay_Flag)|Cursor_On_Flag;
 					crtc.Cursor_Delayed_Status=True;
-					if ((crtc.intf->out_CR_func)&&(crtc.Cursor_Flash_Count>25)) (crtc.intf->out_CR_func)(0,crtc.Cursor_Delayed_Status); /* call CR update */
-					if (crtc.intf->out_CRE_func) (crtc.intf->out_CRE_func)(0,2|((crtc.Cursor_Flash_Count>25)&1)); /* call CR update */
+					if ((crtc.intf->out_CR_func)&&(crtc.Cursor_Flash_Count>25)) (crtc.intf->out_CR_func)(machine,0,crtc.Cursor_Delayed_Status); /* call CR update */
+					if (crtc.intf->out_CRE_func) (crtc.intf->out_CRE_func)(machine,0,2|((crtc.Cursor_Flash_Count>25)&1)); /* call CR update */
 				}
 			}
 		}
@@ -657,7 +657,7 @@ void m6845_clock(running_machine *machine)
 			{
 				crtc.Delay_Flags=crtc.Delay_Flags^Display_Enabled_Delay_Flag;
 				crtc.Display_Delayed_Enabled=True;
-				if (crtc.intf->out_DE_func) (crtc.intf->out_DE_func)(0,crtc.Display_Delayed_Enabled); /* call DE update */
+				if (crtc.intf->out_DE_func) (crtc.intf->out_DE_func)(machine,0,crtc.Display_Delayed_Enabled); /* call DE update */
 			}
 		}
 
@@ -669,7 +669,7 @@ void m6845_clock(running_machine *machine)
 			{
 				crtc.Delay_Flags=crtc.Delay_Flags^Display_Disable_Delay_Flag;
 				crtc.Display_Delayed_Enabled=False;
-				if (crtc.intf->out_DE_func) (crtc.intf->out_DE_func)(0,crtc.Display_Delayed_Enabled); /* call DE update */
+				if (crtc.intf->out_DE_func) (crtc.intf->out_DE_func)(machine,0,crtc.Display_Delayed_Enabled); /* call DE update */
 			}
 		}
 	}

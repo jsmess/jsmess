@@ -76,8 +76,8 @@ static UINT8 LED_ST=0;
 static UINT8 *last_LED=NULL;
 static UINT8 last_LED_value=0;
 
-static int led_update=TRUE;
-static int remove_led_flag=TRUE;
+static int led_update;
+static int remove_led_flag;
 
 static int selecting=NO_ACTION;
 static int confirm_board_click=FALSE;
@@ -526,6 +526,9 @@ static STATE_POSTLOAD( m_board_postload )
 
 static MACHINE_START( supercon )
 {
+	led_update=TRUE;
+	remove_led_flag=TRUE;
+
 	timer_update_irq = timer_alloc(machine,update_irq,NULL);
 	timer_adjust_periodic( timer_update_irq, attotime_zero, 0, ATTOTIME_IN_HZ(1000) );
 

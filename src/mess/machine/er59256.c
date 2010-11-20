@@ -52,7 +52,7 @@ struct _er59256_t
     FUNCTION PROTOTYPES
 ************************************************************************/
 
-void decode_command(er59256_t *er59256);
+static void decode_command(er59256_t *er59256);
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -69,7 +69,7 @@ INLINE er59256_t *get_token(running_device *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-void preload_rom(running_device *device, UINT16 *rom_data, int count)
+void er59256_preload_rom(running_device *device, const UINT16 *rom_data, int count)
 {
 	er59256_t *er59256 = get_token(device);
     int WordNo;
@@ -87,7 +87,7 @@ void preload_rom(running_device *device, UINT16 *rom_data, int count)
     logerror("\n");
 }
 
-UINT8 data_loaded(running_device *device)
+UINT8 er59256_data_loaded(running_device *device)
 {
 	er59256_t *er59256 = get_token(device);
 
@@ -194,7 +194,7 @@ UINT8 er59256_get_iobits(running_device *device)
 }
 
 
-void decode_command(er59256_t *er59256)
+static void decode_command(er59256_t *er59256)
 {
     er59256->out_shifter=0x0000;
     er59256->command=(er59256->in_shifter & (CMD_MASK | ADDR_MASK));

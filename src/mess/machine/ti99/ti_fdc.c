@@ -324,7 +324,7 @@ const wd17xx_interface ti_wd17xx_interface =
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
 };
 
-static ti99_peb_card fdc_card =
+static const ti99_peb_card fdc_card =
 {
 	data_r,
 	data_w,

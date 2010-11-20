@@ -9,6 +9,12 @@
 
 #include "machine/6522via.h"
 
+/*----------- defined in drivers/vectrex.c -----------*/
+
+extern UINT8 *gce_vectorram;
+extern size_t gce_vectorram_size;
+
+
 /*----------- defined in machine/vectrex.c -----------*/
 
 DEVICE_IMAGE_LOAD( vectrex_cart );

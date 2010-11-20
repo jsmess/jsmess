@@ -102,9 +102,9 @@
 
 //static UINT32 pshift;  // for debugging
 
-void draw_sprites(running_machine* machine, const rectangle* rect);
+static void draw_sprites(running_machine* machine, const rectangle* rect);
 
-void towns_crtc_refresh_mode(running_machine* machine)
+static void towns_crtc_refresh_mode(running_machine* machine)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	rectangle scr;
@@ -713,7 +713,7 @@ WRITE8_HANDLER( towns_spriteram_w)
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+static void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	UINT16 xpos,ypos;
@@ -790,7 +790,7 @@ void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, U
 	}
 }
 
-void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+static void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	UINT16 xpos,ypos;
@@ -854,7 +854,7 @@ void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16
 	}
 }
 
-void draw_sprites(running_machine* machine, const rectangle* rect)
+static void draw_sprites(running_machine* machine, const rectangle* rect)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	UINT16 sprite_limit = (state->video.towns_sprite_reg[0] | (state->video.towns_sprite_reg[1] << 8)) & 0x3ff;
@@ -920,7 +920,7 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 	timer_adjust_oneshot(state->video.sprite_timer,machine->device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)),0);
 }
 
-void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	UINT32 off = 0;
@@ -1112,7 +1112,7 @@ void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bit
 	}
 }
 
-void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	int off = 0;
@@ -1303,7 +1303,7 @@ void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,c
 	}
 }
 
-void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	int off = 0;
@@ -1574,7 +1574,7 @@ void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,co
 	}
 }
 
-void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const rectangle* rect,int layer)
+static void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const rectangle* rect,int layer)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	int line;
@@ -1675,7 +1675,7 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 	}
 }
 
-void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr)
+static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr)
 {
 	towns_state* state = machine->driver_data<towns_state>();
 	UINT32 rom_addr;
@@ -1754,7 +1754,7 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 	}
 }
 
-void draw_text_layer(running_machine* machine)
+static void draw_text_layer(running_machine* machine)
 {
 /*
  *  Text format

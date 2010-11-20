@@ -18,9 +18,9 @@ unsigned char *pc88sr_textRAM = NULL;
 int pc8801_is_24KHz;
 static unsigned char *gVRAM = NULL;
 static int selected_vram;
-static int crtc_on, text_on, text_width = 40, text_height = 20, text_invert, text_color;
+static int crtc_on, text_on, text_width, text_height, text_invert, text_color;
 static int text_cursor, text_cursorX, text_cursorY;
-static int blink_period = 24;
+static int blink_period;
 static int analog_palette;
 static int alu_1, alu_2, alu_on;
 static unsigned char alu_save0, alu_save1, alu_save2;
@@ -415,6 +415,9 @@ READ8_HANDLER( pc88_vramtest_r )
 
 VIDEO_START( pc8801 )
 {
+	text_width = 40;
+	text_height = 20;
+	blink_period = 24;
 }
 
 #define BLOCK_YSIZE (pc8801_is_24KHz ? 4 : 2)

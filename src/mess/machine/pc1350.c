@@ -7,7 +7,7 @@
 
 static UINT8 outa,outb;
 
-static int power=1; /* simulates pressed cce when mess is started */
+static int power; /* simulates pressed cce when mess is started */
 
 void pc1350_outa(running_device *device, int data)
 {
@@ -121,6 +121,7 @@ MACHINE_START( pc1350 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
+	power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");

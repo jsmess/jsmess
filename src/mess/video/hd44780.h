@@ -24,7 +24,7 @@ struct hd44780_interface
 {
 	UINT8 height;			// number of lines
 	UINT8 width;			// chars for line
-	UINT8 *custom_layout;	// custom display layout (NULL for default)
+	const UINT8 *custom_layout;	// custom display layout (NULL for default)
 };
 
 

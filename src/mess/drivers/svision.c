@@ -451,6 +451,7 @@ static DRIVER_INIT( svisions )
 {
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	svision_sound = machine->device("custom");
+	dma_finished = svision_dma_finished(svision_sound);
 	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x1c000);
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	svision_pet.on = TRUE;

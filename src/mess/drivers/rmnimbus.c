@@ -68,8 +68,8 @@ static const ay8910_interface nimbus_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,	                    /* portA read */
 	DEVCB_NULL, 					/* portB read */
-	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, sound_ay8910_porta_w),   /* portA write */
-	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, sound_ay8910_portb_w)    /* portB write */
+	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, nimbus_sound_ay8910_porta_w),   /* portA write */
+	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, nimbus_sound_ay8910_portb_w)    /* portB write */
 };
 
 static const msm5205_interface msm5205_config =
@@ -111,14 +111,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(nimbus_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE( 0x0000, 0x0031) AM_READWRITE( nimbus_video_io_r, nimbus_video_io_w)
     AM_RANGE( 0x0032, 0x007f) AM_READWRITE( nimbus_io_r, nimbus_io_w)
-    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8( mcu_r, mcu_w, 0x00FF)
-    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8( iou_r, iou_w, 0x00FF)
-    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8( mouse_js_r, mouse_js_w, 0x00FF)
-    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( pc8031_r, pc8031_w, 0x00FF)
-    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( sound_ay8910_r, sound_ay8910_w, 0x00FF)
+    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8( nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
+    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8( nimbus_iou_r, nimbus_iou_w, 0x00FF)
+    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8( nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
+    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
+    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
     AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
     AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_disk_r, nimbus_disk_w, 0x00FF)
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
+	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nimbus )
@@ -272,9 +272,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nimbus_iocpu_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x00000, 0x000FF) AM_READWRITE(pc8031_iou_r, pc8031_iou_w)
+	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
 	AM_RANGE(0x00010, 0x07fff) AM_RAM
-    AM_RANGE(0x20000, 0x20004) AM_READWRITE(pc8031_port_r, pc8031_port_w)
+	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
 
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( nimbus, driver_device )
 	MDRV_RAM_EXTRA_OPTIONS("128K,256K,384K,512K,640K,1024K")
 
     /* Peripheral chips */
-    MDRV_Z80SIO_ADD(Z80SIO_TAG, 4000000, sio_intf)
+    MDRV_Z80SIO_ADD(Z80SIO_TAG, 4000000, nimbus_sio_intf)
 
     MDRV_ER59256_ADD(ER59256_TAG)
 

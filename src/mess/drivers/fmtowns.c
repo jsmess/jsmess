@@ -1796,7 +1796,7 @@ static void towns_scsi_dma_w(running_machine* machine, UINT16 data)
 	state->scsi->fmscsi_data_w(data & 0xff);
 }
 
-WRITE_LINE_DEVICE_HANDLER( towns_scsi_irq )
+static WRITE_LINE_DEVICE_HANDLER( towns_scsi_irq )
 {
 	towns_state* tstate = device->machine->driver_data<towns_state>();
 	pic8259_ir0_w(tstate->pic_slave, state);
@@ -1804,7 +1804,7 @@ WRITE_LINE_DEVICE_HANDLER( towns_scsi_irq )
 		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( towns_scsi_drq )
+static WRITE_LINE_DEVICE_HANDLER( towns_scsi_drq )
 {
 	towns_state* tstate = device->machine->driver_data<towns_state>();
 	upd71071_dmarq(tstate->dma_1,state,1);  // SCSI HDs use channel 1
@@ -1884,7 +1884,7 @@ static IRQ_CALLBACK( towns_irq_callback )
 }
 
 // YM3438 interrupt (IRQ 13)
-void towns_fm_irq(running_device* device, int irq)
+static void towns_fm_irq(running_device* device, int irq)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic = state->pic_slave;
@@ -1903,7 +1903,7 @@ void towns_fm_irq(running_device* device, int irq)
 }
 
 // PCM interrupt (IRQ 13)
-void towns_pcm_irq(running_device* device, int channel)
+static void towns_pcm_irq(running_device* device, int channel)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic = state->pic_slave;
