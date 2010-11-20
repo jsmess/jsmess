@@ -7,33 +7,59 @@
 #ifndef TI89_H_
 #define TI89_H_
 
- enum
- {
-	HW1 = 1,
-	HW2,
-	HW3,
-	HW4
- };
+#include "machine/intelfsh.h"
 
- enum
- {
-	FLASH,
-	EPROM
- };
+class ti68k_state : public driver_device
+{
+public:
+	ti68k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_flash(*this, "flash")
+		{ }
 
-/*----------- defined in drivers/ti89.c -----------*/
+	required_device<cpu_device> m_maincpu;
+	required_device<sharp_unk128mbit_device> m_flash;
 
-WRITE16_HANDLER ( ti68k_io_w );
-READ16_HANDLER ( ti68k_io_r );
-WRITE16_HANDLER ( ti68k_io2_w );
-READ16_HANDLER ( ti68k_io2_r );
-static WRITE16_HANDLER ( flash_w );
-static READ16_HANDLER ( rom_r );
+	// hardware versions
+	enum { HW1=1, HW2, HW3, HW4 };
 
-static TIMER_CALLBACK( ti68k_timer_callback );
-static INPUT_CHANGED( ti68k_on_key );
-static MACHINE_RESET(ti68k);
-static VIDEO_START( ti68k );
-static VIDEO_UPDATE( ti68k );
+	// HW specifications
+	UINT8 m_hw_version;
+	bool m_flash_mem;
+	UINT32 m_initial_pc;
 
-#endif /* TI89_H_ */
+	// keyboard
+	UINT16 m_kb_mask;
+	UINT8 m_on_key;
+
+	// LCD
+	UINT8 m_lcd_on;
+	UINT32 m_lcd_base;
+	UINT16 m_lcd_width;
+	UINT16 m_lcd_height;
+	UINT16 m_lcd_contrast;
+
+	// I/O
+	UINT16 m_io_hw1[0x10];
+	UINT16 m_io_hw2[0x80];
+
+	// Timer
+	UINT8 m_timer_on;
+	UINT8 m_timer_val;
+	UINT16 m_timer_mask;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	UINT8 keypad_r (running_machine *machine);
+	WRITE16_MEMBER ( ti68k_io_w );
+	READ16_MEMBER ( ti68k_io_r );
+	WRITE16_MEMBER ( ti68k_io2_w );
+	READ16_MEMBER ( ti68k_io2_r );
+	WRITE16_MEMBER ( flash_w );
+	READ16_MEMBER ( flash_r );
+};
+
+#endif // TI89_H_
