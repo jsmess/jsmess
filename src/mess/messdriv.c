@@ -648,6 +648,7 @@ const game_driver * const drivers[] =
 	DRIVER( at386 )	 /* 19?? IBM AT 386   */
 	DRIVER( at486 )	 /* 19?? IBM AT 486   */
 	DRIVER( at586 )	 /* 19?? AT 586   */
+	DRIVER( c386sx16 )	/* 1990 Commodore 386SX-16 */
 	DRIVER( ficvt503 )	/* 1997 FIC VT-503  */
 	DRIVER( megapc )
 	DRIVER( megapcpl )

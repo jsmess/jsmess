@@ -866,6 +866,13 @@ static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MDRV_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 	MDRV_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
 MACHINE_CONFIG_END
+		
+static MACHINE_CONFIG_DERIVED( c386sx16, at386 )
+
+	MDRV_CPU_REPLACE("maincpu", I386, 16000000)		/* 386SX */
+	MDRV_CPU_PROGRAM_MAP(at386_map)
+	MDRV_CPU_IO_MAP(at386_io)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megapc, at386 )
 
@@ -1292,6 +1299,23 @@ ROM_START( at586 )
 ROM_END
 
 
+ROM_START( c386sx16 )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	/* actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php */
+	ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+	ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+
+	/* Commodore 80386SX BIOS Rev. 1.03 */
+	/* Copyright (C) 1985-1990 Commodore Electronics Ltd. */
+	/* Copyright (C) 1985-1990 Phoenix Technologies Ltd. */
+	ROM_LOAD16_BYTE( "390914-01.u39", 0xf0000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b)) /* 390914-01 V1.03 CS-2100 U39 Copyright (C) 1990 CBM */
+	ROM_LOAD16_BYTE( "390915-01.u38", 0xf0001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, "kbdc8042", 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+ROM_END
+
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
 ROM_START( ficvt503 )
 	ROM_REGION32_LE(0x40000, "user1", 0)
@@ -1358,6 +1382,7 @@ COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "<generic
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at386,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga,  at386,      "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  at386,      "FIC", "VT-503", GAME_NOT_WORKING )
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga,  at386,      "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga,  at386,      "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )

@@ -19,6 +19,7 @@ Skeleton drivers:
 - Tektronix 4107A/4109A [Lord Nightmare, Balrog, Curt Coder]
 - PHUNSY (Philipse Universal System)
 - Omnibyte OB68K1A
+- Commodore 386 SX-16
 
 
 
