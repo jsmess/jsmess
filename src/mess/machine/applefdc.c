@@ -66,6 +66,11 @@ typedef enum
 } applefdc_t;
 
 
+static UINT8 swim_default_parms[16] = 
+{
+	0x38, 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b, 
+	0x1b, 0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57
+};
 
 /***************************************************************************
     IWM MODE
@@ -102,7 +107,13 @@ enum
 	IWM_MODE_LATCHMODE			= 0x01
 };
 
-
+enum
+{
+	SWIM_MODE_IWM,
+	SWIM_MODE_SWIM,
+	SWIM_MODE_SWIM2,
+	SWIM_MODE_SWIM3
+};
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -120,6 +131,13 @@ struct _applefdc_token
 	UINT8 lines;					/* flags from IWM_MOTOR - IWM_Q7 */
 	UINT8 mode;						/* 0-31; see above */
 	UINT8 handshake_hack;			/* not sure what this is for */
+
+	/* SWIM extentions */
+	UINT8 swim_mode;
+	UINT8 swim_magic_state;
+	UINT8 ism_regs[8];
+	UINT8 parm_offset;
+	UINT8 parms[16];
 };
 
 
@@ -181,6 +199,7 @@ static void applefdc_start(running_device *device, applefdc_t type)
 	fdc->motor_timer = timer_alloc(device->machine, iwm_turnmotor_onoff, (void *) device);
 	fdc->lines = 0x00;
 	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
+	fdc->swim_mode = SWIM_MODE_IWM;
 
 	/* register save states */
 	state_save_register_item(device->machine, "applefdc", NULL, 0, fdc->write_byte);
@@ -203,6 +222,18 @@ static DEVICE_RESET(applefdc)
 	fdc->write_byte = 0x00;
 	fdc->lines = 0x00;
 	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
+	fdc->swim_magic_state = 0;
+	fdc->swim_mode = SWIM_MODE_IWM;
+	fdc->parm_offset = 0;
+
+	// setup SWIM default parms if it's a SWIM
+	if (fdc->type == APPLEFDC_SWIM)
+	{
+		for (int i = 0; i < 16; i++)
+		{
+			fdc->parms[i] = swim_default_parms[i];
+		}
+	}
 
 	timer_reset(fdc->motor_timer, attotime_never);
 }
@@ -280,6 +311,45 @@ static void iwm_modereg_w(running_device *device, UINT8 data)
 	applefdc_token *fdc = get_token(device);
 
 	fdc->mode = data & 0x1f;	/* write mode register */
+
+	// SWIM mode is unlocked by writing 1/0/1/1 in a row to bit 6 (which is unused on IWM)
+	// when SWIM mode engages, the IWM is disconnected from both the 68k and the drives,
+	// and the ISM is substituted.
+	if (fdc->type == APPLEFDC_SWIM)
+	{
+		switch (fdc->swim_magic_state)
+		{
+			case 0:
+			case 2:
+			case 3:
+				if (data & 0x40)
+				{
+					fdc->swim_magic_state++;
+				}
+				else
+				{
+					fdc->swim_magic_state = 0;
+				}
+				break;
+			case 1: 
+				if (!(data & 0x40))
+				{
+					fdc->swim_magic_state++;
+				}
+				else
+				{
+					fdc->swim_magic_state = 0;
+				}
+				break;
+		}
+
+		if (fdc->swim_magic_state == 4)
+		{
+			fdc->swim_magic_state = 0;
+//			printf("IWM: switching to SWIM mode\n");
+			fdc->swim_mode = SWIM_MODE_SWIM;
+		}
+	}
 
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("iwm_modereg_w: iwm_mode=0x%02x\n", (unsigned) fdc->mode);
@@ -439,16 +509,16 @@ static void iwm_access(running_device *device, int offset)
 	applefdc_token *fdc = get_token(device);
 	const applefdc_interface *intf = get_interface(device);
 
-	if (LOG_APPLEFDC_EXTRA)
-	{
-		logerror("iwm_access(): %s line %s\n",
-			(offset & 1) ? "setting" : "clearing", lines[offset >> 1]);
-	}
-
 	if (offset & 1)
 		fdc->lines |= (1 << (offset >> 1));
 	else
 		fdc->lines &= ~(1 << (offset >> 1));
+
+	if (LOG_APPLEFDC_EXTRA)
+	{
+		logerror("iwm_access(): %s line %s => %02x\n",
+			(offset & 1) ? "setting" : "clearing", lines[offset >> 1], fdc->lines);
+	}
 
 	if ((offset < 0x08) && (intf->set_lines != NULL))
 		intf->set_lines(device,fdc->lines & 0x0f);
@@ -493,51 +563,69 @@ READ8_DEVICE_HANDLER( applefdc_r )
 	UINT8 result = 0;
 
 	/* normalize offset */
-	offset &= 15;
+	offset &= 0xf;
 
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_r: offset=%i\n", offset);
 
-	iwm_access(device, offset);
-
-	switch(fdc->type)
+	if ((fdc->type < APPLEFDC_SWIM) || (fdc->swim_mode == SWIM_MODE_IWM))
 	{
-		case APPLEFDC_APPLE2:
-			switch(offset)
-			{
-				case 0x0C:
-					if (fdc->lines & IWM_Q7)
-					{
-						if (intf->write_data != NULL)
-							intf->write_data(device,fdc->write_byte);
-						result = 0;
-					}
-					else
-						result = applefdc_read_reg(device, 0);
+		iwm_access(device, offset);
 
-					break;
-				case 0x0D:
-					result = applefdc_read_reg(device, IWM_Q6);
-					break;
-				case 0x0E:
-					result = applefdc_read_reg(device, IWM_Q7);
-					break;
-				case 0x0F:
-					result = applefdc_read_reg(device, IWM_Q7 | IWM_Q6);
-					break;
-			}
-			break;
+		switch(fdc->type)
+		{
+			case APPLEFDC_APPLE2:
+				switch(offset)
+				{
+					case 0x0C:
+						if (fdc->lines & IWM_Q7)
+						{
+							if (intf->write_data != NULL)
+								intf->write_data(device,fdc->write_byte);
+							result = 0;
+						}
+						else
+							result = applefdc_read_reg(device, 0);
 
-		case APPLEFDC_IWM:
-			if ((offset & 1) == 0)
-				result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
-			break;
+						break;
+					case 0x0D:
+						result = applefdc_read_reg(device, IWM_Q6);
+						break;
+					case 0x0E:
+						result = applefdc_read_reg(device, IWM_Q7);
+						break;
+					case 0x0F:
+						result = applefdc_read_reg(device, IWM_Q7 | IWM_Q6);
+						break;
+				}
+				break;
 
-		case APPLEFDC_SWIM:
-			if ((offset & 1) == 0)
-				result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
-			break;
+			case APPLEFDC_IWM:
+				if ((offset & 1) == 0)
+					result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
+				break;
+
+			case APPLEFDC_SWIM:
+				if ((offset & 1) == 0)
+					result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
+				break;
+		}
 	}
+	else if (fdc->swim_mode >= SWIM_MODE_SWIM)
+	{
+		// reading parameter RAM?
+		if ((offset & 7) == 3)
+		{
+			result = fdc->parms[fdc->parm_offset++];
+			fdc->parm_offset &= 0xf;
+		}
+		else
+		{
+			result = fdc->ism_regs[offset&7];
+		}
+		printf("SWIM: read %02x from offset %x\n", result, offset & 7);
+	}
+
 	return result;
 }
 
@@ -558,36 +646,73 @@ WRITE8_DEVICE_HANDLER( applefdc_w )
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_w: offset=%i data=0x%02x\n", offset, data);
 
-	iwm_access(device, offset);
-
-	switch(fdc->type)
+	if ((fdc->type < APPLEFDC_SWIM) || (fdc->swim_mode == SWIM_MODE_IWM))
 	{
-		case APPLEFDC_APPLE2:
-			switch(offset)
-			{
-				case 0x0C:
-					if (fdc->lines & IWM_Q7)
-					{
-						if (intf->write_data != NULL)
-							intf->write_data(device,fdc->write_byte);
-					}
-					break;
+		iwm_access(device, offset);
 
-				case 0x0D:
-					fdc->write_byte = data;
-					break;
-			}
-			break;
+		switch(fdc->type)
+		{
+			case APPLEFDC_APPLE2:
+				switch(offset)
+				{
+					case 0x0C:
+						if (fdc->lines & IWM_Q7)
+						{
+							if (intf->write_data != NULL)
+								intf->write_data(device,fdc->write_byte);
+						}
+						break;
 
-		case APPLEFDC_IWM:
-			if (offset & 1)
-				applefdc_write_reg(device, data);
-			break;
+					case 0x0D:
+						fdc->write_byte = data;
+						break;
+				}
+				break;
 
-		case APPLEFDC_SWIM:
-			if (offset & 1)
-				applefdc_write_reg(device, data);
-			break;
+			case APPLEFDC_IWM:
+				if (offset & 1)
+					applefdc_write_reg(device, data);
+				break;
+
+			case APPLEFDC_SWIM:
+				if (offset & 1)
+					applefdc_write_reg(device, data);
+				break;
+		}
+	}
+	else if (fdc->swim_mode >= SWIM_MODE_SWIM)
+	{
+		printf("SWIM: write %02x to offset %x\n", data, offset & 7);
+		switch (offset & 7)
+		{
+			case 2: // write CRC
+				break;
+
+			case 3: // write parameter
+				fdc->parms[fdc->parm_offset++] = data;
+				fdc->parm_offset &= 0xf;
+				break;
+
+			case 6: // write zeros to status (also zeroes parameter RAM pointer)
+				fdc->ism_regs[6] &= ~data;
+				fdc->parm_offset = 0;
+
+				if (data == 0xf8)	// magic "revert to IWM" value
+				{
+					printf("SWIM: reverting to IWM\n");
+					fdc->swim_mode = SWIM_MODE_IWM;
+				}
+				break;
+
+			case 7: // write ones to status
+				fdc->ism_regs[6] |= data;
+				break;
+
+			default:
+				fdc->ism_regs[offset & 7] = data;
+				break;
+
+		}
 	}
 }
 

@@ -10,26 +10,27 @@
     R. Belmont
 
     Mac Model Feature Summary:
-                                CPU             FDC     Kbd/Mouse  PRAM   Video
-         - Mac 128k             68k             IWM     orig       orig   Original
-         - Mac 512k             68k             IWM     orig       orig   Original
-         - Mac 512ke        68k             IWM     orig       orig   Original
-         - Mac Plus         68k             IWM     orig       ext    Original
-         - Mac SE               68k             IWM     MacII ADB  ext    Original
-         - Mac Classic          68k             SWIM    MacII ADB  ext    Original
-         - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU    640x400 B&W
-         - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU    640x400 B&W
-         - Mac II               020             IWM     MacII ADB  ext    NuBus card
-         - Mac IIx              030             SWIM    MacII ADB  ext    NuBus card
-         - Mac IIfx             030             SWIM    ADB-IOP    ext    NuBus card
-         - Mac SE/30            030             SWIM    MacII ADB  ext    Internal fake NuBus card
-         - Mac IIcx             030             SWIM    ADB-CUDA   ext    NuBus card
-         - Mac IIci             030             SWIM    MacII ADB  ext    Internal "RBV" type
-         - Mac IIsi             030             SWIM    Egret ADB  ext    Internal "RBV" type
-         - Mac IIvx/IIvi        030             SWIM    Egret ADB  ext    Internal "VASP" type
-         - Mac LC               020             SWIM    Egret ADB  ext    Internal "V8" type
-         - Mac LC II            030             SWIM    Egret ADB  ext    Internal "V8" type
-         - Mac LC III           030             SWIM    Egret ADB  ext    Internal "Sonora" type
+                                CPU             FDC     Kbd/Mouse  PRAM		Video
+         - Mac 128k             68k             IWM     orig       orig		Original
+         - Mac 512k             68k             IWM     orig       orig		Original
+         - Mac 512ke        	68k             IWM     orig       orig		Original
+         - Mac Plus         	68k             IWM     orig       ext		Original
+         - Mac SE               68k             IWM     MacII ADB  ext		Original
+         - Mac Classic          68k             SWIM    MacII ADB  ext		Original
+         - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU		640x400 B&W
+         - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU		640x400 B&W
+         - Mac II               020             IWM     MacII ADB  ext		NuBus card
+         - Mac IIx              030             SWIM    MacII ADB  ext		NuBus card
+         - Mac IIfx             030             SWIM    ADB-IOP    ext		NuBus card
+         - Mac SE/30            030             SWIM    MacII ADB  ext		Internal fake NuBus card
+         - Mac IIcx             030             SWIM    MacII ADB  ext		NuBus card
+         - Mac IIci             030             SWIM    Egret ADB  ext		Internal "RBV" type
+         - Mac IIsi             030             SWIM    Egret ADB  n/a		Internal "RBV" type
+         - Mac IIvx/IIvi        030             SWIM    Egret ADB  n/a		Internal "VASP" type
+         - Mac LC               020             SWIM    Egret ADB  n/a		Internal "V8" type
+         - Mac LC II            030             SWIM    Egret ADB  n/a		Internal "V8" type
+    	 - Mac LC III           030             SWIM    Egret ADB  n/a		Internal "Sonora" type
+    	 - Mac Classic II		030				SWIM	Egret ADB  n/a		Internal "Eagle" type
 
     Notes:
         - The Mac Plus boot code seems to check to see the extent of ROM
@@ -1490,10 +1491,11 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	UINT16 result = 0;
 	running_device *fdc = space.machine->device("fdc");
 
-	if (LOG_MAC_IWM)
-		logerror("mac_iwm_r: offset=0x%08x mem_mask %04x (PC %x)\n", offset, mem_mask, cpu_get_pc(space.cpu));
-
 	result = applefdc_r(fdc, (offset >> 8));
+
+	if (LOG_MAC_IWM)
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, cpu_get_pc(space.cpu));
+
 	return (result << 8) | result;
 }
 
@@ -1502,7 +1504,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 	running_device *fdc = space.machine->device("fdc");
 
 	if (LOG_MAC_IWM)
-		logerror("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space.cpu));
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space.cpu));
 
 	if (ACCESSING_BITS_0_7)
 		applefdc_w(fdc, (offset >> 8), data & 0xff);
