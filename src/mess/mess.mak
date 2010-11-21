@@ -1812,6 +1812,7 @@ $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/fidelz80.o:	$(MESS_LAYOUT)/fidelz80.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
+$(MESS_DRIVERS)/h8.o:		$(MESS_LAYOUT)/h8.lh
 $(MESS_DRIVERS)/k1003.o:	$(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
 $(MESS_DRIVERS)/junior.o:	$(MESS_LAYOUT)/junior.lh
