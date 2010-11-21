@@ -8,6 +8,7 @@
 
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
+#include "machine/scsibus.h"
 
 #define DEBUG_TEXT  0x01
 #define DEBUG_DB    0x02

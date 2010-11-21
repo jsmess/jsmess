@@ -24,8 +24,6 @@
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "machine/scsi.h"
-#include "machine/scsibus.h"
-#include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 

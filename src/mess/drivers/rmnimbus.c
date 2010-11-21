@@ -19,8 +19,6 @@
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"
 #include "machine/scsi.h"
-#include "machine/scsibus.h"
-#include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
