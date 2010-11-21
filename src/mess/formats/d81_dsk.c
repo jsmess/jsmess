@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "formats/basicdsk.h"
+#include "formats/d81_dsk.h"
 
 /***************************************************************************
     PARAMETERS
@@ -67,7 +68,7 @@
 
 */
 
-UINT64 d81_translate_offset(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
+static UINT64 d81_translate_offset(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
 {
 	UINT64 offset = (track * 20) + (!head * 10) + sector;
 

@@ -12,9 +12,6 @@
 #include "devices/messram.h"
 
 UINT8 *specialist_video_ram;
-//UINT8 erik_page_active;
-UINT8 *erik_video_ram_page_1;
-UINT8 *erik_video_ram_page_2;
 
 
 VIDEO_START( special )

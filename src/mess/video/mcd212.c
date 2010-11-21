@@ -1509,7 +1509,7 @@ TIMER_CALLBACK( mcd212_perform_scan )
     timer_adjust_oneshot(mcd212->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 262, 0), 0);
 }
 
-void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
+static void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
 {
     mcd212->machine = machine;
 
@@ -1611,7 +1611,7 @@ void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
     state_save_register_global_array(machine, mcd212->channel[1].weight_factor_b);
 }
 
-void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
+static void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
 {
     WORD68K w = 0;
     SWORD68K sw = 0;

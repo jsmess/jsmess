@@ -32,7 +32,7 @@
 
 UINT8 *oric_ram;
 
-static int enable_logging = 1;
+static const int enable_logging = 1;
 /* static int save_done = 0; */
 
 
@@ -318,7 +318,9 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	if ((previous_portb_data^data) & (1<<6))
 	{
 		if (data & (1<<6))
-			enable_logging = 1;
+		{
+			//enable_logging = 1;
+		}
 	}
 
 	cassette_change_state(

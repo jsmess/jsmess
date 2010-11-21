@@ -169,7 +169,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	}
 }
 
-void upd71071_soft_reset(running_device* device)
+static void upd71071_soft_reset(running_device* device)
 {
 	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	int x;

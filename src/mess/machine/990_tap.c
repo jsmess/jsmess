@@ -130,7 +130,7 @@ INLINE tap_990_t *get_safe_token(running_device *device)
 	return (tap_990_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-DEVICE_START( ti990_tape )
+static DEVICE_START( ti990_tape )
 {
 	tape_unit_t *t;
 	tap_990_t *tpc = get_safe_token(device->owner());
@@ -148,7 +148,7 @@ DEVICE_START( ti990_tape )
 /*
     Open a tape image
 */
-DEVICE_IMAGE_LOAD( ti990_tape )
+static DEVICE_IMAGE_LOAD( ti990_tape )
 {
 	tape_unit_t *t;
 	tap_990_t *tpc = get_safe_token(image.device().owner());
@@ -168,7 +168,7 @@ DEVICE_IMAGE_LOAD( ti990_tape )
 /*
     Close a tape image
 */
-DEVICE_IMAGE_UNLOAD( ti990_tape )
+static DEVICE_IMAGE_UNLOAD( ti990_tape )
 {
 	tape_unit_t *t;
 	tap_990_t *tpc = get_safe_token(image.device().owner());
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_END
 /*
     Init the tape controller core
 */
-DEVICE_START(tap_990)
+static DEVICE_START(tap_990)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	/* verify that we have an interface assigned */

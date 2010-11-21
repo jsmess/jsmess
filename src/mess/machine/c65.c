@@ -33,9 +33,12 @@ static int c65_charset_select;
 static int c64mode;
 
 static UINT8 c65_6511_port;
-static UINT8 c65_keyline = { 0xff };
+static UINT8 c65_keyline;
 
 static UINT8 vicirq;
+static int old_level;
+static int old_value;
+static int old_data;
 
 /*UINT8 *c65_basic; */
 /*UINT8 *c65_kernal; */
@@ -106,8 +109,6 @@ static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 
 static void c65_irq( running_machine *machine, int level )
 {
-	static int old_level = 0;
-
 	if (level != old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
@@ -829,8 +830,6 @@ static int c65_io_on=0, c65_io_dc00_on=0;
    bit 6 vic3 c65 character set */
 void c65_bankswitch_interface( running_machine *machine, int value )
 {
-	static int old = 0;
-
 	DBG_LOG(machine, 2, "c65 bankswitch", ("%.2x\n",value));
 
 	if (c65_io_on)
@@ -862,7 +861,7 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 	else
 		memory_set_bankptr(machine, "bank2", c64_memory + 0xa000);
 #endif
-	if ((old^value) & 0x20)
+	if ((old_value^value) & 0x20)
 	{
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20)
@@ -878,16 +877,15 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 	else
 		memory_set_bankptr(machine, "bank6", c64_memory + 0xe000);
 #endif
-	old = value;
+	old_value = value;
 }
 
 void c65_bankswitch( running_machine *machine )
 {
-	static int old = -1;
 	int data, loram, hiram, charen;
 
 	data = m4510_get_port(machine->device<legacy_cpu_device>("maincpu"));
-	if (data == old)
+	if (data == old_data)
 		return;
 
 	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
@@ -965,7 +963,7 @@ void c65_bankswitch( running_machine *machine )
 			memory_set_bankptr(machine, "bank10", c64_memory + 0xe000);
 		}
 	}
-	old = data;
+	old_data = data;
 }
 
 void c65_colorram_write( int offset, int value )
@@ -1017,9 +1015,14 @@ static void c65_common_driver_init( running_machine *machine )
 	memory_set_bankptr(machine, "bank14", c64_memory + 0x0c000);
 	memory_set_bankptr(machine, "bank15", c64_memory + 0x0e000);
 
+	cbm_common_init();
+	c65_keyline = 0xff;
+
+	c64_pal = 0;
 	c65_charset_select = 0;
 	c65_6511_port = 0xff;
 	vicirq = 0;
+	old_data = -1;
 
 	/* C65 had no datasette port */
 	c64_tape_on = 0;
@@ -1029,16 +1032,15 @@ static void c65_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( c65 )
 {
-	c64_pal = 0;
 	dma.version = 2;
 	c65_common_driver_init(machine);
 }
 
 DRIVER_INIT( c65pal )
 {
-	c64_pal = 1;
 	dma.version = 1;
 	c65_common_driver_init(machine);
+	c64_pal = 1;
 }
 
 MACHINE_START( c65 )

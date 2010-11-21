@@ -207,9 +207,9 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM // AM_BASE(&milano_ram)//
-	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( write_LED_8 )		// Chessboard
-	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( write_board_8)		// Chessboard
-	AM_RANGE( 0x3000, 0x3000) AM_READ( read_board_8 )		// Chessboard	
+	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( mboard_write_board_8)		// Chessboard
+	AM_RANGE( 0x3000, 0x3000) AM_READ( mboard_read_board_8 )		// Chessboard	
   AM_RANGE( 0x3400, 0x3405) AM_WRITE( write_led)	// Function LEDs 3400 TRN 3401
   AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys)	// CL Key
   AM_RANGE( 0x2004, 0x2004) AM_WRITE( write_lcd_i)	// LCD Instr. Reg + Beeper
@@ -371,7 +371,7 @@ static MACHINE_START( polgar )
 	lcd_shift_counter=3;
 	// timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, update_artwork);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
 	mboard_savestate_register(machine);
 }
 
@@ -381,8 +381,8 @@ static MACHINE_RESET( polgar )
 	// lcd_shift_counter = 3;
         hd44780_device * hd44780 = machine->device<hd44780_device>("hd44780");
       	hd44780->control_write(128, 15);		/* Initialize LCD */
-      	set_boarder_pieces();
-				set_board();
+      	mboard_set_boarder_pieces();
+	mboard_set_board();
 }
 
 

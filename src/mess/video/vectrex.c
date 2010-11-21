@@ -85,7 +85,8 @@ static vectrex_point vectrex_points[NVECT];
 static UINT16 via_timer2;
 static attotime vector_start_time;
 
-void (*vector_add_point_function) (int, int, rgb_t, int) = vectrex_add_point;
+typedef void (*vector_add_point_fn)(int, int, rgb_t, int);
+vector_add_point_fn vector_add_point_function;
 
 
 /*********************************************************************
@@ -305,6 +306,7 @@ VIDEO_START(vectrex)
 
 	vectrex_imager_freq = 1;
 
+	vector_add_point_function = vectrex_add_point;
 	vectrex_imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
 	timer_adjust_periodic(vectrex_imager_timer,
 						  ATTOTIME_IN_HZ(vectrex_imager_freq),
@@ -498,6 +500,7 @@ VIDEO_START(raaspec)
 	x_max = visarea.max_x << 16;
 	y_max = visarea.max_y << 16;
 
+	vector_add_point_function = vectrex_add_point;
 	refresh = timer_alloc(machine, vectrex_refresh, NULL);
 
 	VIDEO_START_CALL(vector);

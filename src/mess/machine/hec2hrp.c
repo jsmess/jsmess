@@ -79,11 +79,11 @@ static UINT8 actions;					/* joy button off*/
 
 // Etat des ports Hector (8255)
 
-UINT8 hector_port_a=0;
-UINT8 hector_port_b=0;
-UINT8 hector_port_c_h=0;
-UINT8 hector_port_c_l=0;
-UINT8 hector_port_cmd=0;
+static UINT8 hector_port_a=0;
+static UINT8 hector_port_b=0;
+static UINT8 hector_port_c_h=0;
+static UINT8 hector_port_c_l=0;
+static UINT8 hector_port_cmd=0;
 static TIMER_CALLBACK( Callback_CK )
 {
 /* To generate the CK signal (K7)*/
@@ -360,10 +360,10 @@ if ((offset & 0x3) == 0x2) /* Port C */
 	   {
            hector_port_c_h = (hector_port_c_h & 0x0c0);	/* Raz de l'etat des bits 4 et 5*/
            
-		   if (disk2_data_w_ready != 0x00) 
+		   if (hector_disk2_data_w_ready != 0x00) 
                 hector_port_c_h = hector_port_c_h + 0x010;	// PC4 (donnee dispo en provenance du Disk II)
 
-           if (disk2_data_r_ready != 0x00) 
+           if (hector_disk2_data_r_ready != 0x00) 
 				hector_port_c_h = hector_port_c_h + 0x020;	// PC5 (donnee pas encore lue par Disk II)
           
            data_h =  hector_port_c_h;			
@@ -394,13 +394,13 @@ if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 		   if BIT(hector_port_c_l, 1)		// PC1 (bit X1)= true
 		   {   
                // Lecture effectuee => RAZ memoire donnee disk2_data_write dispo	
-			   hector_port_b = disk2_data_write; // Mep sur port B si 2eme 74374 existant !
-			   disk2_data_w_ready = 0x00;
+			   hector_port_b = hector_disk2_data_write; // Mep sur port B si 2eme 74374 existant !
+			   hector_disk2_data_w_ready = 0x00;
 		   }
 		   if BIT(hector_port_c_l, 2)		// PC2 (bit X2)= true
 		   {
-				disk2_data_read = hector_port_a; /* mise en place de l'info presente sur le port A */
-				disk2_data_r_ready = 0xff;		 /* memorisation de l'info */
+				hector_disk2_data_read = hector_port_a; /* mise en place de l'info presente sur le port A */
+				hector_disk2_data_r_ready = 0xff;		 /* memorisation de l'info */
 		   }
 
 	   }

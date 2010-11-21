@@ -92,7 +92,7 @@ UINT8 get_scsi_phase(running_device *device);
 /* utility functions */
 
 /* get a drive's number from it's select line */
-UINT8 driveno(UINT8  drivesel);
+UINT8 scsibus_driveno(UINT8  drivesel);
 
 /* get the number of bytes for a scsi command */
 int get_scsi_cmd_len(int cbyte);

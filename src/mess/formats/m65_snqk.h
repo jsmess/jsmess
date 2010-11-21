@@ -17,8 +17,6 @@
 
 #include "devices/snapquik.h"
 
-int microtan_verify_snapshot(UINT8 *data, int size);
-
 SNAPSHOT_LOAD( microtan );
 QUICKLOAD_LOAD( microtan );
 

@@ -626,7 +626,7 @@ static int cd_param_p;
 static int cd_result_p;
 static int cd_result_c;
 static int cd_result_ready;
-static int cd_readed = -1;
+static const int cd_readed = -1;
 static int cd_reset;
 static UINT8 cd_stat;
 static UINT8 cd_io_status;

@@ -31,14 +31,14 @@ static int laser_video_bank;
 #define TRKSIZE_VZ	0x9a0	/* arbitrary (actually from analyzing format) */
 #define TRKSIZE_FM	3172	/* size of a standard FM mode track */
 
-static UINT8 laser_track_x2[2] = {80, 80};
-static UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
+static UINT8 laser_track_x2[2];
+static const UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
 static UINT8 laser_fdc_status = 0;
 static UINT8 laser_fdc_data[TRKSIZE_FM];
 static int laser_data;
 static int laser_fdc_edge = 0;
-static int laser_fdc_bits = 8;
-static int laser_drive = -1;
+static int laser_fdc_bits;
+static int laser_drive;
 static int laser_fdc_start = 0;
 static int laser_fdc_write = 0;
 static int laser_fdc_offs = 0;
@@ -100,14 +100,18 @@ static const char* mwa_bank_hard[4] =
 
 DRIVER_INIT(laser)
 {
-    UINT8 *gfx = memory_region(machine, "gfx2");
-    int i;
+	UINT8 *gfx = memory_region(machine, "gfx2");
+	int i;
+
+	laser_track_x2[0] = laser_track_x2[1] = 80;
+	laser_fdc_bits = 8;
+	laser_drive = -1;
 
 	for (i = 0; i < 256; i++)
-        gfx[i] = i;
+		gfx[i] = i;
 
 	laser_latch = -1;
-    mem = memory_region(machine, "maincpu");
+	mem = memory_region(machine, "maincpu");
 
 	for (i = 0; i < ARRAY_LENGTH(laser_bank); i++)
 		laser_bank[i] = -1;

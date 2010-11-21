@@ -27,7 +27,7 @@ enum
 	TI_86
 };
 
-static UINT8 ti_calculator_model = TI_NOT_INITIALIZED;
+static UINT8 ti_calculator_model;
 
 UINT8 ti85_timer_interrupt_mask;
 static UINT8 ti85_timer_interrupt_status;
@@ -55,7 +55,7 @@ static UINT8 ti81_port_7_data;
 
 static UINT8 *ti8x_ram = NULL;
 
-static UINT8 ti85_PCR = 0xc0;
+static UINT8 ti85_PCR;
 
 static UINT8 ti85_red_out = 0x00;
 static UINT8 ti85_white_out = 0x00;

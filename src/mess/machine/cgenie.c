@@ -28,8 +28,8 @@ UINT8 *cgenie_fontram;
 UINT8 *cgenie_colorram;
 
 
-int cgenie_tv_mode = -1;
-static int port_ff = 0xff;
+int cgenie_tv_mode;
+static int port_ff;
 
 #define IRQ_TIMER		0x80
 #define IRQ_FDC 		0x40
@@ -141,6 +141,8 @@ MACHINE_START( cgenie )
 	irq_status = 0;
 	motor_drive = 0;
 	head = 0;
+	cgenie_tv_mode = -1;
+	port_ff = 0xff;
 
 	/*
      * Every fifth cycle is a wait cycle, so I reduced

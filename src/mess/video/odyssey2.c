@@ -735,6 +735,7 @@ STREAM_UPDATE( odyssey2_sh_update )
     Thomson EF9340/EF9341 extra chips in the g7400
  */
 
+#ifdef UNUSED_FUNCTION
 static struct {
 	UINT8	X;
 	UINT8	Y;
@@ -873,5 +874,6 @@ UINT8 odyssey2_ef9341_r( int command, int b )
 	}
 	return data;
 }
+#endif
 
 DEFINE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);

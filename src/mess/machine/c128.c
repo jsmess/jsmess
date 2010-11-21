@@ -101,11 +101,12 @@ static UINT8 *c128_ram;
 
 static UINT8 c64_port_data;
 
-static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
+static UINT8 c128_keyline[3];
 
-static int c128_cnt1 = 1, c128_sp1 = 1, c128_data_out = 0;
+static int c128_cnt1, c128_sp1, c128_data_out;
 static int c128_va1617;
 static int c128_cia1_on;
+static int c128_monitor;
 static UINT8 vicirq;
 
 static void c128_nmi( running_machine *machine )
@@ -1149,9 +1150,16 @@ static void c128_common_driver_init( running_machine *machine )
 	c64_colorram = ram + 0x122000;
 	c128_vdcram = ram + 0x122800;
 
+	c64_tape_on = 1;
+	c64_pal = 0;
 	c64mode = 0;
 	c128_cia1_on = 1;
 	vicirq = 0;
+
+	c128_monitor = -1;
+	c128_cnt1 = 1;
+	c128_sp1 = 1;
+	c128_keyline[0] = c128_keyline[1] = c128_keyline[2] = 0xff;
 
 	for (i = 0; i < 0x100; i++)
 		gfx[i] = i;
@@ -1165,9 +1173,8 @@ DRIVER_INIT( c128 )
 	running_device *vic2e = machine->device("vic2e");
 	running_device *vdc8563 = machine->device("vdc8563");
 
-	c64_tape_on = 1;
-	c64_pal = 0;
 	c128_common_driver_init(machine);
+
 	vic2_set_rastering(vic2e, 0);
 	vdc8563_set_rastering(vdc8563, 1);
 }
@@ -1177,9 +1184,9 @@ DRIVER_INIT( c128pal )
 	running_device *vic2e = machine->device("vic2e");
 	running_device *vdc8563 = machine->device("vdc8563");
 
-	c64_tape_on = 1;
-	c64_pal = 1;
 	c128_common_driver_init(machine);
+	c64_pal = 1;
+
 	vic2_set_rastering(vic2e, 1);
 	vdc8563_set_rastering(vdc8563, 0);
 }
@@ -1229,7 +1236,6 @@ MACHINE_RESET( c128 )
 
 INTERRUPT_GEN( c128_frame_interrupt )
 {
-	static int monitor = -1;
 	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
 	int i, value;
 	running_device *vic2e = device->machine->device("vic2e");
@@ -1237,7 +1243,7 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 	c128_nmi(device->machine);
 
-	if ((input_port_read(device->machine, "SPECIAL") & 0x08) != monitor)
+	if ((input_port_read(device->machine, "SPECIAL") & 0x08) != c128_monitor)
 	{
 		if (input_port_read(device->machine, "SPECIAL") & 0x08)
 		{
@@ -1254,7 +1260,7 @@ INTERRUPT_GEN( c128_frame_interrupt )
 			else
 				device->machine->primary_screen->set_visible_area(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
 		}
-		monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
+		c128_monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
 	}
 
 

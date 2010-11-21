@@ -85,8 +85,6 @@ struct _bitbanger_config
 /* outputs data to a bitbanger port */
 void bitbanger_output(running_device *device, int value);
 
-void bitbanger_online_func(running_device *device, int state);
-
 /* ui functions */
 const char *bitbanger_mode_string(running_device *device);
 const char *bitbanger_baud_string(running_device *device);

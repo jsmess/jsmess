@@ -15,11 +15,15 @@
 components in its INTERRUPT_GEN */
 
 /* keyboard lines */
-UINT8 c64_keyline[10] =
-{
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
+UINT8 c64_keyline[10];
 
+void cbm_common_init(void)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_LENGTH(c64_keyline); i++)
+		c64_keyline[i] = 0xff;
+}
 
 static TIMER_CALLBACK( lightpen_tick )
 {

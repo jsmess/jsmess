@@ -243,7 +243,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;

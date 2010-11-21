@@ -25,7 +25,7 @@ VIDEO_START( spectrum )
 	state->frame_number = 0;
 	state->flash_invert = 0;
 
-	EventList_Initialise(machine, 30000);
+	spectrum_EventList_Initialise(machine, 30000);
 
 	state->retrace_cycles = SPEC_RETRACE_CYCLES;
 
@@ -38,7 +38,7 @@ VIDEO_START( spectrum_128 )
 	state->frame_number = 0;
 	state->flash_invert = 0;
 
-	EventList_Initialise(machine, 30000);
+	spectrum_EventList_Initialise(machine, 30000);
 
 	state->retrace_cycles = SPEC128_RETRACE_CYCLES;
 }
@@ -70,13 +70,13 @@ VIDEO_EOF( spectrum )
 
 	/* Empty event buffer for undisplayed frames noting the last border
        colour (in case colours are not changed in the next frame). */
-	NumItems = EventList_NumEvents();
+	NumItems = spectrum_EventList_NumEvents();
 	if (NumItems)
 	{
-		pItem = EventList_GetFirstItem();
-		border_set_last_color ( pItem[NumItems-1].Event_Data );
-		EventList_Reset();
-		EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+		pItem = spectrum_EventList_GetFirstItem();
+		spectrum_border_set_last_color ( pItem[NumItems-1].Event_Data );
+		spectrum_EventList_Reset();
+		spectrum_EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }
@@ -155,7 +155,7 @@ VIDEO_UPDATE( spectrum )
 		}
 	}
 
-	border_draw(screen->machine, bitmap, full_refresh,
+	spectrum_border_draw(screen->machine, bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -208,19 +208,19 @@ static int CurrBorderColor = 0;
 static int LastDisplayedBorderColor = -1; /* Negative value indicates redraw */
 
 /* Force the border to be redrawn on the next frame */
-void border_force_redraw (void)
+void spectrum_border_force_redraw (void)
 {
         LastDisplayedBorderColor = -1;
 }
 
 /* Set the last border colour to have been displayed. Used when loading snap
    shots and to record the last colour change in a frame that was skipped. */
-void border_set_last_color (int NewColor)
+void spectrum_border_set_last_color (int NewColor)
 {
         CurrBorderColor = NewColor;
 }
 
-void border_draw(running_machine *machine, bitmap_t *bitmap,
+void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 	int full_refresh,               /* Full refresh flag */
 	int TopBorderLines,             /* Border lines before actual screen */
 	int ScreenLines,                /* Screen height in pixels */
@@ -245,8 +245,8 @@ void border_draw(running_machine *machine, bitmap_t *bitmap,
 	int Count, ScrX, NextScrX, ScrY;
 	rectangle r;
 
-	pItem = EventList_GetFirstItem();
-	NumItems = EventList_NumEvents();
+	pItem = spectrum_EventList_GetFirstItem();
+	NumItems = spectrum_EventList_NumEvents();
 
 	for (Count = 0; Count < NumItems; Count++)
 	{
@@ -526,8 +526,8 @@ void border_draw(running_machine *machine, bitmap_t *bitmap,
 	}
 
 	/* Assume all other routines have processed their data from the list */
-	EventList_Reset();
-	EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
+	spectrum_EventList_Reset();
+	spectrum_EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
 }
 
 /* current item */
@@ -552,24 +552,25 @@ static int CyclesPerFrame=0;
 can be setup as:
 
 Number_of_CPU_Cycles_In_A_Frame/Minimum_Number_Of_Cycles_Per_Instruction */
-void EventList_Initialise(running_machine *machine, int NumEntries)
+void spectrum_EventList_Initialise(running_machine *machine, int NumEntries)
 {
 	pEventListBuffer = auto_alloc_array(machine, char, NumEntries);
 	TotalEvents = NumEntries;
 	CyclesPerFrame = 0;
-	EventList_Reset();
+	spectrum_EventList_Reset();
 }
 
 /* reset the change list */
-void    EventList_Reset(void)
+void spectrum_EventList_Reset(void)
 {
 	NumEvents = 0;
 	pCurrentItem = (EVENT_LIST_ITEM *)pEventListBuffer;
 }
 
 
+#ifdef UNUSED_FUNCTION
 /* add an event to the buffer */
-void	EventList_AddItem(int ID, int Data, int Time)
+void EventList_AddItem(int ID, int Data, int Time)
 {
         if (NumEvents < TotalEvents)
         {
@@ -582,16 +583,17 @@ void	EventList_AddItem(int ID, int Data, int Time)
                 NumEvents++;
         }
 }
+#endif
 
 /* set the start time for use with EventList_AddItemOffset usually this will
    be cpu_getcurrentcycles() at the time that the screen is being refreshed */
-void    EventList_SetOffsetStartTime(int StartTime)
+void spectrum_EventList_SetOffsetStartTime(int StartTime)
 {
         LastFrameStartTime = StartTime;
 }
 
 /* add an event to the buffer with a time index offset from a specified time */
-void    EventList_AddItemOffset(running_machine *machine, int ID, int Data, int Time)
+void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data, int Time)
 {
 
         if (!CyclesPerFrame)
@@ -614,13 +616,13 @@ void    EventList_AddItemOffset(running_machine *machine, int ID, int Data, int 
 }
 
 /* get number of events */
-int     EventList_NumEvents(void)
+int spectrum_EventList_NumEvents(void)
 {
 	return NumEvents;
 }
 
 /* get first item in buffer */
-EVENT_LIST_ITEM *EventList_GetFirstItem(void)
+EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(void)
 {
 	return (EVENT_LIST_ITEM *)pEventListBuffer;
 }

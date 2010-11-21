@@ -37,7 +37,7 @@
 #include "includes/pegasus.h"
 
 static UINT8 pegasus_kbd_row = 0;
-static UINT8 pegasus_kbd_irq = 1;
+static UINT8 pegasus_kbd_irq;
 UINT8 pegasus_control_bits = 0;
 static running_device *pegasus_cass;
 static UINT8 *FNT;

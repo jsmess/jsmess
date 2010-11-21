@@ -43,13 +43,13 @@ static emu_timer *INT_timer;
 /* Callback uPD request */
 static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq );
 
-UINT8 Disk2memory[0x10000];  /* Memory space for Disk II unit*/
+UINT8 hector_Disk2memory[0x10000];  /* Memory space for Disk II unit*/
 //UINT8 Mem_RNMI =0xff;
 /* Buffer of the 74374 (IC1 and IC4) linked to the Hector port */
-UINT8 disk2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
-UINT8 disk2_data_w_ready=0x0; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
-UINT8 disk2_data_read=0;    /* Data send by Hector to Disk 2 when PC2=true */
-UINT8 disk2_data_write=0;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
+UINT8 hector_disk2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
+UINT8 hector_disk2_data_w_ready=0x0; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
+UINT8 hector_disk2_data_read=0;    /* Data send by Hector to Disk 2 when PC2=true */
+UINT8 hector_disk2_data_write=0;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
 static UINT8 disk2_RNMI = 0;		/* State of I/O 50 D5 = authorization for INT / NMI */
 static int NMI_current_state=0;
 static int INT_current_state=0;
@@ -83,11 +83,11 @@ HECTOR SYSTEM CP/M 2.2 Disk
 */
 
 /* Hector Disk II uPD765 interface use interrupts and DMA! */
-const upd765_interface disk2_upd765_interface =
+const upd765_interface hector_disk2_upd765_interface =
 {
-	DEVCB_LINE(disk2_fdc_interrupt),
+	DEVCB_LINE(hector_disk2_fdc_interrupt),
 	DEVCB_LINE(disk2_fdc_dma_irq),
-    NULL,  //	disk2_fdc_get_image,
+	NULL,  //	disk2_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,  //NOT_
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
@@ -97,7 +97,7 @@ const upd765_interface disk2_upd765_interface =
 //	(Ko)											(octet)
 //	200 		1 	DD 		MFM 	40		10 		512 		Micronique Hector 
 //	800 		2 	DD 		MFM 	80 		10 		512 		Micronique Hector 
-const floppy_config disk2_floppy_config =
+const floppy_config hector_disk2_floppy_config =
 {
 	DEVCB_NULL,  // 
 	DEVCB_NULL,
@@ -106,66 +106,65 @@ const floppy_config disk2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,    //DSHD, for other 800Ko disk
 	FLOPPY_OPTIONS_NAME(hector_disk2),
-//	FLOPPY_OPTIONS_NAME(default),
+	//FLOPPY_OPTIONS_NAME(default),
 	NULL 
 };
 
 WRITE8_HANDLER( hector_disk2_w )
 {
 //if ((offset >= 0x0fff)) // || (offset == 0x066) || (offset == 0x067) || (offset == 0x068))
-	Disk2memory[offset]= data;
-	
-/* Autorisation d'ecriture uniquement dans les zones autorisees
-if (offset == 0x066)
-		Disk2memory[offset]= data;
-if (offset == 0x067)
-		Disk2memory[offset]= data;
-if (offset == 0x068)
-		Disk2memory[offset]= data;
-if (offset == 0x038)
-		Disk2memory[offset]= data;
-if (offset == 0x039)
-		Disk2memory[offset]= data;
-if (offset == 0x03A)
-		Disk2memory[offset]= data;*/
+	hector_Disk2memory[offset]= data;
+
+	/* Autorisation d'ecriture uniquement dans les zones autorisees
+	if (offset == 0x066)
+		hector_Disk2memory[offset]= data;
+	if (offset == 0x067)
+		hector_Disk2memory[offset]= data;
+	if (offset == 0x068)
+		hector_Disk2memory[offset]= data;
+	if (offset == 0x038)
+		hector_Disk2memory[offset]= data;
+	if (offset == 0x039)
+		hector_Disk2memory[offset]= data;
+	if (offset == 0x03A)
+		hector_Disk2memory[offset]= data;*/
 }
 
 READ8_HANDLER( hector_disk2_r )
 {
-UINT8 data =0;
-data = Disk2memory[offset];
-//if (offset == 0xff6b)
-//   data = 0x0ff; // force mode verbose on Hector !
-return data;
+	UINT8 data =0;
+	data = hector_Disk2memory[offset];
+	//if (offset == 0xff6b)
+		//data = 0x0ff; // force mode verbose on Hector !
+	return data;
 }
 
 static void valid_interrupt( running_machine *machine)
 {
-/* Called at each rising state of INT / NMI and RNMI ! */
+	/* Called at each rising state of INT / NMI and RNMI ! */
 
-/* Take NMI / INT  only if RNMI ok*/
+	/* Take NMI / INT  only if RNMI ok*/
 
-/* Checking for NMI interrupt */
-if ((disk2_RNMI ==0x00) && (NMI_current_state!=0))
-    {    
+	/* Checking for NMI interrupt */
+	if ((disk2_RNMI ==0x00) && (NMI_current_state!=0))
+	{
 		cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, CLEAR_LINE); // NMI...
 		timer_adjust_oneshot(DMA_timer, ATTOTIME_IN_NSEC(Time_arq), 0 );
-        /*Time_arq = 4000;*/ //  6900us for next step !
-        NMI_current_state=0; /* clear the current request*/
+		/*Time_arq = 4000;*/ //  6900us for next step !
+		NMI_current_state=0; /* clear the current request*/
 	}
 
-/* Checking for INT interrupt */
-if ((disk2_RNMI ==0x00) && (INT_current_state!=0))
-    {
+	/* Checking for INT interrupt */
+	if ((disk2_RNMI ==0x00) && (INT_current_state!=0))
+	{
 		cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT...
 		timer_adjust_oneshot(INT_timer, ATTOTIME_IN_MSEC(400), 0 ); //2010  =  8000
-       INT_current_state=0; /* clear the current request*/
-	   //printf("\nLancement interruption !");
-    }
- 
-}            
+		INT_current_state=0; /* clear the current request*/
+		//printf("\nLancement interruption !");
+	}
+}
 
-void Init_Timer_DiskII( running_machine *machine)
+void hector_disk2_init( running_machine *machine)
 {
        DMA_timer = timer_alloc(machine, Callback_DMA_irq, 0);
        INT_timer = timer_alloc(machine, Callback_INT_irq, 0);
@@ -173,22 +172,23 @@ void Init_Timer_DiskII( running_machine *machine)
 
 static TIMER_CALLBACK( Callback_DMA_irq )
 {
-/* To generate the NMI signal (late) when uPD DMA request*/
-cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
+	/* To generate the NMI signal (late) when uPD DMA request*/
+	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
 
 }
 static TIMER_CALLBACK( Callback_INT_irq )
 {
-/* To generate the INT signal (late) when uPD INT request*/
-cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);  //INT...
+	/* To generate the INT signal (late) when uPD INT request*/
+	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);  //INT...
 }
      
 /* upd765 INT is connected to interrupt of Z80 */
-WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt )
+WRITE_LINE_DEVICE_HANDLER( hector_disk2_fdc_interrupt )
 {
-    INT_current_state = state;
-    valid_interrupt(device->machine);
+	INT_current_state = state;
+	valid_interrupt(device->machine);
 }
+
 /* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization*/
 static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq )
 {
@@ -198,118 +198,125 @@ static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq )
 /////////////////////////////////////
 // Port handling of the Disk II unit
 /////////////////////////////////////
-READ8_HANDLER( disk2_io30_port_r)
+READ8_HANDLER( hector_disk2_io30_port_r )
 {
- return disk2_data_r_ready;
-}
-WRITE8_HANDLER( disk2_io30_port_w)
-{
-}
-READ8_HANDLER( disk2_io40_port_r)
-{
-UINT8 data;
-
-data = disk2_data_read;
-disk2_data_r_ready = 0x00; /* Raz memoire info read dispo*/
-return data;   /* send thez data !*/
-}
-WRITE8_HANDLER( disk2_io40_port_w)
-{
-/* Write a data */
-disk2_data_write = data;	/* Memorisation donnee*/
-disk2_data_w_ready = 0xff;  /* Memorisation donnee dispo*/
+	return hector_disk2_data_r_ready;
 }
 
-READ8_HANDLER( disk2_io50_port_r)
+WRITE8_HANDLER( hector_disk2_io30_port_w )
 {
-return disk2_data_w_ready;
 }
-WRITE8_HANDLER( disk2_io50_port_w)
+
+READ8_HANDLER( hector_disk2_io40_port_r )
 {
-/* FDC Motor Control - Bit 0/1 defines the state of the FDD motor:
+	UINT8 data;
+
+	data = hector_disk2_data_read;
+	hector_disk2_data_r_ready = 0x00; /* Raz memoire info read dispo*/
+	return data;   /* send thez data !*/
+}
+
+WRITE8_HANDLER( hector_disk2_io40_port_w )
+{
+	/* Write a data */
+	hector_disk2_data_write = data;	/* Memorisation donnee*/
+	hector_disk2_data_w_ready = 0xff;  /* Memorisation donnee dispo*/
+}
+
+READ8_HANDLER( hector_disk2_io50_port_r )
+{
+	return hector_disk2_data_w_ready;
+}
+
+WRITE8_HANDLER( hector_disk2_io50_port_w )
+{
+	/* FDC Motor Control - Bit 0/1 defines the state of the FDD motor:
                 * "1" the FDD motor will be active.
                 * "0" the FDD motor will be in-active.*/
 
-running_device *fdc = space->machine->device("upd765");
+	running_device *fdc = space->machine->device("upd765");
 
-floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
-floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
-floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
-floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
+	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
+	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 
-upd765_tc_w(fdc, ASSERT_LINE);
+	upd765_tc_w(fdc, ASSERT_LINE);
 
-/* Ecriture bit TC uPD765 sur D4 du port 50 */
-if (BIT(data, 4))
-   upd765_tc_w(fdc, 1);
-else
-   upd765_tc_w(fdc, 0);
+	/* Ecriture bit TC uPD765 sur D4 du port 50 */
+	if (BIT(data, 4))
+		upd765_tc_w(fdc, 1);
+	else
+		upd765_tc_w(fdc, 0);
 
-/* Authorization interrupt and NMI */
-if BIT(data, 5)
-	disk2_RNMI=0xff;
-else
-	disk2_RNMI=0x00;
+	/* Authorization interrupt and NMI */
+	if BIT(data, 5)
+		disk2_RNMI=0xff;
+	else
+		disk2_RNMI=0x00;
 
 /* if the programm give the authorization => try to interrupt and NMI ! */
-//if 	(disk2_RNMI==0xff)
-//  valid_interrupt(space->machine);
+	//if (disk2_RNMI==0xff)
+		//valid_interrupt(space->machine);
   
 }
 
 
-READ8_HANDLER( disk2_io60_port_r)
+READ8_HANDLER( hector_disk2_io60_port_r )
 {
-/* Lecture du status uPD*/
-UINT8 data=0;
- running_device *fdc = space->machine->device("upd765");
+	/* Lecture du status uPD*/
+	UINT8 data=0;
+	running_device *fdc = space->machine->device("upd765");
  
-data = upd765_status_r(fdc, 0);
+	data = upd765_status_r(fdc, 0);
 
-return data;  
+	return data;  
 }
-READ8_HANDLER( disk2_io61_port_r)
+
+READ8_HANDLER( hector_disk2_io61_port_r )
 {
-/* Lecture d'une data uPD*/
-UINT8 data=0;
- running_device *fdc = space->machine->device("upd765");
+	/* Lecture d'une data uPD*/
+	UINT8 data=0;
+	running_device *fdc = space->machine->device("upd765");
  
-data=upd765_data_r(fdc, 0); /* when pin A0 =1 */
+	data=upd765_data_r(fdc, 0); /* when pin A0 =1 */
 
-return data;  
+	return data;  
 }
-WRITE8_HANDLER( disk2_io60_port_w)
+
+WRITE8_HANDLER( hector_disk2_io60_port_w )
 {
-/* Ecriture du status uPD ??? impossible ! */
- running_device *fdc = space->machine->device("upd765");
+	/* Ecriture du status uPD ??? impossible ! */
+	running_device *fdc = space->machine->device("upd765");
 
-upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
-
+	upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
 }
-WRITE8_HANDLER( disk2_io61_port_w)
+
+WRITE8_HANDLER( hector_disk2_io61_port_w )
 {
-/* Ecriture d'une data uPD*/
- running_device *fdc = space->machine->device("upd765");
+	/* Ecriture d'une data uPD*/
+	running_device *fdc = space->machine->device("upd765");
 
-upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
-
+	upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
 }
-READ8_HANDLER( disk2_io70_port_r)
+
+READ8_HANDLER( hector_disk2_io70_port_r )
 {
-/* Read DMA Data of FDC */
-UINT8 data=0;
-//UINT16 hlreg;/*Used to debug*/
+	/* Read DMA Data of FDC */
+	UINT8 data=0;
+	//UINT16 hlreg;/*Used to debug*/
 
-running_device *fdc = space->machine->device("upd765");
-data=upd765_dack_r(fdc, 1); /* when pin A0 =1*/
-//hlreg = cpu_get_reg(space->machine->device("disk2cpu"), Z80_HL); // voir H   L
+	running_device *fdc = space->machine->device("upd765");
+	data=upd765_dack_r(fdc, 1); /* when pin A0 =1*/
+	//hlreg = cpu_get_reg(space->machine->device("disk2cpu"), Z80_HL); // voir H   L
 
-//printf("%c",hlreg);
-return data;  
+	//printf("%c",hlreg);
+	return data;  
 }
-WRITE8_HANDLER( disk2_io70_port_w)
+
+WRITE8_HANDLER( hector_disk2_io70_port_w )
 {
-running_device *fdc = space->machine->device("upd765");
-/* Write DMA Data on FDC */
-upd765_dack_w(fdc, 0,data);
+	running_device *fdc = space->machine->device("upd765");
+	/* Write DMA Data on FDC */
+	upd765_dack_w(fdc, 0,data);
 }

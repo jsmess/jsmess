@@ -52,29 +52,24 @@ typedef struct {
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ8_HANDLER( read_board_8 );
-WRITE8_HANDLER( write_board_8 );
-WRITE8_HANDLER( write_LED_8 );
+READ8_HANDLER( mboard_read_board_8 );
+WRITE8_HANDLER( mboard_write_board_8 );
+WRITE8_HANDLER( mboard_write_LED_8 );
 
-READ16_HANDLER( read_board_16 );
-WRITE16_HANDLER( write_board_16 );
-WRITE16_HANDLER( write_LED_16 );
+READ16_HANDLER( mboard_read_board_16 );
+WRITE16_HANDLER( mboard_write_board_16 );
+WRITE16_HANDLER( mboard_write_LED_16 );
 
-READ32_HANDLER( read_board_32 );
-WRITE32_HANDLER( write_board_32 );
-WRITE32_HANDLER( write_LED_32 );
+READ32_HANDLER( mboard_read_board_32 );
+WRITE32_HANDLER( mboard_write_board_32 );
+WRITE32_HANDLER( mboard_write_LED_32 );
 
-TIMER_CALLBACK( update_artwork );
-
-STATE_PRESAVE( m_board_presave );
-STATE_POSTLOAD( m_board_postload );
+TIMER_CALLBACK( mboard_update_artwork );
 
 void mboard_savestate_register(running_machine *machine);
 
-void set_board( void );
-void set_artwork (running_machine *machine );
-void check_board_buttons(running_machine *machine );
-void set_boarder_pieces (void);
+void mboard_set_board( void );
+void mboard_set_boarder_pieces (void);
 
 INLINE UINT8 pos_to_num(UINT8 val)
 {
@@ -96,8 +91,8 @@ INLINE UINT8 pos_to_num(UINT8 val)
     GLOBALS
 ***************************************************************************/
 
-extern UINT8 lcd_invert;
-extern UINT8 key_select;
-extern UINT8 key_selector;
+extern UINT8 mboard_lcd_invert;
+extern UINT8 mboard_key_select;
+extern UINT8 mboard_key_selector;
 
 #endif /* __MBOARD_H__ */

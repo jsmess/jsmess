@@ -13,7 +13,7 @@
 UINT8 busicom_printer_line[11][17];
 UINT8 busicom_printer_line_color[11];
 
-static UINT8 printer_font[]= {
+static const UINT8 printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1843,9 +1843,9 @@ VIDEO_UPDATE( busicom )
 	}
 	return 0;
 }
-static UINT8 color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
+static const UINT8 color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
-static UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
+static const UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
 PALETTE_INIT( busicom )
 {

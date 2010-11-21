@@ -24,7 +24,7 @@
 #include "devices/cassette.h"
 
 /* BBC Memory Size */
-static int bbc_RAMSize=1;
+static int bbc_RAMSize;
 /* this stores the DIP switch setting for the DFS type being used */
 static int bbc_DFSType=0;
 /* this stores the DIP switch setting for the SWRAM type being used */
@@ -1213,22 +1213,23 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_porta )
 // D7 VSPRDY
 
 /* this is the interupt and ready signal from the BBC B Speech processor */
-static int TMSint=1;
-static int TMSrdy=1;
+static const int TMSint=1;
+static const int TMSrdy=1;
 
-//void bbc_TMSint(int status)
-//{
-//  TMSint=(!status)&1;
-//  TMSrdy=(!tms5220_readyq_r())&1;
-//  via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
-//}
-
+#ifdef UNUSED_FUNCTION
+void bbc_TMSint(int status)
+{
+	TMSint=(!status)&1;
+	TMSrdy=(!tms5220_readyq_r())&1;
+	via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
+}
+#endif
 
 
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 {
-//  TMSint=(!tms5220_int_r())&1;
-//  TMSrdy=(!tms5220_readyq_r())&1;
+	//TMSint=(!tms5220_int_r())&1;
+	//TMSrdy=(!tms5220_readyq_r())&1;
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
@@ -2068,6 +2069,7 @@ MACHINE_START( bbca )
 MACHINE_RESET( bbca )
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
+	bbc_RAMSize = 1;
 	memory_set_bankptr(machine, "bank1",ram);
 	memory_set_bankptr(machine, "bank3",ram);
 

@@ -31,7 +31,7 @@ static int   lx383_downsampler;
 static int   nmi_delay_counter;
 static int   reset_delay_counter;
 static running_device *z80ne_ay31015;
-static UINT8 lx385_ctrl = 0x1f;
+static UINT8 lx385_ctrl;
 static running_device *lx388_kr2376;
 
 
@@ -206,7 +206,7 @@ DIRECT_UPDATE_HANDLER( z80ne_default )
 /*
  * Handle NMI delay for single step instruction
  */
-DIRECT_UPDATE_HANDLER( nmi_delay_count )
+DIRECT_UPDATE_HANDLER( z80ne_nmi_delay_count )
 {
 	nmi_delay_counter--;
 
@@ -222,7 +222,7 @@ DIRECT_UPDATE_HANDLER( nmi_delay_count )
  * Handle delayed ROM/RAM banking at RESET
  * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
  */
-DIRECT_UPDATE_HANDLER( reset_delay_count )
+DIRECT_UPDATE_HANDLER( z80ne_reset_delay_count )
 {
 	address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 	/*
@@ -259,7 +259,7 @@ static void reset_lx382_banking(running_machine *machine)
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	reset_delay_counter = 2;
-	space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));
+	space->set_direct_update_handler(direct_update_delegate_create_static(z80ne_reset_delay_count, *machine));
 }
 
 static void reset_lx390_banking(running_machine *machine)
@@ -277,7 +277,7 @@ static void reset_lx390_banking(running_machine *machine)
 	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		reset_delay_counter = 2;
-		space->set_direct_update_handler(direct_update_delegate_create_static(reset_delay_count, *machine));
+		space->set_direct_update_handler(direct_update_delegate_create_static(z80ne_reset_delay_count, *machine));
 	    break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -432,12 +432,13 @@ INPUT_CHANGED( z80ne_nmi )
 MACHINE_START( z80ne )
 {
 	LOG(("In MACHINE_START z80ne\n"));
+	lx385_ctrl = 0x1f;
 	state_save_register_item( machine, "z80ne", NULL, 0, lx383_scan_counter );
 	state_save_register_item( machine, "z80ne", NULL, 0, lx383_downsampler );
 	state_save_register_item_array( machine, "z80ne", NULL, 0, lx383_key );
 	state_save_register_item( machine, "z80ne", NULL, 0, nmi_delay_counter );
 	cassette_timer = timer_alloc(machine, z80ne_cassette_tc, NULL);
-    timer_pulse(machine,  ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );
+	timer_pulse( machine, ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );
 }
 
 MACHINE_START( z80net )
@@ -517,7 +518,7 @@ WRITE8_HANDLER( lx383_w )
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
     	nmi_delay_counter = 1;
-		cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(nmi_delay_count, *space->machine));
+		cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(z80ne_nmi_delay_count, *space->machine));
 }
 
 

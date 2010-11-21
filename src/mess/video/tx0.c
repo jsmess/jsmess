@@ -11,6 +11,8 @@
 #include "video/crt.h"
 
 
+static int typewriter_color;
+
 static bitmap_t *panel_bitmap;
 static bitmap_t *typewriter_bitmap;
 
@@ -41,6 +43,8 @@ static void tx0_draw_panel(running_machine *machine, bitmap_t *bitmap);
 */
 VIDEO_START( tx0 )
 {
+	typewriter_color = color_typewriter_black;
+
 	/* alloc bitmaps for our private fun */
 	panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
 	typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
@@ -334,7 +338,6 @@ static int pos;
 
 static int case_shift;
 
-static int color = color_typewriter_black;
 
 enum
 {
@@ -420,8 +423,8 @@ void tx0_typewriter_drawchar(running_machine *machine, int character)
 	case 020:
 #if 0
 		/* color shift */
-		color = color_typewriter_black;
-		color = color_typewriter_red;
+		typewriter_color = color_typewriter_black;
+		typewriter_color = color_typewriter_red;
 #endif
 		break;
 
@@ -474,7 +477,7 @@ void tx0_typewriter_drawchar(running_machine *machine, int character)
 		/* print character (lookup ASCII equivalent in table) */
 		tx0_draw_char(machine, typewriter_bitmap, ascii_table[case_shift][character],
 						8*pos, typewriter_write_offset_y,
-						color);	/* print char */
+						typewriter_color);	/* print char */
 
 		pos++;		/* step carriage forward */
 		break;

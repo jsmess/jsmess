@@ -51,9 +51,6 @@ extern UINT8 erik_background;
 
 extern UINT8 *specialist_video_ram;
 
-extern UINT8 *erik_video_ram_page_1;
-extern UINT8 *erik_video_ram_page_2;
-
 VIDEO_START( special );
 VIDEO_UPDATE( special );
 

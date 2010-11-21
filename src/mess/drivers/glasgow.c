@@ -81,7 +81,7 @@ static WRITE16_HANDLER( glasgow_lcd_flag_w )
 	else
 	{
 		led7 = 0;
-		key_selector = 1;
+		mboard_key_selector = 1;
 	}
 }
 
@@ -92,10 +92,10 @@ static READ16_HANDLER( glasgow_keys_r )
 	/* See if any keys pressed */
 	data = 3;
 
-	if (key_select == input_port_read(space->machine, "LINE0"))
+	if (mboard_key_select == input_port_read(space->machine, "LINE0"))
 		data &= 1;
 
-	if (key_select == input_port_read(space->machine, "LINE1"))
+	if (mboard_key_select == input_port_read(space->machine, "LINE1"))
 		data &= 2;
 
 	return data << 8;
@@ -103,14 +103,14 @@ static READ16_HANDLER( glasgow_keys_r )
 
 static WRITE16_HANDLER( glasgow_keys_w )
 {
-	key_select = data >> 8;
+	mboard_key_select = data >> 8;
 }
 
 static WRITE16_HANDLER( write_lcd )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(lcd_shift_counter, lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output_set_digit_value(lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
@@ -119,11 +119,11 @@ static WRITE16_HANDLER( write_lcd )
 static WRITE16_HANDLER( write_lcd_flag )
 {
 	UINT8 lcd_flag;
-	lcd_invert = 0;
+	mboard_lcd_invert = 0;
 	lcd_flag=data >> 8;
 	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
 	if (lcd_flag == 0)
-		key_selector = 1;
+		mboard_key_selector = 1;
 
  // The key function in the rom expects after writing to
  // the  a value from the second key row;
@@ -149,12 +149,12 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 {
 	UINT16 data;
 
-	if (key_selector == 0)
+	if (mboard_key_selector == 0)
 		data = input_port_read(space->machine, "LINE0");
 	else
 		data = input_port_read(space->machine, "LINE1");
 
-	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, key_selector);
+	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
 	data <<= 8;
 	return data ;
 }
@@ -178,7 +178,7 @@ static WRITE32_HANDLER( write_lcd32 )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(lcd_shift_counter, lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output_set_digit_value(lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
 	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);
@@ -188,10 +188,10 @@ static WRITE32_HANDLER( write_lcd_flag32 )
 {
 	UINT8 lcd_flag = data >> 24;
 
-	lcd_invert = 0;
+	mboard_lcd_invert = 0;
 
 	if (lcd_flag == 0)
-		key_selector = 1;
+		mboard_key_selector = 1;
 
 	//logerror("LCD Flag 32 = %x \n", lcd_flag);
 	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
@@ -206,11 +206,11 @@ static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 {
 	UINT32 data;
 
-	if (key_selector == 0)
+	if (mboard_key_selector == 0)
 		data = input_port_read(space->machine, "LINE0");
 	else
 		data = input_port_read(space->machine, "LINE1");
-	//if (key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
+	//if (mboard_key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
 	if(data)
 		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data <<= 24;
@@ -254,11 +254,11 @@ static MACHINE_START( glasgow )
 {
 	running_device *speaker = machine->device("beep");
 
-	key_selector = 0;
+	mboard_key_selector = 0;
 	irq_flag = 0;
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, update_artwork);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -271,7 +271,7 @@ static MACHINE_START( dallas32 )
 
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, update_artwork);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -282,8 +282,8 @@ static MACHINE_RESET( glasgow )
 {
 	lcd_shift_counter = 3;
 
-	set_boarder_pieces();
-	set_board();
+	mboard_set_boarder_pieces();
+	mboard_set_board();
 }
 
 static ADDRESS_MAP_START(glasgow_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -292,8 +292,8 @@ static ADDRESS_MAP_START(glasgow_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00010000, 0x00010001) AM_WRITE( glasgow_lcd_w )
 	AM_RANGE(0x00010002, 0x00010003) AM_READWRITE( glasgow_keys_r, glasgow_keys_w )
 	AM_RANGE(0x00010004, 0x00010005) AM_WRITE( glasgow_lcd_flag_w )
-	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE( read_board_16, write_LED_16 )
-	AM_RANGE(0x00010008, 0x00010009) AM_WRITE( write_board_16 )
+	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE( mboard_read_board_16, mboard_write_LED_16 )
+	AM_RANGE(0x00010008, 0x00010009) AM_WRITE( mboard_write_board_16 )
 	AM_RANGE(0x0001c000, 0x0001ffff) AM_RAM		// 16KB
 ADDRESS_MAP_END
 
@@ -304,10 +304,10 @@ static ADDRESS_MAP_START(amsterd_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE( write_lcd )
 	AM_RANGE(0x00800008, 0x00800009) AM_WRITE( write_lcd_flag )
 	AM_RANGE(0x00800004, 0x00800005) AM_WRITE( write_irq_flag )
-	AM_RANGE(0x00800010, 0x00800011) AM_WRITE( write_board_16 )
-	AM_RANGE(0x00800020, 0x00800021) AM_READ( read_board_16 )
+	AM_RANGE(0x00800010, 0x00800011) AM_WRITE( mboard_write_board_16 )
+	AM_RANGE(0x00800020, 0x00800021) AM_READ( mboard_read_board_16 )
 	AM_RANGE(0x00800040, 0x00800041) AM_READ( read_newkeys16 )
-	AM_RANGE(0x00800088, 0x00800089) AM_WRITE( write_LED_16 )
+	AM_RANGE(0x00800088, 0x00800089) AM_WRITE( mboard_write_LED_16 )
 	AM_RANGE(0x00ffc000, 0x00ffffff) AM_RAM		// 16KB
 ADDRESS_MAP_END
 
@@ -318,10 +318,10 @@ static ADDRESS_MAP_START(dallas32_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE( write_lcd32 )
 	AM_RANGE(0x00800004, 0x00800007) AM_WRITE( write_beeper32 )
 	AM_RANGE(0x00800008, 0x0080000B) AM_WRITE( write_lcd_flag32 )
-	AM_RANGE(0x00800010, 0x00800013) AM_WRITE( write_board_32 )
-	AM_RANGE(0x00800020, 0x00800023) AM_READ( read_board_32 )
+	AM_RANGE(0x00800010, 0x00800013) AM_WRITE( mboard_write_board_32 )
+	AM_RANGE(0x00800020, 0x00800023) AM_READ( mboard_read_board_32 )
 	AM_RANGE(0x00800040, 0x00800043) AM_READ( read_newkeys32 )
-	AM_RANGE(0x00800088, 0x0080008b) AM_WRITE( write_LED_32 )
+	AM_RANGE(0x00800088, 0x0080008b) AM_WRITE( mboard_write_LED_32 )
 	AM_RANGE(0x0010000, 0x001ffff) AM_RAM	// 64KB
 ADDRESS_MAP_END
 

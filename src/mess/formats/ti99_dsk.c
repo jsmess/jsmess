@@ -1951,7 +1951,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	return 100;
 }
 
-FLOPPY_IDENTIFY(ti99_tdf_identify)
+static FLOPPY_IDENTIFY(ti99_tdf_identify)
 {
 	UINT64 size;
 	size = floppy_image_size(floppy);
@@ -1960,7 +1960,7 @@ FLOPPY_IDENTIFY(ti99_tdf_identify)
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-FLOPPY_CONSTRUCT(ti99_tdf_construct)
+static FLOPPY_CONSTRUCT(ti99_tdf_construct)
 {
 	struct ti99dsk_geometry geometry;
 	struct FloppyCallbacks *callbacks;

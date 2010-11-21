@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/studio2.h"
+#include "formats/studio2_st2.h"
 
 /***************************************************************************
     PARAMETERS

@@ -24,7 +24,7 @@ static UINT8 pmd85_rom_module_present = 0;
 static UINT8 pmd85_ppi_port_outputs[4][3];
 
 static UINT8 pmd85_startup_mem_map = 0;
-static UINT8 pmd853_memory_mapping = 0x01;
+static UINT8 pmd853_memory_mapping;
 static void (*pmd85_update_memory)(running_machine *);
 static int previous_level;
 static int clk_level;
@@ -940,6 +940,7 @@ MACHINE_RESET( pmd85 )
 
 	/* memory initialization */
 	memset(messram_get_ptr(machine->device("messram")), 0, sizeof(unsigned char)*0x10000);
+	pmd853_memory_mapping = 1;
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
 

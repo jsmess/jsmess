@@ -138,7 +138,7 @@ void scsi_data_w(running_device *device, UINT8 data)
         // Note this assumes we only have one initiator and therefore
         // only one line active.
         case SCSI_PHASE_BUS_FREE :
-            bus->last_id=driveno(data);
+            bus->last_id=scsibus_driveno(data);
             break;
 
         case SCSI_PHASE_COMMAND :
@@ -245,7 +245,7 @@ void set_scsi_line_ack(running_device *device, UINT8 state)
     timer_adjust_oneshot(bus->ack_timer,ATTOTIME_IN_NSEC(ACK_DELAY_NS),state);
 }
 
-void dump_command_bytes(scsibus_t   *bus)
+static void dump_command_bytes(scsibus_t   *bus)
 {
     int byteno;
 
@@ -599,7 +599,7 @@ static void scsi_change_phase(running_device *device, UINT8 newphase)
     }
 }
 
-UINT8 driveno(UINT8  drivesel)
+UINT8 scsibus_driveno(UINT8  drivesel)
 {
     switch (drivesel)
     {

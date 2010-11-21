@@ -13,7 +13,7 @@
 
 static UINT8 tvc_video_mode = 0;
 static UINT8 tvc_keyline = 0;
-static UINT8 tvc_flipflop = 0xff;
+static UINT8 tvc_flipflop;
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( tvc_video_mode_w )
 	tvc_video_mode = data & 0x03;
 }
 
-static UINT8 col[4]= {0,1,2,3};
+static UINT8 col[4];
 
 static WRITE8_HANDLER( tvc_palette_w )
 {
@@ -235,6 +235,16 @@ static INPUT_PORTS_START( tvc )
 INPUT_PORTS_END
 
 
+static MACHINE_START(tvc)
+{
+	int i;
+
+	for (i=0; i<4; i++)
+		col[i] = i;
+
+	tvc_flipflop = 0xff;
+}
+
 static MACHINE_RESET(tvc)
 {
 	memset(messram_get_ptr(machine->device("messram")),0,(64+14)*1024);
@@ -361,6 +371,7 @@ static MACHINE_CONFIG_START( tvc, driver_device )
     MDRV_CPU_PROGRAM_MAP(tvc_mem)
     MDRV_CPU_IO_MAP(tvc_io)
 
+    MDRV_MACHINE_START(tvc)
     MDRV_MACHINE_RESET(tvc)
 
 	MDRV_CPU_VBLANK_INT("screen", tvc_interrupt)

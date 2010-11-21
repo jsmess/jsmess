@@ -6,9 +6,12 @@
 #include "emu.h"
 #include "machine/mboard.h"
 
-UINT8 lcd_invert;
-UINT8 key_select;
-UINT8 key_selector;
+static void set_artwork(running_machine *machine );
+static void check_board_buttons(running_machine *machine );
+
+UINT8 mboard_lcd_invert;
+UINT8 mboard_key_select;
+UINT8 mboard_key_selector;
 
 static const int start_board[64] =
 {
@@ -121,7 +124,7 @@ static void write_board( running_machine *machine, UINT8 data)
 	 read_board_flag = FALSE;
 
 	if (data == 0xff)
-		key_selector = 0;
+		mboard_key_selector = 0;
 }
 
 
@@ -132,7 +135,7 @@ static void write_LED(UINT8 data)
 	UINT8 i_AH, i_18;
 	UINT8 LED;
 
-	lcd_invert = 1;
+	mboard_lcd_invert = 1;
 /*
 
 Example: turn led E2 on
@@ -168,7 +171,7 @@ data:  10 0001 0000	Line E
 
 
 
-READ8_HANDLER( read_board_8 )
+READ8_HANDLER( mboard_read_board_8 )
 {
 	UINT8 data;
 
@@ -176,7 +179,7 @@ READ8_HANDLER( read_board_8 )
 	return data;
 }
 
-READ16_HANDLER( read_board_16 )
+READ16_HANDLER( mboard_read_board_16 )
 {
 	UINT8 data;
 
@@ -184,7 +187,7 @@ READ16_HANDLER( read_board_16 )
 	return data << 8;
 }
 
-READ32_HANDLER( read_board_32 )
+READ32_HANDLER( mboard_read_board_32 )
 {
 	UINT8 data;
 
@@ -192,53 +195,53 @@ READ32_HANDLER( read_board_32 )
 	return data<<24;
 }
 
-WRITE8_HANDLER( write_board_8 )
+WRITE8_HANDLER( mboard_write_board_8 )
 {
 	write_board(space->machine,data);
 }
 
-WRITE16_HANDLER( write_board_16 )
+WRITE16_HANDLER( mboard_write_board_16 )
 {
 	write_board(space->machine,data>>8);
 }
 
-WRITE32_HANDLER( write_board_32 )
+WRITE32_HANDLER( mboard_write_board_32 )
 {
 	write_board(space->machine,data>>24);
 }
 
-WRITE8_HANDLER( write_LED_8 )
+WRITE8_HANDLER( mboard_write_LED_8 )
 {
 	 write_LED(data);
 }
 
-WRITE16_HANDLER( write_LED_16 )
+WRITE16_HANDLER( mboard_write_LED_16 )
 {
 	 write_LED(data >> 8);
 }
 
-WRITE32_HANDLER( write_LED_32 )
+WRITE32_HANDLER( mboard_write_LED_32 )
 {
 	 write_LED(data >> 24);
 }
 
-TIMER_CALLBACK( update_artwork )
+TIMER_CALLBACK( mboard_update_artwork )
 {
 	check_board_buttons(machine);
 	set_artwork(machine);
-	set_boarder_pieces(); 
+	mboard_set_boarder_pieces(); 
 }
 
 /* save states callback */
 
-STATE_PRESAVE( m_board_presave )
+static STATE_PRESAVE( m_board_presave )
 {
 	int i;
 	for (i=0;i<64;i++)
 		save_board[i]=m_board[i];
 }
 
-STATE_POSTLOAD( m_board_postload )
+static STATE_POSTLOAD( m_board_postload )
 {
 	int i;
 	for (i=0;i<64;i++)
@@ -253,7 +256,7 @@ void mboard_savestate_register(running_machine *machine)
 	state_save_register_presave(machine,m_board_presave,NULL);
 }
 
-void set_board( void )
+void mboard_set_board( void )
 {
 	int i;
 	for (i=0;i<64;i++)
@@ -267,21 +270,21 @@ static void clear_board( void )
 		m_board[i]=EM;
 }
 
-void set_artwork ( running_machine *machine )
+static void set_artwork ( running_machine *machine )
 {
 	int i;
 	for (i=0;i<64;i++)
 		output_set_indexed_value("P", i, m_board[i]);
 }
 
-void set_boarder_pieces (void)
+void mboard_set_boarder_pieces (void)
 {
 	int i;
 	for (i=0;i<12;i++)
 		output_set_indexed_value("Q", i, border_pieces[i]);
 }
 
-void check_board_buttons ( running_machine *machine )
+static void check_board_buttons ( running_machine *machine )
 {
 	int field;
 	int i;
@@ -417,7 +420,7 @@ void check_board_buttons ( running_machine *machine )
 			return;
 		}else if (port_input==0x02)
 		{
-			set_board();
+			mboard_set_board();
 			return;
 		}
 

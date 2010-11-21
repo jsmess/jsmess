@@ -89,13 +89,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hecdisk2_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x030,0x03f) AM_READWRITE( disk2_io30_port_r, disk2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE( disk2_io40_port_r, disk2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE( disk2_io50_port_r, disk2_io50_port_w )
-	AM_RANGE(0x060,0x060) AM_READWRITE( disk2_io60_port_r, disk2_io60_port_w )
-	AM_RANGE(0x061,0x061) AM_READWRITE( disk2_io61_port_r, disk2_io61_port_w )
-	AM_RANGE(0x070,0x07f) AM_READWRITE( disk2_io70_port_r, disk2_io70_port_w )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x030,0x03f) AM_READWRITE( hector_disk2_io30_port_r, hector_disk2_io30_port_w )
+	AM_RANGE(0x040,0x04f) AM_READWRITE( hector_disk2_io40_port_r, hector_disk2_io40_port_w )
+	AM_RANGE(0x050,0x05f) AM_READWRITE( hector_disk2_io50_port_r, hector_disk2_io50_port_w )
+	AM_RANGE(0x060,0x060) AM_READWRITE( hector_disk2_io60_port_r, hector_disk2_io60_port_w )
+	AM_RANGE(0x061,0x061) AM_READWRITE( hector_disk2_io61_port_r, hector_disk2_io61_port_w )
+	AM_RANGE(0x070,0x07f) AM_READWRITE( hector_disk2_io70_port_r, hector_disk2_io70_port_w )
 ADDRESS_MAP_END
 /*****************************************************************************/
 static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -280,7 +280,7 @@ static MACHINE_START( hec2hrx )
 //Initialisation ROM
 	while (index <0x01001) 
 	{	
-		Disk2memory[index] = RAMD2[index];
+		hector_Disk2memory[index] = RAMD2[index];
 		index++;
 	}
 	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_RESET, PULSE_LINE);
@@ -301,7 +301,7 @@ static MACHINE_START( hec2hrx )
 	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 	hector_init(machine);
-	Init_Timer_DiskII(machine); // Init of the Disk II !
+	hector_disk2_init(machine); // Init of the Disk II !
 }
 
 static MACHINE_RESET(hec2hrp)
@@ -441,8 +441,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MDRV_CPU_PROGRAM_MAP(hecdisk2_mem)
 	MDRV_CPU_IO_MAP(hecdisk2_io)
 //	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_UPD765A_ADD("upd765", disk2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(disk2_floppy_config)
+	MDRV_UPD765A_ADD("upd765", hector_disk2_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(hector_disk2_floppy_config)
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MDRV_CPU_ADD("disk2cpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(hecdisk2_mem)
 	MDRV_CPU_IO_MAP(hecdisk2_io)
-	MDRV_UPD765A_ADD("upd765", disk2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(disk2_floppy_config)
+	MDRV_UPD765A_ADD("upd765", hector_disk2_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(hector_disk2_floppy_config)
 
 
 	/* video hardware */

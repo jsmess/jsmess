@@ -17,6 +17,7 @@
 #include "machine/6522via.h"
 #include "machine/6551.h"
 #include "sound/ay8910.h"
+#include "formats/m65_snqk.h"
 
 static int microtan_verify_snapshot(UINT8 *data, int size)
 {

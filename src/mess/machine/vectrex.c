@@ -55,7 +55,7 @@ static const double crazy_coaster_angles[3] = {0, 0.1631, 0.3305};
 
 
 static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
-static const double *vectrex_imager_angles = unknown_game_angles;
+static const double *vectrex_imager_angles;
 static unsigned char vectrex_imager_pinlevel;
 
 
@@ -357,6 +357,7 @@ DRIVER_INIT(vectrex)
 {
 	int i;
 
+	vectrex_imager_angles = unknown_game_angles;
 	vectrex_beam_color = RGB_WHITE;
 	for (i=0; i<ARRAY_LENGTH(imager_colors); i++)
 		imager_colors[i] = RGB_WHITE;

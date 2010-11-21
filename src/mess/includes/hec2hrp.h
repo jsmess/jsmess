@@ -81,7 +81,6 @@ extern void hector_init(running_machine *machine);
 extern void hec2hrp_reset(running_machine *machine, int hr);
 extern void hec2hrx_reset(running_machine *machine, int hr);
 
-extern READ8_HANDLER( hector_mx_io_port_r );
 extern WRITE8_HANDLER( hector_mx80_io_port_w );
 extern WRITE8_HANDLER( hector_mx40_io_port_w );
 extern  READ8_HANDLER( hector_io_8255_r);
@@ -106,42 +105,37 @@ extern UINT8 hector_videoram[0x04000];
 /* Color status*/
 extern UINT8 hector_color[4];
 
-// state Hector's port
-extern UINT8 hector_port_a;
-extern UINT8 hector_port_b;
-extern UINT8 hector_port_c_h;
-extern UINT8 hector_port_c_l;
-extern UINT8 hector_port_cmd;
+/*----------- defined in machine/hecdisk2.c -----------*/
 
 // state disk2 port 
-extern UINT8 disk2_data_r_ready; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
-extern UINT8 disk2_data_w_ready; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
-extern UINT8 disk2_data_read;    /* Data send by Hector to Disk 2 when PC2=true */
-extern UINT8 disk2_data_write;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
+extern UINT8 hector_disk2_data_r_ready; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
+extern UINT8 hector_disk2_data_w_ready; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
+extern UINT8 hector_disk2_data_read;    /* Data send by Hector to Disk 2 when PC2=true */
+extern UINT8 hector_disk2_data_write;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
 
 // disk2 handling
-extern WRITE_LINE_DEVICE_HANDLER( disk2_fdc_interrupt );
+WRITE_LINE_DEVICE_HANDLER( hector_disk2_fdc_interrupt );
 
-extern READ8_HANDLER(  disk2_io30_port_r);
-extern WRITE8_HANDLER( disk2_io30_port_w);
-extern READ8_HANDLER(  disk2_io40_port_r);
-extern WRITE8_HANDLER( disk2_io40_port_w);
-extern READ8_HANDLER(  disk2_io50_port_r);
-extern WRITE8_HANDLER( disk2_io50_port_w);
-extern READ8_HANDLER(  disk2_io60_port_r);
-extern WRITE8_HANDLER( disk2_io60_port_w);
-extern READ8_HANDLER(  disk2_io61_port_r);
-extern WRITE8_HANDLER( disk2_io61_port_w);
-extern READ8_HANDLER(  disk2_io70_port_r);
-extern WRITE8_HANDLER( disk2_io70_port_w);
+READ8_HANDLER( hector_disk2_io30_port_r );
+WRITE8_HANDLER( hector_disk2_io30_port_w );
+READ8_HANDLER( hector_disk2_io40_port_r );
+WRITE8_HANDLER( hector_disk2_io40_port_w );
+READ8_HANDLER( hector_disk2_io50_port_r );
+WRITE8_HANDLER( hector_disk2_io50_port_w );
+READ8_HANDLER( hector_disk2_io60_port_r );
+WRITE8_HANDLER( hector_disk2_io60_port_w );
+READ8_HANDLER( hector_disk2_io61_port_r );
+WRITE8_HANDLER( hector_disk2_io61_port_w );
+READ8_HANDLER( hector_disk2_io70_port_r );
+WRITE8_HANDLER( hector_disk2_io70_port_w );
 
-extern WRITE8_HANDLER( hector_disk2_w );
-extern READ8_HANDLER(  hector_disk2_r );
+WRITE8_HANDLER( hector_disk2_w );
+READ8_HANDLER( hector_disk2_r );
 
-extern void Init_Timer_DiskII( running_machine *machine);
+void hector_disk2_init(running_machine *machine);
 
-extern const upd765_interface disk2_upd765_interface;
-extern const floppy_config    disk2_floppy_config;
+extern const upd765_interface hector_disk2_upd765_interface;
+extern const floppy_config    hector_disk2_floppy_config;
 
 /* Disk II Memory */
-extern UINT8 Disk2memory[0x10000];  /* Memory space for Disk II unit*/
+extern UINT8 hector_Disk2memory[0x10000];  /* Memory space for Disk II unit*/

@@ -61,7 +61,7 @@ static UINT32 i82371ab_pci_isa_r(running_device *busdevice, running_device *devi
 	return result;
 }
 
-void i82371ab_pci_isa_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
+static void i82371ab_pci_isa_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -92,7 +92,7 @@ static UINT32 i82371ab_pci_ide_r(running_device *busdevice, running_device *devi
 	return result;
 }
 
-void i82371ab_pci_ide_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
+static void i82371ab_pci_ide_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -123,7 +123,7 @@ static UINT32 i82371ab_pci_usb_r(running_device *busdevice, running_device *devi
 	return result;
 }
 
-void i82371ab_pci_usb_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
+static void i82371ab_pci_usb_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -154,7 +154,7 @@ static UINT32 i82371ab_pci_acpi_r(running_device *busdevice, running_device *dev
 	return result;
 }
 
-void i82371ab_pci_acpi_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
+static void i82371ab_pci_acpi_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 

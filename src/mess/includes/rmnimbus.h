@@ -18,6 +18,15 @@
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
+#define SCREEN_WIDTH_PIXELS     640
+#define SCREEN_HEIGHT_LINES     250
+#define SCREEN_NO_COLOURS       16
+
+
+/*----------- defined in drivers/rmnimbus.c -----------*/
+
+extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
+
 
 /*----------- defined in machine/rmnimbus.c -----------*/
 
@@ -136,7 +145,7 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state);
 
 #define FDC_SIDE()          ((nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
 #define FDC_MOTOR()         ((nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
-#define FDC_DRIVE()         (driveno(nimbus_drives.reg400 & FDC_DRIVE_MASK))
+#define FDC_DRIVE()         (scsibus_driveno(nimbus_drives.reg400 & FDC_DRIVE_MASK))
 #define HDC_DRQ_ENABLED()   ((nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
 #define FDC_DRQ_ENABLED()   ((nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 
@@ -199,27 +208,6 @@ WRITE8_HANDLER( nimbus_pc8031_port_w );
 READ8_HANDLER( nimbus_iou_r );
 WRITE8_HANDLER( nimbus_iou_w );
 
-
-/*----------- defined in video/rmnimbus.c -----------*/
-
-READ16_HANDLER (nimbus_video_io_r);
-WRITE16_HANDLER (nimbus_video_io_w);
-
-VIDEO_START( nimbus );
-VIDEO_EOF( nimbus );
-VIDEO_UPDATE( nimbus );
-VIDEO_RESET( nimbus );
-
-#define SCREEN_WIDTH_PIXELS     640
-#define SCREEN_HEIGHT_LINES     250
-#define SCREEN_NO_COLOURS       16
-
-#define RED                     0
-#define GREEN                   1
-#define BLUE                    2
-
-extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
-
 /* Sound hardware */
 
 #define AY8910_TAG              "ay8910"
@@ -254,6 +242,21 @@ READ8_HANDLER( nimbus_mouse_js_r );
 WRITE8_HANDLER( nimbus_mouse_js_w );
 
 #define MOUSE_INT_ENABLED()     ((iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
+
+
+/*----------- defined in video/rmnimbus.c -----------*/
+
+READ16_HANDLER (nimbus_video_io_r);
+WRITE16_HANDLER (nimbus_video_io_w);
+
+VIDEO_START( nimbus );
+VIDEO_EOF( nimbus );
+VIDEO_UPDATE( nimbus );
+VIDEO_RESET( nimbus );
+
+#define RED                     0
+#define GREEN                   1
+#define BLUE                    2
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

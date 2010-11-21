@@ -19,27 +19,27 @@
 
 static running_device *exidy_ay31015;
 
-static UINT8 exidy_fe = 0xff;
+static UINT8 exidy_fe;
 static UINT8 exidy_keyboard_line;
 
 #if 0
 
-The serial code (which was never connected to the outside) is disabled for now.
+/* The serial code (which was never connected to the outside) is disabled for now. */
 
 /* timer for exidy serial chip transmit and receive */
-//static emu_timer *serial_timer;
+static emu_timer *serial_timer;
 
-//static TIMER_CALLBACK(exidy_serial_timer_callback)
-//{
+static TIMER_CALLBACK(exidy_serial_timer_callback)
+{
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
     Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-//  if (exidy_fe & 0x80)
-//  {
-		connect to rs232
-//  }
-//}
+	if (exidy_fe & 0x80)
+	{
+		/* connect to rs232 */
+	}
+}
 #endif
 
 
@@ -445,6 +445,7 @@ MACHINE_START( exidy )
 {
 //  serial_timer = timer_alloc(machine, exidy_serial_timer_callback, NULL);
 	cassette_timer = timer_alloc(machine, exidy_cassette_tc, NULL);
+	exidy_fe = 0xff;
 }
 
 MACHINE_RESET( exidy )

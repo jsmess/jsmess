@@ -3,6 +3,9 @@
 
 #define FOREGROUND_BIT 0x0010
 
+/* initialized to non-zero, because we divide by it */
+static UINT8 tms9927_num_rows;
+
 INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
 	*BITMAP_ADDR16(bitmap, y, x) = (color<<1)+1;
@@ -12,6 +15,7 @@ VIDEO_START( intv )
 {
 	//int i,j,k;
 
+	tms9927_num_rows = 25;
 	VIDEO_START_CALL(generic_bitmapped);
 
 #if 0
@@ -728,8 +732,6 @@ void intv_stic_screenrefresh(running_machine *machine)
 static UINT8 tms9927_cursor_col;
 static UINT8 tms9927_cursor_row;
 static UINT8 tms9927_last_row;
-/* initialized to non-zero, because we divide by it */
-static UINT8 tms9927_num_rows = 25;
 
  READ8_HANDLER( intvkbd_tms9927_r )
 {

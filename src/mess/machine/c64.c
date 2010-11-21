@@ -43,7 +43,7 @@
 
 /* expansion port lines input */
 int c64_pal;
-UINT8 c64_game = 1, c64_exrom = 1;
+UINT8 c64_game, c64_exrom;
 
 /* cpu port */
 UINT8 *c64_vicaddr, *c128_vicaddr;
@@ -66,6 +66,8 @@ static int c64_io_enabled;
 static int is_sx64;				// temporary workaround until we implement full vc1541 emulation for every c64 set
 
 static UINT8 vicirq;
+static int old_level;
+static int old_data, old_exrom, old_game;
 
 static void c64_nmi( running_machine *machine )
 {
@@ -120,8 +122,6 @@ static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 
 static void c64_irq( running_machine *machine, int level )
 {
-	static int old_level = 0;
-
 	if (level != old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
@@ -454,13 +454,12 @@ configuration is active (the -GAME line is shorted to ground), the
 
 static void c64_bankswitch( running_machine *machine, int reset )
 {
-	static int old = -1, exrom, game;
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
 	int data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu")) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
-	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
+	if ((old_data == data) && (old_exrom == c64_exrom) && (old_game == c64_game) && !reset)
 		return;
 
 	/* Are we in Ultimax mode? */
@@ -544,9 +543,9 @@ static void c64_bankswitch( running_machine *machine, int reset )
 	/* NPW 15-May-2008 - Another hack in the C64 drivers broken! */
 	/* opbase->mem_max = 0xcfff; */
 
-	game = c64_game;
-	exrom = c64_exrom;
-	old = data;
+	old_game = c64_game;
+	old_exrom = c64_exrom;
+	old_data = data;
 }
 
 /**
@@ -835,6 +834,10 @@ DRIVER_INIT( sx64 )
 
 MACHINE_START( c64 )
 {
+	cbm_common_init();
+	c64_game = 1;
+	c64_exrom = 1;
+	old_data = -1;
 	c64_port_data = 0x17;
 
 	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);

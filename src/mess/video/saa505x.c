@@ -3370,7 +3370,7 @@ static int teletext_LOSE;
 
 static const char *tt_lookup;
 static const char *tt_graphics;
-static int tt_colour=7;
+static int tt_colour;
 static int tt_rcolour;
 static int tt_bgcolour=0;
 static int tt_start_line=0;
@@ -3392,6 +3392,7 @@ void saa505x_config(const struct saa505x_interface *intf)
 {
 	tt_lookup=teletext_saa5050_characters;
 	tt_graphics=teletext_graphics;
+	tt_colour=7;
 	saa505x_calls.out_Pixel_func=*intf->out_Pixel_func;
 }
 

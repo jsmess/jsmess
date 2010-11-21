@@ -31,7 +31,7 @@ static int is_V2mode,is_Nbasic,is_8MHz;
 int pc88sr_is_highspeed;
 static int port32_save;
 static int text_window;
-static int extmem_mode=-1;
+static int extmem_mode;
 static UINT8 *extRAM;
 static int extRAM_size;
 static void *ext_bank_80[4],*ext_bank_88[256];
@@ -845,6 +845,8 @@ WRITE8_HANDLER( pc88_kanji2_w )
 MACHINE_START( pc88srl )
 {
 	pc88_state *state = machine->driver_data<pc88_state>();
+
+	extmem_mode = -1;
 
 	/* find devices */
 	state->upd765 = machine->device(UPD765_TAG);

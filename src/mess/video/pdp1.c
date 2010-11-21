@@ -23,6 +23,8 @@
 #include "video/crt.h"
 
 
+static int typewriter_color;
+
 static bitmap_t *panel_bitmap;
 static bitmap_t *typewriter_bitmap;
 
@@ -55,6 +57,8 @@ INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 */
 VIDEO_START( pdp1 )
 {
+	typewriter_color = color_typewriter_black;
+
 	/* alloc bitmaps for our private fun */
 	panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
 	typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
@@ -350,8 +354,6 @@ static int pos;
 
 static int case_shift;
 
-static int color = color_typewriter_black;
-
 enum
 {
 	typewriter_line_height = 8,
@@ -434,12 +436,12 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
 	{
 	case 034:
 		/* Black */
-		color = color_typewriter_black;
+		typewriter_color = color_typewriter_black;
 		break;
 
 	case 035:
 		/* Red */
-		color = color_typewriter_red;
+		typewriter_color = color_typewriter_red;
 		break;
 
 	case 036:
@@ -481,7 +483,7 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
 		/* print character (lookup ASCII equivalent in table) */
 		pdp1_draw_char(machine, typewriter_bitmap, ascii_table[case_shift][character],
 						8*pos, typewriter_write_offset_y,
-						color);	/* print char */
+						typewriter_color);	/* print char */
 
 		if ((character!= 040) && (character!= 056))	/* 040 and 056 are non-spacing characters */
 			pos++;		/* step carriage forward */

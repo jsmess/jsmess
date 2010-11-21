@@ -1314,8 +1314,6 @@ $(MESSOBJ)/robotron.a:			\
 	$(MESS_DRIVERS)/a7150.o		\
 	$(MESS_DRIVERS)/k1003.o		\
 	$(MESS_DRIVERS)/rt1715.o	\
-	$(MESS_MACHINE)/rt1715.o	\
-	$(MESS_VIDEO)/rt1715.o		\
 	$(MESS_DRIVERS)/z1013.o		\
 	$(MESS_MACHINE)/z1013.o		\
 	$(MESS_VIDEO)/z1013.o		\
