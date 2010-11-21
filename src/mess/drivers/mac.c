@@ -432,7 +432,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff)	// V8 uses bit 31 and 23-0 for address decoding only
 
-	AM_RANGE(0xa00000, 0xa7ffff) AM_ROM AM_REGION("bootrom", 0)	// ROM (in 32-bit mode)
+	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0)	// ROM (in 32-bit mode)
 
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0xf04000, 0xf05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
@@ -1305,7 +1305,7 @@ ROM_START( macclasc )
 ROM_END
 
 ROM_START( maclc )
-	ROM_REGION32_BE(0x80000, "bootrom", 0)
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
         ROM_LOAD("350eacf0.rom", 0x000000, 0x080000, CRC(71681726) SHA1(6bef5853ae736f3f06c2b4e79772f65910c3b7d4))
 
 	ROM_REGION(0x1100, "egret", 0)
@@ -1374,7 +1374,7 @@ ROM_START( maciisi )
 ROM_END
 
 ROM_START( macclas2 )
-	ROM_REGION32_BE(0x80000, "bootrom", 0)
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
         ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
 
 	ROM_REGION(0x1100, "egret", 0)
@@ -1382,7 +1382,7 @@ ROM_START( macclas2 )
 ROM_END
 
 ROM_START( maclc2 )
-	ROM_REGION32_BE(0x80000, "bootrom", 0)
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
         ROM_LOAD32_BYTE( "341-0476_ue2-hh.bin", 0x000000, 0x020000, CRC(0c3b0ce4) SHA1(e4e8c883d7f2e002a3f7b7aefaa3840991e57025) ) 
         ROM_LOAD32_BYTE( "341-0475_ud2-mh.bin", 0x000001, 0x020000, CRC(7b013595) SHA1(0b82d8fac570270db9774f6254017d28611ae756) ) 
         ROM_LOAD32_BYTE( "341-0474_uc2-ml.bin", 0x000002, 0x020000, CRC(2ff2f52b) SHA1(876850df61d0233c1dd3c00d48d8d6690186b164) ) 
