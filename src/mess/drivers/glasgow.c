@@ -41,7 +41,7 @@ Note about clickable artwork: it seems the horizontal coordinates can vary
 R.Schaefer Oct 2010
 
 1. everything concerning chessboard moved to machine mboard
-2. Boarder pieces added. This allow setting up and repair chess positons 
+2. Border pieces added. This allow setting up and repair chess positons
 3. chessboard added for Amsterdam, Dallas 16 Bit, Dallas 32 Bit, Roma 32 Bit
 4. Save states added.
 
@@ -282,7 +282,7 @@ static MACHINE_RESET( glasgow )
 {
 	lcd_shift_counter = 3;
 
-	mboard_set_boarder_pieces();
+	mboard_set_border_pieces();
 	mboard_set_board();
 }
 
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( board )
 	PORT_START("LINE10")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_WHITE") 
+	PORT_START("B_WHITE")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( board )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_BLACK") 
+	PORT_START("B_BLACK")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
@@ -463,7 +463,7 @@ static INPUT_PORTS_START( board )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_BUTTONS") 
+	PORT_START("B_BUTTONS")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
