@@ -6,7 +6,7 @@
       of the Commodore drives (designed by Chuck Peddle)
 
     Skeleton driver
-
+	
 ***************************************************************************/
 
 /*
@@ -24,8 +24,9 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
-#include "includes/victor9k.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "devices/flopdrv.h"
@@ -39,44 +40,54 @@
 #include "machine/upd7201.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
+#include "includes/victor9k.h"
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_r, pic8259_w)
-	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
-	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
-	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_status_r, mc6845_address_w)
-	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE_MODERN(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE(MC6852_TAG, mc6852_r, mc6852_w)
-	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE_MODERN(M6522_3_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE_MODERN(M6522_4_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE_MODERN(M6522_6_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE_MODERN(M6522_5_TAG, via6522_device, read, write)
-	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(victor9k_state, video_ram)
+	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE_LEGACY(I8259A_TAG, pic8259_r, pic8259_w)
+	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
+	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE_LEGACY(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
+	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE_LEGACY(HD46505S_TAG, mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE_LEGACY(HD46505S_TAG, mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE_LEGACY(MC6852_TAG, mc6852_r, mc6852_w)
+	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(M6522_5_TAG, via6522_device, read, write)
+	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( floppy_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( floppy_io, ADDRESS_SPACE_IO, 8, victor9k_state )
 //  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
 //  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
 //  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
 //  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
 ADDRESS_MAP_END
 
-//static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8, victor9k_state )
 //  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
 //  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
 //  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
 //  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
-//ADDRESS_MAP_END
+ADDRESS_MAP_END
 
 /* Input Ports */
 
 static INPUT_PORTS_START( victor9k )
+	PORT_START("IEEE488")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_dav_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_eoi_r)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ren_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_atn_r)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ifc_r)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_srq_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_nrfd_r)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ndac_r)
 INPUT_PORTS_END
 
 /* Video */
@@ -89,7 +100,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-	address_space *program = cputag_get_address_space(device->machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	if (BIT(ma, 13))
 	{
@@ -101,7 +112,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 		for (int sx = 0; sx < x_count; sx++)
 		{
-			UINT16 code = (state->video_ram[video_ram_addr + 1] << 8) | state->video_ram[video_ram_addr];
+			UINT16 code = (state->m_video_ram[video_ram_addr + 1] << 8) | state->m_video_ram[video_ram_addr];
 			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
 			UINT16 data = program->read_word(char_ram_addr);
 
@@ -120,12 +131,11 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( vsync_w )
+WRITE_LINE_MEMBER( victor9k_state::vsync_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	pic8259_ir7_w(m_pic, state);
 
-	pic8259_ir7_w(driver_state->pic, state);
-	driver_state->vert = state;
+	m_vert = state;
 }
 
 static const mc6845_interface hd46505s_intf =
@@ -138,23 +148,13 @@ static const mc6845_interface hd46505s_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(vsync_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, vsync_w),
 	NULL
 };
 
-static VIDEO_START( victor9k )
+bool victor9k_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	victor9k_state *state = machine->driver_data<victor9k_state>();
-
-	/* find devices */
-	state->crt = machine->device(HD46505S_TAG);
-}
-
-static VIDEO_UPDATE( victor9k )
-{
-	victor9k_state *state = screen->machine->driver_data<victor9k_state>();
-
-	mc6845_update(state->crt, bitmap, cliprect);
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 
 	return 0;
 }
@@ -248,13 +248,11 @@ static UPD7201_INTERFACE( mpsc_intf )
 
 /* MC6852 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( ssda_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_ssda_irq = state;
 
-	driver_state->via6_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static MC6852_INTERFACE( ssda_intf )
@@ -263,7 +261,7 @@ static MC6852_INTERFACE( ssda_intf )
 	0,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(HC55516_TAG, hc55516_digit_w),
-	DEVCB_LINE(ssda_irq_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, ssda_irq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -272,7 +270,7 @@ static MC6852_INTERFACE( ssda_intf )
 
 /* M6522 Interface */
 
-static READ8_DEVICE_HANDLER( via1_pa_r )
+WRITE8_MEMBER( victor9k_state::via1_pa_w )
 {
 	/*
 
@@ -289,34 +287,10 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
-	return ieee488_dio_r(state->ieee488, 0);
+	ieee488_dio_w(m_ieee488, m_via1, data);
 }
 
-static WRITE8_DEVICE_HANDLER( via1_pa_w )
-{
-	/*
-
-        bit     description
-
-        PA0     DIO1
-        PA1     DIO2
-        PA2     DIO3
-        PA3     DIO4
-        PA4     DIO5
-        PA5     DIO6
-        PA6     DIO7
-        PA7     DIO8
-
-    */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
-	ieee488_dio_w(state->ieee488, device, data);
-}
-
-static READ8_DEVICE_HANDLER( via1_pb_r )
+WRITE8_MEMBER( victor9k_state::via1_pb_w )
 {
 	/*
 
@@ -333,114 +307,62 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 
     */
 
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
-	UINT8 data = 0;
-
 	/* data valid */
-	data |= ieee488_dav_r(state->ieee488);
+	ieee488_dav_w(m_ieee488, m_via1, BIT(data, 0));
 
 	/* end or identify */
-	data |= ieee488_eoi_r(state->ieee488) << 1;
+	ieee488_eoi_w(m_ieee488, m_via1, BIT(data, 1));
 
 	/* remote enable */
-	data |= ieee488_ren_r(state->ieee488) << 2;
+	ieee488_ren_w(m_ieee488, m_via1, BIT(data, 2));
 
 	/* attention */
-	data |= ieee488_atn_r(state->ieee488) << 3;
+	ieee488_atn_w(m_ieee488, m_via1, BIT(data, 3));
 
 	/* interface clear */
-	data |= ieee488_ifc_r(state->ieee488) << 4;
+	ieee488_ifc_w(m_ieee488, m_via1, BIT(data, 4));
 
 	/* service request */
-	data |= ieee488_srq_r(state->ieee488) << 5;
+	ieee488_srq_w(m_ieee488, m_via1, BIT(data, 5));
 
 	/* not ready for data */
-	data |= ieee488_nrfd_r(state->ieee488) << 6;
+	ieee488_nrfd_w(m_ieee488, m_via1, BIT(data, 6));
 
 	/* data not accepted */
-	data |= ieee488_ndac_r(state->ieee488) << 7;
-
-	return data;
+	ieee488_ndac_w(m_ieee488, m_via1, BIT(data, 7));
 }
 
-static WRITE8_DEVICE_HANDLER( via1_pb_w )
-{
-	/*
-
-        bit     description
-
-        PB0     DAV
-        PB1     EOI
-        PB2     REN
-        PB3     ATN
-        PB4     IFC
-        PB5     SRQ
-        PB6     NRFD
-        PB7     NDAC
-
-    */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
-	/* data valid */
-	ieee488_dav_w(state->ieee488, device, BIT(data, 0));
-
-	/* end or identify */
-	ieee488_eoi_w(state->ieee488, device, BIT(data, 1));
-
-	/* remote enable */
-	ieee488_ren_w(state->ieee488, device, BIT(data, 2));
-
-	/* attention */
-	ieee488_atn_w(state->ieee488, device, BIT(data, 3));
-
-	/* interface clear */
-	ieee488_ifc_w(state->ieee488, device, BIT(data, 4));
-
-	/* service request */
-	ieee488_srq_w(state->ieee488, device, BIT(data, 5));
-
-	/* not ready for data */
-	ieee488_nrfd_w(state->ieee488, device, BIT(data, 6));
-
-	/* data not accepted */
-	ieee488_ndac_w(state->ieee488, device, BIT(data, 7));
-}
-
-static WRITE_LINE_DEVICE_HANDLER( codec_vol_w )
+WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via1_irq = state;
 
-	driver_state->via1_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via1_intf =
 {
-	DEVCB_HANDLER(via1_pa_r),
-	DEVCB_HANDLER(via1_pb_r),
+	DEVCB_DEVICE_HANDLER(IEEE488_TAG, ieee488_dio_r),
+	DEVCB_INPUT_PORT("IEEE488"),
 	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_nrfd_r),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_ndac_r),
 	DEVCB_NULL,
 
-	DEVCB_HANDLER(via1_pa_w),
-	DEVCB_HANDLER(via1_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via1_pa_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(codec_vol_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, codec_vol_w),
 
-	DEVCB_LINE(via1_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via1_irq_w)
 };
 
-static READ8_DEVICE_HANDLER( via2_pa_r )
+READ8_MEMBER( victor9k_state::via2_pa_r )
 {
 	/*
 
@@ -456,18 +378,16 @@ static READ8_DEVICE_HANDLER( via2_pa_r )
         PA7     VERT
 
     */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
 	/* vertical sync */
-	data |= state->vert << 7;
+	data |= m_vert << 7;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( via2_pa_w )
+WRITE8_MEMBER( victor9k_state::via2_pa_w )
 {
 	/*
 
@@ -485,7 +405,7 @@ static WRITE8_DEVICE_HANDLER( via2_pa_w )
     */
 }
 
-static WRITE8_DEVICE_HANDLER( via2_pb_w )
+WRITE8_MEMBER( victor9k_state::via2_pb_w )
 {
 	/*
 
@@ -502,44 +422,40 @@ static WRITE8_DEVICE_HANDLER( via2_pb_w )
 
     */
 
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
 	/* brightness */
-	state->brt = (data >> 2) & 0x07;
+	m_brt = (data >> 2) & 0x07;
 
 	/* contrast */
-	state->cont = data >> 5;
+	m_cont = data >> 5;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via2_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via2_irq = state;
 
-	driver_state->via2_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via2_intf =
 {
-	DEVCB_HANDLER(via2_pa_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL, // KBRDY
 	DEVCB_NULL, // SRQ/BUSY
 	DEVCB_NULL, // KBDATA
 
-	DEVCB_HANDLER(via2_pa_w),
-	DEVCB_HANDLER(via2_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pa_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(via2_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via2_irq_w)
 };
 
-static READ8_DEVICE_HANDLER( via3_pa_r )
+READ8_MEMBER( victor9k_state::via3_pa_r )
 {
 	/*
 
@@ -559,7 +475,7 @@ static READ8_DEVICE_HANDLER( via3_pa_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via3_pa_w )
+WRITE8_MEMBER( victor9k_state::via3_pa_w )
 {
 	/*
 
@@ -577,7 +493,7 @@ static WRITE8_DEVICE_HANDLER( via3_pa_w )
     */
 }
 
-static READ8_DEVICE_HANDLER( via3_pb_r )
+READ8_MEMBER( victor9k_state::via3_pb_r )
 {
 	/*
 
@@ -597,7 +513,7 @@ static READ8_DEVICE_HANDLER( via3_pb_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via3_pb_w )
+WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
 	/*
 
@@ -613,43 +529,39 @@ static WRITE8_DEVICE_HANDLER( via3_pb_w )
         PB7     J5-46
 
     */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* codec clock output */
-	mc6852_rx_clk_w(state->ssda, BIT(data, 7));
-	mc6852_tx_clk_w(state->ssda, BIT(data, 7));
+	mc6852_rx_clk_w(m_ssda, BIT(data, 7));
+	mc6852_tx_clk_w(m_ssda, BIT(data, 7));
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via3_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via3_irq = state;
 
-	driver_state->via3_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via3_intf =
 {
-	DEVCB_HANDLER(via3_pa_r),
-	DEVCB_HANDLER(via3_pb_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via3_pa_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via3_pb_r),
 	DEVCB_NULL, // J5-12
 	DEVCB_NULL, // J5-48
 	DEVCB_NULL, // J5-14
 	DEVCB_NULL, // J5-50
 
-	DEVCB_HANDLER(via3_pa_w),
-	DEVCB_HANDLER(via3_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via3_pa_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via3_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(via3_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via3_irq_w)
 };
 
-static WRITE8_DEVICE_HANDLER( via4_pa_w )
+WRITE8_MEMBER( victor9k_state::via4_pa_w )
 {
 	/*
 
@@ -665,9 +577,11 @@ static WRITE8_DEVICE_HANDLER( via4_pa_w )
         PA7     ST0D
 
     */
+
+	m_st[0] = data >> 4;
 }
 
-static WRITE8_DEVICE_HANDLER( via4_pb_w )
+WRITE8_MEMBER( victor9k_state::via4_pb_w )
 {
 	/*
 
@@ -683,19 +597,19 @@ static WRITE8_DEVICE_HANDLER( via4_pb_w )
         PB7     ST1D
 
     */
+
+	m_st[1] = data >> 4;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( mode_w )
+WRITE_LINE_MEMBER( victor9k_state::mode_w )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via4_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via4_irq = state;
 
-	driver_state->via4_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via4_intf =
@@ -707,17 +621,17 @@ static const via6522_interface via4_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_HANDLER(via4_pa_w),
-	DEVCB_HANDLER(via4_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via4_pa_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via4_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(mode_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, mode_w),
 	DEVCB_NULL,
 
-	DEVCB_LINE(via4_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via4_irq_w)
 };
 
-static READ8_DEVICE_HANDLER( via5_pa_r )
+READ8_MEMBER( victor9k_state::via5_pa_r )
 {
 	/*
 
@@ -737,7 +651,7 @@ static READ8_DEVICE_HANDLER( via5_pa_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via5_pb_w )
+WRITE8_MEMBER( victor9k_state::via5_pb_w )
 {
 	/*
 
@@ -755,18 +669,16 @@ static WRITE8_DEVICE_HANDLER( via5_pb_w )
     */
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via5_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via5_irq = state;
 
-	driver_state->via5_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via5_intf =
 {
-	DEVCB_HANDLER(via5_pa_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via5_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL, // BRDY
 	DEVCB_NULL,
@@ -774,16 +686,16 @@ static const via6522_interface via5_intf =
 	DEVCB_NULL, // RDY1
 
 	DEVCB_NULL,
-	DEVCB_HANDLER(via5_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via5_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(via5_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via5_irq_w)
 };
 
-static READ8_DEVICE_HANDLER( via6_pa_r )
+READ8_MEMBER( victor9k_state::via6_pa_r )
 {
 	/*
 
@@ -799,24 +711,22 @@ static READ8_DEVICE_HANDLER( via6_pa_r )
         PA7     SYNC
 
     */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
 	/* drive 0 track 0 sense */
-	data |= floppy_tk00_r(state->floppy[0].image) << 1;
+	data |= floppy_tk00_r(m_floppy0) << 1;
 
 	/* drive 1 track 0 sense */
-	data |= floppy_tk00_r(state->floppy[1].image) << 3;
+	data |= floppy_tk00_r(m_floppy1) << 3;
 
 	/* write protect sense */
-	data |= floppy_wpt_r(state->floppy[state->drive].image) << 6;
+	data |= floppy_wpt_r(m_drive ? m_floppy1 : m_floppy0) << 6;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( via6_pa_w )
+WRITE8_MEMBER( victor9k_state::via6_pa_w )
 {
 	/*
 
@@ -833,16 +743,14 @@ static WRITE8_DEVICE_HANDLER( via6_pa_w )
 
     */
 
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
 	/* side select */
-	state->side = BIT(data, 4);
+	m_side = BIT(data, 4);
 
 	/* drive select */
-	state->drive = BIT(data, 5);
+	m_drive = BIT(data, 5);
 }
 
-static READ8_DEVICE_HANDLER( via6_pb_r )
+READ8_MEMBER( victor9k_state::via6_pb_r )
 {
 	/*
 
@@ -858,24 +766,22 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
         PB7     stepper enable B
 
     */
-
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
 	/* drive 0 ready */
-	data |= !(floppy_drive_get_flag_state(state->floppy[0].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 4;
+	data |= !(floppy_drive_get_flag_state(m_floppy0, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 4;
 
 	/* drive 1 ready */
-	data |= !(floppy_drive_get_flag_state(state->floppy[1].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 3;
+	data |= !(floppy_drive_get_flag_state(m_floppy1, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 3;
 
 	/* single/double sided */
-	data |= floppy_twosid_r(state->floppy[state->drive].image) << 5;
+	data |= floppy_twosid_r(m_drive ? m_floppy1 : m_floppy0) << 5;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( via6_pb_w )
+WRITE8_MEMBER( victor9k_state::via6_pb_w )
 {
 	/*
 
@@ -892,52 +798,48 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
 
     */
 
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-
 	/* motor speed controller reset */
-	cputag_set_input_line(device->machine, I8048_TAG, INPUT_LINE_RESET, BIT(data, 2));
+	cpu_set_input_line(m_fdc_cpu, INPUT_LINE_RESET, BIT(data, 2));
 
 	/* stepper enable A */
-	state->floppy[0].se = BIT(data, 6);
+	m_se[0] = BIT(data, 6);
 
 	/* stepper enable B */
-	state->floppy[1].se = BIT(data, 7);
+	m_se[1] = BIT(data, 7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( drw_w )
+WRITE_LINE_MEMBER( victor9k_state::drw_w )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( erase_w )
+WRITE_LINE_MEMBER( victor9k_state::erase_w )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via6_irq_w )
+WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
 {
-	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
+	m_via6_irq = state;
 
-	driver_state->via6_irq = state;
-
-	pic8259_ir3_w(driver_state->pic, driver_state->ssda_irq | driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
+	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
 }
 
 static const via6522_interface via6_intf =
 {
-	DEVCB_HANDLER(via6_pa_r),
-	DEVCB_HANDLER(via6_pb_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pa_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pb_r),
 	DEVCB_NULL, // GCRERR
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_HANDLER(via6_pa_w),
-	DEVCB_HANDLER(via6_pb_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pa_w),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(drw_w),
-	DEVCB_LINE(erase_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, drw_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, erase_w),
 
-	DEVCB_LINE(via6_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via6_irq_w)
 };
 
 /* Floppy Configuration */
@@ -949,7 +851,7 @@ static const floppy_config victor9k_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSQD,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };
@@ -968,28 +870,18 @@ static IRQ_CALLBACK( victor9k_irq_callback )
 {
 	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
-	return pic8259_acknowledge(state->pic);
+	return pic8259_acknowledge(state->m_pic);
 }
 
-static MACHINE_START( victor9k )
+void victor9k_state::machine_start()
 {
-	victor9k_state *state = machine->driver_data<victor9k_state>();
-
 	/* set interrupt callback */
-	cpu_set_irq_callback(machine->firstcpu, victor9k_irq_callback);
-
-	/* find devices */
-	state->ieee488 = machine->device(IEEE488_TAG);
-	state->pic = machine->device(I8259A_TAG);
-	state->ssda = machine->device(MC6852_TAG);
-	state->cvsd = machine->device(HC55516_TAG);
-	state->floppy[0].image = machine->device(FLOPPY_0);
-	state->floppy[1].image = machine->device(FLOPPY_1);
+	cpu_set_irq_callback(m_maincpu, victor9k_irq_callback);
 
 	/* memory banking */
-	address_space *program = cputag_get_address_space(machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
-	int ram_size = messram_get_size(machine->device("messram"));
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(m_ram);
+	int ram_size = messram_get_size(m_ram);
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 }
@@ -1004,10 +896,9 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MDRV_CPU_IO_MAP(floppy_io)
 
-//  MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
-//  MDRV_CPU_IO_MAP(keyboard_io)
-
-	MDRV_MACHINE_START(victor9k)
+	MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
+	MDRV_CPU_IO_MAP(keyboard_io)
+	MDRV_DEVICE_DISABLE()
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1019,9 +910,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_green)
-
-	MDRV_VIDEO_START(victor9k)
-	MDRV_VIDEO_UPDATE(victor9k)
 
 	MDRV_MC6845_ADD(HD46505S_TAG, H46505, 1000000, hd46505s_intf)
 
