@@ -540,7 +540,7 @@ static WRITE8_HANDLER( fm7_fdc_w )
  *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
  *  Clears keyboard IRQ flag
  */
-static READ8_HANDLER( fm7_keyboard_r)
+static READ8_HANDLER( fm7_keyboard_r )
 {
 	UINT8 ret;
 	switch(offset)
@@ -557,7 +557,7 @@ static READ8_HANDLER( fm7_keyboard_r)
 	}
 }
 
-READ8_HANDLER( fm7_sub_keyboard_r)
+READ8_HANDLER( fm7_sub_keyboard_r )
 {
 	UINT8 ret;
 	switch(offset)

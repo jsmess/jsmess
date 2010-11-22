@@ -700,16 +700,18 @@ static  READ8_HANDLER(pcw_printer_status_r)
 	return pcw_printer_status;
 }
 
+#ifdef UNUSED_FUNCTION
 /* MCU handlers */
-/*static READ8_HANDLER(mcu_printer_data_r)
+static READ8_HANDLER(mcu_printer_data_r)
 {
-    return pcw_printer_data;
+	return pcw_printer_data;
 }
 
 static WRITE8_HANDLER(mcu_printer_data_w)
 {
-    pcw_printer_data = data;
-}*/
+	pcw_printer_data = data;
+}
+#endif
 
 static READ8_HANDLER(mcu_printer_command_r)
 {

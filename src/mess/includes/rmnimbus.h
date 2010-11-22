@@ -10,12 +10,6 @@
 #include "machine/wd17xx.h"
 #include "machine/scsibus.h"
 
-#define DEBUG_TEXT  0x01
-#define DEBUG_DB    0x02
-#define DEBUG_PIXEL 0x04
-
-#define DEBUG_SET(flags)    ((debug_flags & (flags))==(flags))
-
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 

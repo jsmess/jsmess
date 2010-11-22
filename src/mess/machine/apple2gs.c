@@ -1619,10 +1619,10 @@ static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(space->mach
 static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0xE0C000); }
 static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0xE1C000); }
 
-static WRITE8_HANDLER( apple2gs_00Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0x00C000, data); }
-static WRITE8_HANDLER( apple2gs_01Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0x01C000, data); }
-static WRITE8_HANDLER( apple2gs_E0Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0xE0C000, data); }
-static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0xE1C000, data); }
+static WRITE8_HANDLER( apple2gs_00Cxxx_w ) { apple2gs_xxCxxx_w(space->machine, offset | 0x00C000, data); }
+static WRITE8_HANDLER( apple2gs_01Cxxx_w ) { apple2gs_xxCxxx_w(space->machine, offset | 0x01C000, data); }
+static WRITE8_HANDLER( apple2gs_E0Cxxx_w ) { apple2gs_xxCxxx_w(space->machine, offset | 0xE0C000, data); }
+static WRITE8_HANDLER( apple2gs_E1Cxxx_w ) { apple2gs_xxCxxx_w(space->machine, offset | 0xE1C000, data); }
 
 static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 {

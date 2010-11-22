@@ -390,7 +390,7 @@ void ui_mess_menu_bitbanger_control(running_machine *machine, ui_menu *menu, voi
 		}
 		menustate->device = device;
 		ui_menu_reset(menu, (ui_menu_reset_options)0);
-   }
+	}
 
 	/* rebuild the menu */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);

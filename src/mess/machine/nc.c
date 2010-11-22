@@ -19,7 +19,7 @@
 static int nc_card_size;
 
 /* save card data back */
-static void	nc_card_save(device_image_interface &image)
+static void nc_card_save(device_image_interface &image)
 {
 	/* if there is no data to write, quit */
 	if (!nc_card_ram || !nc_card_size)
@@ -54,13 +54,13 @@ static int nc_card_calculate_mask(int size)
 
 
 /* load card image */
-static int nc_card_load(device_image_interface *image, unsigned char **ptr)
+static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;
 
 	/* get file size */
-	datasize = image->length();
+	datasize = image.length();
 
 	if (datasize!=0)
 	{
@@ -72,7 +72,7 @@ static int nc_card_load(device_image_interface *image, unsigned char **ptr)
 			nc_card_size = datasize;
 
 			/* read whole file */
-			image->fread(data, datasize);
+			image.fread(data, datasize);
 
 			*ptr = data;
 
@@ -105,7 +105,7 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 	/* filename specified */
 
 	/* attempt to load file */
-	if (nc_card_load(&image, &nc_card_ram))
+	if (nc_card_load(image, &nc_card_ram))
 	{
 		if (nc_card_ram!=NULL)
 		{

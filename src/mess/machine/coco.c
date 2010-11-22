@@ -133,22 +133,22 @@ static UINT8 bitbanger_output_value;
 static UINT8 bitbanger_input_value;
 static UINT8 dac_value;
 
-static WRITE8_DEVICE_HANDLER ( d_pia1_pb_w );
-static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w );
-static READ8_DEVICE_HANDLER ( d_pia1_pa_r );
-static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w );
-static WRITE8_DEVICE_HANDLER ( d_pia0_pb_w );
-static WRITE8_DEVICE_HANDLER ( d_pia1_cb2_w);
-static WRITE8_DEVICE_HANDLER ( d_pia0_cb2_w);
-static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w);
-static WRITE8_DEVICE_HANDLER ( d_pia0_ca2_w);
+static WRITE8_DEVICE_HANDLER( d_pia1_pb_w );
+static WRITE8_DEVICE_HANDLER( d_pia1_pa_w );
+static READ8_DEVICE_HANDLER( d_pia1_pa_r );
+static WRITE8_DEVICE_HANDLER( d_pia0_pa_w );
+static WRITE8_DEVICE_HANDLER( d_pia0_pb_w );
+static WRITE8_DEVICE_HANDLER( d_pia1_cb2_w );
+static WRITE8_DEVICE_HANDLER( d_pia0_cb2_w );
+static WRITE8_DEVICE_HANDLER( d_pia1_ca2_w );
+static WRITE8_DEVICE_HANDLER( d_pia0_ca2_w );
 static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_a );
 static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b );
 static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_a );
 static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_b );
 static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode );
 static SAM6883_SET_MPU_RATE( d_sam_set_mpurate );
-static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize);
+static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize );
 static SAM6883_SET_MAP_TYPE( d_sam_set_maptype );
 
 /* CoCo 1 specific */
@@ -842,7 +842,7 @@ DEVICE_IMAGE_LOAD(coco_rom)
 		romsize = destlength;
 	}
 
-	image.fread( dest, romsize);
+	image.fread( dest, romsize );
 
 	/* Now we need to repeat the mirror the ROM throughout the ROM memory */
 	rombase = dest;
@@ -1495,9 +1495,9 @@ static UINT8 coco3_update_keyboard( running_machine *machine )
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_DEVICE_HANDLER( d_pia0_pb_w )            { (*update_keyboard)(device->machine); }
-INPUT_CHANGED( coco_keyboard_changed )                 { (*update_keyboard)(field->port->machine); }
-static TIMER_CALLBACK( coco_update_keyboard_timerproc) { (*update_keyboard)(machine); }
+static WRITE8_DEVICE_HANDLER( d_pia0_pb_w )             { (*update_keyboard)(device->machine); }
+INPUT_CHANGED( coco_keyboard_changed )                  { (*update_keyboard)(field->port->machine); }
+static TIMER_CALLBACK( coco_update_keyboard_timerproc ) { (*update_keyboard)(machine); }
 
 static WRITE8_DEVICE_HANDLER( d_pia0_pa_w )
 {
@@ -1543,7 +1543,7 @@ static void (*printer_out)(running_machine *machine, int data);
 /* Printer output for the CoCo, output to bitbanger port */
 static void printer_out_coco(running_machine *machine, int data)
 {
-   bitbanger_output_value = (data & 2) >> 1;
+	bitbanger_output_value = (data & 2) >> 1;
 	bitbanger_output(bitbanger_image(machine), bitbanger_output_value);
 }
 
@@ -1572,7 +1572,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	static int dclg_previous_bit;
 	UINT8 ctrl = input_port_read_safe(device->machine, "ctrl_sel", 0x00);
 	UINT8 hires = input_port_read_safe(device->machine, "hires_intf", 0x00);
-   dac_value = dac >> 2;
+	dac_value = dac >> 2;
 
 	coco_sound_update(device->machine);
 

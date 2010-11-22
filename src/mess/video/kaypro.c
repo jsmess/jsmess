@@ -9,8 +9,8 @@ static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 
 static running_device *mc6845;
 static const UINT8 *FNT;
-static UINT8 chr,gfx,fg,bg,attr,speed,flash,framecnt=0;
-static UINT16 mem,x,cursor,mc6845_video_address;
+static UINT8 speed,flash,framecnt=0;
+static UINT16 cursor,mc6845_video_address;
 
 /***********************************************************
 
@@ -37,7 +37,6 @@ VIDEO_UPDATE( kayproii )
     connected from the rom to the shift register, the remaining pixels are held high.
     A high pixel is black and a low pixel is green. */
 
-	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -84,7 +83,6 @@ VIDEO_UPDATE( omni2 )
 {
 	kaypro_state *state = screen->machine->driver_data<kaypro_state>();
 	UINT8 *videoram = state->videoram;
-	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -130,7 +128,8 @@ VIDEO_UPDATE( omni2 )
 VIDEO_UPDATE( kaypro2x )
 {
 	framecnt++;
-	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
+	speed = mc6845_reg[10]&0x20;
+	flash = mc6845_reg[10]&0x40;				// cursor modes
 	cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
@@ -154,14 +153,16 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 	kaypro_state *state = device->machine->driver_data<kaypro_state>();
 	UINT8 *videoram = state->videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 x;
+	UINT8 gfx,fg,bg;
 
 	for (x = 0; x < x_count; x++)				// for each character
 	{
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
-		mem = (ma + x) & 0x7ff;
-		chr = videoram[mem];
-		attr = videoram[mem | 0x800];
+		UINT16 mem = (ma + x) & 0x7ff;
+		UINT8 chr = videoram[mem];
+		UINT8 attr = videoram[mem | 0x800];
 
 		if ((attr & 3) == 3)
 		{

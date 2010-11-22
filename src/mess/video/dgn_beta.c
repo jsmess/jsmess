@@ -168,7 +168,7 @@ static const struct m6845_interface beta_m6845_interface = {
 static int	ClkMax;		/* max crtc clock, used to timeout screen refresh */
 static int	GCtrl;		/* Graphics control reg, from I28 PB0..5, PB6-7, top address lines for text mode */
 
-static	int	FlashCount;	/* Flash counter, IC2, LS393 decade counter */
+static int	FlashCount;	/* Flash counter, IC2, LS393 decade counter */
 static int	FlashBit;	/* Flash bit, FL input to I38 */
 static int	s_DoubleY;	/* Double height latch, 'Y' in I38 */
 static int	DoubleHL;	/* Double height second row 'HL' in I38 */

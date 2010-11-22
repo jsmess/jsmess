@@ -648,7 +648,7 @@ void init_scsibus(running_device *device)
 
         bus->initialised=1;
     }
- }
+}
 
 static DEVICE_START( scsibus )
 {

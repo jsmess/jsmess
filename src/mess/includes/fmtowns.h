@@ -23,8 +23,8 @@ READ8_HANDLER(towns_video_ff81_r);
 WRITE8_HANDLER(towns_video_ff81_w);
 READ8_HANDLER(towns_spriteram_low_r);
 WRITE8_HANDLER(towns_spriteram_low_w);
-READ8_HANDLER( towns_spriteram_r);
-WRITE8_HANDLER( towns_spriteram_w);
+READ8_HANDLER(towns_spriteram_r);
+WRITE8_HANDLER(towns_spriteram_w);
 
 struct towns_cdrom_controller
 {

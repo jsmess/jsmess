@@ -454,7 +454,7 @@ void bitbanger_output(running_device *device, int value)
 
       one_point_five_baud = attotime_add(bi->current_baud, attotime_div(bi->current_baud,2));
       timer_adjust_periodic(bi->bitbanger_output_timer, one_point_five_baud, 0, bi->current_baud);
-    }
+   }
 
    //fprintf(stderr,"%s, %d\n", attotime_string(timer_get_time(device->machine),9), value);
    bi->output_value = value;

@@ -89,7 +89,7 @@ static void oric_refresh_ints(running_machine *machine)
 	}
 }
 
-static	char *oric_ram_0x0c000 = NULL;
+static char *oric_ram_0x0c000 = NULL;
 
 
 /* index of keyboard line to scan */

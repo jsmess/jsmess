@@ -39,7 +39,7 @@ public:
 
 MACHINE_START( advision );
 MACHINE_RESET( advision );
-READ8_HANDLER ( advision_extram_r);
+READ8_HANDLER( advision_extram_r );
 WRITE8_HANDLER( advision_extram_w );
 
 /* Port P1 */
@@ -49,10 +49,10 @@ WRITE8_HANDLER( advision_bankswitch_w );
 /* Port P2 */
 WRITE8_HANDLER( advision_av_control_w );
 
-READ8_HANDLER ( advision_vsync_r );
-READ8_HANDLER ( advision_sound_cmd_r );
-WRITE8_HANDLER ( advision_sound_g_w );
-WRITE8_HANDLER ( advision_sound_d_w );
+READ8_HANDLER( advision_vsync_r );
+READ8_HANDLER( advision_sound_cmd_r );
+WRITE8_HANDLER( advision_sound_g_w );
+WRITE8_HANDLER( advision_sound_d_w );
 
 /*----------- defined in video/advision.c -----------*/
 

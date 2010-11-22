@@ -11,7 +11,7 @@ enum
 
 GFXDECODE_EXTERN( asr733 );
 
-extern PALETTE_INIT ( asr733 ) ;
+PALETTE_INIT( asr733 );
 
 void asr733_init(running_machine *machine);
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *machine, int state));

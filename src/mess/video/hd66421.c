@@ -65,25 +65,25 @@ typedef struct
 
 static HD66421 lcd;
 
-UINT8 hd66421_reg_idx_r( void)
+UINT8 hd66421_reg_idx_r(void)
 {
 	_logerror( 2, ("hd66421_reg_idx_r\n"));
 	return lcd.idx;
 }
 
-void hd66421_reg_idx_w( UINT8 data)
+void hd66421_reg_idx_w(UINT8 data)
 {
 	_logerror( 2, ("hd66421_reg_idx_w (%02X)\n", data));
 	lcd.idx = data;
 }
 
-UINT8 hd66421_reg_dat_r( void)
+UINT8 hd66421_reg_dat_r(void)
 {
 	_logerror( 2, ("hd66421_reg_dat_r\n"));
 	return lcd.dat[lcd.idx];
 }
 
-void hd66421_reg_dat_w( UINT8 data)
+void hd66421_reg_dat_w(UINT8 data)
 {
 	_logerror( 2, ("hd66421_reg_dat_w (%02X)\n", data));
 	lcd.dat[lcd.idx] = data;
@@ -94,7 +94,7 @@ void hd66421_reg_dat_w( UINT8 data)
 	}
 }
 
-INLINE void hd66421_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void hd66421_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
 	*BITMAP_ADDR16( bitmap, y, x) = (UINT16)color;
 }

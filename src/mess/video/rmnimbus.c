@@ -78,7 +78,12 @@ static UINT8   bpp;            // Bits / pixel
 static UINT16  pixel_mask;
 static UINT8   hs_count;
 
-static UINT32 debug_flags;
+#define DEBUG_TEXT  0x01
+#define DEBUG_DB    0x02
+#define DEBUG_PIXEL 0x04
+
+#define DEBUG_SET(flags)    ((debug_video & (flags))==(flags))
+static UINT32 debug_video;
 
 static UINT8 get_pixel(UINT16 x, UINT16 y);
 static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
@@ -586,12 +591,12 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
 {
     if(params>0)
     {
-        sscanf(param[0],"%d",&debug_flags);
+        sscanf(param[0],"%d",&debug_video);
     }
     else
     {
         debug_console_printf(machine,"Error usage : nimbus_vid_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_flags);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_video);
     }
 }
 
@@ -615,7 +620,7 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 
 VIDEO_START( nimbus )
 {
-    debug_flags=0;
+    debug_video=0;
 
     logerror("VIDEO_START\n");
 

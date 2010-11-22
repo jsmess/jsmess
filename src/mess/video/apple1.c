@@ -72,7 +72,7 @@
 
 typedef short termchar_t;
 
-struct terminal
+typedef struct
 {
 	tilemap_t *tm;
 	int gfx;
@@ -84,9 +84,9 @@ struct terminal
 	int cur_offset;
 	int cur_hidden;
 	termchar_t mem[1];
-};
+} terminal_t;
 
-static struct terminal *current_terminal;
+static terminal_t *current_terminal;
 
 static TILE_GET_INFO(terminal_gettileinfo)
 {
@@ -107,14 +107,14 @@ static TILE_GET_INFO(terminal_gettileinfo)
 		0);			/* flags */
 }
 
-static void terminal_draw(bitmap_t *dest, const rectangle *cliprect, struct terminal *terminal)
+static void terminal_draw(bitmap_t *dest, const rectangle *cliprect, terminal_t *terminal)
 {
 	current_terminal = terminal;
 	tilemap_draw(dest, cliprect, terminal->tm, 0, 0);
 	current_terminal = NULL;
 }
 
-static void verify_coords(struct terminal *terminal, int x, int y)
+static void verify_coords(terminal_t *terminal, int x, int y)
 {
 	assert(x >= 0);
 	assert(y >= 0);
@@ -122,7 +122,7 @@ static void verify_coords(struct terminal *terminal, int x, int y)
 	assert(y < terminal->num_rows);
 }
 
-static void terminal_putchar(struct terminal *terminal, int x, int y, int ch)
+static void terminal_putchar(terminal_t *terminal, int x, int y, int ch)
 {
 	int offs;
 
@@ -136,7 +136,7 @@ static void terminal_putchar(struct terminal *terminal, int x, int y, int ch)
 	}
 }
 
-static int terminal_getchar(struct terminal *terminal, int x, int y)
+static int terminal_getchar(terminal_t *terminal, int x, int y)
 {
 	int offs;
 
@@ -145,43 +145,43 @@ static int terminal_getchar(struct terminal *terminal, int x, int y)
 	return terminal->mem[offs];
 }
 
-static void terminal_putblank(struct terminal *terminal, int x, int y)
+static void terminal_putblank(terminal_t *terminal, int x, int y)
 {
 	terminal_putchar(terminal, x, y, terminal->blank_char);
 }
 
-static void terminal_dirtycursor(struct terminal *terminal)
+static void terminal_dirtycursor(terminal_t *terminal)
 {
 	if (terminal->cur_offset >= 0)
 		tilemap_mark_tile_dirty(terminal->tm, terminal->cur_offset);
 }
 
-static void terminal_setcursor(struct terminal *terminal, int x, int y)
+static void terminal_setcursor(terminal_t *terminal, int x, int y)
 {
 	terminal_dirtycursor(terminal);
 	terminal->cur_offset = y * terminal->num_cols + x;
 	terminal_dirtycursor(terminal);
 }
 
-static void terminal_hidecursor(struct terminal *terminal)
+static void terminal_hidecursor(terminal_t *terminal)
 {
 	terminal->cur_hidden = 1;
 	terminal_dirtycursor(terminal);
 }
 
-static void terminal_showcursor(struct terminal *terminal)
+static void terminal_showcursor(terminal_t *terminal)
 {
 	terminal->cur_hidden = 0;
 	terminal_dirtycursor(terminal);
 }
 
-static void terminal_getcursor(struct terminal *terminal, int *x, int *y)
+static void terminal_getcursor(terminal_t *terminal, int *x, int *y)
 {
 	*x = terminal->cur_offset % terminal->num_cols;
 	*y = terminal->cur_offset / terminal->num_cols;
 }
 
-static void terminal_fill(struct terminal *terminal, int val)
+static void terminal_fill(terminal_t *terminal, int val)
 {
 	int i;
 	for (i = 0; i < terminal->num_cols * terminal->num_rows; i++)
@@ -189,24 +189,24 @@ static void terminal_fill(struct terminal *terminal, int val)
 	tilemap_mark_all_tiles_dirty(terminal->tm);
 }
 
-static void terminal_clear(struct terminal *terminal)
+static void terminal_clear(terminal_t *terminal)
 {
 	terminal_fill(terminal, terminal->blank_char);
 }
 
-static struct terminal *terminal_create(
+static terminal_t *terminal_create(
 	running_machine *machine,
 	int gfx, int blank_char, int char_bits,
 	int (*getcursorcode)(int original_code),
 	int num_cols, int num_rows)
 {
-	struct terminal *term;
+	terminal_t *term;
 	int char_width, char_height;
 
 	char_width = machine->gfx[gfx]->width;
 	char_height = machine->gfx[gfx]->height;
 
-	term = (struct terminal *) auto_alloc_array(machine, char, sizeof(struct terminal) - sizeof(term->mem)
+	term = (terminal_t *) auto_alloc_array(machine, char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));
 
 	term->tm = tilemap_create(machine, terminal_gettileinfo, tilemap_scan_rows,
@@ -228,7 +228,7 @@ static struct terminal *terminal_create(
 /**************************************************************************/
 
 
-static struct terminal *apple1_terminal;
+static terminal_t *apple1_terminal;
 
 int apple1_vh_clrscrn_pressed = 0;		/* flag for CLEAR SCREEN switch */
 

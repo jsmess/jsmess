@@ -30,7 +30,7 @@ extern const wd17xx_interface cgenie_wd17xx_interface;
 
 extern int cgenie_tv_mode;
 
-READ8_HANDLER ( cgenie_psg_port_a_r);
+READ8_HANDLER ( cgenie_psg_port_a_r );
 READ8_HANDLER ( cgenie_psg_port_b_r );
 WRITE8_HANDLER ( cgenie_psg_port_a_w );
 WRITE8_HANDLER ( cgenie_psg_port_b_w );
@@ -96,20 +96,20 @@ typedef struct
 
 /*----------- defined in video/cgenie.c -----------*/
 
-extern	int 	cgenie_font_offset[4];
+extern int cgenie_font_offset[4];
 
 VIDEO_START( cgenie );
 VIDEO_UPDATE( cgenie );
 
-extern	 READ8_HANDLER ( cgenie_index_r );
-extern	 READ8_HANDLER ( cgenie_register_r );
+READ8_HANDLER( cgenie_index_r );
+READ8_HANDLER( cgenie_register_r );
 
-extern	WRITE8_HANDLER ( cgenie_index_w );
-extern	WRITE8_HANDLER (	cgenie_register_w );
+WRITE8_HANDLER( cgenie_index_w );
+WRITE8_HANDLER( cgenie_register_w );
 
-extern	int 	cgenie_get_register(int indx);
+int cgenie_get_register(int indx);
 
-extern	void	cgenie_mode_select(int graphics);
+void cgenie_mode_select(int graphics);
 
 
 #endif /* CGENIE_H_ */

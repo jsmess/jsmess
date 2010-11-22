@@ -83,13 +83,13 @@ extern void hec2hrx_reset(running_machine *machine, int hr);
 
 extern WRITE8_HANDLER( hector_mx80_io_port_w );
 extern WRITE8_HANDLER( hector_mx40_io_port_w );
-extern  READ8_HANDLER( hector_io_8255_r);
-extern WRITE8_HANDLER( hector_io_8255_w);
+extern  READ8_HANDLER( hector_io_8255_r );
+extern WRITE8_HANDLER( hector_io_8255_w );
 
 /*----------- defined in video/hec2video.c -----------*/
 
-extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
-extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
+extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram);
+extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram);
 VIDEO_START( hec2hrp );
 VIDEO_UPDATE( hec2hrp );
 

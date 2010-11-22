@@ -1217,3 +1217,6 @@ WRITE16_HANDLER( cdimono1_cdic_ram_w )
     verboselog(space->machine, 0, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
     COMBINE_DATA(&m_ram[offset]);
 }
+
+}
+}

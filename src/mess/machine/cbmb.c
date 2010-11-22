@@ -39,7 +39,6 @@ static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 UINT8 *cbmb_basic;
 UINT8 *cbmb_kernal;
 static UINT8 *cbmb_chargen;
-UINT8 *cbmb_videoram;
 UINT8 *cbmb_colorram;
 
 /* tpi at 0xfde00
@@ -290,8 +289,9 @@ WRITE8_HANDLER( cbmb_colorram_w )
 
 int cbmb_dma_read( running_machine *machine, int offset )
 {
+	cbmb_state *state = machine->driver_data<cbmb_state>();
 	if (offset >= 0x1000)
-		return cbmb_videoram[offset & 0x3ff];
+		return state->videoram[offset & 0x3ff];
 	else
 		return cbmb_chargen[offset & 0xfff];
 }

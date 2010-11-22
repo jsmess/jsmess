@@ -92,14 +92,6 @@
 //#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
 
-//extern UINT32* towns_vram;
-//extern UINT8* towns_gfxvram;
-//extern UINT8* towns_txtvram;
-//extern UINT8* towns_sprram;
-
-//extern UINT32 towns_mainmem_enable;
-//extern UINT32 towns_ankcg_enable;
-
 //static UINT32 pshift;  // for debugging
 
 static void draw_sprites(running_machine* machine, const rectangle* rect);
@@ -680,14 +672,14 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 	}
 }
 
-READ8_HANDLER( towns_spriteram_r)
+READ8_HANDLER( towns_spriteram_r )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 
 	return state->towns_txtvram[offset];
 }
 
-WRITE8_HANDLER( towns_spriteram_w)
+WRITE8_HANDLER( towns_spriteram_w )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 
@@ -1863,13 +1855,15 @@ VIDEO_UPDATE( towns )
 		}
 	}
 
-/*#ifdef SPR_DEBUG
-    if(input_code_pressed(screen->machine,KEYCODE_O))
-        pshift+=0x80;
-    if(input_code_pressed(screen->machine,KEYCODE_I))
-        pshift-=0x80;
-    popmessage("Pixel shift = %08x",pshift);
-#endif*/
+#if 0
+#ifdef SPR_DEBUG
+	if(input_code_pressed(screen->machine,KEYCODE_O))
+		pshift+=0x80;
+	if(input_code_pressed(screen->machine,KEYCODE_I))
+		pshift-=0x80;
+	popmessage("Pixel shift = %08x",pshift);
+#endif
+#endif
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%04x %i %i %i | %04x %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x\nReg28=%04x",
@@ -1884,6 +1878,6 @@ VIDEO_UPDATE( towns )
 		state->video.towns_crtc_reg[28]);
 #endif
 
-    return 0;
+	return 0;
 }
 

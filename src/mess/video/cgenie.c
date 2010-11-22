@@ -10,7 +10,7 @@
 #include "includes/cgenie.h"
 
 
-int cgenie_font_offset[4] = {0, 0, 0, 0};
+int cgenie_font_offset[4];
 
 static CRTC6845 crt;
 static int graphics = 0;

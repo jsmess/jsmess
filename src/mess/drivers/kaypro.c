@@ -44,7 +44,7 @@
 #include "includes/kaypro.h"
 
 
-static READ8_HANDLER( kaypro2x_87) { return 0x7f; }	/* to bypass unemulated HD controller */
+static READ8_HANDLER( kaypro2x_87 ) { return 0x7f; }	/* to bypass unemulated HD controller */
 
 /***********************************************************
 

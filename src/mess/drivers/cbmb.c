@@ -161,7 +161,7 @@ static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
 	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE(&cbmb_basic)
-	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE(&cbmb_videoram)		/* videoram */
+	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE_MEMBER(cbmb_state, videoram)		/* videoram */
 	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_BASE(&cbmb_colorram)		/* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", vic2_port_r, vic2_port_w)
 	/* disk units */

@@ -28,7 +28,7 @@
 #define KEY_MODE_FM16B 1 // FM-16B (FM-77AV and later only)
 #define KEY_MODE_SCAN  2 // Scancode Make/Break (PC-like)
 
-struct fm7_video_flags
+typedef struct
 {
 	UINT8 sub_busy;
 	UINT8 sub_halt;
@@ -52,7 +52,7 @@ struct fm7_video_flags
 	UINT8 active_video_page;
 	UINT8 display_video_page;
 	UINT8 vsync_flag;
-};
+} fm7_video_t;
 
 /*----------- defined in drivers/fm7.c -----------*/
 
@@ -70,7 +70,7 @@ READ8_HANDLER( fm7_sub_beeper_r );
 
 /*----------- defined in video/fm7.c -----------*/
 
-extern struct fm7_video_flags fm7_video;
+extern fm7_video_t fm7_video;
 
 TIMER_CALLBACK( fm77av_vsync );
 

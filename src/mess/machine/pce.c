@@ -83,14 +83,17 @@ enum {
 	PCE_CD_CDDA_PAUSED
 };
 
+static UINT8 pce_io_port_options;
+
 /* system RAM */
 unsigned char *pce_user_ram;    /* scratch RAM at F8 */
 
 /* CD Unit RAM */
-UINT8	*pce_cd_ram;			/* 64KB RAM from a CD unit */
+UINT8 *pce_cd_ram;			/* 64KB RAM from a CD unit */
 static UINT8	pce_sys3_card;	/* Is a Super CD System 3 card present */
 static UINT8	pce_acard;		/* Is this an Arcade Card? */
-static struct {
+
+typedef struct {
 	UINT8	regs[16];
 	UINT8	*bram;
 	UINT8	*adpcm_ram;
@@ -158,7 +161,8 @@ static struct {
 	emu_timer	*adpcm_fadeout_timer;
 	emu_timer	*adpcm_fadein_timer;
 	double	adpcm_volume;
-} pce_cd;
+} pce_cd_t;
+static pce_cd_t pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
 static void pce_cd_msm5205_int(running_device *device);
@@ -166,8 +170,6 @@ const msm5205_interface pce_cd_msm5205_interface = {
 	pce_cd_msm5205_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 1/48 prescaler, 4bit data */
 };
-
-struct pce_struct pce;
 
 static UINT8 *cartridge_ram;
 
@@ -332,17 +334,17 @@ DEVICE_IMAGE_LOAD(pce_cart)
 
 DRIVER_INIT( pce )
 {
-	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
+	pce_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 DRIVER_INIT( tg16 )
 {
-	pce.io_port_options = TG_16_JOY_SIG | CONST_SIG;
+	pce_io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
 DRIVER_INIT( sgx )
 {
-	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
+	pce_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 MACHINE_START( pce )
@@ -443,7 +445,7 @@ READ8_HANDLER ( pce_joystick_r )
 	if (joystick_data_select)
 		data >>= 4;
 
-	ret = (data & 0x0f) | pce.io_port_options;
+	ret = (data & 0x0f) | pce_io_port_options;
 #ifdef UNIFIED_PCE
 	ret &= ~0x40;
 #endif

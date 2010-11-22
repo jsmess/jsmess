@@ -375,7 +375,7 @@ void hd44780_device::data_write(offs_t offset, UINT8 data)
 		ddram[ac] = data;
 	else {
 		cgram[ac] = data;
-		}
+	}
 	data_bus_flag = 1;
 
 	set_busy_flag(41);

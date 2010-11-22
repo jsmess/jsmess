@@ -28,11 +28,6 @@
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE		0x280000
 
-struct pce_struct
-{
-	UINT8 io_port_options; /*driver-specific options for the PCE*/
-};
-
 
 /*----------- defined in machine/pce.c -----------*/
 
@@ -52,7 +47,6 @@ READ8_HANDLER( pce_cd_acard_r );
 WRITE8_HANDLER( pce_cd_acard_wram_w );
 READ8_HANDLER( pce_cd_acard_wram_r );
 
-extern struct pce_struct pce;
 DRIVER_INIT( pce );
 DRIVER_INIT( tg16 );
 DRIVER_INIT( sgx );

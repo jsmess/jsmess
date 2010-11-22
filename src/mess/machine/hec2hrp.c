@@ -336,7 +336,7 @@ static running_device *cassette_device_image(running_machine *machine)
 ********************************************************************************/
 
 /*******************  Lecture PIO 8255 *******************/
-READ8_HANDLER( hector_io_8255_r)
+READ8_HANDLER( hector_io_8255_r )
 {
 
 /* 8255 in mode 0 */
@@ -373,7 +373,7 @@ if ((offset & 0x3) == 0x2) /* Port C */
 return data;  // Retour de la valeur !
 }
 /*******************  Ecriture PIO 8255 *******************/
-WRITE8_HANDLER( hector_io_8255_w) 
+WRITE8_HANDLER( hector_io_8255_w ) 
 {
 /* 8255 in mode 0 */
 if ((offset & 0x3) == 0x0) /* Port A => to printer or Disk II*/
@@ -417,7 +417,7 @@ if ((offset & 0x3) == 0x3) /* Port commande */
 
 
 /*******************  Ecriture PIO specifique machine MX40 *******************/
-WRITE8_HANDLER( hector_mx40_io_port_w)
+WRITE8_HANDLER( hector_mx40_io_port_w )
 {
 /* Bank switching on several address */
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
@@ -436,7 +436,7 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 }
 
 /*******************  Ecriture PIO specifique machine MX80 *******************/
-WRITE8_HANDLER( hector_mx80_io_port_w)
+WRITE8_HANDLER( hector_mx80_io_port_w )
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
 		printer_output(space->machine->device("printer"), data);

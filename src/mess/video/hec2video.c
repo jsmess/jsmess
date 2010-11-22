@@ -46,7 +46,7 @@ UINT8 hector_flag_80c;
 
 
 
-static void Init_Hector_Palette( running_machine  *machine)
+static void Init_Hector_Palette(running_machine *machine)
 {
 	// basic colors !
 	hector_color[0] = 0;  // fond (noir)
@@ -55,23 +55,23 @@ static void Init_Hector_Palette( running_machine  *machine)
 	hector_color[3] = 3; // Ecriture de choix (jaune)
 
 	// Color initialisation : full luminosit??
-	palette_set_color( machine, 0,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine, 1,MAKE_RGB(255,000,000));//Rouge
-	palette_set_color( machine, 2,MAKE_RGB(000,255,000));//Vert
-	palette_set_color( machine, 3,MAKE_RGB(255,255,000));//Jaune
-	palette_set_color( machine, 4,MAKE_RGB(000,000,255));//Bleu
-	palette_set_color( machine, 5,MAKE_RGB(255,000,255));//Magneta
-	palette_set_color( machine, 6,MAKE_RGB(000,255,255));//Cyan
-	palette_set_color( machine, 7,MAKE_RGB(255,255,255));//Blanc
+	palette_set_color( machine, 0, MAKE_RGB(000,000,000) );//Noir
+	palette_set_color( machine, 1, MAKE_RGB(255,000,000) );//Rouge
+	palette_set_color( machine, 2, MAKE_RGB(000,255,000) );//Vert
+	palette_set_color( machine, 3, MAKE_RGB(255,255,000) );//Jaune
+	palette_set_color( machine, 4, MAKE_RGB(000,000,255) );//Bleu
+	palette_set_color( machine, 5, MAKE_RGB(255,000,255) );//Magneta
+	palette_set_color( machine, 6, MAKE_RGB(000,255,255) );//Cyan
+	palette_set_color( machine, 7, MAKE_RGB(255,255,255) );//Blanc
 	// 1/2 luminosit??
-	palette_set_color( machine, 8,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine, 9,MAKE_RGB(128,000,000));//Rouge
-	palette_set_color( machine,10,MAKE_RGB(000,128,000));//Vert
-	palette_set_color( machine,11,MAKE_RGB(128,128,000));//Jaune
-	palette_set_color( machine,12,MAKE_RGB(000,000,128));//Bleu
-	palette_set_color( machine,13,MAKE_RGB(128,000,128));//Magneta
-	palette_set_color( machine,14,MAKE_RGB(000,128,128));//Cyan
-	palette_set_color( machine,15,MAKE_RGB(128,128,128));//Blanc
+	palette_set_color( machine, 8, MAKE_RGB(000,000,000) );//Noir
+	palette_set_color( machine, 9, MAKE_RGB(128,000,000) );//Rouge
+	palette_set_color( machine,10, MAKE_RGB(000,128,000) );//Vert
+	palette_set_color( machine,11, MAKE_RGB(128,128,000) );//Jaune
+	palette_set_color( machine,12, MAKE_RGB(000,000,128) );//Bleu
+	palette_set_color( machine,13, MAKE_RGB(128,000,128) );//Magneta
+	palette_set_color( machine,14, MAKE_RGB(000,128,128) );//Cyan
+	palette_set_color( machine,15, MAKE_RGB(128,128,128) );//Blanc
 }
 
 void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
@@ -83,33 +83,10 @@ void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (4 pixels !) */
-			switch (gfx & 0x03) {
-			     case 0x00 : *p=hector_color[0]; break;
-			     case 0x01 : *p=hector_color[1]; break;
-			     case 0x02 : *p=hector_color[2]; break;
-			     default   : *p=hector_color[3]; break;}
-			p++;
-
-			switch (gfx & 0x0c)	{
-			     case 0x00 : *p=hector_color[0]; break;
-			     case 0x04 : *p=hector_color[1]; break;
-			     case 0x08 : *p=hector_color[2]; break;
-			     default   : *p=hector_color[3]; break;}
-			p++;
-
-			switch (gfx & 0x30)	{
-			     case 0x00 : *p=hector_color[0]; break;
-			     case 0x10 : *p=hector_color[1]; break;
-			     case 0x20 : *p=hector_color[2]; break;
-			     default   : *p=hector_color[3]; break;}
-			p++;
-
-			switch (gfx & 0xc0) {
-			     case 0x00 : *p=hector_color[0]; break;
-			     case 0x40 : *p=hector_color[1]; break;
-			     case 0x80 : *p=hector_color[2]; break;
-			     default   : *p=hector_color[3]; break;}
-			p++;
+			*p++ = hector_color[(gfx >> 0) & 0x03];
+			*p++ = hector_color[(gfx >> 2) & 0x03];
+			*p++ = hector_color[(gfx >> 4) & 0x03];
+			*p++ = hector_color[(gfx >> 6) & 0x03];
 		}
 		ma+=yram;
 	}
@@ -124,22 +101,14 @@ void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (8 pixels !) */
-			*p= (gfx &0x01 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x02 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x04 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x08 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x10 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x20 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x40 ) ? 7 : 0 ;
-			p++;
-			*p= (gfx &0x80 ) ? 7 : 0 ;
-			p++;
+			*p++ = (gfx & 0x01) ? 7 : 0;
+			*p++ = (gfx & 0x02) ? 7 : 0;
+			*p++ = (gfx & 0x04) ? 7 : 0;
+			*p++ = (gfx & 0x08) ? 7 : 0;
+			*p++ = (gfx & 0x10) ? 7 : 0;
+			*p++ = (gfx & 0x20) ? 7 : 0;
+			*p++ = (gfx & 0x40) ? 7 : 0;
+			*p++ = (gfx & 0x80) ? 7 : 0;
 		}
 		ma+=yram;
 	}

@@ -30,7 +30,7 @@ static struct
 jupiter_tape;
 
 static UINT8 *jupiter_data = NULL;
-static int jupiter_data_type = JUPITER_NONE;
+static int jupiter_data_type;
 
 static void jupiter_machine_stop(running_machine &machine);
 
@@ -86,6 +86,7 @@ MACHINE_START( jupiter )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
+	jupiter_data_type = JUPITER_NONE;
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 

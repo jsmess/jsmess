@@ -496,7 +496,7 @@ static void nc_common_open_stream_for_writing(running_machine *machine)
 }
 
 
-static void	nc_common_close_stream(void)
+static void nc_common_close_stream(void)
 {
 	if (file)
 		mame_fclose(file);
@@ -504,7 +504,7 @@ static void	nc_common_close_stream(void)
 
 
 
-static int	previous_inputport_10_state;
+static int previous_inputport_10_state;
 
 static TIMER_CALLBACK(dummy_timer_callback)
 {
@@ -811,7 +811,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 
 
 /* same for nc100 and nc200 */
-static void	nc_printer_update(running_machine *machine, UINT8 data)
+static void nc_printer_update(running_machine *machine, UINT8 data)
 {
 	running_device *printer = machine->device("centronics");
 	centronics_strobe_w(printer, BIT(data, 6));
@@ -850,7 +850,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 }
 
 
-static void	nc100_tc8521_alarm_callback(running_device *device, int state)
+static void nc100_tc8521_alarm_callback(running_device *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and

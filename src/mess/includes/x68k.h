@@ -199,6 +199,18 @@ struct x68k_system
 	} mdctrl;
 };
 
+
+class x68k_state : public driver_device
+{
+public:
+	x68k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
+};
+
+
 /*----------- defined in drivers/x68k.c -----------*/
 
 extern struct x68k_system x68k_sys;

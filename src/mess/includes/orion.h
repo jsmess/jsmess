@@ -14,7 +14,7 @@
 extern UINT8 orion128_video_mode;
 extern UINT8 orion128_video_page;
 extern UINT8 orion128_video_width;
-extern UINT8 orion_video_mode_mask ;
+extern UINT8 orion_video_mode_mask;
 extern UINT8 orionpro_pseudo_color;
 
 extern const i8255a_interface orion128_ppi8255_interface_1;

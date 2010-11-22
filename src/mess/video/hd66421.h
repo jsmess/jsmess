@@ -16,11 +16,11 @@
 
 /*----------- defined in video/hd66421.c -----------*/
 
-UINT8 hd66421_reg_idx_r( void);
-void hd66421_reg_idx_w( UINT8 data);
+UINT8 hd66421_reg_idx_r(void);
+void hd66421_reg_idx_w(UINT8 data);
 
-UINT8 hd66421_reg_dat_r( void);
-void hd66421_reg_dat_w( UINT8 data);
+UINT8 hd66421_reg_dat_r(void);
+void hd66421_reg_dat_w(UINT8 data);
 
 PALETTE_INIT( hd66421 );
 

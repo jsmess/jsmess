@@ -139,17 +139,6 @@
 #include "x68000.lh"
 
 
-class x68000_state : public driver_device
-{
-public:
-	x68000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_nvram(*this, "nvram") { }
-
-	required_shared_ptr<UINT16>	m_nvram;
-};
-
-
 struct x68k_system x68k_sys;
 
 static UINT16* sram;   // SRAM
@@ -1519,7 +1508,7 @@ static void x68k_rtc_alarm_irq(int state)
 
 static WRITE16_HANDLER( x68k_sram_w )
 {
-	x68000_state *state = space->machine->driver_data<x68000_state>();
+	x68k_state *state = space->machine->driver_data<x68k_state>();
 
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
@@ -1529,7 +1518,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 static READ16_HANDLER( x68k_sram_r )
 {
-	x68000_state *state = space->machine->driver_data<x68000_state>();
+	x68k_state *state = space->machine->driver_data<x68k_state>();
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
@@ -1548,7 +1537,7 @@ static READ16_HANDLER( x68k_sram_r )
 
 static READ32_HANDLER( x68k_sram32_r )
 {
-	x68000_state *state = space->machine->driver_data<x68000_state>();
+	x68k_state *state = space->machine->driver_data<x68k_state>();
 	if(offset == 0x08/4)
 		return (messram_get_size(space->machine->device("messram")) & 0xffff0000);  // RAM size
 #if 0
@@ -1564,7 +1553,7 @@ static READ32_HANDLER( x68k_sram32_r )
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
-	x68000_state *state = space->machine->driver_data<x68000_state>();
+	x68k_state *state = space->machine->driver_data<x68k_state>();
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram + offset);
@@ -2500,7 +2489,7 @@ static MACHINE_RESET( x68000 )
 static MACHINE_START( x68000 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	x68000_state *state = machine->driver_data<x68000_state>();
+	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
@@ -2531,7 +2520,7 @@ static MACHINE_START( x68000 )
 static MACHINE_START( x68030 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	x68000_state *state = machine->driver_data<x68000_state>();
+	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
@@ -2616,7 +2605,7 @@ static DRIVER_INIT( x68030 )
 	x68k_sys.sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
-static MACHINE_CONFIG_START( x68000, x68000_state )
+static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map)

@@ -45,7 +45,7 @@ static const UINT8 pointermask[] =
 
 static gfx_element *stylus_pointer;
 
-void	avigo_vh_set_stylus_marker_position(int x,int y)
+void avigo_vh_set_stylus_marker_position(int x,int y)
 {
 	stylus_x = x;
 	stylus_y = y;

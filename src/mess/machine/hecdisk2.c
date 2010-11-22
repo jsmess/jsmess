@@ -139,7 +139,7 @@ READ8_HANDLER( hector_disk2_r )
 	return data;
 }
 
-static void valid_interrupt( running_machine *machine)
+static void valid_interrupt(running_machine *machine)
 {
 	/* Called at each rising state of INT / NMI and RNMI ! */
 
@@ -164,7 +164,7 @@ static void valid_interrupt( running_machine *machine)
 	}
 }
 
-void hector_disk2_init( running_machine *machine)
+void hector_disk2_init(running_machine *machine)
 {
        DMA_timer = timer_alloc(machine, Callback_DMA_irq, 0);
        INT_timer = timer_alloc(machine, Callback_INT_irq, 0);

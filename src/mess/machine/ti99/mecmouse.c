@@ -201,7 +201,7 @@ int mecmouse_get_values8(running_device *device, int mode)
 
 /**************************************************************************/
 
-static DEVICE_START( ti99_mecmouse)
+static DEVICE_START( ti99_mecmouse )
 {
 }
 

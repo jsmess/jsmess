@@ -62,7 +62,8 @@ static int sio_serial_receive( running_device *device, int channel );
 
 /* Debugging */
 
-static UINT32  debug_flags;
+#define DEBUG_SET(flags)    ((debug_machine & (flags))==(flags))
+static UINT32 debug_machine;
 
 #define DMA_BREAK           0x0000001
 #define DECODE_BIOS         0x0000002
@@ -1349,7 +1350,7 @@ MACHINE_START( nimbus )
 		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
     }
 
-    debug_flags=DECODE_BIOS;
+    debug_machine=DECODE_BIOS;
 }
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[])
@@ -1369,8 +1370,6 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
     {
         debug_console_printf(machine,"Error, you must supply an intno and vector to trigger\n");
     }
-
-
 }
 
 
@@ -1393,12 +1392,12 @@ static void nimbus_debug(running_machine *machine, int ref, int params, const ch
 {
     if(params>0)
     {
-        sscanf(param[0],"%d",&debug_flags);
+        sscanf(param[0],"%d",&debug_machine);
     }
     else
     {
         debug_console_printf(machine,"Error usage : nimbus_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_flags);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_machine);
     }
 }
 
@@ -1928,7 +1927,7 @@ typedef struct
 {
     int     blockbase;
     int     blocksize;
-} nimbus_block ;
+} nimbus_block;
 
 typedef nimbus_block nimbus_blocks[3];
 

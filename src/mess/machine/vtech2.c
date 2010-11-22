@@ -57,10 +57,10 @@ static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space->machine, 3,offset,data); }
 static int mra_bank(running_machine *machine, int bank, int offs);
 
 /* wrappers for bank #1 to #4 */
-static READ8_HANDLER ( mra_bank1) { return mra_bank(space->machine,0,offset); }
-static READ8_HANDLER ( mra_bank2) { return mra_bank(space->machine,1,offset); }
-static READ8_HANDLER ( mra_bank3) { return mra_bank(space->machine,2,offset); }
-static READ8_HANDLER ( mra_bank4) { return mra_bank(space->machine,3,offset); }
+static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space->machine,0,offset); }
+static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space->machine,1,offset); }
+static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space->machine,2,offset); }
+static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space->machine,3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
 static const read8_space_func mra_bank_soft[4] =

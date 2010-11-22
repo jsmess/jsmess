@@ -387,7 +387,7 @@ static void atari_load_proc(device_image_interface &image)
  * F->A                    128/256 byte CKS   bad sector table
  *
  *****************************************************************************/
-static	void make_chksum(UINT8 * chksum, UINT8 data)
+static void make_chksum(UINT8 * chksum, UINT8 data)
 {
 	UINT8 newone;
 	newone= *chksum + data;
@@ -400,7 +400,7 @@ static	void make_chksum(UINT8 * chksum, UINT8 data)
 	*chksum = newone;
 }
 
-static	void clr_serout(running_device *device,int expect_data)
+static void clr_serout(running_device *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 

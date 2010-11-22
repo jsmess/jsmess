@@ -625,7 +625,7 @@ WRITE8_HANDLER ( ti85_port_0007_w )
 	running_device *speaker = space->machine->device("speaker");
 	running_device *ti85serial = space->machine->device("ti85serial");
 
-	speaker_level_w(speaker,( (data>>2)|(data>>3) )&0x01 );
+	speaker_level_w(speaker, ( (data>>2)|(data>>3) ) & 0x01);
 	ti85_red_out=(data>>2)&0x01;
 	ti85_white_out=(data>>3)&0x01;
 	ti85serial_red_out( ti85serial, 0, ti85_red_out );
@@ -658,7 +658,7 @@ WRITE8_HANDLER ( ti82_port_0002_w )
 	ti8x_port2 = data;
 }
 
-WRITE8_HANDLER ( ti82_port_0010_w)
+WRITE8_HANDLER ( ti82_port_0010_w )
 {
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;
@@ -765,7 +765,7 @@ WRITE8_HANDLER ( ti83p_port_0007_w )
 	update_ti83p_memory(space->machine);
 }
 
-WRITE8_HANDLER ( ti83p_port_0010_w)
+WRITE8_HANDLER ( ti83p_port_0010_w )
 {
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;

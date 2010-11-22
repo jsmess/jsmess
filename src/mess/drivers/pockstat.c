@@ -919,7 +919,7 @@ static VIDEO_UPDATE( pockstat )
 	return 0;
 }
 
-static DEVICE_IMAGE_LOAD( pockstat_flash)
+static DEVICE_IMAGE_LOAD( pockstat_flash )
 {
 	int i, length;
 	UINT8 *cart = memory_region(image.device().machine, "flash");

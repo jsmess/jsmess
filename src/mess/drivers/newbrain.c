@@ -744,7 +744,7 @@ enum
 };
 
 static UINT8 copdata;
-static int copstate, copbytes, copregint = 1;
+static int copstate, copbytes, copregint;
 
 static READ8_HANDLER( cop_r )
 {
@@ -1382,6 +1382,8 @@ static TIMER_CALLBACK( pwrup_tick )
 static MACHINE_START( newbrain )
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
+
+	copregint = 1;
 
 	/* find devices */
 	state->cassette1 = machine->device(CASSETTE1_TAG);

@@ -367,7 +367,7 @@ WRITE_LINE_DEVICE_HANDLER( ti99_peb_senila )
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( ti99_peb_senilb)
+WRITE_LINE_DEVICE_HANDLER( ti99_peb_senilb )
 {
 	ti99_peb_state *peb = get_safe_token(device);
 	int i;

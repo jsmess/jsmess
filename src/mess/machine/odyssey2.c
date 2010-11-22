@@ -207,6 +207,7 @@ WRITE8_HANDLER( odyssey2_putbus )
 
 ///////////////////////////////////
 
+#ifdef UNUSED_FUNCTION
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size)
 {
 	cart_size = size;
@@ -221,3 +222,4 @@ int odyssey2_cart_verify(const UINT8 *cartdata, size_t size)
 
     return IMAGE_VERIFY_FAIL;
 }
+#endif

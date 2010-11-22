@@ -67,7 +67,7 @@ static void super80_cassette_motor( running_machine *machine, UINT8 data )
 
 /********************************************* TIMER ************************************************/
 
-static UINT8 cass_data[]={ 0, 0, 0, 0 };
+static UINT8 cass_data[4]={ 0, 0, 0, 0 };
 
 	/* this timer runs at 200khz and does 2 jobs:
     1. Scan the keyboard and present the results to the pio

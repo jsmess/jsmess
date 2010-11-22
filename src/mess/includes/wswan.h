@@ -35,7 +35,7 @@
 #define WSWAN_INT_HBLTMR 7
 
 
-struct VDP
+typedef struct
 {
 	UINT8 layer_bg_enable;			/* Background layer on/off */
 	UINT8 layer_fg_enable;			/* Foreground layer on/off */
@@ -80,12 +80,12 @@ struct VDP
 	UINT8 display_vertical;			/* Should the wonderswan be held vertically? */
 	UINT8 new_display_vertical;		/* New value for the display_vertical bit (to prevent mid frame changes) */
 	emu_timer *timer;
-};
+} VDP;
 
 
 /*----------- defined in machine/wswan.c -----------*/
 
-extern struct VDP wswan_vdp;
+extern VDP wswan_vdp;
 extern UINT8 ws_portram[256];
 
 NVRAM_HANDLER( wswan );

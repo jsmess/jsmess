@@ -35,7 +35,7 @@ static int nascom1_tape_size = 0;
 static UINT8 *nascom1_tape_image = NULL;
 static int nascom1_tape_index = 0;
 
-static	struct
+static struct
 {
 	UINT8	stat_flags;
 	UINT8	stat_count;

@@ -22,8 +22,8 @@ static int joy_mode = 0;
 
 /* TODO: Are these digits correct? */
 static int KeyboardBuffer[20]; /* Buffer to store keys pressed */
-static int KbBufferCapacity = 15; /* Capacity of the Keyboard Buffer */
-static int KbRepeatDelay = 20;
+static const int KbBufferCapacity = 15; /* Capacity of the Keyboard Buffer */
+static const int KbRepeatDelay = 20;
 
 static UINT8 KbRepeatTable[256];
 

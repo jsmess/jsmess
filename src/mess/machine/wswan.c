@@ -27,7 +27,7 @@ enum enum_sram { SRAM_NONE=0, SRAM_64K, SRAM_256K, SRAM_512K, SRAM_1M, SRAM_2M, 
 static const char *const wswan_sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM", "1Kbit EEPROM", "16Kbit EEPROM", "8Kbit EEPROM", "Unknown" };
 static const int wswan_sram_size[] = { 0, 64*1024/8, 256*1024/8, 512*1024/8, 1024*1024/8, 2*1024*1024/8,  1024/8, 16*1024/8, 8*1024/8, 0 };
 
-struct EEPROM {
+typedef struct {
 	UINT8	mode;		/* eeprom mode */
 	UINT16	address;	/* Read/write address */
 	UINT8	command;	/* Commands: 00, 01, 02, 03, 04, 08, 0C */
@@ -36,9 +36,9 @@ struct EEPROM {
 	int	size;		/* size of eeprom/sram area */
 	UINT8	*data;		/* pointer to start of sram/eeprom data */
 	UINT8	*page;		/* pointer to current sram/eeprom page */
-};
+} EEPROM;
 
-struct RTC {
+typedef struct {
 	UINT8	present;	/* Is an RTC present */
 	UINT8	setting;	/* Timer setting byte */
 	UINT8	year;		/* Year */
@@ -49,13 +49,13 @@ struct RTC {
 	UINT8	minute;		/* Minute */
 	UINT8	second;		/* Second */
 	UINT8	index;		/* index for reading/writing of current of alarm time */
-};
+} RTC;
 
-struct SoundDMA {
+typedef struct {
 	UINT32	source;		/* Source address */
 	UINT16	size;		/* Size */
 	UINT8	enable;		/* Enabled */
-};
+} SoundDMA;
 
 static TIMER_CALLBACK(wswan_scanline_interrupt);
 
@@ -64,10 +64,10 @@ static UINT8 *ROMMap[256];
 static UINT32 ROMBanks;
 static UINT8 internal_eeprom[INTERNAL_EEPROM_SIZE];
 static UINT8 system_type;
-struct VDP wswan_vdp;
-static struct EEPROM eeprom;
-static struct RTC rtc;
-static struct SoundDMA sound_dma;
+VDP wswan_vdp;
+static EEPROM eeprom;
+static RTC rtc;
+static SoundDMA sound_dma;
 static UINT8 *ws_ram;
 static UINT8 *ws_bios_bank;
 static UINT8 wswan_bios_disabled;

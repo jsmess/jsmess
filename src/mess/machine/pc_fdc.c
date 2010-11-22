@@ -57,7 +57,7 @@ static TIMER_CALLBACK( watchdog_timeout );
 
 static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt );
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq );
-static UPD765_GET_IMAGE ( pc_fdc_get_image);
+static UPD765_GET_IMAGE ( pc_fdc_get_image );
 
 const upd765_interface pc_fdc_upd765_connected_interface =
 {

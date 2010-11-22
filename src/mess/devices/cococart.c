@@ -113,7 +113,7 @@ static DEVICE_START(coco_cartridge)
 	   cococart->cart_line.timer[i]		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
 	   cococart->nmi_line.timer[i] 		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
 	   cococart->halt_line.timer[i]		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
-   }
+	}
    
 	cococart->cart_line.timer_index     = 0;
 	cococart->cart_line.delay		      = 0;

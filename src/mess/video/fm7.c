@@ -8,9 +8,9 @@
 #include "cpu/m6809/m6809.h"
 #include "includes/fm7.h"
 
-struct fm7_video_flags fm7_video;
+fm7_video_t fm7_video;
 
-static struct fm7_alu_flags
+typedef struct
 {
 	UINT8 command;
 	UINT8 lcolour;
@@ -28,7 +28,8 @@ static struct fm7_alu_flags
 	UINT16 y0;
 	UINT16 y1;
 	UINT8 busy;
-} fm7_alu;
+} fm7_alu_t;
+static fm7_alu_t fm7_alu;
 
 /*
  * Main CPU: Sub-CPU interface (port 0xfd05)

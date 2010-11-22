@@ -72,9 +72,9 @@ MACHINE_STOP( cybikov2 );
 MACHINE_STOP( cybikoxt );
 
 // rs232
-static void cybiko_rs232_init( void);
-static void cybiko_rs232_exit( void);
-static void cybiko_rs232_reset( void);
+static void cybiko_rs232_init(void);
+static void cybiko_rs232_exit(void);
+static void cybiko_rs232_reset(void);
 
 ////////////////////////
 // DRIVER INIT & EXIT //
@@ -148,7 +148,7 @@ static mame_file *nvram_system_fopen( running_machine *machine, UINT32 openflags
 	return (filerr == FILERR_NONE) ? file : NULL;
 }
 
-typedef void (nvram_load_func)(running_machine *machine,  mame_file *file);
+typedef void (nvram_load_func)(running_machine *machine, mame_file *file);
 
 static int nvram_system_load( running_machine *machine, const char *name, nvram_load_func _nvram_load, int required)
 {
@@ -164,7 +164,7 @@ static int nvram_system_load( running_machine *machine, const char *name, nvram_
 	return TRUE;
 }
 
-typedef void (nvram_save_func)(running_machine *machine,  mame_file *file);
+typedef void (nvram_save_func)(running_machine *machine, mame_file *file);
 
 static int nvram_system_save( running_machine *machine, const char *name, nvram_save_func _nvram_save)
 {
@@ -342,31 +342,31 @@ typedef struct
 
 static CYBIKO_RS232 rs232;
 
-static void cybiko_rs232_init( void)
+static void cybiko_rs232_init(void)
 {
 	_logerror( 0, ("cybiko_rs232_init\n"));
 	memset( &rs232, 0, sizeof( rs232));
-//  timer_pulse(machine,  TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
+//  timer_pulse(machine, TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
-static void cybiko_rs232_exit( void)
+static void cybiko_rs232_exit(void)
 {
 	_logerror( 0, ("cybiko_rs232_exit\n"));
 }
 
-static void cybiko_rs232_reset( void)
+static void cybiko_rs232_reset(void)
 {
 	_logerror( 0, ("cybiko_rs232_reset\n"));
 }
 
-static void cybiko_rs232_write_byte( UINT8 data)
+static void cybiko_rs232_write_byte(UINT8 data)
 {
 	#if 0
 	printf( "%c", data);
 	#endif
 }
 
-static void cybiko_rs232_pin_sck( int data)
+static void cybiko_rs232_pin_sck(int data)
 {
 	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
 	// clock high-to-low
@@ -394,19 +394,19 @@ static void cybiko_rs232_pin_sck( int data)
 	rs232.pin.sck = data;
 }
 
-static void cybiko_rs232_pin_txd( int data)
+static void cybiko_rs232_pin_txd(int data)
 {
 	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
 	rs232.pin.txd = data;
 }
 
-static int cybiko_rs232_pin_rxd( void)
+static int cybiko_rs232_pin_rxd(void)
 {
 	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
 	return rs232.pin.rxd;
 }
 
-static int cybiko_rs232_rx_queue( void)
+static int cybiko_rs232_rx_queue(void)
 {
 	return 0;
 }

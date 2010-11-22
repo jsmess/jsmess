@@ -264,7 +264,7 @@ static struct
 // to use the mscrtc6845 macros
 #define REG(x) vga.crtc.data[x]
 
-#define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0) )
+#define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0))
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define CRTC_ON (vga.crtc.data[0x17]&0x80)
@@ -293,15 +293,15 @@ static struct
 #define TEXT_START_ADDRESS (EGA_START_ADDRESS)
 #define TEXT_LINE_LENGTH (EGA_LINE_LENGTH>>2)
 
-#define TEXT_COPY_9COLUMN(ch) ( (ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
+#define TEXT_COPY_9COLUMN(ch) ((ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
 
 //#define CURSOR_ON (!(vga.crtc.data[0xa]&0x20))
 //#define CURSOR_STARTLINE (vga.crtc.data[0xa]&0x1f)
 //#define CURSOR_ENDLINE (vga.crtc.data[0xb]&0x1f)
 //#define CURSOR_POS (vga.crtc.data[0xf]|(vga.crtc.data[0xe]<<8))
 
-#define FONT1 ( ((vga.sequencer.data[3]&3)|((vga.sequencer.data[3]&0x10)<<2))*0x2000)
-#define FONT2 ((((vga.sequencer.data[3]&c)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000)
+#define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
+#define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
 
 
 INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
@@ -830,7 +830,7 @@ READ8_HANDLER( vga_port_03b0_r )
 
 
 
-READ8_HANDLER( ega_port_03c0_r)
+READ8_HANDLER( ega_port_03c0_r )
 {
 	UINT8 data = 0xff;
 	switch (offset) {
