@@ -4,21 +4,33 @@
 
         12/05/2009 Skeleton driver.
 
+	STATUS:
+	- It runs, keyboard works, you can enter data
+
+	TODO:
+	- Proper artwork
+	- Add status LEDs
+	- Add beeper
+	- Add extra interrupt stuff
+	- Assign more appropriate keys
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "h8.lh"
 
+#define H8_CLOCK (XTAL_12_288MHz / 6)
+#define H8_BEEP_FRQ (H8_CLOCK / 1024)
+#define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
+
 static UINT8 h8_digit;
 static UINT8 h8_segment;
 
-static void h8_display(void)
+
+static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
-	UINT8 i;
-	for (i = 0; i < 9; i++)
-		if (h8_digit & (1 << i))
-			output_set_digit_value(8-i, h8_segment);
+	cpu_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 static READ8_HANDLER( h8_f0_r )
@@ -43,7 +55,6 @@ static READ8_HANDLER( h8_f0_r )
 				data &= ~(i<<5);
 		data &= 0xef;
 	}
-	//printf("Key=%X ",data);
 	return data;
 }
 
@@ -56,11 +67,11 @@ static WRITE8_HANDLER( h8_f0_w )
     // d7 = beeper enable (hi)
 
 	h8_digit = data & 15;
-	if (h8_digit) h8_display();
-	if (~data & 0x40) cpu_set_input_line_and_vector(space->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
-	if (data & 0x10) cpu_set_input_line_and_vector(space->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
+	//if (~data & 0x40) h8_irqset(space->machine, 160, 0xcf);
+	//if (data & 0x10) h8_irqset(space->machine, 160, 0xd7);
 
-	//printf("f0=%X ",data);
+	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( h8_f1_w )
@@ -74,9 +85,8 @@ static WRITE8_HANDLER( h8_f1_w )
     //d1 segment a
     //d0 segment g
 
-	h8_segment = BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (h8_digit) h8_display();
-	//printf("f1=%X ",data);
+	h8_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
+	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
 }
 
 static ADDRESS_MAP_START(h8_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -122,28 +132,26 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(h8)
 {
-	cpu_set_input_line_and_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
 {
-    // operate the ION LED
+        // operate the ION LED
 }
 
 static WRITE8_DEVICE_HANDLER( h8_status_callback )
 {
 	if (data & I8085_STATUS_INTA)
 	{
-		// interrupt acknowledge
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+        // This is when the vector is presented to the CPU
 	}
 	if (data & I8085_STATUS_M1)
 	{
-		// operate the RUN LED
+        // operate the RUN LED
 	}
 }
 
-static I8085_CONFIG( h8_i8080_config )
+static I8085_CONFIG( h8_cpu_config )
 {
 	DEVCB_HANDLER(h8_status_callback),		/* Status changed callback */
 	DEVCB_LINE(h8_inte_callback),			/* INTE changed callback */
@@ -153,12 +161,13 @@ static I8085_CONFIG( h8_i8080_config )
 
 static MACHINE_CONFIG_START( h8, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, XTAL_12_288MHz / 6)
+	MDRV_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(h8_mem)
 	MDRV_CPU_IO_MAP(h8_io)
-	MDRV_CPU_CONFIG(h8_i8080_config)
+	MDRV_CPU_CONFIG(h8_cpu_config)
 
 	MDRV_MACHINE_RESET(h8)
+	MDRV_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, HZ(H8_IRQ_PULSE) )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_h8)

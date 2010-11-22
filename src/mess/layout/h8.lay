@@ -17,31 +17,31 @@
 		<bezel element="background">
 			<bounds left="1" top="1" right="600" bottom="480" />
 		</bezel>
-		<bezel name="digit0" element="digit">
+		<bezel name="digit1" element="digit">
 			<bounds left="107" top="105" right="154" bottom="185" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit2" element="digit">
 			<bounds left="155" top="105" right="202" bottom="185" />
 		</bezel>
-		<bezel name="digit2" element="digit">
+		<bezel name="digit3" element="digit">
 			<bounds left="203" top="105" right="250" bottom="185" />
 		</bezel>
-		<bezel name="digit3" element="digit">
+		<bezel name="digit4" element="digit">
 			<bounds left="275" top="105" right="322" bottom="185" />
 		</bezel>
-		<bezel name="digit4" element="digit">
+		<bezel name="digit5" element="digit">
 			<bounds left="323" top="105" right="370" bottom="185" />
 		</bezel>
-		<bezel name="digit5" element="digit">
+		<bezel name="digit6" element="digit">
 			<bounds left="371" top="105" right="418" bottom="185" />
 		</bezel>
-		<bezel name="digit6" element="digit">
+		<bezel name="digit7" element="digit">
 			<bounds left="443" top="105" right="490" bottom="185" />
 		</bezel>
-		<bezel name="digit7" element="digit">
+		<bezel name="digit8" element="digit">
 			<bounds left="491" top="105" right="538" bottom="185" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit9" element="digit">
 			<bounds left="539" top="105" right="586" bottom="185" />
 		</bezel>
 	</view>
