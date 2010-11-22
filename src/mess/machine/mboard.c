@@ -29,7 +29,6 @@ static UINT8 border_pieces[12] = {WK,WQ,WR,WB,WN,WP,BK,BQ,BR,BB,BN,BP,};
 
 static int m_board[64];
 static int save_board[64];
-
 static UINT16 Line18_LED;
 static UINT16 Line18_REED;
 
@@ -68,7 +67,7 @@ static UINT8 read_board(void)
 
 /*
 
-Example board scan: 
+Example board scan:
 Starting postion and pawn on E2 is lifted
 
 
@@ -85,7 +84,7 @@ data: ff 1111 1111	all fields empty
 mask: fb 1111 1011	Line 3
 data: ff 1111 1111	all fields empty
 mask: fd 1111 1101	Line 2
-data: 10 0001 0000	E2 is empty rest is occupied 
+data: 10 0001 0000	E2 is empty rest is occupied
 mask: fe 1111 1110	Line 1
 data:  0 0000 0000	all fields occupied
 
@@ -120,7 +119,7 @@ static void write_board( running_machine *machine, UINT8 data)
 		Line18_LED = 0;
 	else
 		Line18_LED = data;
-	
+
 	 read_board_flag = FALSE;
 
 	if (data == 0xff)
@@ -145,7 +144,6 @@ data:  10 0001 0000	Line E
 
 */
 
-
 	for (i=0; i < 64; i++)							/* all  LED's off */
 		output_set_led_value(i, 0);
 
@@ -157,11 +155,11 @@ data:  10 0001 0000	Line E
 			{
 				for (i_18 = 0; i_18 < 8; i_18++)
 				{
-					LED = (i_18*8 + 8-i_AH-1);		
-					if (!(Line18_LED & (1 << i_18)))	/* cleared bit */ 
+					LED = (i_18*8 + 8-i_AH-1);
+					if (!(Line18_LED & (1 << i_18)))	/* cleared bit */
 						output_set_led_value(LED, 1);
-					else
-						output_set_led_value(LED, 0);
+					//else
+					//	output_set_led_value(LED, 0);
 				}
 			}
 		}
@@ -176,6 +174,7 @@ READ8_HANDLER( mboard_read_board_8 )
 	UINT8 data;
 
 	data=read_board();
+	logerror("Read Board Port  Data = %d\n  ",data);
 	return data;
 }
 
@@ -198,38 +197,47 @@ READ32_HANDLER( mboard_read_board_32 )
 WRITE8_HANDLER( mboard_write_board_8 )
 {
 	write_board(space->machine,data);
+	logerror("Write Board Port  Data = %02x\n  ",data);
 }
 
 WRITE16_HANDLER( mboard_write_board_16 )
 {
+	if (data && 0xff) write_board(space->machine,data);
+	logerror("write board 16 %08x\n",data);
 	write_board(space->machine,data>>8);
 }
 
 WRITE32_HANDLER( mboard_write_board_32 )
 {
+	data |= data << 24;
+	logerror("write board 32 o: %08x d: %08x\n",offset,data);
 	write_board(space->machine,data>>24);
 }
 
 WRITE8_HANDLER( mboard_write_LED_8 )
 {
-	 write_LED(data);
+	write_LED(data);
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(7));
 }
 
 WRITE16_HANDLER( mboard_write_LED_16 )
 {
 	 write_LED(data >> 8);
+	 cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(9));
 }
 
 WRITE32_HANDLER( mboard_write_LED_32 )
 {
-	 write_LED(data >> 24);
+	data = data | data << 24;
+	write_LED(data >> 24);
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
 }
 
 TIMER_CALLBACK( mboard_update_artwork )
 {
 	check_board_buttons(machine);
 	set_artwork(machine);
-	mboard_set_boarder_pieces(); 
+	set_boarder_pieces();
 }
 
 /* save states callback */
@@ -317,7 +325,7 @@ static void check_board_buttons ( running_machine *machine )
 
 	if (click_on_boarder_piece)
 	{
-		if (!mouse_down) 
+		if (!mouse_down)
 		{
 			if (border_pieces[i] > 12 )		/* second click on selected border piece */
 			{
@@ -405,7 +413,7 @@ static void check_board_buttons ( running_machine *machine )
 			mouse_hold.piece = 0;
 			mouse_hold.border_piece = FALSE;
 		}
-			
+
 		return;
 	}
 
