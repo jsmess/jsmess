@@ -1026,6 +1026,8 @@ static void c65_common_driver_init( running_machine *machine )
 
 	/* C65 had no datasette port */
 	c64_tape_on = 0;
+	c64_game = 1;
+	c64_exrom = 1;
 
 	/*memset(c64_memory + 0x40000, 0, 0x800000 - 0x40000); */
 }

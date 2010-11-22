@@ -760,6 +760,11 @@ TIMER_CALLBACK( c64_tape_timer )
 
 static void c64_common_driver_init( running_machine *machine )
 {
+	cbm_common_init();
+	c64_game = 1;
+	c64_exrom = 1;
+	old_data = -1;
+
 	if (!ultimax)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
@@ -834,10 +839,6 @@ DRIVER_INIT( sx64 )
 
 MACHINE_START( c64 )
 {
-	cbm_common_init();
-	c64_game = 1;
-	c64_exrom = 1;
-	old_data = -1;
 	c64_port_data = 0x17;
 
 	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);

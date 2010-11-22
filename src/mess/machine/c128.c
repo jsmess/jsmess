@@ -1151,6 +1151,8 @@ static void c128_common_driver_init( running_machine *machine )
 	c128_vdcram = ram + 0x122800;
 
 	c64_tape_on = 1;
+	c64_game = 1;
+	c64_exrom = 1;
 	c64_pal = 0;
 	c64mode = 0;
 	c128_cia1_on = 1;
@@ -1159,6 +1161,7 @@ static void c128_common_driver_init( running_machine *machine )
 	c128_monitor = -1;
 	c128_cnt1 = 1;
 	c128_sp1 = 1;
+	cbm_common_init();
 	c128_keyline[0] = c128_keyline[1] = c128_keyline[2] = 0xff;
 
 	for (i = 0; i < 0x100; i++)
