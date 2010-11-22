@@ -233,12 +233,6 @@ WRITE32_HANDLER( mboard_write_LED_32 )
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
 }
 
-TIMER_CALLBACK( mboard_update_artwork )
-{
-	check_board_buttons(machine);
-	set_artwork(machine);
-	set_boarder_pieces();
-}
 
 /* save states callback */
 
@@ -285,11 +279,18 @@ static void set_artwork ( running_machine *machine )
 		output_set_indexed_value("P", i, m_board[i]);
 }
 
-void mboard_set_boarder_pieces (void)
+void mboard_set_border_pieces (void)
 {
 	int i;
 	for (i=0;i<12;i++)
 		output_set_indexed_value("Q", i, border_pieces[i]);
+}
+
+TIMER_CALLBACK( mboard_update_artwork )
+{
+	check_board_buttons(machine);
+	set_artwork(machine);
+	mboard_set_border_pieces();
 }
 
 static void check_board_buttons ( running_machine *machine )
@@ -304,7 +305,7 @@ static void check_board_buttons ( running_machine *machine )
 	UINT8 pos2num_res = 0;
 	board_row++;
 	board_row &= 7;
-	int click_on_boarder_piece=FALSE;
+	int click_on_border_piece=FALSE;
 
 
 /* check click on border pieces */
@@ -313,17 +314,17 @@ static void check_board_buttons ( running_machine *machine )
 	if (port_input)
 	{
 		i=get_first_bit(port_input)+6;
-		click_on_boarder_piece=TRUE;
+		click_on_border_piece=TRUE;
 	}
 
 	port_input=input_port_read(machine, "B_WHITE");
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
-		click_on_boarder_piece=TRUE;
+		click_on_border_piece=TRUE;
 	}
 
-	if (click_on_boarder_piece)
+	if (click_on_border_piece)
 	{
 		if (!mouse_down)
 		{
