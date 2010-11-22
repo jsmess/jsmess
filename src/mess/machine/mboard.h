@@ -32,7 +32,7 @@ enum
 };
 
 #define NOT_VALID		99
-#define BOARDER_PIECE	64
+#define BORDER_PIECE	64
 
 #define IsPiece(x)		((m_board[x] >=1) && (m_board[x] <=12))
 
@@ -69,7 +69,7 @@ TIMER_CALLBACK( mboard_update_artwork );
 void mboard_savestate_register(running_machine *machine);
 
 void mboard_set_board( void );
-void mboard_set_boarder_pieces (void);
+void mboard_set_border_pieces (void);
 
 INLINE UINT8 pos_to_num(UINT8 val)
 {
