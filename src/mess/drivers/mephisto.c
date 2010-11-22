@@ -112,14 +112,14 @@ static WRITE8_HANDLER ( write_led_mm2 )
 	data &= 0x80;
 
 	if (data==0)
-		led_status &= 255-(1<<offset); 
-	else 
+		led_status &= 255-(1<<offset);
+	else
 		led_status|=1<<offset;
 
 	if (offset<6)
 		output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
 
-	if (offset==7) 
+	if (offset==7)
 	    led7= data & 0x80 ? 0xff :0x00;	//MM2
 
 }
@@ -144,20 +144,20 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( mboard_write_board_8)		// Chessboard
 	AM_RANGE( 0x3800, 0x3800) AM_RAM						// unknwon write access
-	AM_RANGE( 0x3000, 0x3000) AM_READ( mboard_read_board_8 )		// Chessboard	
+	AM_RANGE( 0x3000, 0x3000) AM_READ( mboard_read_board_8 )		// Chessboard
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mm2_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE(&mephisto_ram )	
-	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )				
-	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )					
+	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE(&mephisto_ram )
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )
+	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )
 	AM_RANGE( 0x1000, 0x1007) AM_WRITE( write_led_mm2 )		//Status LEDs
 
-	AM_RANGE( 0x3000, 0x3000) AM_WRITE ( mboard_write_LED_8 )		//Chessboard  
+	AM_RANGE( 0x3000, 0x3000) AM_WRITE ( mboard_write_LED_8 )		//Chessboard
 	AM_RANGE( 0x3800, 0x3800) AM_WRITE ( mboard_write_board_8)		//Chessboard
-	AM_RANGE( 0x2000, 0x2000) AM_READ( mboard_read_board_8 )		//Chessboard		 	
+	AM_RANGE( 0x2000, 0x2000) AM_READ( mboard_read_board_8 )		//Chessboard
 
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library ?
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
@@ -240,7 +240,7 @@ static INPUT_PORTS_START( board )
 	PORT_START("LINE10")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_WHITE") 
+	PORT_START("B_WHITE")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
@@ -248,7 +248,7 @@ static INPUT_PORTS_START( board )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_BLACK") 
+	PORT_START("B_BLACK")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
@@ -256,7 +256,7 @@ static INPUT_PORTS_START( board )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
-	PORT_START("B_BUTTONS") 
+	PORT_START("B_BUTTONS")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 
@@ -334,7 +334,7 @@ static MACHINE_START( mm2 )
 	lcd_shift_counter=3;
 	led7=0xff;
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(450), NULL, 0, update_irq);	
+	timer_pulse(machine, ATTOTIME_IN_HZ(450), NULL, 0, update_irq);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
 
 	mboard_savestate_register(machine);
@@ -345,7 +345,7 @@ static MACHINE_RESET( mephisto )
 {
 	lcd_shift_counter = 3;
 
-	mboard_set_boarder_pieces();
+	mboard_set_border_pieces();
 	mboard_set_board();
 
 /* adjust artwork depending on current emulation*/
@@ -382,7 +382,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
-//	MDRV_IMPORT_FROM( mephisto )		 
+//	MDRV_IMPORT_FROM( mephisto )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
