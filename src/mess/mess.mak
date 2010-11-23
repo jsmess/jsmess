@@ -500,6 +500,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/cdp1861.o		\
 	$(MESS_VIDEO)/cdp1862.o		\
 	$(MESS_VIDEO)/crt9007.o		\
+	$(MESS_VIDEO)/crt9021.o		\
 	$(MESS_VIDEO)/crt9212.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\

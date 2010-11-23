@@ -39,6 +39,7 @@
 #include "machine/upd765.h"
 #include "sound/speaker.h"
 #include "video/crt9007.h"
+#include "video/crt9021.h"
 #include "video/crt9212.h"
 #include "includes/tandy2k.h"
 
@@ -207,6 +208,7 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 	if (m_clkspd != BIT(data, 5))
 	{
 		m_vpac->set_unscaled_clock(BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
+		m_vac->set_unscaled_clock(BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
 		m_clkspd = BIT(data, 5);
 	}
 
@@ -477,7 +479,7 @@ bool tandy2k_state::video_update(screen_device &screen, bitmap_t &bitmap, const 
 {
 	if (m_vidouts)
 	{
-		//m_vag->update_screen(&bitmap, &cliprect);
+		m_vac->update_screen(&bitmap, &cliprect);
 	}
 
 	return 0;
@@ -507,37 +509,70 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 	}
 }
 */
+	
+WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
+{
+	m_drb0->clrcnt_w(state);
+	m_drb1->clrcnt_w(state);
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::vpac_drb_w )
+{
+	m_drb0->tog_w(state);
+	m_drb1->tog_w(state);
+}
+
 static CRT9007_INTERFACE( vpac_intf )
 {
 	SCREEN_TAG,
 	10,
 	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
 	DEVCB_NULL,	// DMAR		80186 HOLD
-	DEVCB_NULL,	// VS		CRT9021B U14 VSYNC
+	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, vsync_w), // VS
 	DEVCB_NULL,	// HS
-	DEVCB_NULL,	// VLT		CRT9212 U55/U15 _CLRCNT
-	DEVCB_NULL,	// CURS		CRT9021B U14 CURSOR
-	DEVCB_NULL,	// DRB		CRT9212 U55/U15 TOG
-	DEVCB_NULL,	// SLG		CRT9021B U14 _SLG
-	DEVCB_NULL	// SLD		CRT9021B U14 SLD
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vpac_vlt_w), // VLT
+	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, cursor_w), // CURS
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vpac_drb_w), // DRB
+	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, slg_w), // SLG
+	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, sld_w) // SLD
 };
 
 static CRT9212_INTERFACE( drb0_intf )
 {
 	DEVCB_NULL, // ROF
 	DEVCB_NULL, // WOF
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r),
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r),
-	DEVCB_LINE_VCC
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r), // REN
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r), // WEN
+	DEVCB_LINE_VCC // WEN2
 };
 
 static CRT9212_INTERFACE( drb1_intf )
 {
 	DEVCB_NULL, // ROF
 	DEVCB_NULL, // WOF
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r),
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r),
-	DEVCB_LINE_VCC
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r), // REN
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r), // WEN
+	DEVCB_LINE_VCC // WEN2
+};
+
+WRITE_LINE_MEMBER( tandy2k_state::vac_ld_ht_w )
+{
+	for (int state = 0; state < 2; state++)
+	{
+		m_drb0->rclk_w(state);
+		m_drb0->wclk_w(state);
+		m_drb1->rclk_w(state);
+		m_drb1->wclk_w(state);
+	}
+}
+
+static CRT9021_INTERFACE( vac_intf )
+{
+	SCREEN_TAG,
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vac_ld_ht_w), // _LD/HT
+	DEVCB_DEVICE_MEMBER(CRT9212_0_TAG, crt9212_device, read), // data
+	DEVCB_DEVICE_MEMBER(CRT9212_1_TAG, crt9212_device, read), // attributes
+	DEVCB_LINE_VCC // ATTEN
 };
 
 /* Intel 8251A Interface */
@@ -837,6 +872,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
 	MDRV_CRT9212_ADD(CRT9212_0_TAG, drb0_intf)
 	MDRV_CRT9212_ADD(CRT9212_1_TAG, drb1_intf)
+	MDRV_CRT9021_ADD(CRT9021B_TAG, XTAL_16MHz*28/16, vac_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

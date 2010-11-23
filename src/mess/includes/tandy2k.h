@@ -29,9 +29,10 @@ public:
 		  m_fdc(*this, I8272A_TAG),
 		  m_pic0(*this, I8259A_0_TAG),
 		  m_pic1(*this, I8259A_1_TAG),
+		  m_vpac(*this, CRT9007_TAG),
 		  m_drb0(*this, CRT9212_0_TAG),
 		  m_drb1(*this, CRT9212_1_TAG),
-		  m_vpac(*this, CRT9007_TAG),
+		  m_vac(*this, CRT9021B_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, "messram"),
@@ -48,7 +49,7 @@ public:
 	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
-//	required_device<crt9201_device> m_vag;
+	required_device<crt9021_device> m_vac;
 	required_device<running_device> m_centronics;
 	required_device<running_device> m_speaker;
 	required_device<running_device> m_ram;
@@ -76,6 +77,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rfrqpulse_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
+	DECLARE_WRITE_LINE_MEMBER( vac_ld_ht_w );
 
 	/* DMA state */
 	UINT8 m_dma_mux;
