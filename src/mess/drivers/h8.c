@@ -10,14 +10,15 @@
 	TODO:
 	- Proper artwork
 	- Add status LEDs
-	- Add beeper
 	- Add extra interrupt stuff
 	- Assign more appropriate keys
+	- Add load/dump facility (cassette port)
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/beep.h"
 #include "h8.lh"
 
 #define H8_CLOCK (XTAL_12_288MHz / 6)
@@ -26,7 +27,7 @@
 
 static UINT8 h8_digit;
 static UINT8 h8_segment;
-
+static running_device *h8_beeper;
 
 static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
@@ -60,11 +61,12 @@ static READ8_HANDLER( h8_f0_r )
 
 static WRITE8_HANDLER( h8_f0_w )
 {
+    // this will always turn off int10 that was set by the timer
     // d0-d3 = digit select
     // d4 = int20 (hi)
     // d5 = mon LED (lo)
     // d6 = int10 (lo)
-    // d7 = beeper enable (hi)
+    // d7 = beeper enable (lo)
 
 	h8_digit = data & 15;
 	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
@@ -72,6 +74,7 @@ static WRITE8_HANDLER( h8_f0_w )
 	//if (data & 0x10) h8_irqset(space->machine, 160, 0xd7);
 
 	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
+	beep_set_state(h8_beeper, (data & 0x80) ? 0 : 1);
 }
 
 static WRITE8_HANDLER( h8_f1_w )
@@ -132,6 +135,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(h8)
 {
+	h8_beeper = machine->device("beep");
+	beep_set_frequency(h8_beeper, H8_BEEP_FRQ);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
@@ -171,6 +176,11 @@ static MACHINE_CONFIG_START( h8, driver_device )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_h8)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -190,4 +200,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,	h8, 	h8, 	 0, 		 "Heath, Inc.",   "Heathkit H8",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1977, h8,  0,       0,	h8, 	h8, 	 0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )
