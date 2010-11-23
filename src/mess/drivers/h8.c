@@ -9,7 +9,6 @@
 
 	TODO:
 	- Proper artwork
-	- Add status LEDs
 	- Add extra interrupt stuff
 	- Add load/dump facility (cassette port)
 
@@ -62,17 +61,17 @@ static WRITE8_HANDLER( h8_f0_w )
 {
     // this will always turn off int10 that was set by the timer
     // d0-d3 = digit select
-    // d4 = int20 (hi)
-    // d5 = mon LED (lo)
-    // d6 = int10 (lo)
-    // d7 = beeper enable (lo)
+    // d4 = int20
+    // d5 = mon LED
+    // d6 = int10
+    // d7 = beeper enable
 
+	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
 	h8_digit = data & 15;
 	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
 	//if (~data & 0x40) h8_irqset(space->machine, 160, 0xcf);
 	//if (data & 0x10) h8_irqset(space->machine, 160, 0xd7);
-
-	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
+	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
 	beep_set_state(h8_beeper, (data & 0x80) ? 0 : 1);
 }
 
@@ -94,7 +93,7 @@ static WRITE8_HANDLER( h8_f1_w )
 static ADDRESS_MAP_START(h8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
+	AM_RANGE(0x2000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8_io , ADDRESS_SPACE_IO, 8)
@@ -136,23 +135,19 @@ static MACHINE_RESET(h8)
 {
 	h8_beeper = machine->device("beep");
 	beep_set_frequency(h8_beeper, H8_BEEP_FRQ);
+	output_set_value("pwr_led", 0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
 {
         // operate the ION LED
+	output_set_value("ion_led",(state) ? 0 : 1);
 }
 
 static WRITE8_DEVICE_HANDLER( h8_status_callback )
 {
-	if (data & I8085_STATUS_INTA)
-	{
-        // This is when the vector is presented to the CPU
-	}
-	if (data & I8085_STATUS_M1)
-	{
         // operate the RUN LED
-	}
+	output_set_value("run_led", (data & I8085_STATUS_M1) ? 1 : 0);
 }
 
 static I8085_CONFIG( h8_cpu_config )

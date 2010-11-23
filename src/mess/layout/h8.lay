@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="digit" defstate="0">
+	<element name="digit">
 		<led7seg>
 			<color red="0.75" green="0.0" blue="0.0" />
 		</led7seg>
+	</element>
+	<element name="red_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
 	</element>
 	<element name="background">
 		<rect>
@@ -12,7 +17,7 @@
 		</rect>
 	</element>
 
-	<view name="Simple LCD">
+	<view name="Heathkit H8">
 		<!-- Black background -->
 		<bezel element="background">
 			<bounds left="1" top="1" right="600" bottom="480" />
@@ -43,6 +48,18 @@
 		</bezel>
 		<bezel name="digit9" element="digit">
 			<bounds left="539" top="105" right="586" bottom="185" />
+		</bezel>
+		<bezel name="ion_led" element="red_led">
+			<bounds left="40" right="55" top="100" bottom="118" />
+		</bezel>
+		<bezel name="mon_led" element="red_led">
+			<bounds left="40" right="55" top="125" bottom="142" />
+		</bezel>
+		<bezel name="run_led" element="red_led">
+			<bounds left="40" right="55" top="150" bottom="166" />
+		</bezel>
+		<bezel name="pwr_led" element="red_led">
+			<bounds left="40" right="55" top="175" bottom="190" />
 		</bezel>
 	</view>
 </mamelayout>
