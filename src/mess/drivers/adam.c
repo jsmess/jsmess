@@ -424,47 +424,48 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( adam_interrupt )
 {
-    TMS9928A_interrupt(device->machine);
-    adam_explore_keyboard(device->machine);
+	TMS9928A_interrupt(device->machine);
+	adam_explore_keyboard(device->machine);
 }
 
-static void adam_vdp_interrupt (running_machine *machine, int state)
+static void adam_vdp_interrupt(running_machine *machine, int state)
 {
-	static int last_state = 0;
-
-    /* only if it goes up */
-	if (state && !last_state)
-    {
-        cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-    }
-	last_state = state;
+	adam_state *drvstate = machine->driver_data<adam_state>();
+	/* only if it goes up */
+	if (state && !drvstate->last_state)
+	{
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	}
+	drvstate->last_state = state;
 }
 
 static TIMER_CALLBACK(adam_paddle_callback)
 {
+	adam_state *state = machine->driver_data<adam_state>();
 	int port7 = input_port_read(machine, "controller1_analog");
 	int port8 = input_port_read(machine, "controller2_analog");
 
 	if (port7 == 0)
-		adam_joy_stat[0] = 0;
+		state->joy_stat[0] = 0;
 	else if (port7 & 0x08)
-		adam_joy_stat[0] = -1;
+		state->joy_stat[0] = -1;
 	else
-		adam_joy_stat[0] = 1;
+		state->joy_stat[0] = 1;
 
 	if (port8 == 0)
-		adam_joy_stat[1] = 0;
+		state->joy_stat[1] = 0;
 	else if (port8 & 0x08)
-		adam_joy_stat[1] = -1;
+		state->joy_stat[1] = -1;
 	else
-		adam_joy_stat[1] = 1;
+		state->joy_stat[1] = 1;
 
-	if (adam_joy_stat[0] || adam_joy_stat[1])
+	if (state->joy_stat[0] || state->joy_stat[1])
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 void adam_set_memory_banks(running_machine *machine)
 {
+	adam_state *state = machine->driver_data<adam_state>();
 /*
 Lineal virtual memory map:
 
@@ -481,10 +482,10 @@ Lineal virtual memory map:
 	UINT8 *BankBase;
 	BankBase = &memory_region(machine, "maincpu")[0x00000];
 
-	switch (adam_lower_memory)
+	switch (state->lower_memory)
 	{
 		case 0: /* SmartWriter ROM */
-			if (adam_net_data & 0x02)
+			if (state->net_data & 0x02)
 			{
 				/* Read */
 				memory_set_bankptr(machine, "bank1", BankBase+0x32000); /* No data here */
@@ -553,7 +554,7 @@ Lineal virtual memory map:
 			memory_set_bankptr(machine, "bank9", BankBase+0x06000);
 	}
 
-	switch (adam_upper_memory)
+	switch (state->upper_memory)
 	{
 		case 0: /* Internal RAM */
 			/* Read */
@@ -577,11 +578,12 @@ Lineal virtual memory map:
 
 void adam_reset_pcb(running_machine *machine)
 {
-    int i;
-    memory_region(machine, "maincpu")[adam_pcb] = 0x01;
+	adam_state *state = machine->driver_data<adam_state>();
+	int i;
+	memory_region(machine, "maincpu")[state->pcb] = 0x01;
 
 	for (i = 0; i < 15; i++)
-		memory_region(machine, "maincpu")[(adam_pcb+4+i*21)&0xFFFF]=i+1;
+		memory_region(machine, "maincpu")[(state->pcb+4+i*21)&0xFFFF]=i+1;
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -600,25 +602,26 @@ static MACHINE_START( adam )
 
 static MACHINE_RESET( adam )
 {
+	adam_state *state = machine->driver_data<adam_state>();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
 
 	if (image->exists())
 	{
 		/* ColecoVision Mode Reset (Cartridge Mounted) */
-		adam_lower_memory = 3; /* OS7 + 24k RAM */
-		adam_upper_memory = 3; /* Cartridge ROM */
+		state->lower_memory = 3; /* OS7 + 24k RAM */
+		state->upper_memory = 3; /* Cartridge ROM */
 	}
 	else
 	{
 		/* Adam Mode Reset */
-		adam_lower_memory = 0; /* SmartWriter ROM/EOS */
-		adam_upper_memory = 0; /* Internal RAM */
+		state->lower_memory = 0; /* SmartWriter ROM/EOS */
+		state->upper_memory = 0; /* Internal RAM */
 	}
 
-	adam_net_data = 0;
+	state->net_data = 0;
 	adam_set_memory_banks(machine);
-	adam_pcb=0xFEC0;
-	adam_clear_keyboard_buffer();
+	state->pcb=0xFEC0;
+	adam_clear_keyboard_buffer(machine);
 
 	memset(&memory_region(machine, "maincpu")[0x0000], 0xFF, 0x20000); /* Initializing RAM */
 }
@@ -635,13 +638,13 @@ static const floppy_config adam_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( adam, driver_device )
+static MACHINE_CONFIG_START( adam, adam_state )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(adam_mem)
 	MDRV_CPU_IO_MAP(adam_io)
 
-    /* Master M6801 AdamNet controller */
+	/* Master M6801 AdamNet controller */
 	//MDRV_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */
 	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
 
@@ -650,7 +653,7 @@ static MACHINE_CONFIG_START( adam, driver_device )
 	MDRV_MACHINE_START( adam )
 	MDRV_MACHINE_RESET( adam )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)

@@ -218,7 +218,7 @@ static const cassette_config apple1_cassette_config =
 };
 
 /* machine definition */
-static MACHINE_CONFIG_START( apple1, driver_device )
+static MACHINE_CONFIG_START( apple1, apple1_state )
 	/* basic machine hardware */
 	/* Actual CPU speed is 1.023 MHz, but RAM refresh effectively
        slows it to 960 kHz. */

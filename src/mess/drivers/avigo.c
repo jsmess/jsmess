@@ -41,13 +41,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/avigo.h"
-#include "machine/intelfsh.h"
 #include "machine/tc8521.h"
 #include "machine/ins8250.h"
 #include "sound/speaker.h"
 #include "devices/messram.h"
 
-static UINT8 avigo_key_line;
 /*
     bit 7:                      ?? high priority. When it occurs, clear this bit.
     bit 6: pen int
@@ -68,25 +66,15 @@ static UINT8 avigo_key_line;
 
 */
 
-static UINT8 avigo_irq;
 
 /* bit 3 = speaker state */
-static UINT8 avigo_speaker_data;
 
 /* bits 0-5 define bank index */
-static unsigned long avigo_ram_bank_l;
-static unsigned long avigo_ram_bank_h;
 /* bits 0-5 define bank index */
-static unsigned long avigo_rom_bank_l;
-static unsigned long avigo_rom_bank_h;
-static unsigned long avigo_ad_control_status;
-static intelfsh8_device *avigo_flashes[3];
-static int avigo_flash_at_0x4000;
-static int avigo_flash_at_0x8000;
-static void *avigo_banked_opbase[4];
 
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
+	avigo_state *state = machine->driver_data<avigo_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char bank_1[10];
 	char bank_5[10];
@@ -97,7 +85,7 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 	{
 		memory_set_bankptr(machine, bank_1, address);
 		memory_set_bankptr(machine, bank_5, address);
-		avigo_banked_opbase[bank] = ((UINT8 *) address) - (bank * 0x4000);
+		state->banked_opbase[bank] = ((UINT8 *) address) - (bank * 0x4000);
 	}
 	if (rh)
 	{
@@ -116,44 +104,51 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 /* memory 0x0000-0x03fff */
 static  READ8_HANDLER(avigo_flash_0x0000_read_handler)
 {
-	return avigo_flashes[0]->read(offset);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->flashes[0]->read(offset);
 }
 
 /* memory 0x04000-0x07fff */
 static  READ8_HANDLER(avigo_flash_0x4000_read_handler)
 {
-	return avigo_flashes[avigo_flash_at_0x4000]->read((avigo_rom_bank_l<<14) | offset);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->flashes[state->flash_at_0x4000]->read((state->rom_bank_l<<14) | offset);
 }
 
 /* memory 0x0000-0x03fff */
 static WRITE8_HANDLER(avigo_flash_0x0000_write_handler)
 {
-	avigo_flashes[0]->write(offset, data);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	state->flashes[0]->write(offset, data);
 }
 
 /* memory 0x04000-0x07fff */
 static WRITE8_HANDLER(avigo_flash_0x4000_write_handler)
 {
-	avigo_flashes[avigo_flash_at_0x4000]->write((avigo_rom_bank_l<<14) | offset, data);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	state->flashes[state->flash_at_0x4000]->write((state->rom_bank_l<<14) | offset, data);
 }
 
 /* memory 0x08000-0x0bfff */
 static  READ8_HANDLER(avigo_flash_0x8000_read_handler)
 {
-	return avigo_flashes[avigo_flash_at_0x8000]->read((avigo_ram_bank_l<<14) | offset);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->flashes[state->flash_at_0x8000]->read((state->ram_bank_l<<14) | offset);
 }
 
 #ifdef UNUSED_FUNCTION
 /* memory 0x08000-0x0bfff */
 static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 {
-	avigo_flashes[avigo_flash_at_0x8000]->write((avigo_rom_bank_l<<14) | offset, data);
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	state->flashes[state->flash_at_0x8000]->write((state->rom_bank_l<<14) | offset, data);
 }
 #endif
 
 static void avigo_refresh_ints(running_machine *machine)
 {
-	if (avigo_irq!=0)
+	avigo_state *state = machine->driver_data<avigo_state>();
+	if (state->irq!=0)
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -161,21 +156,16 @@ static void avigo_refresh_ints(running_machine *machine)
 
 
 /* previous input port data */
-static int previous_input_port_data[4];
-static int stylus_marker_x;
-static int stylus_marker_y;
-static int stylus_press_x;
-static int stylus_press_y;
 
 /* this is not a real interrupt. This timer updates the stylus position from mouse
 movements, and checks if the mouse button is pressed to emulate a press of the stylus to the screen.
 */
 static TIMER_CALLBACK(avigo_dummy_timer_callback)
 {
+	avigo_state *state = machine->driver_data<avigo_state>();
 	int i;
 	int current_input_port_data[4];
 	int changed;
-	static int ox = 0, oy = 0;
 	int nx,ny;
 	int dx, dy;
 	static const char *const linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
@@ -185,7 +175,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		current_input_port_data[i] = input_port_read(machine, linenames[i]);
 	}
 
-	changed = current_input_port_data[3]^previous_input_port_data[3];
+	changed = current_input_port_data[3]^state->previous_input_port_data[3];
 
 	if ((changed & 0x01)!=0)
 	{
@@ -194,15 +184,15 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 			/* pen pressed to screen */
 
 			logerror("pen pressed interrupt\n");
-			stylus_press_x = stylus_marker_x;
-			stylus_press_y = stylus_marker_y;
+			state->stylus_press_x = state->stylus_marker_x;
+			state->stylus_press_y = state->stylus_marker_y;
 			/* set pen interrupt */
-			avigo_irq |= (1<<6);
+			state->irq |= (1<<6);
 		}
 		else
 		{
-			stylus_press_x = 0;
-			stylus_press_y = 0;
+			state->stylus_press_x = 0;
+			state->stylus_press_y = 0;
 		}
 	}
 
@@ -217,27 +207,27 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 
 	for (i=0; i<4; i++)
 	{
-		previous_input_port_data[i] = current_input_port_data[i];
+		state->previous_input_port_data[i] = current_input_port_data[i];
 	}
 
 	nx = input_port_read(machine, "POSX");
 	if (nx>=0x800) nx-=0x1000;
 	else if (nx<=-0x800) nx+=0x1000;
 
-	dx = nx - ox;
-	ox = nx;
+	dx = nx - state->ox;
+	state->ox = nx;
 
 	ny = input_port_read(machine, "POSY");
 	if (ny>=0x800) ny-=0x1000;
 	else if (ny<=-0x800) ny+=0x1000;
 
-	dy = ny - oy;
-	oy = ny;
+	dy = ny - state->oy;
+	state->oy = ny;
 
-	stylus_marker_x +=dx;
-	stylus_marker_y +=dy;
+	state->stylus_marker_x +=dx;
+	state->stylus_marker_y +=dy;
 
-	avigo_vh_set_stylus_marker_position(stylus_marker_x, stylus_marker_y);
+	avigo_vh_set_stylus_marker_position(machine, state->stylus_marker_x, state->stylus_marker_y);
 #if 0
 	/* not sure if keyboard generates an interrupt, or if something
     is plugged in for synchronisation! */
@@ -248,7 +238,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		int current;
 		current = ~current_input_port_data[i];
 
-		changed = ((current^(~previous_input_port_data[i])) & 0x07);
+		changed = ((current^(~state->previous_input_port_data[i])) & 0x07);
 
 		if (changed!=0)
 		{
@@ -256,14 +246,14 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
             that has changed, the old state was off and new state is on */
 			if (current & changed)
 			{
-				avigo_irq |= (1<<2);
+				state->irq |= (1<<2);
 				break;
 			}
 		}
 	}
 #endif
 	/* copy current to previous */
-	memcpy(previous_input_port_data, current_input_port_data, sizeof(int)*4);
+	memcpy(state->previous_input_port_data, current_input_port_data, sizeof(int)*4);
 
 	/* refresh status of interrupts */
 	avigo_refresh_ints(machine);
@@ -272,12 +262,13 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 /* does not do anything yet */
 static void avigo_tc8521_alarm_int(running_device *device, int state)
 {
+	avigo_state *drvstate = device->machine->driver_data<avigo_state>();
 //#if 0
-	avigo_irq &=~(1<<5);
+	drvstate->irq &=~(1<<5);
 
 	if (state)
 	{
-		avigo_irq |= (1<<5);
+		drvstate->irq |= (1<<5);
 	}
 
 	avigo_refresh_ints(device->machine);
@@ -292,35 +283,36 @@ static const tc8521_interface avigo_tc8521_interface =
 
 static void avigo_refresh_memory(running_machine *machine)
 {
+	avigo_state *state = machine->driver_data<avigo_state>();
 	unsigned char *addr;
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	switch (avigo_rom_bank_h)
+	switch (state->rom_bank_h)
 	{
 		/* 011 */
 		case 0x03:
 		{
-			avigo_flash_at_0x4000 = 1;
+			state->flash_at_0x4000 = 1;
 		}
 		break;
 
 		/* 101 */
 		case 0x05:
 		{
-			avigo_flash_at_0x4000 = 2;
+			state->flash_at_0x4000 = 2;
 		}
 		break;
 
 		default:
-			avigo_flash_at_0x4000 = 0;
+			state->flash_at_0x4000 = 0;
 			break;
 	}
 
-	addr = (unsigned char *)avigo_flashes[avigo_flash_at_0x4000]->space()->get_read_ptr(0);
-	addr = addr + (avigo_rom_bank_l<<14);
+	addr = (unsigned char *)state->flashes[state->flash_at_0x4000]->space()->get_read_ptr(0);
+	addr = addr + (state->rom_bank_l<<14);
 	avigo_setbank(machine, 1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
 
-	switch (avigo_ram_bank_h)
+	switch (state->ram_bank_h)
 	{
 		/* %101 */
 		/* screen */
@@ -331,29 +323,29 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = messram_get_ptr(machine->device("messram")) + ((avigo_ram_bank_l & 0x07)<<14);
+			addr = messram_get_ptr(machine->device("messram")) + ((state->ram_bank_l & 0x07)<<14);
 			memory_set_bankptr(machine, "bank3", addr);
 			memory_set_bankptr(machine, "bank7", addr);
-			avigo_banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
+			state->banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
 			memory_install_read_bank (space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank3");
 			memory_install_write_bank(space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank7");
 			break;
 
 		/* %111 */
 		case 0x03:
-			avigo_flash_at_0x8000 = 1;
+			state->flash_at_0x8000 = 1;
 
 
-			addr = (unsigned char *)avigo_flashes[avigo_flash_at_0x8000]->space()->get_read_ptr(0);
-			addr = addr + (avigo_ram_bank_l<<14);
+			addr = (unsigned char *)state->flashes[state->flash_at_0x8000]->space()->get_read_ptr(0);
+			addr = addr + (state->ram_bank_l<<14);
 			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 
 		case 0x07:
-			avigo_flash_at_0x8000 = 0;
+			state->flash_at_0x8000 = 0;
 
-			addr = (unsigned char *)avigo_flashes[avigo_flash_at_0x8000]->space()->get_read_ptr(0);
-			addr = addr + (avigo_ram_bank_l<<14);
+			addr = (unsigned char *)state->flashes[state->flash_at_0x8000]->space()->get_read_ptr(0);
+			addr = addr + (state->ram_bank_l<<14);
 			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 	}
@@ -363,13 +355,14 @@ static void avigo_refresh_memory(running_machine *machine)
 
 static INS8250_INTERRUPT( avigo_com_interrupt )
 {
+	avigo_state *drvstate = device->machine->driver_data<avigo_state>();
 	logerror("com int\r\n");
 
-	avigo_irq &= ~(1<<3);
+	drvstate->irq &= ~(1<<3);
 
 	if (state)
 	{
-		avigo_irq |= (1<<3);
+		drvstate->irq |= (1<<3);
 	}
 
 	avigo_refresh_ints(device->machine);
@@ -389,9 +382,10 @@ static const ins8250_interface avigo_com_interface =
 /* this is needed because this driver uses handlers in memory that gets executed */
 DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 {
+	avigo_state *state = machine->driver_data<avigo_state>();
 	void *opbase_ptr;
 
-	opbase_ptr = avigo_banked_opbase[address / 0x4000];
+	opbase_ptr = state->banked_opbase[address / 0x4000];
 	if (opbase_ptr != NULL)
 	{
 		direct.explicit_configure(0x0000, 0xffff, 0xffff, (UINT8*)opbase_ptr);
@@ -402,47 +396,48 @@ DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 
 static MACHINE_RESET( avigo )
 {
+	avigo_state *state = machine->driver_data<avigo_state>();
 	int i;
 	unsigned char *addr;
 	static const char *const linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
-	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
+	memset(state->banked_opbase, 0, sizeof(state->banked_opbase));
 
 	/* keep machine pointers to flash devices */
-	avigo_flashes[0] = machine->device<intelfsh8_device>("flash0");
-	avigo_flashes[1] = machine->device<intelfsh8_device>("flash1");
-	avigo_flashes[2] = machine->device<intelfsh8_device>("flash2");
+	state->flashes[0] = machine->device<intelfsh8_device>("flash0");
+	state->flashes[1] = machine->device<intelfsh8_device>("flash1");
+	state->flashes[2] = machine->device<intelfsh8_device>("flash2");
 
 	/* initialize flash contents */
-	memcpy(memory_region(machine, "maincpu")+0x10000, avigo_flashes[0]->space()->get_read_ptr(0), 0x100000);
-	memcpy(memory_region(machine, "maincpu")+0x110000, avigo_flashes[1]->space()->get_read_ptr(0), 0x100000);
+	memcpy(memory_region(machine, "maincpu")+0x10000, state->flashes[0]->space()->get_read_ptr(0), 0x100000);
+	memcpy(memory_region(machine, "maincpu")+0x110000, state->flashes[1]->space()->get_read_ptr(0), 0x100000);
 
-	stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
-	stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
-	stylus_press_x = 0;
-	stylus_press_y = 0;
-	avigo_vh_set_stylus_marker_position(stylus_marker_x, stylus_marker_y);
+	state->stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
+	state->stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
+	state->stylus_press_x = 0;
+	state->stylus_press_y = 0;
+	avigo_vh_set_stylus_marker_position(machine, state->stylus_marker_x, state->stylus_marker_y);
 
 	/* initialise settings for port data */
 	for (i = 0; i < 4; i++)
 	{
-		previous_input_port_data[i] = input_port_read(machine, linenames[i]);
+		state->previous_input_port_data[i] = input_port_read(machine, linenames[i]);
 	}
 
-	avigo_irq = 0;
-	avigo_rom_bank_l = 0;
-	avigo_rom_bank_h = 0;
-	avigo_ram_bank_l = 0;
-	avigo_ram_bank_h = 0;
-	avigo_flash_at_0x4000 = 0;
-	avigo_flash_at_0x8000 = 0;
+	state->irq = 0;
+	state->rom_bank_l = 0;
+	state->rom_bank_h = 0;
+	state->ram_bank_l = 0;
+	state->ram_bank_h = 0;
+	state->flash_at_0x4000 = 0;
+	state->flash_at_0x8000 = 0;
 
 	/* clear */
 	memset(messram_get_ptr(machine->device("messram")), 0, 128*1024);
 
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(avigo_opbase_handler, *machine));
 
-	addr = (unsigned char *)avigo_flashes[0]->space()->get_read_ptr(0);
+	addr = (unsigned char *)state->flashes[0]->space()->get_read_ptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
 	avigo_setbank(machine, 3, messram_get_ptr(machine->device("messram")), NULL, NULL);
@@ -469,21 +464,22 @@ ADDRESS_MAP_END
 
 static  READ8_HANDLER(avigo_key_data_read_r)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	UINT8 data;
 
 	data = 0x007;
 
-	if (avigo_key_line & 0x01)
+	if (state->key_line & 0x01)
 	{
 		data &= input_port_read(space->machine, "LINE0");
 	}
 
-	if (avigo_key_line & 0x02)
+	if (state->key_line & 0x02)
 	{
 		data &= input_port_read(space->machine, "LINE1");
 	}
 
-	if (avigo_key_line & 0x04)
+	if (state->key_line & 0x04)
 	{
 		data &= input_port_read(space->machine, "LINE2");
 
@@ -501,55 +497,64 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 /* bit 0 set for line 0, bit 1 set for line 1, bit 2 set for line 2 */
 static WRITE8_HANDLER(avigo_set_key_line_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	/* 5, 101, read back 3 */
-	avigo_key_line = data;
+	state->key_line = data;
 }
 
 static  READ8_HANDLER(avigo_irq_r)
 {
-	return avigo_irq;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->irq;
 }
 
 static WRITE8_HANDLER(avigo_irq_w)
 {
-	avigo_irq &= ~data;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	state->irq &= ~data;
 
 	avigo_refresh_ints(space->machine);
 }
 
 static  READ8_HANDLER(avigo_rom_bank_l_r)
 {
-	return avigo_rom_bank_l;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->rom_bank_l;
 }
 
 static  READ8_HANDLER(avigo_rom_bank_h_r)
 {
-	return avigo_rom_bank_h;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->rom_bank_h;
 }
 
 static  READ8_HANDLER(avigo_ram_bank_l_r)
 {
-	return avigo_ram_bank_l;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->ram_bank_l;
 }
 
 static  READ8_HANDLER(avigo_ram_bank_h_r)
 {
-	return avigo_ram_bank_h;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	return state->ram_bank_h;
 }
 
 
 
 static WRITE8_HANDLER(avigo_rom_bank_l_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	logerror("rom bank l w: %04x\n", data);
 
-        avigo_rom_bank_l = data & 0x03f;
+        state->rom_bank_l = data & 0x03f;
 
         avigo_refresh_memory(space->machine);
 }
 
 static WRITE8_HANDLER(avigo_rom_bank_h_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	logerror("rom bank h w: %04x\n", data);
 
 
@@ -562,7 +567,7 @@ static WRITE8_HANDLER(avigo_rom_bank_h_w)
 
 
         */
-	avigo_rom_bank_h = data;
+	state->rom_bank_h = data;
 
 
         avigo_refresh_memory(space->machine);
@@ -570,32 +575,35 @@ static WRITE8_HANDLER(avigo_rom_bank_h_w)
 
 static WRITE8_HANDLER(avigo_ram_bank_l_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	logerror("ram bank l w: %04x\n", data);
 
-        avigo_ram_bank_l = data & 0x03f;
+        state->ram_bank_l = data & 0x03f;
 
         avigo_refresh_memory(space->machine);
 }
 
 static WRITE8_HANDLER(avigo_ram_bank_h_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	logerror("ram bank h w: %04x\n", data);
 
-	avigo_ram_bank_h = data;
+	state->ram_bank_h = data;
 
         avigo_refresh_memory(space->machine);
 }
 
 static  READ8_HANDLER(avigo_ad_control_status_r)
 {
-	logerror("avigo ad control read %02x\n", (int) avigo_ad_control_status);
-	return avigo_ad_control_status;
+	avigo_state *state = space->machine->driver_data<avigo_state>();
+	logerror("avigo ad control read %02x\n", (int) state->ad_control_status);
+	return state->ad_control_status;
 }
 
-static unsigned int avigo_ad_value;
 
 static WRITE8_HANDLER(avigo_ad_control_status_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	logerror("avigo ad control w %02x\n",data);
 
 	if ((data & 0x070)==0x070)
@@ -605,26 +613,26 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 		if ((data & 0x08)!=0)
 		{
 			logerror("a/d select x coordinate\n");
-			logerror("x coord: %d\n",stylus_press_x);
+			logerror("x coord: %d\n",state->stylus_press_x);
 
 			/* on screen range 0x060->0x03a0 */
 			/* 832 is on-screen range */
 			/* 5.2 a/d units per pixel */
 
-			if (stylus_press_x!=0)
+			if (state->stylus_press_x!=0)
 			{
 				/* this might not be totally accurate because hitable screen
                 area may include the border around the screen! */
-				avigo_ad_value = ((int)(stylus_press_x * 5.2f))+0x060;
-				avigo_ad_value &= 0x03fc;
+				state->ad_value = ((int)(state->stylus_press_x * 5.2f))+0x060;
+				state->ad_value &= 0x03fc;
 			}
 			else
 			{
-				avigo_ad_value = 0;
+				state->ad_value = 0;
 			}
 
-			logerror("ad value: %d\n",avigo_ad_value);
-			stylus_press_x = 0;
+			logerror("ad value: %d\n",state->ad_value);
+			state->stylus_press_x = 0;
 
 		}
 		else
@@ -645,28 +653,29 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			/* 3.25 * 1024.00 = 315.07 */
 
 			logerror("a/d select y coordinate\n");
-			logerror("y coord: %d\n",stylus_press_y);
+			logerror("y coord: %d\n",state->stylus_press_y);
 
-			if (stylus_press_y!=0)
+			if (state->stylus_press_y!=0)
 			{
-				avigo_ad_value = 1024 - (((stylus_press_y)*3.25f) + 0x040);
+				state->ad_value = 1024 - (((state->stylus_press_y)*3.25f) + 0x040);
 			}
 			else
 			{
-				avigo_ad_value = 0;
+				state->ad_value = 0;
 			}
 
-			logerror("ad value: %d\n",avigo_ad_value);
-			stylus_press_y = 0;
+			logerror("ad value: %d\n",state->ad_value);
+			state->stylus_press_y = 0;
 		}
 	}
 
 	/* bit 0: 1 if a/d complete, 0 if a/d not complete */
-	avigo_ad_control_status = data | 1;
+	state->ad_control_status = data | 1;
 }
 
 static  READ8_HANDLER(avigo_ad_data_r)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	unsigned char data;
 
 	data = 0;
@@ -676,7 +685,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 	/* status AND   11110111 */
 	/* status OR    01110000 -> C20F */
 
-	switch (avigo_ad_control_status & 0x078)
+	switch (state->ad_control_status & 0x078)
 	{
 		/* x1110xxx */
 		/* read upper 4 bits of 10 bit A/D number */
@@ -688,7 +697,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 			/* bit 3 must be 1. bit 2 can have any value */
 
 			logerror("a/d read upper 4 bits\n");
-			data = ((avigo_ad_value>>6) & 0x0f)<<4;
+			data = ((state->ad_value>>6) & 0x0f)<<4;
 			data |= 8;
 		}
 		break;
@@ -700,7 +709,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 			/* bit 0 must be 1, bit 1 must be 0 */
 
 			logerror("a/d lower 6-bits\n");
-			data = ((avigo_ad_value & 0x03f)<<2);
+			data = ((state->ad_value & 0x03f)<<2);
 			data |= 1;
 		}
 		break;
@@ -769,14 +778,15 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 static WRITE8_HANDLER(avigo_speaker_w)
 {
+	avigo_state *state = space->machine->driver_data<avigo_state>();
 	running_device *speaker = space->machine->device("speaker");
 	UINT8 previous_speaker;
 
-	previous_speaker = avigo_speaker_data;
-	avigo_speaker_data = data;
+	previous_speaker = state->speaker_data;
+	state->speaker_data = data;
 
 	/* changed state? */
-	if (((data^avigo_speaker_data) & (1<<3))!=0)
+	if (((data^state->speaker_data) & (1<<3))!=0)
 	{
 		/* DAC output state */
 		speaker_level_w(speaker,(data>>3) & 0x01);
@@ -949,7 +959,7 @@ static GFXDECODE_START( avigo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( avigo, driver_device )
+static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(avigo_mem)
@@ -961,7 +971,7 @@ static MACHINE_CONFIG_START( avigo, driver_device )
 
 	MDRV_NS16550_ADD( "ns16550", avigo_com_interface )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

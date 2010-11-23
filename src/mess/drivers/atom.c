@@ -558,17 +558,17 @@ static const via6522_interface via_intf =
     i8271_interface fdc_intf
 -------------------------------------------------*/
 
-static int previous_i8271_int_state = 0;
 
 static void atom_8271_interrupt_callback(running_device *device, int state)
 {
+	atom_state *drvstate = device->machine->driver_data<atom_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
     the nmi will be triggered, but when the state changes because the int
     is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=previous_i8271_int_state)
+	if (state!=drvstate->previous_i8271_int_state)
 	{
 		if (state)
 		{
@@ -578,7 +578,7 @@ static void atom_8271_interrupt_callback(running_device *device, int state)
 		}
 	}
 
-	previous_i8271_int_state = state;
+	drvstate->previous_i8271_int_state = state;
 }
 
 static const i8271_interface fdc_intf =

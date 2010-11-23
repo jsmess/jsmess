@@ -42,7 +42,6 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static UINT8 scrambler;
 
 
 /***************************************************************************
@@ -181,13 +180,15 @@ static READ8_HANDLER( keyboard_r )
 */
 static WRITE8_HANDLER( scrambler_w )
 {
-	scrambler = data;
+	aquarius_state *state = space->machine->driver_data<aquarius_state>();
+	state->scrambler = data;
 }
 
 static READ8_HANDLER( cartridge_r )
 {
+	aquarius_state *state = space->machine->driver_data<aquarius_state>();
 	UINT8 *rom = memory_region(space->machine, "maincpu") + 0xc000;
-	return rom[offset] ^ scrambler;
+	return rom[offset] ^ state->scrambler;
 }
 
 
@@ -232,7 +233,7 @@ static DRIVER_INIT( aquarius )
 static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_BASE_MEMBER(aquarius_state, videoram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_BASE(&aquarius_colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_BASE_MEMBER(aquarius_state, colorram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP /* expansion ram */
 	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)

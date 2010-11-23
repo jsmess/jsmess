@@ -30,35 +30,14 @@
 
 #define READ_MEM(x) space->read_byte(x)
 
-/*static unsigned char *ROM; */
-
 /********** Maria ***********/
 
 #define DPPH 0x2c
 #define DPPL 0x30
 #define CTRL 0x3c
 
-static int maria_palette[8][4];
-static int maria_write_mode;
-static int maria_scanline;
-static unsigned int maria_dll;
-static unsigned int maria_dl;
-static int maria_holey;
-static int maria_offset;
-static int maria_vblank;
-static int maria_dli;
-static int maria_dmaon;				/* dma is enabled */
-static int maria_dodma;				/* doing dma right now */
-static int maria_wsync;
-static int maria_backcolor;
 
-static int maria_color_kill;
-static int maria_cwidth;
-static int maria_bcntl;
-static int maria_kangaroo;
-static int maria_rm;
 
-static unsigned int maria_charbase;
 
 // 20030621 ericball define using logical operations
 #define inc_hpos() { hpos = (hpos + 1) & 0x1FF; }
@@ -71,31 +50,32 @@ static unsigned int maria_charbase;
 ***************************************************************************/
 VIDEO_START( a7800 )
 {
+	a7800_state *state = machine->driver_data<a7800_state>();
 	int i;
 
 	VIDEO_START_CALL(generic_bitmapped);
 
 	for(i=0; i<8; i++)
 	{
-		maria_palette[i][0]=0;
-		maria_palette[i][1]=0;
-		maria_palette[i][2]=0;
-		maria_palette[i][3]=0;
+		state->maria_palette[i][0]=0;
+		state->maria_palette[i][1]=0;
+		state->maria_palette[i][2]=0;
+		state->maria_palette[i][3]=0;
 	}
 
-	maria_write_mode=0;
-	maria_scanline=0;
-	maria_dmaon=0;
-	maria_vblank=0x80;
-	maria_dll=0;
-	maria_dodma=0;
-	maria_wsync=0;
+	state->maria_write_mode=0;
+	state->maria_scanline=0;
+	state->maria_dmaon=0;
+	state->maria_vblank=0x80;
+	state->maria_dll=0;
+	state->maria_dodma=0;
+	state->maria_wsync=0;
 
-	maria_color_kill = 0;
-	maria_cwidth = 0;
-	maria_bcntl = 0;
-	maria_kangaroo = 0;
-	maria_rm = 0;
+	state->maria_color_kill = 0;
+	state->maria_cwidth = 0;
+	state->maria_bcntl = 0;
+	state->maria_kangaroo = 0;
+	state->maria_rm = 0;
 }
 
 /***************************************************************************
@@ -106,6 +86,7 @@ VIDEO_START( a7800 )
 
 static void maria_draw_scanline(running_machine *machine)
 {
+	a7800_state *state = machine->driver_data<a7800_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
@@ -115,12 +96,12 @@ static void maria_draw_scanline(running_machine *machine)
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = BITMAP_ADDR16(machine->generic.tmpbitmap, maria_scanline, 0);
+	scanline = BITMAP_ADDR16(machine->generic.tmpbitmap, state->maria_scanline, 0);
 	for (i = 0; i < 320; i++)
-		scanline[i] = maria_backcolor;
+		scanline[i] = state->maria_backcolor;
 
 	/* Process this DLL entry */
-	dl = maria_dl;
+	dl = state->maria_dl;
 
 	/* Step through DL's */
 	while ((READ_MEM(dl + 1) & 0x5F) != 0)
@@ -133,7 +114,7 @@ static void maria_draw_scanline(running_machine *machine)
 			width = ((READ_MEM(dl+3) ^ 0xff) & 0x1F) + 1;
 			hpos = READ_MEM(dl+4)*2;
 			pal = READ_MEM(dl+3) >> 5;
-			maria_write_mode = (READ_MEM(dl+1) & 0x80) >> 5;
+			state->maria_write_mode = (READ_MEM(dl+1) & 0x80) >> 5;
 			ind = READ_MEM(dl+1) & 0x20;
 			dl+=5;
 		}
@@ -148,9 +129,9 @@ static void maria_draw_scanline(running_machine *machine)
 			dl+=4;
 		}
 
-		mode = maria_rm | maria_write_mode;
+		mode = state->maria_rm | state->maria_write_mode;
 
-		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n",maria_scanline,graph_adr,width,hpos,pal,mode,ind );*/
+		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n",state->maria_scanline,graph_adr,width,hpos,pal,mode,ind );*/
 
 		for (x=0; x<width; x++) // 20030621 ericball get graphic data first, then switch (mode)
 		{
@@ -160,18 +141,18 @@ static void maria_draw_scanline(running_machine *machine)
 			if (ind)
 			{
 				c = READ_MEM(graph_adr + x) & 0xFF;
-				data_addr= (maria_charbase | c) + (maria_offset << 8);
-				if( maria_cwidth )
+				data_addr= (state->maria_charbase | c) + (state->maria_offset << 8);
+				if( state->maria_cwidth )
 					ind_bytes = 2;
 			}
 			else
 			{
-				data_addr = graph_adr + x + (maria_offset  << 8);
+				data_addr = graph_adr + x + (state->maria_offset  << 8);
 			}
 
-			if ( (maria_holey & 0x02) && ((data_addr & 0x9000) == 0x9000))
+			if ( (state->maria_holey & 0x02) && ((data_addr & 0x9000) == 0x9000))
 				continue;
-			if ( (maria_holey & 0x01) && ((data_addr & 0x8800) == 0x8800))
+			if ( (state->maria_holey & 0x01) && ((data_addr & 0x8800) == 0x8800))
 				continue;
 
 			while (ind_bytes > 0)
@@ -184,96 +165,96 @@ static void maria_draw_scanline(running_machine *machine)
 					case 0x00:  /* 160A (160x2) */
 					case 0x01:  /* 160A (160x2) */
 						c = (d & 0xC0) >> 6;
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][c];
-							scanline[hpos + 1] = maria_palette[pal][c];
+							scanline[hpos + 0] = state->maria_palette[pal][c];
+							scanline[hpos + 1] = state->maria_palette[pal][c];
 						}
 						inc_hpos_by_2();
 
 						c = (d & 0x30) >> 4;
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][c];
-							scanline[hpos + 1] = maria_palette[pal][c];
+							scanline[hpos + 0] = state->maria_palette[pal][c];
+							scanline[hpos + 1] = state->maria_palette[pal][c];
 						}
 						inc_hpos_by_2();
 
 						c = (d & 0x0C) >> 2;
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][c];
-							scanline[hpos + 1] = maria_palette[pal][c];
+							scanline[hpos + 0] = state->maria_palette[pal][c];
+							scanline[hpos + 1] = state->maria_palette[pal][c];
 						}
 						inc_hpos_by_2();
 
 						c = (d & 0x03);
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][c];
-							scanline[hpos + 1] = maria_palette[pal][c];
+							scanline[hpos + 0] = state->maria_palette[pal][c];
+							scanline[hpos + 1] = state->maria_palette[pal][c];
 						}
 						inc_hpos_by_2();
 						break;
 
 					case 0x02: /* 320D used by Jinks! */
 						c = pal & 0x04;
-						if ( d & 0xC0 || pal & 0x03 || maria_kangaroo )
+						if ( d & 0xC0 || pal & 0x03 || state->maria_kangaroo )
 						{
-							scanline[hpos + 0] = maria_palette[c][((d & 0x80) >> 6) | ((pal & 2) >> 1)];
-							scanline[hpos + 1] = maria_palette[c][((d & 0x40) >> 5) | ((pal & 1) >> 0)];
+							scanline[hpos + 0] = state->maria_palette[c][((d & 0x80) >> 6) | ((pal & 2) >> 1)];
+							scanline[hpos + 1] = state->maria_palette[c][((d & 0x40) >> 5) | ((pal & 1) >> 0)];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x30 || pal & 0x03 || maria_kangaroo )
+						if ( d & 0x30 || pal & 0x03 || state->maria_kangaroo )
 						{
-							scanline[hpos + 0] = maria_palette[c][((d & 0x20) >> 4) | ((pal & 2) >> 1)];
-							scanline[hpos + 1] = maria_palette[c][((d & 0x10) >> 3) | ((pal & 1) >> 0)];
+							scanline[hpos + 0] = state->maria_palette[c][((d & 0x20) >> 4) | ((pal & 2) >> 1)];
+							scanline[hpos + 1] = state->maria_palette[c][((d & 0x10) >> 3) | ((pal & 1) >> 0)];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x0C || pal & 0x03 || maria_kangaroo )
+						if ( d & 0x0C || pal & 0x03 || state->maria_kangaroo )
 						{
-							scanline[hpos + 0] = maria_palette[c][((d & 0x08) >> 2) | ((pal & 2) >> 1)];
-							scanline[hpos + 1] = maria_palette[c][((d & 0x04) >> 1) | ((pal & 1) >> 0)];
+							scanline[hpos + 0] = state->maria_palette[c][((d & 0x08) >> 2) | ((pal & 2) >> 1)];
+							scanline[hpos + 1] = state->maria_palette[c][((d & 0x04) >> 1) | ((pal & 1) >> 0)];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x03 || pal & 0x03 || maria_kangaroo )
+						if ( d & 0x03 || pal & 0x03 || state->maria_kangaroo )
 						{
-							scanline[hpos + 0] = maria_palette[c][((d & 0x02) << 0) | ((pal & 2) >> 1)];
-							scanline[hpos + 1] = maria_palette[c][((d & 0x01) << 1) | ((pal & 1) >> 0)];
+							scanline[hpos + 0] = state->maria_palette[c][((d & 0x02) << 0) | ((pal & 2) >> 1)];
+							scanline[hpos + 1] = state->maria_palette[c][((d & 0x01) << 1) | ((pal & 1) >> 0)];
 						}
 						inc_hpos_by_2();
 
 						break;
 
 					case 0x03:  /* MODE 320A */
-						if (d & 0xC0 || maria_kangaroo)
+						if (d & 0xC0 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][(d & 0x80) >> 6];
-							scanline[hpos + 1] = maria_palette[pal][(d & 0x40) >> 5];
+							scanline[hpos + 0] = state->maria_palette[pal][(d & 0x80) >> 6];
+							scanline[hpos + 1] = state->maria_palette[pal][(d & 0x40) >> 5];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x30 || maria_kangaroo)
+						if ( d & 0x30 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][(d & 0x20) >> 4];
-							scanline[hpos + 1] = maria_palette[pal][(d & 0x10) >> 3];
+							scanline[hpos + 0] = state->maria_palette[pal][(d & 0x20) >> 4];
+							scanline[hpos + 1] = state->maria_palette[pal][(d & 0x10) >> 3];
 						}
 						inc_hpos_by_2();
 
-						if (d & 0x0C || maria_kangaroo)
+						if (d & 0x0C || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][(d & 0x08) >> 2];
-							scanline[hpos + 1] = maria_palette[pal][(d & 0x04) >> 1];
+							scanline[hpos + 0] = state->maria_palette[pal][(d & 0x08) >> 2];
+							scanline[hpos + 1] = state->maria_palette[pal][(d & 0x04) >> 1];
 						}
 						inc_hpos_by_2();
 
-						if (d & 0x03 || maria_kangaroo)
+						if (d & 0x03 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][(d & 0x02)];
-							scanline[hpos + 1] = maria_palette[pal][(d & 0x01) << 1];
+							scanline[hpos + 0] = state->maria_palette[pal][(d & 0x02)];
+							scanline[hpos + 1] = state->maria_palette[pal][(d & 0x01) << 1];
 						}
 						inc_hpos_by_2();
 						break;
@@ -281,50 +262,50 @@ static void maria_draw_scanline(running_machine *machine)
 					case 0x04:  /* 160B (160x4) */
 					case 0x05:  /* 160B (160x4) */
 						c = (d & 0xC0) >> 6;
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][c];
-							scanline[hpos + 1] = maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][c];
+							scanline[hpos + 0] = state->maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][c];
+							scanline[hpos + 1] = state->maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][c];
 						}
 						inc_hpos_by_2();
 
 						c = (d & 0x30) >> 4;
-						if (c || maria_kangaroo)
+						if (c || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[(pal & 0x04) | (d & 0x03)][c];
-							scanline[hpos + 1] = maria_palette[(pal & 0x04) | (d & 0x03)][c];
+							scanline[hpos + 0] = state->maria_palette[(pal & 0x04) | (d & 0x03)][c];
+							scanline[hpos + 1] = state->maria_palette[(pal & 0x04) | (d & 0x03)][c];
 						}
 						inc_hpos_by_2();
 						break;
 
 					case 0x06:  /* MODE 320B */
-						if (d & 0xCC || maria_kangaroo)
+						if (d & 0xCC || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][((d & 0x80) >> 6) | ((d & 0x08) >> 3)];
-							scanline[hpos + 1] = maria_palette[pal][((d & 0x40) >> 5) | ((d & 0x04) >> 2)];
+							scanline[hpos + 0] = state->maria_palette[pal][((d & 0x80) >> 6) | ((d & 0x08) >> 3)];
+							scanline[hpos + 1] = state->maria_palette[pal][((d & 0x40) >> 5) | ((d & 0x04) >> 2)];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x33 || maria_kangaroo)
+						if ( d & 0x33 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[pal][((d & 0x20) >> 4) | ((d & 0x02) >> 1)];
-							scanline[hpos + 1] = maria_palette[pal][((d & 0x10) >> 3) | (d & 0x01)];
+							scanline[hpos + 0] = state->maria_palette[pal][((d & 0x20) >> 4) | ((d & 0x02) >> 1)];
+							scanline[hpos + 1] = state->maria_palette[pal][((d & 0x10) >> 3) | (d & 0x01)];
 						}
 						inc_hpos_by_2();
 						break;
 
 					case 0x07: /* (320C mode) */
-						if (d & 0xC0 || maria_kangaroo)
+						if (d & 0xC0 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][(d & 0x80) >> 6];
-							scanline[hpos + 1] = maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][(d & 0x40) >> 5];
+							scanline[hpos + 0] = state->maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][(d & 0x80) >> 6];
+							scanline[hpos + 1] = state->maria_palette[(pal & 0x04) | ((d & 0x0C) >> 2)][(d & 0x40) >> 5];
 						}
 						inc_hpos_by_2();
 
-						if ( d & 0x30 || maria_kangaroo)
+						if ( d & 0x30 || state->maria_kangaroo)
 						{
-							scanline[hpos + 0] = maria_palette[(pal & 0x04) | (d & 0x03)][(d & 0x20) >> 4];
-							scanline[hpos + 1] = maria_palette[(pal & 0x04) | (d & 0x03)][(d & 0x10) >> 3];
+							scanline[hpos + 0] = state->maria_palette[(pal & 0x04) | (d & 0x03)][(d & 0x20) >> 4];
+							scanline[hpos + 1] = state->maria_palette[(pal & 0x04) | (d & 0x03)][(d & 0x10) >> 3];
 						}
 						inc_hpos_by_2();
 						break;
@@ -338,42 +319,43 @@ static void maria_draw_scanline(running_machine *machine)
 
 INTERRUPT_GEN( a7800_interrupt )
 {
+	a7800_state *state = device->machine->driver_data<a7800_state>();
 	int frame_scanline;
 	UINT8 *ROM = memory_region(device->machine, "maincpu");
 	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	maria_scanline++;
+	state->maria_scanline++;
 
 	/* why + 1? */
-	frame_scanline = maria_scanline % ( a7800_lines + 1 );
+	frame_scanline = state->maria_scanline % ( state->lines + 1 );
 
 	if( frame_scanline == 1 )
 	{
 		/*logerror( "frame beg\n" );*/
 	}
 
-	if( maria_wsync )
+	if( state->maria_wsync )
 	{
 		cpuexec_trigger( device->machine, TRIGGER_HSYNC );
-		maria_wsync = 0;
+		state->maria_wsync = 0;
 	}
 
 	if( frame_scanline == 16 )
 	{
 		/* end of vblank */
 
-		maria_vblank=0;
-		if( maria_dmaon || maria_dodma )
+		state->maria_vblank=0;
+		if( state->maria_dmaon || state->maria_dodma )
 		{
-			maria_dodma = 1;	/* if dma allowed, start it */
+			state->maria_dodma = 1;	/* if dma allowed, start it */
 
-			maria_dll = (ROM[DPPH] << 8) | ROM[DPPL];
-			maria_dl = (READ_MEM(maria_dll+1) << 8) | READ_MEM(maria_dll+2);
-			maria_offset = READ_MEM(maria_dll) & 0x0f;
-			maria_holey = (READ_MEM(maria_dll) & 0x60) >> 5;
-			maria_dli = READ_MEM(maria_dll) & 0x80;
-			/*  logerror("DLL=%x\n",maria_dll); */
-			/*  logerror("DLL: DL = %x  dllctrl = %x\n",maria_dl,ROM[maria_dll]); */
+			state->maria_dll = (ROM[DPPH] << 8) | ROM[DPPL];
+			state->maria_dl = (READ_MEM(state->maria_dll+1) << 8) | READ_MEM(state->maria_dll+2);
+			state->maria_offset = READ_MEM(state->maria_dll) & 0x0f;
+			state->maria_holey = (READ_MEM(state->maria_dll) & 0x60) >> 5;
+			state->maria_dli = READ_MEM(state->maria_dll) & 0x80;
+			/*  logerror("DLL=%x\n",state->maria_dll); */
+			/*  logerror("DLL: DL = %x  dllctrl = %x\n",state->maria_dl,ROM[state->maria_dll]); */
 		}
 
 		/*logerror( "vblank end on line %d\n", frame_scanline );*/
@@ -383,11 +365,11 @@ INTERRUPT_GEN( a7800_interrupt )
         this fix made PR Baseball happy
         Kung-Fu Master looks worse
         don't know about others yet */
-	if( frame_scanline == ( a7800_lines - 4 ) )
+	if( frame_scanline == ( state->lines - 4 ) )
 	{
 		/* vblank starts 4 scanlines before end of screen */
 
-		maria_vblank = 0x80;
+		state->maria_vblank = 0x80;
 
 		/* fixed 2002/05/14 kubecj
                 when going vblank, dma must be stopped
@@ -404,38 +386,38 @@ INTERRUPT_GEN( a7800_interrupt )
                 Jinks
         */
 
-		maria_dodma = 0;
+		state->maria_dodma = 0;
 		/*logerror( "vblank on line %d\n\n", frame_scanline );*/
 	}
 
 
-	if( ( frame_scanline > 15 ) && maria_dodma )
+	if( ( frame_scanline > 15 ) && state->maria_dodma )
 	{
-		if (maria_scanline < ( a7800_lines - 4 ) )
+		if (state->maria_scanline < ( state->lines - 4 ) )
 			maria_draw_scanline(device->machine);
 
-		if( maria_offset == 0 )
+		if( state->maria_offset == 0 )
 		{
-			maria_dll+=3;
-			maria_dl = (READ_MEM(maria_dll+1) << 8) | READ_MEM(maria_dll+2);
-			maria_offset = READ_MEM(maria_dll) & 0x0f;
-			maria_holey = (READ_MEM(maria_dll) & 0x60) >> 5;
-			maria_dli = READ_MEM(maria_dll) & 0x80;
+			state->maria_dll+=3;
+			state->maria_dl = (READ_MEM(state->maria_dll+1) << 8) | READ_MEM(state->maria_dll+2);
+			state->maria_offset = READ_MEM(state->maria_dll) & 0x0f;
+			state->maria_holey = (READ_MEM(state->maria_dll) & 0x60) >> 5;
+			state->maria_dli = READ_MEM(state->maria_dll) & 0x80;
 		}
 		else
 		{
-			maria_offset--;
+			state->maria_offset--;
 		}
 	}
 
-	if( maria_dli )
+	if( state->maria_dli )
 	{
 		/*logerror( "dli on line %d [%02X] [%02X] [%02X]\n", frame_scanline, ROM[0x7E], ROM[0x7C], ROM[0x7D] );*/
 	}
 
-	if( maria_dli )
+	if( state->maria_dli )
 	{
-		maria_dli = 0;
+		state->maria_dli = 0;
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
@@ -449,7 +431,8 @@ INTERRUPT_GEN( a7800_interrupt )
 /* This routine is called at the start of vblank to refresh the screen */
 VIDEO_UPDATE( a7800 )
 {
-	maria_scanline = 0;
+	a7800_state *state = screen->machine->driver_data<a7800_state>();
+	state->maria_scanline = 0;
 	VIDEO_UPDATE_CALL(generic_bitmapped);
 	return 0;
 }
@@ -459,11 +442,12 @@ VIDEO_UPDATE( a7800 )
 
  READ8_HANDLER( a7800_MARIA_r )
 {
+	a7800_state *state = space->machine->driver_data<a7800_state>();
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	switch (offset)
 	{
 		case 0x08:
-			return maria_vblank;
+			return state->maria_vblank;
 
 		default:
 			logerror("undefined MARIA read %x\n",offset);
@@ -473,127 +457,128 @@ VIDEO_UPDATE( a7800 )
 
 WRITE8_HANDLER( a7800_MARIA_w )
 {
+	a7800_state *state = space->machine->driver_data<a7800_state>();
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	switch (offset)
 	{
 		case 0x00:
-			maria_backcolor = data;
-			// 20030621 ericball added maria_palette[pal][0] to make kanagroo mode easier
-			maria_palette[0][0]=maria_backcolor;
-			maria_palette[1][0]=maria_backcolor;
-			maria_palette[2][0]=maria_backcolor;
-			maria_palette[3][0]=maria_backcolor;
-			maria_palette[4][0]=maria_backcolor;
-			maria_palette[5][0]=maria_backcolor;
-			maria_palette[6][0]=maria_backcolor;
-			maria_palette[7][0]=maria_backcolor;
+			state->maria_backcolor = data;
+			// 20030621 ericball added state->maria_palette[pal][0] to make kanagroo mode easier
+			state->maria_palette[0][0]=state->maria_backcolor;
+			state->maria_palette[1][0]=state->maria_backcolor;
+			state->maria_palette[2][0]=state->maria_backcolor;
+			state->maria_palette[3][0]=state->maria_backcolor;
+			state->maria_palette[4][0]=state->maria_backcolor;
+			state->maria_palette[5][0]=state->maria_backcolor;
+			state->maria_palette[6][0]=state->maria_backcolor;
+			state->maria_palette[7][0]=state->maria_backcolor;
 			break;
 		case 0x01:
-			maria_palette[0][1] = data;
+			state->maria_palette[0][1] = data;
 			break;
 		case 0x02:
-			maria_palette[0][2] = data;
+			state->maria_palette[0][2] = data;
 			break;
 		case 0x03:
-			maria_palette[0][3] = data;
+			state->maria_palette[0][3] = data;
 			break;
 		case 0x04:
 			cpu_spinuntil_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
-			maria_wsync=1;
+			state->maria_wsync=1;
 			break;
 
 		case 0x05:
-			maria_palette[1][1] = data;
+			state->maria_palette[1][1] = data;
 			break;
 		case 0x06:
-			maria_palette[1][2] = data;
+			state->maria_palette[1][2] = data;
 			break;
 		case 0x07:
-			maria_palette[1][3] = data;
+			state->maria_palette[1][3] = data;
 			break;
 
 		case 0x09:
-			maria_palette[2][1] = data;
+			state->maria_palette[2][1] = data;
 			break;
 		case 0x0A:
-			maria_palette[2][2] = data;
+			state->maria_palette[2][2] = data;
 			break;
 		case 0x0B:
-			maria_palette[2][3] = data;
+			state->maria_palette[2][3] = data;
 			break;
 
 		case 0x0D:
-			maria_palette[3][1] = data;
+			state->maria_palette[3][1] = data;
 			break;
 		case 0x0E:
-			maria_palette[3][2] = data;
+			state->maria_palette[3][2] = data;
 			break;
 		case 0x0F:
-			maria_palette[3][3] = data;
+			state->maria_palette[3][3] = data;
 			break;
 
 		case 0x11:
-			maria_palette[4][1] = data;
+			state->maria_palette[4][1] = data;
 			break;
 		case 0x12:
-			maria_palette[4][2] = data;
+			state->maria_palette[4][2] = data;
 			break;
 		case 0x13:
-			maria_palette[4][3] = data;
+			state->maria_palette[4][3] = data;
 			break;
 		case 0x14:
-			maria_charbase = (data << 8);
+			state->maria_charbase = (data << 8);
 			break;
 		case 0x15:
-			maria_palette[5][1] = data;
+			state->maria_palette[5][1] = data;
 			break;
 		case 0x16:
-			maria_palette[5][2] = data;
+			state->maria_palette[5][2] = data;
 			break;
 		case 0x17:
-			maria_palette[5][3] = data;
+			state->maria_palette[5][3] = data;
 			break;
 
 		case 0x19:
-			maria_palette[6][1] = data;
+			state->maria_palette[6][1] = data;
 			break;
 		case 0x1A:
-			maria_palette[6][2] = data;
+			state->maria_palette[6][2] = data;
 			break;
 		case 0x1B:
-			maria_palette[6][3] = data;
+			state->maria_palette[6][3] = data;
 			break;
 
 		case 0x1C:
 			/*logerror("MARIA CTRL=%x\n",data);*/
-			maria_color_kill = data & 0x80;
+			state->maria_color_kill = data & 0x80;
 			if ((data & 0x60) == 0x40)
-				maria_dmaon = 1;
+				state->maria_dmaon = 1;
 			else
-				maria_dmaon = maria_dodma = 0;
+				state->maria_dmaon = state->maria_dodma = 0;
 
-			maria_cwidth = data & 0x10;
-			maria_bcntl = data & 0x08;
-			maria_kangaroo = data & 0x04;
-			maria_rm = data & 0x03;
+			state->maria_cwidth = data & 0x10;
+			state->maria_bcntl = data & 0x08;
+			state->maria_kangaroo = data & 0x04;
+			state->maria_rm = data & 0x03;
 
 			/*logerror( "MARIA CTRL: CK:%d DMA:%d CW:%d BC:%d KM:%d RM:%d\n",
-                    maria_color_kill ? 1 : 0,
+                    state->maria_color_kill ? 1 : 0,
                     ( data & 0x60 ) >> 5,
-                    maria_cwidth ? 1 : 0,
-                    maria_bcntl ? 1 : 0,
-                    maria_kangaroo ? 1 : 0,
-                    maria_rm );*/
+                    state->maria_cwidth ? 1 : 0,
+                    state->maria_bcntl ? 1 : 0,
+                    state->maria_kangaroo ? 1 : 0,
+                    state->maria_rm );*/
 
 			break;
 		case 0x1D:
-			maria_palette[7][1] = data;
+			state->maria_palette[7][1] = data;
 			break;
 		case 0x1E:
-			maria_palette[7][2] = data;
+			state->maria_palette[7][2] = data;
 			break;
 		case 0x1F:
-			maria_palette[7][3] = data;
+			state->maria_palette[7][3] = data;
 			break;
 	}
 	ROM[ 0x20 + offset ] = data;

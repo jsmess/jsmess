@@ -42,6 +42,7 @@ public:
 	/* devices */
 	running_device *mc6847;
 	running_device *cassette;
+	int previous_i8271_int_state;
 };
 
 #endif

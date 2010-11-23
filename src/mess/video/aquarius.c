@@ -9,9 +9,7 @@
 #include "emu.h"
 #include "includes/aquarius.h"
 
-static tilemap_t *aquarius_tilemap;
 
-UINT8 *aquarius_colorram;
 
 static const rgb_t aquarius_colors[] =
 {
@@ -71,13 +69,14 @@ WRITE8_HANDLER( aquarius_videoram_w )
 	aquarius_state *state = space->machine->driver_data<aquarius_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(aquarius_tilemap, offset);
+	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 WRITE8_HANDLER( aquarius_colorram_w )
 {
-	aquarius_colorram[offset] = data;
-	tilemap_mark_tile_dirty(aquarius_tilemap, offset);
+	aquarius_state *state = space->machine->driver_data<aquarius_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 static TILE_GET_INFO(aquarius_gettileinfo)
@@ -86,7 +85,7 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 	UINT8 *videoram = state->videoram;
 	int bank = 0;
 	int code = videoram[tile_index];
-	int color = aquarius_colorram[tile_index];
+	int color = state->colorram[tile_index];
 	int flags = 0;
 
 	SET_TILE_INFO(bank, code, color, flags);
@@ -94,12 +93,14 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 
 VIDEO_START( aquarius )
 {
-	aquarius_tilemap = tilemap_create(machine, aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 25);
+	aquarius_state *state = machine->driver_data<aquarius_state>();
+	state->tilemap = tilemap_create(machine, aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 25);
 }
 
 VIDEO_UPDATE( aquarius )
 {
-	tilemap_draw(bitmap, NULL, aquarius_tilemap, 0, 0);
+	aquarius_state *state = screen->machine->driver_data<aquarius_state>();
+	tilemap_draw(bitmap, NULL, state->tilemap, 0, 0);
 
 	return 0;
 }

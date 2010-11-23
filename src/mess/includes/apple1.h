@@ -10,6 +10,39 @@
 #include "devices/snapquik.h"
 #include "machine/6821pia.h"
 
+typedef short termchar_t;
+
+typedef struct
+{
+	tilemap_t *tm;
+	int gfx;
+	int blank_char;
+	int char_bits;
+	int num_cols;
+	int num_rows;
+	int (*getcursorcode)(int original_code);
+	int cur_offset;
+	int cur_hidden;
+	termchar_t mem[1];
+} terminal_t;
+
+
+class apple1_state : public driver_device
+{
+public:
+	apple1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int vh_clrscrn_pressed;
+	int kbd_data;
+	UINT32 kbd_last_scan[4];
+	int reset_flag;
+	int cassette_output_flipflop;
+	terminal_t *current_terminal;
+	terminal_t *terminal;
+	int blink_on;
+};
+
 
 /*----------- defined in machine/apple1.c -----------*/
 
@@ -28,11 +61,10 @@ WRITE8_HANDLER( apple1_cassette_w );
 VIDEO_START( apple1 );
 VIDEO_UPDATE( apple1 );
 
-void apple1_vh_dsp_w (int data);
-void apple1_vh_dsp_clr (void);
+void apple1_vh_dsp_w (running_machine *machine, int data);
+void apple1_vh_dsp_clr (running_machine *machine);
 attotime apple1_vh_dsp_time_to_ready (running_machine *machine);
 
-extern int apple1_vh_clrscrn_pressed;
 
 
 /*----------- defined in drivers/apple1.c -----------*/

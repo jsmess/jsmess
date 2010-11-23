@@ -21,6 +21,25 @@
 #define AIM65_CLOCK  XTAL_4MHz/4
 
 
+class aim65_state : public driver_device
+{
+public:
+	aim65_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 pia_a;
+	UINT8 pia_b;
+	UINT8 riot_port_a;
+	int printer_x;
+	int printer_y;
+	int printer_dir;
+	int flag_a;
+	int flag_b;
+	emu_timer *print_timer;
+	int printer_level;
+};
+
+
 /*----------- defined in machine/aim65.c -----------*/
 
 void aim65_update_ds1(running_device *device, int digit, int data);

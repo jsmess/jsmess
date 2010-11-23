@@ -683,7 +683,7 @@ ROM_START(las3000)
 	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
 ROM_END
 
-MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
+static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MDRV_VIDEO_START(apple2e)
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

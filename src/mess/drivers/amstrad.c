@@ -870,7 +870,7 @@ static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","gx4000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( amstrad, driver_device )
+static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cpcplus, driver_device )
+static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_START( cpcplus, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx4000, driver_device )
+static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem)

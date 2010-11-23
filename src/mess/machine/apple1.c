@@ -136,7 +136,6 @@ static const UINT8 apple1_control_keymap[] =
 	'\x00', ESCAPE
 };
 
-static int apple1_kbd_data = 0;
 
 
 /*****************************************************************************
@@ -171,7 +170,7 @@ DRIVER_INIT( apple1 )
 MACHINE_RESET( apple1 )
 {
 	/* Reset the display hardware. */
-	apple1_vh_dsp_clr();
+	apple1_vh_dsp_clr(machine);
 }
 
 
@@ -281,6 +280,7 @@ SNAPSHOT_LOAD(apple1)
 *****************************************************************************/
 static TIMER_CALLBACK(apple1_kbd_poll)
 {
+	apple1_state *state = machine->driver_data<apple1_state>();
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
@@ -289,49 +289,46 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 
 	/* This holds the values of all the input ports for ordinary keys
        seen during the last scan. */
-	static UINT32 kbd_last_scan[] = { 0, 0, 0, 0 };
-
-	static int reset_flag = 0;
 
 	/* First we check the RESET and CLEAR SCREEN pushbutton switches. */
 
 	/* The RESET switch resets the CPU and the 6820 PIA. */
 	if (input_port_read(machine, "KEY5") & 0x0001)
 	{
-		if (!reset_flag) {
-			reset_flag = 1;
+		if (!state->reset_flag) {
+			state->reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 			pia->reset();
 		}
 	}
-	else if (reset_flag) {
+	else if (state->reset_flag) {
 		/* RESET released--allow the processor to continue. */
-		reset_flag = 0;
+		state->reset_flag = 0;
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */
 	if (input_port_read(machine, "KEY5") & 0x0002)
 	{
-		if (!apple1_vh_clrscrn_pressed)
+		if (!state->vh_clrscrn_pressed)
 		{
 			/* Ignore further video writes, and clear the screen. */
-			apple1_vh_clrscrn_pressed = 1;
-			apple1_vh_dsp_clr();
+			state->vh_clrscrn_pressed = 1;
+			apple1_vh_dsp_clr(machine);
 		}
 	}
-	else if (apple1_vh_clrscrn_pressed)
+	else if (state->vh_clrscrn_pressed)
 	{
 		/* CLEAR SCREEN released--pay attention to video writes again. */
-		apple1_vh_clrscrn_pressed = 0;
+		state->vh_clrscrn_pressed = 0;
 	}
 
 	/* Now we scan all the input ports for ordinary keys, recording
        new keypresses while ignoring keys that were already pressed in
        the last scan. */
 
-	apple1_kbd_data = 0;
+	state->kbd_data = 0;
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
@@ -345,7 +342,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		UINT32 portval, newkeys;
 
 		portval = input_port_read(machine, keynames[port]);
-		newkeys = portval & ~(kbd_last_scan[port]);
+		newkeys = portval & ~(state->kbd_last_scan[port]);
 
 		if (newkeys)
 		{
@@ -353,7 +350,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 			for (bit = 0; bit < 16; bit++) {
 				if (newkeys & 1)
 				{
-					apple1_kbd_data = (ctrlkeys)
+					state->kbd_data = (ctrlkeys)
 					  ? apple1_control_keymap[port*16 + bit]
 					  : (shiftkeys)
 					  ? apple1_shifted_keymap[port*16 + bit]
@@ -362,7 +359,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 				newkeys >>= 1;
 			}
 		}
-		kbd_last_scan[port] = portval;
+		state->kbd_last_scan[port] = portval;
 	}
 
 	if (key_pressed)
@@ -388,15 +385,16 @@ static TIMER_CALLBACK(apple1_kbd_strobe_end)
 *****************************************************************************/
 static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 {
+	apple1_state *state = device->machine->driver_data<apple1_state>();
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
        what the ROM Monitor software expects. */
-	return apple1_kbd_data | 0x80;
+	return state->kbd_data | 0x80;
 }
 
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
 {
 	/* Send an ASCII character to the video hardware. */
-	apple1_vh_dsp_w(data);
+	apple1_vh_dsp_w(device->machine, data);
 }
 
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
@@ -503,11 +501,10 @@ static running_device *cassette_device_image(running_machine *machine)
    toggles this flip-flop. */
 static void cassette_toggle_output(running_machine *machine)
 {
-	static int cassette_output_flipflop = 0;
-
-	cassette_output_flipflop = !cassette_output_flipflop;
+	apple1_state *state = machine->driver_data<apple1_state>();
+	state->cassette_output_flipflop = !state->cassette_output_flipflop;
 	cassette_output(cassette_device_image(machine),
-					cassette_output_flipflop ? 1.0 : -1.0);
+					state->cassette_output_flipflop ? 1.0 : -1.0);
 }
 
 READ8_HANDLER( apple1_cassette_r )

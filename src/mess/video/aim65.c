@@ -11,16 +11,9 @@
 #include "machine/6522via.h"
 
 
-static int printer_x;
-static int printer_y;
-static int printer_dir;
-static int flag_a;
-static int flag_b;
 
 //UINT16 *printerRAM;
 
-static emu_timer *print_timer;
-static int printer_level;
 
 
 
@@ -44,76 +37,80 @@ static int printer_level;
  */
 
 
-static void aim65_printer_inc(void)
+static void aim65_printer_inc(aim65_state *state)
 {
-	if (printer_dir)
+	if (state->printer_dir)
 	{
-		if (printer_x > 0) {
-			printer_x--;
+		if (state->printer_x > 0) {
+			state->printer_x--;
 		}
 		else {
-			printer_dir = 0;
-			printer_x++;
-			printer_y++;
+			state->printer_dir = 0;
+			state->printer_x++;
+			state->printer_y++;
 		}
 	}
 	else
 	{
-		if (printer_x < 9) {
-			printer_x++;
+		if (state->printer_x < 9) {
+			state->printer_x++;
 		}
 		else {
-			printer_dir = 1;
-			printer_x--;
-			printer_y++;
+			state->printer_dir = 1;
+			state->printer_x--;
+			state->printer_y++;
 		}
 	}
 
-	if (printer_y > 500) printer_y = 0;
+	if (state->printer_y > 500) state->printer_y = 0;
 
-	flag_a=0;
-	flag_b=0;
+	state->flag_a=0;
+	state->flag_b=0;
 }
 
-static void aim65_printer_cr(void) {
-	printer_x=0;
-	printer_y++;
-	if (printer_y > 500) printer_y = 0;
-	flag_a=flag_b=0;
+static void aim65_printer_cr(aim65_state *state)
+{
+	state->printer_x=0;
+	state->printer_y++;
+	if (state->printer_y > 500) state->printer_y = 0;
+	state->flag_a=state->flag_b=0;
 }
 
 static TIMER_CALLBACK(aim65_printer_timer)
 {
+	aim65_state *state = machine->driver_data<aim65_state>();
 	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 
-	via_0->write_cb1(printer_level);
-	via_0->write_cb1(!printer_level);
-	printer_level = !printer_level;
-	aim65_printer_inc();
+	via_0->write_cb1(state->printer_level);
+	via_0->write_cb1(!state->printer_level);
+	state->printer_level = !state->printer_level;
+	aim65_printer_inc(state);
 }
 
 
 WRITE8_DEVICE_HANDLER( aim65_printer_on )
 {
+	aim65_state *state = device->machine->driver_data<aim65_state>();
 	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 	if (!data)
 	{
-		aim65_printer_cr();
-		timer_adjust_periodic(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
+		aim65_printer_cr(state);
+		timer_adjust_periodic(state->print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
 		via_0->write_cb1(0);
-		printer_level = 1;
+		state->printer_level = 1;
 	}
 	else
-		timer_reset(print_timer, attotime_never);
+		timer_reset(state->print_timer, attotime_never);
 }
 
 
 WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 {
 #if 0
-	if (flag_a == 0) {
-		printerRAM[(printer_y * 20) + printer_x] |= data;
-		flag_a = 1;
+	aim65_state *state = device->machine->driver_data<aim65_state>();
+	if (state->flag_a == 0) {
+		printerRAM[(state->printer_y * 20) + state->printer_x] |= data;
+		state->flag_a = 1;
 	}
 #endif
 }
@@ -121,31 +118,33 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 {
 #if 0
+	aim65_state *state = device->machine->driver_data<aim65_state>();
 	data &= 0x03;
 
-	if (flag_b == 0) {
-		printerRAM[(printer_y * 20) + printer_x ] |= (data << 8);
-		flag_b = 1;
+	if (state->flag_b == 0) {
+		printerRAM[(state->printer_y * 20) + state->printer_x ] |= (data << 8);
+		state->flag_b = 1;
 	}
 #endif
 }
 
 VIDEO_START( aim65 )
 {
-	print_timer = timer_alloc(machine, aim65_printer_timer, NULL);
+	aim65_state *state = machine->driver_data<aim65_state>();
+	state->print_timer = timer_alloc(machine, aim65_printer_timer, NULL);
 
 #if 0
 	videoram_size = 600 * 10 * 2;
 	printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
 	memset(printerRAM, 0, videoram_size);
-	printer_x = 0;
-	printer_y = 0;
-	printer_dir = 0;
-	flag_a=0;
-	flag_b=0;
+	state->printer_x = 0;
+	state->printer_y = 0;
+	state->printer_dir = 0;
+	state->flag_a=0;
+	state->flag_b=0;
 
 
-	printer_level = 0;
+	state->printer_level = 0;
 
 	VIDEO_START_CALL(generic);
 #endif

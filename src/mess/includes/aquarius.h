@@ -14,12 +14,14 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 scrambler;
+	UINT8 *colorram;
+	tilemap_t *tilemap;
 };
 
 
 /*----------- defined in video/aquarius.c -----------*/
 
-extern UINT8 *aquarius_colorram;
 WRITE8_HANDLER( aquarius_videoram_w );
 WRITE8_HANDLER( aquarius_colorram_w );
 

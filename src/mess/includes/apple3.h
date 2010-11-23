@@ -22,9 +22,35 @@
 #define VAR_EXTSIDE		0x0080
 
 
+class apple3_state : public driver_device
+{
+public:
+	apple3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 flags;
+	UINT8 via_0_a;
+	UINT8 via_0_b;
+	UINT8 via_1_a;
+	UINT8 via_1_b;
+	int via_1_irq;
+	int enable_mask;
+	offs_t zpa;
+	int profile_lastaddr;
+	UINT8 profile_gotstrobe;
+	UINT8 profile_readdata;
+	UINT8 profile_busycount;
+	UINT8 profile_busy;
+	UINT8 profile_online;
+	UINT8 profile_writedata;
+	UINT8 last_n;
+	UINT8 *char_mem;
+	UINT32 *hgr_map;
+};
+
+
 /*----------- defined in machine/apple3.c -----------*/
 
-extern UINT32 apple3_flags;
 extern const applefdc_interface apple3_fdc_interface;
 extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;

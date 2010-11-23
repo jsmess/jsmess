@@ -95,7 +95,8 @@ Source Changes:
 - Refactored the UPD765 DRQ line to use devcb. The read_write parameter is 
   not present on the real chip, and no driver was using it. [Curt Coder]
   
-- Static and const changes.  [Atari Ace]
+- Static/const changes, and added driver_device state to many drivers.
+  [Atari Ace]
 
 
 
