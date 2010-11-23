@@ -6,16 +6,15 @@
 *  All detailed RE work done by Kevin 'kevtris' Horton
 *
 *  TODO:
-*  * Inputs: 4x4 keypad matrix
-*  * LED displays (four 7seg, two leds, currently is using terminal as a hack so it doesn't crash due to the screenless system bug)
-     The four arrays are populated with the proper data, all thats needed is a callback to draw said data to screen or to artwork
-*  * Figure out why it says the first speech line twice; it shouldn't.
-*  * Get rom locations from pcb
+*  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
+*  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * Add sensory chess challenger to driver, similar hardware.
 *
 ***********************************************************************
 
-Voice Chess Challenger
+Talking Chess Challenger (VCC)
+Advanced Talking Chess Challenger (UVC)
+(which both share the same hardware)
 ----------------------
 
 The CPU is a Z80 running at 4MHz.  The TSI chip runs at around 25KHz, using a
@@ -27,16 +26,23 @@ The Z80's interrupt inputs are all pulled to VCC, so no interrupts are used.
 
 Reset is connected to a power-on reset circuit and a button on the keypad (marked RE).
 
-The TSI chip connects to a 4K ROM marked VCC-ENGL.  All of the Voice Chess Challengers
-use this same ROM  (three).  The later chess boards use a slightly different part
+The TSI chip connects to a 4K ROM.  All of the 'Voiced' Chess Challengers
+use this same ROM  (three or four).  The later chess boards use a slightly different part
 number, but the contents are identical.
 
-Memory map:
+Memory map (VCC):
 -----------
-0000-0FFF: 4K ROM 101-32103
-1000-1FFF: 4K ROM VCC2
-2000-3FFF: 4K ROM VCC3 [LN edit: should be 2000-2FFF]
-4000-5FFF: 1K RAM (2114 * 2)
+0000-0FFF: 4K 2332 ROM 101-32103
+1000-1FFF: 4K 2332 ROM VCC2
+2000-2FFF: 4K 2332 ROM VCC3
+4000-5FFF: 1K RAM (2114 SRAM x2)
+6000-FFFF: empty
+
+Memory map (UVC):
+-----------
+0000-1FFF: 8K 2364 ROM 101-64017
+2000-2FFF: 4K 2332 ROM 101-32010
+4000-5FFF: 1K RAM (2114 SRAM x2)
 6000-FFFF: empty
 
 I/O map:
@@ -440,12 +446,21 @@ ROM_END
 
 ROM_START(vcc)
     ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257BB5AB) SHA1(F7589225BB8E5F3EAC55F23E2BD526BE780B38B5)) // 32014.VCC???
-    ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(F33095E7) SHA1(692FCAB1B88C910B74D04FE4D0660367AEE3F4F0))
-    ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6))
+    ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257BB5AB) SHA1(F7589225BB8E5F3EAC55F23E2BD526BE780B38B5)) // 32014.VCC??? at location b3?
+    ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(F33095E7) SHA1(692FCAB1B88C910B74D04FE4D0660367AEE3F4F0)) // at location a2?
+    ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // at location a1?
 
     ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D))
+    ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // at location c4?
+ROM_END
+
+ROM_START(uvc)
+    ROM_REGION(0x10000, "maincpu", 0)
+    ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(F1133ABF) SHA1(09DD85051C4E7D364D43507C1CFEA5C2D08D37F4)) // "MOS // 101-64017 // 3880"
+    ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
+
+    ROM_REGION(0x2000, "speech", 0)
+    ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
 
@@ -456,5 +471,6 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
 COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, 0,      "Fidelity Electronics",   "Chess Challenger 10",						GAME_NOT_WORKING )
-COMP( 1982, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
+COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
+COMP( 1980, uvc,        vcc,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
 

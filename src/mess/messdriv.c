@@ -1745,6 +1745,7 @@ const game_driver * const drivers[] =
 	DRIVER( codata )
 	DRIVER( rvoicepc )
 	DRIVER( vcc )
+	DRIVER( uvc )
 	DRIVER( victor9k )
 	DRIVER( phc25 )
 	DRIVER( phc25j )
