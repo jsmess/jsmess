@@ -28,22 +28,73 @@ class sg1000_state : public driver_device
 {
 public:
 	sg1000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_ram(*this, "messram")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<running_device> m_ram;
+
+	virtual void machine_start();
+	
+	void install_cartridge(UINT8 *ptr, int size);
+
+	DECLARE_WRITE8_MEMBER( tvdraw_axis_w );
+	DECLARE_READ8_MEMBER( tvdraw_status_r );
+	DECLARE_READ8_MEMBER( tvdraw_data_r );
+	DECLARE_READ8_MEMBER( joysel_r );
 
 	/* keyboard state */
-	UINT8 keylatch;
+	UINT8 m_keylatch;
 
 	/* TV Draw state */
-	UINT8 tvdraw_data;
+	UINT8 m_tvdraw_data;
+};
+
+class sc3000_state : public sg1000_state
+{
+public:
+	sc3000_state(running_machine &machine, const driver_device_config_base &config)
+		: sg1000_state(machine, config),
+		  m_cassette(*this, CASSETTE_TAG)
+	{ }
+
+	required_device<running_device> m_cassette;
+
+	virtual void machine_start();
+
+	void install_cartridge(UINT8 *ptr, int size);
+
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+};
+
+class sf7000_state : public sc3000_state
+{
+public:
+	sf7000_state(running_machine &machine, const driver_device_config_base &config)
+		: sc3000_state(machine, config),
+		  m_fdc(*this, UPD765_TAG),
+		  m_centronics(*this, CENTRONICS_TAG),
+		  m_floppy0(*this, FLOPPY_0)
+	{ }
+
+	required_device<running_device> m_fdc;
+	required_device<running_device> m_centronics;
+	required_device<running_device> m_floppy0;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 
 	/* floppy state */
-	int fdc_irq;
-	int fdc_index;
-
-	/* devices */
-	running_device *upd765;
-	running_device *centronics;
-	running_device *cassette;
+	int m_fdc_irq;
+	int m_fdc_index;
 };
 
 #endif
