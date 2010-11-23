@@ -133,6 +133,8 @@ public:
     DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
+	DECLARE_READ_LINE_MEMBER( vlt_r );
+	DECLARE_READ_LINE_MEMBER( wben_r );
 
 	void set_hpixels_per_column(int hpixels_per_column);
 
@@ -184,6 +186,8 @@ private:
 	int m_hsync_start;
 	int m_hsync_end;
 	int m_hfp;
+	int m_vlt;
+	int m_wben;
 
 	// timers
 	emu_timer *m_vsync_timer;

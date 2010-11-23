@@ -29,6 +29,8 @@ public:
 		  m_fdc(*this, I8272A_TAG),
 		  m_pic0(*this, I8259A_0_TAG),
 		  m_pic1(*this, I8259A_1_TAG),
+		  m_drb0(*this, CRT9212_0_TAG),
+		  m_drb1(*this, CRT9212_1_TAG),
 		  m_vpac(*this, CRT9007_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
@@ -44,8 +46,8 @@ public:
 	required_device<running_device> m_pic0;
 	required_device<running_device> m_pic1;
 	required_device<crt9007_device> m_vpac;
-//	required_device<crt9212_device> m_drb0;
-//	required_device<crt9212_device> m_drb1;
+	required_device<crt9212_device> m_drb0;
+	required_device<crt9212_device> m_drb1;
 //	required_device<crt9201_device> m_vag;
 	required_device<running_device> m_centronics;
 	required_device<running_device> m_speaker;

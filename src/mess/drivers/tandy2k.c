@@ -39,6 +39,7 @@
 #include "machine/upd765.h"
 #include "sound/speaker.h"
 #include "video/crt9007.h"
+#include "video/crt9212.h"
 #include "includes/tandy2k.h"
 
 /* Read/Write Handlers */
@@ -63,10 +64,10 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	UINT16 data = program->read_word(addr);
 
 	// character
-//	m_drb0->write(data & 0xff);
+	m_drb0->write(space, 0, data & 0xff);
 
 	// attributes
-//	m_drb1->write(data >> 8);
+	m_drb1->write(space, 0, data >> 8);
 
 	return data & 0xff;
 }
@@ -506,7 +507,7 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 	}
 }
 */
-static CRT9007_INTERFACE( crt9007_intf )
+static CRT9007_INTERFACE( vpac_intf )
 {
 	SCREEN_TAG,
 	10,
@@ -519,6 +520,24 @@ static CRT9007_INTERFACE( crt9007_intf )
 	DEVCB_NULL,	// DRB		CRT9212 U55/U15 TOG
 	DEVCB_NULL,	// SLG		CRT9021B U14 _SLG
 	DEVCB_NULL	// SLD		CRT9021B U14 SLD
+};
+
+static CRT9212_INTERFACE( drb0_intf )
+{
+	DEVCB_NULL, // ROF
+	DEVCB_NULL, // WOF
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r),
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r),
+	DEVCB_LINE_VCC
+};
+
+static CRT9212_INTERFACE( drb1_intf )
+{
+	DEVCB_NULL, // ROF
+	DEVCB_NULL, // WOF
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r),
+	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r),
+	DEVCB_LINE_VCC
 };
 
 /* Intel 8251A Interface */
@@ -815,7 +834,9 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, crt9007_intf, vpac_mem)
+	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
+	MDRV_CRT9212_ADD(CRT9212_0_TAG, drb0_intf)
+	MDRV_CRT9212_ADD(CRT9212_1_TAG, drb1_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
