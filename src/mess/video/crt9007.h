@@ -30,80 +30,175 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __CRT9007__
 #define __CRT9007__
 
 #include "emu.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(CRT9007, crt9007);
 
-#define MDRV_CRT9007_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), CRT9007, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
+
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MDRV_CRT9007_ADD(_tag, _clock, _config, _map) \
+	MDRV_DEVICE_ADD(_tag, CRT9007, _clock) \
+	MDRV_DEVICE_CONFIG(_config) \
+	MDRV_DEVICE_ADDRESS_MAP(0, _map)
+
 
 #define CRT9007_INTERFACE(name) \
 	const crt9007_interface (name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef void (*crt9007_draw_scanline_func)(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 va, UINT8 sl, UINT8 data, int y, int x, int x_count, int cursor_x);
-#define CRT9007_DRAW_SCANLINE(name) void name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 va, UINT8 sl, UINT8 data, int y, int x, int x_count, int cursor_x)
 
-typedef struct _crt9007_interface crt9007_interface;
-struct _crt9007_interface
+//**************************************************************************
+//	TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> crt9007_interface
+
+struct crt9007_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
 	int hpixels_per_column;		/* number of pixels per video memory address */
 
-	crt9007_draw_scanline_func	draw_scanline_func;
-
 	devcb_write_line		out_int_func;
 	devcb_write_line		out_dmar_func;
 
-	devcb_write_line		out_hs_func;
 	devcb_write_line		out_vs_func;
-/*
-    devcb_write_line        out_cblank_func;
-    devcb_write_line        out_vblank_func;
+	devcb_write_line		out_hs_func;
 
-    devcb_write_line        out_vlt_func;
+	devcb_write_line        out_vlt_func;
     devcb_write_line        out_curs_func;
     devcb_write_line        out_drb_func;
 
-    devcb_write_line        out_slg_func;
-    devcb_write_line        out_sld_func;
-*/
-	devcb_read8				in_vd_func;
-	devcb_write8			out_vd_func;
+	devcb_write_line        out_slg_func;
+	devcb_write_line        out_sld_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* register access */
-READ8_DEVICE_HANDLER( crt9007_r );
-WRITE8_DEVICE_HANDLER( crt9007_w );
 
-/* DMA acknowledge */
-WRITE8_DEVICE_HANDLER( crt9007_ack_w );
+// ======================> crt9007_device_config
 
-/* light pen strobe */
-WRITE_LINE_DEVICE_HANDLER( crt9007_lpstb_w );
+class crt9007_device_config :   public device_config,
+								public device_config_memory_interface,
+                                public crt9007_interface
+{
+    friend class crt9007_device;
 
-/* set the clock of the chip */
-void crt9007_set_clock(running_device *device, UINT32 clock);
+    // construction/destruction
+    crt9007_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-/* set number of pixels per video memory address */
-void crt9007_set_hpixels_per_column(running_device *device, int hpixels_per_column);
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
 
-/* screen update */
-void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
+};
+
+
+
+// ======================> crt9007_device
+
+class crt9007_device :	public device_t,
+						public device_memory_interface
+{
+    friend class crt9007_device_config;
+
+    // construction/destruction
+    crt9007_device(running_machine &_machine, const crt9007_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( read );
+    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
+
+	void set_hpixels_per_column(int hpixels_per_column);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+	virtual void device_clock_changed();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	static const device_timer_id TIMER_HSYNC = 0;
+	static const device_timer_id TIMER_VSYNC = 1;
+	static const device_timer_id TIMER_VLT = 2;
+	static const device_timer_id TIMER_CURS = 3;
+	static const device_timer_id TIMER_DRB = 4;
+
+	inline UINT8 readbyte(offs_t address);
+
+	inline void update_hsync_timer(int state);
+	inline void update_vsync_timer(int state);
+	inline void update_vlt_timer(int state);
+	inline void update_curs_timer(int state);
+	inline void update_drb_timer(int state);
+
+	inline void recompute_parameters();
+
+	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_write_line	m_out_dmar_func;
+	devcb_resolved_write_line	m_out_hs_func;
+	devcb_resolved_write_line	m_out_vs_func;
+	devcb_resolved_write_line	m_out_vlt_func;
+	devcb_resolved_write_line	m_out_curs_func;
+	devcb_resolved_write_line	m_out_drb_func;
+
+	screen_device *m_screen;
+
+	// registers
+	UINT8 m_reg[0x3d];
+	UINT8 m_status;
+
+	int m_disp;
+	int m_hpixels_per_column;
+
+	// runtime variables, do not state save
+	int m_vsync_start;
+	int m_vsync_end;
+	int m_vfp;
+	int m_hsync_start;
+	int m_hsync_end;
+	int m_hfp;
+
+	// timers
+	emu_timer *m_vsync_timer;
+	emu_timer *m_hsync_timer;
+	emu_timer *m_vlt_timer;
+	emu_timer *m_curs_timer;
+	emu_timer *m_drb_timer;
+
+	const crt9007_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type CRT9007;
+
+
 
 #endif

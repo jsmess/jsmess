@@ -10,8 +10,10 @@
 
     TODO:
 
-    - 80186
     - CRT9007
+	- CRT9212 Double Row Buffer
+	- CRT9021B Attribute Generator
+    - 80186
     - keyboard ROM
     - hires graphics board
     - floppy 720K DSQD
@@ -51,6 +53,22 @@ void tandy2k_state::speaker_update()
 	int level = !(m_spkrdata & m_outspkr);
 
 	speaker_level_w(m_speaker, level);
+}
+
+READ8_MEMBER( tandy2k_state::videoram_r )
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	
+	offs_t addr = (m_vram_base << 15) | (offset << 1);
+	UINT16 data = program->read_word(addr);
+
+	// character
+//	m_drb0->write(data & 0xff);
+
+	// attributes
+//	m_drb1->write(data >> 8);
+
+	return data & 0xff;
 }
 
 READ8_MEMBER( tandy2k_state::enable_r )
@@ -182,19 +200,19 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
     */
 
 	/* video access */
-	m_vram_base = data << 15;
+	m_vram_base = data & 0x1f;
 
 	/* video clock speed */
 	if (m_clkspd != BIT(data, 5))
 	{
-		crt9007_set_clock(m_vpac, BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
+		m_vpac->set_unscaled_clock(BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
 		m_clkspd = BIT(data, 5);
 	}
 
 	/* dots per char */
 	if (m_clkcnt != BIT(data, 6))
 	{
-		crt9007_set_hpixels_per_column(m_vpac, BIT(data, 6) ? 8 : 10);
+		m_vpac->set_hpixels_per_column(BIT(data, 6) ? 8 : 10);
 		m_clkcnt = BIT(data, 6);
 	}
 
@@ -304,7 +322,7 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
-	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8_LEGACY(CRT9007_TAG, crt9007_r, crt9007_w, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
+	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
 //  AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
@@ -316,6 +334,10 @@ static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
 //  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
 //  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vpac_mem, 0, 8, tandy2k_state )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8, tandy2k_state )
@@ -454,12 +476,12 @@ bool tandy2k_state::video_update(screen_device &screen, bitmap_t &bitmap, const 
 {
 	if (m_vidouts)
 	{
-		crt9007_update(m_vpac, &bitmap, &cliprect);
+		//m_vag->update_screen(&bitmap, &cliprect);
 	}
 
 	return 0;
 }
-
+/*
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
 	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
@@ -467,7 +489,7 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
-		UINT32 videoram_addr = (state->m_vram_base | (va << 1)) + sx;
+		UINT32 videoram_addr = ((state->m_vram_base << 15) | (va << 1)) + sx;
 		UINT8 videoram_data = program->read_word(videoram_addr);
 		UINT16 charram_addr = (videoram_data << 4) | sl;
 		UINT8 charram_data = state->m_char_ram[charram_addr] & 0xff;
@@ -483,18 +505,20 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 		}
 	}
 }
-
+*/
 static CRT9007_INTERFACE( crt9007_intf )
 {
 	SCREEN_TAG,
 	10,
-	tandy2k_crt9007_display_pixels,
 	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,	// DMAR		80186 HOLD
+	DEVCB_NULL,	// VS		CRT9021B U14 VSYNC
+	DEVCB_NULL,	// HS
+	DEVCB_NULL,	// VLT		CRT9212 U55/U15 _CLRCNT
+	DEVCB_NULL,	// CURS		CRT9021B U14 CURSOR
+	DEVCB_NULL,	// DRB		CRT9212 U55/U15 TOG
+	DEVCB_NULL,	// SLG		CRT9021B U14 _SLG
+	DEVCB_NULL	// SLD		CRT9021B U14 SLD
 };
 
 /* Intel 8251A Interface */
@@ -651,11 +675,11 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 
 static I8255A_INTERFACE( i8255_intf )
 {
-	DEVCB_NULL,							// Port A read
-	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),			// Port B write
-	DEVCB_NULL,							// Port C read
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port A write callback */
-	DEVCB_NULL,							// Port B write
+	DEVCB_NULL,													// Port A read
+	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),				// Port B write
+	DEVCB_NULL,													// Port C read
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
+	DEVCB_NULL,													// Port B write
 	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pc_w)				// Port C write
 };
 
@@ -791,7 +815,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, crt9007_intf)
+	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, crt9007_intf, vpac_mem)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

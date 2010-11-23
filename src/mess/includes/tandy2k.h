@@ -11,7 +11,9 @@
 #define I8259A_1_TAG	"u43"
 #define I8272A_TAG		"u121"
 #define CRT9007_TAG		"u16"
-#define CRT9021_TAG		"u14"
+#define CRT9212_0_TAG	"u55"
+#define CRT9212_1_TAG	"u15"
+#define CRT9021B_TAG	"u14"
 #define WD1010_TAG		"u18"
 #define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
@@ -41,7 +43,10 @@ public:
 	required_device<running_device> m_fdc;
 	required_device<running_device> m_pic0;
 	required_device<running_device> m_pic1;
-	required_device<running_device> m_vpac;
+	required_device<crt9007_device> m_vpac;
+//	required_device<crt9212_device> m_drb0;
+//	required_device<crt9212_device> m_drb1;
+//	required_device<crt9201_device> m_vag;
 	required_device<running_device> m_centronics;
 	required_device<running_device> m_speaker;
 	required_device<running_device> m_ram;
@@ -55,6 +60,7 @@ public:
 	void speaker_update();
 	void dma_request(int line, int state);
 
+	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_READ8_MEMBER( enable_r );
 	DECLARE_WRITE8_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( dma_mux_w );
@@ -88,7 +94,7 @@ public:
 	UINT16 *m_char_ram;
 	UINT16 *m_hires_ram;
 	UINT16 m_palette[16];
-	UINT32 m_vram_base;
+	UINT8 m_vram_base;
 	int m_vidouts;
 	int m_clkspd;
 	int m_clkcnt;

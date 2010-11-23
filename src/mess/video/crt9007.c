@@ -14,7 +14,8 @@
     - interrupts
     - status register
     - reset
-    - DMA mode (currently forcing to non-DMA mode)
+	- non-DMA mode
+    - DMA mode
     - cursor/blank skew
     - sequential breaks
     - interlaced mode
@@ -33,129 +34,133 @@
 #include "emu.h"
 #include "crt9007.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 #define LOG 1
 
 #define HAS_VALID_PARAMETERS \
-	(crt9007->reg[0x00] && crt9007->reg[0x01] && crt9007->reg[0x07] && crt9007->reg[0x08] && crt9007->reg[0x09])
+	(m_reg[0x00] && m_reg[0x01] && m_reg[0x07] && m_reg[0x08] && m_reg[0x09])
 
 #define CHARACTERS_PER_HORIZONTAL_PERIOD \
-	crt9007->reg[0x00]
+	m_reg[0x00]
 
 #define CHARACTERS_PER_DATA_ROW \
-	(crt9007->reg[0x01] + 1)
+	(m_reg[0x01] + 1)
 
 #define HORIZONTAL_DELAY \
-	crt9007->reg[0x02]
+	m_reg[0x02]
 
 #define HORIZONTAL_SYNC_WIDTH \
-	crt9007->reg[0x03]
+	m_reg[0x03]
 
 #define VERTICAL_SYNC_WIDTH \
-	crt9007->reg[0x04]
+	m_reg[0x04]
 
 #define VERTICAL_DELAY \
-	(crt9007->reg[0x05] - 1)
+	(m_reg[0x05] - 1)
 
 #define PIN_CONFIGURATION \
-	(crt9007->reg[0x06] >> 6)
+	(m_reg[0x06] >> 6)
 
 #define CURSOR_SKEW \
-	((crt9007->reg[0x06] >> 3) & 0x07)
+	((m_reg[0x06] >> 3) & 0x07)
 
 #define BLANK_SKEW \
-	(crt9007->reg[0x06] & 0x07)
+	(m_reg[0x06] & 0x07)
 
 #define VISIBLE_DATA_ROWS_PER_FRAME \
-	(crt9007->reg[0x07] + 1)
+	(m_reg[0x07] + 1)
 
 #define SCAN_LINES_PER_DATA_ROW \
-	((crt9007->reg[0x08] & 0x1f) + 1)
+	((m_reg[0x08] & 0x1f) + 1)
 
 #define SCAN_LINES_PER_FRAME \
-	(((crt9007->reg[0x08] << 3) & 0x0700) | crt9007->reg[0x09])
+	(((m_reg[0x08] << 3) & 0x0700) | m_reg[0x09])
 
 #define DMA_BURST_COUNT \
-	(crt9007->reg[0x0a] & 0x0f)
+	(m_reg[0x0a] & 0x0f)
 
 #define DMA_BURST_DELAY \
-	((crt9007->reg[0x0a] >> 4) & 0x07)
+	((m_reg[0x0a] >> 4) & 0x07)
 
 #define DMA_DISABLE \
-	BIT(crt9007->reg[0x0a], 7)
+	BIT(m_reg[0x0a], 7)
 
 #define SINGLE_HEIGHT_CURSOR \
-	BIT(crt9007->reg[0x0b], 0)
+	BIT(m_reg[0x0b], 0)
 
 #define OPERATION_MODE \
-	((crt9007->reg[0x0b] >> 1) & 0x07)
+	((m_reg[0x0b] >> 1) & 0x07)
 
 #define INTERLACE_MODE \
-	((crt9007->reg[0x0b] >> 4) & 0x03)
+	((m_reg[0x0b] >> 4) & 0x03)
 
 #define PAGE_BLANK \
-	BIT(crt9007->reg[0x0b], 6)
+	BIT(m_reg[0x0b], 6)
 
 #define TABLE_START \
-	(((crt9007->reg[0x0d] << 8) & 0x3f00) | crt9007->reg[0x0c])
+	(((m_reg[0x0d] << 8) & 0x3f00) | m_reg[0x0c])
 
 #define ADDRESS_MODE \
-	((crt9007->reg[0x0d] >> 6) & 0x03)
+	((m_reg[0x0d] >> 6) & 0x03)
 
 #define AUXILIARY_ADDRESS_1 \
-	(((crt9007->reg[0x0f] << 8) & 0x3f00) | crt9007->reg[0x0e])
+	(((m_reg[0x0f] << 8) & 0x3f00) | m_reg[0x0e])
 
 #define ROW_ATTRIBUTES_1 \
-	((crt9007->reg[0x0f] >> 6) & 0x03)
+	((m_reg[0x0f] >> 6) & 0x03)
 
 #define SEQUENTIAL_BREAK_1 \
-	crt9007->reg[0x10]
+	m_reg[0x10]
 
 #define SEQUENTIAL_BREAK_2 \
-	crt9007->reg[0x12]
+	m_reg[0x12]
 
 #define DATA_ROW_START \
-	crt9007->reg[0x11]
+	m_reg[0x11]
 
 #define DATA_ROW_END \
-	crt9007->reg[0x12]
+	m_reg[0x12]
 
 #define AUXILIARY_ADDRESS_2 \
-	(((crt9007->reg[0x14] << 8) & 0x3f00) | crt9007->reg[0x13])
+	(((m_reg[0x14] << 8) & 0x3f00) | m_reg[0x13])
 
 #define ROW_ATTRIBUTES_2 \
-	((crt9007->reg[0x14] >> 6) & 0x03)
+	((m_reg[0x14] >> 6) & 0x03)
 
 #define SMOOTH_SCROLL_OFFSET \
-	((crt9007->reg[0x17] >> 1) & 0x3f)
+	((m_reg[0x17] >> 1) & 0x3f)
 
 #define SMOOTH_SCROLL_OFFSET_OVERFLOW \
-	BIT(crt9007->reg[0x17], 7)
+	BIT(m_reg[0x17], 7)
 
 #define VERTICAL_CURSOR \
-	crt9007->reg[0x18]
+	m_reg[0x18]
 
 #define HORIZONTAL_CURSOR \
-	crt9007->reg[0x19]
+	m_reg[0x19]
 
 #define FRAME_TIMER \
-	BIT(crt9007->reg[0x1a], 0)
+	BIT(m_reg[0x1a], 0)
 
 #define LIGHT_PEN_INTERRUPT \
-	BIT(crt9007->reg[0x1a], 5)
+	BIT(m_reg[0x1a], 5)
 
 #define VERTICAL_RETRACE_INTERRUPT \
-	BIT(crt9007->reg[0x1a], 6)
+	BIT(m_reg[0x1a], 6)
 
 #define VERTICAL_LIGHT_PEN \
-	crt9007->reg[0x3b]
+	m_reg[0x3b]
 
 #define HORIZONTAL_LIGHT_PEN \
-	crt9007->reg[0x3c]
+	m_reg[0x3c]
 
+
+// interlace
 enum
 {
 	NON_INTERLACED = 0,
@@ -163,6 +168,8 @@ enum
 	NORMAL_VIDEO_INTERFACE,
 };
 
+
+// operation modes
 enum
 {
 	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,
@@ -171,6 +178,8 @@ enum
 	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7
 };
 
+
+// addressing modes
 enum
 {
 	ADDRESS_MODE_SEQUENTIAL_ADDRESSING = 0,
@@ -179,191 +188,390 @@ enum
 	ADDRESS_MODE_LINKED_LIST_ROW_TABLE
 };
 
-#define STATUS_INTERRUPT_PENDING	0x80
-#define STATUS_VERTICAL_RETRACE		0x40
-#define STATUS_LIGHT_PEN_UPDATE		0x20
-#define STATUS_ODD_EVEN				0x04
-#define STATUS_FRAME_TIMER_OCCURRED	0x01
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+// status register bits
+const int STATUS_INTERRUPT_PENDING		= 0x80;
+const int STATUS_VERTICAL_RETRACE		= 0x40;
+const int STATUS_LIGHT_PEN_UPDATE		= 0x20;
+const int STATUS_ODD_EVEN				= 0x04;
+const int STATUS_FRAME_TIMER_OCCURRED	= 0x01;
 
-typedef struct _crt9007_t crt9007_t;
-struct _crt9007_t
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type CRT9007 = crt9007_device_config::static_alloc_device_config;
+
+
+// default address map
+static ADDRESS_MAP_START( crt9007, 0, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  crt9007_device_config - constructor
+//-------------------------------------------------
+
+crt9007_device_config::crt9007_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "SMC CRT9007", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
 {
-	devcb_resolved_write_line	out_int_func;
-	devcb_resolved_write_line	out_dmar_func;
-	devcb_resolved_write_line	out_hs_func;
-	devcb_resolved_write_line	out_vs_func;
-	devcb_resolved_read8		in_vd_func;
-
-	crt9007_draw_scanline_func	draw_scanline_func;
-
-	screen_device *screen;			/* screen */
-
-	/* registers */
-	UINT8 reg[0x3d];
-	UINT8 status;
-
-	int disp;
-	int hpixels_per_column;
-
-	/* runtime variables, do not state save */
-	int vsync_start;
-	int vsync_end;
-	int vfp;
-	int hsync_start;
-	int hsync_end;
-	int hfp;
-
-	/* timers */
-	emu_timer *vsync_timer;			/* vertical sync timer */
-	emu_timer *hsync_timer;			/* horizontal sync timer */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE crt9007_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	return (crt9007_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const crt9007_interface *get_interface(running_device *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *crt9007_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	assert(device->type() == CRT9007);
-	return (const crt9007_interface *) device->baseconfig().static_config();
+	return global_alloc(crt9007_device_config(mconfig, tag, owner, clock));
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    update_vsync_timer -
--------------------------------------------------*/
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
 
-static void update_vsync_timer(crt9007_t *crt9007, int state)
+device_t *crt9007_device_config::alloc_device(running_machine &machine) const
 {
-	int next_y = state ? crt9007->vsync_start : crt9007->vsync_end;
-
-	attotime duration = crt9007->screen->time_until_pos(next_y, 0);
-
-	timer_adjust_oneshot(crt9007->vsync_timer, duration, !state);
+	return auto_alloc(&machine, crt9007_device(machine, *this));
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( vsync_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( vsync_tick )
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *crt9007_device_config::memory_space_config(int spacenum) const
 {
-	running_device *device = (running_device *)ptr;
-	crt9007_t *crt9007 = get_safe_token(device);
-
-	devcb_call_write_line(&crt9007->out_vs_func, param);
-
-	update_vsync_timer(crt9007, param);
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
-/*-------------------------------------------------
-    update_hsync_timer -
--------------------------------------------------*/
 
-static void update_hsync_timer(crt9007_t *crt9007, int state)
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void crt9007_device_config::device_config_complete()
 {
-	int y = crt9007->screen->vpos();
+	// inherit a copy of the static data
+	const crt9007_interface *intf = reinterpret_cast<const crt9007_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<crt9007_interface *>(this) = *intf;
 
-	int next_x = state ? crt9007->hsync_start : crt9007->hsync_end;
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&out_int_func, 0, sizeof(out_int_func));
+		memset(&out_dmar_func, 0, sizeof(out_dmar_func));
+		memset(&out_vs_func, 0, sizeof(out_vs_func));
+		memset(&out_hs_func, 0, sizeof(out_hs_func));
+		memset(&out_vlt_func, 0, sizeof(out_vlt_func));
+		memset(&out_curs_func, 0, sizeof(out_curs_func));
+		memset(&out_drb_func, 0, sizeof(out_drb_func));
+		memset(&out_slg_func, 0, sizeof(out_slg_func));
+		memset(&out_sld_func, 0, sizeof(out_sld_func));
+	}
+}
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 crt9007_device::readbyte(offs_t address)
+{
+	return space()->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  update_hsync_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_hsync_timer(int state)
+{
+	int y = m_screen->vpos();
+
+	int next_x = state ? m_hsync_start : m_hsync_end;
 	int next_y = (y + 1) % SCAN_LINES_PER_FRAME;
 
-	attotime duration = crt9007->screen->time_until_pos(next_y, next_x);
+	attotime duration = m_screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(crt9007->hsync_timer, duration, !state);
+	timer_adjust_oneshot(m_hsync_timer, duration, !state);
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( hsync_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( hsync_tick )
+//-------------------------------------------------
+//  update_vsync_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_vsync_timer(int state)
 {
-	running_device *device = (running_device *)ptr;
-	crt9007_t *crt9007 = get_safe_token(device);
+	int next_y = state ? m_vsync_start : m_vsync_end;
 
-	devcb_call_write_line(&crt9007->out_hs_func, param);
+	attotime duration = m_screen->time_until_pos(next_y, 0);
 
-	update_hsync_timer(crt9007, param);
+	timer_adjust_oneshot(m_vsync_timer, duration, !state);
 }
 
-/*-------------------------------------------------
-    recompute_parameters -
--------------------------------------------------*/
 
-static void recompute_parameters(running_device *device)
+//-------------------------------------------------
+//  update_vlt_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_vlt_timer(int state)
 {
-	crt9007_t *crt9007 = get_safe_token(device);
+	// TODO
+}
 
-	/* check that necessary registers have been loaded */
+
+//-------------------------------------------------
+//  update_curs_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_curs_timer(int state)
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  update_drb_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_drb_timer(int state)
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  recompute_parameters - 
+//-------------------------------------------------
+
+inline void crt9007_device::recompute_parameters()
+{
+	// check that necessary registers have been loaded
 	if (!HAS_VALID_PARAMETERS) return;
 
-	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * crt9007->hpixels_per_column;
+	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock()) * horiz_pix_total * vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
 
-	crt9007->hsync_start = (CHARACTERS_PER_HORIZONTAL_PERIOD - HORIZONTAL_SYNC_WIDTH) * crt9007->hpixels_per_column;
-	crt9007->hsync_end = 0;
-	crt9007->hfp = (HORIZONTAL_DELAY - HORIZONTAL_SYNC_WIDTH) * crt9007->hpixels_per_column;
+	m_hsync_start = (CHARACTERS_PER_HORIZONTAL_PERIOD - HORIZONTAL_SYNC_WIDTH) * m_hpixels_per_column;
+	m_hsync_end = 0;
+	m_hfp = (HORIZONTAL_DELAY - HORIZONTAL_SYNC_WIDTH) * m_hpixels_per_column;
 
-	crt9007->vsync_start = SCAN_LINES_PER_FRAME - VERTICAL_SYNC_WIDTH;
-	crt9007->vsync_end = 0;
-	crt9007->vfp = VERTICAL_DELAY - VERTICAL_SYNC_WIDTH;
+	m_vsync_start = SCAN_LINES_PER_FRAME - VERTICAL_SYNC_WIDTH;
+	m_vsync_end = 0;
+	m_vfp = VERTICAL_DELAY - VERTICAL_SYNC_WIDTH;
 
 	rectangle visarea;
 
-	visarea.min_x = crt9007->hsync_end;
-	visarea.max_x = crt9007->hsync_start - 1;
+	visarea.min_x = m_hsync_end;
+	visarea.max_x = m_hsync_start - 1;
 
-	visarea.min_y = crt9007->vsync_end;
-	visarea.max_y = crt9007->vsync_start - 1;
+	visarea.min_y = m_vsync_end;
+	visarea.max_y = m_vsync_start - 1;
 
 	if (LOG)
 	{
-		logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", device->tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
-	crt9007->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-	update_hsync_timer(crt9007, 1);
-	update_vsync_timer(crt9007, 1);
+	update_hsync_timer(1);
+	update_vsync_timer(1);
+	update_vlt_timer(1);
+	update_curs_timer(1);
+	update_drb_timer(1);
 }
 
-/*-------------------------------------------------
-    crt9007_r - register read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( crt9007_r )
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  crt9007_device - constructor
+//-------------------------------------------------
+
+crt9007_device::crt9007_device(running_machine &_machine, const crt9007_device_config &config)
+    : device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+      m_config(config)
 {
-	crt9007_t *crt9007 = get_safe_token(device);
+	for (int i = 0; i < 0x3d; i++)
+		m_reg[i] = 0;
+}
 
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void crt9007_device::device_start()
+{
+	// allocate timers
+	m_hsync_timer = device_timer_alloc(*this, TIMER_HSYNC);
+	m_vsync_timer = device_timer_alloc(*this, TIMER_VSYNC);
+	m_vlt_timer = device_timer_alloc(*this, TIMER_VLT);
+	m_curs_timer = device_timer_alloc(*this, TIMER_CURS);
+	m_drb_timer = device_timer_alloc(*this, TIMER_DRB);
+
+	// resolve callbacks
+	devcb_resolve_write_line(&m_out_int_func, &m_config.out_int_func, this);
+	devcb_resolve_write_line(&m_out_dmar_func, &m_config.out_dmar_func, this);
+	devcb_resolve_write_line(&m_out_hs_func, &m_config.out_hs_func, this);
+	devcb_resolve_write_line(&m_out_vs_func, &m_config.out_vs_func, this);
+	devcb_resolve_write_line(&m_out_vlt_func, &m_config.out_vlt_func, this);
+	devcb_resolve_write_line(&m_out_curs_func, &m_config.out_curs_func, this);
+	devcb_resolve_write_line(&m_out_drb_func, &m_config.out_drb_func, this);
+
+	// get the screen device
+	m_screen = machine->device<screen_device>(m_config.screen_tag);
+	assert(m_screen != NULL);
+
+	// set horizontal pixels per column
+	m_hpixels_per_column = m_config.hpixels_per_column;
+
+	// register for state saving
+//	state_save_register_device_item(this, 0, );
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void crt9007_device::device_reset()
+{
+	m_disp = 0;
+
+	// HS = 1
+	devcb_call_write_line(&m_out_hs_func, 1);
+
+	// VS = 1
+	devcb_call_write_line(&m_out_vs_func, 1);
+
+	// CBLANK = 1
+//	devcb_call_write_line(&m_out_cblank_func, 0);
+
+	// CURS = 0
+	devcb_call_write_line(&m_out_curs_func, 0);
+
+	// VLT = 0
+	devcb_call_write_line(&m_out_vlt_func, 0);
+
+	// DRB = 1
+	devcb_call_write_line(&m_out_drb_func, 1);
+
+	// INT = 0
+	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+
+	// 28 (DMAR) = 0
+	devcb_call_write_line(&m_out_dmar_func, CLEAR_LINE);
+
+	// 29 (WBEN) = 0
+
+	// 30 (SLG) = 0
+//	devcb_call_write_line(&m_out_slg_func, 0);
+
+	// 31 (SLD) = 0
+//	devcb_call_write_line(&m_out_sld_func, 0);
+
+	// 32 (LPSTB) = 0
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - handle clock change
+//-------------------------------------------------
+
+void crt9007_device::device_clock_changed()
+{
+	recompute_parameters();
+}
+
+
+//-------------------------------------------------
+//  device_timer - handle timer events
+//-------------------------------------------------
+
+void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_HSYNC:
+		devcb_call_write_line(&m_out_hs_func, param);
+		update_hsync_timer(param);
+		break;
+
+	case TIMER_VSYNC:
+		devcb_call_write_line(&m_out_vs_func, param);
+		update_vsync_timer(param);
+		break;
+
+	case TIMER_VLT:
+		devcb_call_write_line(&m_out_vlt_func, param);
+		update_vlt_timer(param);
+		break;
+
+	case TIMER_CURS:
+		devcb_call_write_line(&m_out_curs_func, param);
+		update_curs_timer(param);
+		break;
+
+	case TIMER_DRB:
+		devcb_call_write_line(&m_out_drb_func, param);
+		update_drb_timer(param);
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  read - register read
+//-------------------------------------------------
+
+READ8_MEMBER( crt9007_device::read )
+{
 	UINT8 data = 0;
 
 	switch (offset)
 	{
 	case 0x15:
-		crt9007->disp = 1;
-		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag());
+		if (LOG) logerror("CRT9007 '%s' Start\n", tag());
+		m_disp = 1;
 		break;
 
 	case 0x16:
-		crt9007->disp = 0;
-		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag());
+		if (LOG) logerror("CRT9007 '%s' Reset\n", tag());
+		device_reset();
 		break;
 
 	case 0x38:
@@ -375,7 +583,7 @@ READ8_DEVICE_HANDLER( crt9007_r )
 		break;
 
 	case 0x3a:
-		data = crt9007->status;
+		data = m_status;
 		break;
 
 	case 0x3b:
@@ -387,95 +595,94 @@ READ8_DEVICE_HANDLER( crt9007_r )
 		break;
 
 	default:
-		logerror("CRT9007 '%s' Read from Invalid Register: %02x!\n", device->tag(), offset);
+		logerror("CRT9007 '%s' Read from Invalid Register: %02x!\n", tag(), offset);
 	}
 
 	return data;
 }
 
-/*-------------------------------------------------
-    crt9007_w - register write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( crt9007_w )
+//-------------------------------------------------
+//  write - register write
+//-------------------------------------------------
+
+WRITE8_MEMBER( crt9007_device::write )
 {
-	crt9007_t *crt9007 = get_safe_token(device);
-
-	crt9007->reg[offset] = data;
+	m_reg[offset] = data;
 
 	switch (offset)
 	{
 	case 0x00:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Characters per Horizontal Period: %u\n", device->tag(), CHARACTERS_PER_HORIZONTAL_PERIOD);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Characters per Horizontal Period: %u\n", tag(), CHARACTERS_PER_HORIZONTAL_PERIOD);
 		break;
 
 	case 0x01:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Characters per Data Row: %u\n", device->tag(), CHARACTERS_PER_DATA_ROW);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Characters per Data Row: %u\n", tag(), CHARACTERS_PER_DATA_ROW);
 		break;
 
 	case 0x02:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Horizontal Delay: %u\n", device->tag(), HORIZONTAL_DELAY);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Horizontal Delay: %u\n", tag(), HORIZONTAL_DELAY);
 		break;
 
 	case 0x03:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Horizontal Sync Width: %u\n", device->tag(), HORIZONTAL_SYNC_WIDTH);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Horizontal Sync Width: %u\n", tag(), HORIZONTAL_SYNC_WIDTH);
 		break;
 
 	case 0x04:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Vertical Sync Width: %u\n", device->tag(), VERTICAL_SYNC_WIDTH);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Vertical Sync Width: %u\n", tag(), VERTICAL_SYNC_WIDTH);
 		break;
 
 	case 0x05:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Vertical Delay: %u\n", device->tag(), VERTICAL_DELAY);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Vertical Delay: %u\n", tag(), VERTICAL_DELAY);
 		break;
 
 	case 0x06:
-		recompute_parameters(device);
+		recompute_parameters();
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Pin Configuration: %u\n", device->tag(), PIN_CONFIGURATION);
-			logerror("CRT9007 '%s' Cursor Skew: %u\n", device->tag(), CURSOR_SKEW);
-			logerror("CRT9007 '%s' Blank Skew: %u\n", device->tag(), BLANK_SKEW);
+			logerror("CRT9007 '%s' Pin Configuration: %u\n", tag(), PIN_CONFIGURATION);
+			logerror("CRT9007 '%s' Cursor Skew: %u\n", tag(), CURSOR_SKEW);
+			logerror("CRT9007 '%s' Blank Skew: %u\n", tag(), BLANK_SKEW);
 		}
 		break;
 
 	case 0x07:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Visible Data Rows per Frame: %u\n", device->tag(), VISIBLE_DATA_ROWS_PER_FRAME);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Visible Data Rows per Frame: %u\n", tag(), VISIBLE_DATA_ROWS_PER_FRAME);
 		break;
 
 	case 0x08:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Scan Lines per Data Row: %u\n", device->tag(), SCAN_LINES_PER_DATA_ROW);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Scan Lines per Data Row: %u\n", tag(), SCAN_LINES_PER_DATA_ROW);
 		break;
 
 	case 0x09:
-		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Scan Lines per Frame: %u\n", device->tag(), SCAN_LINES_PER_FRAME);
+		recompute_parameters();
+		if (LOG) logerror("CRT9007 '%s' Scan Lines per Frame: %u\n", tag(), SCAN_LINES_PER_FRAME);
 		break;
 
 	case 0x0a:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' DMA Burst Count: %u\n", device->tag(), DMA_BURST_COUNT);
-			logerror("CRT9007 '%s' DMA Burst Delay: %u\n", device->tag(), DMA_BURST_DELAY);
-			logerror("CRT9007 '%s' DMA Disable: %u\n", device->tag(), DMA_DISABLE);
+			logerror("CRT9007 '%s' DMA Burst Count: %u\n", tag(), DMA_BURST_COUNT);
+			logerror("CRT9007 '%s' DMA Burst Delay: %u\n", tag(), DMA_BURST_DELAY);
+			logerror("CRT9007 '%s' DMA Disable: %u\n", tag(), DMA_DISABLE);
 		}
 		break;
 
 	case 0x0b:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' %s Height Cursor\n", device->tag(), SINGLE_HEIGHT_CURSOR ? "Single" : "Double");
-			logerror("CRT9007 '%s' Operation Mode: %u\n", device->tag(), OPERATION_MODE);
-			logerror("CRT9007 '%s' Interlace Mode: %u\n", device->tag(), INTERLACE_MODE);
-			logerror("CRT9007 '%s' %s Mechanism\n", device->tag(), PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
+			logerror("CRT9007 '%s' %s Height Cursor\n", tag(), SINGLE_HEIGHT_CURSOR ? "Single" : "Double");
+			logerror("CRT9007 '%s' Operation Mode: %u\n", tag(), OPERATION_MODE);
+			logerror("CRT9007 '%s' Interlace Mode: %u\n", tag(), INTERLACE_MODE);
+			logerror("CRT9007 '%s' %s Mechanism\n", tag(), PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
 		}
 		break;
 
@@ -485,8 +692,8 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x0d:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Table Start Register: %04x\n", device->tag(), TABLE_START);
-			logerror("CRT9007 '%s' Address Mode: %u\n", device->tag(), ADDRESS_MODE);
+			logerror("CRT9007 '%s' Table Start Register: %04x\n", tag(), TABLE_START);
+			logerror("CRT9007 '%s' Address Mode: %u\n", tag(), ADDRESS_MODE);
 		}
 		break;
 
@@ -496,21 +703,21 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x0f:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Auxialiary Address Register 1: %04x\n", device->tag(), AUXILIARY_ADDRESS_1);
-			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag(), ROW_ATTRIBUTES_1);
+			logerror("CRT9007 '%s' Auxialiary Address Register 1: %04x\n", tag(), AUXILIARY_ADDRESS_1);
+			logerror("CRT9007 '%s' Row Attributes: %u\n", tag(), ROW_ATTRIBUTES_1);
 		}
 		break;
 
 	case 0x10:
-		if (LOG) logerror("CRT9007 '%s' Sequential Break Register 1: %u\n", device->tag(), SEQUENTIAL_BREAK_1);
+		if (LOG) logerror("CRT9007 '%s' Sequential Break Register 1: %u\n", tag(), SEQUENTIAL_BREAK_1);
 		break;
 
 	case 0x11:
-		if (LOG) logerror("CRT9007 '%s' Data Row Start Register: %u\n", device->tag(), DATA_ROW_START);
+		if (LOG) logerror("CRT9007 '%s' Data Row Start Register: %u\n", tag(), DATA_ROW_START);
 		break;
 
 	case 0x12:
-		if (LOG) logerror("CRT9007 '%s' Data Row End/Sequential Break Register 2: %u\n", device->tag(), SEQUENTIAL_BREAK_2);
+		if (LOG) logerror("CRT9007 '%s' Data Row End/Sequential Break Register 2: %u\n", tag(), SEQUENTIAL_BREAK_2);
 		break;
 
 	case 0x13:
@@ -519,188 +726,78 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x14:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Auxiliary Address Register 2: %04x\n", device->tag(), AUXILIARY_ADDRESS_2);
-			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag(), ROW_ATTRIBUTES_2);
+			logerror("CRT9007 '%s' Auxiliary Address Register 2: %04x\n", tag(), AUXILIARY_ADDRESS_2);
+			logerror("CRT9007 '%s' Row Attributes: %u\n", tag(), ROW_ATTRIBUTES_2);
 		}
 		break;
 
 	case 0x15:
-		crt9007->disp = 1;
-		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag());
+		if (LOG) logerror("CRT9007 '%s' Start\n", tag());
+		m_disp = 1;
 		break;
 
 	case 0x16:
-		crt9007->disp = 0;
-		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag());
+		if (LOG) logerror("CRT9007 '%s' Reset\n", tag());
+		device_reset();
 		break;
 
 	case 0x17:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Smooth Scroll Offset: %u\n", device->tag(), SMOOTH_SCROLL_OFFSET);
-			logerror("CRT9007 '%s' Smooth Scroll Offset Overflow: %u\n", device->tag(), SMOOTH_SCROLL_OFFSET_OVERFLOW);
+			logerror("CRT9007 '%s' Smooth Scroll Offset: %u\n", tag(), SMOOTH_SCROLL_OFFSET);
+			logerror("CRT9007 '%s' Smooth Scroll Offset Overflow: %u\n", tag(), SMOOTH_SCROLL_OFFSET_OVERFLOW);
 		}
 		break;
 
 	case 0x18:
-		if (LOG) logerror("CRT9007 '%s' Vertical Cursor Register: %u\n", device->tag(), VERTICAL_CURSOR);
+		if (LOG) logerror("CRT9007 '%s' Vertical Cursor Register: %u\n", tag(), VERTICAL_CURSOR);
 		break;
 
 	case 0x19:
-		if (LOG) logerror("CRT9007 '%s' Horizontal Cursor Register: %u\n", device->tag(), HORIZONTAL_CURSOR);
+		if (LOG) logerror("CRT9007 '%s' Horizontal Cursor Register: %u\n", tag(), HORIZONTAL_CURSOR);
 		break;
 
 	case 0x1a:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Frame Timer: %u\n", device->tag(), FRAME_TIMER);
-			logerror("CRT9007 '%s' Light Pen Interrupt: %u\n", device->tag(), LIGHT_PEN_INTERRUPT);
-			logerror("CRT9007 '%s' Vertical Retrace Interrupt: %u\n", device->tag(), VERTICAL_RETRACE_INTERRUPT);
+			logerror("CRT9007 '%s' Frame Timer: %u\n", tag(), FRAME_TIMER);
+			logerror("CRT9007 '%s' Light Pen Interrupt: %u\n", tag(), LIGHT_PEN_INTERRUPT);
+			logerror("CRT9007 '%s' Vertical Retrace Interrupt: %u\n", tag(), VERTICAL_RETRACE_INTERRUPT);
 		}
 		break;
 
 	default:
-		logerror("CRT9007 '%s' Write to Invalid Register: %02x!\n", device->tag(), offset);
+		logerror("CRT9007 '%s' Write to Invalid Register: %02x!\n", tag(), offset);
 	}
 }
 
-/*-------------------------------------------------
-    crt9007_ack_w - DMA acknowledge
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( crt9007_ack_w )
+//-------------------------------------------------
+//  ack_w - DMA acknowledge
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( crt9007_device::ack_w )
 {
+	// TODO
 }
 
-/*-------------------------------------------------
-    crt9007_lpstb_w - light pen strobe
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( crt9007_lpstb_w )
+//-------------------------------------------------
+//  lpstb_w - light pen strobe
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
 {
+	// TODO
 }
 
-/*-------------------------------------------------
-    crt9007_set_clock - set device clock
--------------------------------------------------*/
 
-void crt9007_set_clock(running_device *device, UINT32 clock)
+//-------------------------------------------------
+//  set_hpixels_per_column - 
+//-------------------------------------------------
+
+void crt9007_device::set_hpixels_per_column(int hpixels_per_column)
 {
-	device->set_unscaled_clock(clock);
-	recompute_parameters(device);
+	m_hpixels_per_column = hpixels_per_column;
+	recompute_parameters();
 }
-
-/*-------------------------------------------------
-    crt9007_set_hpixels_per_column
--------------------------------------------------*/
-
-void crt9007_set_hpixels_per_column(running_device *device, int hpixels_per_column)
-{
-	crt9007_t *crt9007 = get_safe_token(device);
-
-	crt9007->hpixels_per_column = hpixels_per_column;
-	recompute_parameters(device);
-}
-
-/*-------------------------------------------------
-    crt9007_update - update screen
--------------------------------------------------*/
-
-void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	crt9007_t *crt9007 = get_safe_token(device);
-
-	if (crt9007->disp && HAS_VALID_PARAMETERS)
-	{
-		int min_y = crt9007->vfp;
-		int max_y = min_y + (VISIBLE_DATA_ROWS_PER_FRAME * SCAN_LINES_PER_DATA_ROW);
-
-		for (int y = min_y; y < max_y; y++)
-		{
-			int sl = (y - min_y) % SCAN_LINES_PER_DATA_ROW;
-			int sy = (y - min_y) / SCAN_LINES_PER_DATA_ROW;
-			int cursor_x = (sy == VERTICAL_CURSOR) ? HORIZONTAL_CURSOR : -1;
-			UINT16 addr = TABLE_START + (sy * CHARACTERS_PER_DATA_ROW);
-//          UINT8 data = devcb_call_read8(&crt9007->in_vd_func, addr);
-
-			crt9007->draw_scanline_func(device, bitmap, cliprect, addr, sl, 0, y, crt9007->hfp, CHARACTERS_PER_DATA_ROW, cursor_x);
-
-			addr++;
-		}
-	}
-	else
-	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_START( crt9007 )
--------------------------------------------------*/
-
-static DEVICE_START( crt9007 )
-{
-	crt9007_t *crt9007 = (crt9007_t *)downcast<legacy_device_base *>(device)->token();
-	const crt9007_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_write_line(&crt9007->out_int_func, &intf->out_int_func, device);
-	devcb_resolve_write_line(&crt9007->out_dmar_func, &intf->out_dmar_func, device);
-	devcb_resolve_write_line(&crt9007->out_hs_func, &intf->out_hs_func, device);
-	devcb_resolve_write_line(&crt9007->out_vs_func, &intf->out_vs_func, device);
-	devcb_resolve_read8(&crt9007->in_vd_func, &intf->in_vd_func, device);
-
-	crt9007->draw_scanline_func = intf->draw_scanline_func;
-	assert(crt9007->draw_scanline_func != NULL);
-
-	/* get the screen device */
-	crt9007->screen = device->machine->device<screen_device>(intf->screen_tag);
-	assert(crt9007->screen != NULL);
-
-	/* set horizontal pixels per column */
-	crt9007->hpixels_per_column = intf->hpixels_per_column;
-
-	/* create the timers */
-	crt9007->vsync_timer = timer_alloc(device->machine, vsync_tick, (void *)device);
-	crt9007->hsync_timer = timer_alloc(device->machine, hsync_tick, (void *)device);
-
-	/* register for state saving */
-//  state_save_register_device_item(device, 0, crt9007->);
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( crt9007 )
--------------------------------------------------*/
-
-static DEVICE_RESET( crt9007 )
-{
-//  crt9007_t *crt9007 = (crt9007_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( crt9007 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( crt9007 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(crt9007_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(crt9007);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(crt9007);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SMC CRT9007");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SMC CRT9007");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(CRT9007, crt9007);
