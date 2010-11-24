@@ -9,7 +9,8 @@
 
 	TODO:
 	- Proper artwork
-	- Add extra interrupt stuff
+	- Fix interrupts
+	- Seems to crash when GO pressed (needs a subject-matter expert to test)
 	- Add load/dump facility (cassette port)
 
 ****************************************************************************/
@@ -25,16 +26,23 @@
 
 static UINT8 h8_digit;
 static UINT8 h8_segment;
+static UINT8 h8_irq_ctl;
 static running_device *h8_beeper;
 
 static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
-	cpu_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+	if (h8_irq_ctl & 1)
+		cpu_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 static READ8_HANDLER( h8_f0_r )
 {
     // reads the keyboard
+
+    // The following not emulated, can occur any time even if keyboard not being scanned
+    // - if 0 and RTM pressed, causes int10
+    // - if 0 and RST pressed, resets cpu
+
 	UINT8 i,keyin,data = 0xff;
 
 	keyin = input_port_read(space->machine, "X0");
@@ -61,18 +69,21 @@ static WRITE8_HANDLER( h8_f0_w )
 {
     // this will always turn off int10 that was set by the timer
     // d0-d3 = digit select
-    // d4 = int20
-    // d5 = mon LED
-    // d6 = int10
+    // d4 = int20 is allowed
+    // d5 = mon led
+    // d6 = int10 is allowed
     // d7 = beeper enable
 
-	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
 	h8_digit = data & 15;
 	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
-	//if (~data & 0x40) h8_irqset(space->machine, 160, 0xcf);
-	//if (data & 0x10) h8_irqset(space->machine, 160, 0xd7);
+
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
 	beep_set_state(h8_beeper, (data & 0x80) ? 0 : 1);
+
+	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
+	h8_irq_ctl &= 0xf0;
+	if (data & 0x40) h8_irq_ctl |= 1;
+	if (~data & 0x10) h8_irq_ctl |= 2;
 }
 
 static WRITE8_HANDLER( h8_f1_w )
@@ -136,18 +147,47 @@ static MACHINE_RESET(h8)
 	h8_beeper = machine->device("beep");
 	beep_set_frequency(h8_beeper, H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);
+	h8_irq_ctl = 1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
 {
         // operate the ION LED
 	output_set_value("ion_led",(state) ? 0 : 1);
+	h8_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
 static WRITE8_DEVICE_HANDLER( h8_status_callback )
 {
+/* This is rather messy, but basically there are 2 D flipflops, one drives the other,
+the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,
+a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
+But, all of this can only occur if bit 5 of port F0 is low. */
+
+	static UINT8 b=0;
+
+	UINT8 state = (data & I8085_STATUS_M1) ? 0 : 1;
+	UINT8 c,a = (h8_irq_ctl & 0x80) ? 1 : 0;
+
+	if (h8_irq_ctl & 2)
+	{
+		if (!state) // rising pulse to push data through flipflops
+		{
+			c=b^1; // from /Q of 2nd flipflop
+			b=a; // from Q of 1st flipflop
+			if (c)
+				cpu_set_input_line_and_vector(device->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+		}
+	}
+	else
+	{ // flipflops are 'set'
+		c=0;
+		b=1;
+	}
+
+		
         // operate the RUN LED
-	output_set_value("run_led", (data & I8085_STATUS_M1) ? 1 : 0);
+	output_set_value("run_led", (data & I8085_STATUS_M1) ? 0 : 1);
 }
 
 static I8085_CONFIG( h8_cpu_config )
