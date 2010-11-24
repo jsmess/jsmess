@@ -80,7 +80,7 @@ Source Changes:
   [Atari Ace]
 
 - Refactored the following drivers to define ADDRESS_MAP_MODERN:
-  abc80, advision, amu880, mm1m6, sg1000, tandy2k, v1050, victor9k,
+  abc80, advision, amu880, bw12, mm1m6, sg1000, tandy2k, v1050, victor9k,
   vidbrain, xerox820, xor100. [Curt Coder]
 
 
