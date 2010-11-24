@@ -5,76 +5,27 @@
         Driver by Sandro Ronco
 
         TODO:
-        - add save state
+        - move datapack into device
         - dump CGROM of the HD44780
-		- emulate other devices in slot C(Comms Link, printer)
+        - emulate other devices in slot C(Comms Link, printer)
 
         Note:
         - 4 lines display has an custom LCD controller derived from an HD66780
         - NVRAM works only if the machine is turned off (with OFF menu) before closing MESS
 
-        16/07/2010 Skeleton driver.
-
-        Memory map info :
-            http://archive.psion2.org/org2/techref/memory.htm
+        More info:
+            http://archive.psion2.org/org2/techref/index.htm
 
 ****************************************************************************/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
 #include "devices/cartslot.h"
 #include "video/hd44780.h"
-
-struct datapack
-{
-	device_image_interface *image;
-	UINT8 id;
-	UINT8 len;
-	UINT16 counter;
-	UINT8 page;
-	UINT8 segment;
-	UINT8 control_lines;
-	UINT8* data;
-
-	bool write_flag;
-};
-
-class psion_state : public driver_device
-{
-public:
-	psion_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-	UINT16 kb_counter;
-	UINT8 enable_nmi;
-	UINT8 *sys_register;
-	UINT8 tcsr_value;
-	UINT8 stby_pwr;
-	UINT8 pulse;
-
-	/* RAM/ROM banks */
-	UINT8 *ram;
-	size_t ram_size;
-	UINT8 *paged_ram;
-	UINT8 rom_bank;
-	UINT8 ram_bank;
-	UINT8 ram_bank_count;
-	UINT8 rom_bank_count;
-
-	UINT8 port2_ddr;
-	UINT8 port2;
-	UINT8 port6_ddr;
-	UINT8 port6;
-
-	datapack pack1;
-	datapack pack2;
-
-	// devices
-	hd44780_device *hd44780;
-	device_t *beep;
-};
-
+#include "includes/psion.h"
 
 /***********************************************
 
@@ -82,51 +33,63 @@ public:
 
 ***********************************************/
 
-static UINT8 datapack_update(datapack *pack, UINT8 data)
-{
-	assert(pack != NULL);
+//Datapack control line
+#define DP_LINE_CLOCK			0x01
+#define DP_LINE_RESET			0x02
+#define DP_LINE_PROGRAM			0x04
+#define DP_LINE_OUTPUT_ENABLE	0x08
+#define DP_LINE_POWER_ON		0x80
 
-	if (pack->len == 0 || (pack->control_lines & 0x80))
+//Datapack ID
+#define DP_ID_EPROM				0x02
+#define DP_ID_PAGED				0x04
+#define DP_ID_WRITE				0x08
+#define DP_ID_BOOT				0x10
+#define DP_ID_COPY				0x20
+
+UINT8 datapack::update(UINT8 data)
+{
+	if (len == 0 || (control_lines & DP_LINE_POWER_ON))
 		return 0;
 
-	UINT32 pack_addr = pack->counter + ((pack->id & 0x04) ? 0x100 * pack->page : 0);
+	UINT32 pack_addr = counter + ((id & DP_ID_PAGED) ? 0x100 * page : 0);
 
 	// if the datapack is 128k or more is treated as segmented
-	if (pack->len >= 0x10)
-		pack_addr += (pack->segment * 0x4000);
+	if (len >= 0x10)
+		pack_addr += (segment * 0x4000);
 
-	if (pack_addr < pack->len * 0x2000)
+	if (pack_addr < len * 0x2000)
 	{
-		if ((pack->control_lines&0x08) && !(pack->control_lines & 0x02))
+		if ((control_lines & DP_LINE_OUTPUT_ENABLE) && !(control_lines & DP_LINE_RESET))
 		{
 			//write latched data
-			pack->data[pack_addr] = data;
-			pack->write_flag = true;
+			buffer[pack_addr] = data;
+			write_flag = true;
 		}
-		else if ((pack->control_lines&0x08) && (pack->control_lines & 0x02))
+		else if ((control_lines & DP_LINE_OUTPUT_ENABLE) && (control_lines & DP_LINE_RESET))
 		{
 			//write datapack segment
-			if (pack->len <= 0x10)
-				pack->segment = data & 0x07;
-			else if (pack->len <= 0x20)
-				pack->segment = data & 0x0f;
-			else if (pack->len <= 0x40)
-				pack->segment = data & 0x1f;
-			else if (pack->len <= 0x80)
-				pack->segment = data & 0x3f;
+			if (len <= 0x10)
+				segment = data & 0x07;
+			else if (len <= 0x20)
+				segment = data & 0x0f;
+			else if (len <= 0x40)
+				segment = data & 0x1f;
+			else if (len <= 0x80)
+				segment = data & 0x3f;
 			else
-				pack->segment = data;
+				segment = data;
 		}
-		else if (!(pack->control_lines&0x08) && !(pack->control_lines & 0x02))
+		else if (!(control_lines & DP_LINE_OUTPUT_ENABLE) && !(control_lines & DP_LINE_RESET))
 		{
 			//latch data
-			data = pack->data[pack_addr];
+			data = buffer[pack_addr];
 		}
-		else if (!(pack->control_lines&0x08) && (pack->control_lines & 0x02))
+		else if (!(control_lines & DP_LINE_OUTPUT_ENABLE) && (control_lines & DP_LINE_RESET))
 		{
 			//read datapack ID
-			if (pack->id & 0x02)
-				data = pack->data[0];
+			if (id & DP_ID_EPROM)
+				data = buffer[0];
 			else
 				data = 1;
 		}
@@ -135,93 +98,111 @@ static UINT8 datapack_update(datapack *pack, UINT8 data)
 	return data;
 }
 
-static void datapack_control_lines_w(datapack *pack, UINT8 data)
+void datapack::control_lines_w(UINT8 data)
 {
-	assert(pack != NULL);
-
-	if ((pack->control_lines & 0x01) != (data & 0x01))
+	if ((control_lines & DP_LINE_CLOCK) != (data & DP_LINE_CLOCK))
 	{
-		pack->counter++;
+		counter++;
 
-		if (pack->counter >= ((pack->id & 0x04) ? 0x100 : (pack->len * 0x2000)))
-			pack->counter = 0;
+		if (counter >= ((id & DP_ID_PAGED) ? 0x100 : (len * 0x2000)))
+			counter = 0;
 	}
 
-	if ((pack->control_lines & 0x04) && !(data & 0x04))
+	if ((control_lines & DP_LINE_PROGRAM) && !(data & DP_LINE_PROGRAM))
 	{
-		pack->page++;
+		page++;
 
-		if (pack->page >= (pack->len * 0x2000) / 0x100)
-			pack->page = 0;
+		if (page >= (len * 0x2000) / 0x100)
+			page = 0;
 	}
 
-	if (data & 0x02)
+	if (data & DP_LINE_RESET)
 	{
-		pack->counter = 0;
-		pack->page = 0;
+		counter = 0;
+		page = 0;
 	}
 
-	pack->control_lines = data;
+	control_lines = data;
 }
 
-static UINT8 datapack_control_lines_r(datapack *pack)
+UINT8 datapack::control_lines_r()
 {
-	assert(pack != NULL);
-
-	return pack->control_lines;
+	return control_lines;
 }
 
-static int datapack_load(device_image_interface &image, datapack &pack)
+int datapack::load(device_image_interface &image)
 {
 	running_machine *machine = image.device().machine;
-	char opk_head[6];
-	UINT8 pack_id, pack_len;
+	UINT8 *data;
+	UINT32 length;
 
-	image.fread(opk_head, 6);
-	image.fread(&pack_id, 1);
-	image.fread(&pack_len, 1);
+	if (image.software_entry() == NULL)
+	{
+		length = image.length();
+		data = auto_alloc_array(machine, UINT8, length);
+		image.fread(data, image.length());
+	}
+	else
+	{
+		length = image.get_software_region_length("rom");
+		data = auto_alloc_array(machine, UINT8, length);
+		memcpy(data, image.get_software_region("rom"), length);
+	}
 
-	if(strcmp(opk_head, "OPK") || pack_len * 0x2000 < image.length() - 6)
+	//check the OPK head
+	if(strncmp((const char*)data, "OPK", 3) || data[7] * 0x2000 < length - 6)
 		return IMAGE_INIT_FAIL;
 
-	pack.image = &image;
-	pack.write_flag = false;
-	pack.id = pack_id;
-	pack.len = pack_len;
-	image.fseek(6, SEEK_SET);
-	pack.data = auto_alloc_array(machine, UINT8, pack.len * 0x2000);
-	memset(pack.data, 0xff, pack.len * 0x2000);
-	image.fread(pack.data, image.length() - 6);
+	d_image = &image;
+	write_flag = false;
+	id = data[6];
+	len = data[7];
+	buffer = auto_alloc_array(machine, UINT8, len * 0x2000);
+	memset(buffer, 0xff, len * 0x2000);
+	memcpy(buffer, data + 6, length - 6);
 
 	/* load battery */
-	UINT8 *opk = auto_alloc_array(machine, UINT8, pack.len * 0x2000 + 6);
-	image.battery_load(opk, pack.len * 0x2000 + 6, 0xff);
+	UINT8 *opk = auto_alloc_array(machine, UINT8, len * 0x2000 + 6);
+	image.battery_load(opk, len * 0x2000 + 6, 0xff);
 	if(!strncmp((char*)opk, "OPK", 3))
-		memcpy(pack.data, opk + 6, pack.len * 0x2000);
+		memcpy(buffer, opk + 6, len * 0x2000);
 
 	return IMAGE_INIT_PASS;
 }
 
-static void datapack_unload(device_image_interface &image, datapack &pack)
+void datapack::unload(device_image_interface &image)
 {
 	running_machine *machine = image.device().machine;
 
 	// save battery only if a write-access occurs
-	if (pack.len > 0 && pack.write_flag)
+	if (len > 0 && write_flag)
 	{
-		UINT8 opk_magic[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
-		UINT8 *opk = auto_alloc_array(machine, UINT8, pack.len * 0x2000 + 6);
+		const UINT8 opk_magic[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
+		UINT8 *opk = auto_alloc_array(machine, UINT8, len * 0x2000 + 6);
 
 		memcpy(opk, opk_magic, 6);
-		memcpy(opk + 6, pack.data, pack.len * 0x2000);
+		memcpy(opk + 6, buffer, len * 0x2000);
 
-		pack.image->battery_save(opk, pack.len * 0x2000 + 6);
+		d_image->battery_save(opk, len * 0x2000 + 6);
 
 		auto_free(machine, opk);
 	}
 
-	auto_free(machine, pack.data);
-	pack.len = 0;
+	auto_free(machine, buffer);
+	len = 0;
+}
+
+void datapack::reset()
+{
+	d_image = NULL;
+	id = 0;
+	len = 0;
+	counter = 0;
+	page = 0;
+	segment = 0;
+	control_lines = 0;
+	buffer = NULL;
+	write_flag = false;
 }
 
 /***********************************************
@@ -234,24 +215,24 @@ static TIMER_CALLBACK( nmi_timer )
 {
 	psion_state *state = machine->driver_data<psion_state>();
 
-	if (state->enable_nmi)
+	if (state->m_enable_nmi)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static UINT8 kb_read(running_machine *machine)
+UINT8 psion_state::kb_read(running_machine *machine)
 {
-	psion_state *state = machine->driver_data<psion_state>();
 	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
 	UINT8 line, data = 0x7c;
 
-	if (state->kb_counter)
+	if (m_kb_counter)
 	{
 		for (line = 0; line < 7; line++)
-			if (state->kb_counter == (0x7f & ~(1 << line)))
+			if (m_kb_counter == (0x7f & ~(1 << line)))
 				data = input_port_read(machine, bitnames[line]);
 	}
 	else
 	{
+		//Read all the input lines
 		for (line = 0; line < 7; line++)
 			data &= input_port_read(machine, bitnames[line]);
 	}
@@ -259,66 +240,58 @@ static UINT8 kb_read(running_machine *machine)
 	return data & 0x7c;
 }
 
-static void update_bank(running_machine *machine)
+void psion_state::update_banks(running_machine *machine)
 {
-	psion_state *state = machine->driver_data<psion_state>();
+	if (m_ram_bank < m_ram_bank_count && m_ram_bank_count)
+		memory_set_bank(machine, "rambank", m_ram_bank);
 
-	if (state->ram_bank < state->ram_bank_count && state->ram_bank_count)
-		memory_set_bankptr(machine,"rambank", state->paged_ram + state->ram_bank*0x4000);
-
-	if (state->rom_bank_count)
-	{
-		if (state->rom_bank==0)
-			memory_set_bankptr(machine,"rombank", memory_region(machine, "maincpu") + 0x8000);
-		else if (state->rom_bank < state->rom_bank_count)
-			memory_set_bankptr(machine,"rombank", memory_region(machine, "maincpu") + state->rom_bank*0x4000 + 0xc000);
-	}
+	if (m_rom_bank < m_rom_bank_count && m_rom_bank_count)
+		memory_set_bank(machine, "rombank", m_rom_bank);
 }
 
-static struct datapack *get_active_slot(running_machine *machine, UINT8 data)
+datapack* psion_state::get_active_slot(UINT8 data)
 {
-	psion_state *state = machine->driver_data<psion_state>();
-
 	switch(data & 0x70)
 	{
 		case 0x60:
-			return &state->pack1;
+			return &m_pack1;
 		case 0x50:
-			return &state->pack2;
+			return &m_pack2;
+		case 0x30:
+			//Unemulated slot C
+			return NULL;
 	}
 
 	return NULL;
 }
 
-static WRITE8_HANDLER( hd63701_int_reg_w )
+WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 {
-	psion_state *state = space->machine->driver_data<psion_state>();
-
 	switch (offset)
 	{
 	case 0x01:
-		state->port2_ddr = data;
+		m_port2_ddr = data;
 		break;
 	case 0x03:
 		/* datapack i/o data bus */
-		if (state->port2_ddr == 0xff)
+		if (m_port2_ddr == 0xff)
 		{
-			datapack *pack = get_active_slot(space->machine, state->port6);
+			datapack *pack = get_active_slot(m_port6);
 
 			if (pack)
-				state->port2 = datapack_update(pack, data);
+				m_port2 = pack->update(data);
 			else
-				state->port2 = data;
+				m_port2 = data;
 		}
 		break;
 	case 0x08:
-		state->tcsr_value = data;
+		m_tcsr_value = data;
 		break;
 	case 0x15:
 		/* read-only */
 		break;
 	case 0x16:
-		state->port6_ddr = data;
+		m_port6_ddr = data;
 		break;
 	case 0x17:
 		/*
@@ -333,44 +306,42 @@ static WRITE8_HANDLER( hd63701_int_reg_w )
         ---- ---x clock line
         */
 		{
-			state->port6 = (data & state->port6_ddr) | (state->port6 & ~state->port6_ddr);
-			datapack *pack = get_active_slot(space->machine, state->port6);
+			m_port6 = (data & m_port6_ddr) | (m_port6 & ~m_port6_ddr);
+			datapack *pack = get_active_slot(m_port6);
 
 			if (pack != NULL)
 			{
-				datapack_control_lines_w(pack, state->port6);
-				datapack_update(pack, state->port2);
+				pack->control_lines_w(m_port6);
+				pack->update(m_port2);
 			}
 		}
 		break;
 	}
 
-	hd63701_internal_registers_w(space, offset, data);
+	hd63701_internal_registers_w(&space, offset, data);
 }
 
-static READ8_HANDLER( hd63701_int_reg_r )
+READ8_MEMBER( psion_state::hd63701_int_reg_r )
 {
-	psion_state *state = space->machine->driver_data<psion_state>();
-
 	switch (offset)
 	{
 	case 0x03:
 		/* datapack i/o data bus */
-		if (state->port2_ddr == 0)
+		if (m_port2_ddr == 0)
 		{
-			datapack *pack = get_active_slot(space->machine, state->port6);
+			datapack *pack = get_active_slot(m_port6);
 
 			if (pack)
-				state->port2 = datapack_update(pack, state->port2);
+				m_port2 = pack->update(m_port2);
 			else
-				state->port2 = 0;
+				m_port2 = 0;
 
-			return state->port2;
+			return m_port2;
 		}
 		else
 			return 0;
 	case 0x14:
-		return (hd63701_internal_registers_r(space, offset)&0x7f) | (state->stby_pwr<<7);
+		return (hd63701_internal_registers_r(&space, offset)&0x7f) | (m_stby_pwr<<7);
 	case 0x15:
 		/*
         x--- ---- ON key active high
@@ -378,114 +349,108 @@ static READ8_HANDLER( hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON") | (state->kb_counter == 0x7ff)<<1 | state->pulse<<1;
+		return kb_read(space.machine) | input_port_read(space.machine, "BATTERY") | input_port_read(space.machine, "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		{
-			datapack *pack = get_active_slot(space->machine, state->port6);
+			datapack *pack = get_active_slot(m_port6);
 
 			if (pack)
-				return datapack_control_lines_r(pack);
+				return pack->control_lines_r();
 			else
-				return state->port6;
+				return m_port6;
 		}
 	case 0x08:
-		hd63701_internal_registers_w(space, offset, state->tcsr_value);
+		hd63701_internal_registers_w(&space, offset, m_tcsr_value);
 	default:
-		return hd63701_internal_registers_r(space, offset);
+		return hd63701_internal_registers_r(&space, offset);
 	}
 }
 
 /* Read/Write common */
-static void io_rw(address_space* space, UINT16 offset)
+void psion_state::io_rw(address_space &space, UINT16 offset)
 {
-	psion_state *state = space->machine->driver_data<psion_state>();
-
-	if (space->debugger_access())
+	if (space.debugger_access())
 		return;
 
 	switch (offset & 0xffc0)
 	{
 	case 0xc0:
 		/* switch off, CPU goes into standby mode */
-		state->enable_nmi = 0;
-		state->stby_pwr = 1;
-		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		m_enable_nmi = 0;
+		m_stby_pwr = 1;
+		space.machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
-		state->pulse = 1;
+		m_pulse = 1;
 		break;
 	case 0x140:
-		state->pulse = 0;
+		m_pulse = 0;
 		break;
 	case 0x200:
-		state->kb_counter = 0;
+		m_kb_counter = 0;
 		break;
 	case 0x180:
-		beep_set_state(state->beep, 1);
+		beep_set_state(m_beep, 1);
 		break;
 	case 0x1c0:
-		beep_set_state(state->beep, 0);
+		beep_set_state(m_beep, 0);
 		break;
 	case 0x240:
-		if (offset == 0x260 && (state->rom_bank_count || state->ram_bank_count))
+		if (offset == 0x260 && (m_rom_bank_count || m_ram_bank_count))
 		{
-			state->ram_bank=0;
-			state->rom_bank=0;
-			update_bank(space->machine);
+			m_ram_bank=0;
+			m_rom_bank=0;
+			update_banks(space.machine);
 		}
 		else
-			state->kb_counter++;
+			m_kb_counter++;
 		break;
 	case 0x280:
-		if (offset == 0x2a0 && state->ram_bank_count)
+		if (offset == 0x2a0 && m_ram_bank_count)
 		{
-			state->ram_bank++;
-			update_bank(space->machine);
+			m_ram_bank++;
+			update_banks(space.machine);
 		}
 		else
-			state->enable_nmi = 1;
+			m_enable_nmi = 1;
 		break;
 	case 0x2c0:
-		if (offset == 0x2e0 && state->rom_bank_count)
+		if (offset == 0x2e0 && m_rom_bank_count)
 		{
-			state->rom_bank++;
-			update_bank(space->machine);
+			m_rom_bank++;
+			update_banks(space.machine);
 		}
 		else
-			state->enable_nmi = 0;
+			m_enable_nmi = 0;
 		break;
 	}
 }
 
-static WRITE8_HANDLER( io_w )
+WRITE8_MEMBER( psion_state::io_w )
 {
-	psion_state *state = space->machine->driver_data<psion_state>();
-
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
 		if (offset & 1)
-			state->hd44780->data_write(offset, data);
+			m_lcdc->data_write(offset, data);
 		else
-			state->hd44780->control_write(offset, data);
+			m_lcdc->control_write(offset, data);
 		break;
 	default:
 		io_rw(space, offset);
 	}
 }
 
-static READ8_HANDLER( io_r )
+READ8_MEMBER( psion_state::io_r )
 {
-		psion_state *state = space->machine->driver_data<psion_state>();
-
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		if (offset& 1)
-			return state->hd44780->data_read(offset);
+		if (offset & 1)
+			return m_lcdc->data_read(offset);
 		else
-			return state->hd44780->control_read(offset);
+			return m_lcdc->control_read(offset);
 	default:
 		io_rw(space, offset);
 	}
@@ -502,50 +467,50 @@ static INPUT_CHANGED( psion_on )
 		cpu->reset();
 }
 
-static ADDRESS_MAP_START(psioncm_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(psioncm_mem, ADDRESS_SPACE_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionla_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(psionla_mem, ADDRESS_SPACE_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
+	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionp350_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(psionp350_mem, ADDRESS_SPACE_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlam_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(psionlam_mem, ADDRESS_SPACE_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
+	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlz_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(psionlz_mem, ADDRESS_SPACE_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE_MEMBER(psion_state, sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(psion_state, ram, ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -559,7 +524,7 @@ INPUT_PORTS_START( psion )
 		PORT_CONFSETTING( 0x01, "Low Battery" )
 
 	PORT_START("ON")
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_F10)  PORT_CHANGED(psion_on, 0)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED(psion_on, 0)
 
 	PORT_START("K1")
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_EQUALS)
@@ -615,28 +580,28 @@ static DEVICE_IMAGE_LOAD( psion_pack1 )
 {
 	psion_state *state = image.device().machine->driver_data<psion_state>();
 
-	return datapack_load(image, state->pack1);
+	return state->m_pack1.load(image);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack1 )
 {
 	psion_state *state = image.device().machine->driver_data<psion_state>();
 
-	datapack_unload(image, state->pack1);
+	state->m_pack1.unload(image);
 }
 
 static DEVICE_IMAGE_LOAD( psion_pack2 )
 {
 	psion_state *state = image.device().machine->driver_data<psion_state>();
 
-	return datapack_load(image, state->pack2);
+	return state->m_pack2.load(image);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack2 )
 {
 	psion_state *state = image.device().machine->driver_data<psion_state>();
 
-	datapack_unload(image, state->pack2);
+	state->m_pack2.unload(image);
 }
 
 static NVRAM_HANDLER( psion )
@@ -645,96 +610,107 @@ static NVRAM_HANDLER( psion )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->sys_register, 0xc0);
-		mame_fwrite(file, state->ram, state->ram_size);
-		if (state->ram_bank_count)
-			mame_fwrite(file, state->paged_ram, state->ram_bank_count * 0x4000);
+		mame_fwrite(file, state->m_sys_register, 0xc0);
+		mame_fwrite(file, state->m_ram, state->m_ram_size);
+		if (state->m_ram_bank_count)
+			mame_fwrite(file, state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->sys_register, 0xc0);
-			mame_fread(file, state->ram, state->ram_size);
-			if (state->ram_bank_count)
-				mame_fread(file, state->paged_ram, state->ram_bank_count * 0x4000);
+			mame_fread(file, state->m_sys_register, 0xc0);
+			mame_fread(file, state->m_ram, state->m_ram_size);
+			if (state->m_ram_bank_count)
+				mame_fread(file, state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 
-			state->stby_pwr = 1;
+			//warm start
+			state->m_stby_pwr = 1;
 		}
 		else
-			state->stby_pwr = 0;
+			//cold start
+			state->m_stby_pwr = 0;
 	}
 }
 
-static MACHINE_START(psion)
+void psion_state::machine_start()
 {
-	psion_state *state = machine->driver_data<psion_state>();
-
 	if (!strcmp(machine->gamedrv->name, "psionlam"))
 	{
-		state->rom_bank_count = 3;
-		state->ram_bank_count = 0;
+		m_rom_bank_count = 3;
+		m_ram_bank_count = 0;
 	}
 	else if (!strcmp(machine->gamedrv->name, "psionp350"))
 	{
-		state->rom_bank_count = 0;
-		state->ram_bank_count = 5;
+		m_rom_bank_count = 0;
+		m_ram_bank_count = 5;
 	}
 	else if (!strncmp(machine->gamedrv->name, "psionlz", 7))
 	{
-		state->rom_bank_count = 3;
-		state->ram_bank_count = 3;
+		m_rom_bank_count = 3;
+		m_ram_bank_count = 3;
 	}
 	else if (!strcmp(machine->gamedrv->name, "psionp464"))
 	{
-		state->rom_bank_count = 3;
-		state->ram_bank_count = 9;
+		m_rom_bank_count = 3;
+		m_ram_bank_count = 9;
 	}
 	else
 	{
-		state->rom_bank_count = 0;
-		state->ram_bank_count = 0;
+		m_rom_bank_count = 0;
+		m_ram_bank_count = 0;
 	}
 
-	if (state->ram_bank_count)
-		state->paged_ram = auto_alloc_array(machine, UINT8, state->ram_bank_count * 0x4000);
+	if (m_rom_bank_count)
+	{
+		UINT8* rom_base = (UINT8 *)memory_region(machine, "maincpu");
+
+		memory_configure_bank(machine, "rombank", 0, 1, rom_base + 0x8000, 0x4000);
+		memory_configure_bank(machine, "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
+		memory_set_bank(machine, "rombank", 0);
+	}
+
+	if (m_ram_bank_count)
+	{
+		m_paged_ram = auto_alloc_array(machine, UINT8, m_ram_bank_count * 0x4000);
+		memory_configure_bank(machine, "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
+		memory_set_bank(machine, "rambank", 0);
+	}
 
 	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, nmi_timer);
 
-	state->hd44780 = machine->device<hd44780_device>("hd44780");
-	state->beep = machine->device<device_t>("beep");
+	state_save_register_global(machine, m_kb_counter);
+	state_save_register_global(machine, m_enable_nmi);
+	state_save_register_global(machine, m_tcsr_value);
+	state_save_register_global(machine, m_stby_pwr);
+	state_save_register_global(machine, m_pulse);
+	state_save_register_global(machine, m_rom_bank);
+	state_save_register_global(machine, m_ram_bank);
+	state_save_register_global(machine, m_port2_ddr);
+	state_save_register_global(machine, m_port2);
+	state_save_register_global(machine, m_port6_ddr);
+	state_save_register_global(machine, m_port6);
+	state_save_register_global_pointer(machine, m_paged_ram, m_ram_bank_count * 0x4000);
 }
 
-static MACHINE_RESET(psion)
+void psion_state::machine_reset()
 {
-	psion_state *state = machine->driver_data<psion_state>();
+	m_enable_nmi=0;
+	m_kb_counter=0;
+	m_ram_bank=0;
+	m_rom_bank=0;
+	m_pulse=0;
 
-	state->enable_nmi=0;
-	state->kb_counter=0;
-	state->ram_bank=0;
-	state->rom_bank=0;
-	state->pulse=0;
+	m_pack1.reset();
+	m_pack2.reset();
 
-	if (state->rom_bank_count || state->ram_bank_count)
-		update_bank(machine);
+	if (m_rom_bank_count || m_ram_bank_count)
+		update_banks(machine);
 }
 
-static VIDEO_START( psion )
+bool psion_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-}
-
-static VIDEO_UPDATE( psion_2lines )
-{
-	psion_state *state = screen->machine->driver_data<psion_state>();
-
-	return state->hd44780->video_update( bitmap, cliprect );
-}
-
-static VIDEO_UPDATE( psion_4lines )
-{
-	psion_state *state = screen->machine->driver_data<psion_state>();
-
-	return state->hd44780->video_update( bitmap, cliprect );
+	return m_lcdc->video_update( &bitmap, &cliprect );
 }
 
 static PALETTE_INIT( psion )
@@ -785,10 +761,7 @@ static const hd44780_interface psion_2line_display =
 /* basic configuration for 2 lines display */
 static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
-
-	MDRV_MACHINE_START(psion)
-    MDRV_MACHINE_RESET(psion)
+    MDRV_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
@@ -804,9 +777,6 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 
 	MDRV_HD44780_ADD("hd44780", psion_2line_display)
 
-    MDRV_VIDEO_START(psion)
-    MDRV_VIDEO_UPDATE(psion_2lines)
-
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
@@ -817,7 +787,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MDRV_FRAGMENT_ADD( psion_slot )
 MACHINE_CONFIG_END
 
-const UINT8 psion_4line_layout[] =
+static const UINT8 psion_4line_layout[] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 	0x40, 0x41, 0x42, 0x43, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
@@ -837,9 +807,6 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
-	MDRV_MACHINE_START(psion)
-    MDRV_MACHINE_RESET(psion)
-
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -853,9 +820,6 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	MDRV_GFXDECODE(psion)
 
 	MDRV_HD44780_ADD("hd44780", psion_4line_display)
-
-    MDRV_VIDEO_START(psion)
-    MDRV_VIDEO_UPDATE(psion_4lines)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
@@ -975,11 +939,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_IMPERFECT_GRAPHICS)
-COMP( 198?, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_IMPERFECT_GRAPHICS)
-COMP( 198?, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_IMPERFECT_GRAPHICS)
-COMP( 198?, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64,  psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64s,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_IMPERFECT_GRAPHICS)
-COMP( 198?, psionp464,	psioncm, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
