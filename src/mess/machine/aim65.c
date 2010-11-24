@@ -171,15 +171,11 @@ WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 
 MACHINE_START( aim65 )
 {
-	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 	running_device *ram = machine->device("messram");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
 	memory_install_ram(space, 0x0000, messram_get_size(ram) - 1, 0, 0, messram_get_ptr(ram));
-
-	via_0->write_cb1(1);
-	via_0->write_ca1(0);
 }
 
 
