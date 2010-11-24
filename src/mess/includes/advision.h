@@ -15,51 +15,57 @@ class advision_state : public driver_device
 {
 public:
 	advision_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, I8048_TAG),
+		  m_soundcpu(*this, COP411_TAG),
+		  m_dac(*this, "dac")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<running_device> m_dac;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	void update_dac();
+	void vh_write(int data);
+	void vh_update(int x);
+
+	DECLARE_READ8_MEMBER( ext_ram_r );
+	DECLARE_WRITE8_MEMBER( ext_ram_w );
+	DECLARE_READ8_MEMBER( controller_r );
+	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	DECLARE_WRITE8_MEMBER( av_control_w );
+	DECLARE_READ8_MEMBER( vsync_r );
+	DECLARE_READ8_MEMBER( sound_cmd_r );
+	DECLARE_WRITE8_MEMBER( sound_g_w );
+	DECLARE_WRITE8_MEMBER( sound_d_w );
 
 	/* external RAM state */
-	UINT8 *extram;
-	int rambank;
+	UINT8 *m_ext_ram;
+	int m_rambank;
 
 	/* video state */
-	int frame_start;
-	int video_enable;
-	int video_bank;
-	int video_hpos;
-	UINT8 led_latch[8];
-	UINT8 *display;
+	int m_frame_count;
+	int m_frame_start;
+	int m_video_enable;
+	int m_video_bank;
+	int m_video_hpos;
+	UINT8 m_led_latch[8];
+	UINT8 *m_display;
 
 	/* sound state */
-	int sound_cmd;
-	int sound_d;
-	int sound_g;
+	int m_sound_cmd;
+	int m_sound_d;
+	int m_sound_g;
 };
-
-/*----------- defined in machine/advision.c -----------*/
-
-MACHINE_START( advision );
-MACHINE_RESET( advision );
-READ8_HANDLER( advision_extram_r );
-WRITE8_HANDLER( advision_extram_w );
-
-/* Port P1 */
-READ8_HANDLER( advision_controller_r );
-WRITE8_HANDLER( advision_bankswitch_w );
-
-/* Port P2 */
-WRITE8_HANDLER( advision_av_control_w );
-
-READ8_HANDLER( advision_vsync_r );
-READ8_HANDLER( advision_sound_cmd_r );
-WRITE8_HANDLER( advision_sound_g_w );
-WRITE8_HANDLER( advision_sound_d_w );
 
 /*----------- defined in video/advision.c -----------*/
 
-VIDEO_START( advision );
-VIDEO_UPDATE( advision );
 PALETTE_INIT( advision );
-void advision_vh_write(running_machine *machine, int data);
-void advision_vh_update(running_machine *machine, int data);
 
 #endif

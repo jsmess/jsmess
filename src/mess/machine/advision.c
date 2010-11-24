@@ -25,149 +25,130 @@
 
 /* Machine Initialization */
 
-MACHINE_START( advision )
+void advision_state::machine_start()
 {
-	advision_state *state = machine->driver_data<advision_state>();
 	/* configure EA banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8048_TAG), 0);
-	memory_install_readwrite_bank(cputag_get_address_space(machine, I8048_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
+	memory_install_readwrite_bank(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
 	memory_set_bank(machine, "bank1", 0);
 
 	/* allocate external RAM */
-	state->extram = auto_alloc_array(machine, UINT8, 0x400);
+	m_ext_ram = auto_alloc_array(machine, UINT8, 0x400);
 }
 
-MACHINE_RESET( advision )
+void advision_state::machine_reset()
 {
-	advision_state *state = machine->driver_data<advision_state>();
-
 	/* enable internal ROM */
-	cputag_set_input_line(machine, I8048_TAG, MCS48_INPUT_EA, CLEAR_LINE);
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* reset sound CPU */
-	cputag_set_input_line(machine, COP411_TAG, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->rambank = 0x300;
-	state->frame_start = 0;
-	state->video_enable = 0;
-	state->sound_cmd = 0;
+	m_rambank = 0x300;
+	m_frame_start = 0;
+	m_video_enable = 0;
+	m_sound_cmd = 0;
 }
 
 /* Bank Switching */
 
-WRITE8_HANDLER( advision_bankswitch_w )
+WRITE8_MEMBER( advision_state::bankswitch_w )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-
 	int ea = BIT(data, 2);
 
-	cputag_set_input_line(space->machine, I8048_TAG, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
-	memory_set_bank(space->machine, "bank1", ea);
+	memory_set_bank(machine, "bank1", ea);
 
-	state->rambank = (data & 0x03) << 8;
+	m_rambank = (data & 0x03) << 8;
 }
 
 /* External RAM */
 
-READ8_HANDLER( advision_extram_r )
+READ8_MEMBER( advision_state::ext_ram_r )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
+	UINT8 data = m_ext_ram[m_rambank + offset];
 
-	UINT8 data = state->extram[state->rambank + offset];
-
-	if (!state->video_enable)
+	if (!m_video_enable)
 	{
 		/* the video hardware interprets reads as writes */
-		advision_vh_write(space->machine, data);
+		vh_write(data);
 	}
 
-	if (state->video_bank == 0x06)
+	if (m_video_bank == 0x06)
 	{
-		cputag_set_input_line(space->machine, COP411_TAG, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	return data;
 }
 
-WRITE8_HANDLER( advision_extram_w )
+WRITE8_MEMBER( advision_state::ext_ram_w )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-
-	state->extram[state->rambank + offset] = data;
+	m_ext_ram[m_rambank + offset] = data;
 }
 
 /* Sound */
 
-READ8_HANDLER( advision_sound_cmd_r )
+READ8_MEMBER( advision_state::sound_cmd_r )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-
-	return state->sound_cmd;
+	return m_sound_cmd;
 }
 
-static void update_dac(running_machine *machine)
+void advision_state::update_dac()
 {
-	running_device *dac_device = machine->device("dac");
-	advision_state *state = machine->driver_data<advision_state>();
-
-	if (state->sound_g == 0 && state->sound_d == 0)
-		dac_data_w(dac_device, 0xff);
-	else if (state->sound_g == 1 && state->sound_d == 1)
-		dac_data_w(dac_device, 0x80);
+	if (m_sound_g == 0 && m_sound_d == 0)
+		dac_data_w(m_dac, 0xff);
+	else if (m_sound_g == 1 && m_sound_d == 1)
+		dac_data_w(m_dac, 0x80);
 	else
-		dac_data_w(dac_device, 0x00);
+		dac_data_w(m_dac, 0x00);
 }
 
-WRITE8_HANDLER( advision_sound_g_w )
+WRITE8_MEMBER( advision_state::sound_g_w )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-	state->sound_g = data & 0x01;
-	update_dac(space->machine);
+	m_sound_g = data & 0x01;
+
+	update_dac();
 }
 
-
-WRITE8_HANDLER( advision_sound_d_w )
+WRITE8_MEMBER( advision_state::sound_d_w )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-	state->sound_d = data & 0x01;
-	update_dac(space->machine);
+	m_sound_d = data & 0x01;
+	
+	update_dac();
 }
 
 /* Video */
 
-WRITE8_HANDLER( advision_av_control_w )
+WRITE8_MEMBER( advision_state::av_control_w )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
+	m_sound_cmd = data >> 4;
 
-	state->sound_cmd = data >> 4;
-
-	if ((state->video_enable == 0x00) && (data & 0x10))
+	if ((m_video_enable == 0x00) && (data & 0x10))
 	{
-		advision_vh_update(space->machine, state->video_hpos);
+		vh_update(m_video_hpos);
 
-		state->video_hpos++;
+		m_video_hpos++;
 
-		if (state->video_hpos > 255)
+		if (m_video_hpos > 255)
 		{
-			state->video_hpos = 0;
+			m_video_hpos = 0;
 			logerror("HPOS OVERFLOW\n");
 		}
 	}
 
-	state->video_enable = data & 0x10;
-	state->video_bank = (data & 0xe0) >> 5;
+	m_video_enable = data & 0x10;
+	m_video_bank = (data & 0xe0) >> 5;
 }
 
-READ8_HANDLER( advision_vsync_r )
+READ8_MEMBER( advision_state::vsync_r )
 {
-	advision_state *state = space->machine->driver_data<advision_state>();
-
-	if (state->frame_start)
+	if (m_frame_start)
 	{
-		state->frame_start = 0;
+		m_frame_start = 0;
 
 		return 0;
 	}
@@ -179,10 +160,10 @@ READ8_HANDLER( advision_vsync_r )
 
 /* Input */
 
-READ8_HANDLER( advision_controller_r )
+READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = input_port_read(space->machine, "joystick");
+	UINT8 in = input_port_read(machine, "joystick");
 	UINT8 data = in | 0x0f;
 
 	// Get buttons

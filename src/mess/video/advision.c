@@ -17,13 +17,12 @@
   Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( advision )
-{
-	advision_state *state = machine->driver_data<advision_state>();
 
-	state->video_hpos = 0;
-	state->display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
-	memset(state->display, 0, 8 * 8 * 256);
+void advision_state::video_start()
+{
+	m_video_hpos = 0;
+	m_display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
+	memset(m_display, 0, 8 * 8 * 256);
 }
 
 /***************************************************************************
@@ -49,26 +48,22 @@ PALETTE_INIT( advision )
 
 ***************************************************************************/
 
-void advision_vh_write(running_machine *machine, int data)
+void advision_state::vh_write(int data)
 {
-	advision_state *state = machine->driver_data<advision_state>();
-
-	if (state->video_bank >= 1 && state->video_bank <=5)
+	if (m_video_bank >= 1 && m_video_bank <=5)
 	{
-		state->led_latch[state->video_bank] = data;
+		m_led_latch[m_video_bank] = data;
 	}
 }
 
-void advision_vh_update(running_machine *machine, int x)
+void advision_state::vh_update(int x)
 {
-	advision_state *state = machine->driver_data<advision_state>();
-
-	UINT8 *dst = &state->display[x];
+	UINT8 *dst = &m_display[x];
 	int y;
 
 	for( y = 0; y < 8; y++ )
 	{
-		UINT8 data = state->led_latch[7-y];
+		UINT8 data = m_led_latch[7-y];
 
 		if( (data & 0x80) == 0 ) dst[0 * 256] = 8;
 		if( (data & 0x40) == 0 ) dst[1 * 256] = 8;
@@ -79,7 +74,7 @@ void advision_vh_update(running_machine *machine, int x)
 		if( (data & 0x02) == 0 ) dst[6 * 256] = 8;
 		if( (data & 0x01) == 0 ) dst[7 * 256] = 8;
 
-		state->led_latch[7-y] = 0xff;
+		m_led_latch[7-y] = 0xff;
 
 		dst += 8 * 256;
 	}
@@ -92,35 +87,29 @@ void advision_vh_update(running_machine *machine, int x)
 
 ***************************************************************************/
 
-VIDEO_UPDATE( advision )
+bool advision_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	advision_state *state = screen->machine->driver_data<advision_state>();
-
 	int x, y;
 
-	static int framecount = 0;
-
-	if( (framecount++ % 4) == 0 )
+	if( (m_frame_count++ % 4) == 0 )
 	{
-		state->frame_start = 1;
-		state->video_hpos = 0;
+		m_frame_start = 1;
+		m_video_hpos = 0;
 	}
 
 	for (x = 0; x < 150; x++)
 	{
-		UINT8 *led = &state->display[x];
+		UINT8 *led = &m_display[x];
 
 		for( y = 0; y < 128; y+=2 )
 		{
 			if( *led > 0 )
-				*BITMAP_ADDR16(bitmap, 30 + y, 85 + x) = --(*led);
+				*BITMAP_ADDR16(&bitmap, 30 + y, 85 + x) = --(*led);
 			else
-				*BITMAP_ADDR16(bitmap, 30 + y, 85 + x) = 0;
+				*BITMAP_ADDR16(&bitmap, 30 + y, 85 + x) = 0;
 
 			led += 256;
 		}
 	}
 	return 0;
 }
-
-

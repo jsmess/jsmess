@@ -25,25 +25,18 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-- [ABC80] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
 - [ABC80] Added graphics PROMs. [Ola Andersson]
 
 - [ABC80] Refactored video to work like real hardware. [Curt Coder]
 
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
 
-- [AMU880] Refactored driver to define ADDRESS_MAP_MODERN, and fixed
-  keyboard. [Curt Coder]
+- [AMU880] Fixed keyboard. [Curt Coder]
 
 - [C64] Added known good dumps softlist for cartridges. Not hooked up
   to driver code yet. [Curt Coder]
 
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
-
-- [MM1M6] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [SG1000] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
   that control when the beam will reach the aim area, to run the function
@@ -57,18 +50,6 @@ System Driver Changes:
   one or both the lens screens (remember that you can enable lens views by 
   selecting the Segascope views from the Video Options menu). The option 
   is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
-
-- [TANDY2K] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [V1050] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [VICTOR9K] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [VIDBRAIN] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [XEROX820] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
-
-- [XOR100] Refactored driver to define ADDRESS_MAP_MODERN. [Curt Coder]
 
 
 
@@ -97,6 +78,10 @@ Source Changes:
   
 - Static/const changes, and added driver_device state to many drivers.
   [Atari Ace]
+
+- Refactored the following drivers to define ADDRESS_MAP_MODERN:
+  abc80, advision, amu880, mm1m6, sg1000, tandy2k, v1050, victor9k,
+  vidbrain, xerox820, xor100. [Curt Coder]
 
 
 
