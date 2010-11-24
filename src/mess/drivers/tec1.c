@@ -49,9 +49,9 @@ It's only taken 25 years to get around to emulating it...
 #include "tec1.lh"
 
 static emu_timer *tec1_kbd_timer;
-static UINT8 tec1_kbd=0;
-static UINT8 tec1_segment=0;
-static UINT8 tec1_digit=0;
+static UINT8 tec1_kbd;
+static UINT8 tec1_segment;
+static UINT8 tec1_digit;
 static running_device *tec1_speaker;
 
 
@@ -173,6 +173,12 @@ static MACHINE_START( tec1 )
 	tec1_speaker = machine->device("speaker");
 }
 
+static MACHINE_RESET( tec1 )
+{
+	tec1_kbd = 0;
+}
+
+
 
 /***************************************************************************
 
@@ -244,6 +250,7 @@ static MACHINE_CONFIG_START( tec1, driver_device )
 	MDRV_CPU_IO_MAP(tec1_io)
 
 	MDRV_MACHINE_START(tec1)
+	MDRV_MACHINE_RESET(tec1)
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_tec1)
