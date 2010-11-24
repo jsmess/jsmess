@@ -35,9 +35,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<running_device> m_pia;
-	required_device<running_device> m_crtc;
 	required_device<running_device> m_fdc;
 	required_device<running_device> m_kbc;
+	required_device<running_device> m_crtc;
 	required_device<running_device> m_centronics;
 	required_device<running_device> m_ram;
 	required_device<running_device> m_floppy0;
