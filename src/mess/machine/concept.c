@@ -22,7 +22,6 @@
 
 
 /* interrupt priority encoder */
-static UINT8 pending_interrupts;
 enum
 {
 	IOCINT_level = 1,	/* serial lines (CTS, DSR & DCD) and I/O ports */
@@ -35,8 +34,6 @@ enum
 };
 
 /* Clock interface */
-static char clock_enable;
-static char clock_address;
 
 /* Omninet */
 /*static int ready;*/			/* ready line from monochip, role unknown */
@@ -62,15 +59,6 @@ const via6522_interface concept_via6522_intf =
 };
 
 /* keyboard interface */
-enum
-{
-	KeyQueueSize = 32,
-	MaxKeyMessageLen = 1
-};
-static UINT8 KeyQueue[KeyQueueSize];
-static int KeyQueueHead;
-static int KeyQueueLen;
-static UINT32 KeyStateSave[/*4*/3];
 
 /* Expansion slots */
 
@@ -87,15 +75,16 @@ static void concept_hdc_init(running_machine *machine, int slot);
 
 MACHINE_START(concept)
 {
+	concept_state *state = machine->driver_data<concept_state>();
 	/* initialize int state */
-	pending_interrupts = 0;
+	state->pending_interrupts = 0;
 
 	/* initialize clock interface */
-	clock_enable = 0/*1*/;
+	state->clock_enable = 0/*1*/;
 
 	/* clear keyboard interface state */
-	KeyQueueHead = KeyQueueLen = 0;
-	memset(KeyStateSave, 0, sizeof(KeyStateSave));
+	state->KeyQueueHead = state->KeyQueueLen = 0;
+	memset(state->KeyStateSave, 0, sizeof(state->KeyStateSave));
 
 	/* initialize expansion slots */
 	memset(expansion_slots, 0, sizeof(expansion_slots));
@@ -137,15 +126,16 @@ VIDEO_UPDATE(concept)
 
 static void concept_set_interrupt(running_machine *machine, int level, int state)
 {
+	concept_state *drvstate = machine->driver_data<concept_state>();
 	int interrupt_mask;
 	int final_level;
 
 	if (state)
-		pending_interrupts |= 1 << level;
+		drvstate->pending_interrupts |= 1 << level;
 	else
-		pending_interrupts &= ~ (1 << level);
+		drvstate->pending_interrupts &= ~ (1 << level);
 
-	for (final_level = 7, interrupt_mask = pending_interrupts; (final_level > 0) && ! (interrupt_mask & 0x80); final_level--, interrupt_mask <<= 1)
+	for (final_level = 7, interrupt_mask = drvstate->pending_interrupts; (final_level > 0) && ! (interrupt_mask & 0x80); final_level--, interrupt_mask <<= 1)
 		;
 
 	if (final_level)
@@ -156,27 +146,28 @@ static void concept_set_interrupt(running_machine *machine, int level, int state
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-INLINE void post_in_KeyQueue(int keycode)
+INLINE void post_in_KeyQueue(concept_state *state, int keycode)
 {
-	KeyQueue[(KeyQueueHead+KeyQueueLen) % KeyQueueSize] = keycode;
-	KeyQueueLen++;
+	state->KeyQueue[(state->KeyQueueHead+state->KeyQueueLen) % KeyQueueSize] = keycode;
+	state->KeyQueueLen++;
 }
 
 static void poll_keyboard(running_machine *machine)
 {
+	concept_state *state = machine->driver_data<concept_state>();
 	UINT32 keystate;
 	UINT32 key_transitions;
 	int i, j;
 	int keycode;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-	for(i = 0; (i < /*4*/3) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
+	for(i = 0; (i < /*4*/3) && (state->KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
 		keystate = input_port_read(machine, keynames[2*i]) | (input_port_read(machine, keynames[2*i + 1]) << 16);
-		key_transitions = keystate ^ KeyStateSave[i];
+		key_transitions = keystate ^ state->KeyStateSave[i];
 		if(key_transitions)
 		{
-			for(j = 0; (j < 32) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
+			for(j = 0; (j < 32) && (state->KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
 			{
 				if((key_transitions >> j) & 1)
 				{
@@ -185,14 +176,14 @@ static void poll_keyboard(running_machine *machine)
 					if (((keystate >> j) & 1))
 					{
 						/* key is pressed */
-						KeyStateSave[i] |= (1 << j);
+						state->KeyStateSave[i] |= (1 << j);
 						keycode |= 0x80;
 					}
 					else
 						/* key is released */
-						KeyStateSave[i] &= ~ (1 << j);
+						state->KeyStateSave[i] &= ~ (1 << j);
 
-					post_in_KeyQueue(keycode);
+					post_in_KeyQueue(state, keycode);
 					concept_set_interrupt(machine, KEYINT_level, 1);
 				}
 			}
@@ -273,6 +264,7 @@ static void via_irq_func(running_device *device, int state)
 
 READ16_HANDLER(concept_io_r)
 {
+	concept_state *state = space->machine->driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return 0;
 
@@ -328,8 +320,8 @@ READ16_HANDLER(concept_io_r)
 	case 6:
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
-		if (!clock_enable)
-			return mm58274c_r(space->machine->device("mm58274c"), clock_address);
+		if (!state->clock_enable)
+			return mm58274c_r(space->machine->device("mm58274c"), state->clock_address);
 		break;
 
 	case 7:
@@ -346,21 +338,21 @@ READ16_HANDLER(concept_io_r)
 				/* data */
 				reply = 0;
 
-				if (KeyQueueLen)
+				if (state->KeyQueueLen)
 				{
-					reply = KeyQueue[KeyQueueHead];
-					KeyQueueHead = (KeyQueueHead + 1) % KeyQueueSize;
-					KeyQueueLen--;
+					reply = state->KeyQueue[state->KeyQueueHead];
+					state->KeyQueueHead = (state->KeyQueueHead + 1) % KeyQueueSize;
+					state->KeyQueueLen--;
 				}
 
-				if (!KeyQueueLen)
+				if (!state->KeyQueueLen)
 					concept_set_interrupt(space->machine, KEYINT_level, 0);
 
 				return reply;
 
 			case 1:
 				/* always tell transmit is empty */
-				reply = KeyQueueLen ? 0x98 : 0x10;
+				reply = state->KeyQueueLen ? 0x98 : 0x10;
 				break;
 			}
 			break;
@@ -411,6 +403,7 @@ READ16_HANDLER(concept_io_r)
 
 WRITE16_HANDLER(concept_io_w)
 {
+	concept_state *state = space->machine->driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return;
 
@@ -470,8 +463,8 @@ WRITE16_HANDLER(concept_io_w)
 	case 6:
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
-		if (!clock_enable)
-			mm58274c_w(space->machine->device("mm58274c"), clock_address, data & 0xf);
+		if (!state->clock_enable)
+			mm58274c_w(space->machine->device("mm58274c"), state->clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -497,12 +490,12 @@ WRITE16_HANDLER(concept_io_w)
 
 		case 4:
 			/* NCALM clock calendar address and strobe register */
-			if (clock_enable != ((data & 0x10) != 0))
+			if (state->clock_enable != ((data & 0x10) != 0))
 			{
-				clock_enable = (data & 0x10) != 0;
-				if (! clock_enable)
+				state->clock_enable = (data & 0x10) != 0;
+				if (! state->clock_enable)
 					/* latch address when enable goes low */
-					clock_address = data & 0x0f;
+					state->clock_address = data & 0x0f;
 			}
 			/*volume_control = (data & 0x20) != 0;*/
 			/*alt_map = (data & 0x40) != 0;*/
@@ -531,8 +524,6 @@ WRITE16_HANDLER(concept_io_w)
     Concept fdc controller
 */
 
-static UINT8 fdc_local_status;
-static UINT8 fdc_local_command;
 enum
 {
 	LS_DRQ_bit		= 0,	// DRQ
@@ -573,26 +564,29 @@ static  READ8_HANDLER(concept_fdc_rom_r);
 
 static void concept_fdc_init(running_machine *machine, int slot)
 {
-	fdc_local_status = 0;
-	fdc_local_command = 0;
+	concept_state *state = machine->driver_data<concept_state>();
+	state->fdc_local_status = 0;
+	state->fdc_local_command = 0;
 
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
 {
+	concept_state *drvstate = device->machine->driver_data<concept_state>();
 	if (state)
-		fdc_local_status |= LS_INT_mask;
+		drvstate->fdc_local_status |= LS_INT_mask;
 	else
-		fdc_local_status &= ~LS_INT_mask;
+		drvstate->fdc_local_status &= ~LS_INT_mask;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_drq_w )
 {
+	concept_state *drvstate = device->machine->driver_data<concept_state>();
 	if (state)
-		fdc_local_status |= LS_DRQ_mask;
+		drvstate->fdc_local_status |= LS_DRQ_mask;
 	else
-		fdc_local_status &= ~LS_DRQ_mask;
+		drvstate->fdc_local_status &= ~LS_DRQ_mask;
 }
 
 const wd17xx_interface concept_wd17xx_interface =
@@ -605,12 +599,13 @@ const wd17xx_interface concept_wd17xx_interface =
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
+	concept_state *state = space->machine->driver_data<concept_state>();
 	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:
 		/* local Status reg */
-		return fdc_local_status;
+		return state->fdc_local_status;
 
 	case 8:
 		/* FDC STATUS REG */
@@ -634,13 +629,14 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
+	concept_state *state = space->machine->driver_data<concept_state>();
 	int current_drive;
 	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:
 		/* local command reg */
-		fdc_local_command = data;
+		state->fdc_local_command = data;
 
 		wd17xx_set_side(fdc,(data & LC_FLPSD1_mask) != 0);
 		current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);

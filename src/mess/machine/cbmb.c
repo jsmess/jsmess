@@ -34,12 +34,7 @@ drivers 8 & 9 as in pet.c ? */
 
 static TIMER_CALLBACK( cbmb_frame_interrupt );
 /* keyboard lines */
-static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
-UINT8 *cbmb_basic;
-UINT8 *cbmb_kernal;
-static UINT8 *cbmb_chargen;
-UINT8 *cbmb_colorram;
 
 /* tpi at 0xfde00
  in interrupt mode
@@ -136,38 +131,42 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
   port a7..a0 b7..b0 keyboard input */
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a )
 {
-	cbmb_keyline_a = data;
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	state->keyline_a = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b )
 {
-	cbmb_keyline_b = data;
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	state->keyline_b = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c )
 {
-	cbmb_keyline_c = data;
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	state->keyline_c = data;
 }
 
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 {
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
 	int data = 0;
-	if (!(cbmb_keyline_c & 0x01))
+	if (!(state->keyline_c & 0x01))
 		data |= input_port_read(device->machine, "ROW0");
 
-	if (!(cbmb_keyline_c & 0x02))
+	if (!(state->keyline_c & 0x02))
 		data |= input_port_read(device->machine, "ROW2");
 
-	if (!(cbmb_keyline_c & 0x04))
+	if (!(state->keyline_c & 0x04))
 		data |= input_port_read(device->machine, "ROW4");
 
-	if (!(cbmb_keyline_c & 0x08))
+	if (!(state->keyline_c & 0x08))
 		data |= input_port_read(device->machine, "ROW6");
 
-	if (!(cbmb_keyline_c & 0x10))
+	if (!(state->keyline_c & 0x10))
 		data |= input_port_read(device->machine, "ROW8");
 
-	if (!(cbmb_keyline_c & 0x20))
+	if (!(state->keyline_c & 0x20))
 		data |= input_port_read(device->machine, "ROW10");
 
 	return data ^0xff;
@@ -175,23 +174,24 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 {
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
 	int data = 0;
-	if (!(cbmb_keyline_c & 0x01))
+	if (!(state->keyline_c & 0x01))
 		data |= input_port_read(device->machine, "ROW1");
 
-	if (!(cbmb_keyline_c & 0x02))
+	if (!(state->keyline_c & 0x02))
 		data |= input_port_read(device->machine, "ROW3");
 
-	if (!(cbmb_keyline_c & 0x04))
+	if (!(state->keyline_c & 0x04))
 		data |= input_port_read(device->machine, "ROW5");
 
-	if (!(cbmb_keyline_c & 0x08))
+	if (!(state->keyline_c & 0x08))
 		data |= input_port_read(device->machine, "ROW7");
 
-	if (!(cbmb_keyline_c & 0x10))
+	if (!(state->keyline_c & 0x10))
 		data |= input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0 );
 
-	if (!(cbmb_keyline_c & 0x20))
+	if (!(state->keyline_c & 0x20))
 		data |= input_port_read(device->machine, "ROW11");
 
 	return data ^0xff;
@@ -201,28 +201,28 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 {
 	int data = 0;
 	cbmb_state *state = device->machine->driver_data<cbmb_state>();
-	if ((input_port_read(device->machine, "ROW0") & ~cbmb_keyline_a) ||
-				(input_port_read(device->machine, "ROW1") & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW0") & ~state->keyline_a) ||
+				(input_port_read(device->machine, "ROW1") & ~state->keyline_b))
 		 data |= 0x01;
 
-	if ((input_port_read(device->machine, "ROW2") & ~cbmb_keyline_a) ||
-				(input_port_read(device->machine, "ROW3") & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW2") & ~state->keyline_a) ||
+				(input_port_read(device->machine, "ROW3") & ~state->keyline_b))
 		 data |= 0x02;
 
-	if ((input_port_read(device->machine, "ROW4") & ~cbmb_keyline_a) ||
-				(input_port_read(device->machine, "ROW5") & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW4") & ~state->keyline_a) ||
+				(input_port_read(device->machine, "ROW5") & ~state->keyline_b))
 		 data |= 0x04;
 
-	if ((input_port_read(device->machine, "ROW6") & ~cbmb_keyline_a) ||
-				(input_port_read(device->machine, "ROW7") & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW6") & ~state->keyline_a) ||
+				(input_port_read(device->machine, "ROW7") & ~state->keyline_b))
 		 data |= 0x08;
 
-	if ((input_port_read(device->machine, "ROW8") & ~cbmb_keyline_a) ||
-				((input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW8") & ~state->keyline_a) ||
+				((input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~state->keyline_b))
 		 data |= 0x10;
 
-	if ((input_port_read(device->machine, "ROW10") & ~cbmb_keyline_a) ||
-				(input_port_read(device->machine, "ROW11") & ~cbmb_keyline_b))
+	if ((input_port_read(device->machine, "ROW10") & ~state->keyline_a) ||
+				(input_port_read(device->machine, "ROW11") & ~state->keyline_b))
 		 data |= 0x20;
 
 	if (!state->p500)
@@ -238,13 +238,12 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 
 void cbmb_irq( running_device *device, int level )
 {
-	static int old_level = 0;
-
-	if (level != old_level)
+	cbmb_state *state = device->machine->driver_data<cbmb_state>();
+	if (level != state->old_level)
 	{
 		DBG_LOG(device->machine, 3, "mos6509", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
-		old_level = level;
+		state->old_level = level;
 	}
 }
 
@@ -284,7 +283,8 @@ const mos6526_interface cbmb_cia =
 
 WRITE8_HANDLER( cbmb_colorram_w )
 {
-	cbmb_colorram[offset] = data | 0xf0;
+	cbmb_state *state = space->machine->driver_data<cbmb_state>();
+	state->colorram[offset] = data | 0xf0;
 }
 
 int cbmb_dma_read( running_machine *machine, int offset )
@@ -293,23 +293,24 @@ int cbmb_dma_read( running_machine *machine, int offset )
 	if (offset >= 0x1000)
 		return state->videoram[offset & 0x3ff];
 	else
-		return cbmb_chargen[offset & 0xfff];
+		return state->chargen[offset & 0xfff];
 }
 
 int cbmb_dma_read_color( running_machine *machine, int offset )
 {
-	return cbmb_colorram[offset & 0x3ff];
+	cbmb_state *state = machine->driver_data<cbmb_state>();
+	return state->colorram[offset & 0x3ff];
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_change_font )
 {
-	cbmb_vh_set_font(data);
+	cbmb_vh_set_font(device->machine, data);
 }
 
 static void cbmb_common_driver_init( running_machine *machine )
 {
 	cbmb_state *state = machine->driver_data<cbmb_state>();
-	cbmb_chargen = memory_region(machine, "maincpu") + 0x100000;
+	state->chargen = memory_region(machine, "maincpu") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
@@ -381,7 +382,7 @@ static TIMER_CALLBACK( p500_lightpen_tick )
 
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
-	static int level = 0;
+	cbmb_state *state = machine->driver_data<cbmb_state>();
 	running_device *tpi_0 = machine->device("tpi6525_0");
 
 #if 0
@@ -389,9 +390,9 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
 #endif
 
-	tpi6525_irq0_level(tpi_0, level);
-	level = !level;
-	if (level) return ;
+	tpi6525_irq0_level(tpi_0, state->irq_level);
+	state->irq_level = !state->irq_level;
+	if (state->irq_level) return ;
 
 #if 0
 	value = 0xff;

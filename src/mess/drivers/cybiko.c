@@ -234,7 +234,7 @@ INPUT_PORTS_END
 // MACHINE DRIVER //
 ////////////////////
 
-static MACHINE_CONFIG_START( cybikov1, driver_device )
+static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// cpu
 	MDRV_CPU_ADD( "maincpu", H8S2241, 11059200 )
 	MDRV_CPU_PROGRAM_MAP( cybikov1_mem )

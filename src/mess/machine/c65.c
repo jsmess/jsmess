@@ -28,38 +28,28 @@
 		} \
 	} while (0)
 
-static int c65_charset_select;
 
-static int c64mode;
 
-static UINT8 c65_6511_port;
-static UINT8 c65_keyline;
 
-static UINT8 vicirq;
-static int old_level;
-static int old_value;
-static int old_data;
 
 /*UINT8 *c65_basic; */
 /*UINT8 *c65_kernal; */
-UINT8 *c65_chargen;
 /*UINT8 *c65_dos; */
 /*UINT8 *c65_monitor; */
-UINT8 *c65_interface;
 /*UINT8 *c65_graphics; */
 
 
 static void c65_nmi( running_machine *machine )
 {
-	static int nmilevel = 0;
+	c65_state *state = machine->driver_data<c65_state>();
 	running_device *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 
-		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
 	}
 }
 
@@ -89,13 +79,14 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
+	c65_state *state = device->machine->driver_data<c65_state>();
 	UINT8 value = 0xff;
 	UINT8 cia0porta = mos6526_pa_r(device->machine->device("cia_0"), 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
-	if (!(c65_6511_port & 0x02))
-		value &= c65_keyline;
+	if (!(state->_6511_port & 0x02))
+		value &= state->keyline;
 
 	return value;
 }
@@ -109,29 +100,32 @@ static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 
 static void c65_irq( running_machine *machine, int level )
 {
-	if (level != old_level)
+	c65_state *state = machine->driver_data<c65_state>();
+	if (level != state->old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
-		old_level = level;
+		state->old_level = level;
 	}
 }
 
 /* is this correct for c65 as well as c64? */
 static void c65_cia0_interrupt( running_device *device, int level )
 {
-	c65_irq (device->machine, level || vicirq);
+	c65_state *state = device->machine->driver_data<c65_state>();
+	c65_irq (device->machine, level || state->vicirq);
 }
 
 /* is this correct for c65 as well as c64? */
 void c65_vic_interrupt( running_machine *machine, int level )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	running_device *cia_0 = machine->device("cia_0");
 #if 1
-	if (level != vicirq)
+	if (level != state->vicirq)
 	{
 		c65_irq (machine, level || mos6526_irq_r(cia_0));
-		vicirq = level;
+		state->vicirq = level;
 	}
 #endif
 }
@@ -269,10 +263,6 @@ static WRITE8_HANDLER( c65_write_mem )
 		space->write_byte(offset, data);
 }
 
-static struct {
-	int version;
-	UINT8 data[4];
-} dma;
 /* dma chip at 0xd700
   used:
    writing banknumber to offset 2
@@ -300,7 +290,7 @@ static struct {
 */
 static void c65_dma_port_w( running_machine *machine, int offset, int value )
 {
-	static int dump = 0;
+	c65_state *state = machine->driver_data<c65_state>();
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
@@ -310,13 +300,13 @@ static void c65_dma_port_w( running_machine *machine, int offset, int value )
 	{
 	case 2:
 	case 1:
-		dma.data[offset & 3] = value;
+		state->dma.data[offset & 3] = value;
 		break;
 	case 0:
 		pair.b.h3 = 0;
-		pair.b.h2 = dma.data[2];
-		pair.b.h = dma.data[1];
-		pair.b.l = dma.data[0]=value;
+		pair.b.h2 = state->dma.data[2];
+		pair.b.h = state->dma.data[1];
+		pair.b.l = state->dma.data[0]=value;
 		cmd = c65_read_mem(space, pair.d++);
 		len.w.h = 0;
 		len.b.l = c65_read_mem(space, pair.d++);
@@ -333,13 +323,13 @@ static void c65_dma_port_w( running_machine *machine, int offset, int value )
 		switch (cmd)
 		{
 		case 0:
-			if (src.d == 0x3ffff) dump = 1;
-			if (dump)
+			if (src.d == 0x3ffff) state->dump_dma = 1;
+			if (state->dump_dma)
 				DBG_LOG(space->machine, 1,"dma copy job",
 						("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 						 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
 						 c65_read_mem(space, pair.d + 1) ) );
-			if ((dma.version == 1)
+			if ((state->dma.version == 1)
 				 && ( (src.d&0x400000) || (dst.d & 0x400000)))
 			{
 				if (!(src.d & 0x400000))
@@ -406,9 +396,10 @@ static int c65_dma_port_r( running_machine *machine, int offset )
 
 static void c65_6511_port_w( running_machine *machine, int offset, int value )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	if (offset == 7)
 	{
-		c65_6511_port = value;
+		state->_6511_port = value;
 	}
 	DBG_LOG(machine, 2, "r6511 write", ("%.2x %.2x\n", offset, value));
 }
@@ -514,20 +505,6 @@ $21cab 9cab read reg 7
 $21caf 9caf write reg 7
 $21cb3
 */
-static struct {
-	int state;
-
-	UINT8 reg[0x0f];
-
-	UINT8 buffer[0x200];
-	int cpu_pos;
-	int fdc_pos;
-
-	UINT16 status;
-
-	attotime time;
-	int head,track,sector;
-} c65_fdc = { 0 };
 
 #define FDC_LOST 4
 #define FDC_CRC 8
@@ -540,13 +517,14 @@ static struct {
 #if 0
 static void c65_fdc_state(void)
 {
-	switch (c65_fdc.state)
+	c65_state *state = machine->driver_data<c65_state>();
+	switch (state->fdc.state)
 	{
 	case FDC_CMD_MOTOR_SPIN_UP:
-		if (timer_get_time(machine) - c65_fdc.time)
+		if (timer_get_time(machine) - state->fdc.time)
 		{
-			c65_fdc.state = 0;
-			c65_fdc.status &= ~FDC_BUSY;
+			state->fdc.state = 0;
+			state->fdc.status &= ~FDC_BUSY;
 		}
 		break;
 	}
@@ -555,25 +533,26 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w( running_machine *machine, int offset, int data )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->device("maincpu")), offset, data));
 	switch (offset & 0xf)
 	{
 	case 0:
-		c65_fdc.reg[0] = data;
+		state->fdc.reg[0] = data;
 		break;
 	case 1:
-		c65_fdc.reg[1] = data;
+		state->fdc.reg[1] = data;
 		switch (data & 0xf9)
 		{
 		case 0x20: // wait for motor spin up
-			c65_fdc.status &= ~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
-			c65_fdc.status |= FDC_BUSY;
-			c65_fdc.time = timer_get_time(machine);
-			c65_fdc.state = FDC_CMD_MOTOR_SPIN_UP;
+			state->fdc.status &= ~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
+			state->fdc.status |= FDC_BUSY;
+			state->fdc.time = timer_get_time(machine);
+			state->fdc.state = FDC_CMD_MOTOR_SPIN_UP;
 			break;
 		case 0: // cancel
-			c65_fdc.status &= ~(FDC_BUSY);
-			c65_fdc.state = 0;
+			state->fdc.status &= ~(FDC_BUSY);
+			state->fdc.state = 0;
 			break;
 		case 0x80: // buffered write
 		case 0x40: // buffered read
@@ -586,57 +565,58 @@ static void c65_fdc_w( running_machine *machine, int offset, int data )
 	case 2: case 3: // read only
 		break;
 	case 4:
-		c65_fdc.reg[offset & 0xf] = data;
-		c65_fdc.track = data;
+		state->fdc.reg[offset & 0xf] = data;
+		state->fdc.track = data;
 		break;
 	case 5:
-		c65_fdc.reg[offset & 0xf] = data;
-		c65_fdc.sector = data;
+		state->fdc.reg[offset & 0xf] = data;
+		state->fdc.sector = data;
 		break;
 	case 6:
-		c65_fdc.reg[offset & 0xf] = data;
-		c65_fdc.head = data;
+		state->fdc.reg[offset & 0xf] = data;
+		state->fdc.head = data;
 		break;
 	case 7:
-		c65_fdc.buffer[c65_fdc.cpu_pos++] = data;
+		state->fdc.buffer[state->fdc.cpu_pos++] = data;
 		break;
 	default:
-		c65_fdc.reg[offset & 0xf] = data;
+		state->fdc.reg[offset & 0xf] = data;
 		break;
 	}
 }
 
 static int c65_fdc_r( running_machine *machine, int offset )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	UINT8 data = 0;
 	switch (offset & 0xf)
 	{
 	case 0:
-		data = c65_fdc.reg[0];
+		data = state->fdc.reg[0];
 		break;
 	case 1:
-		data = c65_fdc.reg[1];
+		data = state->fdc.reg[1];
 		break;
 	case 2:
-		data = c65_fdc.status;
+		data = state->fdc.status;
 		break;
 	case 3:
-		data = c65_fdc.status >> 8;
+		data = state->fdc.status >> 8;
 		break;
 	case 4:
-		data = c65_fdc.track;
+		data = state->fdc.track;
 		break;
 	case 5:
-		data = c65_fdc.sector;
+		data = state->fdc.sector;
 		break;
 	case 6:
-		data = c65_fdc.head;
+		data = state->fdc.head;
 		break;
 	case 7:
-		data = c65_fdc.buffer[c65_fdc.cpu_pos++];
+		data = state->fdc.buffer[state->fdc.cpu_pos++];
 		break;
 	default:
-		data = c65_fdc.reg[offset & 0xf];
+		data = state->fdc.reg[offset & 0xf];
 		break;
 	}
 	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->device("maincpu")), offset, data));
@@ -658,26 +638,25 @@ static int c65_fdc_r( running_machine *machine, int offset )
    read 0
    write 0:ff
 */
-static struct {
-	UINT8 reg;
-} expansion_ram = {0};
 
 static READ8_HANDLER( c65_ram_expansion_r )
 {
+	c65_state *state = space->machine->driver_data<c65_state>();
 	UINT8 data = 0xff;
 	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
-		data = expansion_ram.reg;
+		data = state->expansion_ram.reg;
 	return data;
 }
 
 static WRITE8_HANDLER( c65_ram_expansion_w )
 {
+	c65_state *state = space->machine->driver_data<c65_state>();
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
 	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
 	{
-		expansion_ram.reg = data;
+		state->expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
 		expansion_ram_end = 0x80000 + (messram_get_size(space->machine->device("messram")) - 128*1024) - 1;
@@ -823,16 +802,16 @@ d02f:
  init a5 96 written (seems to be switch to c65 or vic3 mode)
  go64 0 written
 */
-static int c65_io_on=0, c65_io_dc00_on=0;
 
 /* bit 1 external sync enable (genlock)
    bit 2 palette enable
    bit 6 vic3 c65 character set */
 void c65_bankswitch_interface( running_machine *machine, int value )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	DBG_LOG(machine, 2, "c65 bankswitch", ("%.2x\n",value));
 
-	if (c65_io_on)
+	if (state->io_on)
 	{
 		if (value & 1)
 		{
@@ -848,7 +827,7 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 		}
 	}
 
-	c65_io_dc00_on = !(value & 1);
+	state->io_dc00_on = !(value & 1);
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x08)
@@ -861,15 +840,15 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 	else
 		memory_set_bankptr(machine, "bank2", c64_memory + 0xa000);
 #endif
-	if ((old_value^value) & 0x20)
+	if ((state->old_value^value) & 0x20)
 	{
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20)
-			memory_set_bankptr(machine, "bank3", c65_interface);
+			memory_set_bankptr(machine, "bank3", state->interface);
 		else
 			memory_set_bankptr(machine, "bank3", c64_memory + 0xc000);
 	}
-	c65_charset_select = value & 0x40;
+	state->charset_select = value & 0x40;
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x80)
@@ -877,15 +856,16 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 	else
 		memory_set_bankptr(machine, "bank6", c64_memory + 0xe000);
 #endif
-	old_value = value;
+	state->old_value = value;
 }
 
 void c65_bankswitch( running_machine *machine )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	int data, loram, hiram, charen;
 
 	data = m4510_get_port(machine->device<legacy_cpu_device>("maincpu"));
-	if (data == old_data)
+	if (data == state->old_data)
 		return;
 
 	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
@@ -907,11 +887,11 @@ void c65_bankswitch( running_machine *machine )
 
 	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
-		c65_io_on = 1;
+		state->io_on = 1;
 		memory_set_bankptr(machine, "bank6", c64_colorram);
 		memory_set_bankptr(machine, "bank7", c64_colorram);
 
-		if (c65_io_dc00_on)
+		if (state->io_dc00_on)
 		{
 			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_write_io_dc00);
@@ -928,7 +908,7 @@ void c65_bankswitch( running_machine *machine )
 	}
 	else
 	{
-		c65_io_on = 0;
+		state->io_on = 0;
 		memory_set_bankptr(machine, "bank5", c64_memory + 0xd000);
 		memory_set_bankptr(machine, "bank7", c64_memory + 0xd800);
 		memory_set_bankptr(machine, "bank9", c64_memory + 0xdc00);
@@ -963,7 +943,7 @@ void c65_bankswitch( running_machine *machine )
 			memory_set_bankptr(machine, "bank10", c64_memory + 0xe000);
 		}
 	}
-	old_data = data;
+	state->old_data = data;
 }
 
 void c65_colorram_write( int offset, int value )
@@ -978,6 +958,7 @@ void c65_colorram_write( int offset, int value )
  */
 int c65_dma_read( running_machine *machine, int offset )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	if (!c64_game && c64_exrom)
 	{
 		if (offset < 0x3000)
@@ -989,8 +970,8 @@ int c65_dma_read( running_machine *machine, int offset )
 		if (offset < 0x1000)
 			return c64_vicaddr[offset & 0x3fff];
 		if (offset < 0x2000) {
-			if (c65_charset_select)
-				return c65_chargen[offset & 0xfff];
+			if (state->charset_select)
+				return state->chargen[offset & 0xfff];
 			else
 				return c64_chargen[offset & 0xfff];
 		}
@@ -1001,13 +982,15 @@ int c65_dma_read( running_machine *machine, int offset )
 
 int c65_dma_read_color( running_machine *machine, int offset )
 {
-	if (c64mode)
+	c65_state *state = machine->driver_data<c65_state>();
+	if (state->c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
 	return c64_colorram[offset & 0x7ff];
 }
 
 static void c65_common_driver_init( running_machine *machine )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	c64_memory = auto_alloc_array_clear(machine, UINT8, 0x10000);
 	memory_set_bankptr(machine, "bank11", c64_memory + 0x00000);
 	memory_set_bankptr(machine, "bank12", c64_memory + 0x08000);
@@ -1016,13 +999,13 @@ static void c65_common_driver_init( running_machine *machine )
 	memory_set_bankptr(machine, "bank15", c64_memory + 0x0e000);
 
 	cbm_common_init();
-	c65_keyline = 0xff;
+	state->keyline = 0xff;
 
 	c64_pal = 0;
-	c65_charset_select = 0;
-	c65_6511_port = 0xff;
-	vicirq = 0;
-	old_data = -1;
+	state->charset_select = 0;
+	state->_6511_port = 0xff;
+	state->vicirq = 0;
+	state->old_data = -1;
 
 	/* C65 had no datasette port */
 	c64_tape_on = 0;
@@ -1034,19 +1017,22 @@ static void c65_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( c65 )
 {
-	dma.version = 2;
+	c65_state *state = machine->driver_data<c65_state>();
+	state->dma.version = 2;
 	c65_common_driver_init(machine);
 }
 
 DRIVER_INIT( c65pal )
 {
-	dma.version = 1;
+	c65_state *state = machine->driver_data<c65_state>();
+	state->dma.version = 1;
 	c65_common_driver_init(machine);
 	c64_pal = 1;
 }
 
 MACHINE_START( c65 )
 {
+	c65_state *state = machine->driver_data<c65_state>();
 	/* clear upper memory */
 	memset(messram_get_ptr(machine->device("messram")) + 128*1024, 0xff, messram_get_size(machine->device("messram")) -  128*1024);
 
@@ -1054,7 +1040,7 @@ MACHINE_START( c65 )
 //removed   cbm_drive_1_config (SERIAL, 11);
 	c64_vicaddr = c64_memory;
 
-	c64mode = 0;
+	state->c64mode = 0;
 
 	c65_bankswitch_interface(machine, 0xff);
 	c65_bankswitch (machine);
@@ -1063,6 +1049,7 @@ MACHINE_START( c65 )
 
 INTERRUPT_GEN( c65_frame_interrupt )
 {
+	c65_state *state = device->machine->driver_data<c65_state>();
 	int value;
 
 	c65_nmi(device->machine);
@@ -1074,5 +1061,5 @@ INTERRUPT_GEN( c65_frame_interrupt )
 	value = 0xff;
 
 	value &= ~input_port_read(device->machine, "FUNCT");
-	c65_keyline = value;
+	state->keyline = value;
 }

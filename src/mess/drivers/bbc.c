@@ -713,7 +713,7 @@ static INTERRUPT_GEN( bbcb_vsync )
 	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
 	via_0->write_ca1(0);
-	bbc_frameclock();
+	bbc_frameclock(device->machine);
 }
 
 
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MDRV_CARTSLOT_LOAD(bbcb_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbca, driver_device )
+static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem)
@@ -894,7 +894,7 @@ MACHINE_CONFIG_END
 
 
 /****BBC MASTER */
-static MACHINE_CONFIG_START( bbcm, driver_device )
+static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem)

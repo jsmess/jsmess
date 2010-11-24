@@ -30,13 +30,19 @@ public:
 	int cbm700;
 	int cbm_ntsc;
 	UINT8 *videoram;
+	UINT8 *basic;
+	UINT8 *kernal;
+	UINT8 *colorram;
+	int keyline_a;
+	int keyline_b;
+	int keyline_c;
+	UINT8 *chargen;
+	int old_level;
+	int irq_level;
+	int font;
 };
 
 /*----------- defined in machine/cbmb.c -----------*/
-
-extern UINT8 *cbmb_basic;
-extern UINT8 *cbmb_kernal;
-extern UINT8 *cbmb_colorram;
 
 extern const mos6526_interface cbmb_cia;
 
@@ -82,7 +88,7 @@ void cbm600_vh_init(running_machine *machine);
 void cbm700_vh_init(running_machine *machine);
 VIDEO_START( cbm700 );
 
-void cbmb_vh_set_font(int font);
+void cbmb_vh_set_font(running_machine *machine, int font);
 
 
 #endif /* CBMB_H_ */

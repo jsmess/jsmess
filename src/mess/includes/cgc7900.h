@@ -38,6 +38,7 @@ public:
 	UINT16 color_status_bg;
 	UINT16 roll_overlay;
 	int blink;
+	UINT16* chrom_ram;
 };
 
 /*----------- defined in video/cgc7900.c -----------*/

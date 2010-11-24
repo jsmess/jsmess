@@ -43,7 +43,6 @@
 #include "sound/ay8910.h"
 
 
-static UINT16* chrom_ram; // TODO remove
 
 
 /***************************************************************************
@@ -235,7 +234,7 @@ static WRITE16_HANDLER( disk_command_w )
 
 static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&chrom_ram)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cgc7900_z_mode_r, cgc7900_z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_ram)
@@ -406,9 +405,10 @@ static MACHINE_START( cgc7900 )
 
 static MACHINE_RESET(cgc7900)
 {
+	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 	UINT8* user1 = memory_region(machine, M68000_TAG);
 
-	memcpy((UINT8*)chrom_ram,user1,8);
+	memcpy((UINT8*)state->chrom_ram,user1,8);
 
 	machine->device(M68000_TAG)->reset();
 }

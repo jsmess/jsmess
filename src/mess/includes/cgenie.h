@@ -9,6 +9,31 @@
 
 #include "machine/wd17xx.h"
 
+// CRTC 6845
+typedef struct
+{
+	UINT8    cursor_address_lo;
+	UINT8    cursor_address_hi;
+	UINT8    screen_address_lo;
+	UINT8    screen_address_hi;
+	UINT8    cursor_bottom;
+	UINT8    cursor_top;
+	UINT8    scan_lines;
+	UINT8    crt_mode;
+	UINT8    vertical_sync_pos;
+	UINT8    vertical_displayed;
+	UINT8    vertical_adjust;
+	UINT8    vertical_total;
+	UINT8    horizontal_length;
+	UINT8    horizontal_sync_pos;
+	UINT8    horizontal_displayed;
+	UINT8    horizontal_total;
+	UINT8    idx;
+	UINT8    cursor_visible;
+	UINT8    cursor_phase;
+} CRTC6845;
+
+
 class cgenie_state : public driver_device
 {
 public:
@@ -16,6 +41,26 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *fontram;
+	UINT8 *colorram;
+	int tv_mode;
+	int font_offset[4];
+	int port_ff;
+	UINT8 irq_status;
+	UINT8 motor_drive;
+	UINT8 head;
+	UINT8 cass_level;
+	UINT8 cass_bit;
+	UINT8 psg_a_out;
+	UINT8 psg_b_out;
+	UINT8 psg_a_inp;
+	UINT8 psg_b_inp;
+	UINT8 control_port;
+	CRTC6845 crt;
+	int graphics;
+	bitmap_t *dlybitmap;
+	int off_x;
+	int off_y;
 };
 
 
@@ -24,11 +69,8 @@ public:
 READ8_DEVICE_HANDLER( cgenie_sh_control_port_r );
 WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 
-extern UINT8 *cgenie_fontram;
-extern UINT8 *cgenie_colorram;
 extern const wd17xx_interface cgenie_wd17xx_interface;
 
-extern int cgenie_tv_mode;
 
 READ8_HANDLER ( cgenie_psg_port_a_r );
 READ8_HANDLER ( cgenie_psg_port_b_r );
@@ -69,47 +111,20 @@ WRITE8_HANDLER ( cgenie_motor_w );
 int cgenie_videoram_r(running_machine *machine,int offset);
 WRITE8_HANDLER ( cgenie_videoram_w );
 
-// CRTC 6845
-typedef struct
-{
-	UINT8    cursor_address_lo;
-	UINT8    cursor_address_hi;
-	UINT8    screen_address_lo;
-	UINT8    screen_address_hi;
-	UINT8    cursor_bottom;
-	UINT8    cursor_top;
-	UINT8    scan_lines;
-	UINT8    crt_mode;
-	UINT8    vertical_sync_pos;
-	UINT8    vertical_displayed;
-	UINT8    vertical_adjust;
-	UINT8    vertical_total;
-	UINT8    horizontal_length;
-	UINT8    horizontal_sync_pos;
-	UINT8    horizontal_displayed;
-	UINT8    horizontal_total;
-	UINT8    idx;
-	UINT8    cursor_visible;
-	UINT8    cursor_phase;
-} CRTC6845;
-
 
 /*----------- defined in video/cgenie.c -----------*/
-
-extern int cgenie_font_offset[4];
 
 VIDEO_START( cgenie );
 VIDEO_UPDATE( cgenie );
 
-READ8_HANDLER( cgenie_index_r );
-READ8_HANDLER( cgenie_register_r );
+READ8_HANDLER ( cgenie_index_r );
+READ8_HANDLER ( cgenie_register_r );
 
-WRITE8_HANDLER( cgenie_index_w );
-WRITE8_HANDLER( cgenie_register_w );
+WRITE8_HANDLER ( cgenie_index_w );
+WRITE8_HANDLER ( cgenie_register_w );
 
-int cgenie_get_register(int indx);
-
-void cgenie_mode_select(int graphics);
+int cgenie_get_register(running_machine *machine, int indx);
+void cgenie_mode_select(running_machine *machine, int graphics);
 
 
 #endif /* CGENIE_H_ */

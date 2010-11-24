@@ -16,16 +16,48 @@
 
 #include "machine/6526cia.h"
 
-/*----------- defined in machine/c128.c -----------*/
+class c128_state : public driver_device
+{
+public:
+	c128_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *c128_basic;
-extern UINT8 *c128_kernal;
-extern UINT8 *c128_chargen;
-extern UINT8 *c128_z80;
-extern UINT8 *c128_editor;
-extern UINT8 *c128_internal_function;
-extern UINT8 *c128_external_function;
-extern UINT8 *c128_vdcram;
+	UINT8 *basic;
+	UINT8 *kernal;
+	UINT8 *chargen;
+	UINT8 *z80;
+	UINT8 *editor;
+	UINT8 *internal_function;
+	UINT8 *external_function;
+	UINT8 *vdcram;
+	UINT8 mmu[0x0b];
+	int mmu_cpu;
+	int mmu_page0;
+	int mmu_page1;
+	int c64mode;
+	int write_io;
+	int ram_bottom;
+	int ram_top;
+	UINT8 *ram;
+	UINT8 c64_port_data;
+	UINT8 keyline[3];
+	int cnt1;
+	int sp1;
+	int data_out;
+	int va1617;
+	int cia1_on;
+	int monitor;
+	UINT8 vicirq;
+	int nmilevel;
+	int old_level;
+	int old_data;
+	int old_exrom;
+	int old_game;
+	emu_timer *datasette_timer;
+};
+
+
+/*----------- defined in machine/c128.c -----------*/
 
 WRITE8_HANDLER(c128_mmu8722_port_w);
 READ8_HANDLER(c128_mmu8722_port_r);

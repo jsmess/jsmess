@@ -88,7 +88,6 @@ static INTERRUPT_GEN( cps1_interrupt )
 *
 ********************************************************************/
 
-static UINT8 *qsound_sharedram1,*qsound_sharedram2;
 
 static INTERRUPT_GEN( cps1_qsound_interrupt )
 {
@@ -108,24 +107,28 @@ static READ16_HANDLER( qsound_rom_r )
 
 static READ16_HANDLER( qsound_sharedram1_r )
 {
-	return qsound_sharedram1[offset] | 0xff00;
+	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	return state->qsound_sharedram1[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( qsound_sharedram1_w )
 {
+	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
 	if (ACCESSING_BITS_0_7)
-		qsound_sharedram1[offset] = data;
+		state->qsound_sharedram1[offset] = data;
 }
 
 static READ16_HANDLER( qsound_sharedram2_r )
 {
-	return qsound_sharedram2[offset] | 0xff00;
+	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	return state->qsound_sharedram2[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( qsound_sharedram2_w )
 {
+	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
 	if (ACCESSING_BITS_0_7)
-		qsound_sharedram2[offset] = data;
+		state->qsound_sharedram2[offset] = data;
 }
 
 static WRITE8_HANDLER( qsound_banksw_w )
@@ -194,11 +197,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
 	AM_RANGE(0x800020, 0x800021) AM_READNOP
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cpschngr_state, cps1_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cpschngr_state, cps1_cps_b_regs)
 	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)	/* Sound command */
 	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_MEMBER(cpschngr_state, cps1_gfxram) AM_SIZE_MEMBER(cpschngr_state, cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -219,9 +222,9 @@ static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cpschngr_state, cps1_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cpschngr_state, cps1_cps_b_regs)	/* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_MEMBER(cpschngr_state, cps1_gfxram) AM_SIZE_MEMBER(cpschngr_state, cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)			/* Slammasters protection */
 	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ_PORT("IN2")			/* Player 3 controls (later games) */
@@ -235,11 +238,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( qsound_sub_map, ADDRESS_SPACE_PROGRAM, 8 )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&qsound_sharedram1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(cpschngr_state, qsound_sharedram1)
 	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
 	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_r)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&qsound_sharedram2)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(cpschngr_state, qsound_sharedram2)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -356,7 +359,7 @@ static const ym2151_interface ym2151_config =
 *
 ********************************************************************/
 
-static MACHINE_CONFIG_START( cps1_10MHz, driver_device )
+static MACHINE_CONFIG_START( cps1_10MHz, cpschngr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)

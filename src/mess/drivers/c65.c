@@ -88,9 +88,9 @@ static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
-	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE(&c65_chargen)
+	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE_MEMBER(c65_state, chargen)
 	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE(&c64_basic)
-	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_BASE(&c65_interface)
+	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_BASE_MEMBER(c65_state, interface)
 	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE(&c64_chargen)
 	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE(&c64_kernal)
 
@@ -282,7 +282,7 @@ static INTERRUPT_GEN( vic3_raster_irq )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c65, driver_device )
+static MACHINE_CONFIG_START( c65, c65_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
 	MDRV_CPU_PROGRAM_MAP(c65_mem)

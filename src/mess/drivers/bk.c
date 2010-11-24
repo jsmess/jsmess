@@ -18,7 +18,7 @@
 static ADDRESS_MAP_START(bk0010_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE(&bk0010_video_ram) // Video RAM
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, bk0010_video_ram) // Video RAM
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // ROM
     AM_RANGE( 0xc000, 0xdfff ) AM_ROM  // ROM
@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(bk0010fd_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE(&bk0010_video_ram) // Video RAM
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, bk0010_video_ram) // Video RAM
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
     AM_RANGE( 0xa000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xfdff ) AM_ROM  // ROM
@@ -169,7 +169,7 @@ static const cassette_config bk0010_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( bk0010, driver_device )
+static MACHINE_CONFIG_START( bk0010, bk_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( bk0010, driver_device )
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bk0010fd, driver_device )
+static MACHINE_CONFIG_START( bk0010fd, bk_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)

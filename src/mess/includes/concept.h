@@ -14,6 +14,13 @@
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
 
+/* keyboard interface */
+enum
+{
+	KeyQueueSize = 32,
+	MaxKeyMessageLen = 1
+};
+
 class concept_state : public driver_device
 {
 public:
@@ -21,6 +28,15 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	UINT8 pending_interrupts;
+	char clock_enable;
+	char clock_address;
+	UINT8 KeyQueue[KeyQueueSize];
+	int KeyQueueHead;
+	int KeyQueueLen;
+	UINT32 KeyStateSave[3];
+	UINT8 fdc_local_status;
+	UINT8 fdc_local_command;
 };
 
 

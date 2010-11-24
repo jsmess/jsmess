@@ -12,15 +12,10 @@
 #include "machine/i8255a.h"
 #include "includes/bk.h"
 
-static UINT16 kbd_state;
-UINT16 bk_scrool;
-static UINT16 key_code;
-static UINT16 key_pressed;
-static UINT16 key_irq_vector;
-static UINT16 bk_drive;
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	bk_state *state = machine->driver_data<bk_state>();
 	UINT8 code, i, j;
 	static const char *const keynames[] = {
 		"LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
@@ -36,7 +31,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (code == (1 << j))
 				{
-					key_code = j + i*8;
+					state->key_code = j + i*8;
 					break;
 				}
 			}
@@ -44,7 +39,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (i==6 || i==7)
 				{
-					key_code -= 16;
+					state->key_code -= 16;
 				}
 
 			}
@@ -52,17 +47,17 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (i>=8 && i<=11)
 				{
-					key_code += 32;
+					state->key_code += 32;
 				}
 			}
-			key_pressed = 0x40;
+			state->key_pressed = 0x40;
 			if ((input_port_read(machine, "LINE0") & 2) == 0)
 			{
-				key_irq_vector = 0x30;
+				state->key_irq_vector = 0x30;
 			}
 			else
 			{
-				key_irq_vector = 0xBC;
+				state->key_irq_vector = 0xBC;
 			}
 			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 			break;
@@ -78,35 +73,41 @@ MACHINE_START(bk0010)
 
 static IRQ_CALLBACK(bk0010_irq_callback)
 {
+	bk_state *state = device->machine->driver_data<bk_state>();
 	cpu_set_input_line(device, 0, CLEAR_LINE);
-	return key_irq_vector;
+	return state->key_irq_vector;
 }
 
 MACHINE_RESET( bk0010 )
 {
+	bk_state *state = machine->driver_data<bk_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), bk0010_irq_callback);
 
-	kbd_state = 0;
-	bk_scrool = 01330;
+	state->kbd_state = 0;
+	state->scrool = 01330;
 }
 
 READ16_HANDLER (bk_key_state_r)
 {
-	return kbd_state;
+	bk_state *state = space->machine->driver_data<bk_state>();
+	return state->kbd_state;
 }
 READ16_HANDLER (bk_key_code_r)
 {
-	kbd_state &= ~0x80; // mark reading done
-	key_pressed = 0;
-	return key_code;
+	bk_state *state = space->machine->driver_data<bk_state>();
+	state->kbd_state &= ~0x80; // mark reading done
+	state->key_pressed = 0;
+	return state->key_code;
 }
 READ16_HANDLER (bk_vid_scrool_r)
 {
-	return bk_scrool;
+	bk_state *state = space->machine->driver_data<bk_state>();
+	return state->scrool;
 }
 
 READ16_HANDLER (bk_key_press_r)
 {
+	bk_state *state = space->machine->driver_data<bk_state>();
 	double level = cassette_input(space->machine->device("cassette"));
 	UINT16 cas;
 	if (level < 0)
@@ -118,17 +119,19 @@ READ16_HANDLER (bk_key_press_r)
 		cas = 0x20;
 	}
 
-	return 0x8080 | key_pressed | cas;
+	return 0x8080 | state->key_pressed | cas;
 }
 
 WRITE16_HANDLER(bk_key_state_w)
 {
-	kbd_state = (kbd_state & ~0x40) | (data & 0x40);
+	bk_state *state = space->machine->driver_data<bk_state>();
+	state->kbd_state = (state->kbd_state & ~0x40) | (data & 0x40);
 }
 
 WRITE16_HANDLER(bk_vid_scrool_w)
 {
-	bk_scrool = data;
+	bk_state *state = space->machine->driver_data<bk_state>();
+	state->scrool = data;
 }
 
 WRITE16_HANDLER(bk_key_press_w)
@@ -142,25 +145,26 @@ READ16_HANDLER (bk_floppy_cmd_r)
 
 WRITE16_HANDLER(bk_floppy_cmd_w)
 {
+	bk_state *state = space->machine->driver_data<bk_state>();
 	if ((data & 1) == 1)
 	{
-		bk_drive = 0;
+		state->drive = 0;
 	}
 	if ((data & 2) == 2)
 	{
-		bk_drive = 1;
+		state->drive = 1;
 	}
 	if ((data & 4) == 4)
 	{
-		bk_drive = 2;
+		state->drive = 2;
 	}
 	if ((data & 8) == 8)
 	{
-		bk_drive = 3;
+		state->drive = 3;
 	}
 	if (data == 0)
 	{
-		bk_drive = -1;
+		state->drive = -1;
 	}
 }
 

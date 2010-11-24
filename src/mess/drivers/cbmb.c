@@ -133,7 +133,7 @@ static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf2000, 0xf3fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
-	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE(&cbmb_basic)
+	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE_MEMBER(cbmb_state, basic)
 	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE_MEMBER(cbmb_state, videoram) /* VIDEORAM */
 	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE(&cbmb_kernal)
+	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE_MEMBER(cbmb_state, kernal)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -160,9 +160,9 @@ static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf2000, 0xf3fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
-	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE(&cbmb_basic)
+	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE_MEMBER(cbmb_state, basic)
 	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE_MEMBER(cbmb_state, videoram)		/* videoram */
-	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_BASE(&cbmb_colorram)		/* colorram */
+	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_BASE_MEMBER(cbmb_state, colorram)		/* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", vic2_port_r, vic2_port_w)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE(&cbmb_kernal)
+	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE_MEMBER(cbmb_state, kernal)
 ADDRESS_MAP_END
 
 

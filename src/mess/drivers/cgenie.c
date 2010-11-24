@@ -43,8 +43,8 @@ static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
 //  AM_RANGE(0xe000, 0xefff) AM_ROM // installed in cgenie_init_machine
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE( &cgenie_colorram )
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE( cgenie_fontram_r, cgenie_fontram_w) AM_BASE( &cgenie_fontram )
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE_MEMBER(cgenie_state, colorram )
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE( cgenie_fontram_r, cgenie_fontram_w) AM_BASE_MEMBER(cgenie_state, fontram )
 	AM_RANGE(0xf800, 0xf8ff) AM_READ( cgenie_keyboard_r )
 	AM_RANGE(0xf900, 0xffdf) AM_NOP
 	AM_RANGE(0xffe0, 0xffe3) AM_READWRITE( cgenie_irq_status_r, cgenie_motor_w )
@@ -269,7 +269,7 @@ static const gfx_layout cgenie_charlayout =
 static const gfx_layout cgenie_gfxlayout =
 {
 	8,8,			/* 4*8 characters */
-	256,			/* 256 graphics patterns */
+	256,			/* 256 state->graphics patterns */
 	2,				/* 2 bits per pixel */
 	{ 0, 1 },		/* two bitplanes; 2 bit per pixel */
 	{ 0, 0, 2, 2, 4, 4, 6, 6}, /* x offsets */
@@ -437,9 +437,9 @@ static const unsigned short cgenie_palette[] =
 	0,41, 0,42, 0,43, 0,44,
 	0,45, 0,46, 0,47, 0,48,
 
-	0,	  9,	7,	  6,	/* RGB monitor graphics colors */
-	0,	  25,	23,   22,	/* TV set graphics colors: darker */
-	0,	  41,	39,   38,	/* TV set graphics colors: a bit brighter */
+	0,	  9,	7,	  6,	/* RGB monitor state->graphics colors */
+	0,	  25,	23,   22,	/* TV set state->graphics colors: darker */
+	0,	  41,	39,   38,	/* TV set state->graphics colors: a bit brighter */
 };
 
 /* Initialise the palette */
