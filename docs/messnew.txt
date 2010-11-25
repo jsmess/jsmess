@@ -10,6 +10,7 @@ New System Drivers Supported:
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Ausbaufaehiger Mikrocomputer mit dem U 880 [Curt Coder]
+- Heathkit ET3400 [Robbbert]
 
 
 
@@ -37,6 +38,8 @@ System Driver Changes:
   to driver code yet. [Curt Coder]
 
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
+
+- [H8] Progressed from skeleton to almost working. [Robbbert]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
   that control when the beam will reach the aim area, to run the function
