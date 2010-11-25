@@ -7,6 +7,36 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- attributes
+		- reverse video
+		- character blank
+		- character blink
+		- underline
+		- full/half intensity
+	- operation modes
+		- wide graphics
+		- thin graphics
+		- character mode w/o underline
+		- character mode w/underline
+	- double height characters
+	- double width characters
+	- parallel scan line
+	- serial scan line
+	- cursor
+		- underline
+		- blinking underline
+		- reverse video
+		- blinking reverse video
+	- programmable character blink rate (75/25 duty)
+	- programmable cursor blink rate (50/50 duty)
+	- data/attribute latches
+
+*/
+
 #include "emu.h"
 #include "crt9021.h"
 
@@ -17,6 +47,17 @@
 //**************************************************************************
 
 #define LOG 1
+
+
+// attributes
+static const int ATTRIBUTE_REVID	= 0x80;
+static const int ATTRIBUTE_INT		= 0x40;
+static const int ATTRIBUTE_BLINK	= 0x20;
+static const int ATTRIBUTE_MS1		= 0x10;
+static const int ATTRIBUTE_MS0		= 0x08;
+static const int ATTRIBUTE_CHABL	= 0x04;
+static const int ATTRIBUTE_BKC		= 0x02;
+static const int ATTRIBUTE_BLC		= 0x01;
 
 
 
@@ -80,7 +121,6 @@ void crt9021_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&out_ld_sh_func, 0, sizeof(out_ld_sh_func));
 		memset(&in_data_func, 0, sizeof(in_data_func));
 		memset(&in_attr_func, 0, sizeof(in_attr_func));
 		memset(&in_atten_func, 0, sizeof(in_atten_func));
@@ -119,7 +159,6 @@ void crt9021_device::device_start()
 	// allocate timers
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_ld_sh_func, &m_config.out_ld_sh_func, this);
 	devcb_resolve_read8(&m_in_data_func, &m_config.in_data_func, this);
 	devcb_resolve_read8(&m_in_attr_func, &m_config.in_attr_func, this);
 	devcb_resolve_read_line(&m_in_atten_func, &m_config.in_atten_func, this);
@@ -129,7 +168,11 @@ void crt9021_device::device_start()
 	assert(m_screen != NULL);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_sl);
+	state_save_register_device_item(this, 0, m_slg);
+	state_save_register_device_item(this, 0, m_sld);
+	state_save_register_device_item(this, 0, m_cursor);
+	state_save_register_device_item(this, 0, m_retbl);
+	state_save_register_device_item(this, 0, m_vsync);
 }
 
 
@@ -152,47 +195,66 @@ void crt9021_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  slg_w - 
+//  slg_w - scan line gate
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9021_device::slg_w )
 {
+	if (LOG) logerror("CRT9021 '%s' SLG: %u\n", tag(), state);
+
+	m_slg = state;
 }
 
 
 //-------------------------------------------------
-//  sld_w - 
+//  sld_w - scan line data
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9021_device::sld_w )
 {
+	if (LOG) logerror("CRT9021 '%s' SLG: %u\n", tag(), state);
+
+	if (!m_slg)
+	{
+		m_sld <<= 1;
+		m_sld |= state;
+	}
 }
 
 
 //-------------------------------------------------
-//  cursor_w - 
+//  cursor_w - cursor
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9021_device::cursor_w )
 {
+	if (LOG) logerror("CRT9021 '%s' CURSOR: %u\n", tag(), state);
+
+	m_cursor = state;
 }
 
 
 //-------------------------------------------------
-//  retbl_w - 
+//  retbl_w - retrace blank
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9021_device::retbl_w )
 {
+	if (LOG) logerror("CRT9021 '%s' RETBL: %u\n", tag(), state);
+
+	m_retbl = state;
 }
 
 
 //-------------------------------------------------
-//  vsync_w - 
+//  vsync_w - vertical sync
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9021_device::vsync_w )
 {
+	if (LOG) logerror("CRT9021 '%s' VSYNC: %u\n", tag(), state);
+
+	m_vsync = state;
 }
 
 

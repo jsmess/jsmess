@@ -14,7 +14,7 @@
                  CHABL   5 |             | 24  D5
                  BLINK   6 |             | 23  D6
                  INTIN   7 |   CRT9021   | 22  D7
-                   Vcc   8 |             | 21  _VSYNC
+                   +5V   8 |             | 21  _VSYNC
                  ATTEN   9 |             | 20  GND
                 INTOUT  10 |             | 19  SL0/SLD
                 CURSOR  11 |             | 18  SL1/_SLG
@@ -64,8 +64,6 @@
 struct crt9021_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-
-	devcb_write_line		out_ld_sh_func;
 
 	devcb_read8				in_data_func;
 	devcb_read8				in_attr_func;
@@ -122,14 +120,17 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_write_line		m_out_ld_sh_func;
 	devcb_resolved_read8			m_in_data_func;
 	devcb_resolved_read8			m_in_attr_func;
 	devcb_resolved_read_line		m_in_atten_func;
 
 	screen_device *m_screen;
 
-	int m_sl;
+	int m_slg;
+	int m_sld;
+	int m_cursor;
+	int m_retbl;
+	int m_vsync;
 
 	const crt9021_device_config &m_config;
 };

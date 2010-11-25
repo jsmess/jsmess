@@ -204,19 +204,24 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 	/* video access */
 	m_vram_base = data & 0x1f;
 
+	/* dots per char */
+	int character_width = BIT(data, 6) ? 8 : 10;
+
+	if (m_clkcnt != BIT(data, 6))
+	{
+		m_vpac->set_hpixels_per_column(character_width);
+		m_clkcnt = BIT(data, 6);
+	}
+
 	/* video clock speed */
 	if (m_clkspd != BIT(data, 5))
 	{
-		m_vpac->set_unscaled_clock(BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
-		m_vac->set_unscaled_clock(BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
-		m_clkspd = BIT(data, 5);
-	}
+		float pixel_clock = BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20;
+		float character_clock = pixel_clock / character_width;
 
-	/* dots per char */
-	if (m_clkcnt != BIT(data, 6))
-	{
-		m_vpac->set_hpixels_per_column(BIT(data, 6) ? 8 : 10);
-		m_clkcnt = BIT(data, 6);
+		m_vpac->set_unscaled_clock(pixel_clock);
+		m_vac->set_unscaled_clock(character_clock);
+		m_clkspd = BIT(data, 5);
 	}
 
 	/* video source select */
@@ -555,21 +560,9 @@ static CRT9212_INTERFACE( drb1_intf )
 	DEVCB_LINE_VCC // WEN2
 };
 
-WRITE_LINE_MEMBER( tandy2k_state::vac_ld_ht_w )
-{
-	for (int state = 0; state < 2; state++)
-	{
-		m_drb0->rclk_w(state);
-		m_drb0->wclk_w(state);
-		m_drb1->rclk_w(state);
-		m_drb1->wclk_w(state);
-	}
-}
-
 static CRT9021_INTERFACE( vac_intf )
 {
 	SCREEN_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vac_ld_ht_w), // _LD/HT
 	DEVCB_DEVICE_MEMBER(CRT9212_0_TAG, crt9212_device, read), // data
 	DEVCB_DEVICE_MEMBER(CRT9212_1_TAG, crt9212_device, read), // attributes
 	DEVCB_LINE_VCC // ATTEN
@@ -872,7 +865,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
 	MDRV_CRT9212_ADD(CRT9212_0_TAG, drb0_intf)
 	MDRV_CRT9212_ADD(CRT9212_1_TAG, drb1_intf)
-	MDRV_CRT9021_ADD(CRT9021B_TAG, XTAL_16MHz*28/16, vac_intf)
+	MDRV_CRT9021_ADD(CRT9021B_TAG, XTAL_16MHz*28/16/8, vac_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
