@@ -1811,6 +1811,7 @@ $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/e01.o:		$(MESS_LAYOUT)/e01.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
+$(MESS_DRIVERS)/et3400.o:	$(MESS_LAYOUT)/et3400.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/fidelz80.o:	$(MESS_LAYOUT)/fidelz80.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
