@@ -1,6 +1,32 @@
 #ifndef __GMASTER_H__
 #define __GMASTER_H__
 
+typedef struct
+{
+	UINT8 data[8];
+	int index;
+	int x, y;
+	/*bool*/int mode; // true read does not increase address
+	/*bool*/int delayed;
+	UINT8 pixels[8][64/*>=62 sure*/];
+} GMASTER_VIDEO;
+
+typedef struct
+{
+	UINT8 ports[5];
+} GMASTER_MACHINE;
+
+
+class gmaster_state : public driver_device
+{
+public:
+	gmaster_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	GMASTER_VIDEO video;
+	GMASTER_MACHINE machine;
+};
+
 
 /*----------- defined in audio/gmaster.c -----------*/
 

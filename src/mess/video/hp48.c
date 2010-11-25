@@ -32,10 +32,6 @@ static const int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
 #define mix(c1,c2,x) (c1)*(1-(x))+(c2)*(x)
 #define mix2(i,x) mix(hp48_bg_color[i],hp48_fg_color[i],x)
 
-/* screen image averaging */
-#define HP48_NB_SCREENS 3
-static UINT8  hp48_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
-static int    hp48_cur_screen;
 
 
 
@@ -122,7 +118,7 @@ PALETTE_INIT ( hp48 )
 
 
 #define draw_pixel							\
-	hp48_screens[ hp48_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
+	state->screens[ state->cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
 	xp++;								\
 	data >>= 1
 
@@ -133,6 +129,7 @@ PALETTE_INIT ( hp48 )
 
 VIDEO_UPDATE ( hp48 )
 {
+	hp48_state *state = screen->machine->driver_data<hp48_state>();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
@@ -192,14 +189,14 @@ VIDEO_UPDATE ( hp48 )
 			int acc = 0;
 			for ( i = 0; i < HP48_NB_SCREENS; i++ )
 			{
-				acc += hp48_screens[ i ][ y ][ x+8 ];
+				acc += state->screens[ i ][ y ][ x+8 ];
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
 			*BITMAP_ADDR16( bitmap, y, x ) = acc;
 		}
 	}
 
-	hp48_cur_screen = (hp48_cur_screen + 1) % HP48_NB_SCREENS;
+	state->cur_screen = (state->cur_screen + 1) % HP48_NB_SCREENS;
 
 	return 0;
 }

@@ -9,6 +9,18 @@
 
 #include "machine/i8255a.h"
 
+class irisha_state : public driver_device
+{
+public:
+	irisha_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int keyboard_mask;
+	UINT8 keypressed;
+	UINT8 keyboard_cnt;
+};
+
+
 /*----------- defined in machine/irisha.c -----------*/
 
 extern DRIVER_INIT( irisha );

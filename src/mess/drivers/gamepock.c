@@ -65,7 +65,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( gamepock, driver_device )
+static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MDRV_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem)
 	MDRV_CPU_IO_MAP( gamepock_io)

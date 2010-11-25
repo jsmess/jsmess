@@ -73,6 +73,12 @@ typedef enum
 
 #define iosize	(0xfEFF-0xfc00)
 
+typedef struct
+{
+	int	    value;			/* Value of the page register */
+	UINT8	*memory;		/* The memory it actually points to */
+} PageReg;
+
 
 class dgn_beta_state : public driver_device
 {
@@ -81,6 +87,56 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *system_rom;
+	int LogDatWrites;
+	int Keyboard[NoKeyrows];
+	int RowShifter;
+	int Keyrow;
+	int d_pia0_pb_last;
+	int d_pia0_cb2_last;
+	int KInDat_next;
+	int KAny_next;
+	int d_pia1_pa_last;
+	int d_pia1_pb_last;
+	int DMA_NMI_LAST;
+	int wd2797_written;
+	int TaskReg;
+	int PIATaskReg;
+	int EnableMapRegs;
+	PageReg PageRegs[MaxTasks+1][MaxPage+1];
+	int beta_6845_RA;
+	int beta_scr_x;
+	int beta_scr_y;
+	int beta_HSync;
+	int beta_VSync;
+	int beta_DE;
+	int LogRegWrites;
+	int BoxColour;
+	int BoxMinX;
+	int BoxMinY;
+	int BoxMaxX;
+	int BoxMaxY;
+	int HSyncMin;
+	int VSyncMin;
+	int DEPos;
+	int NoScreen;
+	bitmap_t *bit;
+	int MinAddr;
+	int MaxAddr;
+	int MinX;
+	int MaxX;
+	int MinY;
+	int MaxY;
+	int VidAddr;
+	int ClkMax;
+	int GCtrl;
+	int FlashCount;
+	int FlashBit;
+	int s_DoubleY;
+	int DoubleHL;
+	int ColourRAM[4];
+	int Field;
+	int DrawInterlace;
 };
 
 

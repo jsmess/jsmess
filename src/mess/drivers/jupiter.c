@@ -38,10 +38,6 @@ Ports:
 /* This needs to be moved to drivers/xtal */
 #define XTAL_6_5MHz	6500000
 
-static emu_timer	*jupiter_set_irq_timer;
-static emu_timer	*jupiter_clear_irq_timer;
-static UINT8		*jupiter_charram;
-static UINT8		*jupiter_expram;
 
 
 static READ8_HANDLER( jupiter_io_r );
@@ -54,9 +50,9 @@ static WRITE8_HANDLER( jupiter_vh_charram_w );
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, videoram)
-	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_WRITE(jupiter_vh_charram_w) AM_BASE(&jupiter_charram)
+	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_WRITE(jupiter_vh_charram_w) AM_BASE_MEMBER(jupiter_state, charram)
 	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4800, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE(&jupiter_expram)			/* Expansion RAM */
+	AM_RANGE(0x4800, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE_MEMBER(jupiter_state, expram)			/* Expansion RAM */
 ADDRESS_MAP_END
 
 /* port i/o functions */
@@ -192,15 +188,16 @@ static WRITE8_HANDLER( jupiter_port_fe_w )
 
 static WRITE8_HANDLER( jupiter_expram_w )
 {
+	jupiter_state *state = space->machine->driver_data<jupiter_state>();
 	if ( offset > 0x4000 )
 	{
 		if ( input_port_read(space->machine, "CFG") >= 1 )
-			jupiter_expram[offset] = data;
+			state->expram[offset] = data;
 	}
 	else
 	{
 		if ( input_port_read(space->machine, "CFG") == 2 )
-			jupiter_expram[offset] = data;
+			state->expram[offset] = data;
 	}
 }
 
@@ -236,10 +233,11 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( jupiter_vh_charram_w )
 {
-	if(data == jupiter_charram[offset])
+	jupiter_state *state = space->machine->driver_data<jupiter_state>();
+	if(data == state->charram[offset])
 		return; /* no change */
 
-	jupiter_charram[offset] = data;
+	state->charram[offset] = data;
 
 	/* decode character graphics again */
 	offset >>= 3;
@@ -262,14 +260,15 @@ static TIMER_CALLBACK( jupiter_clear_irq_callback )
 
 static VIDEO_START( jupiter )
 {
-	jupiter_set_irq_timer = timer_alloc(machine,  jupiter_set_irq_callback, NULL );
-	jupiter_clear_irq_timer = timer_alloc(machine,  jupiter_clear_irq_callback, NULL );
+	jupiter_state *state = machine->driver_data<jupiter_state>();
+	state->set_irq_timer = timer_alloc(machine,  jupiter_set_irq_callback, NULL );
+	state->clear_irq_timer = timer_alloc(machine,  jupiter_clear_irq_callback, NULL );
 
-	timer_adjust_periodic( jupiter_set_irq_timer,
+	timer_adjust_periodic( state->set_irq_timer,
 		machine->primary_screen->time_until_pos(31*8, 0 ),
 		0, machine->primary_screen->frame_period() );
 
-	timer_adjust_periodic( jupiter_clear_irq_timer,
+	timer_adjust_periodic( state->clear_irq_timer,
 		machine->primary_screen->time_until_pos(32*8, 0 ),
 		0, machine->primary_screen->frame_period() );
 }
@@ -298,7 +297,8 @@ static VIDEO_UPDATE( jupiter )
 
 static DRIVER_INIT( jupiter )
 {
-	jupiter_charram = memory_region(machine, "maincpu")+0x2c00;
+	jupiter_state *state = machine->driver_data<jupiter_state>();
+	state->charram = memory_region(machine, "maincpu")+0x2c00;
 }
 
 static const cassette_config jupiter_cassette_config =

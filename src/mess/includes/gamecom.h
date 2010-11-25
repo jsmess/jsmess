@@ -145,10 +145,83 @@ enum
 	SM8521_SG1W15	= 0x7F
 };
 
+typedef struct
+{
+	int enabled;
+	int transfer_mode;
+	int decrement_y;
+	int decrement_x;
+	int overwrite_mode;
+	int width_x;
+	int width_y;
+	int width_x_count;
+	int width_y_count;
+	int source_x;
+	int source_x_current;
+	int source_y;
+	int source_width;
+	int dest_x;
+	int dest_x_current;
+	int dest_y;
+	int dest_width;
+	int state_count;
+	int state_pixel;
+	int state_limit;
+	UINT8 palette[4];
+	UINT8 *source_bank;
+	unsigned int source_current;
+	unsigned int source_line;
+	unsigned int source_mask;
+	UINT8 *dest_bank;
+	unsigned int dest_current;
+	unsigned int dest_line;
+	unsigned int dest_mask;
+} GAMECOM_DMA;
 
-/*----------- defined in drivers/gamecom.c -----------*/
+typedef struct
+{
+	int enabled;
+	int state_count;
+	int state_limit;
+	int check_value;
+} GAMECOM_TIMER;
 
-extern UINT8 *gamecom_vram;
+typedef struct
+{
+	UINT8 sgc;
+	UINT8 sg0l;
+	UINT8 sg1l;
+	UINT8 sg2l;
+	UINT16 sg0t;
+	UINT16 sg1t;
+	UINT16 sg2t;
+	UINT8 sgda;
+	UINT8 sg0w[16];
+	UINT8 sg1w[16];
+} gamecom_sound_t;
+
+
+class gamecom_state : public driver_device
+{
+public:
+	gamecom_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vram;
+	UINT8 *cartridge1;
+	UINT8 *cartridge2;
+	UINT8 *cartridge;
+	emu_timer *clock_timer;
+	GAMECOM_DMA dma;
+	GAMECOM_TIMER timer[2];
+	gamecom_sound_t sound;
+	UINT32 stylus_x;
+	UINT32 stylus_y;
+	int scanline;
+	unsigned int base_address;
+	emu_timer *scanline_timer;
+};
+
 
 /*----------- defined in machine/gamecom.c -----------*/
 

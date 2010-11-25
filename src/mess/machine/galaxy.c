@@ -36,8 +36,9 @@ UINT8 galaxy_latch_value = 0;
 
 WRITE8_HANDLER( galaxy_latch_w )
 {
+	galaxy_state *state = space->machine->driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
-	galaxy_latch_value = data;
+	state->latch_value = data;
 	cassette_output(space->machine->device("cassette"), val);
 }
 
@@ -55,8 +56,9 @@ INTERRUPT_GEN( galaxy_interrupt )
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
 {
-	galaxy_set_timer();
-	galaxy_interrupts_enabled = TRUE;
+	galaxy_state *state = device->machine->driver_data<galaxy_state>();
+	galaxy_set_timer(device->machine);
+	state->interrupts_enabled = TRUE;
 	return 0xff;
 }
 
@@ -173,6 +175,7 @@ DRIVER_INIT( galaxy )
 
 MACHINE_RESET( galaxy )
 {
+	galaxy_state *state = machine->driver_data<galaxy_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* ROM 2 enable/disable */
@@ -187,7 +190,7 @@ MACHINE_RESET( galaxy )
 		memory_set_bankptr(machine,"bank10", memory_region(machine, "maincpu") + 0x1000);
 
 	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
-	galaxy_interrupts_enabled = TRUE;
+	state->interrupts_enabled = TRUE;
 }
 
 DRIVER_INIT( galaxyp )
@@ -197,6 +200,7 @@ DRIVER_INIT( galaxyp )
 
 MACHINE_RESET( galaxyp )
 {
+	galaxy_state *state = machine->driver_data<galaxy_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -210,5 +214,5 @@ MACHINE_RESET( galaxyp )
 	memory_install_read_bank(space, 0xe000, 0xefff, 0, 0, "bank11");
 	memory_nop_write(space, 0xe000, 0xefff, 0, 0);
 	memory_set_bankptr(machine,"bank11", memory_region(machine, "maincpu") + 0xe000);
-	galaxy_interrupts_enabled = TRUE;
+	state->interrupts_enabled = TRUE;
 }

@@ -10,28 +10,41 @@
 #include "devices/snapquik.h"
 
 
+class galaxy_state : public driver_device
+{
+public:
+	galaxy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int interrupts_enabled;
+	UINT8 latch_value;
+	UINT32 gal_cnt;
+	UINT8 code;
+	UINT8 first;
+	UINT32 start_addr;
+	emu_timer *gal_video_timer;
+};
+
+
 /*----------- defined in machine/galaxy.c -----------*/
 
-extern int galaxy_interrupts_enabled;
+DRIVER_INIT( galaxy );
+MACHINE_RESET( galaxy );
+INTERRUPT_GEN( galaxy_interrupt );
+SNAPSHOT_LOAD( galaxy );
+READ8_HANDLER( galaxy_keyboard_r );
+WRITE8_HANDLER( galaxy_latch_w );
 
-extern DRIVER_INIT( galaxy );
-extern MACHINE_RESET( galaxy );
-extern INTERRUPT_GEN( galaxy_interrupt );
-extern SNAPSHOT_LOAD( galaxy );
-extern READ8_HANDLER( galaxy_keyboard_r );
-extern WRITE8_HANDLER( galaxy_latch_w );
+MACHINE_RESET( galaxyp );
 
-extern MACHINE_RESET( galaxyp );
 
-extern UINT8 galaxy_latch_value;
-
-extern DRIVER_INIT( galaxyp );
+DRIVER_INIT( galaxyp );
 
 /*----------- defined in video/galaxy.c -----------*/
 
-extern VIDEO_START( galaxy );
-extern VIDEO_UPDATE( galaxy );
+VIDEO_START( galaxy );
+VIDEO_UPDATE( galaxy );
 
-void galaxy_set_timer(void);
+void galaxy_set_timer(running_machine *machine);
 
 #endif /* GALAXY_H_ */

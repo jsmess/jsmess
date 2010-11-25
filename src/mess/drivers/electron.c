@@ -175,7 +175,7 @@ static const cassette_config electron_cassette_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( electron, driver_device )
+static MACHINE_CONFIG_START( electron, electron_state )
 	MDRV_CPU_ADD( "maincpu", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem)
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -51,9 +51,21 @@ typedef struct
 } ULA;
 
 
-/*----------- defined in machine/electron.c -----------*/
+class electron_state : public driver_device
+{
+public:
+	electron_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern ULA electron_ula;
+	ULA ula;
+	emu_timer *tape_timer;
+	int map4[256];
+	int map16[256];
+	emu_timer *scanline_timer;
+};
+
+
+/*----------- defined in machine/electron.c -----------*/
 
 READ8_HANDLER( electron_jim_r );
 WRITE8_HANDLER( electron_jim_w );

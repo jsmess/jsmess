@@ -6,6 +6,40 @@
 
 **********************************************************************/
 
+#ifdef CHARDEV
+#include "devices/chardev.h"
+#endif
+
+/* model */
+typedef enum {
+	HP48_S,
+	HP48_SX,
+	HP48_G,
+	HP48_GX,
+	HP48_GP,
+} hp48_models;
+
+/* memory module configuration */
+typedef struct
+{
+	/* static part */
+	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
+	read8_space_func read;
+	write8_space_func write;
+	void* data;                  /* non-NULL for banks */
+	int isnop;
+
+	/* configurable part */
+	UINT8  state;                /* one of HP48_MODULE_ */
+	UINT32 base;                 /* base address */
+	UINT32 mask;                 /* often improperly called size, it is an address select mask */
+
+} hp48_module;
+
+
+/* screen image averaging */
+#define HP48_NB_SCREENS 3
+
 class hp48_state : public driver_device
 {
 public:
@@ -13,6 +47,24 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 io[64];
+	hp48_models model;
+	UINT16 out;
+	UINT8 kdn;
+	hp48_module modules[6];
+	UINT32 port_size[2];
+	UINT8 port_write[2];
+	UINT8* port_data[2];
+	UINT32 bank_switch;
+	UINT32 io_addr;
+	UINT16 crc;
+	UINT8 timer1;
+	UINT32 timer2;
+#ifdef CHARDEV
+	chardev* chardev;
+#endif
+	UINT8 screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
+	int cur_screen;
 };
 
 
@@ -21,11 +73,11 @@ public:
 ***************************************************************************/
 
 /* read from I/O memory */
-#define HP48_IO_4(x)   (hp48_io[(x)])
-#define HP48_IO_8(x)   (hp48_io[(x)] | (hp48_io[(x)+1] << 4))
-#define HP48_IO_12(x)  (hp48_io[(x)] | (hp48_io[(x)+1] << 4) | (hp48_io[(x)+2] << 8))
-#define HP48_IO_20(x)  (hp48_io[(x)] | (hp48_io[(x)+1] << 4) | (hp48_io[(x)+2] << 8) | \
-	               (hp48_io[(x)+3] << 12) | (hp48_io[(x)+4] << 16))
+#define HP48_IO_4(x)   (state->io[(x)])
+#define HP48_IO_8(x)   (state->io[(x)] | (state->io[(x)+1] << 4))
+#define HP48_IO_12(x)  (state->io[(x)] | (state->io[(x)+1] << 4) | (state->io[(x)+2] << 8))
+#define HP48_IO_20(x)  (state->io[(x)] | (state->io[(x)+1] << 4) | (state->io[(x)+2] << 8) | \
+	               (state->io[(x)+3] << 12) | (state->io[(x)+4] << 16))
 
 
 /*----------- defined in machine/hp48.c -----------*/
@@ -35,7 +87,6 @@ public:
 ***************************************************************************/
 
 /* I/O memory */
-extern UINT8 hp48_io[64];
 
 
 

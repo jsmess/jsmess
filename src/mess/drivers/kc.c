@@ -379,7 +379,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( kc85_3, driver_device )
+static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kc85_3_mem)

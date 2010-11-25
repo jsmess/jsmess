@@ -9,6 +9,16 @@
 
 #include "machine/z80pio.h"
 
+class kramermc_state : public driver_device
+{
+public:
+	kramermc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 key_row;
+};
+
+
 /*----------- defined in machine/kramermc.c -----------*/
 
 DRIVER_INIT( kramermc );

@@ -57,162 +57,8 @@ Expansion bus stuff:
 #include "includes/3do.h"
 
 
-typedef struct {
-	/* 03180000 - 0318003f - configuration group */
-	/* 03180040 - 0318007f - diagnostic UART */
-
-	UINT8	cg_r_count;
-	UINT8	cg_w_count;
-	UINT32	cg_input;
-	UINT32	cg_output;
-} SLOW2;
 
 
-typedef struct {
-	UINT32	revision;		/* 03300000 */
-	UINT32	msysbits;		/* 03300004 */
-	UINT32	mctl;			/* 03300008 */
-	UINT32	sltime;			/* 0330000c */
-	UINT32	abortbits;		/* 03300020 */
-	UINT32	privbits;		/* 03300024 */
-	UINT32	statbits;		/* 03300028 */
-	UINT32	diag;			/* 03300040 */
-
-	UINT32	ccobctl0;		/* 03300110 */
-	UINT32	ppmpc;			/* 03300120 */
-
-	UINT32	regctl0;		/* 03300130 */
-	UINT32	regctl1;		/* 03300134 */
-	UINT32	regctl2;		/* 03300138 */
-	UINT32	regctl3;		/* 0330013c */
-	UINT32	xyposh;			/* 03300140 */
-	UINT32	xyposl;			/* 03300144 */
-	UINT32	linedxyh;		/* 03300148 */
-	UINT32	linedxyl;		/* 0330014c */
-	UINT32	dxyh;			/* 03300150 */
-	UINT32	dxyl;			/* 03300154 */
-	UINT32	ddxyh;			/* 03300158 */
-	UINT32	ddxyl;			/* 0330015c */
-
-	UINT32	pip[16];		/* 03300180-033001bc (W); 03300180-033001fc (R) */
-	UINT32	fence[16];		/* 03300200-0330023c (W); 03300200-0330027c (R) */
-	UINT32	mmu[64];		/* 03300300-033003fc */
-	UINT32	dma[32][4];		/* 03300400-033005fc */
-	UINT32	mult[40];		/* 03300600-0330069c */
-	UINT32	mult_control;	/* 033007f0-033007f4 */
-	UINT32	mult_status;	/* 033007f8 */
-} MADAM;
-
-
-typedef struct {
-	screen_device *screen;
-
-	UINT32	revision;		/* 03400000 */
-	UINT32	csysbits;		/* 03400004 */
-	UINT32	vint0;			/* 03400008 */
-	UINT32	vint1;			/* 0340000c */
-	UINT32	audin;			/* 03400020 */
-	UINT32	audout;			/* 03400024 */
-	UINT32	cstatbits;		/* 03400028 */
-	UINT32	wdog;			/* 0340002c */
-	UINT32	hcnt;			/* 03400030 */
-	UINT32	vcnt;			/* 03400034 */
-	UINT32	seed;			/* 03400038 */
-	UINT32	random;			/* 0340004c */
-	UINT32	irq0;			/* 03400040 / 03400044 */
-	UINT32	irq0_enable;	/* 03400048 / 0340004c */
-	UINT32	mode;			/* 03400050 / 03400054 */
-	UINT32	badbits;		/* 03400058 */
-	UINT32	spare;			/* 0340005c */
-	UINT32	irq1;			/* 03400060 / 03400064 */
-	UINT32	irq1_enable;	/* 03400068 / 0340006c */
-	UINT32	hdelay;			/* 03400080 */
-	UINT32	adbio;			/* 03400084 */
-	UINT32	adbctl;			/* 03400088 */
-							/* Timers */
-	UINT32	timer0;			/* 03400100 */
-	UINT32	timerback0;		/* 03400104 */
-	UINT32	timer1;			/* 03400108 */
-	UINT32	timerback1;		/* 0340010c */
-	UINT32	timer2;			/* 03400110 */
-	UINT32	timerback2;		/* 03400114 */
-	UINT32	timer3;			/* 03400118 */
-	UINT32	timerback3;		/* 0340011c */
-	UINT32	timer4;			/* 03400120 */
-	UINT32	timerback4;		/* 03400124 */
-	UINT32	timer5;			/* 03400128 */
-	UINT32	timerback5;		/* 0340012c */
-	UINT32	timer6;			/* 03400130 */
-	UINT32	timerback6;		/* 03400134 */
-	UINT32	timer7;			/* 03400138 */
-	UINT32	timerback7;		/* 0340013c */
-	UINT32	timer8;			/* 03400140 */
-	UINT32	timerback8;		/* 03400144 */
-	UINT32	timer9;			/* 03400148 */
-	UINT32	timerback9;		/* 0340014c */
-	UINT32	timer10;		/* 03400150 */
-	UINT32	timerback10;	/* 03400154 */
-	UINT32	timer11;		/* 03400158 */
-	UINT32	timerback11;	/* 0340015c */
-	UINT32	timer12;		/* 03400160 */
-	UINT32	timerback12;	/* 03400164 */
-	UINT32	timer13;		/* 03400168 */
-	UINT32	timerback13;	/* 0340016c */
-	UINT32	timer14;		/* 03400170 */
-	UINT32	timerback14;	/* 03400174 */
-	UINT32	timer15;		/* 03400178 */
-	UINT32	timerback15;	/* 0340017c */
-	UINT32	settm0;			/* 03400200 */
-	UINT32	clrtm0;			/* 03400204 */
-	UINT32	settm1;			/* 03400208 */
-	UINT32	clrtm1;			/* 0340020c */
-	UINT32	slack;			/* 03400220 */
-							/* DMA */
-	UINT32	dmareqdis;		/* 03400308 */
-							/* Expansion bus */
-	UINT32	expctl;			/* 03400400/03400404 */
-	UINT32	type0_4;		/* 03400408 */
-	UINT32	dipir1;			/* 03400410 */
-	UINT32	dipir2;			/* 03400414 */
-							/* Bus signals */
-	UINT32	sel;			/* 03400500 - 0340053f */
-	UINT32	poll;			/* 03400540 - 0340057f */
-	UINT32	cmdstat;		/* 03400580 - 034005bf */
-	UINT32	data;			/* 034005c0 - 034005ff */
-							/* DSPP */
-	UINT32	semaphore;		/* 034017d0 */
-	UINT32	semaack;		/* 034017d4 */
-	UINT32	dsppdma;		/* 034017e0 */
-	UINT32	dspprst0;		/* 034017e4 */
-	UINT32	dspprst1;		/* 034017e8 */
-	UINT32	dspppc;			/* 034017f4 */
-	UINT32	dsppnr;			/* 034017f8 */
-	UINT32	dsppgw;			/* 034017fc */
-	UINT32	dsppn[0x400];	/* 03401800 - 03401bff DSPP N stack (32bit writes) */
-							/* 03402000 - 034027ff DSPP N stack (16bit writes) */
-	UINT32	dsppei[0x100];	/* 03403000 - 034030ff DSPP EI stack (32bit writes) */
-							/* 03403400 - 034035ff DSPP EI stack (16bit writes) */
-	UINT32	dsppeo[0x1f];	/* 03403800 - 0340381f DSPP EO stack (32bit reads) */
-							/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
-	UINT32	dsppclkreload;	/* 034039dc / 03403fbc */
-							/* UNCLE */
-	UINT32	unclerev;		/* 0340c000 */
-	UINT32	uncle_soft_rev;	/* 0340c004 */
-	UINT32	uncle_addr;		/* 0340c008 */
-	UINT32	uncle_rom;		/* 0340c00c */
-} CLIO;
-
-
-typedef struct {
-	UINT32	sport[512];
-	UINT32	color;
-} SVF;
-
-
-static SLOW2	slow2;
-static MADAM	madam;
-static CLIO		clio;
-static SVF		svf;
 
 
 READ32_HANDLER( _3do_nvarea_r ) {
@@ -252,15 +98,16 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
 */
 
 READ32_HANDLER( _3do_slow2_r ) {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	UINT32 data = 0;
 
 	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 
 	switch( offset ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
-		data = slow2.cg_output & 0x00000001;
-		slow2.cg_output = slow2.cg_output >> 1;
-		slow2.cg_w_count = 0;
+		data = state->slow2.cg_output & 0x00000001;
+		state->slow2.cg_output = state->slow2.cg_output >> 1;
+		state->slow2.cg_w_count = 0;
 	}
 	return data;
 }
@@ -268,6 +115,7 @@ READ32_HANDLER( _3do_slow2_r ) {
 
 WRITE32_HANDLER( _3do_slow2_w )
 {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 
 	switch( offset )
@@ -277,9 +125,9 @@ WRITE32_HANDLER( _3do_slow2_w )
 			/* disable ROM overlay */
 			memory_set_bank(space->machine, "bank1", 0);
 		}
-		slow2.cg_input = slow2.cg_input << 1 | ( data & 0x00000001 );
-		slow2.cg_w_count ++;
-		if ( slow2.cg_w_count == 16 )
+		state->slow2.cg_input = state->slow2.cg_input << 1 | ( data & 0x00000001 );
+		state->slow2.cg_w_count ++;
+		if ( state->slow2.cg_w_count == 16 )
 		{
 		}
 		break;
@@ -289,8 +137,9 @@ WRITE32_HANDLER( _3do_slow2_w )
 
 void _3do_slow2_init( running_machine *machine )
 {
-	slow2.cg_input = 0;
-	slow2.cg_output = 0x00000005 - 1;
+	_3do_state *state = machine->driver_data<_3do_state>();
+	state->slow2.cg_input = 0;
+	state->slow2.cg_output = 0x00000005 - 1;
 }
 
 
@@ -307,11 +156,11 @@ READ32_HANDLER( _3do_svf_r )
 	case 0x0000/4:		/* SPORT transfer */
 		for ( int i = 0; i < 512; i++ )
 		{
-			svf.sport[i] = p[i];
+			state->svf.sport[i] = p[i];
 		}
 		break;
 	case 0x2000/4:		/* Write to color register */
-		return svf.color;
+		return state->svf.color;
 	case 0x4000/4:		/* Flash write */
 		break;
 	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
@@ -336,17 +185,17 @@ WRITE32_HANDLER( _3do_svf_w )
 
 			for ( int i = 0; i < 512; i++ )
 			{
-				p[i] = ( p[i] & keep_bits ) | ( svf.sport[i] & data );
+				p[i] = ( p[i] & keep_bits ) | ( state->svf.sport[i] & data );
 			}
 		}
 		break;
 	case 0x2000/4:		/* Write to color register */
-		svf.color = data;
+		state->svf.color = data;
 		break;
 	case 0x4000/4:		/* Flash write */
 		{
 			UINT32 keep_bits = data ^ 0xffffffff;
-			UINT32 new_bits = svf.color & data;
+			UINT32 new_bits = state->svf.color & data;
 
 			for ( int i = 0; i < 512; i++ )
 			{
@@ -362,53 +211,54 @@ WRITE32_HANDLER( _3do_svf_w )
 
 
 READ32_HANDLER( _3do_madam_r ) {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
-		return madam.revision;
+		return state->madam.revision;
 	case 0x0004/4:
-		return madam.msysbits;
+		return state->madam.msysbits;
 	case 0x0008/4:
-		return madam.mctl;
+		return state->madam.mctl;
 	case 0x000c/4:
-		return madam.sltime;
+		return state->madam.sltime;
 	case 0x0020/4:
-		return madam.abortbits;
+		return state->madam.abortbits;
 	case 0x0024/4:
-		return madam.privbits;
+		return state->madam.privbits;
 	case 0x0028/4:
-		return madam.statbits;
+		return state->madam.statbits;
 	case 0x0040/4:
-		return madam.diag;
+		return state->madam.diag;
 	case 0x0110/4:
-		return madam.ccobctl0;
+		return state->madam.ccobctl0;
 	case 0x0120/4:
-		return madam.ppmpc;
+		return state->madam.ppmpc;
 	case 0x0130/4:
-		return madam.regctl0;
+		return state->madam.regctl0;
 	case 0x0134/4:
-		return madam.regctl1;
+		return state->madam.regctl1;
 	case 0x0138/4:
-		return madam.regctl2;
+		return state->madam.regctl2;
 	case 0x013c/4:
-		return madam.regctl3;
+		return state->madam.regctl3;
 	case 0x0140/4:
-		return madam.xyposh;
+		return state->madam.xyposh;
 	case 0x0144/4:
-		return madam.xyposl;
+		return state->madam.xyposl;
 	case 0x0148/4:
-		return madam.linedxyh;
+		return state->madam.linedxyh;
 	case 0x014c/4:
-		return madam.linedxyl;
+		return state->madam.linedxyl;
 	case 0x0150/4:
-		return madam.dxyh;
+		return state->madam.dxyh;
 	case 0x0154/4:
-		return madam.dxyl;
+		return state->madam.dxyl;
 	case 0x0158/4:
-		return madam.ddxyh;
+		return state->madam.ddxyh;
 	case 0x015c/4:
-		return madam.ddxyl;
+		return state->madam.ddxyl;
 	case 0x0180/4: case 0x0188/4:
 	case 0x0190/4: case 0x0198/4:
 	case 0x01a0/4: case 0x01a8/4:
@@ -417,7 +267,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x01d0/4: case 0x01d8/4:
 	case 0x01e0/4: case 0x01e8/4:
 	case 0x01f0/4: case 0x01f8/4:
-		return madam.pip[(offset/2) & 0x0f] & 0xffff;
+		return state->madam.pip[(offset/2) & 0x0f] & 0xffff;
 	case 0x0184/4: case 0x018c/4:
 	case 0x0194/4: case 0x019c/4:
 	case 0x01a4/4: case 0x01ac/4:
@@ -426,7 +276,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x01d4/4: case 0x01dc/4:
 	case 0x01e4/4: case 0x01ec/4:
 	case 0x01f4/4: case 0x01fc/4:
-		return madam.pip[(offset/2) & 0x0f] >> 16;
+		return state->madam.pip[(offset/2) & 0x0f] >> 16;
 	case 0x0200/4: case 0x0208/4:
 	case 0x0210/4: case 0x0218/4:
 	case 0x0220/4: case 0x0228/4:
@@ -435,7 +285,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x0250/4: case 0x0258/4:
 	case 0x0260/4: case 0x0268/4:
 	case 0x0270/4: case 0x0278/4:
-		return madam.fence[(offset/2) & 0x0f] & 0xffff;
+		return state->madam.fence[(offset/2) & 0x0f] & 0xffff;
 	case 0x0204/4: case 0x020c/4:
 	case 0x0214/4: case 0x021c/4:
 	case 0x0224/4: case 0x022c/4:
@@ -444,7 +294,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x0254/4: case 0x025c/4:
 	case 0x0264/4: case 0x026c/4:
 	case 0x0274/4: case 0x027c/4:
-		return madam.fence[(offset/2) & 0x0f] >> 16;
+		return state->madam.fence[(offset/2) & 0x0f] >> 16;
 	case 0x0300/4: case 0x0304/4: case 0x0308/4: case 0x030c/4:
 	case 0x0310/4: case 0x0314/4: case 0x0318/4: case 0x031c/4:
 	case 0x0320/4: case 0x0324/4: case 0x0328/4: case 0x032c/4:
@@ -461,7 +311,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x03d0/4: case 0x03d4/4: case 0x03d8/4: case 0x03dc/4:
 	case 0x03e0/4: case 0x03e4/4: case 0x03e8/4: case 0x03ec/4:
 	case 0x03f0/4: case 0x03f4/4: case 0x03f8/4: case 0x03fc/4:
-		return madam.mmu[offset&0x3f];
+		return state->madam.mmu[offset&0x3f];
 	case 0x0400/4: case 0x0404/4: case 0x0408/4: case 0x040c/4:
 	case 0x0410/4: case 0x0414/4: case 0x0418/4: case 0x041c/4:
 	case 0x0420/4: case 0x0424/4: case 0x0428/4: case 0x042c/4:
@@ -494,7 +344,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
 	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
 	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		return madam.dma[(offset/4) & 0x1f][offset & 0x03];
+		return state->madam.dma[(offset/4) & 0x1f][offset & 0x03];
 
 	/* Hardware multiplier */
 	case 0x0600/4: case 0x0604/4: case 0x0608/4: case 0x060c/4:
@@ -507,11 +357,11 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		return madam.mult[offset & 0xff];
+		return state->madam.mult[offset & 0xff];
 	case 0x07f0/4:
-		return madam.mult_control;
+		return state->madam.mult_control;
 	case 0x07f8/4:
-		return madam.mult_status;
+		return state->madam.mult_status;
 	default:
 		logerror( "%08X: unhandled MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 		break;
@@ -521,30 +371,31 @@ READ32_HANDLER( _3do_madam_r ) {
 
 
 WRITE32_HANDLER( _3do_madam_w ) {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset ) {
 	case 0x0000/4:
 		break;
 	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
-		madam.msysbits = data;
+		state->madam.msysbits = data;
 		break;
 	case 0x0008/4:
-		madam.mctl = data;
+		state->madam.mctl = data;
 		break;
 	case 0x000c/4:
-		madam.sltime = data;
+		state->madam.sltime = data;
 		break;
 	case 0x0020/4:
-		madam.abortbits = data;
+		state->madam.abortbits = data;
 		break;
 	case 0x0024/4:
-		madam.privbits = data;
+		state->madam.privbits = data;
 		break;
 	case 0x0028/4:
-		madam.statbits = data;
+		state->madam.statbits = data;
 	case 0x0040/4:
-		madam.diag = 1;
+		state->madam.diag = 1;
 		break;
 
 	/* CEL */
@@ -554,48 +405,48 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x010c/4:	/* 0330010c - SPRPAUS - Pause the the CEL engine (W) */
 		break;
 	case 0x0110/4:	/* 03300110 - CCOBCTL0 - CCoB control (RW) */
-		madam.ccobctl0 = data;
+		state->madam.ccobctl0 = data;
 		break;
 	case 0x0129/4:	/* 03300120 - PPMPC (RW) */
-		madam.ppmpc = data;
+		state->madam.ppmpc = data;
 		break;
 
 	/* Regis */
 	case 0x0130/4:
-		madam.regctl0 = data;
+		state->madam.regctl0 = data;
 		break;
 	case 0x0134/4:
-		madam.regctl1 = data;
+		state->madam.regctl1 = data;
 		break;
 	case 0x0138/4:
-		madam.regctl2 = data;
+		state->madam.regctl2 = data;
 		break;
 	case 0x013c/4:
-		madam.regctl3 = data;
+		state->madam.regctl3 = data;
 		break;
 	case 0x0140/4:
-		madam.xyposh = data;
+		state->madam.xyposh = data;
 		break;
 	case 0x0144/4:
-		madam.xyposl = data;
+		state->madam.xyposl = data;
 		break;
 	case 0x0148/4:
-		madam.linedxyh = data;
+		state->madam.linedxyh = data;
 		break;
 	case 0x014c/4:
-		madam.linedxyl = data;
+		state->madam.linedxyl = data;
 		break;
 	case 0x0150/4:
-		madam.dxyh = data;
+		state->madam.dxyh = data;
 		break;
 	case 0x0154/4:
-		madam.dxyl = data;
+		state->madam.dxyl = data;
 		break;
 	case 0x0158/4:
-		madam.ddxyh = data;
+		state->madam.ddxyh = data;
 		break;
 	case 0x015c/4:
-		madam.ddxyl = data;
+		state->madam.ddxyl = data;
 		break;
 
 	/* Pip */
@@ -603,7 +454,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x0190/4: case 0x0194/4: case 0x0198/4: case 0x019c/4:
 	case 0x01a0/4: case 0x01a4/4: case 0x01a8/4: case 0x01ac/4:
 	case 0x01b0/4: case 0x01b4/4: case 0x01b8/4: case 0x01bc/4:
-		madam.pip[offset & 0x0f] = data;
+		state->madam.pip[offset & 0x0f] = data;
 		break;
 
 	/* Fence */
@@ -611,7 +462,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x0210/4: case 0x0214/4: case 0x0218/4: case 0x021c/4:
 	case 0x0220/4: case 0x0224/4: case 0x0228/4: case 0x022c/4:
 	case 0x0230/4: case 0x0234/4: case 0x0238/4: case 0x023c/4:
-		madam.fence[offset & 0x0f] = data;
+		state->madam.fence[offset & 0x0f] = data;
 		break;
 
 	/* MMU */
@@ -631,7 +482,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x03d0/4: case 0x03d4/4: case 0x03d8/4: case 0x03dc/4:
 	case 0x03e0/4: case 0x03e4/4: case 0x03e8/4: case 0x03ec/4:
 	case 0x03f0/4: case 0x03f4/4: case 0x03f8/4: case 0x03fc/4:
-		madam.mmu[offset&0x3f] = data;
+		state->madam.mmu[offset&0x3f] = data;
 		break;
 
 	/* DMA */
@@ -667,7 +518,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
 	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
 	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
+		state->madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
 		return;
 
 	/* Hardware multiplier */
@@ -681,12 +532,12 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		madam.mult[offset & 0xff] = data;
+		state->madam.mult[offset & 0xff] = data;
 	case 0x07f0/4:
-		madam.mult_control |= data;
+		state->madam.mult_control |= data;
 		break;
 	case 0x07f4/4:
-		madam.mult_control &= ~data;
+		state->madam.mult_control &= ~data;
 		break;
 	case 0x07fc/4:	/* Start process */
 		break;
@@ -700,151 +551,153 @@ WRITE32_HANDLER( _3do_madam_w ) {
 
 void _3do_madam_init( running_machine *machine )
 {
-	memset( &madam, 0, sizeof(MADAM) );
-	madam.revision = 0x01020000;
-	madam.msysbits = 0x51;
+	_3do_state *state = machine->driver_data<_3do_state>();
+	memset( &state->madam, 0, sizeof(MADAM) );
+	state->madam.revision = 0x01020000;
+	state->madam.msysbits = 0x51;
 }
 
 
 READ32_HANDLER( _3do_clio_r )
 {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
 
 	switch( offset )
 	{
 	case 0x0000/4:
-		return clio.revision;
+		return state->clio.revision;
 	case 0x0020/4:
-		return clio.audin;
+		return state->clio.audin;
 	case 0x0024/4:
-		return clio.audout;
+		return state->clio.audout;
 	case 0x0028/4:
-		return clio.cstatbits;
+		return state->clio.cstatbits;
 	case 0x0030/4:
-		return clio.screen->hpos();
+		return state->clio.screen->hpos();
 	case 0x0034/4:
 		/* This needs to moved to a proper timer callback function */
-		if ( clio.screen->vpos() == 0 )
+		if ( state->clio.screen->vpos() == 0 )
 		{
-			clio.vcnt ^= 0x800;
+			state->clio.vcnt ^= 0x800;
 		}
-		return ( clio.vcnt & 0x800 ) | clio.screen->vpos();
+		return ( state->clio.vcnt & 0x800 ) | state->clio.screen->vpos();
 	case 0x0038/4:
-		return clio.seed;
+		return state->clio.seed;
 	case 0x003c/4:
-		return clio.random;
+		return state->clio.random;
 	case 0x0080/4:
-		return clio.hdelay;
+		return state->clio.hdelay;
 	case 0x0084/4:
-		return clio.adbio;
+		return state->clio.adbio;
 	case 0x0088/4:
-		return clio.adbctl;
+		return state->clio.adbctl;
 
 	case 0x0100/4:
-		return clio.timer0;
+		return state->clio.timer0;
 	case 0x0104/4:
-		return clio.timerback0;
+		return state->clio.timerback0;
 	case 0x0108/4:
-		return clio.timer1;
+		return state->clio.timer1;
 	case 0x010c/4:
-		return clio.timerback1;
+		return state->clio.timerback1;
 	case 0x0110/4:
-		return clio.timer2;
+		return state->clio.timer2;
 	case 0x0114/4:
-		return clio.timerback2;
+		return state->clio.timerback2;
 	case 0x0118/4:
-		return clio.timer3;
+		return state->clio.timer3;
 	case 0x011c/4:
-		return clio.timerback3;
+		return state->clio.timerback3;
 	case 0x0120/4:
-		return clio.timer4;
+		return state->clio.timer4;
 	case 0x0124/4:
-		return clio.timerback4;
+		return state->clio.timerback4;
 	case 0x0128/4:
-		return clio.timer5;
+		return state->clio.timer5;
 	case 0x012c/4:
-		return clio.timerback5;
+		return state->clio.timerback5;
 	case 0x0130/4:
-		return clio.timer6;
+		return state->clio.timer6;
 	case 0x0134/4:
-		return clio.timerback6;
+		return state->clio.timerback6;
 	case 0x0138/4:
-		return clio.timer7;
+		return state->clio.timer7;
 	case 0x013c/4:
-		return clio.timerback7;
+		return state->clio.timerback7;
 	case 0x0140/4:
-		return clio.timer8;
+		return state->clio.timer8;
 	case 0x0144/4:
-		return clio.timerback8;
+		return state->clio.timerback8;
 	case 0x0148/4:
-		return clio.timer9;
+		return state->clio.timer9;
 	case 0x014c/4:
-		return clio.timerback9;
+		return state->clio.timerback9;
 	case 0x0150/4:
-		return clio.timer10;
+		return state->clio.timer10;
 	case 0x0154/4:
-		return clio.timerback10;
+		return state->clio.timerback10;
 	case 0x0158/4:
-		return clio.timer11;
+		return state->clio.timer11;
 	case 0x015c/4:
-		return clio.timerback11;
+		return state->clio.timerback11;
 	case 0x0160/4:
-		return clio.timer12;
+		return state->clio.timer12;
 	case 0x0164/4:
-		return clio.timerback12;
+		return state->clio.timerback12;
 	case 0x0168/4:
-		return clio.timer13;
+		return state->clio.timer13;
 	case 0x016c/4:
-		return clio.timerback13;
+		return state->clio.timerback13;
 	case 0x0170/4:
-		return clio.timer14;
+		return state->clio.timer14;
 	case 0x0174/4:
-		return clio.timerback14;
+		return state->clio.timerback14;
 	case 0x0178/4:
-		return clio.timer15;
+		return state->clio.timer15;
 	case 0x017c/4:
-		return clio.timerback15;
+		return state->clio.timerback15;
 
 	case 0x0200/4:
-		return clio.settm0;
+		return state->clio.settm0;
 	case 0x0204/4:
-		return clio.clrtm0;
+		return state->clio.clrtm0;
 	case 0x0208/4:
-		return clio.settm1;
+		return state->clio.settm1;
 	case 0x020c/4:
-		return clio.clrtm1;
+		return state->clio.clrtm1;
 
 	case 0x0220/4:
-		return clio.slack;
+		return state->clio.slack;
 
 	case 0x0400/4:
 	case 0x0404/4:
-		return clio.expctl;
+		return state->clio.expctl;
 	case 0x0410/4:
-		return clio.dipir1;
+		return state->clio.dipir1;
 	case 0x0414/4:
-		return clio.dipir2;
+		return state->clio.dipir2;
 
 	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
 	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
 	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
 	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		return clio.sel;
+		return state->clio.sel;
 
 	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
 	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
 	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-		return clio.poll;
+		return state->clio.poll;
 
 	case 0xc000/4:
-		return clio.unclerev;
+		return state->clio.unclerev;
 	case 0xc004/4:
-		return clio.uncle_soft_rev;
+		return state->clio.uncle_soft_rev;
 	case 0xc008/4:
-		return clio.uncle_addr;
+		return state->clio.uncle_addr;
 	case 0xc00c/4:
-		return clio.uncle_rom;
+		return state->clio.uncle_rom;
 
 	default:
 		logerror( "%08X: unhandled CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
@@ -855,6 +708,7 @@ READ32_HANDLER( _3do_clio_r )
 
 WRITE32_HANDLER( _3do_clio_w )
 {
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset )
@@ -862,213 +716,213 @@ WRITE32_HANDLER( _3do_clio_w )
 	case 0x0000/4:
 		break;
 	case 0x0004/4:
-		clio.csysbits = data;
+		state->clio.csysbits = data;
 		break;
 	case 0x0008/4:
-		clio.vint0 = data;
+		state->clio.vint0 = data;
 		break;
 	case 0x000c/4:
-		clio.vint1 = data;
+		state->clio.vint1 = data;
 		break;
 	case 0x0020/4:
-		clio.audin = data;
+		state->clio.audin = data;
 		break;
 	case 0x0024/4:	/* 03400024 - c0020f0f is written here during boot */
-		clio.audout = data;
+		state->clio.audout = data;
 		break;
 	case 0x0028/4:	/* 03400028 - bits 0,1, and 6 are tested (reset source) */
-		clio.cstatbits = data;
+		state->clio.cstatbits = data;
 		break;
 	case 0x002c/4:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
-		clio.wdog = data;
+		state->clio.wdog = data;
 		break;
 	case 0x0030/4:
-		clio.hcnt = data;
+		state->clio.hcnt = data;
 		break;
 	case 0x0034/4:
-		clio.vcnt = data;
+		state->clio.vcnt = data;
 		break;
 	case 0x0038/4:
-		clio.seed = data;
+		state->clio.seed = data;
 		break;
 	case 0x0040/4:
-		clio.irq0 |= data;
+		state->clio.irq0 |= data;
 		break;
 	case 0x0044/4:
-		clio.irq0 &= ~data;
+		state->clio.irq0 &= ~data;
 		break;
 	case 0x0048/4:
-		clio.irq0_enable |= data;
+		state->clio.irq0_enable |= data;
 		break;
 	case 0x004c/4:
-		clio.irq0_enable &= ~data;
+		state->clio.irq0_enable &= ~data;
 		break;
 	case 0x0050/4:
-		clio.mode |= data;
+		state->clio.mode |= data;
 		break;
 	case 0x0054/4:
-		clio.mode &= ~data;
+		state->clio.mode &= ~data;
 		break;
 	case 0x0058/4:
-		clio.badbits = data;
+		state->clio.badbits = data;
 		break;
 	case 0x005c/4:
-		clio.spare = data;
+		state->clio.spare = data;
 		break;
 	case 0x0060/4:
-		clio.irq1 |= data;
+		state->clio.irq1 |= data;
 		break;
 	case 0x0064/4:
-		clio.irq1 &= ~data;
+		state->clio.irq1 &= ~data;
 		break;
 	case 0x0068/4:
-		clio.irq1_enable |= data;
+		state->clio.irq1_enable |= data;
 		break;
 	case 0x006c/4:
-		clio.irq1_enable &= ~data;
+		state->clio.irq1_enable &= ~data;
 		break;
 	case 0x0080/4:
-		clio.hdelay = data;
+		state->clio.hdelay = data;
 		break;
 	case 0x0084/4:
-		clio.adbio = data;
+		state->clio.adbio = data;
 		break;
 	case 0x0088/4:
-		clio.adbctl = data;
+		state->clio.adbctl = data;
 		break;
 
 	case 0x0100/4:
-		clio.timer0 = data & 0x0000ffff;
+		state->clio.timer0 = data & 0x0000ffff;
 		break;
 	case 0x0104/4:
-		clio.timerback0 = data & 0x0000ffff;
+		state->clio.timerback0 = data & 0x0000ffff;
 		break;
 	case 0x0108/4:
-		clio.timer1 = data & 0x0000ffff;
+		state->clio.timer1 = data & 0x0000ffff;
 		break;
 	case 0x010c/4:
-		clio.timerback1 = data & 0x0000ffff;
+		state->clio.timerback1 = data & 0x0000ffff;
 		break;
 	case 0x0110/4:
-		clio.timer2 = data & 0x0000ffff;
+		state->clio.timer2 = data & 0x0000ffff;
 		break;
 	case 0x0114/4:
-		clio.timerback2 = data & 0x0000ffff;
+		state->clio.timerback2 = data & 0x0000ffff;
 		break;
 	case 0x0118/4:
-		clio.timer3 = data & 0x0000ffff;
+		state->clio.timer3 = data & 0x0000ffff;
 		break;
 	case 0x011c/4:
-		clio.timerback3 = data & 0x0000ffff;
+		state->clio.timerback3 = data & 0x0000ffff;
 		break;
 	case 0x0120/4:
-		clio.timer4 = data & 0x0000ffff;
+		state->clio.timer4 = data & 0x0000ffff;
 		break;
 	case 0x0124/4:
-		clio.timerback4 = data & 0x0000ffff;
+		state->clio.timerback4 = data & 0x0000ffff;
 		break;
 	case 0x0128/4:
-		clio.timer5 = data & 0x0000ffff;
+		state->clio.timer5 = data & 0x0000ffff;
 		break;
 	case 0x012c/4:
-		clio.timerback5 = data & 0x0000ffff;
+		state->clio.timerback5 = data & 0x0000ffff;
 		break;
 	case 0x0130/4:
-		clio.timer6 = data & 0x0000ffff;
+		state->clio.timer6 = data & 0x0000ffff;
 		break;
 	case 0x0134/4:
-		clio.timerback6 = data & 0x0000ffff;
+		state->clio.timerback6 = data & 0x0000ffff;
 		break;
 	case 0x0138/4:
-		clio.timer7 = data & 0x0000ffff;
+		state->clio.timer7 = data & 0x0000ffff;
 		break;
 	case 0x013c/4:
-		clio.timerback7 = data & 0x0000ffff;
+		state->clio.timerback7 = data & 0x0000ffff;
 		break;
 	case 0x0140/4:
-		clio.timer8 = data & 0x0000ffff;
+		state->clio.timer8 = data & 0x0000ffff;
 		break;
 	case 0x0144/4:
-		clio.timerback8 = data & 0x0000ffff;
+		state->clio.timerback8 = data & 0x0000ffff;
 		break;
 	case 0x0148/4:
-		clio.timer9 = data & 0x0000ffff;
+		state->clio.timer9 = data & 0x0000ffff;
 		break;
 	case 0x014c/4:
-		clio.timerback9 = data & 0x0000ffff;
+		state->clio.timerback9 = data & 0x0000ffff;
 		break;
 	case 0x0150/4:
-		clio.timer10 = data & 0x0000ffff;
+		state->clio.timer10 = data & 0x0000ffff;
 		break;
 	case 0x0154/4:
-		clio.timerback10 = data & 0x0000ffff;
+		state->clio.timerback10 = data & 0x0000ffff;
 		break;
 	case 0x0158/4:
-		clio.timer11 = data & 0x0000ffff;
+		state->clio.timer11 = data & 0x0000ffff;
 		break;
 	case 0x015c/4:
-		clio.timerback11 = data & 0x0000ffff;
+		state->clio.timerback11 = data & 0x0000ffff;
 		break;
 	case 0x0160/4:
-		clio.timer12 = data & 0x0000ffff;
+		state->clio.timer12 = data & 0x0000ffff;
 		break;
 	case 0x0164/4:
-		clio.timerback12 = data & 0x0000ffff;
+		state->clio.timerback12 = data & 0x0000ffff;
 		break;
 	case 0x0168/4:
-		clio.timer13 = data & 0x0000ffff;
+		state->clio.timer13 = data & 0x0000ffff;
 		break;
 	case 0x016c/4:
-		clio.timerback13 = data & 0x0000ffff;
+		state->clio.timerback13 = data & 0x0000ffff;
 		break;
 	case 0x0170/4:
-		clio.timer14 = data & 0x0000ffff;
+		state->clio.timer14 = data & 0x0000ffff;
 		break;
 	case 0x0174/4:
-		clio.timerback14 = data & 0x0000ffff;
+		state->clio.timerback14 = data & 0x0000ffff;
 		break;
 	case 0x0178/4:
-		clio.timer15 = data & 0x0000ffff;
+		state->clio.timer15 = data & 0x0000ffff;
 		break;
 	case 0x017c/4:
-		clio.timerback15 = data & 0x0000ffff;
+		state->clio.timerback15 = data & 0x0000ffff;
 		break;
 
 	case 0x0200/4:
-		clio.settm0 = data;
+		state->clio.settm0 = data;
 		break;
 	case 0x0204/4:
-		clio.clrtm0 = data;
+		state->clio.clrtm0 = data;
 		break;
 	case 0x0208/4:
-		clio.settm0 = data;
+		state->clio.settm0 = data;
 		break;
 	case 0x020c/4:
 		break;
 
 	case 0x0220/4:
-		clio.slack = data & 0x000003ff;
+		state->clio.slack = data & 0x000003ff;
 		break;
 
 	case 0x0308/4:
-		clio.dmareqdis = data;
+		state->clio.dmareqdis = data;
 		break;
 
 	case 0x0400/4:
-		clio.expctl = clio.expctl | ( data & 0xca00 );
+		state->clio.expctl = state->clio.expctl | ( data & 0xca00 );
 		break;
 	case 0x0404/4:
-		clio.expctl = clio.expctl & ~( data & 0xca00 );
+		state->clio.expctl = state->clio.expctl & ~( data & 0xca00 );
 		break;
 	case 0x0408/4:
-		clio.type0_4 = data;
+		state->clio.type0_4 = data;
 		break;
 
 	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
 	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
 	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
 	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		clio.sel = data & 0xff;
+		state->clio.sel = data & 0xff;
 		/* Start WRSEL cycle */
 
 		/* Detection of too many devices on the bus */
@@ -1076,10 +930,10 @@ WRITE32_HANDLER( _3do_clio_w )
 		{
 		case 0x8f:
 			/* Everything is fine, there are not too many devices in the system */
-			clio.poll = ( clio.poll & 0x0f );
+			state->clio.poll = ( state->clio.poll & 0x0f );
 			break;
 		default:
-			clio.poll = ( clio.poll & 0x0f ) | 0x90;
+			state->clio.poll = ( state->clio.poll & 0x0f ) | 0x90;
 		}
 		break;
 
@@ -1087,7 +941,7 @@ WRITE32_HANDLER( _3do_clio_w )
 	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
 	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-		clio.poll = ( clio.poll & 0xf8 ) | ( data & 0x07 );
+		state->clio.poll = ( state->clio.poll & 0xf8 ) | ( data & 0x07 );
 		break;
 
 	case 0xc000/4:
@@ -1095,7 +949,7 @@ WRITE32_HANDLER( _3do_clio_w )
 	case 0xc00c/4:
 		break;
 	case 0xc008/4:
-		clio.uncle_addr = data;
+		state->clio.uncle_addr = data;
 		break;
 
 	default:
@@ -1107,24 +961,25 @@ WRITE32_HANDLER( _3do_clio_w )
 
 void _3do_clio_init( running_machine *machine, screen_device *screen )
 {
-	memset( &clio, 0, sizeof(CLIO) );
-	clio.screen = screen;
-	clio.revision = 0x02022000 /* 0x04000000 */;
-	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
-	clio.unclerev = 0x03800000;
-	clio.expctl = 0x80;	/* ARM has the expansion bus */
+	_3do_state *state = machine->driver_data<_3do_state>();
+	memset( &state->clio, 0, sizeof(CLIO) );
+	state->clio.screen = screen;
+	state->clio.revision = 0x02022000 /* 0x04000000 */;
+	state->clio.cstatbits = 0x01;	/* bit 0 = reset of state->clio caused by power on */
+	state->clio.unclerev = 0x03800000;
+	state->clio.expctl = 0x80;	/* ARM has the expansion bus */
 }
 
 
 /* 9 -> 5 bits translation */
-static UINT8 video_bits[512];
 
 VIDEO_START( _3do )
 {
+	_3do_state *state = machine->driver_data<_3do_state>();
 	/* We only keep the odd bits and get rid of the even bits */
 	for ( int i = 0; i < 512; i++ )
 	{
-		video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
+		state->video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
 	}
 }
 
@@ -1147,18 +1002,18 @@ VIDEO_UPDATE( _3do )
 			UINT32 upper = ( *source_p >> 1 ) & 0x55555555;
 			UINT32 rgb = 0;
 
-			rgb = ( ( video_bits[upper & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			rgb = ( ( state->video_bits[upper & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( state->video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( state->video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
 
 			dest_p0[0] = rgb;
 			dest_p0[1] = rgb;
 			dest_p0[2] = rgb;
 			dest_p0[3] = rgb;
 
-			rgb = ( ( video_bits[lower & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			rgb = ( ( state->video_bits[lower & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( state->video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( state->video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
 
 			dest_p1[0] = rgb;
 			dest_p1[1] = rgb;

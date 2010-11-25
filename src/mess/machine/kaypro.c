@@ -8,14 +8,7 @@
 #include "devices/flopdrv.h"
 
 
-static running_device *kayproii_z80pio_g;
-static running_device *kayproii_z80pio_s;
-static running_device *kaypro_z80sio;
-static running_device *kaypro2x_z80sio;
-static running_device *kaypro_printer;
-static running_device *kaypro_fdc;
 
-static UINT8 kaypro_system_port;
 
 
 /***********************************************************
@@ -33,10 +26,11 @@ static void kaypro_interrupt(running_device *device, int state)
 
 static READ8_DEVICE_HANDLER( pio_system_r )
 {
+	kaypro_state *state = device->machine->driver_data<kaypro_state>();
 	UINT8 data = 0;
 
 	/* centronics busy */
-	data |= centronics_not_busy_r(kaypro_printer) << 3;
+	data |= centronics_not_busy_r(state->printer) << 3;
 
 	/* PA7 is pulled high */
 	data |= 0x80;
@@ -46,6 +40,7 @@ static READ8_DEVICE_HANDLER( pio_system_r )
 
 static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 {
+	kaypro_state *state = device->machine->driver_data<kaypro_state>();
 /*  d7 bank select
     d6 disk drive motors - (0=on)
     d5 double-density enable (0=double density)
@@ -73,15 +68,15 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
+	wd17xx_dden_w(state->fdc, BIT(data, 5));
 
-	centronics_strobe_w(kaypro_printer, BIT(data, 4));
+	centronics_strobe_w(state->printer, BIT(data, 4));
 
 	if (data & 1)
-		wd17xx_set_drive(kaypro_fdc, 0);
+		wd17xx_set_drive(state->fdc, 0);
 	else
 	if (data & 2)
-		wd17xx_set_drive(kaypro_fdc, 1);
+		wd17xx_set_drive(state->fdc, 1);
 
 	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
 	output_set_value("ledB",(data & 2) ? 1 : 0);
@@ -90,23 +85,25 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 	floppy_mon_w(floppy_get_device(mem->machine, 0), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	floppy_mon_w(floppy_get_device(mem->machine, 1), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-	kaypro_system_port = data;
+	state->system_port = data;
 }
 
 static WRITE8_DEVICE_HANDLER( kayproii_pio_system_w )
 {
+	kaypro_state *state = device->machine->driver_data<kaypro_state>();
 	common_pio_system_w(device, offset, data);
 
 	/* side select */
-	wd17xx_set_side(kaypro_fdc, !BIT(data, 2));
+	wd17xx_set_side(state->fdc, !BIT(data, 2));
 }
 
 static WRITE8_DEVICE_HANDLER( kaypro4_pio_system_w )
 {
+	kaypro_state *state = device->machine->driver_data<kaypro_state>();
 	common_pio_system_w(device, offset, data);
 
 	/* side select */
-	wd17xx_set_side(kaypro_fdc, BIT(data, 2));
+	wd17xx_set_side(state->fdc, BIT(data, 2));
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -152,12 +149,14 @@ const z80pio_interface kaypro4_pio_s_intf =
 
 READ8_HANDLER( kaypro2x_system_port_r )
 {
-	UINT8 data = centronics_busy_r(kaypro_printer) << 6;
-	return (kaypro_system_port & 0xbf) | data;
+	kaypro_state *state = space->machine->driver_data<kaypro_state>();
+	UINT8 data = centronics_busy_r(state->printer) << 6;
+	return (state->system_port & 0xbf) | data;
 }
 
 WRITE8_HANDLER( kaypro2x_system_port_w )
 {
+	kaypro_state *state = space->machine->driver_data<kaypro_state>();
 /*  d7 bank select
     d6 alternate character set (write only)
     d5 double-density enable
@@ -185,17 +184,17 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
+	wd17xx_dden_w(state->fdc, BIT(data, 5));
 
-	centronics_strobe_w(kaypro_printer, BIT(data, 3));
+	centronics_strobe_w(state->printer, BIT(data, 3));
 
 	if (data & 1)
-		wd17xx_set_drive(kaypro_fdc, 0);
+		wd17xx_set_drive(state->fdc, 0);
 	else
 	if (data & 2)
-		wd17xx_set_drive(kaypro_fdc, 1);
+		wd17xx_set_drive(state->fdc, 1);
 
-	wd17xx_set_side(kaypro_fdc, (data & 4) ? 0 : 1);
+	wd17xx_set_side(state->fdc, (data & 4) ? 0 : 1);
 
 	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
 	output_set_value("ledB",(data & 2) ? 1 : 0);
@@ -204,7 +203,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
-	kaypro_system_port = data;
+	state->system_port = data;
 }
 
 
@@ -242,26 +241,29 @@ static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 
 
 WRITE8_HANDLER( kaypro_baud_a_w )	/* channel A - RS232C */
 {
+	//kaypro_state *state = space->machine->driver_data<kaypro_state>();
 	data &= 0x0f;
 
-//  z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 0);
-//  z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 0);
+//  z80sio_set_rx_clock( state->z80sio, baud_clock[data], 0);
+//  z80sio_set_tx_clock( state->z80sio, baud_clock[data], 0);
 }
 
 WRITE8_HANDLER( kayproii_baud_b_w )	/* Channel B - Keyboard - only usable speed is 300 baud */
 {
+	//kaypro_state *state = space->machine->driver_data<kaypro_state>();
 	data &= 0x0f;
 
-//  z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 1);
-//  z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 1);
+//  z80sio_set_rx_clock( state->z80sio, baud_clock[data], 1);
+//  z80sio_set_tx_clock( state->z80sio, baud_clock[data], 1);
 }
 
 WRITE8_HANDLER( kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
 {
+	//kaypro_state *state = space->machine->driver_data<kaypro_state>();
 	data &= 0x0f;
 
-//  z80sio_set_rx_clock( kaypro2x_z80sio, baud_clock[data], 0);
-//  z80sio_set_tx_clock( kaypro2x_z80sio, baud_clock[data], 0);
+//  z80sio_set_rx_clock( state->kaypro2x_z80sio, baud_clock[data], 0);
+//  z80sio_set_tx_clock( state->kaypro2x_z80sio, baud_clock[data], 0);
 }
 
 const z80sio_interface kaypro_sio_intf =
@@ -356,13 +358,14 @@ const wd17xx_interface kaypro_wd1793_interface =
 ************************************************************/
 MACHINE_START( kayproii )
 {
-	kayproii_z80pio_g = machine->device("z80pio_g");
-	kayproii_z80pio_s = machine->device("z80pio_s");
-	kaypro_z80sio = machine->device("z80sio");
-	kaypro_printer = machine->device("centronics");
-	kaypro_fdc = machine->device("wd1793");
+	kaypro_state *state = machine->driver_data<kaypro_state>();
+	state->kayproii_z80pio_g = machine->device("z80pio_g");
+	state->kayproii_z80pio_s = machine->device("z80pio_s");
+	state->z80sio = machine->device("z80sio");
+	state->printer = machine->device("centronics");
+	state->fdc = machine->device("wd1793");
 
-	z80pio_astb_w(kayproii_z80pio_s, 0);
+	z80pio_astb_w(state->kayproii_z80pio_s, 0);
 }
 
 MACHINE_RESET( kayproii )
@@ -372,10 +375,11 @@ MACHINE_RESET( kayproii )
 
 MACHINE_START( kaypro2x )
 {
-	kaypro_z80sio = machine->device("z80sio");
-	kaypro2x_z80sio = machine->device("z80sio_2x");
-	kaypro_printer = machine->device("centronics");
-	kaypro_fdc = machine->device("wd1793");
+	kaypro_state *state = machine->driver_data<kaypro_state>();
+	state->z80sio = machine->device("z80sio");
+	state->kaypro2x_z80sio = machine->device("z80sio_2x");
+	state->printer = machine->device("centronics");
+	state->fdc = machine->device("wd1793");
 }
 
 MACHINE_RESET( kaypro2x )
@@ -398,6 +402,7 @@ MACHINE_RESET( kaypro2x )
 
 QUICKLOAD_LOAD( kayproii )
 {
+	kaypro_state *state = image.device().machine->driver_data<kaypro_state>();
 	running_device *cpu = image.device().machine->device("maincpu");
 	UINT8 *RAM = memory_region(image.device().machine, "rambank");
 	UINT16 i;
@@ -413,7 +418,7 @@ QUICKLOAD_LOAD( kayproii )
 
 //  if (input_port_read(image.device().machine, "CONFIG") & 1)
 	{
-		common_pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
+		common_pio_system_w(state->kayproii_z80pio_s, 0, state->system_port & 0x7f);	// switch TPA in
 		RAM[0x80]=0;							// clear out command tail
 		RAM[0x81]=0;
 		cpu_set_reg(cpu, STATE_GENPC, 0x100);				// start program
@@ -424,6 +429,7 @@ QUICKLOAD_LOAD( kayproii )
 
 QUICKLOAD_LOAD( kaypro2x )
 {
+	kaypro_state *state = image.device().machine->driver_data<kaypro_state>();
 	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *cpu = image.device().machine->device("maincpu");
 	UINT8 *RAM = memory_region(image.device().machine, "rambank");
@@ -439,7 +445,7 @@ QUICKLOAD_LOAD( kaypro2x )
 
 //  if (input_port_read(image.device().machine, "CONFIG") & 1)
 	{
-		kaypro2x_system_port_w(space, 0, kaypro_system_port & 0x7f);
+		kaypro2x_system_port_w(space, 0, state->system_port & 0x7f);
 		RAM[0x80]=0;
 		RAM[0x81]=0;
 		cpu_set_reg(cpu, STATE_GENPC, 0x100);

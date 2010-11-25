@@ -20,7 +20,6 @@ Todo:
 #include "cpu/sm8500/sm8500.h"
 #include "devices/cartslot.h"
 
-UINT8 *gamecom_vram;
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM
@@ -34,7 +33,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                       /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                       /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                       /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE(&gamecom_vram)			/* VRAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE_MEMBER(gamecom_state, vram)			/* VRAM */
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("nvram")                  /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
@@ -95,7 +94,7 @@ static INTERRUPT_GEN( gamecom_interrupt )
 	cputag_set_input_line(device->machine, "maincpu", LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom, driver_device )
+static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)

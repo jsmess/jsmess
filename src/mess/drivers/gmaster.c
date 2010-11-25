@@ -11,24 +11,12 @@
 
 #define MAIN_XTAL	12000000
 
-static struct {
-    UINT8 data[8];
-    int index;
-    int x, y;
-  /*bool*/int mode; // true read does not increase address
-  /*bool*/int delayed;
-    UINT8 pixels[8][64/*>=62 sure*/];
-} gmaster_video;
-
-typedef struct {
-    UINT8 ports[5];
-} GMASTER_MACHINE;
-static GMASTER_MACHINE gmaster;
 
 static READ8_HANDLER( gmaster_io_r )
 {
+	gmaster_state *state = space->machine->driver_data<gmaster_state>();
     UINT8 data = 0;
-    if (gmaster.ports[2] & 1)
+    if (state->machine.ports[2] & 1)
 	{
 		data = memory_region(space->machine, "maincpu")[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -38,11 +26,11 @@ static READ8_HANDLER( gmaster_io_r )
 		switch (offset)
 		{
 		case 1:
-			data=gmaster_video.pixels[gmaster_video.y][gmaster_video.x];
-			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000 + offset, data);
-			if (!(gmaster_video.mode) && gmaster_video.delayed)
-				gmaster_video.x++;
-			gmaster_video.delayed = TRUE;
+			data=state->video.pixels[state->video.y][state->video.x];
+			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), state->video.x, state->video.y, 0x4000 + offset, data);
+			if (!(state->video.mode) && state->video.delayed)
+				state->video.x++;
+			state->video.delayed = TRUE;
 			break;
 		default:
 			logerror("%.4x memory %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -51,11 +39,12 @@ static READ8_HANDLER( gmaster_io_r )
     return data;
 }
 
-#define BLITTER_Y ((gmaster.ports[2]&4)|(gmaster_video.data[0]&3))
+#define BLITTER_Y ((state->machine.ports[2]&4)|(state->video.data[0]&3))
 
 static WRITE8_HANDLER( gmaster_io_w )
 {
-    if (gmaster.ports[2] & 1)
+	gmaster_state *state = space->machine->driver_data<gmaster_state>();
+    if (state->machine.ports[2] & 1)
 	{
 		memory_region(space->machine, "maincpu")[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -65,33 +54,33 @@ static WRITE8_HANDLER( gmaster_io_w )
 		switch (offset)
 		{
 		case 0:
-			gmaster_video.delayed=FALSE;
+			state->video.delayed=FALSE;
 			logerror("%.4x lcd %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
 			// e2 af a4 a0 a9 falling block init for both halves
 			if ((data & 0xfc) == 0xb8)
 			{
-				gmaster_video.index = 0;
-				gmaster_video.data[gmaster_video.index] = data;
-				gmaster_video.y = BLITTER_Y;
+				state->video.index = 0;
+				state->video.data[state->video.index] = data;
+				state->video.y = BLITTER_Y;
 			}
 			else if ((data & 0xc0) == 0)
 			{
-				gmaster_video.x = data;
+				state->video.x = data;
 			}
 			else if ((data & 0xf0) == 0xe0)
 			{
-				gmaster_video.mode = (data & 0xe) ? FALSE : TRUE;
+				state->video.mode = (data & 0xe) ? FALSE : TRUE;
 			}
-			gmaster_video.data[gmaster_video.index] = data;
-			gmaster_video.index = (gmaster_video.index + 1) & 7;
+			state->video.data[state->video.index] = data;
+			state->video.index = (state->video.index + 1) & 7;
 			break;
 		case 1:
-			gmaster_video.delayed = FALSE;
-			if (gmaster_video.x < ARRAY_LENGTH(gmaster_video.pixels[0])) // continental galaxy flutlicht
-				gmaster_video.pixels[gmaster_video.y][gmaster_video.x] = data;
+			state->video.delayed = FALSE;
+			if (state->video.x < ARRAY_LENGTH(state->video.pixels[0])) // continental galaxy flutlicht
+				state->video.pixels[state->video.y][state->video.x] = data;
 			logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n",
-				(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000 + offset, data);
-			gmaster_video.x++;
+				(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), state->video.x, state->video.y, 0x4000 + offset, data);
+			state->video.x++;
 /* 02 b8 1a
    02 bb 1a
    02 bb 22
@@ -115,7 +104,8 @@ static WRITE8_HANDLER( gmaster_io_w )
 
 static READ8_HANDLER( gmaster_port_r )
 {
-//  UINT8 data = gmaster.ports[offset];
+	//gmaster_state *state = space->machine->driver_data<gmaster_state>();
+//  UINT8 data = state->machine.ports[offset];
     UINT8 data = 0xff;
     switch (offset)
 	{
@@ -130,12 +120,13 @@ static READ8_HANDLER( gmaster_port_r )
 
 static WRITE8_HANDLER( gmaster_port_w )
 {
-    gmaster.ports[offset] = data;
+	gmaster_state *state = space->machine->driver_data<gmaster_state>();
+    state->machine.ports[offset] = data;
     logerror("%.4x port %d written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), offset, data);
     switch (offset)
 	{
 		case UPD7810_PORTC:
-			gmaster_video.y = BLITTER_Y;
+			state->video.y = BLITTER_Y;
 			break;
     }
 }
@@ -187,13 +178,14 @@ static PALETTE_INIT( gmaster )
 
 static VIDEO_UPDATE( gmaster )
 {
+	gmaster_state *state = screen->machine->driver_data<gmaster_state>();
     int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
-    for (y = 0; y < ARRAY_LENGTH(gmaster_video.pixels); y++)
+    for (y = 0; y < ARRAY_LENGTH(state->video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(gmaster_video.pixels[0]); x++)
+		for (x = 0; x < ARRAY_LENGTH(state->video.pixels[0]); x++)
 		{
-			UINT8 d = gmaster_video.pixels[y][x];
+			UINT8 d = state->video.pixels[y][x];
 			UINT16 *line;
 
 			line = BITMAP_ADDR16(bitmap, (y * 8), x);
@@ -258,7 +250,7 @@ static const UPD7810_CONFIG config = {
 	gmaster_io_callback
 };
 
-static MACHINE_CONFIG_START( gmaster, driver_device )
+static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
 	MDRV_CPU_PROGRAM_MAP(gmaster_mem)
 	MDRV_CPU_IO_MAP( gmaster_io)
@@ -296,7 +288,8 @@ ROM_END
 
 static DRIVER_INIT( gmaster )
 {
-	memset(&gmaster_video, 0, sizeof(gmaster_video));
+	gmaster_state *state = machine->driver_data<gmaster_state>();
+	memset(&state->video, 0, sizeof(state->video));
 }
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */

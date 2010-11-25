@@ -3,25 +3,23 @@
 
 #define Y_PIXELS 200
 
-static int scanline;
-static unsigned int base_address;
-static emu_timer *scanline_timer;
 
 static TIMER_CALLBACK( gamecom_scanline ) {
+	gamecom_state *state = machine->driver_data<gamecom_state>();
 	UINT8 * RAM = memory_region(machine, "maincpu");
 	// draw line
-	if ( scanline == 0 ) {
-		base_address = ( RAM[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
+	if ( state->scanline == 0 ) {
+		state->base_address = ( RAM[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
 	}
 	if ( ~RAM[SM8521_LCDC] & 0x80 ) {
 		rectangle rec;
 		rec.min_x = 0;
 		rec.max_x = Y_PIXELS - 1;
-		rec.min_y = rec.max_y = scanline;
+		rec.min_y = rec.max_y = state->scanline;
 		bitmap_fill( machine->generic.tmpbitmap, &rec , 0);
 		return;
 	} else {
-		UINT8 *line = &gamecom_vram[ base_address + 40 * scanline ];
+		UINT8 *line = &state->vram[ state->base_address + 40 * state->scanline ];
 		int	pal[4];
 		int	i;
 
@@ -53,21 +51,22 @@ static TIMER_CALLBACK( gamecom_scanline ) {
 		}
 		for( i = 0; i < 40; i++ ) {
 			UINT8 p = line[i];
-			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 0, scanline) = pal[ ( p >> 6 ) & 3 ];
-			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 1, scanline) = pal[ ( p >> 4 ) & 3 ];
-			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 2, scanline) = pal[ ( p >> 2 ) & 3 ];
-			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 3, scanline) = pal[ ( p      ) & 3 ];
+			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 0, state->scanline) = pal[ ( p >> 6 ) & 3 ];
+			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 1, state->scanline) = pal[ ( p >> 4 ) & 3 ];
+			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 2, state->scanline) = pal[ ( p >> 2 ) & 3 ];
+			*BITMAP_ADDR16(machine->generic.tmpbitmap, i * 4 + 3, state->scanline) = pal[ ( p      ) & 3 ];
 		}
 	}
 
-	scanline = ( scanline + 1 ) % Y_PIXELS;
+	state->scanline = ( state->scanline + 1 ) % Y_PIXELS;
 }
 
 VIDEO_START( gamecom )
 {
+	gamecom_state *state = machine->driver_data<gamecom_state>();
 	VIDEO_START_CALL( generic_bitmapped );
-	scanline_timer = timer_alloc( machine, gamecom_scanline, NULL );
-	timer_adjust_periodic( scanline_timer, machine->primary_screen->time_until_pos(0, 0 ), 0, machine->primary_screen->scan_period() );
+	state->scanline_timer = timer_alloc( machine, gamecom_scanline, NULL );
+	timer_adjust_periodic( state->scanline_timer, machine->primary_screen->time_until_pos(0, 0 ), 0, machine->primary_screen->scan_period() );
 
 }
 

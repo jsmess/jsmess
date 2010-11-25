@@ -23,6 +23,59 @@
 #define KC85_SCREEN_WIDTH 320
 #define KC85_SCREEN_HEIGHT 256
 
+/* number of keycodes that can be stored in queue */
+#define KC_KEYCODE_QUEUE_LENGTH 256
+
+#define KC_KEYBOARD_NUM_LINES	9
+
+typedef struct kc_keyboard
+{
+	/* list of stored keys */
+	unsigned char keycodes[KC_KEYCODE_QUEUE_LENGTH];
+	/* index of start of list */
+	int head;
+	/* index of end of list */
+	int tail;
+
+	/* transmitting state */
+	int transmit_state;
+
+	/* number of pulses remaining to be transmitted */
+	int	transmit_pulse_count_remaining;
+	/* count of pulses transmitted so far */
+	int transmit_pulse_count;
+
+	/* pulses to transmit */
+	unsigned char transmit_buffer[32];
+} kc_keyboard;
+
+
+class kc_state : public driver_device
+{
+public:
+	kc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int kc85_pio_data[2];
+	running_device *kc85_z80pio;
+	unsigned char kc85_disc_hw_input_gate;
+	unsigned char *kc85_module_rom;
+	emu_timer *cassette_timer;
+	int cassette_motor_state;
+	unsigned char ardy;
+	int previous_keyboard[KC_KEYBOARD_NUM_LINES-1];
+	unsigned char brdy;
+	kc_keyboard keyboard_data;
+	int kc85_84_data;
+	int kc85_86_data;
+	int kc85_50hz_state;
+	int kc85_15khz_state;
+	int kc85_15khz_count;
+	int kc85_blink_state;
+	unsigned char *kc85_4_display_video_ram;
+	unsigned char *kc85_4_video_ram;
+};
+
 
 /*----------- defined in video/kc.c -----------*/
 
@@ -36,15 +89,15 @@ VIDEO_UPDATE( kc85_3 );
 VIDEO_UPDATE( kc85_4 );
 
 /* select video ram to display */
-void kc85_4_video_ram_select_bank(int bank);
+void kc85_4_video_ram_select_bank(running_machine *machine, int bank);
 /* select video ram which is visible in address space */
-unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
+unsigned char *kc85_4_get_video_ram_base(running_machine *machine, int bank, int colour);
 
 
 /*----------- defined in machine/kc.c -----------*/
 
 extern const upd765_interface kc_fdc_interface;
-extern QUICKLOAD_LOAD( kc );
+QUICKLOAD_LOAD( kc );
 
 MACHINE_START( kc85 );
 MACHINE_RESET( kc85_3 );

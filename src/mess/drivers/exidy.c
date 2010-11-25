@@ -376,7 +376,7 @@ static const floppy_config exidy_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( exidy, driver_device )
+static MACHINE_CONFIG_START( exidy, exidy_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12638000/6)
 	MDRV_CPU_PROGRAM_MAP(exidy_mem)

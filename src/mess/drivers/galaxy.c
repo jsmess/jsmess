@@ -182,7 +182,7 @@ static GFXDECODE_START( galaxy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxy, driver_device )
+static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem)
@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( galaxy, driver_device )
 	MDRV_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galaxyp, driver_device )
+static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem)

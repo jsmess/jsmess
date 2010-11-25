@@ -30,6 +30,27 @@
 
 typedef struct
 {
+	UINT8 buffer[12];
+	UINT8 tx_count;
+	UINT8 rx_count;
+	UINT8 command_length;
+	UINT8 answer_length;
+	UINT8 latch;  // 0=ready to receive
+	UINT8 ack;
+	UINT8 position;
+} fm7_encoder_t;
+
+typedef struct
+{
+	UINT8 bank_addr[8][16];
+	UINT8 segment;
+	UINT8 window_offset;
+	UINT8 enabled;
+	UINT8 mode;
+} fm7_mmr_t;
+
+typedef struct
+{
 	UINT8 sub_busy;
 	UINT8 sub_halt;
 	UINT8 sub_reset;  // high if reset caused by subrom change
@@ -54,13 +75,70 @@ typedef struct
 	UINT8 vsync_flag;
 } fm7_video_t;
 
+typedef struct
+{
+	UINT8 command;
+	UINT8 lcolour;
+	UINT8 mask;
+	UINT8 compare_data;
+	UINT8 compare[8];
+	UINT8 bank_disable;
+	UINT8 tilepaint_b;
+	UINT8 tilepaint_r;
+	UINT8 tilepaint_g;
+	UINT16 addr_offset;
+	UINT16 line_style;
+	UINT16 x0;
+	UINT16 x1;
+	UINT16 y0;
+	UINT16 y1;
+	UINT8 busy;
+} fm7_alu_t;
+
+
+class fm7_state : public driver_device
+{
+public:
+	fm7_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* boot_ram;
+	UINT8 irq_flags;
+	UINT8 irq_mask;
+	emu_timer* timer;
+	emu_timer* subtimer;
+	emu_timer* keyboard_timer;
+	UINT8 basic_rom_en;
+	UINT8 init_rom_en;
+	unsigned int key_delay;
+	unsigned int key_repeat;
+	UINT16 current_scancode;
+	UINT32 key_data[4];
+	UINT32 mod_data;
+	UINT8 key_scan_mode;
+	UINT8 break_flag;
+	UINT8 psg_regsel;
+	UINT8 psg_data;
+	UINT8 fdc_side;
+	UINT8 fdc_drive;
+	UINT8 fdc_irq_flag;
+	UINT8 fdc_drq_flag;
+	UINT8 fm77av_ym_irq;
+	UINT8 speaker_active;
+	UINT16 kanji_address;
+	fm7_encoder_t encoder;
+	fm7_mmr_t mmr;
+	UINT8 cp_prev;
+	UINT8* video_ram;
+	UINT8* shared_ram;
+	emu_timer* fm77av_vsync_timer;
+	UINT8 type;
+	fm7_video_t video;
+	fm7_alu_t alu;
+};
+
+
 /*----------- defined in drivers/fm7.c -----------*/
-
-extern UINT8* fm7_video_ram;
-extern UINT8* fm7_shared_ram;
-extern emu_timer* fm77av_vsync_timer;
-extern UINT8 fm7_type;
-
 
 READ8_HANDLER( fm7_sub_keyboard_r );
 READ8_HANDLER( fm77av_key_encoder_r );
@@ -69,8 +147,6 @@ READ8_HANDLER( fm7_sub_beeper_r );
 
 
 /*----------- defined in video/fm7.c -----------*/
-
-extern fm7_video_t fm7_video;
 
 TIMER_CALLBACK( fm77av_vsync );
 
