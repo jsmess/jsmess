@@ -569,7 +569,7 @@ static WRITE32_HANDLER( s3c240x_irq_w )
 // PWM TIMER
 
 #if 0
-static const char *timer_reg_names[] =
+static const char *const timer_reg_names[] =
 {
 	"Timer config 0",
 	"Timer config 1",

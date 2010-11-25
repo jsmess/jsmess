@@ -351,7 +351,7 @@ INPUT_PORTS_END
     msm8251_interface rs232_intf
 -------------------------------------------------*/
 
-static msm8251_interface rs232_intf =
+static const msm8251_interface rs232_intf =
 {
 	NULL,
 	NULL,
@@ -362,7 +362,7 @@ static msm8251_interface rs232_intf =
     msm8251_interface rs449_intf
 -------------------------------------------------*/
 
-static msm8251_interface rs449_intf =
+static const msm8251_interface rs449_intf =
 {
 	NULL,
 	NULL,

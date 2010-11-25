@@ -26,7 +26,7 @@ static VIDEO_UPDATE( pce220 )
 	int x, y, xi,yi;
 	int count = 0;
 //  static int test_x,test_y;
-	static UINT8 *vram = memory_region(screen->machine, "lcd_vram");
+	UINT8 *vram = memory_region(screen->machine, "lcd_vram");
 
 	for (y = 0; y < 4; y++)
 	{
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( lcd_control_w )
 
 static WRITE8_HANDLER( lcd_data_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "lcd_vram");
+	UINT8 *vram = memory_region(space->machine, "lcd_vram");
 
 	vram[lcd_index_row*0x40|lcd_index_col] = data;
 

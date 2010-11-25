@@ -312,7 +312,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
-	static UINT32 count;
+	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
@@ -353,7 +353,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 
 static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size,int pri)
 {
-	static UINT32 count;
+	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
@@ -410,7 +410,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 
 static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int pri)
 {
-	static UINT32 count;
+	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
@@ -587,12 +587,13 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 
 	/* calculate TV window parameters here */
 	{
-		static int x_offs,y_offs;
+		int x_offs,y_offs;
 
 		monitor_type = ((text_reg[0x0f] & 0x08) >> 3);
 
 		switch((monitor_type|text_col_size<<1) & 3)
 		{
+			default:
 			case 0: x_offs = 64; break;
 			case 1: x_offs = 80; break;
 			case 2: x_offs = 72; break;
@@ -863,7 +864,7 @@ static WRITE8_HANDLER( mz2500_bank_addr_w )
 
 static READ8_HANDLER( mz2500_bank_data_r )
 {
-	static UINT8 res;
+	UINT8 res;
 
 	res = bank_val[bank_addr];
 
@@ -902,7 +903,7 @@ static WRITE8_HANDLER( mz2500_dictionary_bank_w )
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
 static READ8_HANDLER( mz2500_crtc_hvblank_r )
 {
-	static UINT8 vblank_bit, hblank_bit;
+	UINT8 vblank_bit, hblank_bit;
 
 	vblank_bit = space->machine->primary_screen->vblank() ? 0 : 1;
 	hblank_bit = space->machine->primary_screen->hblank() ? 0 : 2;
@@ -1140,8 +1141,8 @@ static WRITE8_HANDLER( mz2500_rom_w )
 static WRITE8_HANDLER( palette4096_io_w )
 {
 	static UINT8 r[16],g[16],b[16];
-	static UINT8 pal_index;
-	static UINT8 pal_entry;
+	UINT8 pal_index;
+	UINT8 pal_entry;
 
 	pal_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 	pal_entry = (pal_index & 0x1e) >> 1;
@@ -1180,7 +1181,7 @@ static READ8_HANDLER( mz2500_rplane_latch_r )
 {
 	if(cg_reg[0x07] & 0x10)
 	{
-		static UINT8 vblank_bit;
+		UINT8 vblank_bit;
 
 		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80 | cg_clear_flag;
 
@@ -1301,7 +1302,7 @@ static UINT8 joy_mode;
 
 static READ8_HANDLER( mz2500_joystick_r )
 {
-	static UINT8 res,dir_en,in_r;
+	UINT8 res,dir_en,in_r;
 
 	res = 0xff;
 	in_r = ~input_port_read(space->machine, joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
@@ -1750,7 +1751,7 @@ static READ8_DEVICE_HANDLER( mz2500_porta_r )
 
 static READ8_DEVICE_HANDLER( mz2500_portb_r )
 {
-	static UINT8 vblank_bit;
+	UINT8 vblank_bit;
 
 	vblank_bit = device->machine->primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 

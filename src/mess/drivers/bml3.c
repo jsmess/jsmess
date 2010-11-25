@@ -47,8 +47,8 @@ static VIDEO_UPDATE( bml3 )
 	int x,y,count;
 	int xi,yi;
 	int width,height;
-	static UINT8 *gfx_rom = memory_region(screen->machine, "char");
-	static UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *gfx_rom = memory_region(screen->machine, "char");
+	UINT8 *vram = memory_region(screen->machine, "vram");
 
 	count = 0x0000;
 
@@ -163,7 +163,7 @@ static READ8_HANDLER( bml3_keyboard_r )
 /* Note: this custom code is there just for simplicity, it'll be nuked in the end */
 static READ8_HANDLER( bml3_io_r )
 {
-	static UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	if(offset == 0x19) return io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
@@ -251,7 +251,7 @@ static WRITE8_HANDLER( bml3_io_w )
 
 static READ8_HANDLER( bml3_vram_r )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = memory_region(space->machine, "vram");
 
 	/* TODO: this presumably also triggers an attr latch read, unsure yet */
 	attr_latch = vram[offset+0x4000];
@@ -261,7 +261,7 @@ static READ8_HANDLER( bml3_vram_r )
 
 static WRITE8_HANDLER( bml3_vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = memory_region(space->machine, "vram");
 
 	vram[offset] = data;
 	vram[offset+0x4000] = attr_latch;

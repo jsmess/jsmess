@@ -1127,7 +1127,8 @@ static I8155_INTERFACE( tandy200_8155_intf )
 
 /* MSM8251 Interface */
 
-static msm8251_interface tandy200_msm8251_interface = {
+static const msm8251_interface tandy200_msm8251_interface =
+{
 	NULL,
 	NULL,
 	NULL

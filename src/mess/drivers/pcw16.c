@@ -650,13 +650,13 @@ static int pcw16_keyboard_can_transmit(void)
 
 #ifdef UNUSED_FUNCTION
 /* issue a begin byte transfer */
-static void	pcw16_begin_byte_transfer(void)
+static void pcw16_begin_byte_transfer(void)
 {
 }
 #endif
 
 /* signal a code has been received */
-static void	pcw16_keyboard_signal_byte_received(running_machine *machine, int data)
+static void pcw16_keyboard_signal_byte_received(running_machine *machine, int data)
 {
 	/* clear clock */
 	pcw16_keyboard_set_clock_state(0);
@@ -1188,7 +1188,7 @@ static  READ8_HANDLER(pcw16_superio_fdc_digital_input_register_r)
 	return pc_fdc_r(space, PC_FDC_DIGITIAL_INPUT_REGISTER);
 }
 
-static void	pcw16_fdc_interrupt(running_machine *machine, int state)
+static void pcw16_fdc_interrupt(running_machine *machine, int state)
 {
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */

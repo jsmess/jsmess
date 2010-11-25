@@ -625,7 +625,8 @@ static UPD1990A_INTERFACE( pc8401a_upd1990a_intf )
 
 /* MSM8251 Interface */
 
-static msm8251_interface pc8401a_msm8251_interface = {
+static const msm8251_interface pc8401a_msm8251_interface =
+{
 	NULL,
 	NULL,
 	NULL

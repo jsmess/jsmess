@@ -499,7 +499,7 @@ static void adpcm_play(running_machine *machine)
  */
 static void pce_cd_msm5205_int(running_device *device)
 {
-	static UINT8 msm_data;
+	UINT8 msm_data;
 
 //	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
@@ -1699,7 +1699,7 @@ PC Engine Arcade Card emulation
 
 READ8_HANDLER( pce_cd_acard_r )
 {
-	static UINT8 r_num;
+	UINT8 r_num;
 
 	if((offset & 0x2e0) == 0x2e0)
 	{
@@ -1762,7 +1762,7 @@ READ8_HANDLER( pce_cd_acard_r )
 
 WRITE8_HANDLER( pce_cd_acard_w )
 {
-	static UINT8 w_num;
+	UINT8 w_num;
 
 	if((offset & 0x2e0) == 0x2e0)
 	{

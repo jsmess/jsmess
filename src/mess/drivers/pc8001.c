@@ -376,7 +376,7 @@ static UPD3301_INTERFACE( pc8001_upd3301_intf )
 
 /* 8251 Interface */
 
-static msm8251_interface pc8001_8251_intf =
+static const msm8251_interface pc8001_8251_intf =
 {
 	NULL,
 	NULL,

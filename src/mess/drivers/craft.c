@@ -58,7 +58,7 @@ enum
 	AVR8_REG_D,
 };
 
-static char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
+static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 #if 0
 static UINT64 avr8_get_timer_1_frequency(craft_state *state)
@@ -362,7 +362,7 @@ static void avr8_spi_update_clock_phase(running_machine *machine)
 	verboselog(machine, 0, "avr8_spi_update_clock_phase: TODO; Sampling edge is %s\n", AVR8_SPCR_CPHA ? "Trailing" : "Leading");
 }
 
-static UINT8 avr8_spi_clock_divisor[8] = { 4, 16, 64, 128, 2, 8, 32, 64 };
+static const UINT8 avr8_spi_clock_divisor[8] = { 4, 16, 64, 128, 2, 8, 32, 64 };
 
 static void avr8_spi_update_clock_rate(running_machine *machine)
 {

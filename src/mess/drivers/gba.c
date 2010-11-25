@@ -95,7 +95,7 @@ static TIMER_CALLBACK( dma_complete )
 {
 	int ctrl;
 	FPTR ch;
-	static UINT32 ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
+	static const UINT32 ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	gba_state *state = machine->driver_data<gba_state>();
 
 	ch = param;
@@ -363,7 +363,7 @@ static void audio_tick(running_machine *machine, int ref)
 
 static TIMER_CALLBACK(timer_expire)
 {
-	static UINT32 tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
+	static const UINT32 tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
 	FPTR tmr = (FPTR) param;
 	gba_state *state = machine->driver_data<gba_state>();
 

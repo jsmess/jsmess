@@ -1030,7 +1030,8 @@ static READ8_HANDLER( x1_pcg_r )
 	int addr;
 	int calc_pcg_offset;
 	static UINT32 kanji_offset;
-	static UINT8 bios_offset,pcg_index_r[3],res;
+	static UINT8 bios_offset,pcg_index_r[3];
+	UINT8 res;
 	UINT8 *gfx_data;
 
 	addr = (offset & 0x300) >> 8;
@@ -1165,7 +1166,7 @@ static WRITE8_HANDLER( x1_pal_b_w ) { x_b = data; set_current_palette(space->mac
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
 {
-	static UINT8 ex_mask;
+	UINT8 ex_mask;
 
 	if     (offset >= 0x0000 && offset <= 0x3fff)	{ ex_mask = 7; }
 	else if(offset >= 0x4000 && offset <= 0x7fff)	{ ex_mask = 6; }

@@ -122,7 +122,7 @@ static void fake_keyboard_data(running_machine *machine)
 
 static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
-	static UINT8 *vram = memory_region(machine, "vram");
+	UINT8 *vram = memory_region(machine, "vram");
 	int x,y,xi,yi;
 	int count;
 
@@ -153,7 +153,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 
 static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
-	static UINT8 *vram = memory_region(machine, "vram");
+	UINT8 *vram = memory_region(machine, "vram");
 	int x,y/*,xi,yi*/;
 	int count;
 
@@ -201,8 +201,8 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 static void draw_mixed_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
-	static UINT8 *vram = memory_region(machine, "vram");
-	static UINT8 *gfx_data = memory_region(machine,"font");
+	UINT8 *vram = memory_region(machine, "vram");
+	UINT8 *gfx_data = memory_region(machine,"font");
 	int x,y,xi,yi;
 	int count;
 
@@ -302,8 +302,8 @@ static VIDEO_UPDATE( paso7 )
 
 static READ8_HANDLER( vram_r )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
-	static UINT8 res;
+	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 res;
 
 	if(vram_sel == 0)
 	{
@@ -332,7 +332,7 @@ static READ8_HANDLER( vram_r )
 
 static WRITE8_HANDLER( vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = memory_region(space->machine, "vram");
 
 	if(vram_sel)
 	{
@@ -525,7 +525,7 @@ static void pasopia_nmi_trap(running_machine *machine)
 
 static READ8_HANDLER( pasopia7_io_r )
 {
-	static UINT16 io_port;
+	UINT16 io_port;
 
 	if(mio_sel)
 	{
@@ -568,7 +568,7 @@ static READ8_HANDLER( pasopia7_io_r )
 
 static WRITE8_HANDLER( pasopia7_io_w )
 {
-	static UINT16 io_port;
+	UINT16 io_port;
 
 	if(mio_sel)
 	{

@@ -52,7 +52,7 @@ enum
 	TPI_192
 };
 
-static int TRACKS_PER_INCH[] = { 48, 67, 96, 100, 135, 192 };
+static const int TRACKS_PER_INCH[] = { 48, 67, 96, 100, 135, 192 };
 
 /* high level track types */
 enum
@@ -74,7 +74,7 @@ enum
 	TRACK_IBM_SD_10		/* not supported */
 };
 
-//static int SECTORS_PER_TRACK[] = { 0, 11, 22, 9, 10, 8, 9, 15, 18, 36, -1, -1, -1, -1, 10 };
+//static const int SECTORS_PER_TRACK[] = { 0, 11, 22, 9, 10, 8, 9, 15, 18, 36, -1, -1, -1, -1, 10 };
 
 /***************************************************************************
     TYPE DEFINITIONS

@@ -249,7 +249,7 @@ static VIDEO_UPDATE( a7000 )
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
 	UINT32 count;
-	static UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *vram = memory_region(screen->machine, "vram");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
@@ -618,7 +618,7 @@ static READ32_HANDLER( a7000_iomd_r )
 	{
 		case IOMD_IOCR:
 		{
-			static UINT8 flyback;
+			UINT8 flyback;
 			int vert_pos;
 
 			vert_pos = space->machine->primary_screen->vpos();

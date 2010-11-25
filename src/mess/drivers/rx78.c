@@ -76,7 +76,7 @@ static VIDEO_START( rx78 )
 
 static VIDEO_UPDATE( rx78 )
 {
-	static UINT8 *vram = memory_region(screen->machine,"vram");
+	UINT8 *vram = memory_region(screen->machine,"vram");
 	int x,y,count;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( key_w )
 
 static READ8_HANDLER( rx78_vram_r )
 {
-	static UINT8 *vram = memory_region(space->machine,"vram");
+	UINT8 *vram = memory_region(space->machine,"vram");
 
 	if(vram_read_bank == 0 || vram_read_bank > 6)
 		return 0xff;
@@ -165,7 +165,7 @@ static READ8_HANDLER( rx78_vram_r )
 
 static WRITE8_HANDLER( rx78_vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine,"vram");
+	UINT8 *vram = memory_region(space->machine,"vram");
 
 	if(vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
 	if(vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }

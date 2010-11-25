@@ -29,7 +29,7 @@ static VIDEO_START( bmjr )
 static VIDEO_UPDATE( bmjr )
 {
 	int x,y,xi,yi,count;
-	static UINT8 *gfx_rom = memory_region(screen->machine, "char");
+	UINT8 *gfx_rom = memory_region(screen->machine, "char");
 
 	count = 0x0100;
 

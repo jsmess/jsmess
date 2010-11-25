@@ -792,7 +792,7 @@ GFXDECODE_END
     msm8251_interface i8251_intf
 -------------------------------------------------*/
 
-static msm8251_interface i8251_intf =
+static const msm8251_interface i8251_intf =
 {
 	NULL,
 	NULL,

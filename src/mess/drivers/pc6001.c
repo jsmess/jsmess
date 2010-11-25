@@ -1360,7 +1360,7 @@ static WRITE8_HANDLER( pc6001sr_bank_rn_w )
 {
 	const char* bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	static UINT8 bank_num;
+	UINT8 bank_num;
 
 	sr_bank_r[offset] = data;
 	bank_num = data & 0x0f;
@@ -1391,7 +1391,7 @@ static WRITE8_HANDLER( pc6001sr_bank_wn_w )
 #define SR_WRAM_BANK_W(_v_) \
 { \
 	UINT8 *ROM = memory_region(space->machine, "maincpu"); \
-	static UINT8 bank_num; \
+	UINT8 bank_num; \
 	bank_num = sr_bank_w[_v_] & 0x0f; \
 	if((sr_bank_w[_v_] & 0xf0) != 0x20) \
 		ROM[offset+(SR_WRAM0(bank_num))] = data; \
@@ -1817,8 +1817,7 @@ static UINT8 check_joy_press(running_machine *machine)
 	UINT8 p1_key = input_port_read(machine,"P1") ^ 0xff;
 	UINT8 shift_key = input_port_read(machine,"key_modifiers") & 0x02;
 	UINT8 space_key = input_port_read(machine,"key2") & 0x01;
-
-	static UINT8 joy_press;
+	UINT8 joy_press;
 
 		/*
             PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

@@ -20,7 +20,7 @@ static VIDEO_START( pc2000 )
 static VIDEO_UPDATE( pc2000 )
 {
 	int x,y;
-	static UINT8 *vram = memory_region(screen->machine, "lcd_vram");
+	UINT8 *vram = memory_region(screen->machine, "lcd_vram");
 
 	for(y=0;y<2;y++)
 	{
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( lcd_vram_addr_w )
 
 static WRITE8_HANDLER( lcd_vram_data_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "lcd_vram");
+	UINT8 *vram = memory_region(space->machine, "lcd_vram");
 
 	vram[lcd_vram_index] = data;
 }

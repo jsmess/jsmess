@@ -140,21 +140,21 @@ static VIDEO_UPDATE( jr200 )
 
 static READ8_HANDLER( jr200_pcg_1_r )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = memory_region(space->machine, "pcg");
 
 	return pcg[offset+0x000];
 }
 
 static READ8_HANDLER( jr200_pcg_2_r )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = memory_region(space->machine, "pcg");
 
 	return pcg[offset+0x400];
 }
 
 static WRITE8_HANDLER( jr200_pcg_1_w )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = memory_region(space->machine, "pcg");
 
 	pcg[offset+0x000] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x000) >> 3);
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( jr200_pcg_1_w )
 
 static WRITE8_HANDLER( jr200_pcg_2_w )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = memory_region(space->machine, "pcg");
 
 	pcg[offset+0x400] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x400) >> 3);
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( jr200_pcg_2_w )
 
 static READ8_HANDLER( jr200_bios_char_r )
 {
-	static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+	UINT8 *gfx = memory_region(space->machine, "gfx_ram");
 
 	return gfx[offset];
 }
@@ -178,7 +178,7 @@ static READ8_HANDLER( jr200_bios_char_r )
 
 static WRITE8_HANDLER( jr200_bios_char_w )
 {
-//  static UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+//  UINT8 *gfx = memory_region(space->machine, "gfx_ram");
 
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  gfx[offset] = data;
@@ -458,8 +458,8 @@ static MACHINE_START(jr200)
 
 static MACHINE_RESET(jr200)
 {
-	static UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
-	static UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
+	UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
+	UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
 	int i;
 	memset(mn1271_ram,0,0x800);
 

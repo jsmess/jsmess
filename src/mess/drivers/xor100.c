@@ -370,7 +370,7 @@ static COM8116_INTERFACE( com5016_intf )
 
 /* Printer 8251A Interface */
 
-static msm8251_interface printer_8251_intf =
+static const msm8251_interface printer_8251_intf =
 {
 	NULL,
 	NULL,
@@ -379,7 +379,7 @@ static msm8251_interface printer_8251_intf =
 
 /* Terminal 8251A Interface */
 
-static msm8251_interface terminal_8251_intf =
+static const msm8251_interface terminal_8251_intf =
 {
 	NULL,
 	NULL,

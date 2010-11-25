@@ -39,10 +39,10 @@ static VIDEO_UPDATE( smc777 )
 {
 	int x,y,yi;
 	UINT16 count;
-	static UINT8 *vram = memory_region(screen->machine, "vram");
-	static UINT8 *attr = memory_region(screen->machine, "attr");
-	static UINT8 *gram = memory_region(screen->machine, "fbuf");
-	static int x_width;
+	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *attr = memory_region(screen->machine, "attr");
+	UINT8 *gram = memory_region(screen->machine, "fbuf");
+	int x_width;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[backdrop_pen+0x10]);
 
@@ -57,7 +57,7 @@ static VIDEO_UPDATE( smc777 )
 		{
 			for(x=0;x<x_width;x++)
 			{
-				static UINT16 color;
+				UINT16 color;
 
 				color = (gram[count] & 0xf0) >> 4;
 				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
@@ -161,8 +161,8 @@ static WRITE8_HANDLER( smc777_6845_w )
 
 static READ8_HANDLER( smc777_vram_r )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
-	static UINT16 vram_index;
+	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -171,8 +171,8 @@ static READ8_HANDLER( smc777_vram_r )
 
 static READ8_HANDLER( smc777_attr_r )
 {
-	static UINT8 *attr = memory_region(space->machine, "attr");
-	static UINT16 vram_index;
+	UINT8 *attr = memory_region(space->machine, "attr");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -181,8 +181,8 @@ static READ8_HANDLER( smc777_attr_r )
 
 static READ8_HANDLER( smc777_pcg_r )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
-	static UINT16 vram_index;
+	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -191,8 +191,8 @@ static READ8_HANDLER( smc777_pcg_r )
 
 static WRITE8_HANDLER( smc777_vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
-	static UINT16 vram_index;
+	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -201,8 +201,8 @@ static WRITE8_HANDLER( smc777_vram_w )
 
 static WRITE8_HANDLER( smc777_attr_w )
 {
-	static UINT8 *attr = memory_region(space->machine, "attr");
-	static UINT16 vram_index;
+	UINT8 *attr = memory_region(space->machine, "attr");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -211,8 +211,8 @@ static WRITE8_HANDLER( smc777_attr_w )
 
 static WRITE8_HANDLER( smc777_pcg_w )
 {
-	static UINT8 *pcg = memory_region(space->machine, "pcg");
-	static UINT16 vram_index;
+	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -223,8 +223,8 @@ static WRITE8_HANDLER( smc777_pcg_w )
 
 static READ8_HANDLER( smc777_fbuf_r )
 {
-	static UINT8 *fbuf = memory_region(space->machine, "fbuf");
-	static UINT16 vram_index;
+	UINT8 *fbuf = memory_region(space->machine, "fbuf");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -233,8 +233,8 @@ static READ8_HANDLER( smc777_fbuf_r )
 
 static WRITE8_HANDLER( smc777_fbuf_w )
 {
-	static UINT8 *fbuf = memory_region(space->machine, "fbuf");
-	static UINT16 vram_index;
+	UINT8 *fbuf = memory_region(space->machine, "fbuf");
+	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
@@ -328,7 +328,7 @@ static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
 
 static READ8_HANDLER( key_r )
 {
-	static UINT8 res;
+	UINT8 res;
 
 	if(offset == 1) //keyboard status
 		return (0xfc) | keyb_press_flag;
@@ -605,7 +605,7 @@ static TIMER_CALLBACK( keyboard_callback )
 
 static MACHINE_START(smc777)
 {
-	static UINT8 *rom = memory_region(machine, "bios");
+	UINT8 *rom = memory_region(machine, "bios");
 	int i;
 
 	for(i=0;i<0x4000;i++)
