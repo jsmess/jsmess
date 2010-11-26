@@ -82,6 +82,7 @@ struct crt9007_interface
 	devcb_write_line        out_vlt_func;
     devcb_write_line        out_curs_func;
     devcb_write_line        out_drb_func;
+    devcb_write_line        out_cblank_func;
 
 	devcb_write_line        out_slg_func;
 	devcb_write_line        out_sld_func;
@@ -151,14 +152,18 @@ private:
 	static const device_timer_id TIMER_VLT = 2;
 	static const device_timer_id TIMER_CURS = 3;
 	static const device_timer_id TIMER_DRB = 4;
+	static const device_timer_id TIMER_DMA = 5;
 
 	inline UINT8 readbyte(offs_t address);
 
+	inline void trigger_interrupt(int line);
+	inline void update_cblank_line();
 	inline void update_hsync_timer(int state);
 	inline void update_vsync_timer(int state);
 	inline void update_vlt_timer(int state);
 	inline void update_curs_timer(int state);
 	inline void update_drb_timer(int state);
+	inline void update_dma_timer();
 
 	inline void recompute_parameters();
 
@@ -169,6 +174,9 @@ private:
 	devcb_resolved_write_line	m_out_vlt_func;
 	devcb_resolved_write_line	m_out_curs_func;
 	devcb_resolved_write_line	m_out_drb_func;
+	devcb_resolved_write_line	m_out_cblank_func;
+	devcb_resolved_write_line	m_out_slg_func;
+	devcb_resolved_write_line	m_out_sld_func;
 
 	screen_device *m_screen;
 
@@ -182,12 +190,28 @@ private:
 	// runtime variables, do not state save
 	int m_vsync_start;
 	int m_vsync_end;
-	int m_vfp;
 	int m_hsync_start;
 	int m_hsync_end;
-	int m_hfp;
+	int m_vlt_start;
+	int m_vlt_end;
+	int m_vlt_bottom;
+	int m_drb_bottom;
+	int m_hs;
+	int m_vs;
+	int m_cblank;
 	int m_vlt;
+	int m_drb;
 	int m_wben;
+	int m_slg;
+	int m_sld;
+	int m_lpstb;
+
+	// DMA
+	int m_dmar;
+	int m_ack;
+	int m_dma_count;
+	int m_dma_burst;
+	int m_dma_delay;
 
 	// timers
 	emu_timer *m_vsync_timer;
@@ -195,6 +219,7 @@ private:
 	emu_timer *m_vlt_timer;
 	emu_timer *m_curs_timer;
 	emu_timer *m_drb_timer;
+	emu_timer *m_dma_timer;
 
 	const crt9007_device_config &m_config;
 };

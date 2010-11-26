@@ -11,9 +11,10 @@
 
     TODO:
 
+	- cursor timer
     - interrupts
-    - status register
-    - reset
+		- light pen
+		- frame timer
 	- non-DMA mode
     - DMA mode
     - cursor/blank skew
@@ -82,10 +83,10 @@
 	(((m_reg[0x08] << 3) & 0x0700) | m_reg[0x09])
 
 #define DMA_BURST_COUNT \
-	(m_reg[0x0a] & 0x0f)
+	((m_reg[0x0a] & 0x0f) + 1)
 
 #define DMA_BURST_DELAY \
-	((m_reg[0x0a] >> 4) & 0x07)
+	((((m_reg[0x0a] >> 4) & 0x07) + 1) % 8)
 
 #define DMA_DISABLE \
 	BIT(m_reg[0x0a], 7)
@@ -144,6 +145,9 @@
 #define HORIZONTAL_CURSOR \
 	m_reg[0x19]
 
+#define INTERRUPT_ENABLE \
+	m_reg[0x1a]
+
 #define FRAME_TIMER \
 	BIT(m_reg[0x1a], 0)
 
@@ -172,10 +176,10 @@ enum
 // operation modes
 enum
 {
-	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,
-	OPERATION_MODE_DOUBLE_ROW_BUFFER,
-	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,
-	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7
+	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,	// not implemented
+	OPERATION_MODE_DOUBLE_ROW_BUFFER = 1,
+	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,				// not implemented
+	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7				// not implemented
 };
 
 
@@ -183,11 +187,16 @@ enum
 enum
 {
 	ADDRESS_MODE_SEQUENTIAL_ADDRESSING = 0,
-	ADDRESS_MODE_SEQUENTIAL_ROLL_ADDRESSING,
-	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,
-	ADDRESS_MODE_LINKED_LIST_ROW_TABLE
+	ADDRESS_MODE_SEQUENTIAL_ROLL_ADDRESSING,			// not implemented
+	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,					// not implemented
+	ADDRESS_MODE_LINKED_LIST_ROW_TABLE					// not implemented
 };
 
+
+// interrupt enable register bits
+const int IE_VERTICAL_RETRACE			= 0x40;
+const int IE_LIGHT_PEN					= 0x20;
+const int IE_FRAME_TIMER				= 0x01;
 
 // status register bits
 const int STATUS_INTERRUPT_PENDING		= 0x80;
@@ -284,6 +293,7 @@ void crt9007_device_config::device_config_complete()
 		memset(&out_vlt_func, 0, sizeof(out_vlt_func));
 		memset(&out_curs_func, 0, sizeof(out_curs_func));
 		memset(&out_drb_func, 0, sizeof(out_drb_func));
+		memset(&out_cblank_func, 0, sizeof(out_cblank_func));
 		memset(&out_slg_func, 0, sizeof(out_slg_func));
 		memset(&out_sld_func, 0, sizeof(out_sld_func));
 	}
@@ -306,6 +316,50 @@ inline UINT8 crt9007_device::readbyte(offs_t address)
 
 
 //-------------------------------------------------
+//  trigger_interrupt - 
+//-------------------------------------------------
+
+inline void crt9007_device::trigger_interrupt(int line)
+{
+	if (INTERRUPT_ENABLE & line)
+	{
+		int status = m_status;
+
+		m_status |= STATUS_INTERRUPT_PENDING | line;
+
+		if (!(status & STATUS_INTERRUPT_PENDING))
+		{
+			if (LOG) logerror("CRT9007 '%s' INT 1\n", tag());
+			devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  update_cblank_line - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_cblank_line()
+{
+	int x = m_screen->hpos();
+	int y = m_screen->vpos();
+
+	// composite blank
+	int cblank = !(m_hs & m_vs);
+		
+	if (m_cblank != cblank)
+	{
+		m_cblank = cblank;
+			
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CBLANK %u\n", tag(), y, x, m_cblank);
+			
+		devcb_call_write_line(&m_out_cblank_func, m_cblank);
+	}
+}
+
+
+//-------------------------------------------------
 //  update_hsync_timer - 
 //-------------------------------------------------
 
@@ -314,7 +368,7 @@ inline void crt9007_device::update_hsync_timer(int state)
 	int y = m_screen->vpos();
 
 	int next_x = state ? m_hsync_start : m_hsync_end;
-	int next_y = (y + 1) % SCAN_LINES_PER_FRAME;
+	int next_y = state ? (y + 1) % SCAN_LINES_PER_FRAME : y;
 
 	attotime duration = m_screen->time_until_pos(next_y, next_x);
 
@@ -342,7 +396,15 @@ inline void crt9007_device::update_vsync_timer(int state)
 
 inline void crt9007_device::update_vlt_timer(int state)
 {
-	// TODO
+	// this signal is active during all visible scan lines and during the horizontal trace at vertical retrace
+	int y = m_screen->vpos();
+
+	int next_x = state ? m_vlt_end : m_vlt_start;
+	int next_y = state ? y : ((y == m_vlt_bottom) ? 0 : (y + 1));
+
+	attotime duration = m_screen->time_until_pos(next_y, next_x);
+
+	timer_adjust_oneshot(m_vlt_timer, duration, !state);
 }
 
 
@@ -352,6 +414,7 @@ inline void crt9007_device::update_vlt_timer(int state)
 
 inline void crt9007_device::update_curs_timer(int state)
 {
+	// this signal is active for 1 character time for all scanlines within the data row
 	// TODO
 }
 
@@ -361,6 +424,42 @@ inline void crt9007_device::update_curs_timer(int state)
 //-------------------------------------------------
 
 inline void crt9007_device::update_drb_timer(int state)
+{
+	// this signal is active for 1 full scan line (VLT edge to edge) at the top scan line of each new row
+	// there is 1 extra DRB signal during the 1st scanline of the vertical retrace interval
+	int y = m_screen->vpos();
+
+	int next_x = m_vlt_end;
+	int next_y = y ? y + 1 : y;
+
+	if (state)
+	{
+		if (y == 0)
+		{
+			next_y = VERTICAL_DELAY - 1;
+		}
+		else if (y == m_drb_bottom)
+		{
+			next_x = 0;
+			next_y = 0;
+		}
+		else
+		{
+			next_y = y + SCAN_LINES_PER_DATA_ROW - 1;
+		}
+	}
+
+	attotime duration = m_screen->time_until_pos(next_y, next_x);
+
+	timer_adjust_oneshot(m_drb_timer, duration, !state);
+}
+
+
+//-------------------------------------------------
+//  update_dma_timer - 
+//-------------------------------------------------
+
+inline void crt9007_device::update_dma_timer()
 {
 	// TODO
 }
@@ -375,26 +474,37 @@ inline void crt9007_device::recompute_parameters()
 	// check that necessary registers have been loaded
 	if (!HAS_VALID_PARAMETERS) return;
 
+	// screen dimensions
 	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
+	// refresh rate
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
 
-	m_hsync_start = (CHARACTERS_PER_HORIZONTAL_PERIOD - HORIZONTAL_SYNC_WIDTH) * m_hpixels_per_column;
-	m_hsync_end = 0;
-	m_hfp = (HORIZONTAL_DELAY - HORIZONTAL_SYNC_WIDTH) * m_hpixels_per_column;
+	// horizontal sync
+	m_hsync_start = 0;
+	m_hsync_end = HORIZONTAL_SYNC_WIDTH * m_hpixels_per_column;
 
-	m_vsync_start = SCAN_LINES_PER_FRAME - VERTICAL_SYNC_WIDTH;
-	m_vsync_end = 0;
-	m_vfp = VERTICAL_DELAY - VERTICAL_SYNC_WIDTH;
+	// visible line time
+	m_vlt_start = HORIZONTAL_DELAY * m_hpixels_per_column;
+	m_vlt_end = (HORIZONTAL_DELAY + CHARACTERS_PER_DATA_ROW) * m_hpixels_per_column;
+	m_vlt_bottom = VERTICAL_DELAY + (VISIBLE_DATA_ROWS_PER_FRAME * SCAN_LINES_PER_DATA_ROW) - 1;
 
+	// data row boundary
+	m_drb_bottom = VERTICAL_DELAY + (VISIBLE_DATA_ROWS_PER_FRAME * SCAN_LINES_PER_DATA_ROW) - SCAN_LINES_PER_DATA_ROW;
+
+	// vertical sync
+	m_vsync_start = 0;
+	m_vsync_end = VERTICAL_SYNC_WIDTH;
+
+	// visible area
 	rectangle visarea;
 
 	visarea.min_x = m_hsync_end;
-	visarea.max_x = m_hsync_start - 1;
+	visarea.max_x = horiz_pix_total - 1;
 
 	visarea.min_y = m_vsync_end;
-	visarea.max_y = m_vsync_start - 1;
+	visarea.max_y = vert_pix_total - 1;
 
 	if (LOG)
 	{
@@ -404,11 +514,10 @@ inline void crt9007_device::recompute_parameters()
 
 	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-	update_hsync_timer(1);
-	update_vsync_timer(1);
-	update_vlt_timer(1);
-	update_curs_timer(1);
-	update_drb_timer(1);
+	timer_adjust_oneshot(m_hsync_timer, m_screen->time_until_pos(0, 0), 0);
+	timer_adjust_oneshot(m_vsync_timer, m_screen->time_until_pos(0, 0), 0);
+	timer_adjust_oneshot(m_vlt_timer, m_screen->time_until_pos(0, m_vlt_start), 1);
+	timer_adjust_oneshot(m_drb_timer, m_screen->time_until_pos(0, 0), 0);
 }
 
 
@@ -442,6 +551,7 @@ void crt9007_device::device_start()
 	m_vlt_timer = device_timer_alloc(*this, TIMER_VLT);
 	m_curs_timer = device_timer_alloc(*this, TIMER_CURS);
 	m_drb_timer = device_timer_alloc(*this, TIMER_DRB);
+	m_dma_timer = device_timer_alloc(*this, TIMER_DMA);
 
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_int_func, &m_config.out_int_func, this);
@@ -451,6 +561,9 @@ void crt9007_device::device_start()
 	devcb_resolve_write_line(&m_out_vlt_func, &m_config.out_vlt_func, this);
 	devcb_resolve_write_line(&m_out_curs_func, &m_config.out_curs_func, this);
 	devcb_resolve_write_line(&m_out_drb_func, &m_config.out_drb_func, this);
+	devcb_resolve_write_line(&m_out_cblank_func, &m_config.out_cblank_func, this);
+	devcb_resolve_write_line(&m_out_slg_func, &m_config.out_slg_func, this);
+	devcb_resolve_write_line(&m_out_sld_func, &m_config.out_sld_func, this);
 
 	// get the screen device
 	m_screen = machine->device<screen_device>(m_config.screen_tag);
@@ -479,7 +592,7 @@ void crt9007_device::device_reset()
 	devcb_call_write_line(&m_out_vs_func, 1);
 
 	// CBLANK = 1
-//	devcb_call_write_line(&m_out_cblank_func, 0);
+	devcb_call_write_line(&m_out_cblank_func, 0);
 
 	// CURS = 0
 	devcb_call_write_line(&m_out_curs_func, 0);
@@ -499,10 +612,10 @@ void crt9007_device::device_reset()
 	// 29 (WBEN) = 0
 
 	// 30 (SLG) = 0
-//	devcb_call_write_line(&m_out_slg_func, 0);
+	devcb_call_write_line(&m_out_slg_func, 0);
 
 	// 31 (SLD) = 0
-//	devcb_call_write_line(&m_out_sld_func, 0);
+	devcb_call_write_line(&m_out_sld_func, 0);
 
 	// 32 (LPSTB) = 0
 }
@@ -524,31 +637,89 @@ void crt9007_device::device_clock_changed()
 
 void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	int x = m_screen->hpos();
+	int y = m_screen->vpos();
+
 	switch (id)
 	{
 	case TIMER_HSYNC:
-		devcb_call_write_line(&m_out_hs_func, param);
+		m_hs = param;
+
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : HS %u\n", tag(), y, x, m_hs);
+
+		devcb_call_write_line(&m_out_hs_func, m_hs);
+
+		update_cblank_line();
+
 		update_hsync_timer(param);
 		break;
 
 	case TIMER_VSYNC:
+		m_vs = param;
+
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VS %u\n", tag(), y, x, m_vs);
+
 		devcb_call_write_line(&m_out_vs_func, param);
+
+		if (m_vs)
+		{
+			// reset all other bits except Light Pen Update to logic 0
+			m_status &= STATUS_LIGHT_PEN_UPDATE;
+		}
+		else
+		{
+			trigger_interrupt(IE_VERTICAL_RETRACE);
+
+			update_cblank_line();
+		}
+
 		update_vsync_timer(param);
 		break;
 
 	case TIMER_VLT:
+		m_vlt = param;
+
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VLT %u\n", tag(), y, x, m_vlt);
+
 		devcb_call_write_line(&m_out_vlt_func, param);
+
 		update_vlt_timer(param);
 		break;
 
 	case TIMER_CURS:
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CURS %u\n", tag(), y, x, param);
+
 		devcb_call_write_line(&m_out_curs_func, param);
+
 		update_curs_timer(param);
 		break;
 
 	case TIMER_DRB:
+		m_drb = param;
+
+		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : DRB %u\n", tag(), y, x, m_drb);
+
 		devcb_call_write_line(&m_out_drb_func, param);
+
+		if (!m_drb && !DMA_DISABLE)
+		{
+			// start DMA burst sequence
+			m_dma_count = CHARACTERS_PER_DATA_ROW;
+			m_dma_burst = DMA_BURST_COUNT ? (DMA_BURST_COUNT * 4) : CHARACTERS_PER_DATA_ROW;
+			m_dma_delay = DMA_BURST_DELAY;
+			m_dmar = 1;
+
+			if (LOG) logerror("CRT9007 '%s' DMAR 1\n", tag());
+			devcb_call_write_line(&m_out_dmar_func, ASSERT_LINE);
+		}
+
 		update_drb_timer(param);
+		break;
+
+	case TIMER_DMA:
+		readbyte(AUXILIARY_ADDRESS_2);
+
+		update_dma_timer();
 		break;
 	}
 }
@@ -584,6 +755,11 @@ READ8_MEMBER( crt9007_device::read )
 
 	case 0x3a:
 		data = m_status;
+
+		// reset interrupt pending bit
+		m_status &= ~STATUS_INTERRUPT_PENDING;
+		if (LOG) logerror("CRT9007 '%s' INT 0\n", tag());
+		devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
 		break;
 
 	case 0x3b:
@@ -592,6 +768,9 @@ READ8_MEMBER( crt9007_device::read )
 
 	case 0x3c:
 		data = HORIZONTAL_LIGHT_PEN;
+
+		// reset light pen update bit
+		m_status &= ~STATUS_LIGHT_PEN_UPDATE;
 		break;
 
 	default:
@@ -778,7 +957,15 @@ WRITE8_MEMBER( crt9007_device::write )
 
 WRITE_LINE_MEMBER( crt9007_device::ack_w )
 {
-	// TODO
+	if (LOG) logerror("CRT9007 '%s' ACK: %u\n", tag(), state);
+
+	if (m_dmar && !m_ack && state)
+	{
+		// start DMA transfer
+		timer_adjust_oneshot(m_dma_timer, ATTOTIME_IN_HZ(clock()), 0);
+	}
+
+	m_ack = state;
 }
 
 
@@ -788,7 +975,14 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 
 WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
 {
-	// TODO
+	if (LOG) logerror("CRT9007 '%s' LPSTB: %u\n", tag(), state);
+
+	if (!m_lpstb && state)
+	{
+		// TODO latch current row/column position
+	}
+
+	m_lpstb = state;
 }
 
 
