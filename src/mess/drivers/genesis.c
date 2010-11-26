@@ -75,6 +75,38 @@ static TIMER_CALLBACK( mess_io_timeout_timer_callback )
 	mess_io_stage[(int)(FPTR)ptr] = -1;
 }
 
+/* J-Cart controller port */
+
+static UINT8	jcart_io_data[2];
+
+WRITE16_HANDLER( jcart_ctrl_w )
+{
+	jcart_io_data[0] = (data & 1) << 6;
+	jcart_io_data[1] = (data & 1) << 6;
+}
+
+READ16_HANDLER( jcart_ctrl_r )
+{
+	UINT16	retdata = 0;
+	UINT8		joy[2];
+
+	if (jcart_io_data[0] & 0x40)
+	{
+		joy[0] = input_port_read_safe(space->machine, "JCART3_3B", 0);
+		joy[1] = input_port_read_safe(space->machine, "JCART4_3B", 0);
+		retdata = (jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+	}
+	else
+	{
+		joy[0] = ((input_port_read_safe(space->machine, "JCART3_3B", 0) & 0xc0) >> 2) |
+		  (input_port_read_safe(space->machine, "JCART3_3B", 0) & 0x03);
+		joy[1] = ((input_port_read_safe(space->machine, "JCART4_3B", 0) & 0xc0) >> 2) |
+		  (input_port_read_safe(space->machine, "JCART4_3B", 0) & 0x03);
+		retdata = (jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+	}
+	return retdata;
+}
+
 static void mess_init_6buttons_pad(running_machine *machine)
 {
 	int i;
@@ -243,6 +275,10 @@ static INPUT_PORTS_START( md )
 	PORT_CATEGORY_CLASS( 0xf0, 0x00, "Player 2 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 20 )
 	PORT_CATEGORY_ITEM( 0x10, "Joystick 6 Buttons", 21 )
+	PORT_CATEGORY_CLASS( 0xf00, 0x00, "Player 3 Controller (J-Cart)" )
+	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 30 )
+	PORT_CATEGORY_CLASS( 0xf000, 0x00, "Player 4 Controller (J-Cart)" )
+	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 40 )
 
 	PORT_START("PAD1_3B")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
@@ -263,6 +299,26 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") PORT_CATEGORY(20)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CATEGORY(20)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CATEGORY(20)
+
+	PORT_START("JCART3_3B")		/* Joypad 3 on J-Cart (3 button + start) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3) PORT_CATEGORY(30)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3) PORT_CATEGORY(30)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3) PORT_CATEGORY(30)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3) PORT_CATEGORY(30)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B") PORT_CATEGORY(30)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 C") PORT_CATEGORY(30)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A") PORT_CATEGORY(30)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(3) PORT_CATEGORY(30)
+
+	PORT_START("JCART4_3B")		/* Joypad 4 on J-Cart (3 button + start) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4) PORT_CATEGORY(40)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4) PORT_CATEGORY(40)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4) PORT_CATEGORY(40)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4) PORT_CATEGORY(40)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B") PORT_CATEGORY(40)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 C") PORT_CATEGORY(40)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A") PORT_CATEGORY(40)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(4) PORT_CATEGORY(40)
 
 	PORT_START("PAD1_6B")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)

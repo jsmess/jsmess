@@ -328,6 +328,454 @@ Known undumped pirates
 -->
 	</software>
 
+	<software name="advbatr">
+		<description>The Adventures of Batman &amp; Robin (Euro)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-18019.ic1" size="2097152" crc="355e8c39" sha1="c08c48236c38263df8ea38a5820d16644bddb1a2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advemm">
+		<description>The Adventures of Mighty Max (Euro)</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17434.ic1" size="1048576" crc="24f1a3bb" sha1="e60eec1d39b32ce5cc2125cffd3016b4070a65c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alexkidd">
+		<description>Alex Kidd in the Enchanted Castle (Euro, Rev. A)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="262144">
+				<rom name="mpr-12608a.ic1" size="262144" crc="778a0f00" sha1="b7e96b33ab1715fe265ed0de81a26dde969698d5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alisiad">
+		<description>Alisia Dragoon (Euro)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14680.ic1" size="1048576" crc="28165bd1" sha1="c8a3667631fdbd4d0073e42ada9f7199d09c0cfa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andreaga">
+		<description>Andre Agassi Tennis (Euro)</description>
+		<year>1992</year>
+		<publisher>Tecmagik</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-15488.ic1" size="524288" crc="224256c7" sha1="70fa6185a4ebbbc9a6b2c7428c489ba5303859b0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anotherw">
+		<description>Another World (Euro)</description>
+		<year>1991</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-15498.ic1" size="1048576" crc="e9742041" sha1="9d98d6817b3e3651837bb2692f7a2a60a608c055" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadecl">
+		<description>Arcade Classics (Euro, USA)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18815.ic1" size="524288" crc="8aed2090" sha1="ec29aec7848dbcea6678adb4b31deba0a6ecf1e2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artalive">
+		<description>Art Alive (World)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5927" />
+			<dataarea name="rom" size="131072">
+				<rom name="mpr-14384.ic1" size="131072" crc="f1b72cdd" sha1="2c57e38592a206a1847e9e202341595832798587" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sor">
+		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World, Rev. A)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14125a.ic1" size="524288" crc="4052e845" sha1="731cdf182fe647e4977477ba4dd2e2b46b9b878a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sora" cloneof="sor">
+		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14125.ic1" size="524288" crc="bff227c6" sha1="3d74dbc81f3472a5bde45bf265e636a72a314667" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman">
+		<description>Batman (Euro)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14561.ic1" size="524288" crc="61c60c35" sha1="c7279c6d45e6533f9de14f65098c289b7534beb3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ferrari">
+		<description>Ferrari Grand Prix Challenge (Euro, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14770a.ic1" size="1048576" crc="250111df" sha1="0e33965994a6f53aca93c3cb164726b913789fc1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: G-4503 -->
+	<software name="gameto">
+		<description>Game Toshokan (Jpn, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5878" />
+			<dataarea name="rom" size="131072">
+				<rom name="mpr-12750a.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghouls">
+		<description>Ghouls 'n Ghosts (Euro, USA, Kor, Rev. A)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5841" />
+			<dataarea name="rom" size="655360">
+				<rom name="mpr-12605a.ic1" size="131072" crc="d367c3cc" sha1="4c2c8fcf0219c6129650cf59a47d8edeb844e2df" offset="000000" />
+				<rom name="mpr-12606a.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="020000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghouls1" cloneof="ghouls">
+		<description>Ghouls 'n Ghosts (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5841" />
+			<dataarea name="rom" size="655360">
+				<rom name="mpr-12605.ic1" size="131072" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="000000" />
+				<rom name="mpr-12606.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="020000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghw">
+		<description>Greatest Heavyweights (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6584A" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-16211.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homea">
+		<description>Home Alone (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14996.ic1" size="524288" crc="aa0d4387" sha1="c3794ef25d53cb7811dd0df73ba6fadd4cecb116" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incred">
+		<description>The Incredible Crash Dummies (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16259.ic1" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemont2a" cloneof="joemont2">
+		<description>Joe Montana II Sports Talk Football (World)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14356.ic1" size="1048576" crc="f2363a4a" sha1="3925623fafb79a7e8467e9b6fe70361c147cbfd3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talmit">
+		<description>Talmit's Adventure (Euro)</description>
+		<year>1991</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="837-8861" />
+			<dataarea name="rom" size="1048576">
+				<rom name="talmit's adventure (euro).bin" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mvlndj" cloneof="talmit">
+		<description>Marvel Land (Jpn)</description>
+		<year>1991</year>
+		<publisher>Namcot</publisher>
+		<part name="cart" interface="megadriv_cart">
+		  <!-- PCB serial isn't present -->
+			<dataarea name="rom" size="1048576">
+				<rom name="LROG452-MML.bin" size="1048576" crc="5d162d21" sha1="2f7ef2f956d62373dcd5f3808e7501e3660c0658" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megabomb">
+		<description>Mega Bomberman (Euro, Kor)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17108.ic1" size="1048576" crc="54ab3beb" sha1="01f76e2f719bdae5f21ff0e5a1ac1262c2def279" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaga63">
+		<description>Mega Games 6 Vol. 3 (Euro)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-7147A" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mpr-18871.ic1" size="3145728" crc="fe3e7e4f" sha1="cca818d624e95c2d07cfc1b22c44eb53e4bdcd02" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microm2">
+		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SRJCV2-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mdm_2bead.bin" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micro96">
+		<description>Micro Machines Turbo Tournament 96 (Euro, v1.1, J-Cart)</description>
+		<year>1995</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SRJCV2-2" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mm96mdeddb.bin" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psampras">
+		<description>Pete Sampras Tennis (Euro, USA, J-Cart)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SRJCV1-2" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mdst6636.bin" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pstar2">
+		<description>Phantasy Star II (Euro, USA, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5921" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-12851a.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
+				<rom name="mpr-12852a.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="080000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shinfrc2">
+		<description>Shining Force II (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6278A" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-16933.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smurfs">
+		<description>The Smurfs (Euro, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Infogrammes</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17019a.ic1" size="1048576" crc="88b30eff" sha1="0da7e621e05dc9160122d728e1fca645ff11e670" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soleils" cloneof="soleil">
+		<description>Soleil (Spa)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6278A" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-17512.ic1" size="2097152" crc="9ed4c323" sha1="95ae529cecb7dbca281df25c3c4e7cb8f48d936c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic3">
+		<description>Sonic the Hedgehog 3 (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6658A" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-16342.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soniccmp1" cloneof="soniccmp">
+		<description>Sonic Compilation (Euro, Earlier)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mpr-18203+mpr-18204.bin" size="3145728" crc="8c70b84e" sha1="109e6d7b31d00fbdb9d4ecb304d4ea19e96c8607" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspin">
+		<description>Sonic Spinball (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16077.ic1" size="1048576" crc="aea0786d" sha1="f61a568314133b60de82ac162b5b52473adc9e1c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharr">
+		<description>Space Harrier II (World)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" /> <!-- Also exist on a 171-6242A -->
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12355.ic1" size="524288" crc="e5c9cbb0" sha1="db4285e4ffb69aa9f1ca68c4103fbfd0843f7b86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smgp">
+		<description>Super Monaco GP (Euro, Jpn, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13250a.ic1" size="524288" crc="be91b28a" sha1="1e49a449367f0ec7ba0331b7b0d074f796e48d58" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssmashtv">
+		<description>Super Smash TV (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-15040.ic1" size="524288" crc="f22412b6" sha1="0459f7c61f152fa0afa98d96ef9fbe4964641f34" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addamfam">
+		<description>The Addams Family (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16147.ic1" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Old scrambled/interleaved dumps -->
 	<software name="12in1">
 		<description>12-in-1</description>
@@ -516,17 +964,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="addamfam">
-		<description>The Addams Family (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16147.bin" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="addamfamp" cloneof="addamfam">
 		<description>The Addams Family (USA, Prototype)</description>
 		<year>199?</year>
@@ -556,17 +993,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13842a.bin" size="1048576" crc="e0d5e18a" sha1="842430c0465d810576e75851023929fec873580d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="advbatr">
-		<description>The Adventures of Batman &amp; Robin (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-18019.bin" size="2097152" crc="355e8c39" sha1="c08c48236c38263df8ea38a5820d16644bddb1a2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -710,17 +1136,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (usa).bin" size="2097152" crc="0caaa4ac" sha1="1da4b3fc92a6572e70d748ebad346aeb291f89f3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="advemm">
-		<description>The Adventures of Mighty Max (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="adventures of mighty max, the (euro).bin" size="1048576" crc="24f1a3bb" sha1="e60eec1d39b32ce5cc2125cffd3016b4070a65c3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -978,17 +1393,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="alexkidd">
-		<description>Alex Kidd in the Enchanted Castle (Euro, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="mpr-12608a.bin" size="262144" crc="778a0f00" sha1="b7e96b33ab1715fe265ed0de81a26dde969698d5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alexkidd1" cloneof="alexkidd">
 		<description>Alex Kidd in the Enchanted Castle (Euro)</description>
 		<year>199?</year>
@@ -1088,17 +1492,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="alisiad">
-		<description>Alisia Dragoon (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="alisia dragoon (euro).bin" size="1048576" crc="28165bd1" sha1="c8a3667631fdbd4d0073e42ada9f7199d09c0cfa" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alisiadj" cloneof="alisiad">
 		<description>Alisia Dragoon (Jpn)</description>
 		<year>199?</year>
@@ -1165,17 +1558,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="andreaga">
-		<description>Andre Agassi Tennis (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-15488.bin" size="524288" crc="224256c7" sha1="70fa6185a4ebbbc9a6b2c7428c489ba5303859b0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="andreagau" cloneof="andreaga">
 		<description>Andre Agassi Tennis (USA)</description>
 		<year>199?</year>
@@ -1216,17 +1598,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="animaniacs (usa).bin" size="1048576" crc="86224d86" sha1="7e9d70b5172b4ea9e1b3f5b6009325fa39315a7c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="anotherw">
-		<description>Another World (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="another world (euro).bin" size="1048576" crc="e9742041" sha1="9d98d6817b3e3651837bb2692f7a2a60a608c055" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1282,17 +1653,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aqua01.bin" size="524288" crc="400f4ba7" sha1="3bbd0853099f655cd33b52d32811f8ccb64b0418" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arcadecl">
-		<description>Arcade Classics (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-18815.bin" size="524288" crc="8aed2090" sha1="ec29aec7848dbcea6678adb4b31deba0a6ecf1e2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1381,17 +1741,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="arrow flash (world) (alt).bin" size="524288" crc="4d89e66b" sha1="916524d2b403a633108cf457eec13b4df7384d95" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="artalive">
-		<description>Art Alive (World)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="mpr-14384.bin" size="131072" crc="f1b72cdd" sha1="2c57e38592a206a1847e9e202341595832798587" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1965,17 +2314,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bass masters classic - pro edition (usa).bin" size="2097152" crc="9eddeb3d" sha1="9af4f7138d261122dfbc88c8afcbc769ce923816" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batman">
-		<description>Batman (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14561.bin" size="524288" crc="61c60c35" sha1="c7279c6d45e6533f9de14f65098c289b7534beb3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6969,17 +7307,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="ferrari">
-		<description>Ferrari Grand Prix Challenge (Euro, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14770a.bin" size="1048576" crc="250111df" sha1="0e33965994a6f53aca93c3cb164726b913789fc1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ferrarip" cloneof="ferrari">
 		<description>Ferrari Grand Prix Challenge (Prototype)</description>
 		<year>199?</year>
@@ -7706,28 +8033,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="ghouls">
-		<description>Ghouls 'n Ghosts (Euro, USA, Kor, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="655360">
-				<rom name="mpr-12605a+mpr-12606a.bin" size="655360" crc="4f2561d5" sha1="aab6d20f01db51576b1d7cafab46e613dddf7f8a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ghouls1" cloneof="ghouls">
-		<description>Ghouls 'n Ghosts (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="655360">
-				<rom name="mpr-12605+mpr-12606.bin" size="655360" crc="d31bd910" sha1="3a3e9eb5caaf6cfb75e99ed2843d58b3dda7284f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="daimakai" cloneof="ghouls">
 		<description>Dai Makaimura (Jpn)</description>
 		<year>199?</year>
@@ -8012,17 +8317,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="great waldo search, the (usa).bin" size="1048576" crc="8c5c93b8" sha1="fe7601c92a67fb4deec28164c5fb0516ef0058c4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ghw">
-		<description>Greatest Heavyweights (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16211.bin" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8390,17 +8684,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="homea">
-		<description>Home Alone (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14996.bin" size="524288" crc="aa0d4387" sha1="c3794ef25d53cb7811dd0df73ba6fadd4cecb116" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="homeap" cloneof="homea">
 		<description>Home Alone (USA, Prototype)</description>
 		<year>199?</year>
@@ -8618,17 +8901,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="wizard of the immortal (jpn).bin" size="2097152" crc="c99fad92" sha1="f36d088c37bbdcf473615b23e1cb21c0b70d8f05" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="incred">
-		<description>The Incredible Crash Dummies (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16259.bin" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9125,17 +9397,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14356a.bin" size="1048576" crc="a45da893" sha1="ce006ff3b9bcd71fef4591a63a80d887004abe77" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="joemont2a" cloneof="joemont2">
-		<description>Joe Montana II Sports Talk Football (World)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14356.bin" size="1048576" crc="f2363a4a" sha1="3925623fafb79a7e8467e9b6fe70361c147cbfd3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10859,17 +11120,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="megabomb">
-		<description>Mega Bomberman (Euro, Kor)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17108.bin" size="1048576" crc="54ab3beb" sha1="01f76e2f719bdae5f21ff0e5a1ac1262c2def279" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="megabombu" cloneof="megabomb">
 		<description>Mega Bomberman (USA)</description>
 		<year>199?</year>
@@ -10943,17 +11193,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="mega games 6 vol. 2 (euro).bin" size="3145728" crc="e8d10db9" sha1="1fc777b946874216add624414ef6f5878bab202b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="megaga63">
-		<description>Mega Games 6 Vol. 3 (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18871.bin" size="3145728" crc="fe3e7e4f" sha1="cca818d624e95c2d07cfc1b22c44eb53e4bdcd02" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11288,17 +11527,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="micro96">
-		<description>Micro Machines Turbo Tournament 96 (Euro, v1.1, J-Cart)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mm96mdeddb.bin" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="micro96a" cloneof="micro96">
 		<description>Micro Machines Turbo Tournament 96 (Euro, J-Cart)</description>
 		<year>199?</year>
@@ -11306,17 +11534,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mm96md7cc3.bin" size="1048576" crc="7492b1de" sha1="9f47fcc7bb2f5921cb1c3beb06b668ffb292cb08" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="microm2">
-		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mdm_2bead.bin" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13930,17 +14147,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="psampras">
-		<description>Pete Sampras Tennis (Euro, USA, J-Cart)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mdst6636.bin" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="psampras1" cloneof="psampras">
 		<description>Pete Sampras Tennis (Euro, USA, J-Cart, Alt)</description>
 		<year>199?</year>
@@ -14036,17 +14242,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pga tour golf iii (euro, usa).bin" size="2097152" crc="aeb3f65f" sha1="702707efcbfe229f6e190f2b6c71b6f53ae9ec36" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pstar2">
-		<description>Phantasy Star II (Euro, USA, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="786432">
-				<rom name="mpr-12851a+mpr-12852a.bin" size="786432" crc="904fa047" sha1="0711080e968490a6b8c5fafbb9db3e62ba597231" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16540,17 +16735,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="shinfrc2">
-		<description>Shining Force II (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16933.bin" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shinfrc2j" cloneof="shinfrc2">
 		<description>Shining Force II - Koe no Fuuin (Jpn)</description>
 		<year>199?</year>
@@ -16947,17 +17131,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="smurfs">
-		<description>The Smurfs (Euro, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17019a.bin" size="1048576" crc="88b30eff" sha1="0da7e621e05dc9160122d728e1fca645ff11e670" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smurfs2">
 		<description>The Smurfs Travel the World (Euro)</description>
 		<year>199?</year>
@@ -17053,17 +17226,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="soleil (germany).bin" size="2097152" crc="332b9ecd" sha1="65c8b7ab94b05812d009b4bebda3c49891a6bfbe" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="soleils" cloneof="soleil">
-		<description>Soleil (Spa)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="soleil (spain).bin" size="2097152" crc="9ed4c323" sha1="95ae529cecb7dbca281df25c3c4e7cb8f48d936c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17431,17 +17593,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="soniccmp1" cloneof="soniccmp">
-		<description>Sonic Compilation (Euro, Earlier)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18203+mpr-18204.bin" size="3145728" crc="8c70b84e" sha1="109e6d7b31d00fbdb9d4ecb304d4ea19e96c8607" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scrack">
 		<description>Sonic Crackers (Jpn, Prototype)</description>
 		<year>199?</year>
@@ -17482,17 +17633,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="sonic jam 6 (unl) (pirate).bin" size="2097152" crc="04f0c93e" sha1="a9e316ccde5b71f6aa85485b6897c1cfc780742d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sspin">
-		<description>Sonic Spinball (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16077.bin" size="1048576" crc="aea0786d" sha1="f61a568314133b60de82ac162b5b52473adc9e1c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17706,17 +17846,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="sonic3">
-		<description>Sonic the Hedgehog 3 (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16342.bin" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sonic3j" cloneof="sonic3">
 		<description>Sonic the Hedgehog 3 (Jpn, Kor)</description>
 		<year>199?</year>
@@ -17801,17 +17930,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="soul blade (unl).bin" size="4194304" crc="f26f88d1" sha1="7714e01819ab4a0f424d7e306e9f891031d053a8" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sharr">
-		<description>Space Harrier II (World)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-12355.bin" size="524288" crc="e5c9cbb0" sha1="db4285e4ffb69aa9f1ca68c4103fbfd0843f7b86" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18366,17 +18484,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="storythof" cloneof="storytho">
-		<description>La Legende de Thor (Fra)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="mpr-17720+mpr-17721.bin" size="3145728" crc="b97cca1c" sha1="677e1fbf2f6f90dd5a016f3bd5f305547249205a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="storythog" cloneof="storytho">
 		<description>The Story of Thor (Ger)</description>
 		<year>199?</year>
@@ -18551,28 +18658,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="street smart (usa, jpn).bin" size="524288" crc="b1dedfad" sha1="a9cb2295b9cd42475904cba19b983e075a1b6014" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sor">
-		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14125a.bin" size="524288" crc="4052e845" sha1="731cdf182fe647e4977477ba4dd2e2b46b9b878a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sora" cloneof="sor">
-		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14125.bin" size="524288" crc="bff227c6" sha1="3d74dbc81f3472a5bde45bf265e636a72a314667" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19286,17 +19371,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="smgp">
-		<description>Super Monaco GP (Euro, Jpn, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13250a.bin" size="524288" crc="be91b28a" sha1="1e49a449367f0ec7ba0331b7b0d074f796e48d58" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smgp1" cloneof="smgp">
 		<description>Super Monaco GP (Euro, Jpn)</description>
 		<year>199?</year>
@@ -19381,17 +19455,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="super skidmarks (euro) (beta).bin" size="2097152" crc="a61a0f0c" sha1="1ec5fb1e7c8adfaf147271bd40454826fffed13e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ssmashtv">
-		<description>Super Smash TV (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-15040.bin" size="524288" crc="f22412b6" sha1="0459f7c61f152fa0afa98d96ef9fbe4964641f34" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19693,17 +19756,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="talmit">
-		<description>Talmit's Adventure (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="talmit's adventure (euro).bin" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mvlnd" cloneof="talmit">
 		<description>Marvel Land (USA)</description>
 		<year>199?</year>
@@ -19711,17 +19763,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="marvel land (usa).bin" size="1048576" crc="cd7eeeb7" sha1="29f290c80f992542e73c9ea95190403cb262b6ad" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mvlndj" cloneof="talmit">
-		<description>Marvel Land (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="marvel land (jpn).bin" size="1048576" crc="5d162d21" sha1="2f7ef2f956d62373dcd5f3808e7501e3660c0658" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23842,18 +23883,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="flux (euro).bin" size="262144" crc="2a1da08c" sha1="6357f38db012278bc889c77c5780a82d535760fd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Id: G-4503 -->
-	<software name="gameto">
-		<description>Game Toshokan (Jpn, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="mpr-12750a.bin" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

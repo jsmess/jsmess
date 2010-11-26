@@ -4,11 +4,11 @@
 
   Machine file to handle emulation of the Sega Mega Drive & Genesis.
 
-	i2c games mapping table:
+    i2c games mapping table:
 
-	game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
-	----------------------------------|------------|------------|------------|----------------|-----------|
-	NBA Jam                           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x00ff (24C02) |   0x03    | xx
+    game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
+    ----------------------------------|------------|------------|------------|----------------|-----------|
+    NBA Jam                           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x00ff (24C02) |   0x03    | xx
     NBA Jam TE                        | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | xx
     NBA Jam TE (32x)                  | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |
     NFL Quarterback Club              | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | xx
@@ -28,8 +28,8 @@
     Brian Lara Cricket 96             | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x1fff (24C64) |   0x??*   |
     ----------------------------------|------------|------------|------------|----------------|-----------|
 
-	* Notes: check these
-	** original Rockman Mega World (J) set uses normal backup RAM
+    * Notes: check these
+    ** original Rockman Mega World (J) set uses normal backup RAM
 
     2008-09: Moved here cart code and custom mapper handlers. Hopefully,
         it will make painless the future merging with HazeMD
@@ -50,6 +50,7 @@
 
 #include "devices/cartslot.h"
 #include "includes/genesis.h"
+#include "genesis_pcb.h"
 
 
 #define MAX_MD_CART_SIZE 0x500000
@@ -676,7 +677,7 @@ static UINT8 i2c_mem,i2c_clk;
 
 static READ16_HANDLER( nba_jam_eeprom_r )
 {
-// 	i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+//  i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
 	return i2c_mem & 1;
 }
@@ -686,13 +687,13 @@ static WRITE16_HANDLER( nba_jam_eeprom_w )
 	i2c_clk = (data & 0x0002) >> 1;
 	i2c_mem = (data & 0x0001);
 
-//	i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
-//	i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
+//  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
+//  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
 
 static READ16_HANDLER( nba_jam_te_eeprom_r )
 {
-// 	i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+//  i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
 	return (i2c_mem & 1);
 }
@@ -702,13 +703,13 @@ static WRITE16_HANDLER( nba_jam_te_eeprom_w )
 	i2c_clk = ((data & 0x0100) >> 8);
 	i2c_mem = data & 0x0001;
 
-//	i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
-//	i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
+//  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
+//  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
 
 static READ16_HANDLER( ea_nhlpa_eeprom_r )
 {
-// 	i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+//  i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
 	return (i2c_mem & 1) << 7;
 }
@@ -718,14 +719,14 @@ static WRITE16_HANDLER( ea_nhlpa_eeprom_w )
 	i2c_clk = ((data & 0x0040) >> 6);
 	i2c_mem = ((data & 0x0080) >> 7);
 
-//	i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
-//	i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
+//  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
+//  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
 
 /* TODO: identical as NBA Jam, used as kludge */
 static READ16_HANDLER( wboy_v_eeprom_r )
 {
-// 	i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+//  i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
 	return ~i2c_mem & 1;
 }
@@ -735,13 +736,13 @@ static WRITE16_HANDLER( wboy_v_eeprom_w )
 	i2c_clk = (data & 0x0002) >> 1;
 	i2c_mem = (data & 0x0001);
 
-//	i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
-//	i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
+//  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
+//  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
 
 static READ16_HANDLER( codemasters_eeprom_r )
 {
-// 	i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+//  i2c_mem = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
 	return (i2c_mem & 1) << 7;
 }
@@ -751,8 +752,8 @@ static WRITE16_HANDLER( codemasters_eeprom_w )
 	i2c_clk = (data & 0x0200) >> 9;
 	i2c_mem = (data & 0x0100) >> 8;
 
-//	i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
-//	i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
+//  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
+//  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
 
 /*************************************
@@ -1136,116 +1137,118 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char fliptemp;
 #endif
 
-	rawROM = memory_region(image.device().machine, "maincpu");
-	ROM = rawROM /*+ 512 */;
-
-	genesis_last_loaded_image_length = -1;
-
-	if (image.software_entry() == NULL)
-		length = image.fread( rawROM + 0x2000, 0x600000);
-	else
-	{
-		length = image.get_software_region_length("rom");
-		memcpy(rawROM + 0x2000, image.get_software_region("rom"), length);
-	}
-
-	logerror("image length = 0x%x\n", length);
-
-	/* is this a SMD file? */
-	if (genesis_is_SMD(&rawROM[0x2200], (unsigned)length))
-	{
-		tmpROMnew = ROM;
-		tmpROM = ROM + 0x2000 + 512;
-
-		for (ptr = 0; ptr < MAX_MD_CART_SIZE / (8192); ptr += 2)
-		{
-			for (x = 0; x < 8192; x++)
-			{
-				*tmpROMnew++ = *(tmpROM + ((ptr + 1) * 8192) + x);
-				*tmpROMnew++ = *(tmpROM + ((ptr + 0) * 8192) + x);
-			}
-		}
-
-#ifdef LSB_FIRST
-		tmpROMnew = ROM;
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-			fliptemp = tmpROMnew[ptr];
-			tmpROMnew[ptr] = tmpROMnew[ptr + 1];
-			tmpROMnew[ptr + 1] = fliptemp;
-		}
-#endif
-		genesis_last_loaded_image_length = length - 512;
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
-
-		relocate = 0;
-
-	}
-
-	/* is this a MD file? */
-	else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
-				(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
-	{
-		tmpROMnew = (unsigned char *)osd_malloc(length);
-		secondhalf = &tmpROMnew[length >> 1];
-
-		if (!tmpROMnew)
-		{
-			logerror("Memory allocation failed reading roms!\n");
-			return IMAGE_INIT_FAIL;
-		}
-
-		memcpy(tmpROMnew, ROM + 0x2000, length);
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-
-			ROM[ptr] = secondhalf[ptr >> 1];
-			ROM[ptr + 1] = tmpROMnew[ptr >> 1];
-		}
-		free(tmpROMnew);
-
-#ifdef LSB_FIRST
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-			fliptemp = ROM[ptr];
-			ROM[ptr] = ROM[ptr+1];
-			ROM[ptr+1] = fliptemp;
-		}
-#endif
-		genesis_last_loaded_image_length = length;
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
-		relocate = 0;
-
-	}
-
-	/* BIN it is, then */
-	else
-	{
-		relocate = 0x2000;
-		genesis_last_loaded_image_length = length;
-
-		for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)		/* mangle bytes for little endian machines */
-		{
-#ifdef LSB_FIRST
-			int temp = ROM[relocate + ptr];
-
-			ROM[ptr] = ROM[relocate + ptr + 1];
-			ROM[ptr + 1] = temp;
-#else
-			ROM[ptr] = ROM[relocate + ptr];
-			ROM[ptr + 1] = ROM[relocate + ptr + 1];
-#endif
-		}
-
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
-	}
-
-	/* Default cartridge type */
+	genesis_sram = NULL;
+	sram_detected = 0;
+	genesis_sram_start = genesis_sram_end = 0;
+	has_serial_eeprom = 0;
 	cart_type = STANDARD;
 
-	/* Detect carts which need additional handlers */
+	if (image.software_entry() == NULL)
 	{
-		static const unsigned char smouse_sig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02 },
+		rawROM = memory_region(image.device().machine, "maincpu");
+		ROM = rawROM /*+ 512 */;
+
+		genesis_last_loaded_image_length = -1;
+
+		length = image.fread( rawROM + 0x2000, 0x600000);
+
+		logerror("image length = 0x%x\n", length);
+
+		/* is this a SMD file? */
+		if (genesis_is_SMD(&rawROM[0x2200], (unsigned)length))
+		{
+			tmpROMnew = ROM;
+			tmpROM = ROM + 0x2000 + 512;
+
+			for (ptr = 0; ptr < MAX_MD_CART_SIZE / (8192); ptr += 2)
+			{
+				for (x = 0; x < 8192; x++)
+				{
+					*tmpROMnew++ = *(tmpROM + ((ptr + 1) * 8192) + x);
+					*tmpROMnew++ = *(tmpROM + ((ptr + 0) * 8192) + x);
+				}
+			}
+
+#ifdef LSB_FIRST
+			tmpROMnew = ROM;
+			for (ptr = 0; ptr < length; ptr += 2)
+			{
+				fliptemp = tmpROMnew[ptr];
+				tmpROMnew[ptr] = tmpROMnew[ptr + 1];
+				tmpROMnew[ptr + 1] = fliptemp;
+			}
+#endif
+			genesis_last_loaded_image_length = length - 512;
+			memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+
+			relocate = 0;
+
+		}
+
+		/* is this a MD file? */
+		else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
+				 (rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
+		{
+			tmpROMnew = (unsigned char *)osd_malloc(length);
+			secondhalf = &tmpROMnew[length >> 1];
+
+			if (!tmpROMnew)
+			{
+				logerror("Memory allocation failed reading roms!\n");
+				return IMAGE_INIT_FAIL;
+			}
+
+			memcpy(tmpROMnew, ROM + 0x2000, length);
+			for (ptr = 0; ptr < length; ptr += 2)
+			{
+
+				ROM[ptr] = secondhalf[ptr >> 1];
+				ROM[ptr + 1] = tmpROMnew[ptr >> 1];
+			}
+			free(tmpROMnew);
+
+#ifdef LSB_FIRST
+			for (ptr = 0; ptr < length; ptr += 2)
+			{
+				fliptemp = ROM[ptr];
+				ROM[ptr] = ROM[ptr+1];
+				ROM[ptr+1] = fliptemp;
+			}
+#endif
+			genesis_last_loaded_image_length = length;
+			memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+			relocate = 0;
+
+		}
+
+		/* BIN it is, then */
+		else
+		{
+			relocate = 0x2000;
+			genesis_last_loaded_image_length = length;
+
+			for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)		/* mangle bytes for little endian machines */
+			{
+#ifdef LSB_FIRST
+				int temp = ROM[relocate + ptr];
+
+				ROM[ptr] = ROM[relocate + ptr + 1];
+				ROM[ptr + 1] = temp;
+#else
+				ROM[ptr] = ROM[relocate + ptr];
+				ROM[ptr + 1] = ROM[relocate + ptr + 1];
+#endif
+			}
+
+			memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+		}
+
+		/* Default cartridge type */
+		cart_type = STANDARD;
+
+		/* Detect carts which need additional handlers */
+		{
+		  static const unsigned char smouse_sig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02 },
 			mjlover_sig[]	= { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00 }, // move.b  ($400000).l,($FFFF0C).l (partial)
 			squir_sig[]		= { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa },
 			bugsl_sig[]		= { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff },
@@ -1266,218 +1269,267 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			radica_sig[]	= { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
 			soulb_sig[]		= { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 			s19in1_sig[]	= { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
-			rockman_sig[] 	= { 0xea, 0x80 };
+			rockman_sig[]	= { 0xea, 0x80 };
 
-		switch (genesis_last_loaded_image_length)
-		{
+			switch (genesis_last_loaded_image_length)
+			{
 			case 0x80000:
-				if (!allendianmemcmp(&ROM[0x08c8], &smouse_sig[0], sizeof(smouse_sig)))
-					cart_type = SMOUSE;
+			    if (!allendianmemcmp(&ROM[0x08c8], &smouse_sig[0], sizeof(smouse_sig)))
+				cart_type = SMOUSE;
 
-				if (!allendianmemcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
-					!allendianmemcmp((char *)&ROM[0x7e100], "SEGA", 4) ||
-					!allendianmemcmp((char *)&ROM[0x7e1e6], "SEGA", 4))
-						cart_type = REALTEC;
+			    if (!allendianmemcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
+				!allendianmemcmp((char *)&ROM[0x7e100], "SEGA", 4) ||
+				!allendianmemcmp((char *)&ROM[0x7e1e6], "SEGA", 4))
+				cart_type = REALTEC;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
-					cart_type = EA_NHLPA;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
+				cart_type = EA_NHLPA;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
-					cart_type = WBOY_V;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
+				cart_type = WBOY_V;
 
-				break;
+			    break;
 
 			case 0xc0000:
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
-					cart_type = WBOY_V;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
+				cart_type = WBOY_V;
 
-				break;
+			    break;
 
 			case 0x100000:
-				if (!allendianmemcmp(&ROM[0x01b24], &mjlover_sig[0], sizeof(mjlover_sig)))
-					cart_type = MJLOVER;
+			    if (!allendianmemcmp(&ROM[0x01b24], &mjlover_sig[0], sizeof(mjlover_sig)))
+				cart_type = MJLOVER;
 
-				if (!allendianmemcmp(&ROM[0x03b4], &squir_sig[0], sizeof(squir_sig)))
-					cart_type = SQUIRRELK;
+			    if (!allendianmemcmp(&ROM[0x03b4], &squir_sig[0], sizeof(squir_sig)))
+				cart_type = SQUIRRELK;
 
-				if (!allendianmemcmp(&ROM[0xee0d0], &bugsl_sig[0], sizeof(bugsl_sig)))
-					cart_type = BUGSLIFE;
+			    if (!allendianmemcmp(&ROM[0xee0d0], &bugsl_sig[0], sizeof(bugsl_sig)))
+				cart_type = BUGSLIFE;
 
-				if (!allendianmemcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
-					cart_type = ELFWOR;
+			    if (!allendianmemcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
+				cart_type = ELFWOR;
 
-				if (!allendianmemcmp(&ROM[0x123e4], &sbub_sig[0], sizeof(sbub_sig)))
-					cart_type = SBUBBOB;
+			    if (!allendianmemcmp(&ROM[0x123e4], &sbub_sig[0], sizeof(sbub_sig)))
+				cart_type = SBUBBOB;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
-					cart_type = EA_NHLPA;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
+				cart_type = EA_NHLPA;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
-					cart_type = WBOY_V;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
+				cart_type = WBOY_V;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
-					cart_type = CODE_MASTERS;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
+				cart_type = CODE_MASTERS;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
-					cart_type = CODE_MASTERS;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
+				cart_type = CODE_MASTERS;
 
-				if (!allendianmemcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
-					cart_type = CODE_MASTERS;
-				break;
+			    if (!allendianmemcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
+				cart_type = CODE_MASTERS;
+			    break;
 
 			case 0x200000:
-				if (!allendianmemcmp(&ROM[0x18c6], &lk3_sig[0], sizeof(lk3_sig)))
-					cart_type = LIONK3;
+			    if (!allendianmemcmp(&ROM[0x18c6], &lk3_sig[0], sizeof(lk3_sig)))
+				cart_type = LIONK3;
 
-				if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
-					cart_type = SKINGKONG;
+			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
+				cart_type = SKINGKONG;
 
-				if (!allendianmemcmp(&ROM[0xce560], &redcliff_sig[0], sizeof(redcliff_sig)))
-					cart_type = REDCLIFF;
+			    if (!allendianmemcmp(&ROM[0xce560], &redcliff_sig[0], sizeof(redcliff_sig)))
+				cart_type = REDCLIFF;
 
-				if (!allendianmemcmp(&ROM[0xc8cb0], &smb_sig[0], sizeof(smb_sig)))
-					cart_type = SMB;
+			    if (!allendianmemcmp(&ROM[0xc8cb0], &smb_sig[0], sizeof(smb_sig)))
+				cart_type = SMB;
 
-				if (!allendianmemcmp(&ROM[0xf24d6], &smb2_sig[0], sizeof(smb2_sig)))
-					cart_type = SMB2;
+			    if (!allendianmemcmp(&ROM[0xf24d6], &smb2_sig[0], sizeof(smb2_sig)))
+				cart_type = SMB2;
 
-				if (!allendianmemcmp(&ROM[0x674e], &kaiju_sig[0], sizeof(kaiju_sig)))
-					cart_type = KAIJU;
+			    if (!allendianmemcmp(&ROM[0x674e], &kaiju_sig[0], sizeof(kaiju_sig)))
+				cart_type = KAIJU;
 
-				if (!allendianmemcmp(&ROM[0x1780], &chifi3_sig[0], sizeof(chifi3_sig)))
-					cart_type = CHINFIGHT3;
+			    if (!allendianmemcmp(&ROM[0x1780], &chifi3_sig[0], sizeof(chifi3_sig)))
+				cart_type = CHINFIGHT3;
 
-				if (!allendianmemcmp(&ROM[0x03c2], &lionk2_sig[0], sizeof(lionk2_sig)))
-					cart_type = LIONK2;
+			    if (!allendianmemcmp(&ROM[0x03c2], &lionk2_sig[0], sizeof(lionk2_sig)))
+				cart_type = LIONK2;
 
-				if (!allendianmemcmp(&ROM[0xc8b90], &rx3_sig[0], sizeof(rx3_sig)))
-					cart_type = ROCKMANX3;
+			    if (!allendianmemcmp(&ROM[0xc8b90], &rx3_sig[0], sizeof(rx3_sig)))
+				cart_type = ROCKMANX3;
 
-				if (!allendianmemcmp(&ROM[0x56ae2], &kof98_sig[0], sizeof(kof98_sig)))
-					cart_type = KOF98;
+			    if (!allendianmemcmp(&ROM[0x56ae2], &kof98_sig[0], sizeof(kof98_sig)))
+				cart_type = KOF98;
 
-				if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
-					cart_type = SUP15IN1;
+			    if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
+				cart_type = SUP15IN1;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
-					cart_type = NBA_JAM;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
+				cart_type = NBA_JAM;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
-					cart_type = WBOY_V;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
+				cart_type = WBOY_V;
 
-				if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
-					(!allendianmemcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !allendianmemcmp(&ROM[0x18e], &rockman_sig[0], sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
-					cart_type = WBOY_V;
+			    if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
+				(!allendianmemcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !allendianmemcmp(&ROM[0x18e], &rockman_sig[0], sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
+				cart_type = WBOY_V;
 
-				break;
+			    break;
 
 			case 0x200005:
-				if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
-					cart_type = REDCL_EN;
-				break;
+			    if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
+				cart_type = REDCL_EN;
+			    break;
 
 			case 0x300000:
-				if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
-					cart_type = SDK99;
+			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
+				cart_type = SDK99;
 
-				if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
-					cart_type = KOF99;
+			    if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
+				cart_type = KOF99;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
-					cart_type = NBA_JAM_TE;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
+				cart_type = NBA_JAM_TE;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
-					cart_type = NBA_JAM_TE;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
+				cart_type = NBA_JAM_TE;
 
-				break;
+			    break;
 
 			case 0x400000:
-				if (!allendianmemcmp(&ROM[0x3c031c], &radica_sig[0], sizeof(radica_sig)) ||
-					!allendianmemcmp(&ROM[0x3f031c], &radica_sig[0], sizeof(radica_sig))) // ssf+gng + radica vol1
-						cart_type = RADICA;
+			    if (!allendianmemcmp(&ROM[0x3c031c], &radica_sig[0], sizeof(radica_sig)) ||
+				!allendianmemcmp(&ROM[0x3f031c], &radica_sig[0], sizeof(radica_sig))) // ssf+gng + radica vol1
+				cart_type = RADICA;
 
-				if (!allendianmemcmp(&ROM[0x028460], &soulb_sig[0], sizeof(soulb_sig)))
-					cart_type = SOULBLAD;
+			    if (!allendianmemcmp(&ROM[0x028460], &soulb_sig[0], sizeof(soulb_sig)))
+				cart_type = SOULBLAD;
 
-				if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
-					cart_type = SUP19IN1;
+			    if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
+				cart_type = SUP19IN1;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
-					cart_type = NFL_QB_96;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
+				cart_type = NFL_QB_96;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
-					cart_type = C_SLAM;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
+				cart_type = C_SLAM;
 
-				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
-					cart_type = C_SLAM;
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
+				cart_type = C_SLAM;
 
-				break;
+			    break;
 
 			case 0x500000:
-				if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
-					cart_type = SSF2;
-				break;
+			    if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
+				cart_type = SSF2;
+			    break;
 
 			default:
-				break;
+			    break;
+			}
+		}
+
+		logerror("cart type: %d\n", cart_type);
+
+		genesis_sram = NULL;
+		sram_detected = 0;
+		genesis_sram_start = genesis_sram_end = 0;
+		has_serial_eeprom = 0;
+
+		/* check if cart has battery save */
+
+		/* For games using SRAM, unfortunately there are ROMs without info
+           about it in header. The solution adopted is do the mapping anyway,
+           then active SRAM later if the game will access it. */
+
+		if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+		{
+			/* SRAM info found in header */
+			genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+			genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
+
+			if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+			  genesis_sram_end = genesis_sram_start + 0x0FFFF;
+
+			/* for some games using serial EEPROM, difference between SRAM
+               end to start is 0 or 1. Currently EEPROM is not emulated. */
+			if ((genesis_sram_end - genesis_sram_start) < 2)
+			  has_serial_eeprom = 1;
+			else
+			  sram_detected = 1;
+		}
+		else
+		{
+			/* set default SRAM positions, with size = 64k */
+			genesis_sram_start = 0x200000;
+			genesis_sram_end = genesis_sram_start + 0xffff;
+		}
+
+		if (genesis_sram_start & 1)
+		  genesis_sram_start -= 1;
+
+		if (!(genesis_sram_end & 1))
+		  genesis_sram_end += 1;
+
+		/* calculate backup RAM location */
+		megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+
+		/* Until serial EEPROM is emulated, clears one byte at beginning of
+           backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
+           Talk Baseball. With this hack some games at least run (NBA Jam, Evander
+           Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
+		//if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
+		//  megadriv_backupram[0] = 0xff00;
+
+		if (sram_detected)
+		  logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
+	}
+	else /* Handle pcb with the softlist info */
+	{
+		int		pcb_id;
+		const char	*pcb_name;
+
+		length = image.get_software_region_length("rom");
+		ROM = memory_region(image.device().machine, "maincpu");
+		memcpy(ROM, image.get_software_region("rom"), length);
+
+		genesis_last_loaded_image_length = length;
+		megadriv_backupram = NULL;
+		if ((pcb_name = image.get_feature("pcb")) == NULL)
+		  pcb_id = STD_ROM;
+		else
+		  pcb_id = md_get_pcb_id(pcb_name);
+
+		switch (pcb_id)
+		{
+			/* Sega PCB */
+		  case SEGA_6584A:
+			fatalerror("Need Serial EEPROM emulation");
+			break;
+		  case SEGA_5921:
+		  case SEGA_6278A:
+			genesis_sram_start = 0x200000;
+			genesis_sram_end = genesis_sram_start + 0x3fff;
+			sram_detected = 1;
+			megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+			break;
+		  case SEGA_6658A:
+			genesis_sram_start = 0x200000;
+			genesis_sram_end = genesis_sram_start + 0x3ff;
+			sram_detected = 1;
+			megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+			break;
+
+			/* Codemasters PCB (J-Carts) */
+		  case CM_JCART:
+			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_r);
+			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_w);
+			break;
+		  case CM_JCART_SEPROM:
+			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_r);
+			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_w);
+			/* TODO add SEPROM part */
+			break;
 		}
 	}
-
-	logerror("cart type: %d\n", cart_type);
-
-	genesis_sram = NULL;
-	sram_detected = 0;
-	genesis_sram_start = genesis_sram_end = 0;
-	has_serial_eeprom = 0;
-
-	/* check if cart has battery save */
-
-	/* For games using SRAM, unfortunately there are ROMs without info
-     about it in header. The solution adopted is do the mapping anyway,
-     then active SRAM later if the game will access it. */
-
-	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
-	{
-		/* SRAM info found in header */
-		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-
-		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
-			genesis_sram_end = genesis_sram_start + 0x0FFFF;
-
-		/* for some games using serial EEPROM, difference between SRAM
-         end to start is 0 or 1. Currently EEPROM is not emulated. */
-		if ((genesis_sram_end - genesis_sram_start) < 2)
-			has_serial_eeprom = 1;
-		else
-			sram_detected = 1;
-	}
-	else
-	{
-		/* set default SRAM positions, with size = 64k */
-		genesis_sram_start = 0x200000;
-		genesis_sram_end = genesis_sram_start + 0xffff;
-	}
-
-	if (genesis_sram_start & 1)
-		genesis_sram_start -= 1;
-
-	if (!(genesis_sram_end & 1))
-		genesis_sram_end += 1;
-
-	/* calculate backup RAM location */
-	megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
-
-	/* Until serial EEPROM is emulated, clears one byte at beginning of
-     backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
-     Talk Baseball. With this hack some games at least run (NBA Jam, Evander
-     Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
-	//if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
-	//	megadriv_backupram[0] = 0xff00;
-
-	if (sram_detected)
-		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
 
 	return IMAGE_INIT_PASS;
 }

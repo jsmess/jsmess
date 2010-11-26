@@ -17,4 +17,7 @@ MACHINE_CONFIG_EXTERN( genesis_cartslot );
 MACHINE_CONFIG_EXTERN( _32x_cartslot );
 MACHINE_CONFIG_EXTERN( pico_cartslot );
 
+WRITE16_HANDLER( jcart_ctrl_w );
+READ16_HANDLER( jcart_ctrl_r );
+
 #endif /* GENESIS_H_ */

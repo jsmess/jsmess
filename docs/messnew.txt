@@ -39,6 +39,10 @@ System Driver Changes:
 
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
 
+- [GENESIS] Added support for several genesis PCB carts [El Barto]
+  Updated softlist to use PCB's
+  Added J-Cart player 3 and 4 support
+
 - [H8] Progressed from skeleton to almost working. [Robbbert]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
