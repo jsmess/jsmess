@@ -10,7 +10,7 @@
 typedef struct rp5c15_interface rp5c15_intf;
 struct rp5c15_interface
 {
-	void (*alarm_irq_callback)(int state);
+	void (*alarm_irq_callback)(running_machine *machine, int state);
 };
 
 DECLARE_LEGACY_DEVICE(RP5C15, rp5c15);

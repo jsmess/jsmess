@@ -35,8 +35,14 @@ enum
 	MFP_IRQ_GPIP7
 };  // MC68901 IRQ priority levels
 
-struct x68k_system
+class x68k_state : public driver_device
 {
+public:
+	x68k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
 	struct
 	{
 		int sram_writeprotect;
@@ -197,27 +203,35 @@ struct x68k_system
 		int seq2;  // part of 6-button input sequence.
 		emu_timer* io_timeout2;
 	} mdctrl;
-};
-
-
-class x68k_state : public driver_device
-{
-public:
-	x68k_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_nvram(*this, "nvram") { }
-
-	required_shared_ptr<UINT16>	m_nvram;
+	UINT16* sram;
+	UINT8 ppi_port[3];
+	int current_vector[8];
+	UINT8 current_irq_line;
+	unsigned int scanline;
+	int led_state;
+	emu_timer* kb_timer;
+	emu_timer* mouse_timer;
+	emu_timer* led_timer;
+	unsigned char scc_prev;
+	UINT16 ppi_prev;
+	int mfp_prev;
+	emu_timer* scanline_timer;
+	emu_timer* raster_irq;
+	emu_timer* vblank_irq;
+	UINT16* gvram;
+	UINT16* tvram;
+	UINT16* spriteram;
+	UINT16* spritereg;
+	tilemap_t* bg0_8;
+	tilemap_t* bg1_8;
+	tilemap_t* bg0_16;
+	tilemap_t* bg1_16;
+	int sprite_shift;
+	int oddscanline;
 };
 
 
 /*----------- defined in drivers/x68k.c -----------*/
-
-extern struct x68k_system x68k_sys;
-
-extern emu_timer* x68k_scanline_timer;
-extern emu_timer* x68k_raster_irq;
-extern emu_timer* x68k_vblank_irq;
 
 #ifdef UNUSED_FUNCTION
 void mfp_trigger_irq(int);
@@ -228,11 +242,6 @@ TIMER_CALLBACK(mfp_timer_d_callback);
 #endif
 
 /*----------- defined in video/x68k.c -----------*/
-
-extern UINT16* x68k_gvram;  // Graphic VRAM
-extern UINT16* x68k_tvram;  // Text VRAM
-extern UINT16* x68k_spriteram;  // sprite/background RAM
-extern UINT16* x68k_spritereg;  // sprite/background registers
 
 TIMER_CALLBACK(x68k_crtc_raster_irq);
 TIMER_CALLBACK(x68k_crtc_vblank_irq);

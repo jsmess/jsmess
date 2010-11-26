@@ -34,6 +34,41 @@
 #define WSWAN_INT_VBL    6
 #define WSWAN_INT_HBLTMR 7
 
+#define INTERNAL_EEPROM_SIZE	1024
+
+
+typedef struct
+{
+	UINT8	mode;		/* eeprom mode */
+	UINT16	address;	/* Read/write address */
+	UINT8	command;	/* Commands: 00, 01, 02, 03, 04, 08, 0C */
+	UINT8	start;		/* start bit */
+	UINT8	write_enabled;	/* write enabled yes/no */
+	int	size;		/* size of eeprom/sram area */
+	UINT8	*data;		/* pointer to start of sram/eeprom data */
+	UINT8	*page;		/* pointer to current sram/eeprom page */
+} EEPROM;
+
+typedef struct
+{
+	UINT8	present;	/* Is an RTC present */
+	UINT8	setting;	/* Timer setting byte */
+	UINT8	year;		/* Year */
+	UINT8	month;		/* Month */
+	UINT8	day;		/* Day */
+	UINT8	day_of_week;	/* Day of the week */
+	UINT8	hour;		/* Hour, high bit = 0 => AM, high bit = 1 => PM */
+	UINT8	minute;		/* Minute */
+	UINT8	second;		/* Second */
+	UINT8	index;		/* index for reading/writing of current of alarm time */
+} RTC;
+
+typedef struct
+{
+	UINT32	source;		/* Source address */
+	UINT16	size;		/* Size */
+	UINT8	enable;		/* Enabled */
+} SoundDMA;
 
 typedef struct
 {
@@ -83,10 +118,29 @@ typedef struct
 } VDP;
 
 
-/*----------- defined in machine/wswan.c -----------*/
+class wswan_state : public driver_device
+{
+public:
+	wswan_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern VDP wswan_vdp;
-extern UINT8 ws_portram[256];
+	VDP vdp;
+	UINT8 ws_portram[256];
+	UINT8 *ROMMap[256];
+	UINT32 ROMBanks;
+	UINT8 internal_eeprom[INTERNAL_EEPROM_SIZE];
+	UINT8 system_type;
+	EEPROM eeprom;
+	RTC rtc;
+	SoundDMA sound_dma;
+	UINT8 *ws_ram;
+	UINT8 *ws_bios_bank;
+	UINT8 bios_disabled;
+	int pal[16][16];
+};
+
+
+/*----------- defined in machine/wswan.c -----------*/
 
 NVRAM_HANDLER( wswan );
 MACHINE_START( wswan );

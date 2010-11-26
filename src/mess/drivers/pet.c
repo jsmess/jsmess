@@ -459,7 +459,7 @@ ADDRESS_MAP_END
 
 */
 static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE(&pet_memory)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pet_state, memory)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE_MEMBER(pet_state, videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)

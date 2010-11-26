@@ -157,8 +157,6 @@ VIDEO_UPDATE( macrbvvram );
 VIDEO_RESET(macrbv);
 VIDEO_RESET(maceagle);
 
-void mac_set_screen_buffer( int buffer );
-
 VIDEO_START( mac_cb264 );
 VIDEO_UPDATE( mac_cb264 );
 INTERRUPT_GEN( mac_cb264_vbl );
@@ -227,7 +225,12 @@ public:
 
 	int m_mouse_bit_x;
 	int m_mouse_bit_y;
+	int last_mx, last_my;
+	int count_x, count_y;
+	int last_was_x;
+	int screen_buffer;
 
+	int irq_count, ca1_data, ca2_data;
 
 	/* state of rTCEnb and rTCClk lines */
 	UINT8 m_rtc_rTCEnb;
@@ -288,19 +291,20 @@ public:
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
 
 	// defined in machine/mac.c
-	void v8_resize(running_machine *machine);
-	void set_memory_overlay(running_machine *machine, int overlay);
-	void scc_mouse_irq( running_machine *machine, int x, int y );
-	void nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
-	void set_scc_interrupt(running_machine *machine, int value);
-	void set_via_interrupt(running_machine *machine, int value);
-	void set_via2_interrupt(running_machine *machine, int value);
-	void field_interrupts(running_machine *machine);
+	void v8_resize();
+	void set_memory_overlay(int overlay);
+	void scc_mouse_irq( int x, int y );
+	void nubus_slot_interrupt(UINT8 slot, UINT32 state);
+	void set_scc_interrupt(int value);
+	void set_via_interrupt(int value);
+	void set_via2_interrupt(int value);
+	void field_interrupts();
 	void rtc_write_rTCEnb(int data);
 	void rtc_shift_data(int data);
-	void vblank_irq(running_machine *machine);
+	void vblank_irq();
 	void rtc_incticks();
-	void adb_talk(running_machine *machine);
+	void adb_talk();
+	void mouse_callback();
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -339,11 +343,11 @@ private:
 	int has_adb();
 	void rtc_init();
 	void rtc_execute_cmd(int data);
-	void adb_reset(running_machine *machine);
-	void adb_vblank(running_machine *machine);
-	int adb_pollkbd(running_machine *machine, int update);
-	int adb_pollmouse(running_machine *machine);
-	void adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY );
+	void adb_reset();
+	void adb_vblank();
+	int adb_pollkbd(int update);
+	int adb_pollmouse();
+	void adb_accummouse( UINT8 *MouseX, UINT8 *MouseY );
 
 
 	// ADB mouse state
@@ -353,6 +357,9 @@ private:
 	// ADB keyboard state
 	int m_adb_keybaddr;
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
+public:
+	emu_timer *scanline_timer;
+	emu_timer *adb_timer;
 };
 
 #endif /* MAC_H_ */

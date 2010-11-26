@@ -23,34 +23,42 @@ One i/o port is used:
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-/* Defines */
 
-/* Components */
-static UINT8 *main_ram;
-
-static struct
+class zexall_state : public driver_device
 {
+public:
+	zexall_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *main_ram;
 	UINT8 data[8]; // unused; to suppress the scalar initializer warning
 	UINT8 out_data; // byte written to 0xFFFF
 	UINT8 out_req; // byte written to 0xFFFE
 	UINT8 out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 out_ack; // byte written to 0xFFFC
-} zexall={ {0}};
+};
+
+
+/* Defines */
+
+/* Components */
 
 /* Devices */
 
 static DRIVER_INIT( zexall )
 {
-	zexall.out_ack = 0;
-	zexall.out_req = 0;
-	zexall.out_req_last = 0;
-	zexall.out_data = 0;
+	zexall_state *state = machine->driver_data<zexall_state>();
+	state->out_ack = 0;
+	state->out_req = 0;
+	state->out_req_last = 0;
+	state->out_data = 0;
 }
 
 static MACHINE_RESET( zexall )
 {
+	zexall_state *state = machine->driver_data<zexall_state>();
 	UINT8 *rom = memory_region(machine, "romcode");
-	UINT8 *ram = main_ram;
+	UINT8 *ram = state->main_ram;
 	int i;
     /* fill main ram with zexall code */
     for (i = 0; i < 0x228a; i++)
@@ -60,42 +68,48 @@ static MACHINE_RESET( zexall )
 
 static READ8_HANDLER( zexall_output_ack_r )
 {
+	zexall_state *state = space->machine->driver_data<zexall_state>();
 	running_device *devconf = space->machine->device("terminal");
 // spit out the byte in out_byte if out_req is not equal to out_req_last
-	if (zexall.out_req != zexall.out_req_last)
+	if (state->out_req != state->out_req_last)
 	{
-	terminal_write(devconf,0,zexall.out_data);
-	fprintf(stderr,"%c",zexall.out_data);
-	zexall.out_req_last = zexall.out_req;
-	zexall.out_ack++;
+	terminal_write(devconf,0,state->out_data);
+	fprintf(stderr,"%c",state->out_data);
+	state->out_req_last = state->out_req;
+	state->out_ack++;
 	}
-	return zexall.out_ack;
+	return state->out_ack;
 }
 
 static WRITE8_HANDLER( zexall_output_ack_w )
 {
-	zexall.out_ack = data;
+	zexall_state *state = space->machine->driver_data<zexall_state>();
+	state->out_ack = data;
 }
 
 static READ8_HANDLER( zexall_output_req_r )
 {
-	return zexall.out_req;
+	zexall_state *state = space->machine->driver_data<zexall_state>();
+	return state->out_req;
 }
 
 static WRITE8_HANDLER( zexall_output_req_w )
 {
-	zexall.out_req_last = zexall.out_req;
-	zexall.out_req = data;
+	zexall_state *state = space->machine->driver_data<zexall_state>();
+	state->out_req_last = state->out_req;
+	state->out_req = data;
 }
 
 static READ8_HANDLER( zexall_output_data_r )
 {
-	return zexall.out_data;
+	zexall_state *state = space->machine->driver_data<zexall_state>();
+	return state->out_data;
 }
 
 static WRITE8_HANDLER( zexall_output_data_w )
 {
-	zexall.out_data = data;
+	zexall_state *state = space->machine->driver_data<zexall_state>();
+	state->out_data = data;
 }
 
 /******************************************************************************
@@ -104,7 +118,7 @@ static WRITE8_HANDLER( zexall_output_data_w )
 
 static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE(&main_ram)
+    AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE_MEMBER(zexall_state, main_ram)
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(zexall_output_ack_r,zexall_output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(zexall_output_req_r,zexall_output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(zexall_output_data_r,zexall_output_data_w)
@@ -135,7 +149,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 	DEVCB_HANDLER(null_kbd_put)
 };
 
-static MACHINE_CONFIG_START( zexall, driver_device )
+static MACHINE_CONFIG_START( zexall, zexall_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
     MDRV_CPU_PROGRAM_MAP(z80_mem)

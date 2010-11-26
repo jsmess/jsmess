@@ -23,6 +23,39 @@
 
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
+/* wave duration threshold */
+typedef enum
+{
+	TAPE_300BPS  = 300, /*  300 bps */
+	TAPE_600BPS  = 600, /*  600 bps */
+	TAPE_1200BPS = 1200 /* 1200 bps */
+} z80netape_speed;
+
+typedef struct {
+	struct {
+		int length;		/* time cassette level is at input.level */
+		int level;		/* cassette level */
+		int bit;		/* bit being read */
+	} input;
+	struct {
+		int length;		/* time cassette level is at output.level */
+		int level;		/* cassette level */
+		int bit;		/* bit to to output */
+	} output;
+	z80netape_speed speed;			/* 300 - 600 - 1200 */
+	int wave_filter;
+	int wave_length;
+	int wave_short;
+	int wave_long;
+} cass_data_t;
+
+typedef struct {
+	int drq;
+	int intrq;
+	UINT8 drive; /* current drive */
+	UINT8 head;  /* current head */
+} wd17xx_state_t;
+
 
 class z80ne_state : public driver_device
 {
@@ -31,6 +64,17 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 lx383_scan_counter;
+	UINT8 lx383_key[LX383_KEYS];
+	int lx383_downsampler;
+	int nmi_delay_counter;
+	int reset_delay_counter;
+	running_device *ay31015;
+	UINT8 lx385_ctrl;
+	running_device *lx388_kr2376;
+	emu_timer *cassette_timer;
+	cass_data_t cass_data;
+	wd17xx_state_t wd17xx_state;
 };
 
 

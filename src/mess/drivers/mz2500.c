@@ -2048,7 +2048,7 @@ static const struct pit8253_config mz2500_pit8253_intf =
 	}
 };
 
-static void mz2500_rtc_alarm_irq(int state)
+static void mz2500_rtc_alarm_irq(running_machine *machine, int state)
 {
 	//mz2500_state *drvstate = device->machine->driver_data<mz2500_state>();
 	/* TODO: doesn't work yet */

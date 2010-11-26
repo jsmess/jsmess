@@ -143,7 +143,6 @@ static TIMER_CALLBACK(mac_scanline_tick);
 static TIMER_CALLBACK(mac_adb_tick);
 static TIMER_CALLBACK(mac_6015_tick);
 static TIMER_CALLBACK(mac_pmu_tick);
-static emu_timer *mac_scanline_timer, *mac_adb_timer;
 static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(running_machine *machine, int val);
@@ -257,7 +256,7 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
     Interrupt handling
 */
 
-void mac_state::field_interrupts(running_machine *machine)
+void mac_state::field_interrupts()
 {
 	int take_interrupt = -1;
 
@@ -305,23 +304,23 @@ void mac_state::field_interrupts(running_machine *machine)
 	}
 }
 
-void mac_state::set_scc_interrupt(running_machine *machine, int value)
+void mac_state::set_scc_interrupt(int value)
 {
 	m_scc_interrupt = value;
-	field_interrupts(machine);
+	this->field_interrupts();
 }
 
-void mac_state::set_via_interrupt(running_machine *machine, int value)
+void mac_state::set_via_interrupt(int value)
 {
 	m_via_interrupt = value;
-	field_interrupts(machine);
+	this->field_interrupts();
 }
 
 
-void mac_state::set_via2_interrupt(running_machine *machine, int value)
+void mac_state::set_via2_interrupt(int value)
 {
 	m_via2_interrupt = value;
-	field_interrupts(machine);
+	this->field_interrupts();
 }
 
 void mac_asc_irq(running_device *device, int state)
@@ -337,7 +336,7 @@ void mac_asc_irq(running_device *device, int state)
 			if (mac->m_rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
 			{
 				mac->m_rbv_ifr |= 0x90;
-				mac->set_via2_interrupt(device->machine, 1);
+				mac->set_via2_interrupt(1);
 			}
 		}
 		else
@@ -384,7 +383,7 @@ static void set_scc_waitrequest(int waitrequest)
 	/* Not Yet Implemented */
 }
 
-void mac_state::v8_resize(running_machine *machine)
+void mac_state::v8_resize()
 {
 	offs_t memory_size;
 	UINT8 *memory_data;
@@ -459,7 +458,7 @@ void mac_state::v8_resize(running_machine *machine)
 	}
 }
 
-void mac_state::set_memory_overlay(running_machine *machine, int overlay)
+void mac_state::set_memory_overlay(int overlay)
 {
 	offs_t memory_size;
 	UINT8 *memory_data;
@@ -490,7 +489,7 @@ void mac_state::set_memory_overlay(running_machine *machine, int overlay)
 		if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC) && ((m_model != MODEL_MAC_LC_III) && (m_model != MODEL_MAC_LC_III_PLUS))) || (m_model == MODEL_MAC_CLASSIC_II))
 		{
 			m_overlay = overlay;
-			v8_resize(machine);
+			this->v8_resize();
 		}
 		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model >= MODEL_MAC_POWERMAC_8100))
 		{
@@ -843,10 +842,8 @@ static void keyboard_receive(running_machine *machine, int val)
  * Mouse
  * *************************************************************************/
 
-static void mouse_callback(running_machine *machine)
+void mac_state::mouse_callback()
 {
-	static int	last_mx = 0, last_my = 0;
-	static int	count_x = 0, count_y = 0;
 	int		new_mx, new_my;
 	int		x_needs_update = 0, y_needs_update = 0;
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -917,7 +914,7 @@ static void mouse_callback(running_machine *machine)
 
 	if (x_needs_update || y_needs_update)
 		/* assert Port B External Interrupt on the SCC */
-		mac->scc_mouse_irq(machine, x_needs_update, y_needs_update );
+		mac->scc_mouse_irq(x_needs_update, y_needs_update );
 }
 
 /* *************************************************************************
@@ -1072,7 +1069,7 @@ void mac_scsi_irq(running_machine *machine, int state)
 	if ((mac->m_scsiirq_enable) && ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC)))
 	{
 		mac->m_scsi_interrupt = state;
-		mac->field_interrupts(machine);
+		mac->field_interrupts();
 	}
 }
 
@@ -1086,15 +1083,14 @@ void mac_scc_irq(running_device *device, int status)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
-	mac->set_scc_interrupt(device->machine, status);
+	mac->set_scc_interrupt(status);
 }
 
 
 
-void mac_state::scc_mouse_irq(running_machine *machine, int x, int y)
+void mac_state::scc_mouse_irq(int x, int y)
 {
 	running_device *scc = machine->device("scc");
-	static int last_was_x = 0;
 	if (x && y)
 	{
 		if (last_was_x)
@@ -1113,7 +1109,7 @@ void mac_state::scc_mouse_irq(running_machine *machine, int x, int y)
 	}
 
 	//cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
-	set_scc_interrupt(machine, 1);
+	this->set_scc_interrupt(1);
 }
 
 
@@ -1520,7 +1516,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
 
-int mac_state::adb_pollkbd(running_machine *machine, int update)
+int mac_state::adb_pollkbd(int update)
 {
 	int i, j, keybuf, report, codes[2], result;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
@@ -1649,7 +1645,7 @@ int mac_state::adb_pollkbd(running_machine *machine, int update)
 	return result;
 }
 
-int mac_state::adb_pollmouse(running_machine *machine)
+int mac_state::adb_pollmouse()
 {
 	int NewX, NewY, NewButton;
 
@@ -1670,7 +1666,7 @@ int mac_state::adb_pollmouse(running_machine *machine)
 	return 0;
 }
 
-void mac_state::adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
+void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
@@ -1714,7 +1710,7 @@ void mac_state::adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 	*MouseY = (UINT8)MouseCountY;
 }
 
-void mac_state::adb_talk(running_machine *machine)
+void mac_state::adb_talk()
 {
 	int addr, reg;
 
@@ -1792,7 +1788,7 @@ void mac_state::adb_talk(running_machine *machine)
 							}
 							else
 							{
-								adb_accummouse(machine, &mouseX, &mouseY);
+								this->adb_accummouse(&mouseX, &mouseY);
 							}
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
 							m_adb_buffer[0] |= mouseX & 0x7f;
@@ -1829,7 +1825,7 @@ void mac_state::adb_talk(running_machine *machine)
 							}
 							else
 							{
-								adb_pollkbd(machine, 1);
+								this->adb_pollkbd(1);
 							}
 //                          printf("keyboard = %02x %02x\n", m_adb_currentkeys[0], m_adb_currentkeys[1]);
 							m_adb_buffer[0] = m_adb_currentkeys[1];
@@ -1839,7 +1835,7 @@ void mac_state::adb_talk(running_machine *machine)
 
 						// read modifier keys
 						case 2:
-							adb_pollkbd(machine, 1);
+							this->adb_pollkbd(1);
 							m_adb_buffer[0] = m_adb_modifiers;	// nothing pressed
 							m_adb_buffer[1] = 0;
 							m_adb_datasize = 2;
@@ -1913,11 +1909,11 @@ static TIMER_CALLBACK(mac_adb_tick)
 	mac->m_adb_timer_ticks--;
 	if (!mac->m_adb_timer_ticks)
 	{
-		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+		timer_adjust_oneshot(mac->adb_timer, attotime_never, 0);
 
 		if ((mac->m_adb_direction) && (ADB_IS_BITBANG))
 		{
-			mac->adb_talk(machine);
+			mac->adb_talk();
 		}
 		else if (ADB_IS_EGRET)
 		{
@@ -1961,7 +1957,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 				}
 
 //              mac->m_adb_timer_ticks = 8;
-//              timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+//              timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 
 				if ((mac->m_adb_datasize == 0) && (mac->m_adb_streaming == MCU_STREAMING_NONE))
 				{
@@ -1987,7 +1983,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 	}
 	else
 	{
-		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
+		timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
 	}
 }
 
@@ -2031,7 +2027,7 @@ static void mac_adb_newaction(mac_state *mac, int state)
 				mac->m_adb_direction = 1;	// Mac is shifting us a command
 				mac->m_adb_waiting_cmd = 1;	// we're going to get a command
 				mac->m_adb_irq_pending = 0;
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_XFER_EVEN:
@@ -2061,7 +2057,7 @@ static void mac_adb_newaction(mac_state *mac, int state)
 					mac->m_adb_irq_pending = 1;
 				}
 
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_IDLE:
@@ -2080,7 +2076,7 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
 	mac->m_adb_datasize = 3;
-	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+	timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
 static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, int extra)
@@ -2093,7 +2089,7 @@ static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
 	mac->m_adb_datasize = 4;
-	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+	timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
 static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
@@ -2108,7 +2104,7 @@ static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
-	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+	timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 
 	// read PRAM is a "streaming" command, don't drop the state line when we're out of data
 	mac->m_adb_streaming = MCU_STREAMING_PRAMRD;
@@ -2130,7 +2126,7 @@ static void mac_egret_response_read_rtc(mac_state *mac)
 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
-	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+	timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
 static void mac_egret_mcu_exec(mac_state *mac)
@@ -2233,7 +2229,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			mac->m_adb_buffer[1] = 0;	// spare
 			mac->m_adb_state |= 1;
 			mac->m_adb_timer_ticks = 8;
-			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			break;
 
 		case 0x0e: // send to DFAC
@@ -2303,21 +2299,21 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		{
 			mac->m_adb_command = 0;
 			mac->m_adb_timer_ticks = 8;
-			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 		}
 
 		// if bit 2 is high and stays high, the falling edge of bit 1, and we're in send phase, the MCU should clock out a byte
 		if ((state & 0x04) && (mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x02) && (mac->m_adb_state & 0x01))
 		{
 			mac->m_adb_timer_ticks = 8;
-			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 		}
 
 		// if bit 2 rises, bit 1 is 0, and MCU XS is high, the MCU should clock out a byte
 		if ((state & 0x04) && !(mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x01))
 		{
 			mac->m_adb_timer_ticks = 8;
-			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			timer_adjust_oneshot(mac->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 		}
 
 		// if bit 2 drops and bit 1 is 1, terminate the command
@@ -2506,11 +2502,11 @@ static void pmu_exec(mac_state *mac)
 	}
 }
 
-void mac_state::adb_vblank(running_machine *machine)
+void mac_state::adb_vblank()
 {
 	if (m_adb_state == ADB_STATE_IDLE)
 	{
-		if (adb_pollmouse(machine))
+		if (this->adb_pollmouse())
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ
@@ -2518,44 +2514,44 @@ void mac_state::adb_vblank(running_machine *machine)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
-				adb_talk(machine);
+				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(this->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			}
 			else
 			{
 				m_adb_irq_pending = 1;
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(this->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				m_adb_srq_switch = 1;
 			}
 		}
-		else if (adb_pollkbd(machine, 0))
+		else if (this->adb_pollkbd(0))
 		{
 			if (m_adb_last_talk == m_adb_keybaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
-				adb_talk(machine);
+				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(this->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			}
 			else
 			{
 				m_adb_irq_pending = 1;
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				timer_adjust_oneshot(this->adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				m_adb_srq_switch = 1;
 			}
 		}
 	}
 }
 
-void mac_state::adb_reset(running_machine *machine)
+void mac_state::adb_reset()
 {
 	int i;
 
@@ -2759,7 +2755,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	}
 
 	set_scc_waitrequest((data & 0x80) >> 7);
-	mac_set_screen_buffer((data & 0x40) >> 6);
+	mac->screen_buffer = (data & 0x40) >> 6;
 	sony_set_sel_line(fdc,(data & 0x20) >> 5);
 	if (mac->m_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
@@ -2781,7 +2777,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
      * first access to the ROM. */
 	if (mac->m_model < MODEL_MAC_SE)
 	{
-		mac->set_memory_overlay(device->machine, (data & 0x10) >> 4);
+		mac->set_memory_overlay((data & 0x10) >> 4);
 	}
 }
 
@@ -2877,7 +2873,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		// clear the interrupt if we disabled it
 		if (!mac->m_se30_vbl_enable)
 		{
-			mac->nubus_slot_interrupt(device->machine, 0xe, 0);
+			mac->nubus_slot_interrupt(0xe, 0);
 		}
 	}
 
@@ -2902,7 +2898,7 @@ static void mac_via_irq(running_device *device, int state)
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
 	/* interrupt the 68k (level 1) */
-	mac->set_via_interrupt(device->machine, state);
+	mac->set_via_interrupt(state);
 }
 
 READ16_MEMBER ( mac_state::mac_via_r )
@@ -2938,7 +2934,7 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
 static void mac_via2_irq(running_device *device, int state)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
-	mac->set_via2_interrupt(device->machine, state);
+	mac->set_via2_interrupt(state);
 }
 
 READ16_MEMBER ( mac_state::mac_via2_r )
@@ -3035,19 +3031,19 @@ void mac_state::machine_start()
 {
 	if (has_adb())
 	{
-		mac_adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
-		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+		this->adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
+		timer_adjust_oneshot(this->adb_timer, attotime_never, 0);
 
 		// also allocate PMU timer
 		if (ADB_IS_PM_CLASS)
 		{
 			m_pmu_send_timer = timer_alloc(machine, mac_pmu_tick, NULL);
-			timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+			timer_adjust_oneshot(this->adb_timer, attotime_never, 0);
 		}
 
 	}
-	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
-	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
+	this->scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
+	timer_adjust_oneshot(this->scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
 	m_6015_timer = timer_alloc(machine, mac_6015_tick, NULL);
 	timer_adjust_oneshot(m_6015_timer, attotime_never, 0);
@@ -3067,7 +3063,7 @@ void mac_state::machine_reset()
 	// clear PMU response timer
 	if (ADB_IS_PM_CLASS)
 	{
-		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+		timer_adjust_oneshot(this->adb_timer, attotime_never, 0);
 	}
 
 	// default to 32-bit mode on LC
@@ -3085,11 +3081,11 @@ void mac_state::machine_reset()
 	if (m_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
 	{
 		m_overlay = -1;	// insure no match
-		set_memory_overlay(machine, 1);
+		this->set_memory_overlay(1);
 	}
 
 	/* setup videoram */
-	mac_set_screen_buffer(1);
+	this->screen_buffer = 1;
 
 	/* setup sound */
 	if (AUDIO_IS_CLASSIC_CLASS)
@@ -3104,7 +3100,7 @@ void mac_state::machine_reset()
 
 	if (has_adb())
 	{
-		adb_reset(machine);
+		this->adb_reset();
 	}
 
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
@@ -3155,7 +3151,7 @@ static STATE_POSTLOAD( mac_state_load )
 
 	overlay = mac->m_overlay;
 	mac->m_overlay = -1;
-	mac->set_memory_overlay(machine, overlay);
+	mac->set_memory_overlay(overlay);
 }
 
 
@@ -3169,28 +3165,28 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
-				mac->set_memory_overlay(machine, 0);		// kill the overlay
+				mac->set_memory_overlay(0);		// kill the overlay
 			}
 		}
 		else if ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC))
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
-				mac->set_memory_overlay(machine, 0);		// kill the overlay
+				mac->set_memory_overlay(0);		// kill the overlay
 			}
 		}
 		else if ((mac->m_model == MODEL_MAC_LC) || (mac->m_model == MODEL_MAC_LC_II) || (mac->m_model == MODEL_MAC_CLASSIC_II))
 		{
 			if ((address >= 0xa00000) && (address <= 0xafffff))
 			{
-				mac->set_memory_overlay(machine, 0);		// kill the overlay
+				mac->set_memory_overlay(0);		// kill the overlay
 			}
 		}
 		else
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
-				mac->set_memory_overlay(machine, 0);		// kill the overlay
+				mac->set_memory_overlay(0);		// kill the overlay
 			}
 		}
 	}
@@ -3220,7 +3216,7 @@ static void mac_driver_init(running_machine *machine, model_t model)
 	}
 
 	mac->m_overlay = -1;
-	mac->set_memory_overlay(machine, 1);
+	mac->set_memory_overlay(1);
 
 	memset(messram_get_ptr(mac->m_ram), 0, messram_get_size(mac->m_ram));
 
@@ -3295,7 +3291,7 @@ DRIVER_INIT(maciix)
 	mac_driver_init(machine, MODEL_MAC_IIX);
 }
 
-void mac_state::nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state)
+void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 {
 	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
 	mac_state *mac = machine->driver_data<mac_state>();
@@ -3327,14 +3323,12 @@ void mac_state::nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT3
 	}
 }
 
-void mac_state::vblank_irq(running_machine *machine)
+void mac_state::vblank_irq()
 {
-	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
-
 	/* handle ADB keyboard/mouse */
 	if (has_adb())
 	{
-		adb_vblank(machine);
+		this->adb_vblank();
 	}
 
 	/* handle keyboard */
@@ -3379,7 +3373,7 @@ void mac_state::vblank_irq(running_machine *machine)
 			m_via2_vbl ^= 1;
 			if (!m_via2_vbl)
 			{
-				nubus_slot_interrupt(machine, 0xe, 1);
+				this->nubus_slot_interrupt(0xe, 1);
 			}
 		}
 	}
@@ -3397,16 +3391,16 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	scanline = machine->primary_screen->vpos();
 	if (scanline == MAC_V_VIS)
-		mac->vblank_irq(machine);
+		mac->vblank_irq();
 	
 	/* check for mouse changes at 10 irqs per frame */
 	if (mac->m_model <= MODEL_MAC_PLUS)
 	{
 		if (!(scanline % 10))
-			mouse_callback(machine);
+			mac->mouse_callback();
 	}
 
-	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0), 0);
+	timer_adjust_oneshot(mac->scanline_timer, machine->primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0), 0);
 }
 
 

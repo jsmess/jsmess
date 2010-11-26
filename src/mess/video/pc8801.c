@@ -29,15 +29,16 @@ static int dmac_fl;
 static UINT16 dmac_addr[3], dmac_size[3];
 static UINT8 dmac_flag, dmac_status;
 
-static enum
+enum
 {
 	noblink_underline,
 	blink_underline,
 	noblink_block,
 	blink_block
-} cursor_mode;
+};
+static int cursor_mode;
 
-static enum
+enum
 {
 	parameter0,
 	parameter1,
@@ -49,17 +50,18 @@ static enum
 	lpenx,
 	lpeny,
 	other
-} crtc_state;
+};
+static int crtc_state;
 
-typedef enum
+enum
 {
 	GRAPH_NO,
 	GRAPH_200_COL,
 	GRAPH_200_BW,
 	GRAPH_400_BW
-} GMODE;
+};
+static int gmode;
 
-static GMODE gmode=GRAPH_NO;
 static int disp_plane[3];
 
 #define TX_SEC		0x0001
@@ -993,7 +995,7 @@ WRITE8_HANDLER( pc88sr_disp_30 )
 
 WRITE8_HANDLER( pc88sr_disp_31 )
 {
-	GMODE gmode_new = GRAPH_NO;
+	int gmode_new = GRAPH_NO;
 
 	switch (data & 0x19)
 	{

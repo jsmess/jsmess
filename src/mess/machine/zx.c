@@ -22,7 +22,6 @@
 #define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine->primary_screen->vpos(), _comment); } while (0)
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine->primary_screen->vpos()); } while (0)
 
-static UINT8 zx_tape_bit;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
@@ -80,29 +79,34 @@ DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 
 MACHINE_RESET ( zx80 )
 {
+	zx_state *state = machine->driver_data<zx_state>();
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));
-	zx_tape_bit = 0x80;
+	state->tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
+	zx_state *state = machine->driver_data<zx_state>();
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, *machine));
-	zx_tape_bit = 0x80;
+	state->tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
+	zx_state *state = machine->driver_data<zx_state>();
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, *machine));
-	zx_tape_bit = 0x80;
+	state->tape_bit = 0x80;
 }
 
 static TIMER_CALLBACK(zx_tape_pulse)
 {
-	zx_tape_bit = 0x80;
+	zx_state *state = machine->driver_data<zx_state>();
+	state->tape_bit = 0x80;
 }
 
 READ8_HANDLER ( zx80_io_r )
 {
+	zx_state *state = space->machine->driver_data<zx_state>();
 /* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
     The upper 8 bits are used to select a keyboard scan line
 
@@ -135,28 +139,28 @@ READ8_HANDLER ( zx80_io_r )
 
 		cassette_output(space->machine->device("cassette"), +0.75);
 
-		if (ula_irq_active)
+		if (state->ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine, 0);
-			ula_irq_active = 0;
+			state->ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 //      else
 //      {
-			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
-				zx_tape_bit = 0x00;
+				state->tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
-			data &= ~zx_tape_bit;
+			data &= ~state->tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 //      }
-		if (ula_frame_vsync == 3)
+		if (state->ula_frame_vsync == 3)
 		{
-			ula_frame_vsync = 2;
+			state->ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -168,6 +172,7 @@ READ8_HANDLER ( zx80_io_r )
 
 READ8_HANDLER ( zx81_io_r )
 {
+	zx_state *state = space->machine->driver_data<zx_state>();
 /* port FB = read printer status, not emulated
     FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
     The upper 8 bits are used to select a keyboard scan line */
@@ -199,28 +204,28 @@ READ8_HANDLER ( zx81_io_r )
 
 		cassette_output(space->machine->device("cassette"), +0.75);
 
-		if (ula_irq_active)
+		if (state->ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine, 0);
-			ula_irq_active = 0;
+			state->ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
-				zx_tape_bit = 0x00;
+				state->tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
-			data &= ~zx_tape_bit;
+			data &= ~state->tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (ula_frame_vsync == 3)
+		if (state->ula_frame_vsync == 3)
 		{
-			ula_frame_vsync = 2;
+			state->ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -232,6 +237,7 @@ READ8_HANDLER ( zx81_io_r )
 
 READ8_HANDLER ( pc8300_io_r )
 {
+	zx_state *state = space->machine->driver_data<zx_state>();
 /* port F5 = sound
     F6 = unknown
     FB = read printer status, not emulated
@@ -241,13 +247,12 @@ READ8_HANDLER ( pc8300_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	static UINT8 speaker_state = 0;
 	running_device *speaker = space->machine->device("speaker");
 
 	if (offs == 0xf5)
 	{
-		speaker_state ^= 1;
-		speaker_level_w(speaker, speaker_state);
+		state->speaker_state ^= 1;
+		speaker_level_w(speaker, state->speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -271,28 +276,28 @@ READ8_HANDLER ( pc8300_io_r )
 
 		cassette_output(space->machine->device("cassette"), +0.75);
 
-		if (ula_irq_active)
+		if (state->ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine, 0);
-			ula_irq_active = 0;
+			state->ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
-				zx_tape_bit = 0x00;
+				state->tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
-			data &= ~zx_tape_bit;
+			data &= ~state->tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (ula_frame_vsync == 3)
+		if (state->ula_frame_vsync == 3)
 		{
-			ula_frame_vsync = 2;
+			state->ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -304,6 +309,7 @@ READ8_HANDLER ( pc8300_io_r )
 
 READ8_HANDLER ( pow3000_io_r )
 {
+	zx_state *state = space->machine->driver_data<zx_state>();
 /* port 7E = read NTSC/PAL diode
     F5 = sound
     F6 = unknown
@@ -313,7 +319,6 @@ READ8_HANDLER ( pow3000_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	static UINT8 speaker_state = 0;
 	running_device *speaker = space->machine->device("speaker");
 
 	if (offs == 0x7e)
@@ -323,8 +328,8 @@ READ8_HANDLER ( pow3000_io_r )
 	else
 	if (offs == 0xf5)
 	{
-		speaker_state ^= 1;
-		speaker_level_w(speaker, speaker_state);
+		state->speaker_state ^= 1;
+		speaker_level_w(speaker, state->speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -348,27 +353,27 @@ READ8_HANDLER ( pow3000_io_r )
 
 		cassette_output(space->machine->device("cassette"), +0.75);
 
-		if (ula_irq_active)
+		if (state->ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine, 0);
-			ula_irq_active = 0;
+			state->ula_irq_active = 0;
 			LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
-				zx_tape_bit = 0x00;
+				state->tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
-			data &= ~zx_tape_bit;
+			data &= ~state->tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (ula_frame_vsync == 3)
+		if (state->ula_frame_vsync == 3)
 		{
-			ula_frame_vsync = 2;
+			state->ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -392,6 +397,7 @@ WRITE8_HANDLER( zx80_io_w )
 
 WRITE8_HANDLER ( zx81_io_w )
 {
+	zx_state *state = space->machine->driver_data<zx_state>();
 /* port F5 = unknown, pc8300/pow3000/lambda only
     F6 = unknown, pc8300/pow3000/lambda only
     FB = write data to printer, not emulated
@@ -405,29 +411,29 @@ WRITE8_HANDLER ( zx81_io_w )
 
 	if (offs == 0xfd)
 	{
-		timer_reset(ula_nmi, attotime_never);
+		timer_reset(state->ula_nmi, attotime_never);
 
 		LOG_ZX81_IOW("ULA NMIs off");
 	}
 	else
 	if (offs == 0xfe)
 	{
-		timer_adjust_periodic(ula_nmi, attotime_zero, 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(207));
+		timer_adjust_periodic(state->ula_nmi, attotime_zero, 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 
 		/* remove the IRQ */
-		ula_irq_active = 0;
+		state->ula_irq_active = 0;
 	}
 	else
 	if (offs == 0xff)
 	{
 		cassette_output(space->machine->device("cassette"), -0.75);
 		zx_ula_bkgnd(space->machine, 1);
-		if (ula_frame_vsync == 2)
+		if (state->ula_frame_vsync == 2)
 		{
 			cpu_spinuntil_time(space->cpu,space->machine->primary_screen->time_until_pos(height - 1, 0));
-			ula_scanline_count = height - 1;
+			state->ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", space->machine->primary_screen->vpos(), space->machine->primary_screen->hpos());
 		}
 

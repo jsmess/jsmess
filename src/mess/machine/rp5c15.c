@@ -109,7 +109,7 @@ struct _rp5c15_t
 	int pulse1_state;
 	int pulse16_state;
 	void (*timer_fired_func)(int state);
-	void (*alarm_callback)(int state);
+	void (*alarm_callback)(running_machine *machine, int state);
 	const rp5c15_intf* intf;
 };  //  Ricoh RP5C15
 

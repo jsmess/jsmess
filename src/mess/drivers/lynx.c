@@ -15,13 +15,13 @@
 static QUICKLOAD_LOAD( lynx );
 
 static ADDRESS_MAP_START( lynx_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_BASE(&lynx_mem_0000)
-	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_BASE(&lynx_mem_fc00)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_BASE(&lynx_mem_fd00)
-	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_BASE(&lynx_mem_fe00) AM_SIZE(&lynx_mem_fe00_size)
+	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_0000)
+	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_fc00)
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_fd00)
+	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_BASE_MEMBER(lynx_state, mem_fe00) AM_SIZE_MEMBER(lynx_state, mem_fe00_size)
 	AM_RANGE(0xfff8, 0xfff8) AM_RAM
 	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE(lynx_memory_config_r, lynx_memory_config_w)
-	AM_RANGE(0xfffa, 0xffff) AM_READ_BANK("bank4") AM_WRITEONLY AM_BASE(&lynx_mem_fffa)
+	AM_RANGE(0xfffa, 0xffff) AM_READ_BANK("bank4") AM_WRITEONLY AM_BASE_MEMBER(lynx_state, mem_fffa)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lynx )
@@ -61,7 +61,7 @@ static PALETTE_INIT( lynx )
 }
 
 
-static MACHINE_CONFIG_START( lynx, driver_device )
+static MACHINE_CONFIG_START( lynx, lynx_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem)

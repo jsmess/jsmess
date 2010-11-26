@@ -30,23 +30,6 @@
  *
  *************************************/
 
-static running_device *nascom1_hd6402;
-static int nascom1_tape_size = 0;
-static UINT8 *nascom1_tape_image = NULL;
-static int nascom1_tape_index = 0;
-
-static struct
-{
-	UINT8	stat_flags;
-	UINT8	stat_count;
-} nascom1_portstat;
-
-static struct
-{
-	UINT8 select;
-	UINT8 irq;
-	UINT8 drq;
-} nascom2_fdc;
 
 
 
@@ -58,12 +41,14 @@ static struct
 
 static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_intrq_w )
 {
-	nascom2_fdc.irq = state;
+	nascom1_state *drvstate = device->machine->driver_data<nascom1_state>();
+	drvstate->nascom2_fdc.irq = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_drq_w )
 {
-	nascom2_fdc.drq = state;
+	nascom1_state *drvstate = device->machine->driver_data<nascom1_state>();
+	drvstate->nascom2_fdc.drq = state;
 }
 
 const wd17xx_interface nascom2_wd17xx_interface =
@@ -77,14 +62,16 @@ const wd17xx_interface nascom2_wd17xx_interface =
 
 READ8_HANDLER( nascom2_fdc_select_r )
 {
-	return nascom2_fdc.select | 0xa0;
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	return state->nascom2_fdc.select | 0xa0;
 }
 
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
 	running_device *fdc = space->machine->device("wd1793");
-	nascom2_fdc.select = data;
+	state->nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
 
@@ -105,7 +92,8 @@ WRITE8_HANDLER( nascom2_fdc_select_w )
  */
 READ8_HANDLER( nascom2_fdc_status_r )
 {
-	return (nascom2_fdc.drq << 7) | nascom2_fdc.irq;
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	return (state->nascom2_fdc.drq << 7) | state->nascom2_fdc.irq;
 }
 
 /*************************************
@@ -116,10 +104,11 @@ READ8_HANDLER( nascom2_fdc_status_r )
 
 READ8_HANDLER ( nascom1_port_00_r )
 {
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
-	if (nascom1_portstat.stat_count < 9)
-		return (input_port_read(space->machine, keynames[nascom1_portstat.stat_count]) | ~0x7f);
+	if (state->portstat.stat_count < 9)
+		return (input_port_read(space->machine, keynames[state->portstat.stat_count]) | ~0x7f);
 
 	return (0xff);
 }
@@ -127,25 +116,26 @@ READ8_HANDLER ( nascom1_port_00_r )
 
 WRITE8_HANDLER( nascom1_port_00_w )
 {
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
 
 	cassette_change_state( space->machine->device("cassette"),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET))
 	{
-		if (nascom1_portstat.stat_flags & NASCOM1_KEY_RESET)
-			nascom1_portstat.stat_count = 0;
+		if (state->portstat.stat_flags & NASCOM1_KEY_RESET)
+			state->portstat.stat_count = 0;
 	}
 	else
-		nascom1_portstat.stat_flags = NASCOM1_KEY_RESET;
+		state->portstat.stat_flags = NASCOM1_KEY_RESET;
 
 	if (!(data & NASCOM1_KEY_INCR))
 	{
-		if (nascom1_portstat.stat_flags & NASCOM1_KEY_INCR)
-			nascom1_portstat.stat_count++;
+		if (state->portstat.stat_flags & NASCOM1_KEY_INCR)
+			state->portstat.stat_count++;
 	}
 	else
-		nascom1_portstat.stat_flags = NASCOM1_KEY_INCR;
+		state->portstat.stat_flags = NASCOM1_KEY_INCR;
 }
 
 
@@ -160,26 +150,29 @@ WRITE8_HANDLER( nascom1_port_00_w )
 
 READ8_HANDLER( nascom1_port_01_r )
 {
-	return ay31015_get_received_data( nascom1_hd6402 );
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	return ay31015_get_received_data( state->hd6402 );
 }
 
 
 WRITE8_HANDLER( nascom1_port_01_w )
 {
-	ay31015_set_transmit_data( nascom1_hd6402, data );
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	ay31015_set_transmit_data( state->hd6402, data );
 }
 
 READ8_HANDLER( nascom1_port_02_r )
 {
+	nascom1_state *state = space->machine->driver_data<nascom1_state>();
 	UINT8 data = 0x31;
 
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_OR ) ? 0x02 : 0;
-	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_PE ) ? 0x04 : 0;
-	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_FE ) ? 0x08 : 0;
-	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_TBMT ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_DAV ) ? 0x80 : 0;
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( state->hd6402, AY31015_OR ) ? 0x02 : 0;
+	data |= ay31015_get_output_pin( state->hd6402, AY31015_PE ) ? 0x04 : 0;
+	data |= ay31015_get_output_pin( state->hd6402, AY31015_FE ) ? 0x08 : 0;
+	data |= ay31015_get_output_pin( state->hd6402, AY31015_TBMT ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( state->hd6402, AY31015_DAV ) ? 0x80 : 0;
+	ay31015_set_input_pin( state->hd6402, AY31015_SWE, 1 );
 
 	return data;
 }
@@ -198,20 +191,22 @@ WRITE8_DEVICE_HANDLER( nascom1_hd6402_so )
 
 DEVICE_IMAGE_LOAD( nascom1_cassette )
 {
-	nascom1_tape_size = image.length();
-	nascom1_tape_image = (UINT8*)image.ptr();
-	if (!nascom1_tape_image)
+	nascom1_state *state = image.device().machine->driver_data<nascom1_state>();
+	state->tape_size = image.length();
+	state->tape_image = (UINT8*)image.ptr();
+	if (!state->tape_image)
 		return IMAGE_INIT_FAIL;
 
-	nascom1_tape_index = 0;
+	state->tape_index = 0;
 	return IMAGE_INIT_PASS;
 }
 
 
 DEVICE_IMAGE_UNLOAD( nascom1_cassette )
 {
-	nascom1_tape_image = NULL;
-	nascom1_tape_size = nascom1_tape_index = 0;
+	nascom1_state *state = image.device().machine->driver_data<nascom1_state>();
+	state->tape_image = NULL;
+	state->tape_size = state->tape_index = 0;
 }
 
 
@@ -259,18 +254,19 @@ SNAPSHOT_LOAD( nascom1 )
 
 MACHINE_RESET( nascom1 )
 {
-	nascom1_hd6402 = machine->device("hd6402");
+	nascom1_state *state = machine->driver_data<nascom1_state>();
+	state->hd6402 = machine->device("hd6402");
 
 	/* Set up hd6402 pins */
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_SWE, 1 );
 
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 0 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_NP, 1 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_NB1, 1 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_NB2, 1 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_EPS, 1 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_TSB, 1 );
-	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_CS, 0 );
+	ay31015_set_input_pin( state->hd6402, AY31015_NP, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_NB1, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_NB2, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_EPS, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_TSB, 1 );
+	ay31015_set_input_pin( state->hd6402, AY31015_CS, 1 );
 }
 
 DRIVER_INIT( nascom1 )

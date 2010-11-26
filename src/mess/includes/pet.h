@@ -12,6 +12,13 @@
 #include "machine/6522via.h"
 #include "devices/cartslot.h"
 
+typedef struct
+{
+	int bank; /* rambank to be switched in 0x9000 */
+	int rom; /* rom socket 6502? at 0x9000 */
+} spet_t;
+
+
 class pet_state : public driver_device
 {
 public:
@@ -26,6 +33,15 @@ public:
 	int pia1_irq;
 	int via_irq;
 	UINT8 *videoram;
+	int font;
+	UINT8 *memory;
+	UINT8 *supermemory;
+	UINT8 *pet80_bank1_base;
+	int keyline_select;
+	emu_timer *datasette1_timer;
+	emu_timer *datasette2_timer;
+	spet_t spet;
+	int pia_level;
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -42,14 +58,11 @@ WRITE_LINE_DEVICE_HANDLER( pet_display_enable_changed );
 
 /*----------- defined in machine/pet.c -----------*/
 
-extern int pet_font;
 extern const via6522_interface pet_via;
 extern const pia6821_interface pet_pia0;
 extern const pia6821_interface petb_pia0;
 extern const pia6821_interface pet_pia1;
 
-extern UINT8 *pet_memory;
-extern UINT8 *superpet_memory;
 
 WRITE8_HANDLER(cbm8096_w);
 extern READ8_HANDLER(superpet_r);

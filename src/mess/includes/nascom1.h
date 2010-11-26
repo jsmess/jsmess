@@ -10,6 +10,19 @@
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 
+typedef struct
+{
+	UINT8	stat_flags;
+	UINT8	stat_count;
+} nascom1_portstat_t;
+
+typedef struct
+{
+	UINT8 select;
+	UINT8 irq;
+	UINT8 drq;
+} nascom2_fdc_t;
+
 
 class nascom1_state : public driver_device
 {
@@ -18,6 +31,12 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	running_device *hd6402;
+	int tape_size;
+	UINT8 *tape_image;
+	int tape_index;
+	nascom1_portstat_t portstat;
+	nascom2_fdc_t nascom2_fdc;
 };
 
 

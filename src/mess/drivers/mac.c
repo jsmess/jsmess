@@ -76,7 +76,7 @@ INTERRUPT_GEN( mac_rbv_vbl )
 	if ((mac->m_rbv_regs[0x12] & 0x40) && (mac->m_rbv_ier & 0x2))	
 	{
 		mac->m_rbv_ifr |= 0x82;
-		mac->set_via2_interrupt(device->machine, 1);
+		mac->set_via2_interrupt(1);
 	}
 }
 
@@ -256,7 +256,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				if (((data & 0xc0) != (m_rbv_regs[1] & 0xc0)) && (m_rbv_type == RBV_TYPE_V8))
 				{
 					m_rbv_regs[1] = data;
-					v8_resize(space.machine);
+					this->v8_resize();
 				}
 				break;
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 0x03:
-				set_via2_interrupt(space.machine, 0);
+				this->set_via2_interrupt(0);
 				m_rbv_regs[offset] = data;
 				break;
 
@@ -323,7 +323,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 			case 13:	// IFR
 //				printf("rbv_w: %02x to IFR\n", data);
 				m_rbv_ifr = data;
-				set_via2_interrupt(space.machine, 0);
+				this->set_via2_interrupt(0);
 				break;
 
 			case 14:	// IER

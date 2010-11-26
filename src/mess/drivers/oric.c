@@ -58,7 +58,7 @@
 
 
 static ADDRESS_MAP_START(oric_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE( &oric_ram )
+    AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(oric_state, ram )
     AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -385,7 +385,7 @@ static const floppy_config prav8d_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( oric, driver_device )
+static MACHINE_CONFIG_START( oric, oric_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem)

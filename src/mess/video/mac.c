@@ -17,8 +17,6 @@
 #include "includes/mac.h"
 #include "devices/messram.h"
 
-static int screen_buffer;
-
 PALETTE_INIT( mac )
 {
 	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
@@ -27,16 +25,8 @@ PALETTE_INIT( mac )
 
 
 
-void mac_set_screen_buffer(int buffer)
-{
-	screen_buffer = buffer;
-}
-
-
-
 VIDEO_START( mac )
 {
-	screen_buffer = 0;
 }
 
 
@@ -51,8 +41,9 @@ VIDEO_UPDATE( mac )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
+	mac_state *mac = screen->machine->driver_data<mac_state>();
 
-	video_base = messram_get_size(screen->machine->device("messram")) - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_base = messram_get_size(screen->machine->device("messram")) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
 	video_ram = (const UINT16 *) (messram_get_ptr(screen->machine->device("messram")) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
@@ -80,7 +71,7 @@ VIDEO_UPDATE( macse30 )
 	int y, x, b;
 	mac_state *mac = screen->machine->driver_data<mac_state>();
 
-	video_base = screen_buffer ? 0x8000 : 0;
+	video_base = mac->screen_buffer ? 0x8000 : 0;
 	video_ram = (const UINT16 *) &mac->m_se30_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
@@ -128,7 +119,7 @@ INTERRUPT_GEN( mac_cb264_vbl )
 
 	if (!mac->m_cb264_vbl_disable)
 	{
-		mac->nubus_slot_interrupt(device->machine, 0xe, 1);
+		mac->nubus_slot_interrupt(0xe, 1);
 	}
 }
 
@@ -277,7 +268,7 @@ WRITE32_MEMBER( mac_state::mac_cb264_w )
 		case 0x14/4:	// VBL ack
 			{
 				mac_state *mac = space.machine->driver_data<mac_state>();
-				mac->nubus_slot_interrupt(space.machine, 0xe, 0);
+				mac->nubus_slot_interrupt(0xe, 0);
 			}
 			break;
 

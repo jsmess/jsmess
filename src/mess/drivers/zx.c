@@ -383,7 +383,7 @@ static const cassette_config zx81_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( zx80, driver_device )
+static MACHINE_CONFIG_START( zx80, zx_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, ZX81_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zx80_map)

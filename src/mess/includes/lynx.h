@@ -14,16 +14,103 @@
 #define LYNX_QUICKLOAD	1
 
 
+class lynx_state;
+typedef struct
+{
+	UINT8 *mem;
+	// global
+	UINT16 screen;
+	UINT16 colbuf;
+	UINT16 colpos; // byte where value of collision is written
+	UINT16 xoff, yoff;
+	// in command
+	int mode;
+	UINT16 cmd;
+	UINT8 spritenr;
+	int x,y;
+	UINT16 width, height; // uint16 important for blue lightning
+	UINT16 stretch, tilt; // uint16 important
+	UINT8 color[16]; // or stored
+	void (*line_function)(lynx_state *state, const int y, const int xdir);
+	UINT16 bitmap;
+
+	int everon;
+	int memory_accesses;
+	attotime time;
+} BLITTER;
+
+typedef struct
+{
+	UINT8 serctl;
+	UINT8 data_received, data_to_send, buffer;
+
+	int received;
+	int sending;
+	int buffer_loaded;
+} UART;
+
+typedef struct
+{
+	UINT8 data[0x100];
+	int accumulate_overflow;
+	UINT8 high;
+	int low;
+} SUZY;
+
+typedef struct
+{
+	UINT8 data[0x100];
+} MIKEY;
+
+typedef struct
+{
+	UINT8	bakup;
+	UINT8	cntrl1;
+	UINT8	cntrl2;
+	int		counter;
+	emu_timer	*timer;
+	int		timer_active;
+} LYNX_TIMER;
+
+#define NR_LYNX_TIMERS	8
+
+class lynx_state : public driver_device
+{
+public:
+	lynx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *mem_0000;
+	UINT8 *mem_fc00;
+	UINT8 *mem_fd00;
+	UINT8 *mem_fe00;
+	UINT8 *mem_fffa;
+	size_t mem_fe00_size;
+	UINT16 granularity;
+	int line;
+	int line_y;
+	int sign_AB;
+	int sign_CD;
+	UINT32 palette[0x10];
+	int rotate0;
+	int rotate;
+	running_device *audio;
+	SUZY suzy;
+	BLITTER blitter;
+	UINT8 memory_config;
+	UINT8 sprite_collide;
+	MIKEY mikey;
+	int height;
+	int width;
+	LYNX_TIMER timer[NR_LYNX_TIMERS];
+	UART uart;
+};
+
+
 /*----------- defined in machine/lynx.c -----------*/
 
 MACHINE_START( lynx );
 
-extern UINT8 *lynx_mem_0000;
-extern UINT8 *lynx_mem_fc00;
-extern UINT8 *lynx_mem_fd00;
-extern UINT8 *lynx_mem_fe00;
-extern UINT8 *lynx_mem_fffa;
-extern size_t lynx_mem_fe00_size;
 
 READ8_HANDLER( lynx_memory_config_r );
 WRITE8_HANDLER( lynx_memory_config_w );

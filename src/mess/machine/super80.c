@@ -8,22 +8,19 @@
 #include "machine/ctronics.h"
 #include "includes/super80.h"
 
-static running_device *super80_z80pio;
-static running_device *super80_speaker;
-static running_device *super80_cassette;
-static running_device *super80_printer;
 
 /**************************** PIO ******************************************************************************/
 
-static UINT8 keylatch;
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	keylatch = data;
+	super80_state *state = device->machine->driver_data<super80_state>();
+	state->keylatch = data;
 };
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
+	super80_state *state = device->machine->driver_data<super80_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	int bit;
@@ -31,7 +28,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 	for (bit = 0; bit < 8; bit++)
 	{
-		if (!BIT(keylatch, bit)) data &= input_port_read(device->machine, keynames[bit]);
+		if (!BIT(state->keylatch, bit)) data &= input_port_read(device->machine, keynames[bit]);
 	}
 
 	return data;
@@ -53,21 +50,21 @@ Z80PIO_INTERFACE( super80_pio_intf )
 
 static void super80_cassette_motor( running_machine *machine, UINT8 data )
 {
+	super80_state *state = machine->driver_data<super80_state>();
 	if (data)
-		cassette_change_state(super80_cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(state->cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	else
-		cassette_change_state(super80_cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(state->cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
 	if (input_port_read(machine, "CONFIG") & 8)
-		cassette_change_state(super80_cassette, CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(state->cassette, CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
-		cassette_change_state(super80_cassette, CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(state->cassette, CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 }
 
 /********************************************* TIMER ************************************************/
 
-static UINT8 cass_data[4]={ 0, 0, 0, 0 };
 
 	/* this timer runs at 200khz and does 2 jobs:
     1. Scan the keyboard and present the results to the pio
@@ -89,20 +86,21 @@ static UINT8 cass_data[4]={ 0, 0, 0, 0 };
 
 static TIMER_CALLBACK( super80_timer )
 {
+	super80_state *state = machine->driver_data<super80_state>();
 	UINT8 cass_ws=0;
 
-	cass_data[1]++;
-	cass_ws = (cassette_input(super80_cassette) > +0.03) ? 4 : 0;
+	state->cass_data[1]++;
+	cass_ws = (cassette_input(state->cassette) > +0.03) ? 4 : 0;
 
-	if (cass_ws != cass_data[0])
+	if (cass_ws != state->cass_data[0])
 	{
-		if (cass_ws) cass_data[3] ^= 2;						// the MDS flipflop
-		cass_data[0] = cass_ws;
-		cass_data[2] = ((cass_data[1] < 0x40) ? 1 : 0) | cass_ws | cass_data[3];
-		cass_data[1] = 0;
+		if (cass_ws) state->cass_data[3] ^= 2;						// the MDS flipflop
+		state->cass_data[0] = cass_ws;
+		state->cass_data[2] = ((state->cass_data[1] < 0x40) ? 1 : 0) | cass_ws | state->cass_data[3];
+		state->cass_data[1] = 0;
 	}
 
-	z80pio_pb_w(super80_z80pio,1,pio_port_b_r(super80_z80pio,0));
+	z80pio_pb_w(state->z80pio,1,pio_port_b_r(state->z80pio,0));
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
@@ -113,7 +111,6 @@ static TIMER_CALLBACK( super80_reset )
 
 static TIMER_CALLBACK( super80_halfspeed )
 {
-	static UINT8 int_sw=0;
 	UINT8 go_fast = 0;
 	super80_state *state = machine->driver_data<super80_state>();
 	if (!(state->super80_shared & 4) || (!(input_port_read(machine, "CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
@@ -122,22 +119,22 @@ static TIMER_CALLBACK( super80_halfspeed )
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
 	if (!go_fast)
 	{
-		if (!int_sw)
+		if (!state->int_sw)
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
 
-		int_sw++;
-		if (int_sw > 1)
+		state->int_sw++;
+		if (state->int_sw > 1)
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
-			int_sw = 0;
+			state->int_sw = 0;
 		}
 	}
 	else
 	{
-		if (int_sw < 8)								// @2MHz, reset just once
+		if (state->int_sw < 8)								// @2MHz, reset just once
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			int_sw = 8;							// ...not every time
+			state->int_sw = 8;							// ...not every time
 		}
 	}
 }
@@ -157,44 +154,46 @@ static TIMER_CALLBACK( super80_halfspeed )
 
 READ8_HANDLER( super80_dc_r )
 {
+	super80_state *state = space->machine->driver_data<super80_state>();
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
     0 = printer is not busy */
 
-	data |= centronics_busy_r(super80_printer) << 7;
+	data |= centronics_busy_r(state->printer) << 7;
 
 	return data;
 }
 
 READ8_HANDLER( super80_f2_r )
 {
+	super80_state *state = space->machine->driver_data<super80_state>();
 	UINT8 data = input_port_read(space->machine, "DSW") & 0xf0;	// dip switches on pcb
-	data |= cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
+	data |= state->cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;
 }
 
 WRITE8_HANDLER( super80_dc_w )
 {
+	super80_state *state = space->machine->driver_data<super80_state>();
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	centronics_strobe_w(super80_printer, 1);
-	centronics_data_w(super80_printer, 0, data);
-	centronics_strobe_w(super80_printer, 0);
+	centronics_strobe_w(state->printer, 1);
+	centronics_data_w(state->printer, 0, data);
+	centronics_strobe_w(state->printer, 0);
 }
 
-static UINT8 last_data;
 
 WRITE8_HANDLER( super80_f0_w )
 {
 	super80_state *state = space->machine->driver_data<super80_state>();
-	UINT8 bits = data ^ last_data;
+	UINT8 bits = data ^ state->last_data;
 	state->super80_shared = data;
-	speaker_level_w(super80_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(state->speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	if (bits & 2) super80_cassette_motor(space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	cassette_output(state->cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
-	last_data = data;
+	state->last_data = data;
 }
 
 WRITE8_HANDLER( super80r_f0_w )
@@ -212,10 +211,10 @@ MACHINE_RESET( super80 )
 	state->super80_shared=0xff;
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, "bank1", 1);
-	super80_z80pio = machine->device("z80pio");
-	super80_speaker = machine->device("speaker");
-	super80_cassette = machine->device("cassette");
-	super80_printer = machine->device("centronics");
+	state->z80pio = machine->device("z80pio");
+	state->speaker = machine->device("speaker");
+	state->cassette = machine->device("cassette");
+	state->printer = machine->device("centronics");
 }
 
 static void driver_init_common( running_machine *machine )
