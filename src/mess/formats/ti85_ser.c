@@ -889,7 +889,7 @@ static void ti85_receive_variables (running_device *device)
 				ti85serial->variable_number = 0;
 				ti85serial->status =  TI85_SEND_STOP;
 				sprintf (var_file_name, "%08d.85g", ti85serial->var_file_number);
-				filerr = mame_fopen(SEARCHPATH_IMAGE, var_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &var_file);
+				filerr = mame_fopen(NULL, var_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &var_file);
 				if (filerr == FILERR_NONE)
 				{
 					mame_fwrite(var_file, ti85serial->var_file_data, ti85serial->var_file_size);
@@ -1031,7 +1031,7 @@ static void ti85_receive_backup (running_device *device)
 					ti85serial->backup_file_data[0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]] = ti85_calculate_checksum(ti85serial->backup_file_data+0x37, 0x42+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x06-0x37)&0x00ff;
 					ti85serial->backup_file_data[0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x01] = (ti85_calculate_checksum(ti85serial->backup_file_data+0x37, 0x42+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x06-0x37)&0xff00)>>8;
 					sprintf (backup_file_name, "%08d.85b", ti85serial->backup_file_number);
-					filerr = mame_fopen(SEARCHPATH_IMAGE, backup_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &backup_file);
+					filerr = mame_fopen(NULL, backup_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &backup_file);
 					if (filerr == FILERR_NONE)
 					{
 						mame_fwrite(backup_file, ti85serial->backup_file_data, 0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x02);
@@ -1095,7 +1095,7 @@ static void ti85_receive_screen (running_device *device)
 			{
 				ti85_convert_stream_to_data (ti85serial->receive_buffer, 1030*8, ti85serial->receive_data);
 				sprintf (image_file_name, "%08d.85i", ti85serial->image_file_number);
-				filerr = mame_fopen(SEARCHPATH_IMAGE, image_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &image_file);
+				filerr = mame_fopen(NULL, image_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &image_file);
 				if (filerr == FILERR_NONE)
 				{
 					image_file_data = (UINT8*)malloc (0x49+1008);
