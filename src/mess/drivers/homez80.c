@@ -11,7 +11,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static UINT8* homez80_video_ram;
+
+class homez80_state : public driver_device
+{
+public:
+	homez80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* video_ram;
+	int irq;
+};
+
+
 
 const gfx_layout homez80_charlayout =
 {
@@ -38,7 +49,7 @@ static READ8_HANDLER( homez80_keyboard_r )
 static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(&homez80_video_ram) // Video RAM	
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE_MEMBER(homez80_state, video_ram) // Video RAM	
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
     AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM	
 ADDRESS_MAP_END
@@ -206,12 +217,13 @@ static VIDEO_START( homez80 )
 
 static VIDEO_UPDATE( homez80 )
 {
+	homez80_state *state = screen->machine->driver_data<homez80_state>();
     int x,y;
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 32; x++ )
 		{
-			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  homez80_video_ram[x + y*32] , 0, 0,0, x*8+44,y*8);
+			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  state->video_ram[x + y*32] , 0, 0,0, x*8+44,y*8);
 		}
 	}
 	return 0;
@@ -221,15 +233,15 @@ static GFXDECODE_START( homez80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static int homez80_irq = 0;
 
 static INTERRUPT_GEN( homez80_interrupt )
-{	
-	cpu_set_input_line(device, 0, (homez80_irq & 1) ? HOLD_LINE : CLEAR_LINE);
-	homez80_irq ^= 1;
+{
+	homez80_state *state = device->machine->driver_data<homez80_state>();	
+	cpu_set_input_line(device, 0, (state->irq & 1) ? HOLD_LINE : CLEAR_LINE);
+	state->irq ^= 1;
 }
 
-static MACHINE_CONFIG_START( homez80, driver_device )
+static MACHINE_CONFIG_START( homez80, homez80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
     MDRV_CPU_PROGRAM_MAP(homez80_mem)

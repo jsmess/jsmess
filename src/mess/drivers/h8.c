@@ -20,18 +20,30 @@
 #include "sound/beep.h"
 #include "h8.lh"
 
+
+class h8_state : public driver_device
+{
+public:
+	h8_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 digit;
+	UINT8 segment;
+	UINT8 irq_ctl;
+	running_device *beeper;
+	UINT8 ff_b;
+};
+
+
 #define H8_CLOCK (XTAL_12_288MHz / 6)
 #define H8_BEEP_FRQ (H8_CLOCK / 1024)
 #define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 
-static UINT8 h8_digit;
-static UINT8 h8_segment;
-static UINT8 h8_irq_ctl;
-static running_device *h8_beeper;
 
 static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
-	if (h8_irq_ctl & 1)
+	h8_state *state = timer.machine->driver_data<h8_state>();
+	if (state->irq_ctl & 1)
 		cpu_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
@@ -67,6 +79,7 @@ static READ8_HANDLER( h8_f0_r )
 
 static WRITE8_HANDLER( h8_f0_w )
 {
+	h8_state *state = space->machine->driver_data<h8_state>();
     // this will always turn off int10 that was set by the timer
     // d0-d3 = digit select
     // d4 = int20 is allowed
@@ -74,20 +87,21 @@ static WRITE8_HANDLER( h8_f0_w )
     // d6 = int10 is allowed
     // d7 = beeper enable
 
-	h8_digit = data & 15;
-	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
+	state->digit = data & 15;
+	if (state->digit) output_set_digit_value(state->digit, state->segment);
 
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
-	beep_set_state(h8_beeper, (data & 0x80) ? 0 : 1);
+	beep_set_state(state->beeper, (data & 0x80) ? 0 : 1);
 
 	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
-	h8_irq_ctl &= 0xf0;
-	if (data & 0x40) h8_irq_ctl |= 1;
-	if (~data & 0x10) h8_irq_ctl |= 2;
+	state->irq_ctl &= 0xf0;
+	if (data & 0x40) state->irq_ctl |= 1;
+	if (~data & 0x10) state->irq_ctl |= 2;
 }
 
 static WRITE8_HANDLER( h8_f1_w )
 {
+	h8_state *state = space->machine->driver_data<h8_state>();
     //d7 segment dot
     //d6 segment f
     //d5 segment e
@@ -97,8 +111,8 @@ static WRITE8_HANDLER( h8_f1_w )
     //d1 segment a
     //d0 segment g
 
-	h8_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (h8_digit) output_set_digit_value(h8_digit, h8_segment);
+	state->segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
+	if (state->digit) output_set_digit_value(state->digit, state->segment);
 }
 
 static ADDRESS_MAP_START(h8_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -144,37 +158,38 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(h8)
 {
-	h8_beeper = machine->device("beep");
-	beep_set_frequency(h8_beeper, H8_BEEP_FRQ);
+	h8_state *state = machine->driver_data<h8_state>();
+	state->beeper = machine->device("beep");
+	beep_set_frequency(state->beeper, H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);
-	h8_irq_ctl = 1;
+	state->irq_ctl = 1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
 {
+	h8_state *drvstate = device->machine->driver_data<h8_state>();
         // operate the ION LED
 	output_set_value("ion_led",(state) ? 0 : 1);
-	h8_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
+	drvstate->irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
 static WRITE8_DEVICE_HANDLER( h8_status_callback )
 {
+	h8_state *drvstate = device->machine->driver_data<h8_state>();
 /* This is rather messy, but basically there are 2 D flipflops, one drives the other,
 the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,
 a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
 But, all of this can only occur if bit 5 of port F0 is low. */
 
-	static UINT8 b=0;
-
 	UINT8 state = (data & I8085_STATUS_M1) ? 0 : 1;
-	UINT8 c,a = (h8_irq_ctl & 0x80) ? 1 : 0;
+	UINT8 c,a = (drvstate->irq_ctl & 0x80) ? 1 : 0;
 
-	if (h8_irq_ctl & 2)
+	if (drvstate->irq_ctl & 2)
 	{
 		if (!state) // rising pulse to push data through flipflops
 		{
-			c=b^1; // from /Q of 2nd flipflop
-			b=a; // from Q of 1st flipflop
+			c=drvstate->ff_b^1; // from /Q of 2nd flipflop
+			drvstate->ff_b=a; // from Q of 1st flipflop
 			if (c)
 				cpu_set_input_line_and_vector(device->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
 		}
@@ -182,7 +197,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	else
 	{ // flipflops are 'set'
 		c=0;
-		b=1;
+		drvstate->ff_b=1;
 	}
 
 		
@@ -198,7 +213,7 @@ static I8085_CONFIG( h8_cpu_config )
 	DEVCB_NULL					/* SOD changed callback (I8085A only) */
 };
 
-static MACHINE_CONFIG_START( h8, driver_device )
+static MACHINE_CONFIG_START( h8, h8_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(h8_mem)

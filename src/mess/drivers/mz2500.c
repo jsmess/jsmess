@@ -59,18 +59,65 @@
 #include "formats/flopimg.h"
 #include "formats/basicdsk.h"
 
+
+class mz2500_state : public driver_device
+{
+public:
+	mz2500_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank_val[8];
+	UINT8 bank_addr;
+	UINT8 irq_sel;
+	UINT8 irq_vector[4];
+	UINT8 irq_mask[4];
+	UINT8 kanji_bank;
+	UINT8 dic_bank;
+	UINT8 fdc_reverse;
+	UINT8 key_mux;
+	UINT8 monitor_type;
+	UINT8 text_reg[0x100];
+	UINT8 text_reg_index;
+	UINT8 text_col_size;
+	UINT8 text_font_reg;
+	UINT8 pal_select;
+	UINT16 cg_vs;
+	UINT16 cg_ve;
+	UINT16 cg_hs;
+	UINT16 cg_he;
+	INT16 tv_vs;
+	INT16 tv_ve;
+	INT16 tv_hs;
+	INT16 tv_he;
+	UINT8 cg_latch[4];
+	UINT8 cg_reg_index;
+	UINT8 cg_reg[0x20];
+	UINT8 clut16[0x10];
+	UINT16 clut256[0x100];
+	UINT8 cg_mask;
+	int scr_x_size;
+	int scr_y_size;
+	UINT8 cg_clear_flag;
+	UINT32 rom_index;
+	UINT8 hrom_index;
+	UINT8 lrom_index;
+	struct { UINT8 r,g,b; } pal[16];
+	UINT8 joy_mode;
+	UINT16 kanji_index;
+	UINT32 emm_offset;
+	UINT8 old_portc;
+	UINT8 prev_col_val;
+	UINT8 pio_latchb;
+	UINT8 ym_porta;
+};
+
+
 /* machine stuff */
-static UINT8 bank_val[8],bank_addr;
-static UINT8 irq_sel,irq_vector[4],irq_mask[4];
-static UINT8 kanji_bank,dic_bank;
-static UINT8 fdc_reverse;
-static UINT8 key_mux;
-static UINT8 monitor_type;
 
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static void mz2500_reset(UINT8 type);
+static void mz2500_reset(mz2500_state *state, UINT8 type);
 static const UINT8 bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
@@ -78,19 +125,6 @@ static const UINT8 bank_reset_val[2][8] =
 };
 
 /* video stuff*/
-static UINT8 text_reg[0x100], text_reg_index;
-static UINT8 text_col_size, text_font_reg;
-static UINT8 pal_select;
-static UINT16 cg_vs,cg_ve,cg_hs,cg_he; //CG window parameters
-static INT16 tv_vs,tv_ve,tv_hs,tv_he; //TV window parameters
-static UINT8 cg_latch[4];
-static UINT8 cg_reg_index;
-static UINT8 cg_reg[0x20];
-static UINT8 clut16[0x10];
-static UINT16 clut256[0x100];
-static UINT8 cg_mask;
-static int scr_x_size,scr_y_size;
-static UINT8 cg_clear_flag;
 
 static VIDEO_START( mz2500 )
 {
@@ -132,6 +166,7 @@ static void mz2500_draw_pixel(running_machine *machine, bitmap_t *bitmap,int x,i
 
 static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 map_addr)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
@@ -141,9 +176,9 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 	count = (map_addr & 0x7ff);
 
-	y_step = (text_font_reg) ? 1 : 2;
-	y_height = (text_reg[0] & 0x10) ? 10 : 8;
-	s_y = text_reg[9] & 0xf;
+	y_step = (state->text_font_reg) ? 1 : 2;
+	y_height = (state->text_reg[0] & 0x10) ? 10 : 8;
+	s_y = state->text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
 	{
@@ -190,7 +225,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
-					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+					if(res_x < state->tv_hs || res_x >= state->tv_he || res_y < state->tv_vs || res_y >= state->tv_ve)
 						continue;
 
 					if(gfx_sel & 0x8)
@@ -209,7 +244,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x10),0,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(state->pal_select ? 0x00 : 0x10),0,0);
 					}
 				}
 			}
@@ -222,6 +257,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,UINT16 map_addr)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT8 *vram = memory_region(machine, "maincpu");
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
@@ -231,9 +267,9 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
-	y_step = (text_font_reg) ? 1 : 2;
-	y_height = (text_reg[0] & 0x10) ? 10 : 8;
-	s_y = text_reg[9] & 0xf;
+	y_step = (state->text_font_reg) ? 1 : 2;
+	y_height = (state->text_reg[0] & 0x10) ? 10 : 8;
+	s_y = state->text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
 	{
@@ -280,7 +316,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
-					if(res_x < tv_hs || res_x >= tv_he || res_y < tv_vs || res_y >= tv_ve)
+					if(res_x < state->tv_hs || res_x >= state->tv_he || res_y < state->tv_vs || res_y >= state->tv_ve)
 						continue;
 
 					if(gfx_sel & 0x8)
@@ -299,7 +335,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(pal_select ? 0x00 : 0x10),scr_x_size == 640,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(state->pal_select ? 0x00 : 0x10),state->scr_x_size == 640,0);
 					}
 				}
 			}
@@ -312,6 +348,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
+	//mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[2];
@@ -330,7 +367,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 				res_y = y;
 
 				/* check window boundaries */
-				//if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+				//if(res_x < state->cg_hs || res_x >= state->cg_he || res_y < state->cg_vs || res_y >= state->cg_ve)
 				//  continue;
 
 				/* TODO: very preliminary, just Yukar K2 uses this so far*/
@@ -342,7 +379,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 					pen |= pen_bit[pen_i];
 
 				{
-					//if(pri == ((clut256[pen] & 0x100) >> 8))
+					//if(pri == ((state->clut256[pen] & 0x100) >> 8))
 					mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen,0,0);
 				}
 			}
@@ -353,6 +390,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 
 static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int x_size,int pri)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[4];
@@ -366,14 +404,14 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
-	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
-	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
+	count = (state->cg_reg[0x10]) | ((state->cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (state->cg_reg[0x12]) | ((state->cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
-	s_x = (cg_reg[0x0f] & 0xf);
-	cg_interlace = text_font_reg ? 1 : 2;
-	pen_mask = (cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
+	s_x = (state->cg_reg[0x0f] & 0xf);
+	cg_interlace = state->text_font_reg ? 1 : 2;
+	pen_mask = (state->cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
 
-//	popmessage("%d %d %d %d",cg_hs,cg_he,cg_vs,cg_ve);
+//	popmessage("%d %d %d %d",state->cg_hs,state->cg_he,state->cg_vs,state->cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -385,7 +423,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				res_y = y;
 
 				/* check window boundaries */
-				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+				if(res_x < state->cg_hs || res_x >= state->cg_he || res_y < state->cg_vs || res_y >= state->cg_ve)
 					continue;
 
 				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
@@ -397,8 +435,8 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((clut16[pen] & 0x10) >> 4) && clut16[pen] != 0x00 && pen_mask) //correct?
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut16[pen] & 0x0f)+0x10,(x_size == 320 && scr_x_size == 640),cg_interlace == 2);
+				if(pri == ((state->clut16[pen] & 0x10) >> 4) && state->clut16[pen] != 0x00 && pen_mask) //correct?
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(state->clut16[pen] & 0x0f)+0x10,(x_size == 320 && state->scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -410,6 +448,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 
 static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,int pri)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
 	UINT8 *vram = memory_region(machine, "maincpu");
 	UINT8 pen,pen_bit[8];
@@ -422,11 +461,11 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 
 	base_mask = 0x3f; //no x_size == 640
 
-	count = (cg_reg[0x10]) | ((cg_reg[0x11] & base_mask) << 8);
-	wa_reg = (cg_reg[0x12]) | ((cg_reg[0x13] & base_mask) << 8);
+	count = (state->cg_reg[0x10]) | ((state->cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (state->cg_reg[0x12]) | ((state->cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
-	s_x = (cg_reg[0x0f] & 0xf);
-	cg_interlace = text_font_reg ? 1 : 2;
+	s_x = (state->cg_reg[0x0f] & 0xf);
+	cg_interlace = state->text_font_reg ? 1 : 2;
 
 	for(y=0;y<200;y++)
 	{
@@ -438,24 +477,24 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 				res_y = y;
 
 				/* check window boundaries */
-				if(res_x < cg_hs || res_x >= cg_he || res_y < cg_vs || res_y >= cg_ve)
+				if(res_x < state->cg_hs || res_x >= state->cg_he || res_y < state->cg_vs || res_y >= state->cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x10) : 0; // B1
-				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x01) : 0; // B0
-				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x20) : 0; // R1
-				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x02) : 0; // R0
-				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x40) : 0; // G1
-				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x04) : 0; // G0
-				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x80) : 0; // I1
-				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (cg_reg[0x18] & 0x08) : 0; // I0
+				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x10) : 0; // B1
+				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x01) : 0; // B0
+				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x20) : 0; // R1
+				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x02) : 0; // R0
+				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x40) : 0; // G1
+				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x04) : 0; // G0
+				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x80) : 0; // I1
+				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (state->cg_reg[0x18] & 0x08) : 0; // I0
 
 				pen = 0;
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(clut256[pen] & 0xff)+0x100,scr_x_size == 640,cg_interlace == 2);
+				if(pri == ((state->clut256[pen] & 0x100) >> 8))
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(state->clut256[pen] & 0xff)+0x100,state->scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -467,20 +506,21 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 
 static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT16 base_addr;
 
-	base_addr = text_reg[1] | ((text_reg[2] & 0x7) << 8);
+	base_addr = state->text_reg[1] | ((state->text_reg[2] & 0x7) << 8);
 
-//	popmessage("%02x",clut16[0]);
-//	popmessage("%d %d %d %d",tv_hs,(tv_he),tv_vs,(tv_ve));
+//	popmessage("%02x",state->clut16[0]);
+//	popmessage("%d %d %d %d",state->tv_hs,(state->tv_he),state->tv_vs,(state->tv_ve));
 
-	if(text_col_size)
+	if(state->text_col_size)
 		draw_80x25(machine,bitmap,cliprect,base_addr);
 	else
 	{
 		int tv_mode;
 
-		tv_mode = text_reg[0] >> 2;
+		tv_mode = state->text_reg[0] >> 2;
 
 		switch(tv_mode & 3)
 		{
@@ -497,16 +537,17 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
-			//default: popmessage("%02x %02x %02x",tv_mode & 3,text_reg[1],text_reg[2]); break;
+			//default: popmessage("%02x %02x %02x",tv_mode & 3,state->text_reg[1],state->text_reg[2]); break;
 		}
 	}
 }
 
 static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
-	//popmessage("%02x %02x",cg_reg[0x0e],cg_reg[0x18]);
+	mz2500_state *state = machine->driver_data<mz2500_state>();
+	//popmessage("%02x %02x",state->cg_reg[0x0e],state->cg_reg[0x18]);
 
-	switch(cg_reg[0x0e])
+	switch(state->cg_reg[0x0e])
 	{
 		case 0x00:
 			break;
@@ -531,20 +572,21 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 			draw_cg16_screen(machine,bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MESS dev",cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x, contact MESS dev",state->cg_reg[0x0e]);
 			break;
 	}
 }
 
 static VIDEO_UPDATE( mz2500 )
 {
+	//mz2500_state *state = screen->machine->driver_data<mz2500_state>();
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //TODO: correct?
 
 	draw_cg_screen(screen->machine,bitmap,cliprect,0);
 	draw_tv_screen(screen->machine,bitmap,cliprect);
 	draw_cg_screen(screen->machine,bitmap,cliprect,1);
-	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",cg_reg[0x0f],cg_reg[0x10],cg_reg[0x11],cg_reg[0x12],cg_reg[0x13],cg_reg[0x14],cg_reg[0x15],cg_reg[0x16],cg_reg[0x17]);
-	//  popmessage("%02x",text_reg[0x0f]);
+	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",state->cg_reg[0x0f],state->cg_reg[0x10],state->cg_reg[0x11],state->cg_reg[0x12],state->cg_reg[0x13],state->cg_reg[0x14],state->cg_reg[0x15],state->cg_reg[0x16],state->cg_reg[0x17]);
+	//  popmessage("%02x",state->text_reg[0x0f]);
 
 
     return 0;
@@ -552,46 +594,47 @@ static VIDEO_UPDATE( mz2500 )
 
 static void mz2500_reconfigure_screen(running_machine *machine)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	rectangle visarea;
 
-	if((cg_reg[0x0e] & 0x1f) == 0x17 || (cg_reg[0x0e] & 0x1f) == 0x03 || text_col_size)
-		scr_x_size = 640;
+	if((state->cg_reg[0x0e] & 0x1f) == 0x17 || (state->cg_reg[0x0e] & 0x1f) == 0x03 || state->text_col_size)
+		state->scr_x_size = 640;
 	else
-		scr_x_size = 320;
+		state->scr_x_size = 320;
 
-	if((cg_reg[0x0e] & 0x1f) == 0x03)
-		scr_y_size = 400;
+	if((state->cg_reg[0x0e] & 0x1f) == 0x03)
+		state->scr_y_size = 400;
 	else
-		scr_y_size = 200 * ((text_font_reg) ? 1 : 2);
+		state->scr_y_size = 200 * ((state->text_font_reg) ? 1 : 2);
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
-	visarea.max_x = scr_x_size - 1;
-	visarea.max_y = scr_y_size - 1;
+	visarea.max_x = state->scr_x_size - 1;
+	visarea.max_y = state->scr_y_size - 1;
 
-	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,cg_reg[0x0e]);
+	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,state->cg_reg[0x0e]);
 
 	machine->primary_screen->configure(720, 480, visarea, machine->primary_screen->frame_period().attoseconds);
 
 	/* calculate CG window parameters here */
-	cg_vs = (cg_reg[0x08]) | ((cg_reg[0x09]<<8) & 1);
-	cg_ve = (cg_reg[0x0a]) | ((cg_reg[0x0b]<<8) & 1);
-	cg_hs = ((cg_reg[0x0c] & 0x7f)*8);
-	cg_he = ((cg_reg[0x0d] & 0x7f)*8);
+	state->cg_vs = (state->cg_reg[0x08]) | ((state->cg_reg[0x09]<<8) & 1);
+	state->cg_ve = (state->cg_reg[0x0a]) | ((state->cg_reg[0x0b]<<8) & 1);
+	state->cg_hs = ((state->cg_reg[0x0c] & 0x7f)*8);
+	state->cg_he = ((state->cg_reg[0x0d] & 0x7f)*8);
 
-	if(scr_x_size == 320)
+	if(state->scr_x_size == 320)
 	{
-		cg_hs /= 2;
-		cg_he /= 2;
+		state->cg_hs /= 2;
+		state->cg_he /= 2;
 	}
 
 	/* calculate TV window parameters here */
 	{
 		int x_offs,y_offs;
 
-		monitor_type = ((text_reg[0x0f] & 0x08) >> 3);
+		state->monitor_type = ((state->text_reg[0x0f] & 0x08) >> 3);
 
-		switch((monitor_type|text_col_size<<1) & 3)
+		switch((state->monitor_type|state->text_col_size<<1) & 3)
 		{
 			default:
 			case 0: x_offs = 64; break;
@@ -599,32 +642,32 @@ static void mz2500_reconfigure_screen(running_machine *machine)
 			case 2: x_offs = 72; break;
 			case 3: x_offs = 88; break;
 		}
-		//printf("%d %d %d\n",x_offs,(text_reg[7] & 0x7f) * 8,(text_reg[8] & 0x7f)* 8);
+		//printf("%d %d %d\n",x_offs,(state->text_reg[7] & 0x7f) * 8,(state->text_reg[8] & 0x7f)* 8);
 
-		y_offs = (monitor_type) ? 76 : 34;
+		y_offs = (state->monitor_type) ? 76 : 34;
 
-		tv_hs = ((text_reg[7] & 0x7f)*8) - x_offs;
-		tv_he = ((text_reg[8] & 0x7f)*8) - x_offs;
-		tv_vs = (text_reg[3]*2) - y_offs;
-		tv_ve = (text_reg[5]*2) - y_offs;
+		state->tv_hs = ((state->text_reg[7] & 0x7f)*8) - x_offs;
+		state->tv_he = ((state->text_reg[8] & 0x7f)*8) - x_offs;
+		state->tv_vs = (state->text_reg[3]*2) - y_offs;
+		state->tv_ve = (state->text_reg[5]*2) - y_offs;
 
-		if(scr_x_size == 320)
+		if(state->scr_x_size == 320)
 		{
-			tv_hs /= 2;
-			tv_he /= 2;
+			state->tv_hs /= 2;
+			state->tv_he /= 2;
 		}
 
-		if(scr_y_size == 200)
+		if(state->scr_y_size == 200)
 		{
-			tv_vs /= 2;
-			tv_ve /= 2;
+			state->tv_vs /= 2;
+			state->tv_ve /= 2;
 		}
 	}
 }
 
-static UINT8 mz2500_cg_latch_compare(void)
+static UINT8 mz2500_cg_latch_compare(mz2500_state *state)
 {
-	UINT8 compare_val = cg_reg[0x07] & 0xf;
+	UINT8 compare_val = state->cg_reg[0x07] & 0xf;
 	UINT8 pix_val;
 	UINT8 res;
 	UINT16 i;
@@ -632,7 +675,7 @@ static UINT8 mz2500_cg_latch_compare(void)
 
 	for(i=1;i<0x100;i<<=1)
 	{
-		pix_val = ((cg_latch[0] & i) ? 1 : 0) | ((cg_latch[1] & i) ? 2 : 0) | ((cg_latch[2] & i) ? 4 : 0) | ((cg_latch[3] & i) ? 8 : 0);
+		pix_val = ((state->cg_latch[0] & i) ? 1 : 0) | ((state->cg_latch[1] & i) ? 2 : 0) | ((state->cg_latch[2] & i) ? 4 : 0) | ((state->cg_latch[3] & i) ? 8 : 0);
 		if(pix_val == compare_val)
 			res|=i;
 	}
@@ -642,8 +685,9 @@ static UINT8 mz2500_cg_latch_compare(void)
 
 static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank_num)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT8 *ram = memory_region(machine, "maincpu");
-	UINT8 cur_bank = bank_val[bank_num];
+	UINT8 cur_bank = state->bank_val[bank_num];
 
 	switch(cur_bank)
 	{
@@ -653,33 +697,33 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 		case 0x33:
 		{
 			// READ MODIFY WRITE
-			if(cg_reg[0x0e] == 0x3)
+			if(state->cg_reg[0x0e] == 0x3)
 			{
 				// ...
 			}
 			else
 			{
 				int plane;
-				cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
-				cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
-				cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
-				cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
-				plane = cg_reg[0x07] & 3;
+				state->cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
+				state->cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
+				state->cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
+				state->cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
+				plane = state->cg_reg[0x07] & 3;
 
-				if(cg_reg[0x07] & 0x10)
-					return mz2500_cg_latch_compare();
+				if(state->cg_reg[0x07] & 0x10)
+					return mz2500_cg_latch_compare(state);
 				else
-					return cg_latch[plane];
+					return state->cg_latch[plane];
 			}
 		}
 		break;
 		case 0x39:
 		{
-			if(kanji_bank & 0x80) //kanji ROM
+			if(state->kanji_bank & 0x80) //kanji ROM
 			{
 				UINT8 *knj_rom = memory_region(machine, "kanji");
 
-				return knj_rom[(offset & 0x7ff)+((kanji_bank & 0x7f)*0x800)];
+				return knj_rom[(offset & 0x7ff)+((state->kanji_bank & 0x7f)*0x800)];
 			}
 			else //PCG RAM
 			{
@@ -693,7 +737,7 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 		{
 			UINT8 *dic_rom = memory_region(machine, "dictionary");
 
-			return dic_rom[(offset & 0x1fff) + ((dic_bank & 0x1f)*0x2000)];
+			return dic_rom[(offset & 0x1fff) + ((state->dic_bank & 0x1f)*0x2000)];
 		}
 		break;
 		case 0x3c:
@@ -714,11 +758,12 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 
 static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data, UINT8 bank_num)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT8 *ram = memory_region(machine, "maincpu");
-	UINT8 cur_bank = bank_val[bank_num];
+	UINT8 cur_bank = state->bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
-//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",cg_reg[0],cg_reg[1],cg_reg[2],cg_reg[3],offset,data);
+//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",state->cg_reg[0],state->cg_reg[1],state->cg_reg[2],state->cg_reg[3],offset,data);
 
 	switch(cur_bank)
 	{
@@ -728,56 +773,56 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 		case 0x33:
 		{
 			// READ MODIFY WRITE
-			if(cg_reg[0x0e] == 0x3)
+			if(state->cg_reg[0x0e] == 0x3)
 			{
 				// ...
 			}
 			else
 			{
-				if((cg_reg[0x05] & 0xc0) == 0x00) //replace
+				if((state->cg_reg[0x05] & 0xc0) == 0x00) //replace
 				{
-					if(cg_reg[5] & 1) //B
+					if(state->cg_reg[5] & 1) //B
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (cg_reg[4] & 1) ? (data & cg_reg[0] & cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~state->cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (state->cg_reg[4] & 1) ? (data & state->cg_reg[0] & state->cg_reg[6]) : 0;
 					}
-					if(cg_reg[5] & 2) //R
+					if(state->cg_reg[5] & 2) //R
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (cg_reg[4] & 2) ? (data & cg_reg[1] & cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~state->cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (state->cg_reg[4] & 2) ? (data & state->cg_reg[1] & state->cg_reg[6]) : 0;
 					}
-					if(cg_reg[5] & 4) //G
+					if(state->cg_reg[5] & 4) //G
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (cg_reg[4] & 4) ? (data & cg_reg[2] & cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~state->cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (state->cg_reg[4] & 4) ? (data & state->cg_reg[2] & state->cg_reg[6]) : 0;
 					}
-					if(cg_reg[5] & 8) //I
+					if(state->cg_reg[5] & 8) //I
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (cg_reg[4] & 8) ? (data & cg_reg[3] & cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~state->cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (state->cg_reg[4] & 8) ? (data & state->cg_reg[3] & state->cg_reg[6]) : 0;
 					}
 				}
-				else if((cg_reg[0x05] & 0xc0) == 0x40) //pset
+				else if((state->cg_reg[0x05] & 0xc0) == 0x40) //pset
 				{
-					if(cg_reg[5] & 1) //B
+					if(state->cg_reg[5] & 1) //B
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (cg_reg[4] & 1) ? (data & cg_reg[0]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (state->cg_reg[4] & 1) ? (data & state->cg_reg[0]) : 0;
 					}
-					if(cg_reg[5] & 2) //R
+					if(state->cg_reg[5] & 2) //R
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (cg_reg[4] & 2) ? (data & cg_reg[1]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (state->cg_reg[4] & 2) ? (data & state->cg_reg[1]) : 0;
 					}
-					if(cg_reg[5] & 4) //G
+					if(state->cg_reg[5] & 4) //G
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (cg_reg[4] & 4) ? (data & cg_reg[2]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (state->cg_reg[4] & 4) ? (data & state->cg_reg[2]) : 0;
 					}
-					if(cg_reg[5] & 8) //I
+					if(state->cg_reg[5] & 8) //I
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (cg_reg[4] & 8) ? (data & cg_reg[3]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (state->cg_reg[4] & 8) ? (data & state->cg_reg[3]) : 0;
 					}
 				}
 			}
@@ -801,7 +846,7 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 		case 0x39:
 		{
 			ram[offset+cur_bank*0x2000] = data;
-			if(kanji_bank & 0x80) //kanji ROM
+			if(state->kanji_bank & 0x80) //kanji ROM
 			{
 				//NOP
 			}
@@ -853,51 +898,57 @@ static WRITE8_HANDLER( bank7_w ) { mz2500_ram_write(space->machine, offset, data
 
 static READ8_HANDLER( mz2500_bank_addr_r )
 {
-	return bank_addr;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	return state->bank_addr;
 }
 
 static WRITE8_HANDLER( mz2500_bank_addr_w )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 //  printf("%02x\n",data);
-	bank_addr = data & 7;
+	state->bank_addr = data & 7;
 }
 
 static READ8_HANDLER( mz2500_bank_data_r )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 res;
 
-	res = bank_val[bank_addr];
+	res = state->bank_val[state->bank_addr];
 
-	bank_addr++;
-	bank_addr&=7;
+	state->bank_addr++;
+	state->bank_addr&=7;
 
 	return res;
 }
 
 static WRITE8_HANDLER( mz2500_bank_data_w )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 //  UINT8 *ROM = memory_region(space->machine, "maincpu");
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
-	bank_val[bank_addr] = data & 0x3f;
+	state->bank_val[state->bank_addr] = data & 0x3f;
 
 //  if((data*2) >= 0x70)
-//  printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
+//  printf("%s %02x\n",bank_name[state->bank_addr],state->bank_val[state->bank_addr]*2);
 
-//  memory_set_bankptr(space->machine, bank_name[bank_addr], &ROM[bank_val[bank_addr]*0x2000]);
+//  memory_set_bankptr(space->machine, bank_name[state->bank_addr], &ROM[state->bank_val[state->bank_addr]*0x2000]);
 
-	bank_addr++;
-	bank_addr&=7;
+	state->bank_addr++;
+	state->bank_addr&=7;
 }
 
 static WRITE8_HANDLER( mz2500_kanji_bank_w )
 {
-	kanji_bank = data;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->kanji_bank = data;
 }
 
 static WRITE8_HANDLER( mz2500_dictionary_bank_w )
 {
-	dic_bank = data;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
@@ -952,26 +1003,27 @@ static UINT8 pal_256_param(int index, int param)
 
 static WRITE8_HANDLER( mz2500_tv_crtc_w )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	switch(offset)
 	{
-		case 0: text_reg_index = data; break;
+		case 0: state->text_reg_index = data; break;
 		case 1:
-			text_reg[text_reg_index] = data;
+			state->text_reg[state->text_reg_index] = data;
 
 			#if 0
-			//printf("[%02x] <- %02x\n",text_reg_index,data);
+			//printf("[%02x] <- %02x\n",state->text_reg_index,data);
 			popmessage("(%02x %02x) (%02x %02x %02x %02x) (%02x %02x %02x) (%02x %02x %02x %02x)"
-			,text_reg[0] & ~0x1e,text_reg[3]
-			,text_reg[4],text_reg[5],text_reg[6],text_reg[7]
-			,text_reg[8],text_reg[10],text_reg[11]
-			,text_reg[12],text_reg[13],text_reg[14],text_reg[15]);
+			,state->text_reg[0] & ~0x1e,state->text_reg[3]
+			,state->text_reg[4],state->text_reg[5],state->text_reg[6],state->text_reg[7]
+			,state->text_reg[8],state->text_reg[10],state->text_reg[11]
+			,state->text_reg[12],state->text_reg[13],state->text_reg[14],state->text_reg[15]);
 
 			#endif
-			//popmessage("%d %02x %d %02x %d %d",text_reg[3],text_reg[4],text_reg[5],text_reg[6],text_reg[7]*8,text_reg[8]*8);
+			//popmessage("%d %02x %d %02x %d %d",state->text_reg[3],state->text_reg[4],state->text_reg[5],state->text_reg[6],state->text_reg[7]*8,state->text_reg[8]*8);
 
 			mz2500_reconfigure_screen(space->machine);
 
-			if(text_reg_index == 0x0a) // set 256 color palette
+			if(state->text_reg_index == 0x0a) // set 256 color palette
 			{
 				int i,r,g,b;
 				UINT8 b_param,r_param,g_param;
@@ -1000,31 +1052,31 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 					palette_set_color_rgb(space->machine, i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 				}
 			}
-			if(text_reg_index >= 0x80 && text_reg_index <= 0x8f) //Bitmap 16 clut registers
+			if(state->text_reg_index >= 0x80 && state->text_reg_index <= 0x8f) //Bitmap 16 clut registers
 			{
 				/*
                 ---x ---- priority
                 ---- xxxx clut number
                 */
-				clut16[text_reg_index & 0xf] = data & 0x1f;
-				//printf("%02x -> [%02x]\n",text_reg[text_reg_index],text_reg_index);
+				state->clut16[state->text_reg_index & 0xf] = data & 0x1f;
+				//printf("%02x -> [%02x]\n",state->text_reg[state->text_reg_index],state->text_reg_index);
 
 				{
 					int i;
 
 					for(i=0;i<0x10;i++)
 					{
-						clut256[(text_reg_index & 0xf) | (i << 4)] = (((data & 0x1f) << 4) | i);
+						state->clut256[(state->text_reg_index & 0xf) | (i << 4)] = (((data & 0x1f) << 4) | i);
 					}
 				}
 			}
 			break;
 		case 2: /* CG Mask reg (priority mixer) */
-			cg_mask = data;
+			state->cg_mask = data;
 			break;
 		case 3:
 			/* Font size reg */
-			text_font_reg = data & 1;
+			state->text_font_reg = data & 1;
 			mz2500_reconfigure_screen(space->machine);
 			break;
 	}
@@ -1032,27 +1084,29 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 
 static WRITE8_HANDLER( mz2500_irq_sel_w )
 {
-	irq_sel = data;
-	//printf("%02x\n",irq_sel);
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->irq_sel = data;
+	//printf("%02x\n",state->irq_sel);
 	// activeness is trusted, see Tower of Druaga
-	irq_mask[0] = (data & 0x08); //CRTC
-	irq_mask[1] = (data & 0x04); //i8253
-	irq_mask[2] = (data & 0x02); //printer
-	irq_mask[3] = (data & 0x01); //RP5c15
+	state->irq_mask[0] = (data & 0x08); //CRTC
+	state->irq_mask[1] = (data & 0x04); //i8253
+	state->irq_mask[2] = (data & 0x02); //printer
+	state->irq_mask[3] = (data & 0x01); //RP5c15
 }
 
 static WRITE8_HANDLER( mz2500_irq_data_w )
 {
-	if(irq_sel & 0x80)
-		irq_vector[0] = data; //CRTC
-	if(irq_sel & 0x40)
-		irq_vector[1] = data; //i8253
-	if(irq_sel & 0x20)
-		irq_vector[2] = data; //printer
-	if(irq_sel & 0x10)
-		irq_vector[3] = data; //RP5c15
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	if(state->irq_sel & 0x80)
+		state->irq_vector[0] = data; //CRTC
+	if(state->irq_sel & 0x40)
+		state->irq_vector[1] = data; //i8253
+	if(state->irq_sel & 0x20)
+		state->irq_vector[2] = data; //printer
+	if(state->irq_sel & 0x10)
+		state->irq_vector[3] = data; //RP5c15
 
-//  popmessage("%02x %02x %02x %02x",irq_vector[0],irq_vector[1],irq_vector[2],irq_vector[3]);
+//  popmessage("%02x %02x %02x %02x",state->irq_vector[0],state->irq_vector[1],state->irq_vector[2],state->irq_vector[3]);
 }
 
 static WRITE8_HANDLER( mz2500_fdc_w )
@@ -1112,35 +1166,35 @@ static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bank7_r,bank7_w)
 ADDRESS_MAP_END
 
-static UINT32 rom_index;
-static UINT8 hrom_index,lrom_index;
 
 static READ8_HANDLER( mz2500_rom_r )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 *rom = memory_region(space->machine, "rom");
 	UINT8 res;
 
-	lrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+	state->lrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
 
-	rom_index = (rom_index & 0xffff00) | (lrom_index & 0xff);
+	state->rom_index = (state->rom_index & 0xffff00) | (state->lrom_index & 0xff);
 
-	res = rom[rom_index];
+	res = rom[state->rom_index];
 
 	return res;
 }
 
 static WRITE8_HANDLER( mz2500_rom_w )
 {
-	hrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->hrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
 
-	rom_index = (data << 8) | (rom_index & 0x0000ff) | ((hrom_index & 0xff)<<16);
+	state->rom_index = (data << 8) | (state->rom_index & 0x0000ff) | ((state->hrom_index & 0xff)<<16);
 	//printf("%02x\n",data);
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
 static WRITE8_HANDLER( palette4096_io_w )
 {
-	static UINT8 r[16],g[16],b[16];
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 pal_index;
 	UINT8 pal_entry;
 
@@ -1148,57 +1202,63 @@ static WRITE8_HANDLER( palette4096_io_w )
 	pal_entry = (pal_index & 0x1e) >> 1;
 
 	if(pal_index & 1)
-		g[pal_entry] = (data & 0x0f);
+		state->pal[pal_entry].g = (data & 0x0f);
 	else
 	{
-		r[pal_entry] = (data & 0xf0) >> 4;
-		b[pal_entry] = data & 0x0f;
+		state->pal[pal_entry].r = (data & 0xf0) >> 4;
+		state->pal[pal_entry].b = data & 0x0f;
 	}
 
-	palette_set_color_rgb(space->machine, pal_entry+0x10,pal4bit(r[pal_entry]),pal4bit(g[pal_entry]),pal4bit(b[pal_entry]));
+	palette_set_color_rgb(space->machine, pal_entry+0x10, pal4bit(state->pal[pal_entry].r), pal4bit(state->pal[pal_entry].g), pal4bit(state->pal[pal_entry].b));
 }
 
 static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
 {
-	return wd17xx_r(device, offset) ^ fdc_reverse;
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	return wd17xx_r(device, offset) ^ state->fdc_reverse;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 {
-	wd17xx_w(device, offset, data ^ fdc_reverse);
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	wd17xx_w(device, offset, data ^ state->fdc_reverse);
 }
 
 static READ8_HANDLER( mz2500_bplane_latch_r )
 {
-	if(cg_reg[7] & 0x10)
-		return mz2500_cg_latch_compare();
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	if(state->cg_reg[7] & 0x10)
+		return mz2500_cg_latch_compare(state);
 	else
-		return cg_latch[0];
+		return state->cg_latch[0];
 }
 
 
 static READ8_HANDLER( mz2500_rplane_latch_r )
 {
-	if(cg_reg[0x07] & 0x10)
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	if(state->cg_reg[0x07] & 0x10)
 	{
 		UINT8 vblank_bit;
 
-		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80 | cg_clear_flag;
+		vblank_bit = space->machine->primary_screen->vblank() ? 0 : 0x80 | state->cg_clear_flag;
 
 		return vblank_bit;
 	}
 	else
-		return cg_latch[1];
+		return state->cg_latch[1];
 }
 
 static READ8_HANDLER( mz2500_gplane_latch_r )
 {
-	return cg_latch[2];
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	return state->cg_latch[2];
 }
 
 static READ8_HANDLER( mz2500_iplane_latch_r )
 {
-	return cg_latch[3];
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	return state->cg_latch[3];
 }
 
 /*
@@ -1233,57 +1293,59 @@ static READ8_HANDLER( mz2500_iplane_latch_r )
 
 static WRITE8_HANDLER( mz2500_cg_addr_w )
 {
-	cg_reg_index = data;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->cg_reg_index = data;
 }
 
 static WRITE8_HANDLER( mz2500_cg_data_w )
 {
-	cg_reg[cg_reg_index & 0x1f] = data;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->cg_reg[state->cg_reg_index & 0x1f] = data;
 
-	if((cg_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
-		cg_reg[0x09] = 0;
+	if((state->cg_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
+		state->cg_reg[0x09] = 0;
 
-	if((cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
-		cg_reg[0x0b] = 0;
+	if((state->cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
+		state->cg_reg[0x0b] = 0;
 
-	if((cg_reg_index & 0x1f) == 0x05 && (cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
+	if((state->cg_reg_index & 0x1f) == 0x05 && (state->cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
 		UINT8 *vram = memory_region(space->machine, "maincpu");
 		UINT32 layer_bank;
 
-		layer_bank = (cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
+		layer_bank = (state->cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
 
 		/* TODO: this isn't yet 100% accurate */
-		if(cg_reg[0x05] & 1)
+		if(state->cg_reg[0x05] & 1)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x40000+layer_bank] = 0x00; //clear B
 		}
-		if(cg_reg[0x05] & 2)
+		if(state->cg_reg[0x05] & 2)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x44000+layer_bank] = 0x00; //clear R
 		}
-		if(cg_reg[0x05] & 4)
+		if(state->cg_reg[0x05] & 4)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x48000+layer_bank] = 0x00; //clear G
 		}
-		if(cg_reg[0x05] & 8)
+		if(state->cg_reg[0x05] & 8)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x4c000+layer_bank] = 0x00; //clear I
 		}
-		cg_clear_flag = 1;
+		state->cg_clear_flag = 1;
 	}
 
 	{
 		mz2500_reconfigure_screen(space->machine);
 	}
 
-	if(cg_reg_index & 0x80) //enable auto-inc
-		cg_reg_index = (cg_reg_index & 0xfc) | ((cg_reg_index + 1) & 0x03);
+	if(state->cg_reg_index & 0x80) //enable auto-inc
+		state->cg_reg_index = (state->cg_reg_index & 0xfc) | ((state->cg_reg_index + 1) & 0x03);
 }
 
 static WRITE8_HANDLER( timer_w )
@@ -1298,26 +1360,26 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate1_w(pit8253, 1);
 }
 
-static UINT8 joy_mode;
 
 static READ8_HANDLER( mz2500_joystick_r )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 res,dir_en,in_r;
 
 	res = 0xff;
-	in_r = ~input_port_read(space->machine, joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
+	in_r = ~input_port_read(space->machine, state->joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
 
-	if(joy_mode & 0x40)
+	if(state->joy_mode & 0x40)
 	{
-		if(!(joy_mode & 0x04)) res &= ~0x20;
-		if(!(joy_mode & 0x08)) res &= ~0x10;
-		dir_en = (joy_mode & 0x20) ? 0 : 1;
+		if(!(state->joy_mode & 0x04)) res &= ~0x20;
+		if(!(state->joy_mode & 0x08)) res &= ~0x10;
+		dir_en = (state->joy_mode & 0x20) ? 0 : 1;
 	}
 	else
 	{
-		if(!(joy_mode & 0x01)) res &= ~0x20;
-		if(!(joy_mode & 0x02)) res &= ~0x10;
-		dir_en = (joy_mode & 0x10) ? 0 : 1;
+		if(!(state->joy_mode & 0x01)) res &= ~0x20;
+		if(!(state->joy_mode & 0x02)) res &= ~0x10;
+		dir_en = (state->joy_mode & 0x10) ? 0 : 1;
 	}
 
 	if(dir_en)
@@ -1330,23 +1392,25 @@ static READ8_HANDLER( mz2500_joystick_r )
 
 static WRITE8_HANDLER( mz2500_joystick_w )
 {
-	joy_mode = data;
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	state->joy_mode = data;
 }
 
-static UINT16 kanji_index;
 
 static READ8_HANDLER( mz2500_kanji_r )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 *knj2_rom = memory_region(space->machine, "kanji2");
 
 	printf("Read from kanji 2 ROM\n");
 
-	return knj2_rom[(kanji_index << 1) | (offset & 1)];
+	return knj2_rom[(state->kanji_index << 1) | (offset & 1)];
 }
 
 static WRITE8_HANDLER( mz2500_kanji_w )
 {
-	(offset & 1) ? (kanji_index = (data << 8) | (kanji_index & 0xff)) : (kanji_index = (data & 0xff) | (kanji_index & 0xff00));
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
+	(offset & 1) ? (state->kanji_index = (data << 8) | (state->kanji_index & 0xff)) : (state->kanji_index = (data & 0xff) | (state->kanji_index & 0xff00));
 }
 
 static READ8_DEVICE_HANDLER( rp5c15_8_r )
@@ -1367,43 +1431,45 @@ static WRITE8_DEVICE_HANDLER( rp5c15_8_w )
 	rp5c15_w(device,rtc_index,data,0xff);
 }
 
-static UINT32 emm_offset;
 
 static READ8_HANDLER( mz2500_emm_data_r )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 *emm_ram = memory_region(space->machine, "emm");
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
 
-	emm_offset = (emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+	state->emm_offset = (state->emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
-	if(emm_offset < 0x100000) //emm max size
-		return emm_ram[emm_offset];
+	if(state->emm_offset < 0x100000) //emm max size
+		return emm_ram[state->emm_offset];
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( mz2500_emm_addr_w )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 emm_hi_index;
 
 	emm_hi_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
 
-	emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (emm_offset & 0xff);
+	state->emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (state->emm_offset & 0xff);
 }
 
 static WRITE8_HANDLER( mz2500_emm_data_w )
 {
+	mz2500_state *state = space->machine->driver_data<mz2500_state>();
 	UINT8 *emm_ram = memory_region(space->machine, "emm");
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
 
-	emm_offset = (emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+	state->emm_offset = (state->emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
-	if(emm_offset < 0x100000) //emm max size
-		emm_ram[emm_offset] = data;
+	if(state->emm_offset < 0x100000) //emm max size
+		emm_ram[state->emm_offset] = data;
 }
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
@@ -1623,26 +1689,27 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static void mz2500_reset(UINT8 type)
+static void mz2500_reset(mz2500_state *state, UINT8 type)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		bank_val[i] = bank_reset_val[type][i];
+		state->bank_val[i] = bank_reset_val[type][i];
 }
 
 static MACHINE_RESET(mz2500)
 {
+	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	UINT8 *IPL = memory_region(machine, "ipl");
 	UINT32 i;
 
-	mz2500_reset(IPL_RESET);
+	mz2500_reset(state, IPL_RESET);
 
-	//irq_vector[0] = 0xef; /* RST 28h - vblank */
+	//state->irq_vector[0] = 0xef; /* RST 28h - vblank */
 
-	text_col_size = 0;
-	text_font_reg = 0;
+	state->text_col_size = 0;
+	state->text_font_reg = 0;
 
 	/* copy IPL to its natural bank ROM/RAM position */
 	for(i=0;i<0x8000;i++)
@@ -1657,16 +1724,16 @@ static MACHINE_RESET(mz2500)
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
-		irq_mask[i] = 0;
+		state->irq_mask[i] = 0;
 
-	kanji_bank = 0;
+	state->kanji_bank = 0;
 
-	cg_clear_flag = 0;
+	state->cg_clear_flag = 0;
 
 	beep_set_frequency(machine->device("beeper"),4096);
 	beep_set_state(machine->device("beeper"),0);
 
-//	monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
+//	state->monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1736,10 +1803,11 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( mz2500_vbl )
 {
-	if(irq_mask[0])
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	if(state->irq_mask[0])
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->irq_vector[0]);
 
-	cg_clear_flag = 0;
+	state->cg_clear_flag = 0;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_porta_r )
@@ -1777,8 +1845,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 {
-	static UINT8 reset_lines;
-
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
 	/*
 	---- x--- 0->1 transition = IPL reset
 	---- -x-- beeper state
@@ -1786,9 +1853,9 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 	*/
 
 	/* work RAM reset */
-	if((reset_lines & 0x02) == 0x00 && (data & 0x02))
+	if((state->old_portc & 0x02) == 0x00 && (data & 0x02))
 	{
-		mz2500_reset(WRAM_RESET);
+		mz2500_reset(state, WRAM_RESET);
 		/* correct? */
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
@@ -1796,10 +1863,10 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 	/* bit 2 is speaker */
 
 	/* IPL reset */
-	if((reset_lines & 0x08) == 0x00 && (data & 0x08))
-		mz2500_reset(IPL_RESET);
+	if((state->old_portc & 0x08) == 0x00 && (data & 0x08))
+		mz2500_reset(state, IPL_RESET);
 
-	reset_lines = data;
+	state->old_portc = data;
 
 	beep_set_state(device->machine->device("beeper"),data & 0x04);
 
@@ -1819,28 +1886,28 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 {
-	static UINT8 prev_col_val;
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
 //  printf("%02x\n",data);
 
-	if(prev_col_val != ((data & 0x20) >> 5))
+	if(state->prev_col_val != ((data & 0x20) >> 5))
 	{
-		text_col_size = ((data & 0x20) >> 5);
-		prev_col_val = text_col_size;
+		state->text_col_size = ((data & 0x20) >> 5);
+		state->prev_col_val = state->text_col_size;
 		mz2500_reconfigure_screen(device->machine);
 	}
-	key_mux = data & 0x1f;
+	state->key_mux = data & 0x1f;
 }
 
-static UINT8 pio_latchb;
 
 static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 {
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
 	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
 
-	if(((key_mux & 0x10) == 0x00) || ((key_mux & 0x0f) == 0x0f)) //status read
+	if(((state->key_mux & 0x10) == 0x00) || ((state->key_mux & 0x0f) == 0x0f)) //status read
 	{
 		int res,i;
 
@@ -1848,20 +1915,21 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 		for(i=0;i<0xe;i++)
 			res &= input_port_read(device->machine, keynames[i]);
 
-		pio_latchb = res;
+		state->pio_latchb = res;
 
 		return res;
 	}
 
-	pio_latchb = input_port_read(device->machine, keynames[key_mux & 0xf]);
+	state->pio_latchb = input_port_read(device->machine, keynames[state->key_mux & 0xf]);
 
-	return input_port_read(device->machine, keynames[key_mux & 0xf]);
+	return input_port_read(device->machine, keynames[state->key_mux & 0xf]);
 }
 
 #if 0
 static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
 {
-	return pio_latchb;
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	return state->pio_latchb;
 }
 #endif
 
@@ -1876,25 +1944,26 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 	DEVCB_NULL
 };
 
-static UINT8 ym_porta;
 
 static READ8_DEVICE_HANDLER( opn_porta_r )
 {
-	return ym_porta;
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	return state->ym_porta;
 }
 
 static WRITE8_DEVICE_HANDLER( opn_porta_w )
 {
+	mz2500_state *state = device->machine->driver_data<mz2500_state>();
 	/*
     ---- x--- mouse select
     ---- -x-- palette bit (16/4096 colors)
     ---- --x- floppy reverse bit (controls wd17xx bits in command registers)
     */
 
-	fdc_reverse = (data & 2) ? 0x00 : 0xff;
-	pal_select = (data & 4) ? 1 : 0;
+	state->fdc_reverse = (data & 2) ? 0x00 : 0xff;
+	state->pal_select = (data & 4) ? 1 : 0;
 
-	ym_porta = data;
+	state->ym_porta = data;
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1953,8 +2022,9 @@ static PALETTE_INIT( mz2500 )
 
 static WRITE_LINE_DEVICE_HANDLER( pit8253_clk0_irq )
 {
-	if(irq_mask[1]/* && state & 1*/)
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,irq_vector[1]);
+	mz2500_state *drvstate = device->machine->driver_data<mz2500_state>();
+	if(drvstate->irq_mask[1]/* && state & 1*/)
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE,drvstate->irq_vector[1]);
 }
 
 static const struct pit8253_config mz2500_pit8253_intf =
@@ -1980,9 +2050,10 @@ static const struct pit8253_config mz2500_pit8253_intf =
 
 static void mz2500_rtc_alarm_irq(int state)
 {
+	//mz2500_state *drvstate = device->machine->driver_data<mz2500_state>();
 	/* TODO: doesn't work yet */
-//  if(irq_mask[3] && state & 1)
-//      cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,irq_vector[3]);
+//  if(drvstate->irq_mask[3] && state & 1)
+//      cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,drvstate->irq_vector[3]);
 }
 
 static const struct rp5c15_interface rtc_intf =
@@ -2000,7 +2071,7 @@ static const z80sio_interface mz2500_sio_intf =
 	NULL
 };
 
-static MACHINE_CONFIG_START( mz2500, driver_device )
+static MACHINE_CONFIG_START( mz2500, mz2500_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
     MDRV_CPU_PROGRAM_MAP(mz2500_map)

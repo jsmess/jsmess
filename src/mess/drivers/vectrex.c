@@ -18,12 +18,10 @@ Bruce Tomlin (hardware info)
 #include "sound/dac.h"
 #include "machine/nvram.h"
 
-UINT8 *gce_vectorram;
-size_t gce_vectorram_size;
 
 static ADDRESS_MAP_START(vectrex_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(&gce_vectorram) AM_SIZE(&gce_vectorram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE_MEMBER(vectrex_state, gce_vectorram) AM_SIZE_MEMBER(vectrex_state, gce_vectorram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -98,7 +96,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( vectrex, driver_device )
+static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map)
@@ -181,7 +179,7 @@ static ADDRESS_MAP_START(raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(&gce_vectorram) AM_SIZE(&gce_vectorram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE_MEMBER(vectrex_state, gce_vectorram) AM_SIZE_MEMBER(vectrex_state, gce_vectorram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE (vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

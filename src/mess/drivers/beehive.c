@@ -14,8 +14,18 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
-static const UINT8 *FNT;
-static const UINT8 *videoram;
+
+class beehive_state : public driver_device
+{
+public:
+	beehive_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	const UINT8 *FNT;
+	const UINT8 *videoram;
+};
+
+
 
 static ADDRESS_MAP_START(beehive_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -38,14 +48,16 @@ static MACHINE_RESET(beehive)
 
 static VIDEO_START( beehive )
 {
-	FNT = memory_region(machine, "chargen");
-	videoram = memory_region(machine, "maincpu")+0x81fa;
+	beehive_state *state = machine->driver_data<beehive_state>();
+	state->FNT = memory_region(machine, "chargen");
+	state->videoram = memory_region(machine, "maincpu")+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
 static VIDEO_UPDATE( beehive )
 {
+	beehive_state *state = screen->machine->driver_data<beehive_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;
@@ -64,7 +76,7 @@ static VIDEO_UPDATE( beehive )
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = videoram[xx++];
+					chr = state->videoram[xx++];
 
 				//	/* Take care of flashing characters */
 				//	if ((chr < 0x80) && (framecnt & 0x08))
@@ -74,7 +86,7 @@ static VIDEO_UPDATE( beehive )
 						x--;
 					else
 					{
-						gfx = FNT[(chr<<4) | ra ];
+						gfx = state->FNT[(chr<<4) | ra ];
 
 						/* Display a scanline of a character */
 						*p = ( gfx & 0x80 ) ? 1 : 0; p++;
@@ -94,7 +106,7 @@ static VIDEO_UPDATE( beehive )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( beehive, driver_device )
+static MACHINE_CONFIG_START( beehive, beehive_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(beehive_mem)

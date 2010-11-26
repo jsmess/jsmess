@@ -39,12 +39,6 @@
 #include "machine/6821pia.h"
 #include "machine/rescap.h"
 
-static UINT8 d6800_keylatch;
-static UINT8 d6800_keydown;
-static UINT8 d6800_screen;
-static UINT8 d6800_rtc;
-static running_device *d6800_cassette;
-static running_device *d6800_speaker;
 
 class d6800_state : public driver_device
 {
@@ -53,6 +47,12 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 dummy;
+	UINT8 keylatch;
+	UINT8 keydown;
+	UINT8 screen;
+	UINT8 rtc;
+	running_device *cassette;
+	running_device *speaker;
 };
 
 
@@ -103,6 +103,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( d6800 )
 {
+	d6800_state *state = screen->machine->driver_data<d6800_state>();
 	UINT8 x,y,gfx=0;
 	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
@@ -112,7 +113,7 @@ static VIDEO_UPDATE( d6800 )
 
 		for (x = 0; x < 8; x++)
 		{
-			if (d6800_screen)
+			if (state->screen)
 				gfx = RAM[0x100 | x | (y<<3)];
 
 			*p++ = ( gfx & 0x80 ) ? 1 : 0;
@@ -132,19 +133,22 @@ static VIDEO_UPDATE( d6800 )
 
 static INTERRUPT_GEN( d6800_interrupt )
 {
-	d6800_rtc = 1;
+	d6800_state *state = device->machine->driver_data<d6800_state>();
+	state->rtc = 1;
 }
 
 static READ_LINE_DEVICE_HANDLER( d6800_rtc_pulse )
 {
-	UINT8 res = d6800_rtc;
-	d6800_rtc = 0;
+	d6800_state *state = device->machine->driver_data<d6800_state>();
+	UINT8 res = state->rtc;
+	state->rtc = 0;
 	return res;
 }
 
 static READ_LINE_DEVICE_HANDLER( d6800_keydown_r )
 {
-	return d6800_keydown;
+	d6800_state *state = device->machine->driver_data<d6800_state>();
+	return state->keydown;
 }
 
 static READ_LINE_DEVICE_HANDLER( d6800_fn_key_r )
@@ -154,7 +158,8 @@ static READ_LINE_DEVICE_HANDLER( d6800_fn_key_r )
 
 static WRITE_LINE_DEVICE_HANDLER( d6800_screen_w )
 {
-	d6800_screen = state;
+	d6800_state *drvstate = device->machine->driver_data<d6800_state>();
+	drvstate->screen = state;
 }
 
 static READ8_DEVICE_HANDLER( d6800_cassette_r )
@@ -171,31 +176,34 @@ static READ8_DEVICE_HANDLER( d6800_cassette_r )
 
 static WRITE8_DEVICE_HANDLER( d6800_cassette_w )
 {
+	d6800_state *state = device->machine->driver_data<d6800_state>();
 	/*
 	Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
 	or 1200 Hz depending on the state of the transistor. This is controlled by
 	bit 0 of the PIA. Bit 6 drives the speaker.
 	*/
 
-	speaker_level_w(d6800_speaker, (data & 0x40) ? 0 : 1);
+	speaker_level_w(state->speaker, (data & 0x40) ? 0 : 1);
 }
 
 static READ8_DEVICE_HANDLER( d6800_keyboard_r )
 {
+	d6800_state *state = device->machine->driver_data<d6800_state>();
 	UINT8 data = 0xff;
 
-	if (!BIT(d6800_keylatch, 4)) data &= input_port_read(device->machine, "LINE0");
-	if (!BIT(d6800_keylatch, 5)) data &= input_port_read(device->machine, "LINE1");
-	if (!BIT(d6800_keylatch, 6)) data &= input_port_read(device->machine, "LINE2");
-	if (!BIT(d6800_keylatch, 7)) data &= input_port_read(device->machine, "LINE3");
+	if (!BIT(state->keylatch, 4)) data &= input_port_read(device->machine, "LINE0");
+	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine, "LINE1");
+	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine, "LINE2");
+	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine, "LINE3");
 
-	d6800_keydown = (data==0xff) ? 0 : 1;
+	state->keydown = (data==0xff) ? 0 : 1;
 
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( d6800_keyboard_w )
 {
+	d6800_state *state = device->machine->driver_data<d6800_state>();
 	/*
 
         bit     description
@@ -212,7 +220,7 @@ static WRITE8_DEVICE_HANDLER( d6800_keyboard_w )
     */
 
 
-	d6800_keylatch = data & 0xf0;
+	state->keylatch = data & 0xf0;
 }
 
 static const pia6821_interface d6800_mc6821_intf =
@@ -235,8 +243,9 @@ static const pia6821_interface d6800_mc6821_intf =
 
 static MACHINE_START( d6800 )
 {
-	d6800_speaker = machine->device("speaker");
-	d6800_cassette = machine->device("cassette");
+	d6800_state *state = machine->driver_data<d6800_state>();
+	state->speaker = machine->device("speaker");
+	state->cassette = machine->device("cassette");
 }
 
 static MACHINE_RESET( d6800 )

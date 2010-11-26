@@ -25,26 +25,54 @@ enum
 };
 
 
+class nc_state : public driver_device
+{
+public:
+	nc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	emu_timer *serial_timer;
+	char memory_config[4];
+	emu_timer *keyboard_timer;
+	int membank_rom_mask;
+	int membank_internal_ram_mask;
+	UINT8 poweroff_control;
+	int card_status;
+	unsigned char uart_control;
+	int irq_mask;
+	int irq_status;
+	int irq_latch;
+	int irq_latch_mask;
+	int sound_channel_periods[2];
+	mame_file *file;
+	int previous_inputport_10_state;
+	int previous_alarm_state;
+	UINT8 nc200_uart_interrupt_irq;
+	unsigned char *card_ram;
+	int membank_card_ram_mask;
+	unsigned long display_memory_start;
+	UINT8 type;
+	int card_size;
+	int nc200_backlight;
+};
+
+
 /*----------- defined in video/nc.c -----------*/
 
 extern VIDEO_START( nc );
 extern VIDEO_UPDATE( nc );
 extern PALETTE_INIT( nc );
 
-void nc200_video_set_backlight(int state);
+void nc200_video_set_backlight(running_machine *machine, int state);
 
 
 /*----------- defined in drivers/nc.c -----------*/
 
 /* pointer to loaded data */
-extern unsigned char *nc_card_ram;
 /* mask used to stop access over end of card ram area */
-extern int nc_membank_card_ram_mask;
 
-extern unsigned long nc_display_memory_start;
-extern UINT8 nc_type;
 
-void nc_set_card_present_state(int);
+void nc_set_card_present_state(running_machine *machine, int state);
 
 
 /*----------- defined in machine/nc.c -----------*/

@@ -40,11 +40,11 @@ PALETTE_INIT( nc )
 	palette_set_colors(machine, 0, nc_palette, ARRAY_LENGTH(nc_palette));
 }
 
-static int nc200_backlight = 0;
 
-void nc200_video_set_backlight(int state)
+void nc200_video_set_backlight(running_machine *machine, int state)
 {
-	nc200_backlight = state;
+	nc_state *drvstate = machine->driver_data<nc_state>();
+	drvstate->nc200_backlight = state;
 }
 
 
@@ -55,18 +55,19 @@ void nc200_video_set_backlight(int state)
 ***************************************************************************/
 VIDEO_UPDATE( nc )
 {
+	nc_state *state = screen->machine->driver_data<nc_state>();
 	int y;
 	int b;
 	int x;
 	int height, width;
 	int pens[2];
 
-    if (nc_type==NC_TYPE_200)
+    if (state->type==NC_TYPE_200)
     {
         height = NC200_SCREEN_HEIGHT;
         width = NC200_SCREEN_WIDTH;
 
-		if (nc200_backlight)
+		if (state->nc200_backlight)
 		{
 			pens[0] = 2;
 			pens[1] = 3;
@@ -90,7 +91,7 @@ VIDEO_UPDATE( nc )
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)messram_get_ptr(screen->machine->device("messram"))) + nc_display_memory_start + (y<<6);
+		char *line_ptr = ((char*)messram_get_ptr(screen->machine->device("messram"))) + state->display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

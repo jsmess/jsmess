@@ -91,48 +91,6 @@ enum
 	pdp1_fontdata_size = 8 * pdp1_charnum
 };
 
-
-/*----------- defined in machine/pdp1.c -----------*/
-
-extern pdp1_reset_param_t pdp1_reset_param;
-
-MACHINE_START( pdp1 );
-MACHINE_RESET( pdp1 );
-
-DEVICE_START( pdp1_tape );
-DEVICE_IMAGE_LOAD( pdp1_tape );
-DEVICE_IMAGE_UNLOAD( pdp1_tape );
-
-DEVICE_IMAGE_LOAD(pdp1_typewriter);
-DEVICE_IMAGE_UNLOAD(pdp1_typewriter);
-
-DEVICE_IMAGE_LOAD(pdp1_drum);
-DEVICE_IMAGE_UNLOAD(pdp1_drum);
-
-INTERRUPT_GEN( pdp1_interrupt );
-
-void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-
-typedef struct lightpen_t
-{
-	char active;
-	char down;
-	short x, y;
-	short radius;
-} lightpen_t;
-
-
-/*----------- defined in video/pdp1.c -----------*/
-
-VIDEO_START( pdp1 );
-VIDEO_UPDATE( pdp1 );
-
-void pdp1_plot(int x, int y);
-
-void pdp1_typewriter_drawchar(running_machine *machine, int character);
-
-void pdp1_update_lightpen_state(const lightpen_t *new_state);
-
 enum
 {
 	/* size and position of crt window */
@@ -204,6 +162,131 @@ enum
 	pen_lightpen_nonpressed = pen_red,
 	pen_lightpen_pressed = pen_green
 };
+
+/* tape reader registers */
+typedef struct tape_reader_t
+{
+	device_image_interface *fd;	/* file descriptor of tape image */
+
+	int motor_on;	/* 1-bit reader motor on */
+
+	int rb;			/* 18-bit reader buffer */
+	int rcl;		/* 1-bit reader clutch */
+	int rc;			/* 2-bit reader counter */
+	int rby;		/* 1-bit reader binary mode flip-flop */
+	int rcp;		/* 1-bit reader "need a completion pulse" flip-flop */
+
+	emu_timer *timer;	/* timer to simulate reader timing */
+} tape_reader_t;
+
+
+
+/* tape puncher registers */
+typedef struct tape_puncher_t
+{
+	device_image_interface *fd;	/* file descriptor of tape image */
+
+	emu_timer *timer;	/* timer to generate completion pulses */
+} tape_puncher_t;
+
+
+
+/* typewriter registers */
+typedef struct typewriter_t
+{
+	device_image_interface *fd;	/* file descriptor of output image */
+
+	int tb;			/* state->typewriter buffer */
+
+	emu_timer *tyo_timer;/* timer to generate completion pulses */
+} typewriter_t;
+
+/* MIT parallel drum (mostly similar to type 23) */
+typedef struct parallel_drum_t
+{
+	device_image_interface *fd;	/* file descriptor of drum image */
+
+	int il;			/* initial location (12-bit) */
+	int wc;			/* word counter (12-bit) */
+	int wcl;		/* word core location counter (16-bit) */
+	int rfb;		/* read field buffer (5-bit) */
+	int wfb;		/* write field buffer (5-bit) */
+
+	int dba;
+
+	emu_timer *rotation_timer;	/* timer called each time dc is 0 */
+	emu_timer *il_timer;		/* timer called each time dc is il */
+} parallel_drum_t;
+
+
+typedef struct lightpen_t
+{
+	char active;
+	char down;
+	short x, y;
+	short radius;
+} lightpen_t;
+
+
+class pdp1_state : public driver_device
+{
+public:
+	pdp1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	pdp1_reset_param_t reset_param;
+	int io_status;
+	tape_reader_t tape_reader;
+	tape_puncher_t tape_puncher;
+	typewriter_t typewriter;
+	emu_timer *dpy_timer;
+	lightpen_t lightpen;
+	parallel_drum_t parallel_drum;
+	int old_typewriter_keys[4];
+	int old_lightpen;
+	int old_control_keys;
+	int old_tw_keys;
+	int old_ta_keys;
+	int typewriter_color;
+	bitmap_t *panel_bitmap;
+	bitmap_t *typewriter_bitmap;
+	lightpen_t lightpen_state;
+	lightpen_t previous_lightpen_state;
+	int pos;
+	int case_shift;
+};
+
+
+/*----------- defined in machine/pdp1.c -----------*/
+
+extern pdp1_reset_param_t pdp1_reset_param;
+
+MACHINE_START( pdp1 );
+MACHINE_RESET( pdp1 );
+
+DEVICE_START( pdp1_tape );
+DEVICE_IMAGE_LOAD( pdp1_tape );
+DEVICE_IMAGE_UNLOAD( pdp1_tape );
+
+DEVICE_IMAGE_LOAD(pdp1_typewriter);
+DEVICE_IMAGE_UNLOAD(pdp1_typewriter);
+
+DEVICE_IMAGE_LOAD(pdp1_drum);
+DEVICE_IMAGE_UNLOAD(pdp1_drum);
+
+INTERRUPT_GEN( pdp1_interrupt );
+
+void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
+
+
+/*----------- defined in video/pdp1.c -----------*/
+
+VIDEO_START( pdp1 );
+VIDEO_UPDATE( pdp1 );
+
+void pdp1_plot(int x, int y);
+void pdp1_typewriter_drawchar(running_machine *machine, int character);
+void pdp1_update_lightpen_state(running_machine *machine, const lightpen_t *new_state);
 
 
 #endif /* PDP1_H_ */

@@ -16,19 +16,19 @@
 /* the data is stored as a simple memory dump, there is no header or other information */
 
 /* stores size of actual file on filesystem */
-static int nc_card_size;
 
 /* save card data back */
 static void nc_card_save(device_image_interface &image)
 {
+	nc_state *state = image.device().machine->driver_data<nc_state>();
 	/* if there is no data to write, quit */
-	if (!nc_card_ram || !nc_card_size)
+	if (!state->card_ram || !state->card_size)
 		return;
 
 	logerror("attempting card save\n");
 
 	/* write data */
-	image.fwrite(nc_card_ram, nc_card_size);
+	image.fwrite(state->card_ram, state->card_size);
 
 	logerror("write succeeded!\r\n");
 }
@@ -56,10 +56,11 @@ static int nc_card_calculate_mask(int size)
 /* load card image */
 static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 {
+	nc_state *state = image.device().machine->driver_data<nc_state>();
 	int datasize;
 	unsigned char *data;
 
-	/* get file size */
+	/* get state->file size */
 	datasize = image.length();
 
 	if (datasize!=0)
@@ -69,18 +70,18 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 		if (data!=NULL)
 		{
-			nc_card_size = datasize;
+			state->card_size = datasize;
 
-			/* read whole file */
+			/* read whole state->file */
 			image.fread(data, datasize);
 
 			*ptr = data;
 
 			logerror("File loaded!\r\n");
 
-			nc_membank_card_ram_mask = nc_card_calculate_mask(datasize);
+			state->membank_card_ram_mask = nc_card_calculate_mask(datasize);
 
-			logerror("Mask: %02x\n",nc_membank_card_ram_mask);
+			logerror("Mask: %02x\n",state->membank_card_ram_mask);
 
 			/* ok! */
 			return 1;
@@ -92,27 +93,29 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 DEVICE_START( nc_pcmcia_card )
 {
+	nc_state *state = device->machine->driver_data<nc_state>();
 	/* card not present */
-	nc_set_card_present_state(0);
+	nc_set_card_present_state(device->machine, 0);
 	/* card ram NULL */
-	nc_card_ram = NULL;
-	nc_card_size = 0;
+	state->card_ram = NULL;
+	state->card_size = 0;
 }
 
 /* load pcmcia card */
 DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 {
+	nc_state *state = image.device().machine->driver_data<nc_state>();
 	/* filename specified */
 
-	/* attempt to load file */
-	if (nc_card_load(image, &nc_card_ram))
+	/* attempt to load state->file */
+	if (nc_card_load(image, &state->card_ram))
 	{
-		if (nc_card_ram!=NULL)
+		if (state->card_ram!=NULL)
 		{
 			/* card present! */
-			if (nc_membank_card_ram_mask!=0)
+			if (state->membank_card_ram_mask!=0)
 			{
-				nc_set_card_present_state(1);
+				nc_set_card_present_state(image.device().machine, 1);
 			}
 			return IMAGE_INIT_PASS;
 		}
@@ -124,19 +127,20 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 
 DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 {
+	nc_state *state = image.device().machine->driver_data<nc_state>();
 	/* save card data if there is any */
 	nc_card_save(image);
 
 	/* free ram allocated to card */
-	if (nc_card_ram!=NULL)
+	if (state->card_ram!=NULL)
 	{
-		free(nc_card_ram);
-		nc_card_ram = NULL;
+		free(state->card_ram);
+		state->card_ram = NULL;
 	}
-	nc_card_size = 0;
+	state->card_size = 0;
 
 	/* set card not present state */
-	nc_set_card_present_state(0);
+	nc_set_card_present_state(image.device().machine, 0);
 }
 
 

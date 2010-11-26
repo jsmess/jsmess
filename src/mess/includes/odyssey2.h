@@ -27,6 +27,81 @@
 #define I824X_SCREEN_HEIGHT				243
 #define I824X_LINE_CLOCKS				228
 
+typedef union {
+    UINT8 reg[0x100];
+    struct {
+	struct {
+	    UINT8 y,x,color,res;
+	} sprites[4];
+	struct {
+	    UINT8 y,x,ptr,color;
+	} foreground[12];
+	struct {
+	    struct {
+		UINT8 y,x,ptr,color;
+	    } single[4];
+	} quad[4];
+	UINT8 shape[4][8];
+	UINT8 control;
+	UINT8 status;
+	UINT8 collision;
+	UINT8 color;
+	UINT8 y;
+	UINT8 x;
+	UINT8 res;
+	UINT8 shift1,shift2,shift3;
+	UINT8 sound;
+	UINT8 res2[5+0x10];
+	UINT8 hgrid[2][0x10];
+	UINT8 vgrid[0x10];
+    } s;
+} o2_vdc_t;
+
+typedef struct
+{
+	UINT8	X;
+	UINT8	Y;
+	UINT8	Y0;
+	UINT8	R;
+	UINT8	M;
+	UINT8	TA;
+	UINT8	TB;
+	UINT8	busy;
+	UINT8	ram[1024];
+} ef9341_t;
+
+
+class odyssey2_state : public driver_device
+{
+public:
+	odyssey2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int the_voice_lrq_state;
+	UINT8 *ram;
+	UINT8 p1;
+	UINT8 p2;
+	size_t cart_size;
+	o2_vdc_t o2_vdc;
+	UINT32 o2_snd_shift[2];
+	UINT8 x_beam_pos;
+	UINT8 y_beam_pos;
+	UINT8 control_status;
+	UINT8 collision_status;
+	int iff;
+	emu_timer *i824x_line_timer;
+	emu_timer *i824x_hblank_timer;
+	bitmap_t *tmp_bitmap;
+	int start_vpos;
+	int start_vblank;
+	UINT8 lum;
+	UINT16 lfsr;
+	sound_stream *sh_channel;
+	UINT16 sh_count;
+	//ef9341_t ef9341;
+};
+
+
 /*----------- defined in video/odyssey2.c -----------*/
 
 extern const UINT8 odyssey2_colors[];
@@ -41,8 +116,8 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 
 STREAM_UPDATE( odyssey2_sh_update );
 
-void odyssey2_ef9341_w( int command, int b, UINT8 data );
-UINT8 odyssey2_ef9341_r( int command, int b );
+void odyssey2_ef9341_w( running_machine *machine, int command, int b, UINT8 data );
+UINT8 odyssey2_ef9341_r( running_machine *machine, int command, int b );
 
 DECLARE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
 

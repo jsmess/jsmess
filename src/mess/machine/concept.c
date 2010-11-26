@@ -62,14 +62,6 @@ const via6522_interface concept_via6522_intf =
 
 /* Expansion slots */
 
-static struct
-{
-	read8_space_func reg_read;
-	write8_space_func reg_write;
-	read8_space_func rom_read;
-	write8_space_func rom_write;
-} expansion_slots[4];
-
 static void concept_fdc_init(running_machine *machine, int slot);
 static void concept_hdc_init(running_machine *machine, int slot);
 
@@ -87,20 +79,21 @@ MACHINE_START(concept)
 	memset(state->KeyStateSave, 0, sizeof(state->KeyStateSave));
 
 	/* initialize expansion slots */
-	memset(expansion_slots, 0, sizeof(expansion_slots));
+	memset(state->expansion_slots, 0, sizeof(state->expansion_slots));
 
 	concept_hdc_init(machine, 1);	/* Flat cable Hard Disk Controller in Slot 2 */
 	concept_fdc_init(machine, 2);	/* Floppy Disk Controller in Slot 3 */
 }
 
-static void install_expansion_slot(int slot,
+static void install_expansion_slot(running_machine *machine, int slot,
 	read8_space_func reg_read, write8_space_func reg_write,
 	read8_space_func rom_read, write8_space_func rom_write)
 {
-	expansion_slots[slot].reg_read = reg_read;
-	expansion_slots[slot].reg_write = reg_write;
-	expansion_slots[slot].rom_read = rom_read;
-	expansion_slots[slot].rom_write = rom_write;
+	concept_state *state = machine->driver_data<concept_state>();
+	state->expansion_slots[slot].reg_read = reg_read;
+	state->expansion_slots[slot].reg_write = reg_write;
+	state->expansion_slots[slot].rom_read = rom_read;
+	state->expansion_slots[slot].rom_write = rom_write;
 }
 
 VIDEO_START(concept)
@@ -284,8 +277,8 @@ READ16_HANDLER(concept_io_r)
 			/* IO4 registers */
 			{
 				int slot = ((offset >> 4) & 7) - 1;
-				if (expansion_slots[slot].reg_read)
-					return expansion_slots[slot].reg_read(space, offset & 0xf);
+				if (state->expansion_slots[slot].reg_read)
+					return state->expansion_slots[slot].reg_read(space, offset & 0xf);
 			}
 			break;
 
@@ -307,8 +300,8 @@ READ16_HANDLER(concept_io_r)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
-			if (expansion_slots[slot].rom_read)
-				return expansion_slots[slot].rom_read(space, offset & 0xff);
+			if (state->expansion_slots[slot].rom_read)
+				return state->expansion_slots[slot].rom_read(space, offset & 0xff);
 		}
 		break;
 
@@ -427,8 +420,8 @@ WRITE16_HANDLER(concept_io_w)
 				int slot = ((offset >> 4) & 7) - 1;
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
-				if (expansion_slots[slot].reg_write)
-					expansion_slots[slot].reg_write(space, offset & 0xf, data);
+				if (state->expansion_slots[slot].reg_write)
+					state->expansion_slots[slot].reg_write(space, offset & 0xf, data);
 			}
 			break;
 
@@ -450,8 +443,8 @@ WRITE16_HANDLER(concept_io_w)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
-			if (expansion_slots[slot].rom_write)
-				expansion_slots[slot].rom_write(space, offset & 0xff, data);
+			if (state->expansion_slots[slot].rom_write)
+				state->expansion_slots[slot].rom_write(space, offset & 0xff, data);
 		}
 		break;
 
@@ -568,7 +561,7 @@ static void concept_fdc_init(running_machine *machine, int slot)
 	state->fdc_local_status = 0;
 	state->fdc_local_command = 0;
 
-	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
+	install_expansion_slot(machine, slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
@@ -691,7 +684,7 @@ static  READ8_HANDLER(concept_hdc_rom_r);
 static void concept_hdc_init(running_machine *machine, int slot)
 {
 	if(corvus_hdc_init(machine))
-		install_expansion_slot(slot, concept_hdc_reg_r, concept_hdc_reg_w, concept_hdc_rom_r, NULL);
+		install_expansion_slot(machine, slot, concept_hdc_reg_r, concept_hdc_reg_w, concept_hdc_rom_r, NULL);
 }
 
 /*

@@ -21,6 +21,15 @@ enum
 	MaxKeyMessageLen = 1
 };
 
+typedef struct
+{
+	read8_space_func reg_read;
+	write8_space_func reg_write;
+	read8_space_func rom_read;
+	write8_space_func rom_write;
+} expansion_slot_t;
+
+
 class concept_state : public driver_device
 {
 public:
@@ -37,6 +46,7 @@ public:
 	UINT32 KeyStateSave[3];
 	UINT8 fdc_local_status;
 	UINT8 fdc_local_command;
+	expansion_slot_t expansion_slots[4];
 };
 
 

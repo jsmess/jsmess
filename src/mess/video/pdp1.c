@@ -23,10 +23,7 @@
 #include "video/crt.h"
 
 
-static int typewriter_color;
 
-static bitmap_t *panel_bitmap;
-static bitmap_t *typewriter_bitmap;
 
 static const rectangle typewriter_bitmap_bounds =
 {
@@ -43,9 +40,8 @@ static const rectangle panel_bitmap_bounds =
 static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap);
 static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap);
 
-static lightpen_t lightpen_state, previous_lightpen_state;
-static void pdp1_erase_lightpen(bitmap_t *bitmap);
-static void pdp1_draw_lightpen(bitmap_t *bitmap);
+static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t *bitmap);
+static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t *bitmap);
 
 INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -57,16 +53,17 @@ INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 */
 VIDEO_START( pdp1 )
 {
-	typewriter_color = color_typewriter_black;
+	pdp1_state *state = machine->driver_data<pdp1_state>();
+	state->typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
-	panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
+	state->panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
+	state->typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up out bitmaps */
-	pdp1_draw_panel_backdrop(machine, panel_bitmap);
+	pdp1_draw_panel_backdrop(machine, state->panel_bitmap);
 
-	bitmap_fill(typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
+	bitmap_fill(state->typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
 	/* initialize CRT */
 	video_start_crt(machine, pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
@@ -90,14 +87,15 @@ void pdp1_plot(int x, int y)
 */
 VIDEO_UPDATE( pdp1 )
 {
-	pdp1_erase_lightpen(bitmap);
+	pdp1_state *state = screen->machine->driver_data<pdp1_state>();
+	pdp1_erase_lightpen(state, bitmap);
 	VIDEO_UPDATE_CALL(crt);
-	pdp1_draw_lightpen(bitmap);
+	pdp1_draw_lightpen(state, bitmap);
 
-	pdp1_draw_panel(screen->machine, panel_bitmap);
-	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
+	pdp1_draw_panel(screen->machine, state->panel_bitmap);
+	copybitmap(bitmap, state->panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
+	copybitmap(bitmap, state->typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 
@@ -255,8 +253,9 @@ static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const c
 */
 static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
+	pdp1_state *state = machine->driver_data<pdp1_state>();
 	/* fill with black */
-	bitmap_fill(panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
+	bitmap_fill(state->panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
 
 	/* column 1: registers, test word, test address */
 	pdp1_draw_string(machine, bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
@@ -350,9 +349,7 @@ static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 */
 
 
-static int pos;
 
-static int case_shift;
 
 enum
 {
@@ -374,20 +371,22 @@ enum
 
 static void pdp1_typewriter_linefeed(running_machine *machine)
 {
+	pdp1_state *state = machine->driver_data<pdp1_state>();
 	UINT8 buf[typewriter_window_width];
 	int y;
 
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
-		extract_scanline8(typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens);
+		extract_scanline8(state->typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
+		draw_scanline8(state->typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens);
 	}
 
-	bitmap_fill(typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
+	bitmap_fill(state->typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
 }
 
 void pdp1_typewriter_drawchar(running_machine *machine, int character)
 {
+	pdp1_state *state = machine->driver_data<pdp1_state>();
 	static const char ascii_table[2][64] =
 	{	/* n-s = non-spacing */
 		{	/* lower case */
@@ -436,57 +435,57 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
 	{
 	case 034:
 		/* Black */
-		typewriter_color = color_typewriter_black;
+		state->typewriter_color = color_typewriter_black;
 		break;
 
 	case 035:
 		/* Red */
-		typewriter_color = color_typewriter_red;
+		state->typewriter_color = color_typewriter_red;
 		break;
 
 	case 036:
 		/* Tab */
-		pos = pos + tab_step - (pos % tab_step);
+		state->pos = state->pos + tab_step - (state->pos % tab_step);
 		break;
 
 	case 072:
 		/* Lower case */
-		case_shift = 0;
+		state->case_shift = 0;
 		break;
 
 	case 074:
 		/* Upper case */
-		case_shift = 1;
+		state->case_shift = 1;
 		break;
 
 	case 075:
 		/* Backspace */
-		if (pos)
-			pos--;
+		if (state->pos)
+			state->pos--;
 		break;
 
 	case 077:
 		/* Carriage Return */
-		pos = 0;
+		state->pos = 0;
 		pdp1_typewriter_linefeed(machine);
 		break;
 
 	default:
 		/* Any printable character... */
 
-		if (pos >= 80)
+		if (state->pos >= 80)
 		{	/* if past right border, wrap around. (Right???) */
 			pdp1_typewriter_linefeed(machine);	/* next line */
-			pos = 0;					/* return to start of line */
+			state->pos = 0;					/* return to start of line */
 		}
 
 		/* print character (lookup ASCII equivalent in table) */
-		pdp1_draw_char(machine, typewriter_bitmap, ascii_table[case_shift][character],
-						8*pos, typewriter_write_offset_y,
-						typewriter_color);	/* print char */
+		pdp1_draw_char(machine, state->typewriter_bitmap, ascii_table[state->case_shift][character],
+						8*state->pos, typewriter_write_offset_y,
+						state->typewriter_color);	/* print char */
 
 		if ((character!= 040) && (character!= 056))	/* 040 and 056 are non-spacing characters */
-			pos++;		/* step carriage forward */
+			state->pos++;		/* step carriage forward */
 
 		break;
 	}
@@ -498,9 +497,10 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
     lightpen code
 */
 
-void pdp1_update_lightpen_state(const lightpen_t *new_state)
+void pdp1_update_lightpen_state(running_machine *machine, const lightpen_t *new_state)
 {
-	lightpen_state = *new_state;
+	pdp1_state *state = machine->driver_data<pdp1_state>();
+	state->lightpen_state = *new_state;
 }
 
 #if 1
@@ -571,40 +571,40 @@ static void pdp1_draw_circle(bitmap_t *bitmap, int x, int y, int radius, int col
 }
 #endif
 
-static void pdp1_erase_lightpen(bitmap_t *bitmap)
+static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t *bitmap)
 {
-	if (previous_lightpen_state.active)
+	if (state->previous_lightpen_state.active)
 	{
 #if 0
-		if (previous_lightpen_state.x>0)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
-		if (previous_lightpen_state.x<1023)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
-		if (previous_lightpen_state.y>0)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
-		if (previous_lightpen_state.y<1023)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);
+		if (state->previous_lightpen_state.x>0)
+			pdp1_plot_pixel(bitmap, state->previous_lightpen_state.x/2-1, state->previous_lightpen_state.y/2, pen_black);
+		if (state->previous_lightpen_state.x<1023)
+			pdp1_plot_pixel(bitmap, state->previous_lightpen_state.x/2+1, state->previous_lightpen_state.y/2, pen_black);
+		if (state->previous_lightpen_state.y>0)
+			pdp1_plot_pixel(bitmap, state->previous_lightpen_state.x/2, state->previous_lightpen_state.y/2-1, pen_black);
+		if (state->previous_lightpen_state.y<1023)
+			pdp1_plot_pixel(bitmap, state->previous_lightpen_state.x/2, state->previous_lightpen_state.y/2+1, pen_black);
 #endif
-		pdp1_draw_circle(bitmap, previous_lightpen_state.x, previous_lightpen_state.y, previous_lightpen_state.radius, pen_black);
+		pdp1_draw_circle(bitmap, state->previous_lightpen_state.x, state->previous_lightpen_state.y, state->previous_lightpen_state.radius, pen_black);
 	}
 }
 
-static void pdp1_draw_lightpen(bitmap_t *bitmap)
+static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t *bitmap)
 {
-	if (lightpen_state.active)
+	if (state->lightpen_state.active)
 	{
-		int color_ = lightpen_state.down ? pen_lightpen_pressed : pen_lightpen_nonpressed;
+		int color_ = state->lightpen_state.down ? pen_lightpen_pressed : pen_lightpen_nonpressed;
 #if 0
-		if (lightpen_state.x>0)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
-		if (lightpen_state.x<1023)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
-		if (lightpen_state.y>0)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
-		if (lightpen_state.y<1023)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);
+		if (state->lightpen_state.x>0)
+			pdp1_plot_pixel(bitmap, state->lightpen_state.x/2-1, state->lightpen_state.y/2, color);
+		if (state->lightpen_state.x<1023)
+			pdp1_plot_pixel(bitmap, state->lightpen_state.x/2+1, state->lightpen_state.y/2, color);
+		if (state->lightpen_state.y>0)
+			pdp1_plot_pixel(bitmap, state->lightpen_state.x/2, state->lightpen_state.y/2-1, color);
+		if (state->lightpen_state.y<1023)
+			pdp1_plot_pixel(bitmap, state->lightpen_state.x/2, state->lightpen_state.y/2+1, color);
 #endif
-		pdp1_draw_circle(bitmap, lightpen_state.x, lightpen_state.y, lightpen_state.radius, color_);
+		pdp1_draw_circle(bitmap, state->lightpen_state.x, state->lightpen_state.y, state->lightpen_state.radius, color_);
 	}
-	previous_lightpen_state = lightpen_state;
+	state->previous_lightpen_state = state->lightpen_state;
 }

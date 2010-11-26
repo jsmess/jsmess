@@ -172,7 +172,7 @@ static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( odyssey2, driver_device )
+static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( odyssey2, driver_device )
 	MDRV_FRAGMENT_ADD(odyssey2_cartslot)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( videopac, driver_device )
+static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( videopac, driver_device )
 	MDRV_FRAGMENT_ADD(odyssey2_cartslot)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( g7400, driver_device )
+static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8048, 5911000 )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem)

@@ -457,7 +457,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 #define PAD_DATA_OK   ( 0x5a ) /* Z */
 #define PAD_DATA_IDLE ( 0xff )
 
-static struct
+typedef struct
 {
 	int n_shiftin;
 	int n_shiftout;
@@ -466,17 +466,20 @@ static struct
 	int n_byte;
 	int b_lastclock;
 	int b_ack;
-} m_pad[ 2 ];
+} pad_t;
+static pad_t m_pad[ 2 ];
 
 static TIMER_CALLBACK(psx_pad_ack)
 {
 	int n_port = param;
-	if( m_pad[ n_port ].n_state != PAD_STATE_IDLE )
+	pad_t *pad = &m_pad[ n_port];
+
+	if( pad->n_state != PAD_STATE_IDLE )
 	{
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, m_pad[ n_port ].b_ack * PSX_SIO_IN_DSR );
-		if( !m_pad[ n_port ].b_ack )
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, pad->b_ack * PSX_SIO_IN_DSR );
+		if( !pad->b_ack )
 		{
-			m_pad[ n_port ].b_ack = 1;
+			pad->b_ack = 1;
 			timer_set(machine, ATTOTIME_IN_USEC( 2 ), NULL, n_port, psx_pad_ack );
 		}
 	}
@@ -484,6 +487,7 @@ static TIMER_CALLBACK(psx_pad_ack)
 
 static void psx_pad( running_machine *machine, int n_port, int n_data )
 {
+	pad_t *pad = &m_pad[ n_port];
 	int b_sel;
 	int b_clock;
 	int b_data;
@@ -499,90 +503,90 @@ static void psx_pad( running_machine *machine, int n_port, int n_data )
 
 	if( b_sel )
 	{
-		m_pad[ n_port ].n_state = PAD_STATE_IDLE;
+		pad->n_state = PAD_STATE_IDLE;
 	}
 
-	switch( m_pad[ n_port ].n_state )
+	switch( pad->n_state )
 	{
 	case PAD_STATE_LISTEN:
 	case PAD_STATE_ACTIVE:
 	case PAD_STATE_READ:
-		if( m_pad[ n_port ].b_lastclock && !b_clock )
+		if( pad->b_lastclock && !b_clock )
 		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( m_pad[ n_port ].n_shiftout & 1 ) * PSX_SIO_IN_DATA );
-			m_pad[ n_port ].n_shiftout >>= 1;
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( pad->n_shiftout & 1 ) * PSX_SIO_IN_DATA );
+			pad->n_shiftout >>= 1;
 		}
-		if( !m_pad[ n_port ].b_lastclock && b_clock )
+		if( !pad->b_lastclock && b_clock )
 		{
-			m_pad[ n_port ].n_shiftin >>= 1;
-			m_pad[ n_port ].n_shiftin |= b_data << 7;
-			m_pad[ n_port ].n_bits++;
+			pad->n_shiftin >>= 1;
+			pad->n_shiftin |= b_data << 7;
+			pad->n_bits++;
 
-			if( m_pad[ n_port ].n_bits == 8 )
+			if( pad->n_bits == 8 )
 			{
-				m_pad[ n_port ].n_bits = 0;
+				pad->n_bits = 0;
 				b_ready = 1;
 			}
 		}
 		break;
 	}
 
-	m_pad[ n_port ].b_lastclock = b_clock;
+	pad->b_lastclock = b_clock;
 
-	switch( m_pad[ n_port ].n_state )
+	switch( pad->n_state )
 	{
 	case PAD_STATE_IDLE:
 		if( !b_sel )
 		{
-			m_pad[ n_port ].n_state = PAD_STATE_LISTEN;
-			m_pad[ n_port ].n_shiftout = PAD_DATA_IDLE;
-			m_pad[ n_port ].n_bits = 0;
+			pad->n_state = PAD_STATE_LISTEN;
+			pad->n_shiftout = PAD_DATA_IDLE;
+			pad->n_bits = 0;
 		}
 		break;
 	case PAD_STATE_LISTEN:
 		if( b_ready )
 		{
-			if( m_pad[ n_port ].n_shiftin == PAD_CMD_START )
+			if( pad->n_shiftin == PAD_CMD_START )
 			{
-				m_pad[ n_port ].n_state = PAD_STATE_ACTIVE;
-				m_pad[ n_port ].n_shiftout = ( PAD_TYPE_STANDARD << 4 ) | ( PAD_BYTES_STANDARD >> 1 );
+				pad->n_state = PAD_STATE_ACTIVE;
+				pad->n_shiftout = ( PAD_TYPE_STANDARD << 4 ) | ( PAD_BYTES_STANDARD >> 1 );
 				b_ack = 1;
 			}
 			else
 			{
-				m_pad[ n_port ].n_state = PAD_STATE_UNLISTEN;
+				pad->n_state = PAD_STATE_UNLISTEN;
 			}
 		}
 		break;
 	case PAD_STATE_ACTIVE:
 		if( b_ready )
 		{
-			if( m_pad[ n_port ].n_shiftin == PAD_CMD_READ )
+			if( pad->n_shiftin == PAD_CMD_READ )
 			{
-				m_pad[ n_port ].n_state = PAD_STATE_READ;
-				m_pad[ n_port ].n_shiftout = PAD_DATA_OK;
-				m_pad[ n_port ].n_byte = 0;
+				pad->n_state = PAD_STATE_READ;
+				pad->n_shiftout = PAD_DATA_OK;
+				pad->n_byte = 0;
 				b_ack = 1;
 			}
 			else
 			{
-				logerror( "unknown pad command %02x\n", m_pad[ n_port ].n_shiftin );
-				m_pad[ n_port ].n_state = PAD_STATE_UNLISTEN;
+				logerror( "unknown pad command %02x\n", pad->n_shiftin );
+				pad->n_state = PAD_STATE_UNLISTEN;
 			}
 		}
 		break;
 	case PAD_STATE_READ:
 		if( b_ready )
 		{
-			if( m_pad[ n_port ].n_byte < PAD_BYTES_STANDARD )
+			if( pad->n_byte < PAD_BYTES_STANDARD )
 			{
-				m_pad[ n_port ].n_shiftout = input_port_read(machine, portnames[m_pad[ n_port ].n_byte + ( n_port * PAD_BYTES_STANDARD )]);
-				m_pad[ n_port ].n_byte++;
+				pad->n_shiftout = input_port_read(machine, portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )]);
+				pad->n_byte++;
 				b_ack = 1;
 			}
 			else
 			{
-				m_pad[ n_port ].n_state = PAD_STATE_LISTEN;
+				pad->n_state = PAD_STATE_LISTEN;
 			}
 		}
 		break;
@@ -590,7 +594,7 @@ static void psx_pad( running_machine *machine, int n_port, int n_data )
 
 	if( b_ack )
 	{
-		m_pad[ n_port ].b_ack = 0;
+		pad->b_ack = 0;
 		timer_set(machine, ATTOTIME_IN_USEC( 10 ), NULL, n_port, psx_pad_ack );
 	}
 }

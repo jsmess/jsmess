@@ -19,9 +19,23 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
 
-static UINT8 *jr200_vram,*jr200_cram;
-static UINT8 *mn1271_ram;
-static UINT8 jr200_border_col;
+
+class jr200_state : public driver_device
+{
+public:
+	jr200_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vram;
+	UINT8 *cram;
+	UINT8 *mn1271_ram;
+	UINT8 border_col;
+	UINT8 old_keydata;
+	UINT8 freq_reg[2];
+	emu_timer *timer_d;
+};
+
+
 
 /* TODO: double check this */
 static const UINT8 jr200_keycodes[4][9][8] =
@@ -86,16 +100,17 @@ static VIDEO_START( jr200 )
 
 static VIDEO_UPDATE( jr200 )
 {
+	jr200_state *state = screen->machine->driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
 
-	bitmap_fill(bitmap, cliprect, jr200_border_col);
+	bitmap_fill(bitmap, cliprect, state->border_col);
 
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = jr200_vram[x + y*32];
-			UINT8 attr = jr200_cram[x + y*32];
+			UINT8 tile = state->vram[x + y*32];
+			UINT8 attr = state->cram[x + y*32];
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -193,9 +208,9 @@ I/O Device
 
 static READ8_HANDLER( mcu_keyb_r )
 {
+	jr200_state *state = space->machine->driver_data<jr200_state>();
 	int row, col, table = 0;
-	int keydata = 0;
-	static UINT8 res;
+	UINT8 keydata = 0;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 	if (input_port_read(space->machine, "ROW9") & 0x07)
@@ -219,12 +234,12 @@ static READ8_HANDLER( mcu_keyb_r )
 		}
 	}
 
-	if(res == keydata)
+	if(state->old_keydata == keydata)
 		return 0x00;
 
-	res = keydata;
+	state->old_keydata = keydata;
 
-	return res;
+	return keydata;
 }
 
 static WRITE8_HANDLER( jr200_beep_w )
@@ -235,22 +250,22 @@ static WRITE8_HANDLER( jr200_beep_w )
 
 static WRITE8_HANDLER( jr200_beep_freq_w )
 {
+	jr200_state *state = space->machine->driver_data<jr200_state>();
 	UINT32 beep_freq;
-	static UINT8 freq_reg[2];
 
-	freq_reg[offset] = data;
+	state->freq_reg[offset] = data;
 
-	beep_freq = ((freq_reg[0]<<8) | (freq_reg[1] & 0xff)) + 1;
+	beep_freq = ((state->freq_reg[0]<<8) | (state->freq_reg[1] & 0xff)) + 1;
 
 	beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
 }
 
 static WRITE8_HANDLER( jr200_border_col_w )
 {
-	jr200_border_col = data;
+	jr200_state *state = space->machine->driver_data<jr200_state>();
+	state->border_col = data;
 }
 
-static emu_timer *timer_d;
 
 static TIMER_CALLBACK(timer_d_callback)
 {
@@ -259,22 +274,23 @@ static TIMER_CALLBACK(timer_d_callback)
 
 static READ8_HANDLER( mn1271_io_r )
 {
-	UINT8 retVal = mn1271_ram[offset];
+	jr200_state *state = space->machine->driver_data<jr200_state>();
+	UINT8 retVal = state->mn1271_ram[offset];
 	if((offset+0xc800) > 0xca00)
 		retVal= 0xff;
 
 	switch(offset+0xc800)
 	{
 		case 0xc801: retVal= mcu_keyb_r(space,0); break;
-		case 0xc803: retVal= (mn1271_ram[0x03] & 0xcf) | 0x30;  break;//---x ---- printer status ready (ACTIVE HIGH)
-		case 0xc807: retVal= (mn1271_ram[0x07] & 0x80) | 0x60; break;
-		case 0xc80a: retVal= (mn1271_ram[0x0a] & 0xfe); break;
-		case 0xc80c: retVal= (mn1271_ram[0x0c] & 0xdf) | 0x20; break;
+		case 0xc803: retVal= (state->mn1271_ram[0x03] & 0xcf) | 0x30;  break;//---x ---- printer status ready (ACTIVE HIGH)
+		case 0xc807: retVal= (state->mn1271_ram[0x07] & 0x80) | 0x60; break;
+		case 0xc80a: retVal= (state->mn1271_ram[0x0a] & 0xfe); break;
+		case 0xc80c: retVal= (state->mn1271_ram[0x0c] & 0xdf) | 0x20; break;
 		case 0xc80e: retVal= 0; break;
 		case 0xc810: retVal= 0; break;
 		case 0xc816: retVal= 0x4e; break;
-		case 0xc81c: retVal= (mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
-		case 0xc81d: retVal= (mn1271_ram[0x1d] & 0xed); break;
+		case 0xc81c: retVal= (state->mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
+		case 0xc81d: retVal= (state->mn1271_ram[0x1d] & 0xed); break;
 	}
 	//logerror("mn1271_io_r [%04x] = %02x\n",offset+0xc800,retVal);
 	return retVal;
@@ -282,14 +298,15 @@ static READ8_HANDLER( mn1271_io_r )
 
 static WRITE8_HANDLER( mn1271_io_w )
 {
-	mn1271_ram[offset] = data;
+	jr200_state *state = space->machine->driver_data<jr200_state>();
+	state->mn1271_ram[offset] = data;
 	switch(offset+0xc800)
 	{
 		case 0xc805: break; //LPT printer port W
 		case 0xc816: if (data!=0) {
-					timer_adjust_periodic(timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (mn1271_ram[0x17]*0x100 + mn1271_ram[0x18])));
+					timer_adjust_periodic(state->timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (state->mn1271_ram[0x17]*0x100 + state->mn1271_ram[0x18])));
 				} else {
-					timer_adjust_periodic(timer_d, attotime_zero, 0,  attotime_zero);
+					timer_adjust_periodic(state->timer_d, attotime_zero, 0,  attotime_zero);
 				}
 				break;
 		case 0xc819: jr200_beep_w(space,0,data); break;
@@ -311,12 +328,12 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(jr200_pcg_1_r,jr200_pcg_1_w) //PCG area (1)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr200_vram)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE_MEMBER(jr200_state, vram)
 	AM_RANGE(0xc400, 0xc4ff) AM_READWRITE(jr200_pcg_2_r,jr200_pcg_2_w) //PCG area (2)
-	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(&jr200_cram)
+	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE_MEMBER(jr200_state, cram)
 
 //  0xc800 - 0xcfff I / O area
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_BASE(&mn1271_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_BASE_MEMBER(jr200_state, mn1271_ram)
 
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
 	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)
@@ -451,17 +468,19 @@ GFXDECODE_END
 
 static MACHINE_START(jr200)
 {
+	jr200_state *state = machine->driver_data<jr200_state>();
 	beep_set_frequency(machine->device("beeper"),0);
 	beep_set_state(machine->device("beeper"),0);
-	timer_d = timer_alloc(machine, timer_d_callback, NULL);
+	state->timer_d = timer_alloc(machine, timer_d_callback, NULL);
 }
 
 static MACHINE_RESET(jr200)
 {
+	jr200_state *state = machine->driver_data<jr200_state>();
 	UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
 	UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
 	int i;
-	memset(mn1271_ram,0,0x800);
+	memset(state->mn1271_ram,0,0x800);
 
 	for(i=0;i<0x800;i++)
 		gfx_ram[i] = gfx_rom[i];
@@ -471,7 +490,7 @@ static MACHINE_RESET(jr200)
 }
 
 
-static MACHINE_CONFIG_START( jr200, driver_device )
+static MACHINE_CONFIG_START( jr200, jr200_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)

@@ -20,46 +20,57 @@
 #include "sound/beep.h"
 #include "devices/snapquik.h"
 
-static UINT8 *jr100_ram;
-static UINT8 *jr100_vram;
-static UINT8 *jr100_pcg;
-static UINT8 keyboard_line;
-static bool jr100_use_pcg;
-static UINT8 jr100_speaker;
+
+class jr100_state : public driver_device
+{
+public:
+	jr100_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+	UINT8 *vram;
+	UINT8 *pcg;
+	UINT8 keyboard_line;
+	bool use_pcg;
+	UINT8 speaker;
+	UINT16 t1latch;
+	UINT8 beep_en;
+};
+
+
+
 
 static WRITE8_HANDLER( jr100_via_w )
 {
-	static UINT16 t1latch;
-	static UINT8 beep_en;
-
+	jr100_state *state = space->machine->driver_data<jr100_state>();
 	/* ACR: beeper masking */
 	if(offset == 0x0b)
 	{
 		//printf("BEEP %s\n",((data & 0xe0) == 0xe0) ? "ON" : "OFF");
-		beep_en = ((data & 0xe0) == 0xe0);
+		state->beep_en = ((data & 0xe0) == 0xe0);
 
-		if(!beep_en)
+		if(!state->beep_en)
 			beep_set_state(space->machine->device("beeper"),0);
 	}
 
 	/* T1L-L */
 	if(offset == 0x04)
 	{
-		t1latch = (t1latch & 0xff00) | (data & 0xff);
+		state->t1latch = (state->t1latch & 0xff00) | (data & 0xff);
 		//printf("BEEP T1CL %02x\n",data);
 	}
 
 	/* T1L-H */
 	if(offset == 0x05)
 	{
-		t1latch = (t1latch & 0xff) | ((data & 0xff) << 8);
+		state->t1latch = (state->t1latch & 0xff) | ((data & 0xff) << 8);
 		//printf("BEEP T1CH %02x\n",data);
 
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
-		if(beep_en)
+		if(state->beep_en)
 		{
 			beep_set_state(space->machine->device("beeper"),1);
-			beep_set_frequency(space->machine->device("beeper"),894886.25 / (double)(t1latch) / 2.0);
+			beep_set_frequency(space->machine->device("beeper"),894886.25 / (double)(state->t1latch) / 2.0);
 		}
 	}
 	via6522_device *via = space->machine->device<via6522_device>("via");	
@@ -68,9 +79,9 @@ static WRITE8_HANDLER( jr100_via_w )
 
 static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&jr100_ram)
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&jr100_pcg)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(&jr100_vram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(jr100_state, ram)
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_MEMBER(jr100_state, pcg)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE_MEMBER(jr100_state, vram)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD_MODERN("via", via6522_device, read) AM_WRITE(jr100_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -158,6 +169,7 @@ static VIDEO_START( jr100 )
 
 static VIDEO_UPDATE( jr100 )
 {
+	jr100_state *state = screen->machine->driver_data<jr100_state>();
 	int x,y,xi,yi;
 
 	UINT8 *rom_pcg = memory_region(screen->machine, "maincpu") + 0xe000;
@@ -165,12 +177,12 @@ static VIDEO_UPDATE( jr100 )
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = jr100_vram[x + y*32];
+			UINT8 tile = state->vram[x + y*32];
 			UINT8 attr = tile >> 7;
 			// ATTR is inverted for normal char or use PCG in case of CMODE1
 			UINT8 *gfx_data = rom_pcg;
-			if (jr100_use_pcg && attr) {
-				gfx_data = jr100_pcg;
+			if (state->use_pcg && attr) {
+				gfx_data = state->pcg;
 				attr = 0; // clear attr so bellow code stay same
 			}
 			tile &= 0x7f;
@@ -211,22 +223,25 @@ static const char *const keynames[] = {
 
 static READ8_DEVICE_HANDLER(jr100_via_read_b)
 {
+	jr100_state *state = device->machine->driver_data<jr100_state>();
 	UINT8 val = 0x1f;
-	if (keynames[keyboard_line]) {
-		val = input_port_read(device->machine, keynames[keyboard_line]);
+	if (keynames[state->keyboard_line]) {
+		val = input_port_read(device->machine, keynames[state->keyboard_line]);
 	}
 	return val;
 }
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
 {
-	keyboard_line = data & 0x0f;
+	jr100_state *state = device->machine->driver_data<jr100_state>();
+	state->keyboard_line = data & 0x0f;
 }
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 {
-	jr100_use_pcg = (data & 0x20) ? TRUE : FALSE;
-	jr100_speaker = data>>7;
+	jr100_state *state = device->machine->driver_data<jr100_state>();
+	state->use_pcg = (data & 0x20) ? TRUE : FALSE;
+	state->speaker = data>>7;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(jr100_via_write_cb2)
@@ -259,9 +274,10 @@ static const cassette_config jr100_cassette_config =
 
 static TIMER_DEVICE_CALLBACK( sound_tick )
 {
+	jr100_state *state = timer.machine->driver_data<jr100_state>();
 	running_device *speaker = timer.machine->device("speaker");
-	speaker_level_w(speaker,jr100_speaker);
-	jr100_speaker = 0;
+	speaker_level_w(speaker,state->speaker);
+	state->speaker = 0;
 
 	via6522_device *via = timer.machine->device<via6522_device>("via");
 	double level = cassette_input(timer.machine->device("cassette"));
@@ -283,6 +299,7 @@ static UINT32 readByLittleEndian(UINT8 *buf,int pos)
 
 static QUICKLOAD_LOAD(jr100)
 {
+	jr100_state *state = image.device().machine->driver_data<jr100_state>();
 	int quick_length;
 	UINT8 buf[0x10000];
 	int read_;
@@ -311,25 +328,25 @@ static QUICKLOAD_LOAD(jr100)
 
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code
-	memcpy(jr100_ram + start_address,buf + pos,code_length);
+	memcpy(state->ram + start_address,buf + pos,code_length);
 	if (flag == 0) {
-      jr100_ram[end_address + 1] =  0xdf;
-      jr100_ram[end_address + 2] =  0xdf;
-      jr100_ram[end_address + 3] =  0xdf;
-      jr100_ram[6 ] = (end_address >> 8 & 0xFF);
-      jr100_ram[7 ] = (end_address & 0xFF);
-      jr100_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
-      jr100_ram[9 ] = ((end_address + 1) & 0xFF);
-      jr100_ram[10] = ((end_address + 2) >> 8 & 0xFF);
-      jr100_ram[11] = ((end_address + 2) & 0xFF);
-      jr100_ram[12] = ((end_address + 3) >> 8 & 0xFF);
-      jr100_ram[13] = ((end_address + 3) & 0xFF);
+      state->ram[end_address + 1] =  0xdf;
+      state->ram[end_address + 2] =  0xdf;
+      state->ram[end_address + 3] =  0xdf;
+      state->ram[6 ] = (end_address >> 8 & 0xFF);
+      state->ram[7 ] = (end_address & 0xFF);
+      state->ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
+      state->ram[9 ] = ((end_address + 1) & 0xFF);
+      state->ram[10] = ((end_address + 2) >> 8 & 0xFF);
+      state->ram[11] = ((end_address + 2) & 0xFF);
+      state->ram[12] = ((end_address + 3) >> 8 & 0xFF);
+      state->ram[13] = ((end_address + 3) & 0xFF);
     }
 
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( jr100, driver_device )
+static MACHINE_CONFIG_START( jr100, jr100_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
     MDRV_CPU_PROGRAM_MAP(jr100_mem)

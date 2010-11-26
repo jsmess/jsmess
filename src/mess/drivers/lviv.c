@@ -425,7 +425,7 @@ static const cassette_config lviv_cassette_config =
 
 
 /* machine definition */
-static MACHINE_CONFIG_START( lviv, driver_device )
+static MACHINE_CONFIG_START( lviv, lviv_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2500000)
 	MDRV_CPU_PROGRAM_MAP(lviv_mem)

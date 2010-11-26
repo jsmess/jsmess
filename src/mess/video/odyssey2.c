@@ -123,51 +123,7 @@ static const UINT8 o2_shape[0x40][8]={
     { 0x00,0x00,0x00,0x10,0x38,0xFF,0x7E,0x00 }
 };
 
-static union {
-    UINT8 reg[0x100];
-    struct {
-	struct {
-	    UINT8 y,x,color,res;
-	} sprites[4];
-	struct {
-	    UINT8 y,x,ptr,color;
-	} foreground[12];
-	struct {
-	    struct {
-		UINT8 y,x,ptr,color;
-	    } single[4];
-	} quad[4];
-	UINT8 shape[4][8];
-	UINT8 control;
-	UINT8 status;
-	UINT8 collision;
-	UINT8 color;
-	UINT8 y;
-	UINT8 x;
-	UINT8 res;
-	UINT8 shift1,shift2,shift3;
-	UINT8 sound;
-	UINT8 res2[5+0x10];
-	UINT8 hgrid[2][0x10];
-	UINT8 vgrid[0x10];
-    } s;
-} o2_vdc= { { 0 } };
 
-static UINT32		o2_snd_shift[2];
-static UINT8		x_beam_pos;
-static UINT8		y_beam_pos;
-static UINT8		control_status;
-static UINT8		collision_status;
-static int			iff;
-static emu_timer	*i824x_line_timer;
-static emu_timer	*i824x_hblank_timer;
-static bitmap_t		*tmp_bitmap;
-static int			start_vpos;
-static int			start_vblank;
-static UINT8		lum;		/* Output of P1 bit 7 influences the intensity of the background and grid colours */
-static UINT16		lfsr;
-
-static sound_stream *odyssey2_sh_channel;
 
 
 PALETTE_INIT( odyssey2 )
@@ -182,15 +138,16 @@ PALETTE_INIT( odyssey2 )
 
 READ8_HANDLER( odyssey2_video_r )
 {
+	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
     UINT8 data = 0;
 
     switch (offset)
     {
         case 0xa1:
-			data = control_status;
-			iff = 0;
+			data = state->control_status;
+			state->iff = 0;
 			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-			control_status &= ~ 0x08;
+			state->control_status &= ~ 0x08;
 			if ( space->machine->primary_screen->hpos() < I824X_START_ACTIVE_SCAN || space->machine->primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
 			{
 				data |= 1;
@@ -199,42 +156,42 @@ READ8_HANDLER( odyssey2_video_r )
             break;
 
         case 0xa2:
-			data = collision_status;
-			collision_status = 0;
+			data = state->collision_status;
+			state->collision_status = 0;
 
             break;
 
         case 0xa4:
 
-            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
-                y_beam_pos = space->machine->primary_screen->vpos() - start_vpos;
+            if ((state->o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+                state->y_beam_pos = space->machine->primary_screen->vpos() - state->start_vpos;
 
-            data = y_beam_pos;
+            data = state->y_beam_pos;
 
             break;
 
 
         case 0xa5:
 
-            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+            if ((state->o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
-                x_beam_pos = space->machine->primary_screen->hpos();
-				if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
+                state->x_beam_pos = space->machine->primary_screen->hpos();
+				if ( state->x_beam_pos < I824X_START_ACTIVE_SCAN )
 				{
-					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
+					state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
 				}
 				else
 				{
-					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
+					state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN;
 				}
 			}
 
-            data = x_beam_pos;
+            data = state->x_beam_pos;
 
             break;
 
         default:
-            data = o2_vdc.reg[offset];
+            data = state->o2_vdc.reg[offset];
     }
 
     return data;
@@ -242,27 +199,28 @@ READ8_HANDLER( odyssey2_video_r )
 
 WRITE8_HANDLER( odyssey2_video_w )
 {
+	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
 	/* Update the sound */
 	if( offset >= 0xa7 && offset <= 0xaa )
-		stream_update( odyssey2_sh_channel );
+		stream_update( state->sh_channel );
 
     if (offset == 0xa0)
     {
-        if (    o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
+        if (    state->o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            x_beam_pos = space->machine->primary_screen->hpos();
-			if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
+            state->x_beam_pos = space->machine->primary_screen->hpos();
+			if ( state->x_beam_pos < I824X_START_ACTIVE_SCAN )
 			{
-				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
+				state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
 			}
 			else
 			{
-				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
+				state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
 
-            y_beam_pos = space->machine->primary_screen->vpos() - start_vpos;
+            state->y_beam_pos = space->machine->primary_screen->vpos() - state->start_vpos;
 
             /* This is wrong but more games work with it, TODO: Figure
              * out correct change.  Maybe update the screen here??
@@ -274,17 +232,19 @@ WRITE8_HANDLER( odyssey2_video_w )
         }
     }
 
-    o2_vdc.reg[offset] = data;
+    state->o2_vdc.reg[offset] = data;
 }
 
 WRITE8_HANDLER ( odyssey2_lum_w )
 {
-	lum = data;
+	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
+	state->lum = data;
 }
 
 READ8_HANDLER( odyssey2_t1_r )
 {
-	if ( space->machine->primary_screen->vpos() > start_vpos && space->machine->primary_screen->vpos() < start_vblank )
+	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
+	if ( space->machine->primary_screen->vpos() > state->start_vpos && space->machine->primary_screen->vpos() < state->start_vblank )
 	{
 		if ( space->machine->primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && space->machine->primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
 		{
@@ -296,59 +256,60 @@ READ8_HANDLER( odyssey2_t1_r )
 
 static TIMER_CALLBACK( i824x_scanline_callback )
 {
+	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	UINT8	collision_map[160];
 	int		vpos = machine->primary_screen->vpos();
 
-	if ( vpos < start_vpos )
+	if ( vpos < state->start_vpos )
 		return;
 
-	if ( vpos == start_vpos )
+	if ( vpos == state->start_vpos )
 	{
-		control_status &= ~0x08;
+		state->control_status &= ~0x08;
 	}
 
-	if ( vpos < start_vblank )
+	if ( vpos < state->start_vblank )
 	{
 		rectangle rect;
 		//int   sprite_width[4] = { 8, 8, 8, 8 };
 		int i;
 
-		control_status &= ~ 0x01;
+		state->control_status &= ~ 0x01;
 
 		/* Draw a line */
 		rect.min_y = rect.max_y = vpos;
 		rect.min_x = I824X_START_ACTIVE_SCAN;
 		rect.max_x = I824X_END_ACTIVE_SCAN - 1;
-		bitmap_fill( tmp_bitmap, &rect , ( (o2_vdc.s.color >> 3) & 0x7 ) | ( ( lum << 3 ) ^ 0x08 ));
+		bitmap_fill( state->tmp_bitmap, &rect , ( (state->o2_vdc.s.color >> 3) & 0x7 ) | ( ( state->lum << 3 ) ^ 0x08 ));
 
 		/* Clear collision map */
 		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
-		if ( o2_vdc.s.control & 0x08 )
+		if ( state->o2_vdc.s.control & 0x08 )
 		{
-			UINT16	color = ( o2_vdc.s.color & 7 ) | ( ( o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( lum << 3 ) ^ 0x08 );
+			UINT16	color = ( state->o2_vdc.s.color & 7 ) | ( ( state->o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( state->lum << 3 ) ^ 0x08 );
 			int		x_grid_offset = 8;
 			int 	y_grid_offset = 24;
 			int		width = 16;
 			int		height = 24;
-			int		w = ( o2_vdc.s.control & 0x80 ) ? width : 2;
+			int		w = ( state->o2_vdc.s.control & 0x80 ) ? width : 2;
 			int		j, k, y;
 
 			/* Draw horizontal part of grid */
 			for ( j = 1, y = 0; y < 9; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + y * height + 3 )
+				if ( y_grid_offset + y * height <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y_grid_offset + y * height + 3 )
 				{
 					for ( i = 0; i < 9; i++ )
 					{
-						if ( ( o2_vdc.s.hgrid[0][i] & j ) || ( o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) )
+						if ( ( state->o2_vdc.s.hgrid[0][i] & j ) || ( state->o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) )
 						{
 							for ( k = 0; k < width + 2; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 								collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
-								*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -358,28 +319,28 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			/* Draw vertical part of grid */
 			for( j = 1, y = 0; y < 8; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + ( y + 1 ) * height )
+				if ( y_grid_offset + y * height <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y_grid_offset + ( y + 1 ) * height )
 				{
 					for ( i = 0; i < 10; i++ )
 					{
-						if ( o2_vdc.s.vgrid[i] & j )
+						if ( state->o2_vdc.s.vgrid[i] & j )
 						{
 							for ( k = 0; k < w; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ px ] & o2_vdc.s.collision )
+								if ( collision_map[ px ] & state->o2_vdc.s.collision )
 								{
-									collision_status |= COLLISION_VERTICAL_GRID;
+									state->collision_status |= COLLISION_VERTICAL_GRID;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_VERTICAL_GRID & o2_vdc.s.collision && collision_map[ px ] )
+								if ( COLLISION_VERTICAL_GRID & state->o2_vdc.s.collision && collision_map[ px ] )
 								{
-									collision_status |= collision_map[ px ];
+									state->collision_status |= collision_map[ px ];
 								}
 								collision_map[ px ] |= COLLISION_VERTICAL_GRID;
-								*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -388,20 +349,20 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		}
 
 		/* Display objects if enabled */
-		if ( o2_vdc.s.control & 0x20 )
+		if ( state->o2_vdc.s.control & 0x20 )
 		{
 			/* Regular foreground objects */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.foreground ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( state->o2_vdc.s.foreground ); i++ )
 			{
-				int	y = o2_vdc.s.foreground[i].y;
-				int	height = 8 - ( ( ( y >> 1 ) + o2_vdc.s.foreground[i].ptr ) & 7 );
+				int	y = state->o2_vdc.s.foreground[i].y;
+				int	height = 8 - ( ( ( y >> 1 ) + state->o2_vdc.s.foreground[i].ptr ) & 7 );
 
-				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
+				if ( y <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y + height * 2 )
 				{
-					UINT16	color = 16 + ( ( o2_vdc.s.foreground[i].color & 0x0E ) >> 1 );
-					int		offset = ( o2_vdc.s.foreground[i].ptr | ( ( o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
+					UINT16	color = 16 + ( ( state->o2_vdc.s.foreground[i].color & 0x0E ) >> 1 );
+					int		offset = ( state->o2_vdc.s.foreground[i].ptr | ( ( state->o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->start_vpos - y ) >> 1 );
 					UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
-					int		x = o2_vdc.s.foreground[i].x;
+					int		x = state->o2_vdc.s.foreground[i].x;
 					UINT8	m;
 
 					for ( m = 0x80; m > 0; m >>= 1, x++ )
@@ -411,17 +372,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 							if ( x >= 0 && x < 160 )
 							{
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ x ] & o2_vdc.s.collision )
+								if ( collision_map[ x ] & state->o2_vdc.s.collision )
 								{
-									collision_status |= COLLISION_CHARACTERS;
+									state->collision_status |= COLLISION_CHARACTERS;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] )
+								if ( COLLISION_CHARACTERS & state->o2_vdc.s.collision && collision_map[ x ] )
 								{
-									collision_status |= collision_map[ x ];
+									state->collision_status |= collision_map[ x ];
 								}
 								collision_map[ x ] |= COLLISION_CHARACTERS;
-								*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+								*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 							}
 						}
 					}
@@ -429,23 +390,23 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Quad objects */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.quad ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( state->o2_vdc.s.quad ); i++ )
 			{
-				int y = o2_vdc.s.quad[i].single[0].y;
+				int y = state->o2_vdc.s.quad[i].single[0].y;
 				int height = 8;
 
-				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
+				if ( y <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y + height * 2 )
 				{
-					int	x = o2_vdc.s.quad[i].single[0].x;
+					int	x = state->o2_vdc.s.quad[i].single[0].x;
 					int j;
 
-					for ( j = 0; j < ARRAY_LENGTH( o2_vdc.s.quad[0].single ); j++, x += 8 )
+					for ( j = 0; j < ARRAY_LENGTH( state->o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-						int		char_height = 8 - ( ( ( y >> 1 ) + o2_vdc.s.quad[i].single[j].ptr ) & 7 );
-						if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + char_height * 2 )
+						int		char_height = 8 - ( ( ( y >> 1 ) + state->o2_vdc.s.quad[i].single[j].ptr ) & 7 );
+						if ( y <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y + char_height * 2 )
 						{
-							UINT16 color = 16 + ( ( o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
-							int	offset = ( o2_vdc.s.quad[i].single[j].ptr | ( ( o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
+							UINT16 color = 16 + ( ( state->o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
+							int	offset = ( state->o2_vdc.s.quad[i].single[j].ptr | ( ( state->o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->start_vpos - y ) >> 1 );
 							UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
 							UINT8	m;
 							for ( m = 0x80; m > 0; m >>= 1, x++ )
@@ -455,17 +416,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 									if ( x >= 0 && x < 160 )
 									{
 										/* Check if we collide with an already drawn source object */
-										if ( collision_map[ x ] & o2_vdc.s.collision )
+										if ( collision_map[ x ] & state->o2_vdc.s.collision )
 										{
-											collision_status |= COLLISION_CHARACTERS;
+											state->collision_status |= COLLISION_CHARACTERS;
 										}
 										/* Check if an already drawn object would collide with us */
-										if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] )
+										if ( COLLISION_CHARACTERS & state->o2_vdc.s.collision && collision_map[ x ] )
 										{
-											collision_status |= collision_map[ x ];
+											state->collision_status |= collision_map[ x ];
 										}
 										collision_map[ x ] |= COLLISION_CHARACTERS;
-										*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+										*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 									}
 								}
 							}
@@ -479,19 +440,19 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Sprites */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.sprites ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( state->o2_vdc.s.sprites ); i++ )
 			{
-				int y = o2_vdc.s.sprites[i].y;
+				int y = state->o2_vdc.s.sprites[i].y;
 				int height = 8;
-				if ( o2_vdc.s.sprites[i].color & 4 )
+				if ( state->o2_vdc.s.sprites[i].color & 4 )
 				{
 					/* Zoomed sprite */
 					//sprite_width[i] = 16;
-					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 4 )
+					if ( y <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y + height * 4 )
 					{
-						UINT16 color = 16 + ( ( o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
-						UINT8	chr = o2_vdc.s.shape[i][ ( ( vpos - start_vpos - y ) >> 2 ) ];
-						int		x = o2_vdc.s.sprites[i].x;
+						UINT16 color = 16 + ( ( state->o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
+						UINT8	chr = state->o2_vdc.s.shape[i][ ( ( vpos - state->start_vpos - y ) >> 2 ) ];
+						int		x = state->o2_vdc.s.sprites[i].x;
 						UINT8	m;
 
 						for ( m = 0x01; m > 0; m <<= 1, x += 2 )
@@ -501,32 +462,32 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision )
+									if ( collision_map[ x ] & state->o2_vdc.s.collision )
 									{
-										collision_status |= ( 1 << i );
+										state->collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & state->o2_vdc.s.collision && collision_map[ x ] )
 									{
-										collision_status |= collision_map[ x ];
+										state->collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 								if ( x >= -1 && x < 159 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision )
+									if ( collision_map[ x ] & state->o2_vdc.s.collision )
 									{
-										collision_status |= ( 1 << i );
+										state->collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & state->o2_vdc.s.collision && collision_map[ x ] )
 									{
-										collision_status |= collision_map[ x ];
+										state->collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
+									*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
 								}
 							}
 						}
@@ -535,11 +496,11 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 				else
 				{
 					/* Regular sprite */
-					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
+					if ( y <= ( vpos - state->start_vpos ) && ( vpos - state->start_vpos ) < y + height * 2 )
 					{
-						UINT16 color = 16 + ( ( o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
-						UINT8	chr = o2_vdc.s.shape[i][ ( ( vpos - start_vpos - y ) >> 1 ) ];
-						int		x = o2_vdc.s.sprites[i].x;
+						UINT16 color = 16 + ( ( state->o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
+						UINT8	chr = state->o2_vdc.s.shape[i][ ( ( vpos - state->start_vpos - y ) >> 1 ) ];
+						int		x = state->o2_vdc.s.sprites[i].x;
 						UINT8	m;
 
 						for ( m = 0x01; m > 0; m <<= 1, x++ )
@@ -549,17 +510,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision )
+									if ( collision_map[ x ] & state->o2_vdc.s.collision )
 									{
-										collision_status |= ( 1 << i );
+										state->collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & state->o2_vdc.s.collision && collision_map[ x ] )
 									{
-										collision_status |= collision_map[ x ];
+										state->collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									*BITMAP_ADDR16( state->tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 							}
 						}
@@ -570,27 +531,28 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	}
 
 	/* Check for start of VBlank */
-	if ( vpos == start_vblank )
+	if ( vpos == state->start_vblank )
 	{
-		control_status |= 0x08;
-		if ( ! iff )
+		state->control_status |= 0x08;
+		if ( ! state->iff )
 		{
 			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-			iff = 1;
+			state->iff = 1;
 		}
 	}
 }
 
 static TIMER_CALLBACK( i824x_hblank_callback )
 {
+	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	int vpos = machine->primary_screen->vpos();
 
-	if ( vpos < start_vpos - 1 )
+	if ( vpos < state->start_vpos - 1 )
 		return;
 
-	if ( vpos < start_vblank - 1 )
+	if ( vpos < state->start_vblank - 1 )
 	{
-		control_status |= 0x01;
+		state->control_status |= 0x01;
 	}
 }
 
@@ -602,38 +564,39 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 
 VIDEO_START( odyssey2 )
 {
+	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	screen_device *screen = screen_first(*machine);
 	int width = screen->width();
 	int height = screen->height();
 
-	memset(o2_vdc.reg, 0, 0x100);
+	memset(state->o2_vdc.reg, 0, 0x100);
 
-	o2_snd_shift[0] = o2_snd_shift[1] = 0;
-	x_beam_pos = 0;
-	y_beam_pos = 0;
-	control_status = 0;
-	collision_status = 0;
-	iff = 0;
-	start_vpos = 0;
-	start_vblank = 0;
-	lum = 0;
-	lfsr = 0;
+	state->o2_snd_shift[0] = state->o2_snd_shift[1] = 0;
+	state->x_beam_pos = 0;
+	state->y_beam_pos = 0;
+	state->control_status = 0;
+	state->collision_status = 0;
+	state->iff = 0;
+	state->start_vpos = 0;
+	state->start_vblank = 0;
+	state->lum = 0;
+	state->lfsr = 0;
 
-	o2_snd_shift[0] = machine->sample_rate / 983;
-	o2_snd_shift[1] = machine->sample_rate / 3933;
+	state->o2_snd_shift[0] = machine->sample_rate / 983;
+	state->o2_snd_shift[1] = machine->sample_rate / 3933;
 
-	start_vpos = I824X_START_Y;
-	start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
-	control_status = 0;
-	iff = 0;
+	state->start_vpos = I824X_START_Y;
+	state->start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
+	state->control_status = 0;
+	state->iff = 0;
 
-	tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
+	state->tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
 
-	i824x_line_timer = timer_alloc(machine,  i824x_scanline_callback, NULL );
-	timer_adjust_periodic( i824x_line_timer, machine->primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine->primary_screen->scan_period() );
+	state->i824x_line_timer = timer_alloc(machine,  i824x_scanline_callback, NULL );
+	timer_adjust_periodic( state->i824x_line_timer, machine->primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine->primary_screen->scan_period() );
 
-	i824x_hblank_timer = timer_alloc(machine,  i824x_hblank_callback, NULL );
-	timer_adjust_periodic( i824x_hblank_timer, machine->primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine->primary_screen->scan_period() );
+	state->i824x_hblank_timer = timer_alloc(machine,  i824x_hblank_callback, NULL );
+	timer_adjust_periodic( state->i824x_hblank_timer, machine->primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine->primary_screen->scan_period() );
 }
 
 /***************************************************************************
@@ -644,14 +607,16 @@ VIDEO_START( odyssey2 )
 
 VIDEO_UPDATE( odyssey2 )
 {
-	copybitmap( bitmap, tmp_bitmap, 0, 0, 0, 0, cliprect );
+	odyssey2_state *state = screen->machine->driver_data<odyssey2_state>();
+	copybitmap( bitmap, state->tmp_bitmap, 0, 0, 0, 0, cliprect );
 
 	return 0;
 }
 
 static DEVICE_START( odyssey2_sound )
 {
-	odyssey2_sh_channel = stream_create(device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
+	odyssey2_state *state = device->machine->driver_data<odyssey2_state>();
+	state->sh_channel = stream_create(device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 }
 
 
@@ -670,55 +635,55 @@ DEVICE_GET_INFO( odyssey2_sound )
 
 STREAM_UPDATE( odyssey2_sh_update )
 {
-	static UINT32 signal;
-	static UINT16 count = 0;
+	odyssey2_state *state = device->machine->driver_data<odyssey2_state>();
+	UINT32 signal;
 	int ii;
 	int period;
 	stream_sample_t *buffer = outputs[0];
 
 	/* Generate the signal */
-	signal = o2_vdc.s.shift3 | (o2_vdc.s.shift2 << 8) | (o2_vdc.s.shift1 << 16);
+	signal = state->o2_vdc.s.shift3 | (state->o2_vdc.s.shift2 << 8) | (state->o2_vdc.s.shift1 << 16);
 
-	if( o2_vdc.s.sound & 0x80 )	/* Sound is enabled */
+	if( state->o2_vdc.s.sound & 0x80 )	/* Sound is enabled */
 	{
 		for( ii = 0; ii < samples; ii++, buffer++ )
 		{
 			*buffer = 0;
 			*buffer = signal & 0x1;
-			period = (o2_vdc.s.sound & 0x20) ? 1 : 4;
-			if( ++count >= period )
+			period = (state->o2_vdc.s.sound & 0x20) ? 1 : 4;
+			if( ++state->sh_count >= period )
 			{
-				count = 0;
+				state->sh_count = 0;
 				signal >>= 1;
 				/* Loop sound */
-				if( o2_vdc.s.sound & 0x40 )
+				if( state->o2_vdc.s.sound & 0x40 )
 				{
 					signal |= *buffer << 23;
 				}
 				/* Noise poly is : L=16 W=2 10000000000100001 */
-				lfsr = ( lfsr >> 1 ) | ( ( ( lfsr & 0x01 ) ^ ( ( lfsr & 0x800 ) >> 11 ) ) << 15 );
-				if ( ! lfsr )
+				state->lfsr = ( state->lfsr >> 1 ) | ( ( ( state->lfsr & 0x01 ) ^ ( ( state->lfsr & 0x800 ) >> 11 ) ) << 15 );
+				if ( ! state->lfsr )
 				{
-					lfsr = 0xFFFF;
+					state->lfsr = 0xFFFF;
 				}
 				/* Check if noise should be applied */
-				if ( o2_vdc.s.sound & 0x10 )
+				if ( state->o2_vdc.s.sound & 0x10 )
 				{
-					*buffer |= ( lfsr & 0x01 );
+					*buffer |= ( state->lfsr & 0x01 );
 				}
-				o2_vdc.s.shift3 = signal & 0xFF;
-				o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
-				o2_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
+				state->o2_vdc.s.shift3 = signal & 0xFF;
+				state->o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
+				state->o2_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
 			}
 
 			/* Throw an interrupt if enabled */
-			if( o2_vdc.s.control & 0x4 )
+			if( state->o2_vdc.s.control & 0x4 )
 			{
 				cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE); /* Is this right? */
 			}
 
 			/* Adjust volume */
-			*buffer *= o2_vdc.s.sound & 0xf;
+			*buffer *= state->o2_vdc.s.sound & 0xf;
 			/* Pump the volume up */
 			*buffer <<= 10;
 		}
@@ -736,116 +701,106 @@ STREAM_UPDATE( odyssey2_sh_update )
  */
 
 #ifdef UNUSED_FUNCTION
-static struct {
-	UINT8	X;
-	UINT8	Y;
-	UINT8	Y0;
-	UINT8	R;
-	UINT8	M;
-	UINT8	TA;
-	UINT8	TB;
-	UINT8	busy;
-	UINT8	ram[1024];
-} ef9341;
-
-INLINE UINT16 ef9341_get_c_addr( void )
+INLINE UINT16 ef9341_get_c_addr( odyssey2_state *state )
 {
-	if ( ( ef9341.Y & 0x0C ) == 0x0C )
+	if ( ( state->ef9341.Y & 0x0C ) == 0x0C )
 	{
-		return 0x318 | ( ( ef9341.X & 0x38 ) << 2 ) | ( ef9341.X & 0x07 );
+		return 0x318 | ( ( state->ef9341.X & 0x38 ) << 2 ) | ( state->ef9341.X & 0x07 );
 	}
-	if ( ef9341.X & 0x20 )
+	if ( state->ef9341.X & 0x20 )
 	{
-		return 0x300 | ( ( ef9341.Y & 0x07 ) << 5 ) | ( ef9341.Y & 0x18 ) | ( ef9341.X & 0x07 );
+		return 0x300 | ( ( state->ef9341.Y & 0x07 ) << 5 ) | ( state->ef9341.Y & 0x18 ) | ( state->ef9341.X & 0x07 );
 	}
-	return ( ef9341.Y << 5 ) | ef9341.X;
+	return ( state->ef9341.Y << 5 ) | state->ef9341.X;
 }
 
-INLINE void ef9341_inc_c( void )
+INLINE void ef9341_inc_c( odyssey2_state *state )
 {
-	ef9341.X++;
-	if ( ef9341.X >= 40 )
+	state->ef9341.X++;
+	if ( state->ef9341.X >= 40 )
 	{
-		ef9341.Y = ( ef9341.Y + 1 ) % 24;
+		state->ef9341.Y = ( state->ef9341.Y + 1 ) % 24;
 	}
 }
 
-void odyssey2_ef9341_w( int command, int b, UINT8 data )
+void odyssey2_ef9341_w( running_machine *machine, int command, int b, UINT8 data )
 {
+	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
 	if ( command )
 	{
 		if ( b )
 		{
-			ef9341.TB = data;
-			ef9341.busy = 0x80;
-			switch( ef9341.TB & 0xE0 )
+			state->ef9341.TB = data;
+			state->ef9341.busy = 0x80;
+			switch( state->ef9341.TB & 0xE0 )
 			{
 			case 0x00:	/* Begin row */
-				ef9341.X = 0;
-				ef9341.Y = ef9341.TA & 0x1F;
+				state->ef9341.X = 0;
+				state->ef9341.Y = state->ef9341.TA & 0x1F;
 				break;
 			case 0x20:	/* Load Y */
-				ef9341.Y = ef9341.TA & 0x1F;
+				state->ef9341.Y = state->ef9341.TA & 0x1F;
 				break;
 			case 0x40:	/* Load X */
-				ef9341.X = ef9341.TA & 0x3F;
+				state->ef9341.X = state->ef9341.TA & 0x3F;
 				break;
 			case 0x60:	/* INC C */
-				ef9341_inc_c();
+				ef9341_inc_c(state);
 				break;
 			case 0x80:	/* Load M */
-				ef9341.M = ef9341.TA;
+				state->ef9341.M = state->ef9341.TA;
 				break;
 			case 0xA0:	/* Load R */
-				ef9341.R = ef9341.TA;
+				state->ef9341.R = state->ef9341.TA;
 				break;
 			case 0xC0:	/* Load Y0 */
-				ef9341.Y0 = ef9341.TA & 0x3F;
+				state->ef9341.Y0 = state->ef9341.TA & 0x3F;
 				break;
 			}
-			ef9341.busy = 0;
+			state->ef9341.busy = 0;
 		}
 		else
 		{
-			ef9341.TA = data;
+			state->ef9341.TA = data;
 		}
 	}
 	else
 	{
 		if ( b )
 		{
-			ef9341.TB = data;
-			ef9341.busy = 0x80;
-			switch ( ef9341.M & 0xE0 )
+			state->ef9341.TB = data;
+			state->ef9341.busy = 0x80;
+			switch ( state->ef9341.M & 0xE0 )
 			{
 			case 0x00:	/* Write */
-				ef9341.ram[ ef9341_get_c_addr() ] = ef9341.TB;
-				ef9341_inc_c();
+				state->ef9341.ram[ ef9341_get_c_addr(state) ] = state->ef9341.TB;
+				ef9341_inc_c(state);
 				break;
 			case 0x20:	/* Read */
-				logerror("ef9341 unimplemented data action %02X\n", ef9341.M & 0xE0 );
-				ef9341_inc_c();
+				logerror("ef9341 unimplemented data action %02X\n", state->ef9341.M & 0xE0 );
+				ef9341_inc_c(state);
 				break;
 			case 0x40:	/* Write without increment */
 			case 0x60:	/* Read without increment */
 			case 0x80:	/* Write slice */
 			case 0xA0:	/* Read slice */
-				logerror("ef9341 unimplemented data action %02X\n", ef9341.M & 0xE0 );
+				logerror("ef9341 unimplemented data action %02X\n", state->ef9341.M & 0xE0 );
 				break;
 			}
-			ef9341.busy = 0;
+			state->ef9341.busy = 0;
 		}
 		else
 		{
-			ef9341.TA = data;
+			state->ef9341.TA = data;
 		}
 	}
 }
 
-UINT8 odyssey2_ef9341_r( int command, int b )
+UINT8 odyssey2_ef9341_r( running_machine *machine, int command, int b )
 {
+	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	UINT8	data = 0xFF;
 
 	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
@@ -857,19 +812,19 @@ UINT8 odyssey2_ef9341_r( int command, int b )
 		}
 		else
 		{
-			data = ef9341.busy;
+			data = state->ef9341.busy;
 		}
 	}
 	else
 	{
 		if ( b )
 		{
-			data = ef9341.TB;
-			ef9341.busy = 0x80;
+			data = state->ef9341.TB;
+			state->ef9341.busy = 0x80;
 		}
 		else
 		{
-			data = ef9341.TA;
+			data = state->ef9341.TA;
 		}
 	}
 	return data;

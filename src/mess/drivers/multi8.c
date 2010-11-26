@@ -18,23 +18,41 @@
 #include "machine/i8255a.h"
 #include "sound/beep.h"
 
-static UINT8 mcu_init;
-static UINT8 keyb_press,keyb_press_flag,shift_press_flag,display_reg;
-static UINT16 cursor_addr,cursor_raster;
-static UINT8 vram_bank;
-static UINT8 pen_clut[8],bw_mode;
+
+class multi8_state : public driver_device
+{
+public:
+	multi8_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 mcu_init;
+	UINT8 keyb_press;
+	UINT8 keyb_press_flag;
+	UINT8 shift_press_flag;
+	UINT8 display_reg;
+	UINT16 cursor_addr;
+	UINT16 cursor_raster;
+	UINT8 vram_bank;
+	UINT8 pen_clut[8];
+	UINT8 bw_mode;
+	int addr_latch;
+};
+
+
 
 static VIDEO_START( multi8 )
 {
-	keyb_press = keyb_press_flag = shift_press_flag = display_reg = 0;
-	cursor_addr = cursor_raster = 0;
-	for (bw_mode = 0; bw_mode < 8; bw_mode++) pen_clut[bw_mode]=0;
-	vram_bank = 8;
-	bw_mode = 0;
+	multi8_state *state = machine->driver_data<multi8_state>();
+	state->keyb_press = state->keyb_press_flag = state->shift_press_flag = state->display_reg = 0;
+	state->cursor_addr = state->cursor_raster = 0;
+	for (state->bw_mode = 0; state->bw_mode < 8; state->bw_mode++) state->pen_clut[state->bw_mode]=0;
+	state->vram_bank = 8;
+	state->bw_mode = 0;
 }
 
 static VIDEO_UPDATE( multi8 )
 {
+	multi8_state *state = screen->machine->driver_data<multi8_state>();
 	int x,y,count;
 	int x_width;
 	int xi,yi;
@@ -43,7 +61,7 @@ static VIDEO_UPDATE( multi8 )
 
 	count = 0x0000;
 
-	x_width = (display_reg & 0x40) ? 640 : 320;
+	x_width = (state->display_reg & 0x40) ? 640 : 320;
 
 	for(y=0;y<200;y++)
 	{
@@ -57,24 +75,24 @@ static VIDEO_UPDATE( multi8 )
 				pen_r = (vram[count | 0x4000] >> (7-xi)) & 1;
 				pen_g = (vram[count | 0x8000] >> (7-xi)) & 1;
 
-				if(bw_mode)
+				if(state->bw_mode)
 				{
-					pen_b = (display_reg & 1) ? pen_b : 0;
-					pen_r = (display_reg & 2) ? pen_r : 0;
-					pen_g = (display_reg & 4) ? pen_g : 0;
+					pen_b = (state->display_reg & 1) ? pen_b : 0;
+					pen_r = (state->display_reg & 2) ? pen_r : 0;
+					pen_g = (state->display_reg & 4) ? pen_g : 0;
 
 					color = ((pen_b) | (pen_r) | (pen_g)) ? 7 : 0;
 				}
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen_clut[color]];
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[state->pen_clut[color]];
 			}
 			count++;
 		}
 	}
 
-	x_width = (display_reg & 0x40) ? 80 : 40;
+	x_width = (state->display_reg & 0x40) ? 80 : 40;
 	count = 0xc000;
 
 	for(y=0;y<25;y++)
@@ -83,7 +101,7 @@ static VIDEO_UPDATE( multi8 )
 		{
 			int tile = vram[count];
 			int attr = vram[count+0x800];
-			int color = (display_reg & 0x80) ? 7 : (attr & 0x07);
+			int color = (state->display_reg & 0x80) ? 7 : (attr & 0x07);
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -104,12 +122,12 @@ static VIDEO_UPDATE( multi8 )
 			//drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
-			if(cursor_addr+0xc000 == count)
+			if(state->cursor_addr+0xc000 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(cursor_raster & 0x60)
+				switch(state->cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -119,7 +137,7 @@ static VIDEO_UPDATE( multi8 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -129,7 +147,7 @@ static VIDEO_UPDATE( multi8 )
 				}
 			}
 
-			(display_reg & 0x40) ? count++ : count+=2;
+			(state->display_reg & 0x40) ? count++ : count+=2;
 		}
 	}
     return 0;
@@ -137,21 +155,20 @@ static VIDEO_UPDATE( multi8 )
 
 static WRITE8_HANDLER( multi8_6845_w )
 {
-	static int addr_latch;
-
+	multi8_state *state = space->machine->driver_data<multi8_state>();
 	if(offset == 0)
 	{
-		addr_latch = data;
+		state->addr_latch = data;
 		//mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
-		if(addr_latch == 0x0a)
-			cursor_raster = data;
-		if(addr_latch == 0x0e)
-			cursor_addr = ((data<<8) & 0x3f00) | (cursor_addr & 0xff);
-		else if(addr_latch == 0x0f)
-			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
+		if(state->addr_latch == 0x0a)
+			state->cursor_raster = data;
+		if(state->addr_latch == 0x0e)
+			state->cursor_addr = ((data<<8) & 0x3f00) | (state->cursor_addr & 0xff);
+		else if(state->addr_latch == 0x0f)
+			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
 
 		//mc6845_register_w(space->machine->device("crtc"), 0,data);
 	}
@@ -159,73 +176,79 @@ static WRITE8_HANDLER( multi8_6845_w )
 
 static READ8_HANDLER( key_input_r )
 {
-	if(mcu_init == 0){ mcu_init++;	return 3; }
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+	if(state->mcu_init == 0){ state->mcu_init++;	return 3; }
 
-	keyb_press_flag &= 0xfe;
+	state->keyb_press_flag &= 0xfe;
 
-	return keyb_press;
+	return state->keyb_press;
 }
 
 static READ8_HANDLER( key_status_r )
 {
-	if(mcu_init == 0){				return 1; }
-	if(mcu_init == 1){ mcu_init++;	return 1; }
-	if(mcu_init == 2){ mcu_init++;	return 0; }
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+	if(state->mcu_init == 0){				return 1; }
+	if(state->mcu_init == 1){ state->mcu_init++;	return 1; }
+	if(state->mcu_init == 2){ state->mcu_init++;	return 0; }
 
-	return keyb_press_flag | (shift_press_flag << 7);
+	return state->keyb_press_flag | (state->shift_press_flag << 7);
 }
 
 static READ8_HANDLER( multi8_vram_r )
 {
+	multi8_state *state = space->machine->driver_data<multi8_state>();
 	UINT8 *vram = memory_region(space->machine, "vram");
 	UINT8 *wram = memory_region(space->machine, "wram");
 	UINT8 res;
 
-	if(!(vram_bank & 0x10)) //select plain work ram
+	if(!(state->vram_bank & 0x10)) //select plain work ram
 		return wram[offset];
 
 	res = 0xff;
-	if(!(vram_bank & 1)) { res &= vram[offset | 0x0000]; }
-	if(!(vram_bank & 2)) { res &= vram[offset | 0x4000]; }
-	if(!(vram_bank & 4)) { res &= vram[offset | 0x8000]; }
-	if(!(vram_bank & 8)) { res &= vram[offset | 0xc000]; }
+	if(!(state->vram_bank & 1)) { res &= vram[offset | 0x0000]; }
+	if(!(state->vram_bank & 2)) { res &= vram[offset | 0x4000]; }
+	if(!(state->vram_bank & 4)) { res &= vram[offset | 0x8000]; }
+	if(!(state->vram_bank & 8)) { res &= vram[offset | 0xc000]; }
 
 	return res;
 }
 
 static WRITE8_HANDLER( multi8_vram_w )
 {
+	multi8_state *state = space->machine->driver_data<multi8_state>();
 	UINT8 *vram = memory_region(space->machine, "vram");
 	UINT8 *wram = memory_region(space->machine, "wram");
 
-	if(!(vram_bank & 0x10)) //select plain work ram
+	if(!(state->vram_bank & 0x10)) //select plain work ram
 	{
 		wram[offset] = data;
 		return;
 	}
 
-	if(!(vram_bank & 1)) { vram[offset | 0x0000] = data; }
-	if(!(vram_bank & 2)) { vram[offset | 0x4000] = data; }
-	if(!(vram_bank & 4)) { vram[offset | 0x8000] = data; }
-	if(!(vram_bank & 8)) { vram[offset | 0xc000] = data; }
+	if(!(state->vram_bank & 1)) { vram[offset | 0x0000] = data; }
+	if(!(state->vram_bank & 2)) { vram[offset | 0x4000] = data; }
+	if(!(state->vram_bank & 4)) { vram[offset | 0x8000] = data; }
+	if(!(state->vram_bank & 8)) { vram[offset | 0xc000] = data; }
 }
 
 static READ8_HANDLER( pal_r )
 {
-	return pen_clut[offset];
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+	return state->pen_clut[offset];
 }
 
 static WRITE8_HANDLER( pal_w )
 {
-	pen_clut[offset] = data;
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+	state->pen_clut[offset] = data;
 
 	{
 		int i;
 		for(i=0;i<8;i++)
 		{
-			if(pen_clut[i]) { bw_mode = 0; return; }
+			if(state->pen_clut[i]) { state->bw_mode = 0; return; }
 		}
-		bw_mode = 1;
+		state->bw_mode = 1;
 	}
 }
 
@@ -374,12 +397,13 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( keyboard_callback )
 {
+	multi8_state *state = machine->driver_data<multi8_state>();
 	const char* portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
 	scancode = 0;
 
-	shift_press_flag = ((keymod & 0x02) >> 1);
+	state->shift_press_flag = ((keymod & 0x02) >> 1);
 
 	for(port_i=0;port_i<3;port_i++)
 	{
@@ -388,7 +412,7 @@ static TIMER_CALLBACK( keyboard_callback )
 			if((input_port_read(machine,portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
-				if(!shift_press_flag)  // shift not pressed
+				if(!state->shift_press_flag)  // shift not pressed
 				{
 					if(scancode >= 0x41 && scancode < 0x5b)
 						scancode += 0x20;  // lowercase
@@ -410,8 +434,8 @@ static TIMER_CALLBACK( keyboard_callback )
 					if(scancode == 0x3c)
 						scancode = 0x3e;
 				}
-				keyb_press = scancode;
-				keyb_press_flag = 1;
+				state->keyb_press = scancode;
+				state->keyb_press_flag = 1;
 				return;
 			}
 			scancode++;
@@ -469,6 +493,7 @@ static READ8_DEVICE_HANDLER( porta_r )
 
 static WRITE8_DEVICE_HANDLER( portb_w )
 {
+	multi8_state *state = device->machine->driver_data<multi8_state>();
 	/*
         x--- ---- color mode
         -x-- ---- screen width (80 / 40)
@@ -480,7 +505,7 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 //  printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 
 	{
-		if((display_reg & 0x40) != (data & 0x40))
+		if((state->display_reg & 0x40) != (data & 0x40))
 		{
 			rectangle visarea = device->machine->primary_screen->visible_area();
 			int x_width;
@@ -495,13 +520,14 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 		}
 	}
 
-	display_reg = data;
+	state->display_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( portc_w )
 {
+	multi8_state *state = device->machine->driver_data<multi8_state>();
 //  printf("Port C w = %02x\n",data);
-	vram_bank = data & 0x1f;
+	state->vram_bank = data & 0x1f;
 
 	if(data & 0x20 && data != 0xff)
 		printf("Work RAM bank selected!\n");
@@ -542,12 +568,13 @@ static MACHINE_START(multi8)
 
 static MACHINE_RESET(multi8)
 {
+	multi8_state *state = machine->driver_data<multi8_state>();
 	beep_set_frequency(machine->device("beeper"),1200); //guesswork
 	beep_set_state(machine->device("beeper"),0);
-	mcu_init = 0;
+	state->mcu_init = 0;
 }
 
-static MACHINE_CONFIG_START( multi8, driver_device )
+static MACHINE_CONFIG_START( multi8, multi8_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(multi8_mem)

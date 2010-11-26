@@ -7,6 +7,145 @@
 #ifndef TX0_H_
 #define TX0_H_
 
+enum state_t
+{
+	MTS_UNSELECTED,
+	MTS_SELECTING,
+	MTS_SELECTED,
+	MTS_UNSELECTING
+};
+
+enum backspace_state_t
+{
+	MTBSS_STATE0,
+	MTBSS_STATE1,
+	MTBSS_STATE2,
+	MTBSS_STATE3,
+	MTBSS_STATE4,
+	MTBSS_STATE5,
+	MTBSS_STATE6
+};
+
+enum state_2_t
+{
+	MTRDS_STATE0,
+	MTRDS_STATE1,
+	MTRDS_STATE2,
+	MTRDS_STATE3,
+	MTRDS_STATE4,
+	MTRDS_STATE5,
+	MTRDS_STATE6
+};
+
+enum state_3_t
+{
+	MTWTS_STATE0,
+	MTWTS_STATE1,
+	MTWTS_STATE2,
+	MTWTS_STATE3
+};
+
+enum irg_pos_t
+{
+	MTIRGP_START,
+	MTIRGP_ENDMINUS1,
+	MTIRGP_END
+};
+
+
+
+/* tape reader registers */
+typedef struct tape_reader_t
+{
+	device_image_interface *fd;	/* file descriptor of tape image */
+
+	int motor_on;	/* 1-bit reader motor on */
+
+	int rcl;		/* 1-bit reader clutch */
+	int rc;			/* 2-bit reader counter */
+
+	emu_timer *timer;	/* timer to simulate reader timing */
+} tape_reader_t;
+
+
+
+/* tape puncher registers */
+typedef struct tape_puncher_t
+{
+	device_image_interface *fd;	/* file descriptor of tape image */
+
+	emu_timer *timer;	/* timer to generate completion pulses */
+} tape_puncher_t;
+
+
+
+/* typewriter registers */
+typedef struct typewriter_t
+{
+	device_image_interface *fd;	/* file descriptor of output image */
+
+	emu_timer *prt_timer;/* timer to generate completion pulses */
+} typewriter_t;
+
+
+/* magnetic tape unit registers */
+typedef struct magtape_t
+{
+	device_image_interface *img;		/* image descriptor */
+
+	state_t state;
+
+	int command;
+	int binary_flag;
+
+	union
+	{
+		backspace_state_t backspace_state;
+		struct
+		{
+			state_2_t state;
+			int space_flag;
+		} read;
+		struct
+		{
+			state_3_t state;
+			int counter;
+		} write;
+	} u;
+
+	int sel_pending;
+	int cpy_pending;
+
+	irg_pos_t irg_pos;			/* position relative to inter-record gap */
+
+	int long_parity;
+
+	emu_timer *timer;	/* timer to simulate reader timing */
+} magtape_t;
+
+
+class tx0_state : public driver_device
+{
+public:
+	tx0_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	tape_reader_t tape_reader;
+	tape_puncher_t tape_puncher;
+	typewriter_t typewriter;
+	emu_timer *dis_timer;
+	magtape_t magtape;
+	int old_typewriter_keys[4];
+	int old_control_keys;
+	int old_tsr_keys;
+	int tsr_index;
+	int typewriter_color;
+	bitmap_t *panel_bitmap;
+	bitmap_t *typewriter_bitmap;
+	int pos;
+	int case_shift;
+};
+
 
 /*----------- defined in machine/tx0.c -----------*/
 
