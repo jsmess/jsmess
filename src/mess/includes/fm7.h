@@ -135,6 +135,7 @@ public:
 	UINT8 type;
 	fm7_video_t video;
 	fm7_alu_t alu;
+	int sb_prev;
 };
 
 

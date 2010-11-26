@@ -374,7 +374,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 }
 
 
-static void	oric_via_irq_func(running_device *device, int state)
+static void oric_via_irq_func(running_device *device, int state)
 {
 	oric_irqs &= ~(1<<0);
 
@@ -853,7 +853,7 @@ static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_drq_w )
 		port_318_r |= (1<<7);
 }
 
-static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
+static void oric_microdisc_set_mem_0x0c000(running_machine *machine)
 {
 	if (oric_is_telestrat)
 		return;
@@ -1294,7 +1294,7 @@ struct  telestrat_mem_block
 
 static struct telestrat_mem_block	telestrat_blocks[8];
 
-static void	telestrat_refresh_mem(running_machine *machine)
+static void telestrat_refresh_mem(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1376,7 +1376,7 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 }
 
 
-static void	telestrat_via2_irq_func(running_device *device, int state)
+static void telestrat_via2_irq_func(running_device *device, int state)
 {
     oric_irqs &=~(1<<2);
 

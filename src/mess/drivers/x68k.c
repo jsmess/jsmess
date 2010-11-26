@@ -601,17 +601,17 @@ static READ16_HANDLER( x68k_scc_r )
 	}
 }
 
+static unsigned char scc_prev;
 static WRITE16_HANDLER( x68k_scc_w )
 {
 	running_device *scc = space->machine->device("scc");
-	static unsigned char prev;
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
 		scc8530_w(scc, 0,(UINT8)data);
-		if((scc8530_get_reg_b(scc, 5) & 0x02) != prev)
+		if((scc8530_get_reg_b(scc, 5) & 0x02) != scc_prev)
 		{
 			if(scc8530_get_reg_b(scc, 5) & 0x02)  // Request to Send
 			{
@@ -632,7 +632,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 		scc8530_w(scc, 3,(UINT8)data);
 		break;
 	}
-	prev = scc8530_get_reg_b(scc, 5) & 0x02;
+	scc_prev = scc8530_get_reg_b(scc, 5) & 0x02;
 }
 
 static TIMER_CALLBACK(x68k_scc_ack)
@@ -916,46 +916,41 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan
 */
+static UINT16 ppi_prev;
 static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
 	running_device *oki = device->machine->device("okim6258");
-	static UINT16 prev1;
-	static UINT16 prev2;
-	static UINT16 prevA;
 
 	ppi_port[2] = data;
-	if((data & 0x0f) != (prevA & 0x0f))
+	if((data & 0x0f) != (ppi_prev & 0x0f))
 	{
 		x68k_sys.adpcm.pan = data & 0x03;
 		x68k_sys.adpcm.rate = data & 0x0c;
 		x68k_set_adpcm(device->machine);
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
-	prevA = data & 0x0f;
 
 	// The joystick enable bits also handle the multiplexer for various controllers
 	x68k_sys.joy.joy1_enable = data & 0x10;
 	x68k_sys.mdctrl.mux1 = data & 0x10;
-	if((prev1 & 0x10) == 0x00 && (data & 0x10) == 0x10)
+	if((ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		x68k_sys.mdctrl.seq1++;
 		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
 	}
-	prev1 = data;
 
 	x68k_sys.joy.joy2_enable = data & 0x20;
 	x68k_sys.mdctrl.mux2 = data & 0x20;
-	if((prev2 & 0x20) == 0x00 && (data & 0x20) == 0x20)
+	if((ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		x68k_sys.mdctrl.seq2++;
 		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
 	}
-	prev2 = data;
+	ppi_prev = data;
 
 	x68k_sys.joy.ioc6 = data & 0x40;
 	x68k_sys.joy.ioc7 = data & 0x80;
-
 }
 
 
@@ -1856,10 +1851,10 @@ static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
 	}
 }
 
+static int mfp_prev;
 static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 {
-	static int prev;
-	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+	if(mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 	if(state != CLEAR_LINE)
 		state = HOLD_LINE;  // to get around erroneous spurious interrupt
@@ -1867,7 +1862,7 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 //      return;
 	cputag_set_input_line(device->machine, "maincpu", 6, state);
 	current_vector[6] = 0;
-	prev = state;
+	mfp_prev = state;
 }
 
 static INTERRUPT_GEN( x68k_vsync_irq )

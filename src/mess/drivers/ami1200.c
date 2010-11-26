@@ -45,6 +45,19 @@
 #include "devices/chd_cd.h"
 
 
+class ami1200_state : public cubocd32_state
+{
+public:
+	ami1200_state(running_machine &machine, const driver_device_config_base &config)
+		: cubocd32_state(machine, config) { }
+
+	UINT16 potgo_value;
+	int cd32_shifter[2];
+	int oldstate[2];
+};
+
+
+
 #define A1200PAL_XTAL_X1  XTAL_28_37516MHz
 #define A1200PAL_XTAL_X2  XTAL_4_433619MHz
 #define CD32PAL_XTAL_X1   XTAL_28_37516MHz
@@ -52,7 +65,7 @@
 #define CD32PAL_XTAL_X3   XTAL_16_9344MHz
 
 
-static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra);
+static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra);
 
 static WRITE32_HANDLER( aga_overlay_w )
 {
@@ -90,6 +103,8 @@ static WRITE32_HANDLER( aga_overlay_w )
 
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
+	ami1200_state *state = device->machine->driver_data<ami1200_state>();
+
 	/* bit 1 = cd audio mute */
 	running_device *cdda = device->machine->device("cdda");
 
@@ -99,7 +114,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, !BIT(data, 1));
 
-	handle_cd32_joystick_cia(data, mos6526_r(device, 2));
+	handle_cd32_joystick_cia(state, data, mos6526_r(device, 2));
 }
 
 /*************************************
@@ -154,15 +169,14 @@ ADDRESS_MAP_END
 
 //int cd32_input_port_val = 0;
 //int cd32_input_select = 0;
-static UINT16 potgo_value = 0;
-static int cd32_shifter[2];
 
 static void cd32_potgo_w(running_machine *machine, UINT16 data)
 {
+	ami1200_state *state = machine->driver_data<ami1200_state>();
 	int i;
 
-	potgo_value = potgo_value & 0x5500;
-	potgo_value |= data & 0xaa00;
+	state->potgo_value = state->potgo_value & 0x5500;
+	state->potgo_value |= data & 0xaa00;
 
     for (i = 0; i < 8; i += 2)
 	{
@@ -170,23 +184,22 @@ static void cd32_potgo_w(running_machine *machine, UINT16 data)
 		if (data & dir)
 		{
 			UINT16 d = 0x0100 << i;
-			potgo_value &= ~d;
-			potgo_value |= data & d;
+			state->potgo_value &= ~d;
+			state->potgo_value |= data & d;
 		}
     }
     for (i = 0; i < 2; i++)
 	{
 	    UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 	    UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-	    if ((potgo_value & p5dir) && (potgo_value & p5dat))
-		cd32_shifter[i] = 8;
+	    if ((state->potgo_value & p5dir) && (state->potgo_value & p5dat))
+		state->cd32_shifter[i] = 8;
     }
 
 }
 
-static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
+static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
 {
-    static int oldstate[2];
     int i;
 
     for (i = 0; i < 2; i++)
@@ -194,24 +207,25 @@ static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-		if (!(potgo_value & p5dir) || !(potgo_value & p5dat))
+		if (!(state->potgo_value & p5dir) || !(state->potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != oldstate[i])
+			if ((dra & but) && (pra & but) != state->oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					cd32_shifter[i]--;
-					if (cd32_shifter[i] < 0)
-						cd32_shifter[i] = 0;
+					state->cd32_shifter[i]--;
+					if (state->cd32_shifter[i] < 0)
+						state->cd32_shifter[i] = 0;
 				}
 			}
 		}
-		oldstate[i] = pra & but;
+		state->oldstate[i] = pra & but;
     }
 }
 
 static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 {
+	ami1200_state *state = machine->driver_data<ami1200_state>();
     int i;
 
     for (i = 0; i < 2; i++)
@@ -223,17 +237,17 @@ static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 
 	    /* p5 is floating in input-mode */
 	    potgor &= ~p5dat;
-	    potgor |= potgo_value & p5dat;
-	    if (!(potgo_value & p9dir))
+	    potgor |= state->potgo_value & p5dat;
+	    if (!(state->potgo_value & p9dir))
 			potgor |= p9dat;
 	    /* P5 output and 1 -> shift register is kept reset (Blue button) */
-	    if ((potgo_value & p5dir) && (potgo_value & p5dat))
-			cd32_shifter[i] = 8;
+	    if ((state->potgo_value & p5dir) && (state->potgo_value & p5dat))
+			state->cd32_shifter[i] = 8;
 	    /* shift at 1 == return one, >1 = return button states */
-	    if (cd32_shifter[i] == 0)
+	    if (state->cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
 		if (i == 0)
-			if (cd32_shifter[i] >= 2 && (input_port_read(machine, "IN0") & (1 << (cd32_shifter[i] - 2))))
+			if (state->cd32_shifter[i] >= 2 && (input_port_read(machine, "IN0") & (1 << (state->cd32_shifter[i] - 2))))
 				potgor &= ~p9dat;
     }
     return potgor;
@@ -241,7 +255,8 @@ static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 
 static CUSTOM_INPUT(cd32_input)
 {
-	return handle_joystick_potgor(field->port->machine, potgo_value) >> 10;
+	ami1200_state *state = field->port->machine->driver_data<ami1200_state>();
+	return handle_joystick_potgor(field->port->machine, state->potgo_value) >> 10;
 }
 
 
@@ -437,7 +452,7 @@ static const mos6526_interface cd32_cia_1_intf =
 	DEVCB_NULL									/* port B */
 };
 
-static MACHINE_CONFIG_START( a1200n, cubocd32_state )
+static MACHINE_CONFIG_START( a1200n, ami1200_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */

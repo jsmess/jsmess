@@ -143,7 +143,17 @@ PCB 'Z545-1 A240570-1'
 //#include "cpu/v60/v60.h"
 #include "devices/cartslot.h"
 
-static UINT32 *bios_rom;
+
+class casloopy_state : public driver_device
+{
+public:
+	casloopy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *bios_rom;
+};
+
+
 
 static VIDEO_START( casloopy )
 {
@@ -156,7 +166,7 @@ static VIDEO_UPDATE( casloopy )
 }
 
 static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE(&bios_rom)
+	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, bios_rom)
 //	AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
@@ -177,7 +187,7 @@ static MACHINE_RESET( casloopy )
 
 }
 
-static MACHINE_CONFIG_START( casloopy, driver_device )
+static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,8000000)
@@ -227,9 +237,10 @@ ROM_END
 
 static DRIVER_INIT( casloopy )
 {
+	casloopy_state *state = machine->driver_data<casloopy_state>();
 	/* load hand made bios data*/
-	bios_rom[0/4] = 0x6000964; //SPC
-	bios_rom[4/4] = 0xffffff0; //SSP
+	state->bios_rom[0/4] = 0x6000964; //SPC
+	state->bios_rom[4/4] = 0xffffff0; //SSP
 }
 
 GAME( 1995, casloopy,  0,   casloopy,  casloopy,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )

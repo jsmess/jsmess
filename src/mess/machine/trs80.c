@@ -32,7 +32,7 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
-static UINT8 trs80_int=0;		/* interrupting devices */
+static UINT8 trs80_irq=0;		/* interrupting devices */
 static UINT8 trs80_mask= 0;		/* interrupt mask */
 static UINT8 trs80_nmi_mask= 0;		/* nmi mask */
 static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
@@ -84,7 +84,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		if (trs80_mask & CASS_FALL)	/* see if 1500 baud */
 		{
 			cassette_data = 0;
-			trs80_int |= CASS_FALL;
+			trs80_irq |= CASS_FALL;
 			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
@@ -94,7 +94,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		if (trs80_mask & CASS_RISE)	/* 1500 baud */
 		{
 			cassette_data = 1;
-			trs80_int |= CASS_RISE;
+			trs80_irq |= CASS_RISE;
 			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
@@ -127,7 +127,7 @@ READ8_HANDLER( trs80m4_e0_r )
     d0 Cass 1500 baud Rising */
 
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-	return ~(trs80_mask & trs80_int);
+	return ~(trs80_mask & trs80_irq);
 }
 
 READ8_HANDLER( trs80m4_e4_r )
@@ -194,7 +194,7 @@ READ8_HANDLER( trs80m4_eb_r )
 READ8_HANDLER( trs80m4_ec_r )
 {
 /* Reset the RTC interrupt */
-	trs80_int &= ~IRQ_M4_RTC;
+	trs80_irq &= ~IRQ_M4_RTC;
 	return 0;
 }
 
@@ -244,7 +244,7 @@ READ8_HANDLER( trs80m4_ff_r )
     d6..d1 info from write of port EC
     d0 High-speed data */
 
-	trs80_int &= 0xfc;	/* clear cassette interrupts */
+	trs80_irq &= 0xfc;	/* clear cassette interrupts */
 
 	return trs80_port_ec | cassette_data;
 }
@@ -682,13 +682,13 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 	{
 		if (trs80_mask & IRQ_M4_RTC)
 		{
-			trs80_int |= IRQ_M4_RTC;
+			trs80_irq |= IRQ_M4_RTC;
 			cpu_set_input_line(device, 0, HOLD_LINE);
 		}
 	}
 	else		// Model 1
 	{
-		trs80_int |= IRQ_M1_RTC;
+		trs80_irq |= IRQ_M1_RTC;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
@@ -705,7 +705,7 @@ static void trs80_fdc_interrupt_internal(running_machine *machine)
 	}
 	else		// Model 1 does a IRQ
 	{
-		trs80_int |= IRQ_M1_FDC;
+		trs80_irq |= IRQ_M1_FDC;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
@@ -726,7 +726,7 @@ static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )
 		if (trs80_model4)
 			trs80_nmi_data = 0;
 		else
-			trs80_int &= ~IRQ_M1_FDC;
+			trs80_irq &= ~IRQ_M1_FDC;
 	}
 }
 
@@ -795,9 +795,9 @@ READ8_HANDLER( trs80_irq_status_r )
     All interrupting devices are serviced in a single interrupt. There is a mask byte,
     which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
-	int result = trs80_int;
+	int result = trs80_irq;
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-	trs80_int = 0;
+	trs80_irq = 0;
 	return result;
 }
 

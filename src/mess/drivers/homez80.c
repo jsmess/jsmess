@@ -221,12 +221,12 @@ static GFXDECODE_START( homez80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static int homez80_int = 0;
+static int homez80_irq = 0;
 
 static INTERRUPT_GEN( homez80_interrupt )
 {	
-	cpu_set_input_line(device, 0, (homez80_int & 1) ? HOLD_LINE : CLEAR_LINE);
-	homez80_int ^= 1;
+	cpu_set_input_line(device, 0, (homez80_irq & 1) ? HOLD_LINE : CLEAR_LINE);
+	homez80_irq ^= 1;
 }
 
 static MACHINE_CONFIG_START( homez80, driver_device )

@@ -11,17 +11,28 @@
 #include "cpu/i8085/i8085.h"
 #include "bob85.lh"
 
+
+class bob85_state : public driver_device
+{
+public:
+	bob85_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 prev_key;
+	UINT8 count_key;
+};
+
+
 static ADDRESS_MAP_START(bob85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x02ff ) AM_ROM
 	AM_RANGE( 0x0300, 0x1fff ) AM_RAM
 ADDRESS_MAP_END
 
-static UINT8 prev_key = 0;
-static UINT8 count_key = 0;
 
 static READ8_HANDLER(bob85_keyboard_r)
 {
+	bob85_state *state = space->machine->driver_data<bob85_state>();
 	UINT8 retVal = 0;
 	UINT8 line0 = input_port_read(space->machine, "LINE0");
 	UINT8 line1 = input_port_read(space->machine, "LINE1");
@@ -63,13 +74,13 @@ static READ8_HANDLER(bob85_keyboard_r)
 			default :  break;
 		}
 	}
-	if (retVal != prev_key) {
-		prev_key = retVal;
-		count_key = 0;
+	if (retVal != state->prev_key) {
+		state->prev_key = retVal;
+		state->count_key = 0;
 		return retVal;
 	} else {
-		if (count_key <1) {
-			count_key++;
+		if (state->count_key <1) {
+			state->count_key++;
 			return retVal;
 		} else {
 			return 0;
@@ -77,8 +88,8 @@ static READ8_HANDLER(bob85_keyboard_r)
 	}
 
 	if (retVal == 0) {
-		prev_key = 0;
-		count_key = 0;
+		state->prev_key = 0;
+		state->count_key = 0;
 	}
 
 	return retVal;
@@ -130,7 +141,7 @@ static MACHINE_RESET(bob85)
 {
 }
 
-static MACHINE_CONFIG_START( bob85, driver_device )
+static MACHINE_CONFIG_START( bob85, bob85_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, 2000000)
     MDRV_CPU_PROGRAM_MAP(bob85_mem)

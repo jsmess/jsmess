@@ -68,21 +68,32 @@
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"
 
-static int joy_mode;
-static int joy_status[2];
-static int last_state=0;
+
+class coleco_state : public driver_device
+{
+public:
+	coleco_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int joy_mode;
+	int joy_status[2];
+	int last_state;
+};
+
+
 
 /* Read/Write Handlers */
 
 static READ8_HANDLER( paddle_1_r )
 {
+	coleco_state *state = space->machine->driver_data<coleco_state>();
 	UINT8 ctrl_sel = input_port_read_safe(space->machine, "CTRLSEL", 0);
 
 	/* is there a controller connected to port1? */
 	if ((ctrl_sel & 0x07) != 0x01 )
 	{
 		/* Keypad and fire 1 (SAC Yellow Button) */
-		if (joy_mode == 0)
+		if (state->joy_mode == 0)
 		{
 			UINT8 data = 0x0f;	/* No key pressed by default */
 			UINT16 ipt1 = 0x00;
@@ -129,8 +140,8 @@ static READ8_HANDLER( paddle_1_r )
 			 /* If any extra contoller enabled */
 			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x07) == 0x02) || ((ctrl_sel & 0x07) == 0x03))
 			{
-				if (joy_status[0] == 0) data |= 0x30; /* Spinner Move Left*/
-				else if (joy_status[0] == 1) data |= 0x20; /* Spinner Move Right */
+				if (state->joy_status[0] == 0) data |= 0x30; /* Spinner Move Left*/
+				else if (state->joy_status[0] == 1) data |= 0x20; /* Spinner Move Right */
 			}
 
 			return data | 0x80;
@@ -142,13 +153,14 @@ static READ8_HANDLER( paddle_1_r )
 
 static READ8_HANDLER( paddle_2_r )
 {
+	coleco_state *state = space->machine->driver_data<coleco_state>();
 	UINT8 ctrl_sel = input_port_read_safe(space->machine, "CTRLSEL", 0);
 
 	/* is there a controller connected to port2? */
 	if ((ctrl_sel & 0x70) != 0x10 )
 	{
 		/* Keypad and fire 1 */
-		if (joy_mode == 0)
+		if (state->joy_mode == 0)
 		{
 			UINT8 data = 0x0f;	/* No key pressed by default */
 			UINT16 ipt2 = 0x00;
@@ -192,8 +204,8 @@ static READ8_HANDLER( paddle_2_r )
 			/* If Roller Controller or P2 Super Action Controller enabled */
 			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x70) == 0x20))
 			{
-				if (joy_status[1] == 0) data |= 0x30;
-				else if (joy_status[1] == 1) data |= 0x20;
+				if (state->joy_status[1] == 0) data |= 0x30;
+				else if (state->joy_status[1] == 1) data |= 0x20;
 			}
 
 			return data | 0x80;
@@ -205,12 +217,14 @@ static READ8_HANDLER( paddle_2_r )
 
 static WRITE8_HANDLER( paddle_off_w )
 {
-	joy_mode = 0;
+	coleco_state *state = space->machine->driver_data<coleco_state>();
+	state->joy_mode = 0;
 }
 
 static WRITE8_HANDLER( paddle_on_w )
 {
-	joy_mode = 1;
+	coleco_state *state = space->machine->driver_data<coleco_state>();
+	state->joy_mode = 1;
 }
 
 /* Memory Maps */
@@ -466,15 +480,17 @@ static INTERRUPT_GEN( coleco_interrupt )
 
 static void coleco_vdp_interrupt(running_machine *machine, int state)
 {
+	coleco_state *drvstate = machine->driver_data<coleco_state>();
     // only if it goes up
-	if (state && !last_state)
+	if (state && !drvstate->last_state)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	last_state = state;
+	drvstate->last_state = state;
 }
 
 static TIMER_CALLBACK( paddle_callback )
 {
+	coleco_state *state = machine->driver_data<coleco_state>();
 	UINT8 analog1 = 0x00;
 	UINT8 analog2 = 0x00;
 	UINT8 ctrl_sel = input_port_read_safe(machine, "CTRLSEL", 0);
@@ -503,20 +519,20 @@ static TIMER_CALLBACK( paddle_callback )
 	}
 
     if (analog1 == 0)
-		joy_status[0] = 0;
+		state->joy_status[0] = 0;
     else if (analog1 & 0x08)
-		joy_status[0] = -1;
+		state->joy_status[0] = -1;
     else
-		joy_status[0] = 1;
+		state->joy_status[0] = 1;
 
     if (analog2 == 0)
-		joy_status[1] = 0;
+		state->joy_status[1] = 0;
     else if (analog2 & 0x08)
-		joy_status[1] = -1;
+		state->joy_status[1] = -1;
     else
-		joy_status[1] = 1;
+		state->joy_status[1] = 1;
 
-    if (joy_status[0] || joy_status[1])
+    if (state->joy_status[0] || state->joy_status[1])
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
@@ -538,7 +554,8 @@ static MACHINE_START( coleco )
 
 static MACHINE_RESET( coleco )
 {
-	last_state = 0;
+	coleco_state *state = machine->driver_data<coleco_state>();
+	state->last_state = 0;
 	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
 }
@@ -571,7 +588,7 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco, driver_device )
+static MACHINE_CONFIG_START( coleco, coleco_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(coleco_map)
@@ -598,7 +615,7 @@ static MACHINE_CONFIG_START( coleco, driver_device )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( czz50, driver_device )
+static MACHINE_CONFIG_START( czz50, coleco_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(czz50_map)

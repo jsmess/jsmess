@@ -1180,9 +1180,8 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	fm7_state *state = space->machine->driver_data<fm7_state>();
 //  UINT8* RAM = memory_region(space->machine,"sub");
 	UINT8* ROM;
-	static int prev;
 
-	if((data & 0x03) == (prev & 0x03))
+	if((data & 0x03) == (state->sb_prev & 0x03))
 		return;
 
 	state->video.subrom = data & 0x03;
@@ -1218,7 +1217,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	state->video.sub_busy = 0x80;
 	state->video.sub_halt = 0;
 	state->video.sub_reset = 1;
-	prev = data;
+	state->sb_prev = data;
 }
 
 /*

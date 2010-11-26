@@ -620,7 +620,7 @@ static void execute_sync_cmd(running_machine *machine)
 	*/
 	rectangle visarea;
 	attoseconds_t refresh;
-	static UINT16 x_vis_area,y_vis_area;
+	UINT16 x_vis_area,y_vis_area;
 
 	//printf("V blank start: %d\n",(sync_cmd[0x8]));
 	//printf("V border start: %d\n",(sync_cmd[0x9]));
@@ -929,7 +929,7 @@ static WRITE8_HANDLER( pc88va_fdc_w )
 
 static READ16_HANDLER( sysop_r )
 {
-	static UINT8 sys_op;
+	UINT8 sys_op;
 
 	sys_op = input_port_read(space->machine, "SYSOP_SW") & 3;
 
@@ -1349,7 +1349,7 @@ static I8255A_INTERFACE( fdd_intf )
 
 static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
 {
-	static UINT8 sw5, sw4, sw3, sw2,speed_sw;
+	UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
 	speed_sw = (input_port_read(device->machine, "SPEED_SW") & 1) ? 0x20 : 0x00;
 	sw5 = (input_port_read(device->machine, "DSW") & 0x10);
@@ -1362,7 +1362,7 @@ static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
 
 static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
 {
-	static UINT8 xsw1;
+	UINT8 xsw1;
 
 	xsw1 = (input_port_read(device->machine, "DSW") & 1) ? 0 : 8;
 

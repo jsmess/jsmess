@@ -14,11 +14,21 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static UINT8 *czk80_ram;
+
+class czk80_state : public driver_device
+{
+public:
+	czk80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+};
+
+
 
 static ADDRESS_MAP_START(czk80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&czk80_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(czk80_state, ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( czk80_io, ADDRESS_SPACE_IO, 8 )
@@ -31,10 +41,11 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(czk80)
 {
+	czk80_state *state = machine->driver_data<czk80_state>();
 	UINT8* bios = memory_region(machine, "maincpu") + 0xe000;
 
-	memcpy(czk80_ram,bios, 0x2000);
-	memcpy(czk80_ram+0xe000,bios, 0x2000);
+	memcpy(state->ram,bios, 0x2000);
+	memcpy(state->ram+0xe000,bios, 0x2000);
 }
 
 static VIDEO_START( czk80 )
@@ -46,7 +57,7 @@ static VIDEO_UPDATE( czk80 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( czk80, driver_device )
+static MACHINE_CONFIG_START( czk80, czk80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(czk80_mem)

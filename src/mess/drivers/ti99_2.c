@@ -93,7 +93,7 @@ public:
 
 
 static int ROM_paged;
-static int state = ASSERT_LINE;
+static int irq_state;
 
 static DRIVER_INIT( ti99_2_24 )
 {
@@ -112,7 +112,7 @@ static DRIVER_INIT( ti99_2_32 )
 
 static MACHINE_RESET( ti99_2 )
 {
-	state = ASSERT_LINE;
+	irq_state = ASSERT_LINE;
 	if (! ROM_paged)
 		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu")+0x4000);
 	else
@@ -121,8 +121,8 @@ static MACHINE_RESET( ti99_2 )
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
-	cpu_set_input_line(device, 1, state);
-	state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+	cpu_set_input_line(device, 1, irq_state);
+	irq_state = (irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 

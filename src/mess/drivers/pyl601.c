@@ -16,7 +16,7 @@
 
 static UINT8 rom_page;
 static UINT32 vdisk_addr = 0;
-static UINT8 key_code = 0xff;
+static UINT8 key_code;
 static UINT8 keyboard_clk = 0x00;
 static UINT8 video_mode = 0x00;
 static UINT8 tick50_mark = 0x00;
@@ -318,6 +318,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pyl601)
 {
+	key_code = 0xff;
 	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xc000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);

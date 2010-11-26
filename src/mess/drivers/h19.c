@@ -10,13 +10,23 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
-static UINT8 *video_ram;
+
+class h19_state : public driver_device
+{
+public:
+	h19_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+};
+
+
 
 static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&video_ram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(h19_state, video_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
@@ -48,13 +58,14 @@ static VIDEO_UPDATE( h19 )
 
 static MC6845_UPDATE_ROW( h19_update_row )
 {
+	h19_state *state = device->machine->driver_data<h19_state>();
 	UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = video_ram[((ma + column) & 0x7ff)];
+		UINT8 code = state->video_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = code << 4 | (ra & 0x0f);
 		UINT8 data = charrom[addr & 0x7ff];
 
@@ -103,7 +114,7 @@ static GFXDECODE_START( h19 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( h19, driver_device )
+static MACHINE_CONFIG_START( h19, h19_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6) // From schematics
 	MDRV_CPU_PROGRAM_MAP(h19_mem)

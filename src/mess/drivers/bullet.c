@@ -13,6 +13,17 @@
 #include "devices/messram.h"
 #include "machine/z80dma.h"
 
+
+class bullet_state : public driver_device
+{
+public:
+	bullet_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 port19;
+};
+
+
 static ADDRESS_MAP_START(bullet_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
@@ -20,11 +31,11 @@ static ADDRESS_MAP_START(bullet_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static UINT8 port19 = 0;
 
 static READ8_HANDLER(port19_r) 
 {
-	return port19;
+	bullet_state *state = space->machine->driver_data<bullet_state>();
+	return state->port19;
 }
 
 static WRITE8_HANDLER(port15_w) 
@@ -91,17 +102,19 @@ static const floppy_config bullet_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER( bullet_wd17xx_irq_w )
 {
+	bullet_state *drvstate = device->machine->driver_data<bullet_state>();
 	if (state)
-		port19 |= (1<<6);
+		drvstate->port19 |= (1<<6);
 	else
-		port19 &=~(1<<6);
+		drvstate->port19 &=~(1<<6);
 }
 static WRITE_LINE_DEVICE_HANDLER( bullet_wd17xx_drq_w )
 {
+	bullet_state *drvstate = device->machine->driver_data<bullet_state>();
 	if (state)
-		port19 |= (1<<7);
+		drvstate->port19 |= (1<<7);
 	else
-		port19 &=~(1<<7);
+		drvstate->port19 &=~(1<<7);
 }
 
 static const wd17xx_interface bullet_wd17xx_interface =
@@ -126,7 +139,7 @@ static Z80DMA_INTERFACE( bullet_dma )
 	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte),
 };
 
-static MACHINE_CONFIG_START( bullet,driver_device )
+static MACHINE_CONFIG_START( bullet, bullet_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(bullet_mem)

@@ -10,7 +10,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-static UINT8 *ccs_ram;
+
+class ccs2422_state : public driver_device
+{
+public:
+	ccs2422_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ccs_ram;
+};
+
+
 
 static WRITE8_HANDLER(ccs2422_terminal_w)
 {
@@ -20,7 +30,7 @@ static WRITE8_HANDLER(ccs2422_terminal_w)
 
 static ADDRESS_MAP_START(ccs2422_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&ccs_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(ccs2422_state, ccs_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ccs2422_io , ADDRESS_SPACE_IO, 8)
@@ -37,8 +47,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ccs2422)
 {
+	ccs2422_state *state = machine->driver_data<ccs2422_state>();
 	UINT8* user1 = memory_region(machine, "user1");
-	memcpy((UINT8*)ccs_ram,user1,0x0800);
+	memcpy((UINT8*)state->ccs_ram,user1,0x0800);
 
 	// this should be rom/ram banking
 }
@@ -52,7 +63,7 @@ static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
 	DEVCB_HANDLER(ccs2422_kbd_put)
 };
 
-static MACHINE_CONFIG_START( ccs2422, driver_device )
+static MACHINE_CONFIG_START( ccs2422, ccs2422_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(ccs2422_mem)

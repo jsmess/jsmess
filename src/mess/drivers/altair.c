@@ -11,12 +11,23 @@
 #include "machine/terminal.h"
 #include "devices/snapquik.h"
 
-static UINT8 term_data;
-static UINT8* altair_ram;
+
+class altair_state : public driver_device
+{
+public:
+	altair_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 term_data;
+	UINT8* ram;
+};
+
+
 
 static READ8_HANDLER(sio_status_r)
 {
-	if (term_data!=0) return 0x01; // data in
+	altair_state *state = space->machine->driver_data<altair_state>();
+	if (state->term_data!=0) return 0x01; // data in
 	return 0x02; // ready
 }
 
@@ -27,8 +38,9 @@ static WRITE8_HANDLER(sio_command_w)
 
 static READ8_HANDLER(sio_data_r)
 {
-	UINT8 retVal = term_data;
-	term_data = 0;
+	altair_state *state = space->machine->driver_data<altair_state>();
+	UINT8 retVal = state->term_data;
+	state->term_data = 0;
 	return retVal;
 }
 
@@ -40,12 +52,13 @@ static WRITE8_HANDLER(sio_data_w)
 
 static READ8_HANDLER(sio_key_status_r)
 {
-	return (term_data!=0) ? 0x40 : 0x01;
+	altair_state *state = space->machine->driver_data<altair_state>();
+	return (state->term_data!=0) ? 0x40 : 0x01;
 }
 
 static ADDRESS_MAP_START(altair_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xfcff ) AM_RAM  AM_BASE(&altair_ram)
+	AM_RANGE( 0x0000, 0xfcff ) AM_RAM  AM_BASE_MEMBER(altair_state, ram)
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
@@ -66,12 +79,13 @@ INPUT_PORTS_END
 
 QUICKLOAD_LOAD(altair)
 {
+	altair_state *state = image.device().machine->driver_data<altair_state>();
 	int quick_length;
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
 		return IMAGE_INIT_FAIL;
-	read_ = image.fread(altair_ram, quick_length);
+	read_ = image.fread(state->ram, quick_length);
 	if (read_ != quick_length)
 		return IMAGE_INIT_FAIL;
 
@@ -81,15 +95,17 @@ QUICKLOAD_LOAD(altair)
 
 static MACHINE_RESET(altair)
 {
+	altair_state *state = machine->driver_data<altair_state>();
 	// Set startup addess done by turn-key
 	cpu_set_reg(machine->device("maincpu"), I8085_PC, 0xFD00);
 
-	term_data = 0;
+	state->term_data = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( altair_kbd_put )
 {
-	term_data = data;
+	altair_state *state = device->machine->driver_data<altair_state>();
+	state->term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
@@ -97,7 +113,7 @@ static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
 	DEVCB_HANDLER(altair_kbd_put)
 };
 
-static MACHINE_CONFIG_START( altair, driver_device )
+static MACHINE_CONFIG_START( altair, altair_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(altair_mem)

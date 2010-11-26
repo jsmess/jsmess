@@ -274,7 +274,7 @@ static VIDEO_UPDATE( nanos )
 
 static UINT8 key_command;
 static UINT8 last_code = 0;
-static UINT8 key_pressed = 0xff;
+static UINT8 key_pressed;
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
 	UINT8 retVal;
@@ -399,6 +399,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static MACHINE_START(nanos)
 {
+	key_pressed = 0xff;
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
 

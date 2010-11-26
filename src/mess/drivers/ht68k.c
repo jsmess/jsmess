@@ -13,11 +13,21 @@
 #include "machine/wd17xx.h"
 #include "machine/terminal.h"
 
-static UINT16* ht68k_ram;
+
+class ht68k_state : public driver_device
+{
+public:
+	ht68k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* ram;
+};
+
+
 
 static ADDRESS_MAP_START(ht68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&ht68k_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(ht68k_state, ram) // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
 	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd17xx_r, wd17xx_w, 0x00ff) // FDC WD1770
@@ -33,9 +43,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ht68k)
 {
+	ht68k_state *state = machine->driver_data<ht68k_state>();
 	UINT8* user1 = memory_region(machine, "user1");
 
-	memcpy((UINT8*)ht68k_ram,user1,0x8000);
+	memcpy((UINT8*)state->ram,user1,0x8000);
 
 	machine->device("maincpu")->reset();
 }
@@ -114,7 +125,7 @@ static const floppy_config ht68k_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ht68k, driver_device )
+static MACHINE_CONFIG_START( ht68k, ht68k_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(ht68k_mem)

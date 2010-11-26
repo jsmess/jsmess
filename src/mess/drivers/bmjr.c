@@ -18,9 +18,21 @@
 #include "devices/cassette.h"
 #include "sound/wave.h"
 
-static UINT8 *wram;
-static UINT8 tape_switch;
-static UINT8 xor_display;
+
+class bmjr_state : public driver_device
+{
+public:
+	bmjr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *wram;
+	UINT8 tape_switch;
+	UINT8 xor_display;
+	UINT8 key_mux;
+	running_device *cassette;
+};
+
+
 
 static VIDEO_START( bmjr )
 {
@@ -28,6 +40,7 @@ static VIDEO_START( bmjr )
 
 static VIDEO_UPDATE( bmjr )
 {
+	bmjr_state *state = screen->machine->driver_data<bmjr_state>();
 	int x,y,xi,yi,count;
 	UINT8 *gfx_rom = memory_region(screen->machine, "char");
 
@@ -37,7 +50,7 @@ static VIDEO_UPDATE( bmjr )
 	{
 		for(x=0;x<32;x++)
 		{
-			int tile = wram[count];
+			int tile = state->wram[count];
 			int color = 4;
 
 			for(yi=0;yi<8;yi++)
@@ -46,7 +59,7 @@ static VIDEO_UPDATE( bmjr )
 				{
 					int pen;
 
-					if(xor_display)
+					if(state->xor_display)
 						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
 					else
 						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
@@ -62,28 +75,28 @@ static VIDEO_UPDATE( bmjr )
     return 0;
 }
 
-static UINT8 key_mux;
 
 static READ8_HANDLER( key_r )
 {
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
 	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
 
 
-	return (input_port_read(space->machine, keynames[key_mux]) & 0xf) | ((input_port_read(space->machine, "KEYMOD") & 0xf) << 4);
+	return (input_port_read(space->machine, keynames[state->key_mux]) & 0xf) | ((input_port_read(space->machine, "KEYMOD") & 0xf) << 4);
 }
 
 static WRITE8_HANDLER( key_w )
 {
-	key_mux = data & 0xf;
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	state->key_mux = data & 0xf;
 
 //  if(data & 0xf0)
 //      printf("%02x",data & 0xf0);
 }
 
-static running_device *bmjr_cassette;
 
 static READ8_HANDLER( ff_r )
 {
@@ -97,42 +110,47 @@ static READ8_HANDLER( unk_r )
 
 static READ8_HANDLER( tape_r )
 {
-	//cassette_change_state(bmjr_cassette,CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	//cassette_change_state(state->cassette,CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
-	return (cassette_input(bmjr_cassette) > 0.03) ? 0xff : 0x00;
+	return (cassette_input(state->cassette) > 0.03) ? 0xff : 0x00;
 }
 
 static WRITE8_HANDLER( tape_w )
 {
-	if(!tape_switch)
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	if(!state->tape_switch)
 	{
 		beep_set_state(space->machine->device("beeper"),!(data & 0x80));
 	}
 	else
 	{
-		//cassette_change_state(bmjr_cassette,CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
-		cassette_output(bmjr_cassette, (data & 0x80) ? -1.0 : +1.0);
+		//cassette_change_state(state->cassette,CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
+		cassette_output(state->cassette, (data & 0x80) ? -1.0 : +1.0);
 	}
 }
 
 static READ8_HANDLER( tape_stop_r )
 {
-	tape_switch = 0;
-	//cassette_change_state(bmjr_cassette,CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-	cassette_change_state(bmjr_cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	state->tape_switch = 0;
+	//cassette_change_state(state->cassette,CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+	cassette_change_state(state->cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
 static READ8_HANDLER( tape_start_r )
 {
-	tape_switch = 1;
-	cassette_change_state(bmjr_cassette,CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	state->tape_switch = 1;
+	cassette_change_state(state->cassette,CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
 static WRITE8_HANDLER( xor_display_w )
 {
-	xor_display = data;
+	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	state->xor_display = data;
 }
 
 static ADDRESS_MAP_START(bmjr_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -140,7 +158,7 @@ static ADDRESS_MAP_START(bmjr_mem, ADDRESS_SPACE_PROGRAM, 8)
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	AM_RANGE(0x0000, 0xafff) AM_RAM AM_BASE(&wram)
+	AM_RANGE(0x0000, 0xafff) AM_RAM AM_BASE_MEMBER(bmjr_state, wram)
 	AM_RANGE(0xb000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
@@ -309,12 +327,13 @@ static MACHINE_START(bmjr)
 
 static MACHINE_RESET(bmjr)
 {
-	tape_switch = 0;
-	bmjr_cassette = machine->device("cassette");
-	cassette_change_state(bmjr_cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	bmjr_state *state = machine->driver_data<bmjr_state>();
+	state->tape_switch = 0;
+	state->cassette = machine->device("cassette");
+	cassette_change_state(state->cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr, driver_device )
+static MACHINE_CONFIG_START( bmjr, bmjr_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
     MDRV_CPU_PROGRAM_MAP(bmjr_mem)
