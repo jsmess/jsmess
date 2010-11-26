@@ -128,7 +128,7 @@ static DEVICE_START(channelf_sound)
 	/* This is the minimum forced ontime, in samples */
 	state->min_ontime = rate/1000*2;  /* approx 2ms - estimated, not verified on HW */
 
-	/* This was measured, decay state->envelope with half life of ~9ms */
+	/* This was measured, decay envelope with half life of ~9ms */
 	/* (this is decay multiplier per sample) */
 	state->decay_mult = exp((-0.693/9e-3)/rate);
 

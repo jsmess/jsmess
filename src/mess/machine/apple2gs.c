@@ -147,7 +147,7 @@ static void process_clock(running_machine *machine)
 	UINT8 operation;
 	seconds_t current_interval;
 
-	/* update state->clock_curtime */
+	/* update clock_curtime */
 	current_interval = timer_get_time(machine).seconds;
 	state->clock_curtime += current_interval - state->clock_curtime_interval;
 	state->clock_curtime_interval = current_interval;
@@ -415,7 +415,7 @@ static void adb_do_command(apple2gs_state *state)
 
 	state->adb_state = ADBSTATE_IDLE;
 	if (LOG_ADB)
-		logerror("adb_do_command(): state->adb_command=0x%02x\n", state->adb_command);
+		logerror("adb_do_command(): adb_command=0x%02x\n", state->adb_command);
 
 	switch(state->adb_command)
 	{

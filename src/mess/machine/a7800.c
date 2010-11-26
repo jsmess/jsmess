@@ -247,7 +247,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	{
 		/* Super Cart */
 
-		/* Extra state->ROM at $4000 */
+		/* Extra ROM at $4000 */
 		if( state->cart_type & 0x08 )
 		{
 			image.fread(memory + 0x4000, 0x4000 );

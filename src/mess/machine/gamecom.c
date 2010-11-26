@@ -40,7 +40,7 @@ static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 	}
 	else
 	{
-		/* select state->cartridge bank */
+		/* select cartridge bank */
 		if ( state->cartridge )
 			memory_set_bankptr( machine, bank, state->cartridge + ( data << 13 ) );
 	}
@@ -168,8 +168,8 @@ WRITE8_HANDLER( gamecom_pio_w )
 				}
 				return;
 	case SM8521_P3:
-				/* P3 bit7 clear, bit6 set -> enable state->cartridge port #0? */
-				/* P3 bit6 clear, bit7 set -> enable state->cartridge port #1? */
+				/* P3 bit7 clear, bit6 set -> enable cartridge port #0? */
+				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				switch( data & 0xc0 )
 				{
 				case 0x40: state->cartridge = state->cartridge1; break;
@@ -585,7 +585,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 		case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
 		case 0x200000: load_offset = 0;        break;  /* 2  MB */
 		default:                                       /* otherwise */
-			logerror("Error loading state->cartridge: Invalid file size 0x%X\n", filesize);
+			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
 			return IMAGE_INIT_FAIL;
 	}
@@ -632,7 +632,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 		case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
 		case 0x200000: load_offset = 0;        break;  /* 2  MB */
 		default:                                       /* otherwise */
-			logerror("Error loading state->cartridge: Invalid file size 0x%X\n", filesize);
+			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
 			return IMAGE_INIT_FAIL;
 	}

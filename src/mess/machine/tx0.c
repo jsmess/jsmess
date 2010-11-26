@@ -112,7 +112,7 @@ DEVICE_IMAGE_LOAD( tx0_tape )
 
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
-        before state->tape_reader.timer is allocated.  It does not matter, as the clutch is never
+        before tape_reader.timer is allocated.  It does not matter, as the clutch is never
         down at power-up, but we must not call timer_enable with a NULL parameter! */
 		if (state->tape_reader.timer)
 		{
@@ -472,7 +472,7 @@ DEVICE_IMAGE_LOAD( tx0_magtape )
 
 	/* restart IO when necessary */
 	/* note that this function may be called before tx0_init_machine, therefore
-    before state->magtape.timer is allocated.  We must not call timer_enable with a
+    before magtape.timer is allocated.  We must not call timer_enable with a
     NULL parameter! */
 	if (state->magtape.timer)
 	{
@@ -828,7 +828,7 @@ static void magtape_callback(running_device *device)
 					if (state->magtape.long_parity)
 					{
 						logerror("invalid longitudinal parity\n");
-						/* no idea if the original tx-0 state->magtape controller
+						/* no idea if the original tx-0 magtape controller
                         checks parity, but can't harm if we do */
 						cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_PC);
 					}

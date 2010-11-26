@@ -425,7 +425,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 		memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0x3000 );
 	}
 
-	/* state->ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
+	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
 	/* if 0 the I/O is paged for both reads and writes */
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
 	if (state->ACCCON_TST)

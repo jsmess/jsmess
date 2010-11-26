@@ -158,14 +158,14 @@ typedef enum {
 #define GCtrlSWChar	0x02	/* Character set select */
 #define GCtrlHiLo	0x04	/* Hi/Lo res graphics, Hi=1, Lo=0 */
 #define GCtrlChrGfx	0x08	/* Character=1 / Graphics=0 */
-#define GCtrlControl	0x10	/* Control state->bit, sets direct drive mode */
+#define GCtrlControl	0x10	/* Control bit, sets direct drive mode */
 #define GCtrlFS		0x20	/* labeled F/S, not yet sure of function Fast or Slow scan ? */
 #define GCtrlAddrLines	0xC0	/* Top two address lines for text mode */
 
 #define IsTextMode	(state->GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
 #define IsGfx16 	((~state->GCtrl & GCtrlChrGfx) && (~state->GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
 #define IsGfx2		((state->GCtrl & GCtrlHiLo) && (~state->GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
-#define SWChar		(state->GCtrl & GCtrlSWChar)>>1					// Swchar state->bit
+#define SWChar		(state->GCtrl & GCtrlSWChar)>>1					// Swchar bit
 
 //static int beta_state;
 
@@ -249,7 +249,7 @@ static void beta_Set_VSync(running_machine *machine, int offset, int data)
 		if(state->FlashCount==10)
 		{
 			state->FlashCount=0;			// Reset counter
-			state->FlashBit=(!state->FlashBit) & 0x01;	// Invert flash state->bit.
+			state->FlashBit=(!state->FlashBit) & 0x01;	// Invert flash bit.
 		}
 
 		if (state->DrawInterlace==INTERLACE_AT_VS)
@@ -569,9 +569,9 @@ static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *b
 		Hi	= videoram[Addr+1];
 		Word	= (Hi<<8) | Lo;
 
-		/* If contol is low then we are plotting 4 state->bit per pixel, 16 colour mode */
+		/* If contol is low then we are plotting 4 bit per pixel, 16 colour mode */
 		/* This directly drives the colour output lines, from the pixel value */
-		/* If Control is high, then we lookup the colour from the LS670 4x4 state->bit */
+		/* If Control is high, then we lookup the colour from the LS670 4x4 bit */
 		/* palate register */
 		if (IsGfx16)
 		{
@@ -715,7 +715,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 WRITE8_HANDLER(dgnbeta_colour_ram_w)
 {
 	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
-	state->ColourRAM[offset]=data&0x0f;			/* Colour ram 4 state->bit and write only to CPU */
+	state->ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
 }
 
 /*************************************
@@ -812,7 +812,7 @@ static void execute_beta_vid_limits(running_machine *machine, int ref, int param
 	debug_console_printf(machine, "Min X     =$%4X, Max X     =$%4X\n",state->MinX,state->MaxX);
 	debug_console_printf(machine, "Min Y     =$%4X, Max Y     =$%4X\n",state->MinY,state->MaxY);
 	debug_console_printf(machine, "MinVidAddr=$%5X, MaxVidAddr=$%5X\n",state->MinAddr,state->MaxAddr);
-	debug_console_printf(machine, "HsyncMin  =%d, state->VSyncMin=%d\n",state->HSyncMin, state->VSyncMin);
+	debug_console_printf(machine, "HsyncMin  =%d, VSyncMin=%d\n",state->HSyncMin, state->VSyncMin);
 	debug_console_printf(machine, "Interlace =%d\n",state->DrawInterlace);
 	debug_console_printf(machine, "DEPos=%d\n",state->DEPos);
 	if (IsGfx16)

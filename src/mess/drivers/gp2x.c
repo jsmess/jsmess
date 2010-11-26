@@ -220,7 +220,7 @@ static READ32_HANDLER(nand_r)
 							state->nand_ptr++;
 							return ret;
 						default:
-							logerror("Bad state->nand_subword_stage = %d\n", state->nand_subword_stage);
+							logerror("Bad nand_subword_stage = %d\n", state->nand_subword_stage);
 							break;
 					}
 				}

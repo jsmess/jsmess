@@ -965,7 +965,7 @@ void _3do_clio_init( running_machine *machine, screen_device *screen )
 	memset( &state->clio, 0, sizeof(CLIO) );
 	state->clio.screen = screen;
 	state->clio.revision = 0x02022000 /* 0x04000000 */;
-	state->clio.cstatbits = 0x01;	/* bit 0 = reset of state->clio caused by power on */
+	state->clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	state->clio.unclerev = 0x03800000;
 	state->clio.expctl = 0x80;	/* ARM has the expansion bus */
 }

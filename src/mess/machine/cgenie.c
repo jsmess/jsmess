@@ -144,7 +144,7 @@ MACHINE_START( cgenie )
      */
 //  cpunum_set_clockscale(machine, 0, 0.80);
 
-	/* Initialize some patterns to be displayed in state->graphics mode */
+	/* Initialize some patterns to be displayed in graphics mode */
 	for( i = 0; i < 256; i++ )
 		memset(gfx + i * 8, i, 8);
 
@@ -168,7 +168,7 @@ MACHINE_START( cgenie )
 #define FF_CHR1 0x08		   /* charset 0xc0 - 0xff 1:fixed 0:defined */
 #define FF_CHR0 0x10		   /* charset 0x80 - 0xbf 1:fixed 0:defined */
 #define FF_CHR	(FF_CHR0 | FF_CHR1)
-#define FF_FGR	0x20		   /* 1: "hi" resolution state->graphics, 0: text mode */
+#define FF_FGR	0x20		   /* 1: "hi" resolution graphics, 0: text mode */
 #define FF_BGD1 0x40		   /* background color select 1 */
 #define FF_BGD2 0x80		   /* background color select 2 */
 #define FF_BGD	(FF_BGD0 | FF_BGD1 | FF_BGD2)
@@ -236,7 +236,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 		state->font_offset[3] = (data & FF_CHR1) ? 0x00 : 0x80;
 	}
 
-	/* state->graphics mode changed ? */
+	/* graphics mode changed ? */
 	if( port_ff_changed & FF_FGR )
 	{
 		cgenie_mode_select(space->machine, data & FF_FGR);
@@ -472,7 +472,7 @@ WRITE8_HANDLER( cgenie_motor_w )
 	if( drive > 3 )
 		return;
 
-	/* mask state->head select bit */
+	/* mask head select bit */
 		state->head = (data >> 4) & 1;
 
 	/* currently selected drive */

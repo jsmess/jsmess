@@ -269,7 +269,7 @@ static const gfx_layout cgenie_charlayout =
 static const gfx_layout cgenie_gfxlayout =
 {
 	8,8,			/* 4*8 characters */
-	256,			/* 256 state->graphics patterns */
+	256,			/* 256 graphics patterns */
 	2,				/* 2 bits per pixel */
 	{ 0, 1 },		/* two bitplanes; 2 bit per pixel */
 	{ 0, 0, 2, 2, 4, 4, 6, 6}, /* x offsets */
@@ -437,9 +437,9 @@ static const unsigned short cgenie_palette[] =
 	0,41, 0,42, 0,43, 0,44,
 	0,45, 0,46, 0,47, 0,48,
 
-	0,	  9,	7,	  6,	/* RGB monitor state->graphics colors */
-	0,	  25,	23,   22,	/* TV set state->graphics colors: darker */
-	0,	  41,	39,   38,	/* TV set state->graphics colors: a bit brighter */
+	0,	  9,	7,	  6,	/* RGB monitor graphics colors */
+	0,	  25,	23,   22,	/* TV set graphics colors: darker */
+	0,	  41,	39,   38,	/* TV set graphics colors: a bit brighter */
 };
 
 /* Initialise the palette */

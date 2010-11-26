@@ -73,7 +73,7 @@ READ8_HANDLER( odyssey2_bus_r )
 {
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
     if ((state->p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
-		return odyssey2_video_r(space, offset); /* seems to have higher priority than state->ram??? */
+		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
 
     else if (!(state->p1 & P1_EXT_RAM_ENABLE))
 		return state->ram[offset];
@@ -88,7 +88,7 @@ WRITE8_HANDLER( odyssey2_bus_w )
 		state->ram[offset] = data;
 		if ( offset & 0x80 ) {
 			if ( data & 0x20 ) {
-				logerror("voice write %02X, data = %02X (state->p1 = %02X)\n", offset, data, state->p1 );
+				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, state->p1 );
 				sp0256_ALD_w( space->machine->device("sp0256_speech"), 0, offset & 0x7F );
 			} else {
 				/* TODO: Reset sp0256 in this case */
@@ -104,7 +104,7 @@ READ8_HANDLER( g7400_bus_r )
 {
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
 	if ((state->p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0) {
-		return odyssey2_video_r(space, offset); /* seems to have higher priority than state->ram??? */
+		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
 	}
 	else if (!(state->p1 & P1_EXT_RAM_ENABLE)) {
 		return state->ram[offset];
@@ -135,7 +135,7 @@ READ8_HANDLER( odyssey2_getp1 )
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
 	UINT8 data = state->p1;
 
-	logerror("%.9f state->p1 read %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
+	logerror("%.9f p1 read %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
 	return data;
 }
 
@@ -148,7 +148,7 @@ WRITE8_HANDLER( odyssey2_putp1 )
 
 	odyssey2_lum_w ( space, 0, state->p1 >> 7 );
 
-	logerror("%.6f state->p1 written %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
+	logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
 }
 
 READ8_HANDLER( odyssey2_getp2 )
@@ -183,7 +183,7 @@ READ8_HANDLER( odyssey2_getp2 )
     else
         state->p2 = state->p2 | 0xF0;
 
-    logerror("%.6f state->p2 read %.2x\n", attotime_to_double(timer_get_time(space->machine)), state->p2);
+    logerror("%.6f p2 read %.2x\n", attotime_to_double(timer_get_time(space->machine)), state->p2);
     return state->p2;
 }
 
@@ -192,7 +192,7 @@ WRITE8_HANDLER( odyssey2_putp2 )
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
     state->p2 = data;
 
-    logerror("%.6f state->p2 written %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
+    logerror("%.6f p2 written %.2x\n", attotime_to_double(timer_get_time(space->machine)), data);
 }
 
 READ8_HANDLER( odyssey2_getbus )

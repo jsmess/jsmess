@@ -196,7 +196,7 @@ typedef struct typewriter_t
 {
 	device_image_interface *fd;	/* file descriptor of output image */
 
-	int tb;			/* state->typewriter buffer */
+	int tb;			/* typewriter buffer */
 
 	emu_timer *tyo_timer;/* timer to generate completion pulses */
 } typewriter_t;

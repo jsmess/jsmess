@@ -272,7 +272,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 
 			if( state->graphics )
 			{
-				/* get state->graphics code */
+				/* get graphics code */
 				code = videoram[i];
 				drawgfx_opaque(bitmap, &r, machine->gfx[1], code, 0,
 					0, 0, r.min_x, r.min_y);
@@ -325,12 +325,12 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 	cgenie_state *state = machine->driver_data<cgenie_state>();
 	UINT8 *videoram = state->videoram;
 	int i, address, offset, cursor, size, code, x, y;
-    rectangle r;
+	rectangle r;
 
 	bitmap_fill(machine->generic.tmpbitmap, cliprect, get_black_pen(machine));
 	bitmap_fill(state->dlybitmap, cliprect, get_black_pen(machine));
 
-    if(state->crt.vertical_displayed || state->crt.horizontal_displayed)
+	if(state->crt.vertical_displayed || state->crt.horizontal_displayed)
 	{
 		offset = 256 * state->crt.screen_address_hi + state->crt.screen_address_lo;
 		size = state->crt.horizontal_displayed * state->crt.vertical_displayed;
@@ -353,7 +353,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 
 			if( state->graphics )
 			{
-				/* get state->graphics code */
+				/* get graphics code */
 				code = videoram[i];
 				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y);

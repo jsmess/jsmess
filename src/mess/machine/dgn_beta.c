@@ -246,7 +246,7 @@ static const struct bank_info_entry bank_info[] =
 //
 // Each block of 16 page registers (1 for each task), is paged in at $FE00-$FE0F, the bottom
 // 4 bits of the PIA register at $FCC0 seem to contain which task is active.
-// state->bit 6 of the same port seems to enable the memory paging
+// bit 6 of the same port seems to enable the memory paging
 //
 // For the purpose of this driver any block that is not ram, and is not a known ROM block,
 // is mapped to the first page of the boot rom, I do not know what happens in the real
@@ -525,7 +525,7 @@ static int SelectedKeyrow(dgn_beta_state *state, int Rows)
 			Found=1;		/* Mark as found */
 		}
 		Idx=Idx-1;			/* Decrement row count */
-		Mask=Mask>>1;			/* Select next state->bit */
+		Mask=Mask>>1;			/* Select next bit */
 	}
 
 	return Row;
@@ -619,17 +619,17 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 	InClkState	= data & KInClk;
 	//OutClkState   = data & KOutClk;
 
-	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X state->Keyrow=$%02X ",InClkState,(state->d_pia0_pb_last & KInClk),state->Keyrow));
+	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(state->d_pia0_pb_last & KInClk),state->Keyrow));
 
-	/* Input clock state->bit has changed state */
+	/* Input clock bit has changed state */
 	if ((InClkState) != (state->d_pia0_pb_last & KInClk))
 	{
-		/* Clock in state->bit */
+		/* Clock in bit */
 		if(InClkState)
 		{
 			state->KInDat_next=(~state->Keyrow & 0x40)>>6;
 			state->Keyrow = ((state->Keyrow<<1) | 0x01) & 0x7F ;
-			LOG_KEYBOARD(("Keyrow=$%02X state->KInDat_next=%X\n",state->Keyrow,state->KInDat_next));
+			LOG_KEYBOARD(("Keyrow=$%02X KInDat_next=%X\n",state->Keyrow,state->KInDat_next));
 		}
 	}
 
@@ -652,8 +652,8 @@ static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 		/* In the beta the shift registers are a cmos 4015, and a cmos 4013 in series */
 		state->RowShifter = (state->RowShifter<<1) | ((state->d_pia0_pb_last & KOutDat)>>4);
 		state->RowShifter &= 0x3FF;
-		LOG_KEYBOARD(("Rowshifter=$%02X state->Keyrow=$%02X\n",state->RowShifter,state->Keyrow));
-		if (VERBOSE) debug_console_printf(device->machine, "rowshifter clocked, value=%3X, RowNo=%d, state->Keyrow=%2X\n",state->RowShifter,RowNo,state->Keyrow);
+		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",state->RowShifter,state->Keyrow));
+		if (VERBOSE) debug_console_printf(device->machine, "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->RowShifter,RowNo,state->Keyrow);
 	}
 
 	state->d_pia0_cb2_last=data;
@@ -691,7 +691,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 	int	HALT_DMA;
 	running_device *fdc = device->machine->device(FDC_TAG);
 
-	/* Only play with halt line if halt state->bit changed since last write */
+	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != state->d_pia1_pa_last)
 	{
 		/* Bit 7 of $FF24, seems to control HALT on second CPU (through an inverter) */
@@ -728,7 +728,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
 	int	HALT_CPU;
 
-	/* Only play with halt line if halt state->bit changed since last write */
+	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x02) != state->d_pia1_pb_last)
 	{
 		/* Bit 1 of $FF26, seems to control HALT on primary CPU */
@@ -813,7 +813,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 	OldTask = state->PIATaskReg;
 	state->PIATaskReg = data & 0x0F;
 
-	LOG_TASK(("OldTask=$%02X state->EnableMapRegs=%d OldEnableMap=%d\n", OldTask, state->EnableMapRegs, OldEnableMap));
+	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n", OldTask, state->EnableMapRegs, OldEnableMap));
 
 	// Maping was enabled or disabled, select apropreate task reg
 	// and map it in
@@ -835,7 +835,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 			UpdateBanks(device->machine, 0, IOPage + 1);
 		}
 	}
-	LOG_TASK(("TaskReg=$%02X state->PIATaskReg=$%02X\n", state->TaskReg, state->PIATaskReg));
+	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", state->TaskReg, state->PIATaskReg));
 }
 
 static READ8_DEVICE_HANDLER(d_pia2_pb_r)
@@ -1092,7 +1092,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->d_pia0_pb_last = 0x00;		/* Last byte output to pia0 port b */
 	state->d_pia0_cb2_last = 0x00;		/* Last state of CB2 */
 
-	state->KInDat_next = 0x00;			/* Next data state->bit to input */
+	state->KInDat_next = 0x00;			/* Next data bit to input */
 	state->KAny_next = 0x00;			/* Next value for KAny */
 
 	state->DMA_NMI_LAST = 0x80;		/* start with DMA NMI inactive, as pulled up */

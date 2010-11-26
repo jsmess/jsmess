@@ -60,7 +60,7 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 	int datasize;
 	unsigned char *data;
 
-	/* get state->file size */
+	/* get file size */
 	datasize = image.length();
 
 	if (datasize!=0)
@@ -72,7 +72,7 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 		{
 			state->card_size = datasize;
 
-			/* read whole state->file */
+			/* read whole file */
 			image.fread(data, datasize);
 
 			*ptr = data;
@@ -107,7 +107,7 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 	nc_state *state = image.device().machine->driver_data<nc_state>();
 	/* filename specified */
 
-	/* attempt to load state->file */
+	/* attempt to load file */
 	if (nc_card_load(image, &state->card_ram))
 	{
 		if (state->card_ram!=NULL)

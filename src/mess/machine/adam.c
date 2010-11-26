@@ -514,15 +514,15 @@ If you have the source listing or the Rom dump, please send us.
 				ram[offset] = 0x82;
 				//logerror("Synchronizing the Master 6801 clock\n");
 				break;
-			case 3: /* Request to relocate state->pcb */
+			case 3: /* Request to relocate pcb */
 				ram[offset] = 0x83; /* Must return 0x83 if success */
 				//ram[offset] = 0x9B; /* Time Out */
-				logerror("Request to relocate state->pcb from %04Xh to %04Xh... not implemented... but returns OK\n", state->pcb, (ram[state->pcb+1]|ram[state->pcb+2]<<8));
+				logerror("Request to relocate pcb from %04Xh to %04Xh... not implemented... but returns OK\n", state->pcb, (ram[state->pcb+1]|ram[state->pcb+2]<<8));
 				break;
 		}
 	}
 
-	for(DCB_Num=1;DCB_Num<=ram[state->pcb+3];DCB_Num++) /* Test status of each DCB in state->pcb table */
+	for(DCB_Num=1;DCB_Num<=ram[state->pcb+3];DCB_Num++) /* Test status of each DCB in pcb table */
 	{
 		statusDCB = (state->pcb+4)+(DCB_Num-1)*21;
 		if (offset==statusDCB)

@@ -123,8 +123,8 @@ VIDEO_UPDATE( kaypro2x )
 	kaypro_state *state = screen->machine->driver_data<kaypro_state>();
 	state->framecnt++;
 	state->speed = state->mc6845_reg[10]&0x20;
-	state->flash = state->mc6845_reg[10]&0x40;				// state->cursor modes
-	state->cursor = (state->mc6845_reg[14]<<8) | state->mc6845_reg[15];					// get state->cursor position
+	state->flash = state->mc6845_reg[10]&0x40;				// cursor modes
+	state->cursor = (state->mc6845_reg[14]<<8) | state->mc6845_reg[15];					// get cursor position
 	mc6845_update(state->mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -185,7 +185,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		if ((attr & 4) && (state->framecnt & 8))
 			fg = bg;
 
-		/* process state->cursor - remove when mame fixed */
+		/* process cursor - remove when mame fixed */
 		if ((((!state->flash) && (!state->speed)) ||
 			((state->flash) && (state->speed) && (state->framecnt & 0x10)) ||
 			((state->flash) && (!state->speed) && (state->framecnt & 8))) &&
@@ -217,30 +217,30 @@ static void mc6845_cursor_configure(kaypro_state *state)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
 
-	/* curs_type holds the general state->cursor shape to be created
-        0 = no state->cursor
-        1 = partial state->cursor (only shows on a block of scan lines)
-        2 = full state->cursor
-        3 = two-part state->cursor (has a part at the top and bottom with the middle blank) */
+	/* curs_type holds the general cursor shape to be created
+        0 = no cursor
+        1 = partial cursor (only shows on a block of scan lines)
+        2 = full cursor
+        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(state->mc6845_cursor); i++) state->mc6845_cursor[i] = 0;		// prepare state->cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(state->mc6845_cursor); i++) state->mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
 	r9  = state->mc6845_reg[9];					// number of scan lines - 1
-	r10 = state->mc6845_reg[10] & 0x1f;				// state->cursor start line = last 5 bits
-	r11 = state->mc6845_reg[11]+1;					// state->cursor end line incremented to suit for-loops below
+	r10 = state->mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = state->mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
 	else
-	if (r10 == r11) curs_type=2;				// if equal, show full state->cursor
-	else curs_type=3;					// if start greater than end, it's a two-part state->cursor
+	if (r10 == r11) curs_type=2;				// if equal, show full cursor
+	else curs_type=3;					// if start greater than end, it's a two-part cursor
 
-	if ((r11 - 1) > r9) curs_type=2;			// if end greater than scan-lines, show full state->cursor
-	if (r10 > r9) curs_type=0;				// if start greater than scan-lines, then no state->cursor
+	if ((r11 - 1) > r9) curs_type=2;			// if end greater than scan-lines, show full cursor
+	if (r10 > r9) curs_type=0;				// if start greater than scan-lines, then no cursor
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
-	/* create the new state->cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(state->mc6845_cursor);i++) state->mc6845_cursor[i]=0xff; // turn on full state->cursor
+	/* create the new cursor */
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(state->mc6845_cursor);i++) state->mc6845_cursor[i]=0xff; // turn on full cursor
 
 	if (curs_type == 1) for (i = r10;i < r11;i++) state->mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
 

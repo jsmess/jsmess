@@ -331,7 +331,7 @@ static void apple3_update_memory(running_machine *machine)
 
 	if (LOG_MEMORY)
 	{
-		logerror("apple3_update_memory(): state->via_0_b=0x%02x state->via_1_a=0x0x%02x\n", state->via_0_b, state->via_1_a);
+		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", state->via_0_b, state->via_1_a);
 	}
 
 	cputag_set_clock(machine, "maincpu", (state->via_0_a & 0x80) ? 1000000 : 2000000);
@@ -546,7 +546,7 @@ static UINT8 *apple3_get_indexed_addr(running_machine *machine,offs_t offset)
 		{
 			if (state->last_n != n)
 			{
-				logerror("indxaddr: state->zpa=0x%04x n=0x%02x\n", state->zpa, n);
+				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", state->zpa, n);
 				state->last_n = n;
 			}
 		}

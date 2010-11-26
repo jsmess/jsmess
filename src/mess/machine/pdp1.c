@@ -71,7 +71,7 @@ static void iot_cks(running_device *device, int op2, int nac, int mb, int *io, i
     emulated:
     * perforated tape reader
     * perforated tape punch
-    * state->typewriter output
+    * typewriter output
     * CRT display
     unemulated:
     * card punch (pac: 43)
@@ -87,8 +87,8 @@ enum
 {
 	io_st_pen = 0400000,	/* light pen: light has hit the pen */
 	io_st_ptr = 0200000,	/* perforated tape reader: reader buffer full */
-	io_st_tyo = 0100000,	/* state->typewriter out: device ready */
-	io_st_tyi = 0040000,	/* state->typewriter in: new character in buffer */
+	io_st_tyo = 0100000,	/* typewriter out: device ready */
+	io_st_tyi = 0040000,	/* typewriter in: new character in buffer */
 	io_st_ptp = 0020000		/* perforated tape punch: device ready */
 };
 
