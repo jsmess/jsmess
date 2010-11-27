@@ -84,7 +84,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 		return IMAGE_INIT_FAIL;
 	}
 
-	/* If VIA T2 starts, reset state->refresh timer.
+	/* If VIA T2 starts, reset refresh timer.
        This is the best strategy for most games. */
 	state->reset_refresh = 1;
 

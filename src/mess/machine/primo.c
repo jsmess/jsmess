@@ -24,8 +24,6 @@
 #include "devices/cartslot.h"
 
 
-static UINT8 primo_port_FD = 0x00;
-static int primo_nmi = 0;
 
 /*******************************************************************************
 
@@ -35,7 +33,8 @@ static int primo_nmi = 0;
 
 INTERRUPT_GEN( primo_vblank_interrupt )
 {
-	if (primo_nmi)
+	primo_state *state = device->machine->driver_data<primo_state>();
+	if (state->nmi)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -47,8 +46,9 @@ INTERRUPT_GEN( primo_vblank_interrupt )
 
 static void primo_update_memory(running_machine *machine)
 {
+	primo_state *state = machine->driver_data<primo_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
-	switch (primo_port_FD & 0x03)
+	switch (state->port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
@@ -67,7 +67,7 @@ static void primo_update_memory(running_machine *machine)
 			memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu")+0x18000);
 			break;
 	}
-	logerror ("Memory update: %02x\n", primo_port_FD);
+	logerror ("Memory update: %02x\n", state->port_FD);
 }
 
 /*******************************************************************************
@@ -135,9 +135,10 @@ READ8_HANDLER( primo_be_2_r )
 
 WRITE8_HANDLER( primo_ki_1_w )
 {
+	primo_state *state = space->machine->driver_data<primo_state>();
 	running_device *speaker = space->machine->device("speaker");
 	// bit 7 - NMI generator enable/disable
-	primo_nmi = (data & 0x80) ? 1 : 0;
+	state->nmi = (data & 0x80) ? 1 : 0;
 
 	// bit 6 - joystick register shift (not emulated)
 
@@ -148,9 +149,9 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 	// bit 3 - display buffer
 	if (data & 0x08)
-		primo_video_memory_base |= 0x2000;
+		state->video_memory_base |= 0x2000;
 	else
-		primo_video_memory_base &= 0xdfff;
+		state->video_memory_base &= 0xdfff;
 
 	// bit 2 - V.24 (1) / tape control (not emulated)
 
@@ -197,9 +198,10 @@ WRITE8_HANDLER( primo_ki_2_w )
 
 WRITE8_HANDLER( primo_FD_w )
 {
+	primo_state *state = space->machine->driver_data<primo_state>();
 	if (!input_port_read(space->machine, "MEMORY_EXPANSION"))
 	{
-		primo_port_FD = data;
+		state->port_FD = data;
 		primo_update_memory(space->machine);
 	}
 }
@@ -210,27 +212,30 @@ WRITE8_HANDLER( primo_FD_w )
 
 *******************************************************************************/
 
-static void primo_common_driver_init (void)
+static void primo_common_driver_init (primo_state *state)
 {
-	primo_port_FD = 0x00;
+	state->port_FD = 0x00;
 }
 
 DRIVER_INIT( primo32 )
 {
-	primo_common_driver_init();
-	primo_video_memory_base = 0x6800;
+	primo_state *state = machine->driver_data<primo_state>();
+	primo_common_driver_init(state);
+	state->video_memory_base = 0x6800;
 }
 
 DRIVER_INIT( primo48 )
 {
-	primo_common_driver_init();
-	primo_video_memory_base = 0xa800;
+	primo_state *state = machine->driver_data<primo_state>();
+	primo_common_driver_init(state);
+	state->video_memory_base = 0xa800;
 }
 
 DRIVER_INIT( primo64 )
 {
-	primo_common_driver_init();
-	primo_video_memory_base = 0xe800;
+	primo_state *state = machine->driver_data<primo_state>();
+	primo_common_driver_init(state);
+	state->video_memory_base = 0xe800;
 }
 
 /*******************************************************************************
@@ -241,8 +246,9 @@ DRIVER_INIT( primo64 )
 
 static void primo_common_machine_init (running_machine *machine)
 {
+	primo_state *state = machine->driver_data<primo_state>();
 	if (input_port_read(machine, "MEMORY_EXPANSION"))
-		primo_port_FD = 0x00;
+		state->port_FD = 0x00;
 	primo_update_memory(machine);
 	machine->device("maincpu")->set_clock_scale(input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
 }
@@ -268,6 +274,7 @@ MACHINE_RESET( primob )
 
 static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UINT32 snapshot_size)
 {
+	primo_state *state = machine->driver_data<primo_state>();
 	int i;
 	running_device *speaker = machine->device("speaker");
 
@@ -292,7 +299,7 @@ static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UIN
 	/* IO ports */
 
 	// KI-1 bit 7 - NMI generator enable/disable
-	primo_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
+	state->nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
 	speaker_level_w(speaker, (snapshot_data[30]&0x10)>>4);

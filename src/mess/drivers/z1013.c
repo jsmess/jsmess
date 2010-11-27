@@ -15,7 +15,7 @@
 /* Address maps */
 static ADDRESS_MAP_START(z1013_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xefff ) AM_RAM
-    AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE(&z1013_video_ram)
+    AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z1013_state, video_ram)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( z1013, driver_device )
+static MACHINE_CONFIG_START( z1013, z1013_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1MHz )
 	MDRV_CPU_PROGRAM_MAP(z1013_mem)

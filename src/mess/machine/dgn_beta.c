@@ -1088,7 +1088,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->d_pia1_pa_last = 0x00;
 	state->d_pia1_pb_last = 0x00;
 	state->RowShifter = 0x00;			/* shift register to select row */
-	state->Keyrow = 0x00;				/* state->Keyboard row being shifted out */
+	state->Keyrow = 0x00;				/* Keyboard row being shifted out */
 	state->d_pia0_pb_last = 0x00;		/* Last byte output to pia0 port b */
 	state->d_pia0_cb2_last = 0x00;		/* Last state of CB2 */
 

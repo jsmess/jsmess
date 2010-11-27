@@ -76,6 +76,17 @@ struct blink_hw
 };
 
 
+class z88_state : public driver_device
+{
+public:
+	z88_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int frame_number;
+	int flash_invert;
+};
+
+
 /*----------- defined in drivers/z88.c -----------*/
 
 extern struct blink_hw z88_blink;

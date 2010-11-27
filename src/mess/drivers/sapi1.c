@@ -23,7 +23,7 @@ static ADDRESS_MAP_START(sapi1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&sapi_video_ram) // AND-1 (video RAM)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_MEMBER(sapi1_state, sapi_video_ram) // AND-1 (video RAM)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
@@ -94,7 +94,7 @@ static INPUT_PORTS_START( sapi1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1, driver_device )
+static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sapi1_mem)
@@ -122,7 +122,7 @@ static MACHINE_CONFIG_START( sapi1, driver_device )
 	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapizps3, driver_device )
+static MACHINE_CONFIG_START( sapizps3, sapi1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sapizps3_mem)

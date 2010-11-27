@@ -12,26 +12,20 @@
 #include "devices/cassette.h"
 #include "machine/serial.h"
 
-static UINT8 intr = 0;
-static UINT8 last_code = 0;
-static UINT8 int_vector = 0;
-static emu_timer * poly88_cassette_timer;
-static emu_timer * poly88_usart_timer;
-static int previous_level;
-static int clk_level;
-static int clk_level_tape;
 
 static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
-	int_vector = 0xe7;
+	poly88_state *state = machine->driver_data<poly88_state>();
+	state->int_vector = 0xe7;
 	cpu_set_input_line(machine->device("maincpu"), 0, HOLD_LINE);
 }
 
 WRITE8_HANDLER(poly88_baud_rate_w)
 {
+	poly88_state *state = space->machine->driver_data<poly88_state>();
 	logerror("poly88_baud_rate_w %02x\n",data);
-	poly88_usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
-	timer_adjust_periodic(poly88_usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
+	state->usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
+	timer_adjust_periodic(state->usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
 
 }
 
@@ -49,6 +43,7 @@ static UINT8 row_number(UINT8 code) {
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	poly88_state *state = machine->driver_data<poly88_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
 
 	int i;
@@ -124,17 +119,18 @@ static TIMER_CALLBACK(keyboard_callback)
 			}
 		}
 	}
-	if (key_code==0 && last_code !=0){
-		int_vector = 0xef;
+	if (key_code==0 && state->last_code !=0){
+		state->int_vector = 0xef;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	} else {
-		last_code = key_code;
+		state->last_code = key_code;
 	}
 }
 
 static IRQ_CALLBACK (poly88_irq_callback)
 {
-	return int_vector;
+	poly88_state *state = device->machine->driver_data<poly88_state>();
+	return state->int_vector;
 }
 
 
@@ -147,6 +143,7 @@ static void poly88_cassette_write(running_machine *machine, int id, unsigned lon
 
 static TIMER_CALLBACK(poly88_cassette_timer_callback)
 {
+	poly88_state *state = machine->driver_data<poly88_state>();
 	int data;
 	int current_level;
 
@@ -156,24 +153,24 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		/* tape reading */
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_PLAY)
 		{
-					if (clk_level_tape)
+					if (state->clk_level_tape)
 					{
-						previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
-						clk_level_tape = 0;
+						state->previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
+						state->clk_level_tape = 0;
 					}
 					else
 					{
 						current_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 
-						if (previous_level!=current_level)
+						if (state->previous_level!=current_level)
 						{
-							data = (!previous_level && current_level) ? 1 : 0;
+							data = (!state->previous_level && current_level) ? 1 : 0;
 //data = current_level;
 							set_out_data_bit(poly88_cassette_serial_connection.State, data);
 							serial_connection_out(machine, &poly88_cassette_serial_connection);
 							msm8251_receive_clock(machine->device("uart"));
 
-							clk_level_tape = 1;
+							state->clk_level_tape = 1;
 						}
 					}
 		}
@@ -182,22 +179,22 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(poly88_cassette_serial_connection.input_state);
-			data ^= clk_level_tape;
+			data ^= state->clk_level_tape;
 			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
-			if (!clk_level_tape)
+			if (!state->clk_level_tape)
 				msm8251_transmit_clock(machine->device("uart"));
 
-			clk_level_tape = clk_level_tape ? 0 : 1;
+			state->clk_level_tape = state->clk_level_tape ? 0 : 1;
 
 			return;
 		}
 
-		clk_level_tape = 1;
+		state->clk_level_tape = 1;
 
-		if (!clk_level)
+		if (!state->clk_level)
 			msm8251_transmit_clock(machine->device("uart"));
-		clk_level = clk_level ? 0 : 1;
+		state->clk_level = state->clk_level ? 0 : 1;
 //  }
 }
 
@@ -209,10 +206,11 @@ static TIMER_CALLBACK( setup_machine_state )
 
 DRIVER_INIT ( poly88 )
 {
-	previous_level = 0;;
-	clk_level = clk_level_tape = 1;
-	poly88_cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
-	timer_adjust_periodic(poly88_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
+	poly88_state *state = machine->driver_data<poly88_state>();
+	state->previous_level = 0;;
+	state->clk_level = state->clk_level_tape = 1;
+	state->cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
+	timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
 
 	serial_connection_init(machine, &poly88_cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &poly88_cassette_serial_connection, poly88_cassette_write);
@@ -222,21 +220,24 @@ DRIVER_INIT ( poly88 )
 
 MACHINE_RESET(poly88)
 {
+	poly88_state *state = machine->driver_data<poly88_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), poly88_irq_callback);
-	intr = 0;
-	last_code = 0;
+	state->intr = 0;
+	state->last_code = 0;
 
 	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 }
 
 INTERRUPT_GEN( poly88_interrupt )
 {
-	int_vector = 0xf7;
+	poly88_state *state = device->machine->driver_data<poly88_state>();
+	state->int_vector = 0xf7;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 static void poly88_usart_rxready (running_device *device, int state)
 {
-	//int_vector = 0xe7;
+	//poly88_state *drvstate = device->machine->driver_data<poly88_state>();
+	//drvstate->int_vector = 0xe7;
 	//cpu_set_input_line(device, 0, HOLD_LINE);
 }
 const msm8251_interface poly88_usart_interface=
@@ -248,9 +249,10 @@ const msm8251_interface poly88_usart_interface=
 
 READ8_HANDLER(poly88_keyboard_r)
 {
-	UINT8 retVal = last_code;
+	poly88_state *state = space->machine->driver_data<poly88_state>();
+	UINT8 retVal = state->last_code;
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-	last_code = 0x00;
+	state->last_code = 0x00;
 	return retVal;
 }
 

@@ -9,6 +9,21 @@
 
 #include "machine/i8255a.h"
 
+class vector06_state : public driver_device
+{
+public:
+	vector06_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 keyboard_mask;
+	UINT8 color_index;
+	UINT8 video_mode;
+	UINT8 romdisk_msb;
+	UINT8 romdisk_lsb;
+	UINT8 vblank_state;
+};
+
+
 /*----------- defined in machine/vector06.c -----------*/
 
 extern const i8255a_interface vector06_ppi8255_interface;
@@ -27,9 +42,6 @@ extern WRITE8_HANDLER(vector06_8255_2_w);
 extern WRITE8_HANDLER(vector06_color_set);
 extern WRITE8_HANDLER(vector06_disc_w);
 
-extern UINT8 vector06_keyboard_mask;
-extern UINT8 vector06_color_index;
-extern UINT8 vector06_video_mode;
 
 /*----------- defined in video/vector06.c -----------*/
 

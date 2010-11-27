@@ -11,7 +11,6 @@
 #include "includes/special.h"
 #include "devices/messram.h"
 
-UINT8 *specialist_video_ram;
 
 
 VIDEO_START( special )
@@ -20,6 +19,7 @@ VIDEO_START( special )
 
 VIDEO_UPDATE( special )
 {
+	special_state *state = screen->machine->driver_data<special_state>();
   UINT8 code;
 	int y, x, b;
 
@@ -27,7 +27,7 @@ VIDEO_UPDATE( special )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = specialist_video_ram[y + x*256];
+			code = state->specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
@@ -42,6 +42,7 @@ VIDEO_START( specialp )
 
 VIDEO_UPDATE( specialp )
 {
+	special_state *state = screen->machine->driver_data<special_state>();
   UINT8 code;
 	int y, x, b;
 
@@ -49,7 +50,7 @@ VIDEO_UPDATE( specialp )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = specialist_video_ram[y + x*256];
+			code = state->specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
@@ -87,12 +88,14 @@ PALETTE_INIT( specimx )
 
 VIDEO_START( specimx )
 {
-	specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(specimx_colorram,0x70,0x3000);
+	special_state *state = machine->driver_data<special_state>();
+	state->specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
+	memset(state->specimx_colorram,0x70,0x3000);
 }
 
 VIDEO_UPDATE( specimx )
 {
+	special_state *state = screen->machine->driver_data<special_state>();
 	UINT8 code,color;
 	int y, x, b;
 
@@ -101,7 +104,7 @@ VIDEO_UPDATE( specimx )
 		for (y = 0; y < 256; y++)
 		{
 			code = messram_get_ptr(screen->machine->device("messram"))[0x9000 + y + x*256];
-			color = specimx_colorram[y + x*256];
+			color = state->specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 
@@ -128,9 +131,6 @@ PALETTE_INIT( erik )
 	palette_set_colors(machine, 0, erik_palette, ARRAY_LENGTH(erik_palette));
 }
 
-UINT8 erik_color_1;
-UINT8 erik_color_2;
-UINT8 erik_background;
 
 VIDEO_START( erik )
 {
@@ -138,6 +138,7 @@ VIDEO_START( erik )
 
 VIDEO_UPDATE( erik )
 {
+	special_state *state = screen->machine->driver_data<special_state>();
   UINT8 code1;
   UINT8 code2;
   UINT8 color1,color2;
@@ -157,8 +158,8 @@ VIDEO_UPDATE( erik )
 
 			for (b = 7; b >= 0; b--)
 			{
-				color1 = ((code1 >> b) & 0x01)==0 ? erik_background : erik_color_1;
-				color2 = ((code2 >> b) & 0x01)==0 ? erik_background : erik_color_2;
+				color1 = ((code1 >> b) & 0x01)==0 ? state->erik_background : state->erik_color_1;
+				color2 = ((code2 >> b) & 0x01)==0 ? state->erik_background : state->erik_color_2;
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  color1 | color2;
 			}
 		}

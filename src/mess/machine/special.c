@@ -19,13 +19,7 @@
 #include "devices/messram.h"
 #include "devices/flopdrv.h"
 
-static UINT8 specimx_color;
-UINT8 *specimx_colorram;
-static running_device *specimx_audio;
 
-static int specialist_8255_porta;
-static int specialist_8255_portb;
-static int specialist_8255_portc;
 
 /* Driver initialization */
 DRIVER_INIT(special)
@@ -52,22 +46,23 @@ static READ8_DEVICE_HANDLER (specialist_8255_porta_r )
 
 static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 {
+	special_state *state = device->machine->driver_data<special_state>();
 
 	int dat = 0;
 	double level;
 
-	if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE0") ^ 0xff);
-	if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE1") ^ 0xff);
-	if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE2") ^ 0xff);
-	if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE3") ^ 0xff);
-	if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(device->machine, "LINE4") ^ 0xff);
-	if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(device->machine, "LINE5") ^ 0xff);
-	if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(device->machine, "LINE6") ^ 0xff);
-	if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(device->machine, "LINE7") ^ 0xff);
-	if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE8") ^ 0xff);
-	if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE9") ^ 0xff);
-	if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE10") ^ 0xff);
-	if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE11") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE0") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE1") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE2") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE3") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(device->machine, "LINE4") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(device->machine, "LINE5") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(device->machine, "LINE6") ^ 0xff);
+	if ((state->specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(device->machine, "LINE7") ^ 0xff);
+	if ((state->specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE8") ^ 0xff);
+	if ((state->specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE9") ^ 0xff);
+	if ((state->specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE10") ^ 0xff);
+	if ((state->specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE11") ^ 0xff);
 
 	dat = (dat  << 2) ^0xff;
 	if (input_port_read(device->machine, "LINE12")!=0xff) dat ^= 0x02;
@@ -91,18 +86,21 @@ static READ8_DEVICE_HANDLER (specialist_8255_portc_r )
 
 static WRITE8_DEVICE_HANDLER (specialist_8255_porta_w )
 {
-	specialist_8255_porta = data;
+	special_state *state = device->machine->driver_data<special_state>();
+	state->specialist_8255_porta = data;
 }
 
 static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 {
-	specialist_8255_portb = data;
+	special_state *state = device->machine->driver_data<special_state>();
+	state->specialist_8255_portb = data;
 }
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {
+	special_state *state = device->machine->driver_data<special_state>();
 	running_device *dac_device = device->machine->device("dac");
 
-	specialist_8255_portc = data;
+	state->specialist_8255_portc = data;
 
 	cassette_output(device->machine->device("cassette"),data & 0x80 ? 1 : -1);
 
@@ -149,18 +147,21 @@ WRITE8_HANDLER( specialist_keyboard_w )
 
 static WRITE8_HANDLER( video_memory_w )
 {
+	special_state *state = space->machine->driver_data<special_state>();
 	messram_get_ptr(space->machine->device("messram"))[0x9000 + offset] = data;
-	specimx_colorram[offset]  = specimx_color;
+	state->specimx_colorram[offset]  = state->specimx_color;
 }
 
 WRITE8_HANDLER (specimx_video_color_w )
 {
-	specimx_color = data;
+	special_state *state = space->machine->driver_data<special_state>();
+	state->specimx_color = data;
 }
 
 READ8_HANDLER (specimx_video_color_r )
 {
-	return specimx_color;
+	special_state *state = space->machine->driver_data<special_state>();
+	return state->specimx_color;
 }
 
 static void specimx_set_bank(running_machine *machine, int i,int data)
@@ -211,21 +212,24 @@ WRITE8_HANDLER( specimx_select_bank )
 
 static WRITE_LINE_DEVICE_HANDLER( specimx_pit8253_out0_changed )
 {
-	specimx_set_input( specimx_audio, 0, state );
+	special_state *drvstate = device->machine->driver_data<special_state>();
+	specimx_set_input( drvstate->specimx_audio, 0, state );
 }
 
 
 
 static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out1_changed)
 {
-	specimx_set_input( specimx_audio, 1, state );
+	special_state *drvstate = device->machine->driver_data<special_state>();
+	specimx_set_input( drvstate->specimx_audio, 1, state );
 }
 
 
 
 static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out2_changed)
 {
-	specimx_set_input( specimx_audio, 2, state );
+	special_state *drvstate = device->machine->driver_data<special_state>();
+	specimx_set_input( drvstate->specimx_audio, 2, state );
 }
 
 
@@ -253,7 +257,8 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	specimx_audio = machine->device("custom");
+	special_state *state = machine->driver_data<special_state>();
+	state->specimx_audio = machine->device("custom");
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
@@ -267,8 +272,9 @@ static TIMER_CALLBACK( setup_pit8253_gates )
 
 MACHINE_RESET( specimx )
 {
+	special_state *state = machine->driver_data<special_state>();
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
-	specimx_color = 0x70;
+	state->specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
 	running_device *fdc = machine->device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
@@ -299,15 +305,14 @@ WRITE8_HANDLER( specimx_disk_ctrl_w )
 /*
     Erik
 */
-static UINT8 RR_register;
-static UINT8 RC_register;
 
 static void erik_set_bank(running_machine *machine)
 {
-	UINT8 bank1 = (RR_register & 3);
-	UINT8 bank2 = ((RR_register >> 2) & 3);
-	UINT8 bank3 = ((RR_register >> 4) & 3);
-	UINT8 bank4 = ((RR_register >> 6) & 3);
+	special_state *state = machine->driver_data<special_state>();
+	UINT8 bank1 = (state->RR_register & 3);
+	UINT8 bank2 = ((state->RR_register >> 2) & 3);
+	UINT8 bank3 = ((state->RR_register >> 4) & 3);
+	UINT8 bank4 = ((state->RR_register >> 6) & 3);
 	UINT8 *mem = memory_region(machine, "maincpu");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -376,40 +381,46 @@ static void erik_set_bank(running_machine *machine)
 
 DRIVER_INIT( erik )
 {
-	erik_color_1 = 0;
-	erik_color_2 = 0;
-	erik_background = 0;
+	special_state *state = machine->driver_data<special_state>();
+	state->erik_color_1 = 0;
+	state->erik_color_2 = 0;
+	state->erik_background = 0;
 }
 
 MACHINE_RESET( erik )
 {
-	RR_register = 0x00;
-	RC_register = 0x00;
+	special_state *state = machine->driver_data<special_state>();
+	state->RR_register = 0x00;
+	state->RC_register = 0x00;
 	erik_set_bank(machine);
 }
 
 READ8_HANDLER ( erik_rr_reg_r )
 {
-	return RR_register;
+	special_state *state = space->machine->driver_data<special_state>();
+	return state->RR_register;
 }
 WRITE8_HANDLER( erik_rr_reg_w )
 {
-	RR_register = data;
+	special_state *state = space->machine->driver_data<special_state>();
+	state->RR_register = data;
 	erik_set_bank(space->machine);
 }
 
 READ8_HANDLER ( erik_rc_reg_r )
 {
-	return RC_register;
+	special_state *state = space->machine->driver_data<special_state>();
+	return state->RC_register;
 }
 
 
 WRITE8_HANDLER( erik_rc_reg_w )
 {
-	RC_register = data;
-	erik_color_1 =  RC_register & 7;
-	erik_color_2 =  (RC_register >> 3) & 7;
-	erik_background = ((RC_register  >> 6 ) & 1) + ((RC_register  >> 7 ) & 1) * 4;
+	special_state *state = space->machine->driver_data<special_state>();
+	state->RC_register = data;
+	state->erik_color_1 =  state->RC_register & 7;
+	state->erik_color_2 =  (state->RC_register >> 3) & 7;
+	state->erik_background = ((state->RC_register  >> 6 ) & 1) + ((state->RC_register  >> 7 ) & 1) * 4;
 }
 
 READ8_HANDLER ( erik_disk_reg_r )

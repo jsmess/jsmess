@@ -10,6 +10,18 @@
 #include "devices/snapquik.h"
 
 
+class primo_state : public driver_device
+{
+public:
+	primo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 video_memory_base;
+	UINT8 port_FD;
+	int nmi;
+};
+
+
 /*----------- defined in machine/primo.c -----------*/
 
 extern READ8_HANDLER ( primo_be_1_r );
@@ -30,7 +42,6 @@ extern QUICKLOAD_LOAD( primo );
 /*----------- defined in video/primo.c -----------*/
 
 extern VIDEO_UPDATE( primo );
-extern UINT16 primo_video_memory_base;
 
 
 #endif /* PRIMO_H_ */

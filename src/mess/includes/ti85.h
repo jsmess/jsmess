@@ -10,13 +10,55 @@
 #include "devices/snapquik.h"
 
 
-/*----------- defined in machine/ti85.c -----------*/
+class ti85_state : public driver_device
+{
+public:
+	ti85_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
 
-extern UINT8 ti85_LCD_memory_base;
-extern UINT8 ti85_LCD_contrast;
-extern UINT8 ti85_LCD_status;
-extern UINT8 ti85_timer_interrupt_mask;
-extern UINT8 ti82_video_buffer[0x300];
+	optional_shared_ptr<UINT8>	m_nvram;
+	UINT8 LCD_memory_base;
+	UINT8 LCD_contrast;
+	UINT8 LCD_status;
+	UINT8 timer_interrupt_mask;
+	UINT8 ti82_video_buffer[0x300];
+	UINT8 ti_calculator_model;
+	UINT8 timer_interrupt_status;
+	UINT8 ON_interrupt_mask;
+	UINT8 ON_interrupt_status;
+	UINT8 ON_pressed;
+	UINT8 ti8x_memory_page_1;
+	UINT8 ti8x_memory_page_2;
+	UINT8 LCD_mask;
+	UINT8 power_mode;
+	UINT8 keypad_mask;
+	UINT8 video_buffer_width;
+	UINT8 interrupt_speed;
+	UINT8 port4_bit0;
+	UINT8 ti81_port_7_data;
+	UINT8 *ti8x_ram;
+	UINT8 PCR;
+	UINT8 red_out;
+	UINT8 white_out;
+	UINT8 ti82_video_mode;
+	UINT8 ti82_video_x;
+	UINT8 ti82_video_y;
+	UINT8 ti82_video_dir;
+	UINT8 ti82_video_scroll;
+	UINT8 ti82_video_bit;
+	UINT8 ti82_video_col;
+	UINT8 ti8x_port2;
+	UINT8 ti83p_port4;
+	int ti_video_memory_size;
+	int ti_screen_x_size;
+	int ti_screen_y_size;
+	int ti_number_of_frames;
+	UINT8 * frames;
+};
+
+
+/*----------- defined in machine/ti85.c -----------*/
 
 MACHINE_START( ti81 );
 MACHINE_START( ti82 );

@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "includes/poly88.h"
 
-UINT8* poly88_video_ram;
-
 static const UINT8 mcm6571a[] =
 {
 	0x00,0x00,0x00,0x00,0x31,0x4A,0x44,0x4A,0x31,// 0
@@ -181,6 +179,7 @@ VIDEO_START( poly88 )
 
 VIDEO_UPDATE( poly88 )
 {
+	poly88_state *state = screen->machine->driver_data<poly88_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;
@@ -192,7 +191,7 @@ VIDEO_UPDATE( poly88 )
 		xpos = 0;
 		for(x = 0; x < 64; x++ )
 		{
-			UINT8 code = poly88_video_ram[addr + x];
+			UINT8 code = state->video_ram[addr + x];
 			if ((code & 0x80)==0) {
 				for(j = 0; j < 15; j++ )
 				{

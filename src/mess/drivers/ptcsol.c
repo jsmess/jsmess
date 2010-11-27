@@ -29,26 +29,40 @@
 #include "machine/terminal.h"
 #include "devices/messram.h"
 
-static UINT8 sol20_fa;
-static UINT8 sol20_fc;
-static UINT8 sol20_fe;
-static const UINT8 *FNT;
-static const UINT8 *videoram;
+
+class ptcsol_state : public driver_device
+{
+public:
+	ptcsol_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 sol20_fa;
+	UINT8 sol20_fc;
+	UINT8 sol20_fe;
+	const UINT8 *FNT;
+	const UINT8 *videoram;
+	UINT8 framecnt;
+};
+
+
 
 static READ8_HANDLER( sol20_fa_r )
 {
-	return sol20_fa;
+	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
+	return state->sol20_fa;
 }
 
 static READ8_HANDLER( sol20_fc_r )
 {
-	sol20_fa = 0xff;
-	return sol20_fc;
+	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
+	state->sol20_fa = 0xff;
+	return state->sol20_fc;
 }
 
 static WRITE8_HANDLER( sol20_fe_w )
 {
-	sol20_fe = data;
+	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
+	state->sol20_fe = data;
 }
 
 static ADDRESS_MAP_START( sol20_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -83,26 +97,28 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( sol20 )
 {
-	sol20_fa=0xff;
-	sol20_fe=0;
+	ptcsol_state *state = machine->driver_data<ptcsol_state>();
+	state->sol20_fa=0xff;
+	state->sol20_fe=0;
 }
 
 static VIDEO_START( sol20 )
 {
-	FNT = memory_region(machine, "chargen");
-	videoram = memory_region(machine, "maincpu")+0xcc00;
+	ptcsol_state *state = machine->driver_data<ptcsol_state>();
+	state->FNT = memory_region(machine, "chargen");
+	state->videoram = memory_region(machine, "maincpu")+0xcc00;
 }
 
 static VIDEO_UPDATE( sol20 )
 {
+	ptcsol_state *state = screen->machine->driver_data<ptcsol_state>();
 /* visible screen is 64 x 16, with start position controlled by scroll register */
-	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 
-	framecnt++;
+	state->framecnt++;
 
-	ma = sol20_fe << 6; // scroll register
+	ma = state->sol20_fe << 6; // scroll register
 
 	for (y = 0; y < 16; y++)
 	{
@@ -112,11 +128,11 @@ static VIDEO_UPDATE( sol20 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = videoram[x & 0x3ff];
+				chr = state->videoram[x & 0x3ff];
 				inv = 0;
 
 				/* Take care of flashing characters */
-				if ((chr & 0x80) && (framecnt & 0x08))
+				if ((chr & 0x80) && (state->framecnt & 0x08))
 					inv ^= 0xff;
 
 				chr &= 0x7f;
@@ -126,7 +142,7 @@ static VIDEO_UPDATE( sol20 )
 				else
 				if (ra < 10)
 
-					gfx = FNT[(chr<<4) | (ra-1) ] ^ inv;
+					gfx = state->FNT[(chr<<4) | (ra-1) ] ^ inv;
 				else
 					gfx = inv;
 
@@ -148,8 +164,9 @@ static VIDEO_UPDATE( sol20 )
 
 static WRITE8_DEVICE_HANDLER( sol20_kbd_put )
 {
-	sol20_fa &= 0xfe;
-	sol20_fc = data;
+	ptcsol_state *state = device->machine->driver_data<ptcsol_state>();
+	state->sol20_fa &= 0xfe;
+	state->sol20_fc = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
@@ -157,7 +174,7 @@ static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
 	DEVCB_HANDLER(sol20_kbd_put)
 };
 
-static MACHINE_CONFIG_START( sol20, driver_device )
+static MACHINE_CONFIG_START( sol20, ptcsol_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
 	MDRV_CPU_PROGRAM_MAP(sol20_mem)

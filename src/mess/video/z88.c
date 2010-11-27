@@ -10,8 +10,6 @@
 #include "devices/messram.h"
 #include "includes/z88.h"
 
-static int frame_number = 0;
-static int flash_invert = 0;
 
 INLINE void z88_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -139,11 +137,12 @@ static unsigned char *z88_convert_address(running_machine *machine, unsigned lon
 
 VIDEO_EOF( z88 )
 {
-	frame_number++;
-	if (frame_number >= 50)
+	z88_state *state = machine->driver_data<z88_state>();
+	state->frame_number++;
+	if (state->frame_number >= 50)
 	{
-		frame_number = 0;
-		flash_invert = !flash_invert;
+		state->frame_number = 0;
+		state->flash_invert = !state->flash_invert;
 	}
 }
 
@@ -156,6 +155,7 @@ VIDEO_EOF( z88 )
 ***************************************************************************/
 VIDEO_UPDATE( z88 )
 {
+	//z88_state *state = screen->machine->driver_data<z88_state>();
 	int x,y;
 	unsigned char *ptr = z88_convert_address(screen->machine, z88_blink.sbf);
 	unsigned char *stored_ptr = ptr;
@@ -204,7 +204,7 @@ VIDEO_UPDATE( z88 )
 
 //          if (byte1 & Z88_SCR_HW_FLS)
 //          {
-//              if (flash_invert)
+//              if (state->flash_invert)
 //              {
 //                  pen1 = pen0;
 //              }

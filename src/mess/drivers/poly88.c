@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // System Expansion area
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // Minimal user RAM area
 	AM_RANGE(0x4000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE(&poly88_video_ram) // Video RAM
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE_MEMBER(poly88_state, video_ram) // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly88_io , ADDRESS_SPACE_IO, 8)
@@ -37,7 +37,7 @@ static ADDRESS_MAP_START(poly8813_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE(&poly88_video_ram) // Video RAM
+	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE_MEMBER(poly88_state, video_ram) // Video RAM
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
@@ -144,7 +144,7 @@ static const cassette_config poly88_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( poly88, driver_device )
+static MACHINE_CONFIG_START( poly88, poly88_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1853000)
     MDRV_CPU_PROGRAM_MAP(poly88_mem)

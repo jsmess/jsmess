@@ -251,7 +251,7 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 	{ NULL}
 };
 
-static MACHINE_CONFIG_START( primoa32, driver_device )
+static MACHINE_CONFIG_START( primoa32, primo_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 2500000 )
 	MDRV_CPU_PROGRAM_MAP( primo32_mem)

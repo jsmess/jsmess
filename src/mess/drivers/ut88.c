@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(ut88_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  // Video RAM (not used)
-    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE(&ut88_video_ram) // Video RAM
+    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE_MEMBER(ut88_state, video_ram) // Video RAM
     AM_RANGE( 0xf400, 0xf7ff ) AM_RAM  // System RAM
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -175,7 +175,7 @@ static const cassette_config ut88_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88, driver_device )
+static MACHINE_CONFIG_START( ut88, ut88_state )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88_mem)
@@ -208,7 +208,7 @@ static MACHINE_CONFIG_START( ut88, driver_device )
 	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini, driver_device )
+static MACHINE_CONFIG_START( ut88mini, ut88_state )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88mini_mem)

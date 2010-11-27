@@ -9,6 +9,18 @@
 
 #include "machine/i8255a.h"
 
+class ut88_state : public driver_device
+{
+public:
+	ut88_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+	int keyboard_mask;
+	int lcd_digit[6];
+};
+
+
 /*----------- defined in machine/ut88.c -----------*/
 
 extern const i8255a_interface ut88_ppi8255_interface;
@@ -28,7 +40,6 @@ extern WRITE8_HANDLER( ut88mini_write_led );
 
 /*----------- defined in video/ut88.c -----------*/
 
-extern UINT8 *ut88_video_ram;
 extern const gfx_layout ut88_charlayout;
 
 extern VIDEO_START( ut88 );

@@ -486,18 +486,8 @@ static INPUT_PORTS_START (ti83)
 		PORT_DIPSETTING( 0x00, "Low Battery" )
 INPUT_PORTS_END
 
-class ti_state : public driver_device
-{
-public:
-	ti_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_nvram(*this, "nvram") { }
-
-	optional_shared_ptr<UINT8>	m_nvram;
-};
-
 /* machine definition */
-static MACHINE_CONFIG_START( ti81, ti_state )
+static MACHINE_CONFIG_START( ti81, ti85_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(ti81_mem)

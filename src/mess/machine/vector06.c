@@ -15,22 +15,20 @@
 #include "includes/vector06.h"
 #include "devices/messram.h"
 
-UINT8 vector06_keyboard_mask;
-UINT8 vector06_color_index;
-UINT8 vector06_video_mode;
 
 
 static READ8_DEVICE_HANDLER( vector06_8255_portb_r )
 {
+	vector06_state *state = device->machine->driver_data<vector06_state>();
 	UINT8 key = 0xff;
-	if ((vector06_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
-	if ((vector06_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"LINE1"); }
-	if ((vector06_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"LINE2"); }
-	if ((vector06_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"LINE3"); }
-	if ((vector06_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"LINE4"); }
-	if ((vector06_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
-	if ((vector06_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
-	if ((vector06_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
+	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
+	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"LINE1"); }
+	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"LINE2"); }
+	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"LINE3"); }
+	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"LINE4"); }
+	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
+	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
+	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
 	return key;
 }
 
@@ -46,7 +44,8 @@ static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 
 static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
 {
-	vector06_keyboard_mask = data ^ 0xff;
+	vector06_state *state = device->machine->driver_data<vector06_state>();
+	state->keyboard_mask = data ^ 0xff;
 }
 
 static void vector06_set_video_mode(running_machine *machine, int width) {
@@ -61,40 +60,43 @@ static void vector06_set_video_mode(running_machine *machine, int width) {
 
 static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
 {
-	vector06_color_index = data & 0x0f;
-	if ((data & 0x10) != vector06_video_mode)
+	vector06_state *state = device->machine->driver_data<vector06_state>();
+	state->color_index = data & 0x0f;
+	if ((data & 0x10) != state->video_mode)
 	{
-		vector06_video_mode = data & 0x10;
-		vector06_set_video_mode(device->machine,(vector06_video_mode==0x10) ? 512 : 256);
+		state->video_mode = data & 0x10;
+		vector06_set_video_mode(device->machine,(state->video_mode==0x10) ? 512 : 256);
 	}
 }
 
 WRITE8_HANDLER(vector06_color_set)
 {
+	vector06_state *state = space->machine->driver_data<vector06_state>();
 	UINT8 r = (data & 7) << 5;
 	UINT8 g = ((data >> 3) & 7) << 5;
 	UINT8 b = ((data >>6) & 3) << 6;
-	palette_set_color( space->machine, vector06_color_index, MAKE_RGB(r,g,b) );
+	palette_set_color( space->machine, state->color_index, MAKE_RGB(r,g,b) );
 }
 
-static UINT8 romdisk_msb;
-static UINT8 romdisk_lsb;
 
 static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
 {
+	vector06_state *state = device->machine->driver_data<vector06_state>();
 	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x18000;
-	UINT16 addr = (romdisk_msb*256+romdisk_lsb) & 0x7fff;
+	UINT16 addr = (state->romdisk_msb*256+state->romdisk_lsb) & 0x7fff;
 	return romdisk[addr];
 }
 
 static WRITE8_DEVICE_HANDLER (vector06_romdisk_porta_w )
 {
-	romdisk_lsb = data;
+	vector06_state *state = device->machine->driver_data<vector06_state>();
+	state->romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (vector06_romdisk_portc_w )
 {
-	romdisk_msb = data;
+	vector06_state *state = device->machine->driver_data<vector06_state>();
+	state->romdisk_msb = data;
 }
 
 I8255A_INTERFACE( vector06_ppi8255_2_interface )
@@ -136,12 +138,12 @@ WRITE8_HANDLER(vector06_8255_2_w) {
 
 }
 
-static UINT8 vblank_state = 0;
 INTERRUPT_GEN( vector06_interrupt )
 {
-	vblank_state++;
-	if (vblank_state>1) vblank_state=0;
-	cpu_set_input_line(device,0,vblank_state ? HOLD_LINE : CLEAR_LINE);
+	vector06_state *state = device->machine->driver_data<vector06_state>();
+	state->vblank_state++;
+	if (state->vblank_state>1) state->vblank_state=0;
+	cpu_set_input_line(device,0,state->vblank_state ? HOLD_LINE : CLEAR_LINE);
 
 }
 
@@ -178,6 +180,7 @@ MACHINE_START( vector06 )
 
 MACHINE_RESET( vector06 )
 {
+	vector06_state *state = machine->driver_data<vector06_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(machine->device("maincpu"), vector06_irq_callback);
@@ -191,7 +194,7 @@ MACHINE_RESET( vector06 )
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
 
-	vector06_keyboard_mask = 0;
-	vector06_color_index = 0;
-	vector06_video_mode = 0;
+	state->keyboard_mask = 0;
+	state->color_index = 0;
+	state->video_mode = 0;
 }

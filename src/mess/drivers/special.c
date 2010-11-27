@@ -28,7 +28,7 @@
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
+    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
@@ -37,7 +37,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(specialp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE(&specialist_video_ram) // Video RAM
+    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
@@ -410,7 +410,7 @@ static const floppy_config specimx_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special, driver_device )
+static MACHINE_CONFIG_START( special, special_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem)
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik, driver_device )
+static MACHINE_CONFIG_START( erik, special_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 4000000)
     MDRV_CPU_PROGRAM_MAP(erik_mem)

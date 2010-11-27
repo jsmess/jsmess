@@ -2,8 +2,6 @@
 #include "includes/pcw16.h"
 #include "devices/messram.h"
 
-int pcw16_colour_palette[16];
-int pcw16_video_control;
 
 /* 16 colours, + 1 for border */
 static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
@@ -66,7 +64,7 @@ VIDEO_START( pcw16 )
 }
 
 /* 640, 1 bit per pixel */
-static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int local_byte;
@@ -75,8 +73,8 @@ static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char 
 
 	local_byte = byte;
 
-	cols[0] = pcw16_colour_palette[0];
-	cols[1] = pcw16_colour_palette[1];
+	cols[0] = state->colour_palette[0];
+	cols[1] = state->colour_palette[1];
 
 	px = x;
 	for (b=0; b<8; b++)
@@ -89,7 +87,7 @@ static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char 
 }
 
 /* 320, 2 bits per pixel */
-static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int px;
@@ -98,7 +96,7 @@ static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char 
 
 	for (b=0; b<3; b++)
 	{
-		cols[b] = pcw16_colour_palette[b];
+		cols[b] = state->colour_palette[b];
 	}
 
 	local_byte = byte;
@@ -120,15 +118,15 @@ static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char 
 }
 
 /* 160, 4 bits per pixel */
-static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int px;
 	int b;
 	int local_byte;
 	int cols[2];
 
-	cols[0] = pcw16_colour_palette[0];
-	cols[1] = pcw16_colour_palette[1];
+	cols[0] = state->colour_palette[0];
+	cols[1] = state->colour_palette[1];
 	local_byte = byte;
 
 	px = x;
@@ -158,6 +156,7 @@ static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char 
 ***************************************************************************/
 VIDEO_UPDATE( pcw16 )
 {
+	pcw16_state *state = screen->machine->driver_data<pcw16_state>();
 	unsigned char *pScanLine = (unsigned char *)messram_get_ptr(screen->machine->device("messram")) + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;
@@ -165,19 +164,19 @@ VIDEO_UPDATE( pcw16 )
 
 	int border_colour;
 
-	border_colour = pcw16_video_control & 31;
+	border_colour = state->video_control & 31;
 
 	/* reverse video? */
-	if (pcw16_video_control & (1<<7))
+	if (state->video_control & (1<<7))
 	{
 		/* colour 0 and colour 1 need to be inverted? - what happens in mode 1 and 2 - ignored? or is bit 1 toggled,
         or is whole lot toggled? */
 
 		/* force border to be colour 1 */
-		border_colour = pcw16_colour_palette[1];
+		border_colour = state->colour_palette[1];
 	}
 
-	if ((pcw16_video_control & (1<<6))==0)
+	if ((state->video_control & (1<<6))==0)
 	{
 		/* blank */
 		rectangle rect;
@@ -247,20 +246,20 @@ VIDEO_UPDATE( pcw16 )
 				{
 					case 0:
 					{
-						pcw16_vh_decode_mode0(bitmap,x,y+PCW16_BORDER_HEIGHT,byte);
+						pcw16_vh_decode_mode0(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 1:
 					{
-						pcw16_vh_decode_mode1(bitmap, x,y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode1(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 3:
 					case 2:
 					{
-						pcw16_vh_decode_mode2(bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode2(state, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 				}

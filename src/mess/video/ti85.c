@@ -38,12 +38,7 @@
 #define TI73_SCREEN_Y_SIZE	  64
 #define TI73_NUMBER_OF_FRAMES	   6
 
-static int ti_video_memory_size;
-static int ti_screen_x_size;
-static int ti_screen_y_size;
-static int ti_number_of_frames;
 
-static UINT8 * ti85_frames;
 
 static const unsigned char ti85_colors[32*7][3] =
 {
@@ -119,6 +114,7 @@ static const unsigned short ti85_palette[32][7] =
 
 PALETTE_INIT( ti85 )
 {
+	ti85_state *state = machine->driver_data<ti85_state>();
 	UINT8 i, j, r, g, b;
 
 	machine->colortable = colortable_alloc(machine, 224);
@@ -135,52 +131,52 @@ PALETTE_INIT( ti85 )
 
 	if (!strncmp(machine->gamedrv->name, "ti81", 4))
 	{
-		ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI81_SCREEN_X_SIZE;
-		ti_screen_y_size = TI81_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI81_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI81_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti85", 4))
 	{
-		ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI85_SCREEN_X_SIZE;
-		ti_screen_y_size = TI85_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI85_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI85_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti82", 4))
 	{
-		ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI82_SCREEN_X_SIZE;
-		ti_screen_y_size = TI82_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI82_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI82_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti83p", 5))
 	{
-		ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI83_SCREEN_X_SIZE;
-		ti_screen_y_size = TI83_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti83", 4))
 	{
-		ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI83_SCREEN_X_SIZE;
-		ti_screen_y_size = TI83_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti86", 4))
 	{
-		ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI86_SCREEN_X_SIZE;
-		ti_screen_y_size = TI86_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI86_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI86_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
 	}
 	else if (!strncmp(machine->gamedrv->name, "ti73", 4))
 	{
-		ti_video_memory_size = TI73_VIDEO_MEMORY_SIZE;
-		ti_screen_x_size = TI73_SCREEN_X_SIZE;
-		ti_screen_y_size = TI73_SCREEN_Y_SIZE;
-		ti_number_of_frames = TI73_NUMBER_OF_FRAMES;
+		state->ti_video_memory_size = TI73_VIDEO_MEMORY_SIZE;
+		state->ti_screen_x_size = TI73_SCREEN_X_SIZE;
+		state->ti_screen_y_size = TI73_SCREEN_Y_SIZE;
+		state->ti_number_of_frames = TI73_NUMBER_OF_FRAMES;
 	}
 	else
 	{
@@ -188,7 +184,7 @@ PALETTE_INIT( ti85 )
 		return;
 	}
 
-	ti85_frames = auto_alloc_array_clear(machine, UINT8, ti_number_of_frames*ti_video_memory_size);
+	state->frames = auto_alloc_array_clear(machine, UINT8, state->ti_number_of_frames*state->ti_video_memory_size);
 }
 
 VIDEO_START( ti85 )
@@ -197,78 +193,80 @@ VIDEO_START( ti85 )
 
 VIDEO_UPDATE( ti85 )
 {
+	ti85_state *state = screen->machine->driver_data<ti85_state>();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;
 
-	if (!ti85_LCD_status || !ti85_timer_interrupt_mask)
+	if (!state->LCD_status || !state->timer_interrupt_mask)
 	{
-		for (y=0; y<ti_screen_y_size; y++)
-			for (x=0; x<ti_screen_x_size; x++)
+		for (y=0; y<state->ti_screen_y_size; y++)
+			for (x=0; x<state->ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][6];
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->LCD_contrast&0x1f][6];
 		return 0;
 	}
 
-	lcdmem =  ((ti85_LCD_memory_base & 0x3F) + 0xc0) << 0x08;
+	lcdmem =  ((state->LCD_memory_base & 0x3F) + 0xc0) << 0x08;
 
-	memcpy (ti85_frames, ti85_frames+ti_video_memory_size, sizeof (UINT8) * (ti_number_of_frames-1) * ti_video_memory_size);
+	memcpy (state->frames, state->frames+state->ti_video_memory_size, sizeof (UINT8) * (state->ti_number_of_frames-1) * state->ti_video_memory_size);
 
-        for (y=0; y<ti_screen_y_size; y++)
-		for (x=0; x<ti_screen_x_size; x++)
-			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = space->read_byte(lcdmem+y*ti_screen_x_size+x);
+        for (y=0; y<state->ti_screen_y_size; y++)
+		for (x=0; x<state->ti_screen_x_size; x++)
+			*(state->frames+(state->ti_number_of_frames-1)*state->ti_video_memory_size+y*state->ti_screen_x_size+x) = space->read_byte(lcdmem+y*state->ti_screen_x_size+x);
 
-    	for (y=0; y<ti_screen_y_size; y++)
-		for (x=0; x<ti_screen_x_size; x++)
+    	for (y=0; y<state->ti_screen_y_size; y++)
+		for (x=0; x<state->ti_screen_x_size; x++)
 			for (b=0; b<8; b++)
 			{
-				brightnes = ((*(ti85_frames+0*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+1*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+2*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+3*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
+				brightnes = ((*(state->frames+0*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+1*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+2*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+3*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+4*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+5*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->LCD_contrast&0x1f][brightnes];
 			}
 	return 0;
 }
 
 VIDEO_UPDATE( ti82 )
 {
+	ti85_state *state = screen->machine->driver_data<ti85_state>();
 	//for now use the ti85_palette
 
 	int x,y,b;
 	int brightnes;
 
-	if (!ti85_LCD_status || !ti85_timer_interrupt_mask)
+	if (!state->LCD_status || !state->timer_interrupt_mask)
 	{
-		for (y=0; y<ti_screen_y_size; y++)
-			for (x=0; x<ti_screen_x_size; x++)
+		for (y=0; y<state->ti_screen_y_size; y++)
+			for (x=0; x<state->ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][6];
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->LCD_contrast&0x1f][6];
 		return 0;
 	}
 
-	memcpy (ti85_frames, ti85_frames+ti_video_memory_size, sizeof (UINT8) * (ti_number_of_frames-1) * ti_video_memory_size);
+	memcpy (state->frames, state->frames+state->ti_video_memory_size, sizeof (UINT8) * (state->ti_number_of_frames-1) * state->ti_video_memory_size);
 
-        for (y=0; y<ti_screen_y_size; y++)
-		for (x=0; x<ti_screen_x_size; x++)
-			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = ti82_video_buffer[ y*ti_screen_x_size+x];
+        for (y=0; y<state->ti_screen_y_size; y++)
+		for (x=0; x<state->ti_screen_x_size; x++)
+			*(state->frames+(state->ti_number_of_frames-1)*state->ti_video_memory_size+y*state->ti_screen_x_size+x) = state->ti82_video_buffer[ y*state->ti_screen_x_size+x];
 
-    	for (y=0; y<ti_screen_y_size; y++)
-		for (x=0; x<ti_screen_x_size; x++)
+    	for (y=0; y<state->ti_screen_y_size; y++)
+		for (x=0; x<state->ti_screen_x_size; x++)
 			for (b=0; b<8; b++)
 			{
-				brightnes = ((*(ti85_frames+0*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+1*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+2*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+3*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
+				brightnes = ((*(state->frames+0*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+1*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+2*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+3*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+4*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(state->frames+5*state->ti_video_memory_size+y*state->ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->LCD_contrast&0x1f][brightnes];
 			}
 	return 0;
 }

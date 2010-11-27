@@ -231,17 +231,34 @@
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 
-static UINT32 *pc9801_vram;
-static UINT32 *gfx_bitmap_ram;
-static UINT32 *work_ram_banked;
-static UINT8 ems_bank;
-static UINT8 wram_bank;
+
+class pc98_state : public driver_device
+{
+public:
+	pc98_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *pc9801_vram;
+	UINT32 *gfx_bitmap_ram;
+	UINT32 *work_ram_banked;
+	UINT8 ems_bank;
+	UINT8 wram_bank;
+	UINT8 rom_bank;
+	UINT8 gate_a20;
+	UINT8 wram_latch_reg;
+	UINT8 portb_tmp;
+	int dma_channel;
+	UINT8 dma_offset[2][4];
+	UINT8 at_pages[0x10];
+};
+
 
 
 static VIDEO_START( pc9801 )
 {
-	gfx_bitmap_ram = auto_alloc_array(machine, UINT32, 0x18000*2);
-	work_ram_banked = auto_alloc_array(machine, UINT32, 0x2000*0xfe); //shouldn't be here
+	pc98_state *state = machine->driver_data<pc98_state>();
+	state->gfx_bitmap_ram = auto_alloc_array(machine, UINT32, 0x18000*2);
+	state->work_ram_banked = auto_alloc_array(machine, UINT32, 0x2000*0xfe); //shouldn't be here
 }
 
 /*
@@ -256,6 +273,7 @@ bit 5-7: BRG colors
 
 static VIDEO_UPDATE( pc9801 )
 {
+	pc98_state *state = screen->machine->driver_data<pc98_state>();
 //  const gfx_element *gfx = screen->machine->gfx[0];
 	int y,x;
 	int yi,xi;
@@ -271,8 +289,8 @@ static VIDEO_UPDATE( pc9801 )
 				{
 					int tile,attr,pen[3],pen_mask,color;
 
-					tile = (pc9801_vram[(x+y*40)] & 0x00ff0000) >> 16;
-					attr = (pc9801_vram[((x+y*40)+0x2000/4)] & 0x00ff0000) >> 16;
+					tile = (state->pc9801_vram[(x+y*40)] & 0x00ff0000) >> 16;
+					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x00ff0000) >> 16;
 
 					pen_mask = (attr & 0xe0)>>5;
 
@@ -288,8 +306,8 @@ static VIDEO_UPDATE( pc9801 )
 					if(((x*2+1)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
 						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[color];
 
-					tile = (pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
-					attr = (pc9801_vram[((x+y*40)+0x2000/4)] & 0x000000ff) >> 0;
+					tile = (state->pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
+					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x000000ff) >> 0;
 
 					pen_mask = (attr & 0xe0)>>5;
 
@@ -427,10 +445,10 @@ static WRITE8_HANDLER( port_a0_w )
 		crtc_cmd_w(space,0,data);
 }
 
-static UINT8 rom_bank;
 
 static WRITE8_HANDLER( ems_sel_w )
 {
+	pc98_state *state = space->machine->driver_data<pc98_state>();
 //  printf("%02x %02x\n",offset,data);
 
 	if(offset == 1)
@@ -439,13 +457,13 @@ static WRITE8_HANDLER( ems_sel_w )
 
 		if(data == 0x00 || data == 0x10)
 		{
-			rom_bank = 1;
+			state->rom_bank = 1;
 			memory_set_bankptr(space->machine, "bank1", &ROM[0x20000]);
 		}
 
 		if(data == 0x02 || data == 0x12)
 		{
-			rom_bank = 0;
+			state->rom_bank = 0;
 			memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 		}
 	}
@@ -453,22 +471,23 @@ static WRITE8_HANDLER( ems_sel_w )
 	if(offset == 3)
 	{
 		if(data == 0x22)
-			ems_bank = 1;
+			state->ems_bank = 1;
 		if(data == 0x20)
-			ems_bank = 0;
+			state->ems_bank = 0;
 		//printf("%02x %02x\n",offset,data);
 	}
 }
 
 static WRITE8_HANDLER( rom_bank_w )
 {
+	pc98_state *state = space->machine->driver_data<pc98_state>();
 	UINT8 *ROM = memory_region(space->machine, "cpudata");
 
-//  printf("%08x %04x %08x\n",ROM[offset+(rom_bank*0x20000/4)],offset+(rom_bank*0x20000/4),data);
+//  printf("%08x %04x %08x\n",ROM[offset+(state->rom_bank*0x20000/4)],offset+(state->rom_bank*0x20000/4),data);
 
 	/* NOP any attempt to write on ROM (TODO: why it's overwriting here anyway? Doesn't make sense...) */
-	if((rom_bank == 0 && offset < 0x8000) || (rom_bank == 1 && offset < 0x18000))
-		ROM[offset+(rom_bank*0x20000)] = data;
+	if((state->rom_bank == 0 && offset < 0x8000) || (state->rom_bank == 1 && offset < 0x18000))
+		ROM[offset+(state->rom_bank*0x20000)] = data;
 }
 
 static READ8_HANDLER( port_70_r )
@@ -520,20 +539,21 @@ static WRITE8_HANDLER( port_00_w )
 	}
 }
 
-static UINT8 gate_a20;
 
 static READ8_HANDLER( port_f0_r )
 {
+	pc98_state *state = space->machine->driver_data<pc98_state>();
 	if(offset == 0x02)
-		return (gate_a20 ^ 1) | 0x2e;
+		return (state->gate_a20 ^ 1) | 0x2e;
 	else if(offset == 0x06)
-		return (gate_a20 ^ 1) | 0x5e;
+		return (state->gate_a20 ^ 1) | 0x5e;
 
 	return 0x00;
 }
 
 static WRITE8_HANDLER( port_f0_w )
 {
+	pc98_state *state = space->machine->driver_data<pc98_state>();
 	if(offset == 0x00)
 	{
 		//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
@@ -541,36 +561,37 @@ static WRITE8_HANDLER( port_f0_w )
 
 	if(offset == 0x02)
 	{
-		gate_a20 = 1;
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+		state->gate_a20 = 1;
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, state->gate_a20);
 	}
 	if(offset == 0x06)
 	{
 		if(data == 0x02)
 		{
-			gate_a20 = 1;
-			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+			state->gate_a20 = 1;
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, state->gate_a20);
 		}
 		else if(data == 0x03)
 		{
-			gate_a20 = 0;
-			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+			state->gate_a20 = 0;
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, state->gate_a20);
 		}
 	}
 }
 
-static UINT8 wram_latch_reg;
 
 static READ8_HANDLER( wram_sel_r )
 {
-	return (wram_bank << 1) | wram_latch_reg;
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	return (state->wram_bank << 1) | state->wram_latch_reg;
 }
 
 static WRITE8_HANDLER( wram_sel_w )
 {
-	wram_bank = (data & 0xfe) >> 1;
-	wram_latch_reg = data & 1; //<- correct?
-	//printf("%02x\n",wram_bank);
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	state->wram_bank = (data & 0xfe) >> 1;
+	state->wram_latch_reg = data & 1; //<- correct?
+	//printf("%02x\n",state->wram_bank);
 }
 
 static READ8_HANDLER( pc98_mouse_r )
@@ -582,19 +603,46 @@ static READ8_HANDLER( pc98_mouse_r )
 	return 0xff;
 }
 
-static READ32_HANDLER( gfx_bitmap_ram_r ) { return gfx_bitmap_ram[offset+ems_bank*0x18000/4]; }
-static WRITE32_HANDLER( gfx_bitmap_ram_w ) { COMBINE_DATA(&gfx_bitmap_ram[offset+ems_bank*0x18000/4]); }
+static READ32_HANDLER( gfx_bitmap_ram_r )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	return state->gfx_bitmap_ram[offset+state->ems_bank*0x18000/4];
+}
 
-static READ32_HANDLER( wram_bank_r ) { return work_ram_banked[offset+wram_bank*0x2000/4]; }
-static WRITE32_HANDLER( wram_bank_w ) { COMBINE_DATA(&work_ram_banked[offset+wram_bank*0x2000/4]); }
+static WRITE32_HANDLER( gfx_bitmap_ram_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	COMBINE_DATA(&state->gfx_bitmap_ram[offset+state->ems_bank*0x18000/4]);
+}
 
-static READ32_HANDLER( wram_ide_r ) { return work_ram_banked[offset+4*0x2000/4]; } //todo: ide hookup & calculate the correct bank number here
-static WRITE32_HANDLER( wram_ide_w ) { COMBINE_DATA(&work_ram_banked[offset+4*0x2000/4]); }
+static READ32_HANDLER( wram_bank_r )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	return state->work_ram_banked[offset+state->wram_bank*0x2000/4];
+}
+
+static WRITE32_HANDLER( wram_bank_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	COMBINE_DATA(&state->work_ram_banked[offset+state->wram_bank*0x2000/4]);
+}
+
+static READ32_HANDLER( wram_ide_r ) //todo: ide hookup & calculate the correct bank number here
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	return state->work_ram_banked[offset+4*0x2000/4];
+}
+
+static WRITE32_HANDLER( wram_ide_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	COMBINE_DATA(&state->work_ram_banked[offset+4*0x2000/4]);
+}
 
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE(wram_bank_r,wram_bank_w)
-	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE(&pc9801_vram) //vram + attr
+	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE_MEMBER(pc98_state, pc9801_vram) //vram + attr
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_RAM //cg window
 	AM_RANGE(0x000a5000, 0x000a7fff) AM_RAM //??? (presumably another work ram bank)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
@@ -687,21 +735,23 @@ static IRQ_CALLBACK(irq_callback)
 #include "cpu/i386/i386priv.h"
 
 
+
 static MACHINE_RESET(pc9801)
 {
+	pc98_state *state = machine->driver_data<pc98_state>();
 	UINT8 *ROM = memory_region(machine, "cpudata");
 
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
-	gate_a20 = 0;
+	state->gate_a20 = 0;
 	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
-	wram_bank = 0;
-	rom_bank = 1;
+	state->wram_bank = 0;
+	state->rom_bank = 1;
 }
 
 /*************************************************************
@@ -765,11 +815,10 @@ static READ8_DEVICE_HANDLER( pc98_porta_r )
 
 static READ8_DEVICE_HANDLER( pc98_portb_r )
 {
-	static UINT8 tmp;
-
-	tmp ^= 1; //<- actually related to the RTC somehow
+	pc98_state *state = device->machine->driver_data<pc98_state>();
+	state->portb_tmp ^= 1; //<- actually related to the RTC somehow
 	//printf("PPI Port B read\n");
-	return 0xf8 | tmp; //bit 2 seems used for error stuff (returns parity error or ems error on different spots), don't know the real use of it...
+	return 0xf8 | state->portb_tmp; //bit 2 seems used for error stuff (returns parity error or ems error on different spots), don't know the real use of it...
 }
 
 static READ8_DEVICE_HANDLER( pc98_portc_r )
@@ -860,29 +909,27 @@ static PALETTE_INIT( pc9801 )
 		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
 
 #if 0
-static UINT8 at_pages[0x10];
 
 
 static READ8_HANDLER(at_page8_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = state->dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = state->dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = state->dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = state->dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -891,20 +938,21 @@ static READ8_HANDLER(at_page8_r)
 
 static WRITE8_HANDLER(at_page8_w)
 {
-	at_pages[offset % 0x10] = data;
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		state->dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		state->dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		state->dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		state->dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -921,7 +969,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -930,7 +979,8 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
@@ -938,7 +988,8 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static void set_dma_channel(running_device *device, int channel, int state)
 {
-	if (!state) dma_channel = channel;
+	pc98_state *drvstate = device->machine->driver_data<pc98_state>();
+	if (!state) drvstate->dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -959,7 +1010,7 @@ static I8237_INTERFACE( dma8237_1_config )
 
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
-static MACHINE_CONFIG_START( pc9801, driver_device )
+static MACHINE_CONFIG_START( pc9801, pc98_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
