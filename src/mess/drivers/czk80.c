@@ -9,10 +9,13 @@
         FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
         Mega board contains 74LS612 and memory chips
 
+	27/11/2010 Connected to a terminal
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/terminal.h"
 
 
 class czk80_state : public driver_device
@@ -24,7 +27,31 @@ public:
 	UINT8 *ram;
 };
 
+static UINT8 term_data;
 
+static WRITE8_HANDLER( czk80_80_w )
+{
+	running_device *terminal = space->machine->device("terminal");
+
+	terminal_write(terminal, 0, data);
+}
+
+static READ8_HANDLER( czk80_80_r )
+{
+	UINT8 ret = term_data;
+	term_data = 0;
+	return ret;
+}
+
+static READ8_HANDLER( czk80_c0_r )
+{
+	return 0x80;
+}
+
+static READ8_HANDLER( czk80_81_r )
+{
+	return 1 | ((term_data) ? 2 : 0);
+}
 
 static ADDRESS_MAP_START(czk80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -33,10 +60,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( czk80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(czk80_80_r,czk80_80_w)
+	AM_RANGE(0x81, 0x81) AM_READ(czk80_81_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(czk80_c0_r)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( czk80 )
+static INPUT_PORTS_START( czk80 )
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static MACHINE_RESET(czk80)
@@ -48,42 +79,34 @@ static MACHINE_RESET(czk80)
 	memcpy(state->ram+0xe000,bios, 0x2000);
 }
 
-static VIDEO_START( czk80 )
+
+static WRITE8_DEVICE_HANDLER( czk80_kbd_put )
 {
+	term_data = data;
 }
 
-static VIDEO_UPDATE( czk80 )
+static GENERIC_TERMINAL_INTERFACE( czk80_terminal_intf )
 {
-	return 0;
-}
+	DEVCB_HANDLER(czk80_kbd_put)
+};
 
 static MACHINE_CONFIG_START( czk80, czk80_state )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(czk80_mem)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_PROGRAM_MAP(czk80_mem)
 	MDRV_CPU_IO_MAP(czk80_io)
 
-    MDRV_MACHINE_RESET(czk80)
+	MDRV_MACHINE_RESET(czk80)
 
-    /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192) /* border size not accurate */
-	MDRV_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+	MDRV_FRAGMENT_ADD( generic_terminal )
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-
-    MDRV_VIDEO_START(czk80)
-    MDRV_VIDEO_UPDATE(czk80)
+	MDRV_GENERIC_TERMINAL_ADD("terminal", czk80_terminal_intf)
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( czk80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "czk80.rom", 0xe000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
 ROM_END
 
