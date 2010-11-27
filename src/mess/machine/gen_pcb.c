@@ -5,7 +5,7 @@
 ****************************************************************************************/
 
 #include "emu.h"
-#include "genesis_pcb.h"
+#include "gen_pcb.h"
 
 typedef struct _md_pcb  md_pcb;
 struct _md_pcb

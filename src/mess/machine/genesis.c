@@ -50,7 +50,7 @@
 
 #include "devices/cartslot.h"
 #include "includes/genesis.h"
-#include "genesis_pcb.h"
+#include "gen_pcb.h"
 
 
 #define MAX_MD_CART_SIZE 0x500000

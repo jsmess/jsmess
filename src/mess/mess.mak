@@ -1342,7 +1342,7 @@ $(MESSOBJ)/sanyo.a:				\
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/genesis.o	\
 	$(MESS_MACHINE)/genesis.o	\
-	$(MESS_MACHINE)/genesis_pcb.o	\
+	$(MESS_MACHINE)/gen_pcb.o	\
 	$(MESS_DRIVERS)/saturn.o	\
 	$(MAME_MACHINE)/stvcd.o		\
 	$(MAME_MACHINE)/scudsp.o	\
