@@ -757,26 +757,80 @@ static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 
 
 /* These read handlers will return the byte from the new bank */
-static  READ8_HANDLER(modeF8_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeF8_switch(space->machine, offset, 0); return state->bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeFA_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeFA_switch(space->machine, offset, 0); return state->bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeF6_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeF6_switch(space->machine, offset, 0); return state->bank_base[1][0xff6 + offset]; }
-static  READ8_HANDLER(modeF4_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeF4_switch(space->machine, offset, 0); return state->bank_base[1][0xff4 + offset]; }
-static  READ8_HANDLER(modeE0_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeE0_switch(space->machine, offset, 0); return state->bank_base[4][0x3e0 + offset]; }
-static  READ8_HANDLER(modeE7_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeE7_switch(space->machine, offset, 0); return state->bank_base[1][0xfe0 + offset]; }
-static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(space->machine, offset, 0); return 0; }
-static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(space->machine, offset, 0); return 0; }
-static  READ8_HANDLER(modeDC_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeDC_switch(space->machine, offset, 0); return state->bank_base[1][0xff0 + offset]; }
-static  READ8_HANDLER(modeFV_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeFV_switch(space->machine, offset, 0); return state->bank_base[1][0xfd0 + offset]; }
-static  READ8_HANDLER(modeJVP_switch_r) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeJVP_switch(space->machine, offset, 0); return state->riot_ram[ 0x20 + offset ]; }
+static  READ8_HANDLER(modeF8_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeF8_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xff8 + offset];
+}
+
+static  READ8_HANDLER(modeFA_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeFA_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xff8 + offset];
+}
+
+static  READ8_HANDLER(modeF6_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeF6_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xff6 + offset];
+}
+
+static  READ8_HANDLER(modeF4_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeF4_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xff4 + offset];
+}
+
+static  READ8_HANDLER(modeE0_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeE0_switch(space->machine, offset, 0);
+	return state->bank_base[4][0x3e0 + offset];
+}
+
+static  READ8_HANDLER(modeE7_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeE7_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xfe0 + offset];
+}
+
+static  READ8_HANDLER(modeE7_RAM_switch_r)
+{
+	modeE7_RAM_switch(space->machine, offset, 0);
+	return 0;
+}
+
+static  READ8_HANDLER(modeUA_switch_r)
+{
+	modeUA_switch(space->machine, offset, 0);
+	return 0;
+}
+
+static  READ8_HANDLER(modeDC_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeDC_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xff0 + offset];
+}
+
+static  READ8_HANDLER(modeFV_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeFV_switch(space->machine, offset, 0);
+	return state->bank_base[1][0xfd0 + offset];
+}
+
+static  READ8_HANDLER(modeJVP_switch_r)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeJVP_switch(space->machine, offset, 0);
+	return state->riot_ram[ 0x20 + offset ];
+}
 
 
 static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(space->machine, offset, data); }
@@ -800,8 +854,11 @@ static WRITE8_HANDLER(mode3E_RAM_w)
 	}
 }
 static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(space->machine, offset, data); }
-static WRITE8_HANDLER(modeJVP_switch_w) {
-	a2600_state *state = space->machine->driver_data<a2600_state>(); modeJVP_switch(space->machine, offset, data); state->riot_ram[ 0x20 + offset ] = data; }
+static WRITE8_HANDLER(modeJVP_switch_w)
+{
+	a2600_state *state = space->machine->driver_data<a2600_state>();
+	modeJVP_switch(space->machine, offset, data); state->riot_ram[ 0x20 + offset ] = data;
+}
 
 
 DIRECT_UPDATE_HANDLER( modeF6_opbase )

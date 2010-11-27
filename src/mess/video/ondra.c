@@ -11,21 +11,22 @@
 #include "includes/ondra.h"
 #include "devices/messram.h"
 
-UINT8 ondra_video_enable;
 
 
 VIDEO_START( ondra )
 {
-	ondra_video_enable = 0;
+	ondra_state *state = machine->driver_data<ondra_state>();
+	state->video_enable = 0;
 }
 
 VIDEO_UPDATE( ondra )
 {
+	ondra_state *state = screen->machine->driver_data<ondra_state>();
 	UINT8 code1,code2;
 	int y, x, b;
 	int Vaddr = 0x2800;
 
-	if (ondra_video_enable==1) {
+	if (state->video_enable==1) {
 		for (x = 0; x < 40; x++)
 		{
 			for (y = 127; y >=0; y--)

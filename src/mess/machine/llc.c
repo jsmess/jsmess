@@ -12,29 +12,28 @@
 #include "includes/llc.h"
 #include "devices/messram.h"
 
-static UINT8 s_code = 0;
 
-static UINT8 llc1_key_state = 0;
 
 static READ8_DEVICE_HANDLER (llc1_port_b_r)
 {
+	llc_state *state = device->machine->driver_data<llc_state>();
 	UINT8 retVal = 0;
-	if (s_code!=0) {
-		if (llc1_key_state==0) {
-			llc1_key_state = 1;
+	if (state->s_code!=0) {
+		if (state->llc1_key_state==0) {
+			state->llc1_key_state = 1;
 			retVal = 0x5F;
 		} else {
-			if (llc1_key_state == 1) {
-				llc1_key_state = 2;
+			if (state->llc1_key_state == 1) {
+				state->llc1_key_state = 2;
 				retVal = 0;
 			} else {
-				llc1_key_state = 0;
-				retVal = s_code;
-				s_code =0;
+				state->llc1_key_state = 0;
+				retVal = state->s_code;
+				state->s_code =0;
 			}
 		}
 	} else {
-		llc1_key_state = 0;
+		state->llc1_key_state = 0;
 		retVal = 0;
 	}
 	return retVal;
@@ -66,6 +65,7 @@ Z80CTC_INTERFACE( llc2_ctc_intf )
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	llc_state *state = machine->driver_data<llc_state>();
 	int i,j;
 	UINT8 c;
 	static const char *const keynames[] = {
@@ -82,7 +82,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (c == (1 << j))
 				{
-					s_code = j + i*8;
+					state->s_code = j + i*8;
 					break;
 				}
 			}
@@ -106,7 +106,8 @@ MACHINE_START(llc1)
 
 DRIVER_INIT(llc2)
 {
-	llc_video_ram = messram_get_ptr(machine->device("messram")) + 0xc000;
+	llc_state *state = machine->driver_data<llc_state>();
+	state->video_ram = messram_get_ptr(machine->device("messram")) + 0xc000;
 }
 
 MACHINE_RESET( llc2 )

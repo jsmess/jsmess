@@ -89,6 +89,7 @@ WRITE8_HANDLER( mc8030_zve_write_protect_w )
 
 WRITE8_HANDLER( mc8030_vis_w )
 {
+	mc80_state *state = space->machine->driver_data<mc80_state>();
 	// reg C
 	// 7 6 5 4 -- module
 	//         3 - 0 left half, 1 right half
@@ -104,7 +105,7 @@ WRITE8_HANDLER( mc8030_vis_w )
 	UINT16 addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
 	UINT8 val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 	int c = offset & 1;
-	mc8030_video_mem[addr] = mc8030_video_mem[addr] | (val[data & 7]*c);
+	state->mc8030_video_mem[addr] = state->mc8030_video_mem[addr] | (val[data & 7]*c);
 
 }
 

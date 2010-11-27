@@ -15,6 +15,9 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 segment;
+	UINT8 digit;
+	UINT8 keydata;
 };
 
 

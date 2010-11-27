@@ -11,6 +11,17 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+class mc80_state : public driver_device
+{
+public:
+	mc80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* mc8020_video_ram;
+	UINT8 *mc8030_video_mem;
+};
+
+
 /*----------- defined in machine/mc80.c -----------*/
 
 /*****************************************************************************/
@@ -42,7 +53,6 @@ extern const z80sio_interface mc8030_asp_z80sio_intf;
 /*                            Implementation for MC80.2x                     */
 /*****************************************************************************/
 
-extern UINT8* mc8020_video_ram;
 
 extern VIDEO_START( mc8020 );
 extern VIDEO_UPDATE( mc8020 );
@@ -51,7 +61,6 @@ extern VIDEO_UPDATE( mc8020 );
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
 
-extern UINT8 *mc8030_video_mem;
 
 extern VIDEO_START( mc8030 );
 extern VIDEO_UPDATE( mc8030 );

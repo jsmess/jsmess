@@ -258,10 +258,11 @@ static const cassette_config mz80k_cassette_config =
 
 static TIMER_DEVICE_CALLBACK( ne555_tempo_callback )
 {
-	mz80k_tempo_strobe ^= 1;
+	mz80_state *state = timer.machine->driver_data<mz80_state>();
+	state->mz80k_tempo_strobe ^= 1;
 }
 
-static MACHINE_CONFIG_START( mz80k, driver_device )
+static MACHINE_CONFIG_START( mz80k, mz80_state )
 	/* basic machine hardware */
 
 	/* main CPU */

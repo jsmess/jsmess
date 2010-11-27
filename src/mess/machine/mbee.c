@@ -13,17 +13,6 @@
 #include "devices/flopdrv.h"
 #include "includes/mbee.h"
 
-static size_t mbee_size;
-static UINT8 mbee_clock_pulse;
-static UINT8 mbee256_key_available;
-static UINT8 fdc_intrq,fdc_drq;
-static UINT8 mbee_0a;
-static running_device *mbee_fdc;
-static mc146818_device *mbee_rtc;
-static running_device *mbee_z80pio;
-static running_device *mbee_speaker;
-static running_device *mbee_cassette;
-static running_device *mbee_printer;
 
 /***********************************************************
 
@@ -33,20 +22,23 @@ static running_device *mbee_printer;
 
 static WRITE8_DEVICE_HANDLER( pio_ardy )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	/* devices need to be redeclared in this callback for some strange reason */
-	mbee_printer = device->machine->device("centronics");
-	centronics_strobe_w(mbee_printer, (data) ? 0 : 1);
+	state->printer = device->machine->device("centronics");
+	centronics_strobe_w(state->printer, (data) ? 0 : 1);
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
-	z80pio_astb_w( mbee_z80pio, 1);	/* needed - otherwise nothing prints */
-	centronics_data_w(mbee_printer, 0, data);
+	z80pio_astb_w( state->z80pio, 1);	/* needed - otherwise nothing prints */
+	centronics_data_w(state->printer, 0, data);
 };
 
 static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 /*  PIO port B - d5..d2 not emulated
     d7 network interrupt (microbee network for classrooms)
     d6 speaker
@@ -57,21 +49,22 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
     d1 cass out and (on 256tc) keyboard irq
     d0 cass in */
 
-	cassette_output(mbee_cassette, (data & 0x02) ? -1.0 : +1.0);
+	cassette_output(state->cassette, (data & 0x02) ? -1.0 : +1.0);
 
-	speaker_level_w(mbee_speaker, (data & 0x40) ? 1 : 0);
+	speaker_level_w(state->speaker, (data & 0x40) ? 1 : 0);
 };
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	UINT8 data = 0;
 
-	if (cassette_input(mbee_cassette) > 0.03) data |= 1;
+	if (cassette_input(state->cassette) > 0.03) data |= 1;
 
-	data |= mbee_clock_pulse;
-	data |= mbee256_key_available;
+	data |= state->clock_pulse;
+	data |= state->mbee256_key_available;
 
-	mbee_clock_pulse = 0;
+	state->clock_pulse = 0;
 
 	return data;
 };
@@ -98,12 +91,14 @@ const z80pio_interface mbee_z80pio_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_intrq_w )
 {
-	fdc_intrq = state ? 0x80 : 0;
+	mbee_state *drvstate = device->machine->driver_data<mbee_state>();
+	drvstate->fdc_intrq = state ? 0x80 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_drq_w )
 {
-	fdc_drq = state ? 0x80 : 0;
+	mbee_state *drvstate = device->machine->driver_data<mbee_state>();
+	drvstate->fdc_drq = state ? 0x80 : 0;
 }
 
 const wd17xx_interface mbee_wd17xx_interface =
@@ -116,22 +111,24 @@ const wd17xx_interface mbee_wd17xx_interface =
 
 READ8_HANDLER ( mbee_fdc_status_r )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /*  d7 indicate if IRQ or DRQ is occuring (1=happening)
     d6..d0 not used */
 
-	return 0x7f | fdc_intrq | fdc_drq;
+	return 0x7f | state->fdc_intrq | state->fdc_drq;
 }
 
 WRITE8_HANDLER ( mbee_fdc_motor_w )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /*  d7..d4 not used
     d3 density (1=MFM)
     d2 side (1=side 1)
     d1..d0 drive select (0 to 3) */
 
-	wd17xx_set_drive(mbee_fdc, data & 3);
-	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
-	wd17xx_dden_w(mbee_fdc, !BIT(data, 3));
+	wd17xx_set_drive(state->fdc, data & 3);
+	wd17xx_set_side(state->fdc, (data & 4) ? 1 : 0);
+	wd17xx_dden_w(state->fdc, !BIT(data, 3));
 	/* no idea what turns the motors on & off, guessing it could be drive select 
 	commented out because it prevents 128k and 256TC from booting up */
 	//floppy_mon_w(floppy_get_device(space->machine, data & 3), CLEAR_LINE); // motor on
@@ -143,12 +140,10 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 ************************************************************/
 
-static UINT8 mbee256_was_pressed[15] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-static UINT8 mbee256_q[20];
-static UINT8 mbee256_q_pos;
 
 static TIMER_CALLBACK( mbee256_kbd )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
     /* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
     pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
     line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
@@ -175,38 +170,39 @@ static TIMER_CALLBACK( mbee256_kbd )
 	/* find what has changed */
 	for (i = 0; i < 15; i++)
 	{
-		if (pressed[i] != mbee256_was_pressed[i])
+		if (pressed[i] != state->mbee256_was_pressed[i])
 		{
 			/* get scankey value */
 			for (j = 0; j < 8; j++)
 			{
-				if (BIT(pressed[i]^mbee256_was_pressed[i], j))
+				if (BIT(pressed[i]^state->mbee256_was_pressed[i], j))
 				{
 					/* put it in the queue */
-					mbee256_q[mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
-					if (mbee256_q_pos < 19) mbee256_q_pos++;
+					state->mbee256_q[state->mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
+					if (state->mbee256_q_pos < 19) state->mbee256_q_pos++;
 				}
 			}
-			mbee256_was_pressed[i] = pressed[i];
+			state->mbee256_was_pressed[i] = pressed[i];
 		}
 	}
 
 	/* if anything queued, cause an interrupt */
-	if (mbee256_q_pos)
-		mbee256_key_available = 2; // set irq
+	if (state->mbee256_q_pos)
+		state->mbee256_key_available = 2; // set irq
 }
 
 READ8_HANDLER( mbee256_18_r )
 {
-	UINT8 i, data = mbee256_q[0]; // get oldest key
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	UINT8 i, data = state->mbee256_q[0]; // get oldest key
 
-	if (mbee256_q_pos)
+	if (state->mbee256_q_pos)
 	{
-		mbee256_q_pos--;
-		for (i = 0; i < mbee256_q_pos; i++) mbee256_q[i] = mbee256_q[i+1]; // ripple queue
+		state->mbee256_q_pos--;
+		for (i = 0; i < state->mbee256_q_pos; i++) state->mbee256_q[i] = state->mbee256_q[i+1]; // ripple queue
 	}
 
-	mbee256_key_available = 0; // clear irq
+	state->mbee256_key_available = 0; // clear irq
 	return data;
 }
 
@@ -239,25 +235,29 @@ READ8_HANDLER( mbee256_speed_high_r )
 
 WRITE8_HANDLER( mbee_04_w )	// address
 {
-	mbee_rtc->write(*space, 0, data);
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->rtc->write(*space, 0, data);
 }
 
 WRITE8_HANDLER( mbee_06_w )	// write
 {
-	mbee_rtc->write(*space, 1, data);
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->rtc->write(*space, 1, data);
 }
 
 READ8_HANDLER( mbee_07_r )	// read
 {
-	return mbee_rtc->read(*space, 1);
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->rtc->read(*space, 1);
 }
 
 static TIMER_CALLBACK( mbee_rtc_irq )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mc146818_device *rtc = machine->device<mc146818_device>("rtc");
 	UINT8 data = rtc->read(*mem, 12);
-	if (data) mbee_clock_pulse = 0x80;
+	if (data) state->clock_pulse = 0x80;
 }
 
 
@@ -472,27 +472,31 @@ WRITE8_HANDLER( mbee64_50_w )
 
 READ8_HANDLER ( mbeeic_0a_r )
 {
-	return mbee_0a;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->_0a;
 }
 
 WRITE8_HANDLER ( mbeeic_0a_w )
 {
-	mbee_0a = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->_0a = data;
 	memory_set_bank(space->machine, "pak", data & 15);
 }
 
 READ8_HANDLER ( mbeepc_telcom_low_r )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /* Read of port 0A - set Telcom rom to first half */
 	memory_set_bank(space->machine, "telcom", 0);
-	return mbee_0a;
+	return state->_0a;
 }
 
 READ8_HANDLER ( mbeepc_telcom_high_r )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /* Read of port 10A - set Telcom rom to 2nd half */
 	memory_set_bank(space->machine, "telcom", 1);
-	return mbee_0a;
+	return state->_0a;
 }
 
 
@@ -516,19 +520,21 @@ static TIMER_CALLBACK( mbee_reset )
 
 static void machine_reset_common(running_machine *machine)
 {
-	mbee_z80pio = machine->device("z80pio");
-	mbee_speaker = machine->device("speaker");
-	mbee_cassette = machine->device("cassette");
-	mbee_printer = machine->device("centronics");
+	mbee_state *state = machine->driver_data<mbee_state>();
+	state->z80pio = machine->device("z80pio");
+	state->speaker = machine->device("speaker");
+	state->cassette = machine->device("cassette");
+	state->printer = machine->device("centronics");
 }
 
 static void machine_reset_common_disk(running_machine *machine)
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	machine_reset_common(machine);
-	mbee_fdc = machine->device("fdc");
+	state->fdc = machine->device("fdc");
 	/* These values need to be fine tuned or the fdc repaired */
-	wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
-	wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
+	wd17xx_set_pause_time(state->fdc, 45);       /* default is 40 usec if not set */
+	wd17xx_set_complete_command_delay(state->fdc, 50);   /* default is 12 usec if not set */
 }
 
 MACHINE_RESET( mbee )
@@ -563,12 +569,13 @@ MACHINE_RESET( mbee128 )
 
 MACHINE_RESET( mbee256 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 i;
 	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	machine_reset_common_disk(machine);
-	mbee_rtc = machine->device<mc146818_device>("rtc");
-	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
-	mbee256_q_pos = 0;
+	state->rtc = machine->device<mc146818_device>("rtc");
+	for (i = 0; i < 15; i++) state->mbee256_was_pressed[i] = 0;
+	state->mbee256_q_pos = 0;
 	mbee256_50_w(mem,0,0); // set banks to default
 	memory_set_bank(machine, "boot", 8); // boot time
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
@@ -576,10 +583,11 @@ MACHINE_RESET( mbee256 )
 
 MACHINE_RESET( mbeett )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 i;
-	mbee_rtc = machine->device<mc146818_device>("rtc");
-	for (i = 0; i < 15; i++) mbee256_was_pressed[i] = 0;
-	mbee256_q_pos = 0;
+	state->rtc = machine->device<mc146818_device>("rtc");
+	for (i = 0; i < 15; i++) state->mbee256_was_pressed[i] = 0;
+	state->mbee256_q_pos = 0;
 	machine_reset_common(machine);
 	memory_set_bank(machine, "boot", 1);
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
@@ -589,6 +597,7 @@ INTERRUPT_GEN( mbee_interrupt )
 {
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
 #if 0
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 
 	//address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
@@ -596,13 +605,13 @@ INTERRUPT_GEN( mbee_interrupt )
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	//z80pio_astb_w( mbee_z80pio, centronics_busy_r(mbee_printer));	/* signal int when not busy (L->H) */
-	//space->write_byte(0x109, centronics_busy_r(mbee_printer));
+	//z80pio_astb_w( state->z80pio, centronics_busy_r(state->printer));	/* signal int when not busy (L->H) */
+	//space->write_byte(0x109, centronics_busy_r(state->printer));
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
 	but need to find out what it does */
-	mbee_clock_pulse = 0x80;
+	state->clock_pulse = 0x80;
 	irq0_line_hold(device);
 
 #endif
@@ -610,13 +619,15 @@ INTERRUPT_GEN( mbee_interrupt )
 
 DRIVER_INIT( mbee )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
-	mbee_size = 0x4000;
+	state->size = 0x4000;
 }
 
 DRIVER_INIT( mbeeic )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
@@ -624,11 +635,12 @@ DRIVER_INIT( mbeeic )
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 0);
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbeepc )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
@@ -640,11 +652,12 @@ DRIVER_INIT( mbeepc )
 
 	memory_set_bank(machine, "pak", 0);
 	memory_set_bank(machine, "telcom", 0);
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbeepc85 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
@@ -656,11 +669,12 @@ DRIVER_INIT( mbeepc85 )
 
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbeeppc )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
 
@@ -677,18 +691,20 @@ DRIVER_INIT( mbeeppc )
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
 	memory_set_bank(machine, "basic", 0);
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbee56 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
-	mbee_size = 0xe000;
+	state->size = 0xe000;
 }
 
 DRIVER_INIT( mbee64 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
 	memory_configure_bank(machine, "bankl", 0, 1, &RAM[0x1000], 0x0000);
@@ -699,11 +715,12 @@ DRIVER_INIT( mbee64 )
 	memory_configure_bank(machine, "bankh", 1, 1, &RAM[0x0000], 0x0000);
 	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
-	mbee_size = 0xf000;
+	state->size = 0xf000;
 }
 
 DRIVER_INIT( mbee128 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 4, &RAM[0x0000], 0x8000); // standard banks 0000
 	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x1000], 0x8000); // standard banks 1000
@@ -719,11 +736,12 @@ DRIVER_INIT( mbee128 )
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
 	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800], 0x0000); // rom
 
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbee256 )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 8, &RAM[0x0000], 0x8000); // standard banks 0000
 	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x1000], 0x8000); // standard banks 1000
@@ -742,11 +760,12 @@ DRIVER_INIT( mbee256 )
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
 
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 DRIVER_INIT( mbeett )
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
@@ -762,7 +781,7 @@ DRIVER_INIT( mbeett )
 	timer_pulse(machine, ATTOTIME_IN_HZ(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
 	timer_pulse(machine, ATTOTIME_IN_HZ(25),NULL,0,mbee256_kbd);	/* timer for kbd */
 
-	mbee_size = 0x8000;
+	state->size = 0x8000;
 }
 
 
@@ -795,6 +814,7 @@ Z80BIN_EXECUTE( mbee )
 
 QUICKLOAD_LOAD( mbee )
 {
+	mbee_state *state = image.device().machine->driver_data<mbee_state>();
 	running_device *cpu = image.device().machine->device("maincpu");
 	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
@@ -813,7 +833,7 @@ QUICKLOAD_LOAD( mbee )
 				return IMAGE_INIT_FAIL;
 			}
 
-			if ((j < mbee_size) || (j > 0xefff))
+			if ((j < state->size) || (j > 0xefff))
 				space->write_byte(j, data);
 			else
 			{
@@ -843,7 +863,7 @@ QUICKLOAD_LOAD( mbee )
 				return IMAGE_INIT_FAIL;
 			}
 
-			if ((j < mbee_size) || (j > 0xefff))
+			if ((j < state->size) || (j > 0xefff))
 				space->write_byte(j, data);
 			else
 			{

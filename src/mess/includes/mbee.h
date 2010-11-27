@@ -13,6 +13,7 @@
 #include "machine/z80pio.h"
 #include "devices/cassette.h"
 #include "machine/ctronics.h"
+#include "machine/mc146818.h"
 #include "video/mc6845.h"
 #include "sound/speaker.h"
 
@@ -24,11 +25,39 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 dummy;
+	size_t size;
+	UINT8 clock_pulse;
+	UINT8 mbee256_key_available;
+	UINT8 fdc_intrq;
+	UINT8 fdc_drq;
+	UINT8 _0a;
+	running_device *fdc;
+	mc146818_device *rtc;
+	running_device *z80pio;
+	running_device *speaker;
+	running_device *cassette;
+	running_device *printer;
+	UINT8 mbee256_was_pressed[15];
+	UINT8 mbee256_q[20];
+	UINT8 mbee256_q_pos;
+	UINT8 framecnt;
+	UINT8 *gfxram;
+	UINT8 *colorram;
+	UINT8 *videoram;
+	UINT8 *attribram;
+	UINT8 _08;
+	UINT8 _0b;
+	UINT8 _1c;
+	UINT8 is_premium;
+	UINT8 sy6545_cursor[16];
+	UINT8 sy6545_status;
+	running_device *mc6845;
+	UINT8 speed;
+	UINT8 flash;
+	UINT16 cursor;
+	UINT8 sy6545_reg[32];
+	UINT8 sy6545_ind;
 };
-
-
-/*----------- defined in drivers/mbee.c -----------*/
-
 
 
 /*----------- defined in machine/mbee.c -----------*/
@@ -74,7 +103,6 @@ QUICKLOAD_LOAD( mbee );
 
 
 /*----------- defined in video/mbee.c -----------*/
-
 
 READ8_HANDLER( m6545_status_r );
 WRITE8_HANDLER( m6545_index_w );

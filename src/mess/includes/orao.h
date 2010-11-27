@@ -8,9 +8,18 @@
 #define ORAO_H_
 
 
-/*----------- defined in machine/orao.c -----------*/
+class orao_state : public driver_device
+{
+public:
+	orao_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *orao_memory;
+	UINT8 *memory;
+	UINT8 *video_ram;
+};
+
+
+/*----------- defined in machine/orao.c -----------*/
 
 extern DRIVER_INIT( orao );
 extern MACHINE_RESET( orao );
@@ -22,7 +31,6 @@ extern WRITE8_HANDLER( orao_io_w );
 
 
 /*----------- defined in video/orao.c -----------*/
-extern UINT8 *orao_video_ram;
 
 extern VIDEO_START( orao );
 extern VIDEO_UPDATE( orao );

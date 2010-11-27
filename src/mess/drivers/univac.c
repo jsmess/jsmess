@@ -16,24 +16,38 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static const UINT8 *FNT;
-static UINT8 uts20_screen;
+
+class univac_state : public driver_device
+{
+public:
+	univac_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	const UINT8 *FNT;
+	UINT8 uts20_screen;
+	UINT8 framecnt;
+};
+
+
 
 static WRITE8_HANDLER( uts20_43_w )
 {
-	uts20_screen = data & 1;
+	univac_state *state = space->machine->driver_data<univac_state>();
+	state->uts20_screen = data & 1;
 }
 
 static READ8_HANDLER( uts20_vram_r )
 {
+	univac_state *state = space->machine->driver_data<univac_state>();
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	return RAM[offset | ((uts20_screen) ? 0xe000 : 0xc000)];
+	return RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)];
 }
 
 static WRITE8_HANDLER( uts20_vram_w )
 {
+	univac_state *state = space->machine->driver_data<univac_state>();
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	RAM[offset | ((uts20_screen) ? 0xe000 : 0xc000)] = data;
+	RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)] = data;
 }
 
 
@@ -58,22 +72,24 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(uts20)
 {
-	uts20_screen = 0;
+	univac_state *state = machine->driver_data<univac_state>();
+	state->uts20_screen = 0;
 }
 
 static VIDEO_START( uts20 )
 {
-	FNT = memory_region(machine, "chargen");
+	univac_state *state = machine->driver_data<univac_state>();
+	state->FNT = memory_region(machine, "chargen");
 }
 
 static VIDEO_UPDATE( uts20 )
 {
-	static UINT8 framecnt=0;
+	univac_state *state = screen->machine->driver_data<univac_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = memory_region(screen->machine, "maincpu")+((uts20_screen) ? 0xe000 : 0xc000);
+	UINT8 *videoram = memory_region(screen->machine, "maincpu")+((state->uts20_screen) ? 0xe000 : 0xc000);
 
-	framecnt++;
+	state->framecnt++;
 
 	for (y = 0; y < 25; y++)
 	{
@@ -90,12 +106,12 @@ static VIDEO_UPDATE( uts20 )
 					chr = videoram[x];
 
 					/* Take care of flashing characters */
-					if ((chr & 0x80) && (framecnt & 0x08))
+					if ((chr & 0x80) && (state->framecnt & 0x08))
 						chr = 0x20;
 
 					chr &= 0x7f;
 
-					gfx = FNT[(chr<<4) | ra ];
+					gfx = state->FNT[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */
@@ -114,7 +130,7 @@ static VIDEO_UPDATE( uts20 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( uts20, driver_device )
+static MACHINE_CONFIG_START( uts20, univac_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(uts20_mem)

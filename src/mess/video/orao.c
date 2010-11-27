@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "includes/orao.h"
 
-UINT8 *orao_video_ram;
 
 VIDEO_START( orao )
 {
@@ -18,6 +17,7 @@ VIDEO_START( orao )
 
 VIDEO_UPDATE( orao )
 {
+	orao_state *state = screen->machine->driver_data<orao_state>();
 	UINT8 code;
 	int y, x, b;
 
@@ -27,7 +27,7 @@ VIDEO_UPDATE( orao )
 		int horpos = 0;
 		for (x = 0; x < 32; x++)
 		{
-			code = orao_video_ram[addr++];
+			code = state->video_ram[addr++];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;

@@ -14,7 +14,7 @@
 static ADDRESS_MAP_START(mc8020_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE(&mc8020_video_ram)// 1KB RAM ZRE
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_MEMBER(mc80_state, mc8020_video_ram)// 1KB RAM ZRE
 	AM_RANGE(0x2000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -54,7 +54,7 @@ static INPUT_PORTS_START( mc80 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( mc8020, driver_device )
+static MACHINE_CONFIG_START( mc8020, mc80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8020_mem)
@@ -79,7 +79,7 @@ static MACHINE_CONFIG_START( mc8020, driver_device )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mc8030, driver_device )
+static MACHINE_CONFIG_START( mc8030, mc80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8030_mem)

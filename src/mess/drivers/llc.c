@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(llc1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
 	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(&llc_video_ram) // Video RAM
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(llc_state, video_ram) // Video RAM
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
@@ -314,7 +314,7 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( llc1, driver_device )
+static MACHINE_CONFIG_START( llc1, llc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_CONFIG(llc1_daisy_chain)
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( llc1, driver_device )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( llc2, driver_device )
+static MACHINE_CONFIG_START( llc2, llc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_PROGRAM_MAP(llc2_mem)

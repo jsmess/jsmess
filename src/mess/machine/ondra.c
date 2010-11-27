@@ -19,8 +19,6 @@ static running_device *cassette_device_image(running_machine *machine)
 	return machine->device("cassette");
 }
 
-static UINT8 ondra_bank1_status;
-static UINT8 ondra_bank2_status;
 
 static READ8_HANDLER( ondra_keyboard_r )
 {
@@ -41,8 +39,9 @@ static READ8_HANDLER( ondra_keyboard_r )
 
 static void ondra_update_banks(running_machine *machine)
 {
+	ondra_state *state = machine->driver_data<ondra_state>();
 	UINT8 *mem = memory_region(machine, "maincpu");
-	if (ondra_bank1_status==0) {
+	if (state->bank1_status==0) {
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	} else {
@@ -50,7 +49,7 @@ static void ondra_update_banks(running_machine *machine)
 		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
 	}
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
-	if (ondra_bank2_status==0) {
+	if (state->bank2_status==0) {
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, "bank3");
 		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);
 	} else {
@@ -61,9 +60,10 @@ static void ondra_update_banks(running_machine *machine)
 
 WRITE8_HANDLER( ondra_port_03_w )
 {
-	ondra_video_enable = data & 1;
-	ondra_bank1_status = (data >> 1) & 1;
-	ondra_bank2_status = (data >> 2) & 1;
+	ondra_state *state = space->machine->driver_data<ondra_state>();
+	state->video_enable = data & 1;
+	state->bank1_status = (data >> 1) & 1;
+	state->bank2_status = (data >> 2) & 1;
 	ondra_update_banks(space->machine);
 	cassette_output(cassette_device_image(space->machine), ((data >> 3) & 1) ? -1.0 : +1.0);
 }
@@ -86,8 +86,9 @@ static TIMER_CALLBACK(nmi_check_callback)
 
 MACHINE_RESET( ondra )
 {
-	ondra_bank1_status = 0;
-	ondra_bank2_status = 0;
+	ondra_state *state = machine->driver_data<ondra_state>();
+	state->bank1_status = 0;
+	state->bank2_status = 0;
 	ondra_update_banks(machine);
 }
 

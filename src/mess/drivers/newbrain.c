@@ -743,8 +743,6 @@ enum
 	NEWBRAIN_COP_STATE_DATA
 };
 
-static UINT8 copdata;
-static int copstate, copbytes, copregint;
 
 static READ8_HANDLER( cop_r )
 {
@@ -753,16 +751,16 @@ static READ8_HANDLER( cop_r )
 	state->copint = 1;
 	check_interrupt(space->machine);
 
-	return copdata;
+	return state->copdata;
 }
 
 static WRITE8_HANDLER( cop_w )
 {
 	newbrain_state *state = space->machine->driver_data<newbrain_state>();
 
-	copdata = data;
+	state->copdata = data;
 
-	switch (copstate)
+	switch (state->copstate)
 	{
 	case NEWBRAIN_COP_STATE_COMMAND:
 		logerror("COP command %02x\n", data);
@@ -773,11 +771,11 @@ static WRITE8_HANDLER( cop_w )
 			break;
 
 		case NEWBRAIN_COPCMD_DISPCOM:
-			copregint = 0;
-			copbytes = 18;
-			copstate = NEWBRAIN_COP_STATE_DATA;
+			state->copregint = 0;
+			state->copbytes = 18;
+			state->copstate = NEWBRAIN_COP_STATE_DATA;
 
-			copdata = NEWBRAIN_COP_NO_DATA;
+			state->copdata = NEWBRAIN_COP_NO_DATA;
 			state->copint = 0;
 			check_interrupt(space->machine);
 
@@ -785,35 +783,35 @@ static WRITE8_HANDLER( cop_w )
 
 #if 0
 		case NEWBRAIN_COPCMD_TIMCOM:
-			copregint = 0;
-			copbytes = 6;
-			copstate = NEWBRAIN_COP_STATE_DATA;
+			state->copregint = 0;
+			state->copbytes = 6;
+			state->copstate = NEWBRAIN_COP_STATE_DATA;
 			break;
 #endif
 		case NEWBRAIN_COPCMD_PDNCOM:
 			/* power down */
-			copregint = 0;
+			state->copregint = 0;
 			break;
 
 		default:
 			if (data & NEWBRAIN_COPCMD_TAPECOM)
 			{
-				copregint = 0;
+				state->copregint = 0;
 			}
 		}
 		break;
 
 	case NEWBRAIN_COP_STATE_DATA:
 		logerror("COP data %02x\n", data);
-		copbytes--;
+		state->copbytes--;
 
-		if (copbytes == 0)
+		if (state->copbytes == 0)
 		{
-			copstate = NEWBRAIN_COP_STATE_COMMAND;
-			copregint = 1;
+			state->copstate = NEWBRAIN_COP_STATE_COMMAND;
+			state->copregint = 1;
 		}
 
-		copdata = NEWBRAIN_COP_NO_DATA;
+		state->copdata = NEWBRAIN_COP_NO_DATA;
 		state->copint = 0;
 		check_interrupt(space->machine);
 
@@ -825,7 +823,7 @@ static TIMER_DEVICE_CALLBACK( cop_regint_tick )
 {
 	newbrain_state *state = timer.machine->driver_data<newbrain_state>();
 
-	if (copregint)
+	if (state->copregint)
 	{
 		logerror("COP REGINT\n");
 		state->copint = 0;
@@ -1383,7 +1381,7 @@ static MACHINE_START( newbrain )
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	copregint = 1;
+	state->copregint = 1;
 
 	/* find devices */
 	state->cassette1 = machine->device(CASSETTE1_TAG);

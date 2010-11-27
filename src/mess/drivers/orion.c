@@ -123,7 +123,7 @@ static const floppy_config orion_floppy_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( orion128, driver_device )
+static MACHINE_CONFIG_START( orion128, orion_state )
     MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(orion128_mem)
     MDRV_CPU_IO_MAP(orion128_io)
@@ -180,7 +180,7 @@ static const ay8910_interface orionz80_ay_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( orionz80, driver_device )
+static MACHINE_CONFIG_START( orionz80, orion_state )
     MDRV_CPU_ADD("maincpu", Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem)
     MDRV_CPU_IO_MAP(orionz80_io)
@@ -238,7 +238,7 @@ static MACHINE_CONFIG_DERIVED( orionz80ms, orionz80 )
 	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( orionpro, driver_device )
+static MACHINE_CONFIG_START( orionpro, orion_state )
     MDRV_CPU_ADD("maincpu", Z80, 5000000)
     MDRV_CPU_PROGRAM_MAP(orionpro_mem)
     MDRV_CPU_IO_MAP(orionpro_io)

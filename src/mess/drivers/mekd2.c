@@ -42,9 +42,6 @@
 
 #define XTAL_MEKD2 1228800
 
-static UINT8 mekd2_segment;
-static UINT8 mekd2_digit;
-static UINT8 mekd2_keydata;
 
 /***********************************************************
 
@@ -73,32 +70,34 @@ static WRITE_LINE_DEVICE_HANDLER( mekd2_nmi_w )
 
 static READ_LINE_DEVICE_HANDLER( mekd2_key40_r )
 {
-	return (mekd2_keydata & 0x40) ? 1 : 0;
+	mekd2_state *state = device->machine->driver_data<mekd2_state>();
+	return (state->keydata & 0x40) ? 1 : 0;
 }
 
 static READ8_DEVICE_HANDLER( mekd2_key_r )
 {
+	mekd2_state *state = device->machine->driver_data<mekd2_state>();
 	char kbdrow[4];
 	UINT8 i;
-	mekd2_keydata = 0xff;
+	state->keydata = 0xff;
 
 	for (i = 0; i < 6; i++)
-		if (BIT(mekd2_digit, i))
+		if (BIT(state->digit, i))
 		{
 			sprintf(kbdrow,"X%d",i);
-			mekd2_keydata &= input_port_read(device->machine, kbdrow);
+			state->keydata &= input_port_read(device->machine, kbdrow);
 		}
 
-	if (mekd2_digit < 0x40)
-		i = (mekd2_keydata & 1) ? 0x80 : 0;
+	if (state->digit < 0x40)
+		i = (state->keydata & 1) ? 0x80 : 0;
 	else
-	if (mekd2_digit < 0x80)
-		i = (mekd2_keydata & 2) ? 0x80 : 0;
+	if (state->digit < 0x80)
+		i = (state->keydata & 2) ? 0x80 : 0;
 	else
-	if (mekd2_digit < 0xc0)
-		i = (mekd2_keydata & 4) ? 0x80 : 0;
+	if (state->digit < 0xc0)
+		i = (state->keydata & 4) ? 0x80 : 0;
 	else
-		i = (mekd2_keydata & 8) ? 0x80 : 0;
+		i = (state->keydata & 8) ? 0x80 : 0;
 
 	return i;
 }
@@ -111,7 +110,8 @@ static READ8_DEVICE_HANDLER( mekd2_key_r )
 
 static WRITE8_DEVICE_HANDLER( mekd2_segment_w )
 {
-	mekd2_segment = ~data;
+	mekd2_state *state = device->machine->driver_data<mekd2_state>();
+	state->segment = ~data;
 }
 
 static WRITE8_DEVICE_HANDLER( mekd2_digit_w )
@@ -123,11 +123,11 @@ static WRITE8_DEVICE_HANDLER( mekd2_digit_w )
 	for (i = 0; i < 6; i++)
 		if (BIT(data, i))
 		{
-			videoram[10 - i * 2] = mekd2_segment;
+			videoram[10 - i * 2] = state->segment;
 			videoram[11 - i * 2] = 14;
 		}
 
-	mekd2_digit = data;
+	state->digit = data;
 }
 
 /***********************************************************

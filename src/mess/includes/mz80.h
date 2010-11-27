@@ -7,6 +7,22 @@
 #ifndef MZ80_H_
 #define MZ80_H_
 
+class mz80_state : public driver_device
+{
+public:
+	mz80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 mz80k_vertical;
+	UINT8 mz80k_cursor_cnt;
+	UINT8 mz80k_tempo_strobe;
+	UINT8 mz80k_8255_portc;
+	UINT8 mz80k_keyboard_line;
+	UINT8 speaker_level;
+	UINT8 prev_state;
+};
+
+
 /*----------- defined in machine/mz80.c -----------*/
 
 extern DRIVER_INIT( mz80k );
@@ -17,9 +33,6 @@ extern WRITE8_HANDLER( mz80k_strobe_w );
 extern const i8255a_interface mz80k_8255_int;
 extern const struct pit8253_config mz80k_pit8253_config;
 
-extern UINT8 mz80k_vertical;
-extern UINT8 mz80k_cursor_cnt;
-extern UINT8 mz80k_tempo_strobe;
 
 /*----------- defined in video/mz80.c -----------*/
 

@@ -20,8 +20,8 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(orao_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_BASE(&orao_memory)
-    AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_BASE(&orao_video_ram) // video ram
+    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_BASE_MEMBER(orao_state, memory)
+    AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_BASE_MEMBER(orao_state, video_ram) // video ram
     AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE( orao_io_r, orao_io_w )
     AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
     AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
@@ -171,7 +171,7 @@ static const cassette_config orao_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( orao, driver_device )
+static MACHINE_CONFIG_START( orao, orao_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6502, 1000000)
     MDRV_CPU_PROGRAM_MAP(orao_mem)

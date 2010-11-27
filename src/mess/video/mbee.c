@@ -28,23 +28,7 @@
 #include "emu.h"
 #include "includes/mbee.h"
 
-static UINT8 framecnt = 0;
-static UINT8 *gfxram;
-static UINT8 *colorram;
-static UINT8 *videoram;
-static UINT8 *attribram;
-static UINT8 mbee_08;
-static UINT8 mbee_0b;
-static UINT8 mbee_1c;
-static UINT8 is_premium;
-static UINT8 sy6545_cursor[16];
-static UINT8 sy6545_status = 0;
-static void sy6545_cursor_configure(void);
-static running_device *mc6845;
-static UINT8 speed,flash;
-static UINT16 cursor;
-static UINT8 sy6545_reg[32];				/* registers */
-static UINT8 sy6545_ind;				/* register index */
+static void sy6545_cursor_configure(mbee_state *state);
 static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
 
 
@@ -57,122 +41,139 @@ static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 
 READ8_HANDLER( mbee_low_r )
 {
-	if (mbee_0b & 1)
-		return gfxram[offset];
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if (state->_0b & 1)
+		return state->gfxram[offset];
 	else
-		return videoram[offset];
+		return state->videoram[offset];
 }
 
 WRITE8_HANDLER( mbee_low_w )
 {
-	videoram[offset] = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->videoram[offset] = data;
 }
 
 READ8_HANDLER( mbee_high_r )
 {
-	return gfxram[0x800 | offset];
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->gfxram[0x800 | offset];
 }
 
 WRITE8_HANDLER( mbee_high_w )
 {
-	gfxram[0x800 | offset] = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->gfxram[0x800 | offset] = data;
 }
 
 READ8_HANDLER ( mbee_0b_r )
 {
-	return mbee_0b;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->_0b;
 }
 
 WRITE8_HANDLER ( mbee_0b_w )
 {
-	mbee_0b = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->_0b = data;
 }
 
 READ8_HANDLER ( mbeeic_08_r )
 {
-	return mbee_08;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->_08;
 }
 
 WRITE8_HANDLER ( mbeeic_08_w )
 {
-	mbee_08 = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	state->_08 = data;
 }
 
 READ8_HANDLER( mbeeic_high_r )
 {
-	if (mbee_08 & 0x40)
-		return colorram[offset];
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if (state->_08 & 0x40)
+		return state->colorram[offset];
 	else
-		return gfxram[0x800 | offset];
+		return state->gfxram[0x800 | offset];
 }
 
 WRITE8_HANDLER ( mbeeic_high_w )
 {
-	if ((mbee_08 & 0x40) && (~mbee_0b & 1))
-		colorram[offset] = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if ((state->_08 & 0x40) && (~state->_0b & 1))
+		state->colorram[offset] = data;
 	else
-		gfxram[0x0800 | offset] = data;
+		state->gfxram[0x0800 | offset] = data;
 }
 
 READ8_HANDLER ( mbeeppc_1c_r )
 {
-	return mbee_1c;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	return state->_1c;
 }
 
 WRITE8_HANDLER( mbeeppc_1c_w )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
     d4 select attribute ram
-    d3..d0 select videoram bank */
+    d3..d0 select state->videoram bank */
 
-	mbee_1c = data;
+	state->_1c = data;
 	memory_set_bank(space->machine, "basic", (data & 0x20) ? 1 : 0);
 }
 
 WRITE8_HANDLER( mbee256_1c_w )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 /*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
     d4 select attribute ram
-    d3..d0 select videoram bank */
+    d3..d0 select state->videoram bank */
 
-	mbee_1c = data;
+	state->_1c = data;
 }
 
 READ8_HANDLER( mbeeppc_low_r )
 {
-	if ((mbee_1c & 0x1f) == 0x10)
-		return attribram[offset];
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if ((state->_1c & 0x1f) == 0x10)
+		return state->attribram[offset];
 	else
-	if (mbee_0b & 1)
-		return gfxram[offset];
+	if (state->_0b & 1)
+		return state->gfxram[offset];
 	else
-		return videoram[offset];
+		return state->videoram[offset];
 }
 
 WRITE8_HANDLER( mbeeppc_low_w )
 {
-	if (mbee_1c & 16)
-		attribram[offset] = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if (state->_1c & 16)
+		state->attribram[offset] = data;
 	else
-		videoram[offset] = data;
+		state->videoram[offset] = data;
 }
 
 READ8_HANDLER( mbeeppc_high_r )
 {
-	if (mbee_08 & 0x40)
-		return colorram[offset];
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if (state->_08 & 0x40)
+		return state->colorram[offset];
 	else
-		return gfxram[(((mbee_1c & 15) + 1) << 11) | offset];
+		return state->gfxram[(((state->_1c & 15) + 1) << 11) | offset];
 }
 
 WRITE8_HANDLER ( mbeeppc_high_w )
 {
-	if ((mbee_08 & 0x40) && (~mbee_0b & 1))
-		colorram[offset] = data;
+	mbee_state *state = space->machine->driver_data<mbee_state>();
+	if ((state->_08 & 0x40) && (~state->_0b & 1))
+		state->colorram[offset] = data;
 	else
-		gfxram[(((mbee_1c & 15) + 1) << 11) | offset] = data;
+		state->gfxram[(((state->_1c & 15) + 1) << 11) | offset] = data;
 }
 
 
@@ -187,11 +188,12 @@ static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LIN
 /* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
 static void keyboard_matrix_r(running_machine *machine, int offs)
 {
+	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 port = (offs >> 7) & 7;
 	UINT8 bit = (offs >> 4) & 7;
 	UINT8 data = (input_port_read(machine, keynames[port]) >> bit) & 1;
 
-	if ((data | is_premium) == 0)
+	if ((data | state->is_premium) == 0)
 	{
 		UINT8 extra = input_port_read(machine, "EXTRA");
 
@@ -231,16 +233,17 @@ static void keyboard_matrix_r(running_machine *machine, int offs)
 
 	if( data )
 	{
-		sy6545_reg[17] = offs;
-		sy6545_reg[16] = (offs >> 8) & 0x3f;
-		sy6545_status |= 0x40; //lpen_strobe
+		state->sy6545_reg[17] = offs;
+		state->sy6545_reg[16] = (offs >> 8) & 0x3f;
+		state->sy6545_status |= 0x40; //lpen_strobe
 	}
 }
 
 
 static void mbee_video_kbd_scan( running_machine *machine, int param )
 {
-	if (mbee_0b) return;
+	mbee_state *state = machine->driver_data<mbee_state>();
+	if (state->_0b) return;
 
 	keyboard_matrix_r(machine, param);
 }
@@ -254,10 +257,11 @@ static void mbee_video_kbd_scan( running_machine *machine, int param )
 
 READ8_HANDLER ( m6545_status_r )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 	screen_device *screen = screen_first(*space->machine);
 	const rectangle &visarea = screen->visible_area();
 
-	UINT8 data = sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
+	UINT8 data = state->sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
 	int y = space->machine->primary_screen->vpos();
 
 	if( y < visarea.min_y || y > visarea.max_y )
@@ -268,23 +272,24 @@ READ8_HANDLER ( m6545_status_r )
 
 READ8_HANDLER ( m6545_data_r )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 	UINT16 addr;
-	UINT8 data = mc6845_register_r(mc6845, 0);
+	UINT8 data = mc6845_register_r(state->mc6845, 0);
 
-	switch( sy6545_ind )
+	switch( state->sy6545_ind )
 	{
 	case 16:
 	case 17:
-		sy6545_status &= 0x80; // turn off lpen_strobe
+		state->sy6545_status &= 0x80; // turn off lpen_strobe
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
 		then increments the address, then sets update strobe on. */
-		addr = (sy6545_reg[18] << 8) | sy6545_reg[19];
+		addr = (state->sy6545_reg[18] << 8) | state->sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
-		sy6545_reg[19]++;
-		if (!sy6545_reg[19]) sy6545_reg[18]++;
-		sy6545_status |= 0x80; // update_strobe
+		state->sy6545_reg[19]++;
+		if (!state->sy6545_reg[19]) state->sy6545_reg[18]++;
+		state->sy6545_status |= 0x80; // update_strobe
 		break;
 	}
 	return data;
@@ -292,35 +297,37 @@ READ8_HANDLER ( m6545_data_r )
 
 WRITE8_HANDLER ( m6545_index_w )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 	data &= 0x1f;
-	sy6545_ind = data;
-	mc6845_address_w( mc6845, 0, data );
+	state->sy6545_ind = data;
+	mc6845_address_w( state->mc6845, 0, data );
 }
 
 WRITE8_HANDLER ( m6545_data_w )
 {
+	mbee_state *state = space->machine->driver_data<mbee_state>();
 	int addr = 0;
 
-	switch( sy6545_ind )
+	switch( state->sy6545_ind )
 	{
 	case 12:
 		data &= 0x3f; // select alternate character set
-		if( sy6545_reg[12] != data )
-			memcpy(gfxram, memory_region(space->machine, "gfx") + (((data & 0x30) == 0x20) << 11), 0x800);
+		if( state->sy6545_reg[12] != data )
+			memcpy(state->gfxram, memory_region(space->machine, "gfx") + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
 		then increments the address, then sets update strobe on. */
-		addr = (sy6545_reg[18] << 8) | sy6545_reg[19];
+		addr = (state->sy6545_reg[18] << 8) | state->sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
-		sy6545_reg[19]++;
-		if (!sy6545_reg[19]) sy6545_reg[18]++;
-		sy6545_status |= 0x80; // update_strobe
+		state->sy6545_reg[19]++;
+		if (!state->sy6545_reg[19]) state->sy6545_reg[18]++;
+		state->sy6545_status |= 0x80; // update_strobe
 		break;
 	}
-	sy6545_reg[sy6545_ind] = data & sy6545_mask[sy6545_ind];	/* save data in register */
-	mc6845_register_w( mc6845, 0, data );
-	if ((sy6545_ind > 8) && (sy6545_ind < 12)) sy6545_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	state->sy6545_reg[state->sy6545_ind] = data & sy6545_mask[state->sy6545_ind];	/* save data in register */
+	mc6845_register_w( state->mc6845, 0, data );
+	if ((state->sy6545_ind > 8) && (state->sy6545_ind < 12)) sy6545_cursor_configure(state);		/* adjust cursor shape - remove when mame fixed */
 }
 
 
@@ -334,7 +341,7 @@ WRITE8_HANDLER ( m6545_data_w )
 
 ************************************************************/
 
-static void sy6545_cursor_configure(void)
+static void sy6545_cursor_configure(mbee_state *state)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
 
@@ -344,11 +351,11 @@ static void sy6545_cursor_configure(void)
         2 = full cursor
         3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(sy6545_cursor); i++) sy6545_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(state->sy6545_cursor); i++) state->sy6545_cursor[i] = 0;		// prepare cursor by erasing old one
 
-	r9  = sy6545_reg[9];					// number of scan lines - 1
-	r10 = sy6545_reg[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = sy6545_reg[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = state->sy6545_reg[9];					// number of scan lines - 1
+	r10 = state->sy6545_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = state->sy6545_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
@@ -361,11 +368,11 @@ static void sy6545_cursor_configure(void)
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(sy6545_cursor);i++) sy6545_cursor[i]=0xff; // turn on full cursor
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(state->sy6545_cursor);i++) state->sy6545_cursor[i]=0xff; // turn on full cursor
 
-	if (curs_type == 1) for (i = r10;i < r11;i++) sy6545_cursor[i]=0xff; // for each line that should show, turn on that scan line
+	if (curs_type == 1) for (i = r10;i < r11;i++) state->sy6545_cursor[i]=0xff; // for each line that should show, turn on that scan line
 
-	if (curs_type == 3) for (i = r11; i < r10;i++) sy6545_cursor[i]=0; // now take a bite out of the middle
+	if (curs_type == 3) for (i = r11; i < r10;i++) state->sy6545_cursor[i]=0; // now take a bite out of the middle
 }
 
 
@@ -379,37 +386,41 @@ static void sy6545_cursor_configure(void)
 
 VIDEO_START( mbee )
 {
-	mc6845 = machine->device("crtc");
-	videoram = memory_region(machine, "videoram");
-	gfxram = memory_region(machine, "gfx")+0x1000;
-	is_premium = 0;
+	mbee_state *state = machine->driver_data<mbee_state>();
+	state->mc6845 = machine->device("crtc");
+	state->videoram = memory_region(machine, "videoram");
+	state->gfxram = memory_region(machine, "gfx")+0x1000;
+	state->is_premium = 0;
 }
 
 VIDEO_START( mbeeic )
 {
-	mc6845 = machine->device("crtc");
-	videoram = memory_region(machine, "videoram");
-	colorram = memory_region(machine, "colorram");
-	gfxram = memory_region(machine, "gfx")+0x1000;
-	is_premium = 0;
+	mbee_state *state = machine->driver_data<mbee_state>();
+	state->mc6845 = machine->device("crtc");
+	state->videoram = memory_region(machine, "videoram");
+	state->colorram = memory_region(machine, "colorram");
+	state->gfxram = memory_region(machine, "gfx")+0x1000;
+	state->is_premium = 0;
 }
 
 VIDEO_START( mbeeppc )
 {
-	mc6845 = machine->device("crtc");
-	videoram = memory_region(machine, "videoram");
-	colorram = memory_region(machine, "colorram");
-	gfxram = memory_region(machine, "gfx")+0x1000;
-	attribram = memory_region(machine, "attrib");
-	is_premium = 1;
+	mbee_state *state = machine->driver_data<mbee_state>();
+	state->mc6845 = machine->device("crtc");
+	state->videoram = memory_region(machine, "videoram");
+	state->colorram = memory_region(machine, "colorram");
+	state->gfxram = memory_region(machine, "gfx")+0x1000;
+	state->attribram = memory_region(machine, "attrib");
+	state->is_premium = 1;
 }
 
 VIDEO_UPDATE( mbee )
 {
-	framecnt++;
-	speed = sy6545_reg[10]&0x20, flash = sy6545_reg[10]&0x40;			// cursor modes
-	cursor = (sy6545_reg[14]<<8) | sy6545_reg[15];					// get cursor position
-	mc6845_update(mc6845, bitmap, cliprect);
+	mbee_state *state = screen->machine->driver_data<mbee_state>();
+	state->framecnt++;
+	state->speed = state->sy6545_reg[10]&0x20, state->flash = state->sy6545_reg[10]&0x40;			// cursor modes
+	state->cursor = (state->sy6545_reg[14]<<8) | state->sy6545_reg[15];					// get cursor position
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	return 0;
 }
 
@@ -428,6 +439,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
 /* monochrome bee */
 MC6845_UPDATE_ROW( mbee_update_row )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
@@ -436,19 +448,19 @@ MC6845_UPDATE_ROW( mbee_update_row )
 	{
 		UINT8 inv=0;
 		mem = (ma + x) & 0x7ff;
-		chr = videoram[mem];
+		chr = state->videoram[mem];
 
 		mbee_video_kbd_scan(device->machine, x+ma);
 
 		/* process cursor */
-		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-			(mem == cursor))					// displaying at cursor position?
-				inv ^= sy6545_cursor[ra];			// cursor scan row
+		if ((((!state->flash) && (!state->speed)) ||					// (5,6)=(0,0) = cursor on always
+			((state->flash) && (state->speed) && (state->framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((state->flash) && (!state->speed) && (state->framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == state->cursor))					// displaying at cursor position?
+				inv ^= state->sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
-		gfx = gfxram[(chr<<4) | ra] ^ inv;
+		gfx = state->gfxram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = ( gfx & 0x80 ) ? 1 : 0;
@@ -465,29 +477,30 @@ MC6845_UPDATE_ROW( mbee_update_row )
 /* prom-based colours */
 MC6845_UPDATE_ROW( mbeeic_update_row )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
-	UINT16 colourm = (mbee_08 & 0x0e) << 7;
+	UINT16 colourm = (state->_08 & 0x0e) << 7;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
 		UINT8 inv=0;
 		mem = (ma + x) & 0x7ff;
-		chr = videoram[mem];
-		col = colorram[mem] | colourm;					// read a byte of colour
+		chr = state->videoram[mem];
+		col = state->colorram[mem] | colourm;					// read a byte of colour
 
 		mbee_video_kbd_scan(device->machine, x+ma);
 
 		/* process cursor */
-		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-			(mem == cursor))					// displaying at cursor position?
-				inv ^= sy6545_cursor[ra];			// cursor scan row
+		if ((((!state->flash) && (!state->speed)) ||					// (5,6)=(0,0) = cursor on always
+			((state->flash) && (state->speed) && (state->framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((state->flash) && (!state->speed) && (state->framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == state->cursor))					// displaying at cursor position?
+				inv ^= state->sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
-		gfx = gfxram[(chr<<4) | ra] ^ inv;
+		gfx = state->gfxram[(chr<<4) | ra] ^ inv;
 		fg = (col & 0x001f) | 64;					// map to foreground palette
 		bg = (col & 0x07e0) >> 5;					// and background palette
 
@@ -507,6 +520,7 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 /* new colours & hires2 */
 MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
+	mbee_state *state = device->machine->driver_data<mbee_state>();
 	UINT8 gfx,fg,bg;
 	UINT16 mem,x,col,chr;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
@@ -515,12 +529,12 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 	{
 		UINT8 inv=0;
 		mem = (ma + x) & 0x7ff;
-		chr = videoram[mem];
-		col = colorram[mem];						// read a byte of colour
+		chr = state->videoram[mem];
+		col = state->colorram[mem];						// read a byte of colour
 
-		if (mbee_1c & 0x80)						// are extended features enabled?
+		if (state->_1c & 0x80)						// are extended features enabled?
 		{
-			UINT8 attr = attribram[mem];
+			UINT8 attr = state->attribram[mem];
 
 			if (chr & 0x80)
 				chr += ((attr & 15) << 7);			// bump chr to its particular pcg definition
@@ -528,21 +542,21 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 			if (attr & 0x40)
 				inv ^= 0xff;					// inverse attribute
 
-			if ((attr & 0x80) && (framecnt & 0x10))			// flashing attribute
+			if ((attr & 0x80) && (state->framecnt & 0x10))			// flashing attribute
 				chr = 0x20;
 		}
 
 		mbee_video_kbd_scan(device->machine, x+ma);
 
 		/* process cursor */
-		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-			(mem == cursor))					// displaying at cursor position?
-				inv ^= sy6545_cursor[ra];			// cursor scan row
+		if ((((!state->flash) && (!state->speed)) ||					// (5,6)=(0,0) = cursor on always
+			((state->flash) && (state->speed) && (state->framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+			((state->flash) && (!state->speed) && (state->framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+			(mem == state->cursor))					// displaying at cursor position?
+				inv ^= state->sy6545_cursor[ra];			// cursor scan row
 
 		/* get pattern of pixels for that character scanline */
-		gfx = gfxram[(chr<<4) | ra] ^ inv;
+		gfx = state->gfxram[(chr<<4) | ra] ^ inv;
 		fg = col & 15;							// map to foreground palette
 		bg = (col & 0xf0) >> 4;						// and background palette
 

@@ -18,12 +18,10 @@
     d1 7 or 8 bit video (1=requires 7-bit, 0=don't care)
     d0 80/64 or 40/32 characters per line (1=32) */
 
-static UINT16 start_address=0;
-static UINT8 crtc_reg;
-static UINT8 trs80_size_store;
 
 WRITE8_HANDLER( trs80m4_88_w )
 {
+	trs80_state *state = space->machine->driver_data<trs80_state>();
 /* This is for the programming of the CRTC registers.
     However this CRTC is mask-programmed, and only the
     start address register can be used. The cursor and
@@ -32,23 +30,24 @@ WRITE8_HANDLER( trs80m4_88_w )
     Therefore it is easier to use normal
     coding rather than the mc6845 device. */
 
-	if (!offset) crtc_reg = data & 0x1f;
+	if (!offset) state->crtc_reg = data & 0x1f;
 
-	if (offset) switch (crtc_reg)
+	if (offset) switch (state->crtc_reg)
 	{
 		case 12:
-			start_address = (start_address & 0x00ff) | (data << 8);
+			state->start_address = (state->start_address & 0x00ff) | (data << 8);
 			break;
 		case 13:
-			start_address = (start_address & 0xff00) | data;
+			state->start_address = (state->start_address & 0xff00) | data;
 	}
 }
 
 
 VIDEO_START( trs80 )
 {
-	trs80_size_store = 0xff;
-	trs80_mode &= 2;
+	trs80_state *state = machine->driver_data<trs80_state>();
+	state->size_store = 0xff;
+	state->mode &= 2;
 }
 
 
@@ -60,12 +59,12 @@ VIDEO_UPDATE( trs80 )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 cols = (trs80_mode & 1) ? 32 : 64;
-	UINT8 skip = (trs80_mode & 1) ? 2 : 1;
+	UINT8 cols = (state->mode & 1) ? 32 : 64;
+	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
-	if (trs80_mode != trs80_size_store)
+	if (state->mode != state->size_store)
 	{
-		trs80_size_store = trs80_mode & 1;
+		state->size_store = state->mode & 1;
 		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
@@ -93,7 +92,7 @@ VIDEO_UPDATE( trs80 )
 				}
 				else
 				{
-					if ((trs80_mode & 2) && (chr < 32)) chr+=64;
+					if ((state->mode & 2) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					if (ra < 8)
@@ -125,21 +124,21 @@ VIDEO_UPDATE( trs80m4 )
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	UINT8 skip=1;
-	UINT8 cols = (trs80_mode & 4) ? 80 : 64;
-	UINT8 rows = (trs80_mode & 4) ? 24 : 16;
-	UINT8 lines = (trs80_mode & 4) ? 10 : 12;
+	UINT8 cols = (state->mode & 4) ? 80 : 64;
+	UINT8 rows = (state->mode & 4) ? 24 : 16;
+	UINT8 lines = (state->mode & 4) ? 10 : 12;
 	UINT8 s_cols = cols;
-	UINT8 mask = (trs80_mode & 0x20) ? 0xff : 0xbf;	/* Select Japanese or extended chars */
+	UINT8 mask = (state->mode & 0x20) ? 0xff : 0xbf;	/* Select Japanese or extended chars */
 
-	if (trs80_mode & 1)
+	if (state->mode & 1)
 	{
 		s_cols >>= 1;
 		skip = 2;
 	}
 
-	if ((trs80_mode & 0x7f) != trs80_size_store)
+	if ((state->mode & 0x7f) != state->size_store)
 	{
-		trs80_size_store = trs80_mode & 5;
+		state->size_store = state->mode & 5;
 		screen->set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
 	}
 
@@ -151,9 +150,9 @@ VIDEO_UPDATE( trs80m4 )
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
-				chr = videoram[x+start_address];
+				chr = videoram[x+state->start_address];
 
-				if (((chr & 0xc0) == 0xc0) && (~trs80_mode & 8))
+				if (((chr & 0xc0) == 0xc0) && (~state->mode & 8))
 				{
 					if (ra < 8)
 						gfx = FNT[((chr&mask)<<3) | ra ];
@@ -170,7 +169,7 @@ VIDEO_UPDATE( trs80m4 )
 					*p++ = ( gfx & 0x01 ) ? 1 : 0;
 				}
 				else
-				if ((chr & 0x80) && (~trs80_mode & 8))
+				if ((chr & 0x80) && (~state->mode & 8))
 				{
 					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character */
@@ -193,7 +192,7 @@ VIDEO_UPDATE( trs80m4 )
 						gfx = 0;
 
 					/* if inverse mode, and bit 7 set, invert gfx */
-					if ((trs80_mode & 8) && (chr & 0x80))
+					if ((state->mode & 8) && (chr & 0x80))
 						gfx ^= 0xff;
 
 					/* Display a scanline of a character */
@@ -221,12 +220,12 @@ VIDEO_UPDATE( ht1080z )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 cols = (trs80_mode & 1) ? 32 : 64;
-	UINT8 skip = (trs80_mode & 1) ? 2 : 1;
+	UINT8 cols = (state->mode & 1) ? 32 : 64;
+	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
-	if (trs80_mode != trs80_size_store)
+	if (state->mode != state->size_store)
 	{
-		trs80_size_store = trs80_mode & 1;
+		state->size_store = state->mode & 1;
 		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
@@ -254,7 +253,7 @@ VIDEO_UPDATE( ht1080z )
 				}
 				else
 				{
-					if ((trs80_mode & 2) && (chr < 32)) chr+=64;
+					if ((state->mode & 2) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<4) | ra ];
@@ -283,22 +282,22 @@ VIDEO_UPDATE( lnw80 )
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 cols = (trs80_mode & 0x10) ? 80 : 64;
+	UINT8 cols = (state->mode & 0x10) ? 80 : 64;
 
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
-	if (trs80_mode != trs80_size_store)
+	if (state->mode != state->size_store)
 	{
-		trs80_size_store = trs80_mode & 0x10;
+		state->size_store = state->mode & 0x10;
 		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
-	if (trs80_mode & 8)
+	if (state->mode & 8)
 	{
 		bg = 0;
 		fg = 7;
 	}
 
-	switch (trs80_mode & 0x30)
+	switch (state->mode & 0x30)
 	{
 		case 0:					// MODE 0
 			for (y = 0; y < 16; y++)
@@ -354,7 +353,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = trs80_gfxram[ y | x | ra];
+						gfx = state->gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -366,7 +365,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = trs80_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						gfx = state->gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -390,7 +389,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = trs80_gfxram[ y | x | ra];
+						gfx = state->gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						fg = (gfx & 0x38) >> 3;
 						*p++ = fg;
@@ -417,7 +416,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = trs80_gfxram[ y | x | ra];
+						gfx = state->gfxram[ y | x | ra];
 						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
@@ -431,13 +430,13 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = trs80_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
-						fg = (trs80_gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
+						gfx = state->gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						fg = (state->gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = trs80_gfxram[ 0x3c00 | x | y ] & 0x07;
+						fg = state->gfxram[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;
@@ -457,12 +456,12 @@ VIDEO_UPDATE( radionic )
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 cols = (trs80_mode & 1) ? 32 : 64;
-	UINT8 skip = (trs80_mode & 1) ? 2 : 1;
+	UINT8 cols = (state->mode & 1) ? 32 : 64;
+	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
-	if (trs80_mode != trs80_size_store)
+	if (state->mode != state->size_store)
 	{
-		trs80_size_store = trs80_mode & 1;
+		state->size_store = state->mode & 1;
 		screen->set_visible_area(0, cols*8-1, 0, 16*16-1);
 	}
 
@@ -504,7 +503,7 @@ READ8_HANDLER( trs80_videoram_r )
 {
 	trs80_state *state = space->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
-	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
+	if ((state->mode & 0x80) && (~state->model4 & 1)) offset |= 0x400;
 	return videoram[offset];
 }
 
@@ -512,7 +511,7 @@ WRITE8_HANDLER( trs80_videoram_w )
 {
 	trs80_state *state = space->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
-	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
+	if ((state->mode & 0x80) && (~state->model4 & 1)) offset |= 0x400;
 	videoram[offset] = data;
 }
 
@@ -523,12 +522,14 @@ WRITE8_HANDLER( trs80_videoram_w )
 
 READ8_HANDLER( trs80_gfxram_r )
 {
-	return trs80_gfxram[offset];
+	trs80_state *state = space->machine->driver_data<trs80_state>();
+	return state->gfxram[offset];
 }
 
 WRITE8_HANDLER( trs80_gfxram_w )
 {
-	trs80_gfxram[offset] = data;
+	trs80_state *state = space->machine->driver_data<trs80_state>();
+	state->gfxram[offset] = data;
 }
 
 

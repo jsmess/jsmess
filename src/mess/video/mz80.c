@@ -40,11 +40,12 @@ VIDEO_START( mz80k )
 
 VIDEO_UPDATE( mz80k )
 {
+	mz80_state *state = screen->machine->driver_data<mz80_state>();
 	int x,y;
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz80k_vertical = mz80k_vertical ? 0 : 1;
-	mz80k_cursor_cnt++;
-	if (mz80k_cursor_cnt==64) mz80k_cursor_cnt = 0;
+	state->mz80k_vertical = state->mz80k_vertical ? 0 : 1;
+	state->mz80k_cursor_cnt++;
+	if (state->mz80k_cursor_cnt==64) state->mz80k_cursor_cnt = 0;
 
 	for(y = 0; y < 25; y++ )
 	{

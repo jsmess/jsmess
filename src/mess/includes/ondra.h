@@ -7,6 +7,18 @@
 #ifndef ONDRA_H_
 #define ONDRA_H_
 
+class ondra_state : public driver_device
+{
+public:
+	ondra_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 video_enable;
+	UINT8 bank1_status;
+	UINT8 bank2_status;
+};
+
+
 /*----------- defined in machine/ondra.c -----------*/
 
 extern MACHINE_START( ondra );
@@ -17,7 +29,6 @@ extern WRITE8_HANDLER( ondra_port_09_w );
 extern WRITE8_HANDLER( ondra_port_0a_w );
 /*----------- defined in video/ondra.c -----------*/
 
-extern UINT8 ondra_video_enable;
 extern VIDEO_START( ondra );
 extern VIDEO_UPDATE( ondra );
 

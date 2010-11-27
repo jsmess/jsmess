@@ -9,6 +9,19 @@
 
 #include "machine/i8255a.h"
 
+class mikro80_state : public driver_device
+{
+public:
+	mikro80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+	UINT8 *cursor_ram;
+	int keyboard_mask;
+	int key_mask;
+};
+
+
 /*----------- defined in machine/mikro80.c -----------*/
 
 extern const i8255a_interface mikro80_ppi8255_interface;
@@ -26,8 +39,6 @@ extern READ8_HANDLER (mikro80_8255_portc_r );
 extern WRITE8_HANDLER (mikro80_8255_porta_w );
 extern WRITE8_HANDLER (mikro80_8255_portc_w );
 /*----------- defined in video/mikro80.c -----------*/
-extern UINT8 *mikro80_video_ram;
-extern UINT8 *mikro80_cursor_ram;
 
 extern VIDEO_START( mikro80 );
 extern VIDEO_UPDATE( mikro80 );

@@ -119,7 +119,7 @@ static const cassette_config ondra_cassette_config =
 };
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ondra, driver_device )
+static MACHINE_CONFIG_START( ondra, ondra_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(ondra_mem)

@@ -158,8 +158,6 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "formats/trs_cas.h"
 #include "formats/trs_cmd.h"
 
-UINT8 *trs80_gfxram;
-UINT8 trs80_model4;
 
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -825,38 +823,40 @@ ROM_END
 
 static DRIVER_INIT( trs80 )
 {
-	trs80_mode = 0;
-	trs80_model4 = 0;
+	trs80_state *state = machine->driver_data<trs80_state>();
+	state->mode = 0;
+	state->model4 = 0;
 }
 
 static DRIVER_INIT( trs80l2 )
 {
-	trs80_mode = 2;
-	trs80_model4 = 0;
+	trs80_state *state = machine->driver_data<trs80_state>();
+	state->mode = 2;
+	state->model4 = 0;
 }
 
 static DRIVER_INIT( trs80m4 )
 {
 	trs80_state *state = machine->driver_data<trs80_state>();
-	trs80_mode = 0;
-	trs80_model4 = 2;
+	state->mode = 0;
+	state->model4 = 2;
 	state->videoram = memory_region(machine, "maincpu")+0x4000;
 }
 
 static DRIVER_INIT( trs80m4p )
 {
 	trs80_state *state = machine->driver_data<trs80_state>();
-	trs80_mode = 0;
-	trs80_model4 = 4;
+	state->mode = 0;
+	state->model4 = 4;
 	state->videoram = memory_region(machine, "maincpu")+0x4000;
 }
 
 static DRIVER_INIT( lnw80 )
 {
 	trs80_state *state = machine->driver_data<trs80_state>();
-	trs80_mode = 0;
-	trs80_model4 = 0;
-	trs80_gfxram = memory_region(machine, "gfx2");
+	state->mode = 0;
+	state->model4 = 0;
+	state->gfxram = memory_region(machine, "gfx2");
 	state->videoram = memory_region(machine, "gfx2")+0x4000;
 }
 

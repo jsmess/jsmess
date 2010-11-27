@@ -21,18 +21,40 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 model4;
+	UINT8 *gfxram;
+	UINT8 mode;
+	UINT8 irq;
+	UINT8 mask;
+	UINT8 nmi_mask;
+	UINT8 port_ec;
+	UINT8 tape_unit;
+	UINT8 reg_load;
+	UINT8 nmi_data;
+#ifdef USE_TRACK
+	UINT8 track[4];
+#endif
+	UINT8 head;
+#ifdef USE_SECTOR
+	UINT8 sector[4];
+#endif
+	UINT8 cassette_data;
+	emu_timer *cassette_data_timer;
+	running_device *printer;
+	running_device *ay31015;
+	running_device *cass;
+	running_device *speaker;
+	running_device *fdc;
+	double old_cassette_val;
+	UINT16 start_address;
+	UINT8 crtc_reg;
+	UINT8 size_store;
 };
 
-
-/*----------- defined in drivers/trs80.c -----------*/
-
-extern UINT8 trs80_model4;
-extern UINT8 *trs80_gfxram;
 
 /*----------- defined in machine/trs80.c -----------*/
 
 extern const wd17xx_interface trs80_wd17xx_interface;
-extern UINT8 trs80_mode;
 
 MACHINE_START( trs80 );
 MACHINE_RESET( trs80 );

@@ -10,6 +10,18 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 
+class llc_state : public driver_device
+{
+public:
+	llc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+	UINT8 s_code;
+	UINT8 llc1_key_state;
+};
+
+
 /*----------- defined in machine/llc.c -----------*/
 extern DRIVER_INIT( llc1 );
 extern MACHINE_START( llc1 );
@@ -27,7 +39,6 @@ extern WRITE8_HANDLER(llc2_rom_disable_w);
 extern WRITE8_HANDLER(llc2_basic_enable_w);
 
 /*----------- defined in video/llc.c -----------*/
-extern UINT8 *llc_video_ram;
 
 extern VIDEO_START( llc1 );
 extern VIDEO_UPDATE( llc1 );

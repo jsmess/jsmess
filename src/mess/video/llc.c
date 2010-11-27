@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "includes/llc.h"
 
-UINT8 *llc_video_ram;
 
 VIDEO_START( llc1 )
 {
@@ -18,6 +17,7 @@ VIDEO_START( llc1 )
 
 VIDEO_UPDATE( llc1 )
 {
+	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c,inv;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
@@ -26,7 +26,7 @@ VIDEO_UPDATE( llc1 )
 	{
 		for (y = 0; y < 16; y++)
 		{
-			code = llc_video_ram[x + y*64];
+			code = state->video_ram[x + y*64];
 			inv = code & 0x80; // highest bit is invert flag
 			code &= 0x7f;
 			for (b = 0; b < 8; b++)
@@ -49,6 +49,7 @@ VIDEO_START( llc2 )
 
 VIDEO_UPDATE( llc2 )
 {
+	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
@@ -57,7 +58,7 @@ VIDEO_UPDATE( llc2 )
 	{
 		for (y = 0; y < 32; y++)
 		{
-			code = llc_video_ram[x + y*64];
+			code = state->video_ram[x + y*64];
 			for (b = 0; b < 8; b++)
 			{
 				disp = gfx[code * 8 + b];

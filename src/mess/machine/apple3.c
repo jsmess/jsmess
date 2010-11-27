@@ -470,14 +470,29 @@ static void apple3_via_out(running_machine *machine, UINT8 *var, UINT8 data)
 static READ8_DEVICE_HANDLER(apple3_via_1_in_a) { return ~0; }
 static READ8_DEVICE_HANDLER(apple3_via_1_in_b) { return ~0; }
 
-static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a) {
-	apple3_state *state = device->machine->driver_data<apple3_state>(); apple3_via_out(device->machine, &state->via_0_a, data); }
-static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b) {
-	apple3_state *state = device->machine->driver_data<apple3_state>(); apple3_via_out(device->machine, &state->via_0_b, data); }
-static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a) {
-	apple3_state *state = device->machine->driver_data<apple3_state>(); apple3_via_out(device->machine, &state->via_1_a, data); }
-static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b) {
-	apple3_state *state = device->machine->driver_data<apple3_state>(); apple3_via_out(device->machine, &state->via_1_b, data); }
+static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a)
+{
+	apple3_state *state = device->machine->driver_data<apple3_state>();
+	apple3_via_out(device->machine, &state->via_0_a, data);
+}
+
+static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b)
+{
+	apple3_state *state = device->machine->driver_data<apple3_state>();
+	apple3_via_out(device->machine, &state->via_0_b, data);
+}
+
+static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a)
+{
+	apple3_state *state = device->machine->driver_data<apple3_state>();
+	apple3_via_out(device->machine, &state->via_1_a, data);
+}
+
+static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b)
+{
+	apple3_state *state = device->machine->driver_data<apple3_state>();
+	apple3_via_out(device->machine, &state->via_1_b, data);
+}
 
 static void apple2_via_1_irq_func(running_device *device, int state)
 {

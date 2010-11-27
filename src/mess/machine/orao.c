@@ -12,17 +12,18 @@
 #include "devices/cassette.h"
 #include "includes/orao.h"
 
-UINT8 *orao_memory;
 
 /* Driver initialization */
 DRIVER_INIT(orao)
 {
-	memset(orao_memory,0xff,0x6000);
+	orao_state *state = machine->driver_data<orao_state>();
+	memset(state->memory,0xff,0x6000);
 }
 
 DRIVER_INIT(orao103)
 {
-	memset(orao_memory,0xff,0x6000);
+	orao_state *state = machine->driver_data<orao_state>();
+	memset(state->memory,0xff,0x6000);
 }
 
 MACHINE_RESET( orao )

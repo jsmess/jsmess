@@ -48,11 +48,22 @@ It's only taken 25 years to get around to emulating it...
 #include "sound/speaker.h"
 #include "tec1.lh"
 
-static emu_timer *tec1_kbd_timer;
-static UINT8 tec1_kbd;
-static UINT8 tec1_segment;
-static UINT8 tec1_digit;
-static running_device *tec1_speaker;
+
+class tec1_state : public driver_device
+{
+public:
+	tec1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	emu_timer *kbd_timer;
+	UINT8 kbd;
+	UINT8 segment;
+	UINT8 digit;
+	running_device *speaker;
+	UINT8 kbd_row;
+};
+
+
 
 
 /***************************************************************************
@@ -61,16 +72,17 @@ static running_device *tec1_speaker;
 
 ***************************************************************************/
 
-static void tec1_display(void)
+static void tec1_display(tec1_state *state)
 {
 	UINT8 i;
 	for (i = 0; i < 6; i++)
-		if (tec1_digit & (1 << i))
-			output_set_digit_value(5-i, tec1_segment);
+		if (state->digit & (1 << i))
+			output_set_digit_value(5-i, state->segment);
 }
 
 static WRITE8_HANDLER( tec1_segment_w )
 {
+	tec1_state *state = space->machine->driver_data<tec1_state>();
 /*  d7 segment d
     d6 segment e
     d5 segment c
@@ -80,12 +92,13 @@ static WRITE8_HANDLER( tec1_segment_w )
     d1 segment f
     d0 segment a */
 
-	tec1_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
-	if (tec1_digit) tec1_display();
+	state->segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
+	if (state->digit) tec1_display(state);
 }
 
 static WRITE8_HANDLER( tec1_digit_w )
 {
+	tec1_state *state = space->machine->driver_data<tec1_state>();
 /*  d7 speaker
     d6 not used
     d5 data digit 1
@@ -95,10 +108,10 @@ static WRITE8_HANDLER( tec1_digit_w )
     d1 address digit 3
     d0 address digit 4 */
 
-	speaker_level_w(tec1_speaker, (data & 0x80) ? 1 : 0);
+	speaker_level_w(state->speaker, (data & 0x80) ? 1 : 0);
 
-	tec1_digit = data & 0x3f;
-	if (tec1_digit) tec1_display();
+	state->digit = data & 0x3f;
+	if (state->digit) tec1_display(state);
 }
 
 
@@ -110,8 +123,9 @@ static WRITE8_HANDLER( tec1_digit_w )
 
 static READ8_HANDLER( tec1_kbd_r )
 {
+	tec1_state *state = space->machine->driver_data<tec1_state>();
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return tec1_kbd;
+	return state->kbd;
 }
 
 static UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row )
@@ -138,23 +152,20 @@ static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 static TIMER_CALLBACK( tec1_kbd_callback )
 {
+	tec1_state *state = machine->driver_data<tec1_state>();
 /* 74C923 4 by 5 key encoder. */
-
-
-	static UINT8 row=0;
-
 	/* if previous key is still held, bail out */
-	if (input_port_read(machine, keynames[row]))
-		if (tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row) == tec1_kbd)
+	if (input_port_read(machine, keynames[state->kbd_row]))
+		if (tec1_convert_col_to_bin(input_port_read(machine, keynames[state->kbd_row]), state->kbd_row) == state->kbd)
 			return;
 
-	row++;
-	row &= 3;
+	state->kbd_row++;
+	state->kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (input_port_read(machine, keynames[row]))
+	if (input_port_read(machine, keynames[state->kbd_row]))
 	{
-		tec1_kbd = tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row);
+		state->kbd = tec1_convert_col_to_bin(input_port_read(machine, keynames[state->kbd_row]), state->kbd_row);
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
@@ -168,14 +179,16 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
 static MACHINE_START( tec1 )
 {
-	tec1_kbd_timer = timer_alloc(machine,  tec1_kbd_callback, NULL );
-	timer_adjust_periodic( tec1_kbd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(500) );
-	tec1_speaker = machine->device("speaker");
+	tec1_state *state = machine->driver_data<tec1_state>();
+	state->kbd_timer = timer_alloc(machine,  tec1_kbd_callback, NULL );
+	timer_adjust_periodic( state->kbd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(500) );
+	state->speaker = machine->device("speaker");
 }
 
 static MACHINE_RESET( tec1 )
 {
-	tec1_kbd = 0;
+	tec1_state *state = machine->driver_data<tec1_state>();
+	state->kbd = 0;
 }
 
 
@@ -243,7 +256,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tec1, driver_device )
+static MACHINE_CONFIG_START( tec1, tec1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 500000)	/* speed can be varied between 250kHz and 2MHz */
 	MDRV_CPU_PROGRAM_MAP(tec1_map)

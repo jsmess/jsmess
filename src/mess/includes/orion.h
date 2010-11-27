@@ -9,13 +9,34 @@
 
 #include "machine/i8255a.h"
 
-/*----------- defined in machine/orion.c -----------*/
+class orion_state : public driver_device
+{
+public:
+	orion_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 orion128_video_mode;
-extern UINT8 orion128_video_page;
-extern UINT8 orion128_video_width;
-extern UINT8 orion_video_mode_mask;
-extern UINT8 orionpro_pseudo_color;
+	UINT8 orion128_video_mode;
+	UINT8 orion128_video_page;
+	UINT8 orion128_video_width;
+	UINT8 video_mode_mask;
+	UINT8 orionpro_pseudo_color;
+	UINT8 romdisk_lsb;
+	UINT8 romdisk_msb;
+	UINT8 orion128_memory_page;
+	UINT8 orionz80_memory_page;
+	UINT8 orionz80_dispatcher;
+	UINT8 speaker;
+	UINT8 orionpro_ram0_segment;
+	UINT8 orionpro_ram1_segment;
+	UINT8 orionpro_ram2_segment;
+	UINT8 orionpro_page;
+	UINT8 orionpro_128_page;
+	UINT8 orionpro_rom2_segment;
+	UINT8 orionpro_dispatcher;
+};
+
+
+/*----------- defined in machine/orion.c -----------*/
 
 extern const i8255a_interface orion128_ppi8255_interface_1;
 

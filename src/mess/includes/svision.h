@@ -7,6 +7,25 @@
 #ifndef SVISION_H_
 #define SVISION_H_
 
+typedef struct
+{
+	emu_timer *timer1;
+	int timer_shot;
+} svision_t;
+
+typedef struct
+{
+	int state;
+	int on, clock, data;
+	UINT8 input;
+	emu_timer *timer;
+} svision_pet_t;
+
+typedef struct
+{
+	UINT16 palette[4/*0x40?*/]; /* rgb8 */
+	int palette_on;
+} tvlink_t;
 
 
 class svision_state : public driver_device
@@ -16,6 +35,12 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *reg;
+	running_device *sound;
+	int *dma_finished;
+	svision_t svision;
+	svision_pet_t pet;
+	tvlink_t tvlink;
 };
 
 

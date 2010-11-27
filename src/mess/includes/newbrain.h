@@ -102,6 +102,10 @@ public:
 	running_device *upd765;
 	running_device *cassette1;
 	running_device *cassette2;
+	UINT8 copdata;
+	int copstate;
+	int copbytes;
+	int copregint;
 };
 
 /* ---------- defined in video/newbrain.c ---------- */
