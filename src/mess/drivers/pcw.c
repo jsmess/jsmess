@@ -130,6 +130,7 @@ static UINT8 pcw_nmi_flag;
 static UINT8 pcw_printer_command;
 static UINT8 pcw_printer_data;
 static UINT8 pcw_printer_status;
+static UINT8 pcw_printer_headpos; // non-zero if not at left margin
 
 static UINT16 pcw_kb_scan_row;
 
@@ -385,7 +386,7 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	/* check interrupts */
 	pcw_update_irqs(space->machine);
 	/* return data */
-	LOG(("SYS: IRQ counter read, returning %02x\n",data));
+	//LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
 }
 
@@ -677,45 +678,81 @@ static WRITE8_HANDLER(pcw_printer_data_w)
 {
 	pcw_printer_data = data;
 	upi41_master_w(space->machine->device("printer_mcu"),0,data);
-	logerror("PRN: Sent data %02x\n",data);
+	logerror("PRN [0xFC]: Sent command %02x\n",data);
 }
 
 static WRITE8_HANDLER(pcw_printer_command_w)
 {
 	pcw_printer_command = data;
 	upi41_master_w(space->machine->device("printer_mcu"),1,data);
-	logerror("PRN: Sent command %02x\n",data);
+	logerror("PRN [0xFD]: Sent command %02x\n",data);
 }
 
+// print error type
+// should return 0xF8 if there are no errors
+// 0 = underrun
+// 1 = printer controller RAM fault
+// 3 = bad command
+// 5 = print error
+// anything else = no printer
 static  READ8_HANDLER(pcw_printer_data_r)
 {
-//  pcw_printer_data = 0xf8;
-	pcw_printer_data = upi41_master_r(space->machine->device("printer_mcu"),0);
-	return pcw_printer_data;
+	return upi41_master_r(space->machine->device("printer_mcu"),0);
 }
 
+// printer status
+// bit 7 - bail bar in
+// bit 6 - not currently executing a command
+// bit 5 - always 0 for dot matrix printer (PCW8256/8512), 1 if a daisywheel printer(PCW9512)
+// bit 4 - print head is not at left margin
+// bit 3 - sheet feeder is present
+// bit 2 - paper is present
+// bit 1 - busy
+// bit 0 - controller fault
 static  READ8_HANDLER(pcw_printer_status_r)
 {
-	pcw_printer_status = upi41_master_r(space->machine->device("printer_mcu"),1);
-	return pcw_printer_status;
+	return upi41_master_r(space->machine->device("printer_mcu"),1);
 }
 
-#ifdef UNUSED_FUNCTION
 /* MCU handlers */
-static READ8_HANDLER(mcu_printer_data_r)
+static READ8_HANDLER(mcu_printer_p1_r)
 {
-	return pcw_printer_data;
+//	logerror("PRN: MCU reading data from P1\n");
+	return 0x00;
 }
 
-static WRITE8_HANDLER(mcu_printer_data_w)
+static WRITE8_HANDLER(mcu_printer_p1_w)
 {
-	pcw_printer_data = data;
+	logerror("PRN: MCU writing %02x to P1\n",data);
 }
-#endif
 
-static READ8_HANDLER(mcu_printer_command_r)
+static READ8_HANDLER(mcu_printer_p2_r)
 {
-	return pcw_printer_command;
+	UINT8 ret = 0x00;
+//	logerror("PRN: MCU reading data from P2\n");
+	ret |= 0x80;
+	return ret;
+}
+
+static WRITE8_HANDLER(mcu_printer_p2_w)
+{
+//	logerror("PRN: MCU writing %02x to P2\n",data);
+	if((data & 0x20) == 0)
+		pcw_printer_headpos = 1;  // move head
+	if((data & 0x10) == 0)
+		pcw_printer_headpos = 0;
+}
+
+// Paper sensor?
+static READ8_HANDLER(mcu_printer_t1_r)
+{
+	return 1;
+}
+
+// Print head location? (0 if at left margin, otherwise 1)
+static READ8_HANDLER(mcu_printer_t0_r)
+{
+	return pcw_printer_headpos;
 }
 
 /*
@@ -837,12 +874,6 @@ static WRITE8_HANDLER(pcw9512_parallel_w)
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER(pcw_printer_output_w)
-{
-	// TODO: figure out the outputs and how it sends the initial Z80 code to the data bus.
-	logerror("PRN: MCU write to P7: offset %i, data %02x\n",offset,data);
-}
-
 static ADDRESS_MAP_START(pcw_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
@@ -874,10 +905,10 @@ ADDRESS_MAP_END
 
 /* i8041 MCU */
 static ADDRESS_MAP_START(pcw_printer_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(mcu_printer_command_r)
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_data_r, mcu_printer_data_w)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(mcu_printer_p2_r)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("printer_8243",i8243_prog_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_printer_p2_r,mcu_printer_p2_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_p1_r, mcu_printer_p1_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_printer_t1_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_printer_t0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcw_keyboard_io, ADDRESS_SPACE_IO, 8)
@@ -933,6 +964,7 @@ static MACHINE_RESET( pcw )
 	pcw_printer_status = 0xff;
 	pcw_printer_command = 0xff;
 	pcw_printer_data = 0x00;
+	pcw_printer_headpos = 0x00; // bring printer head to left margin
 }
 
 static DRIVER_INIT(pcw)
@@ -1171,8 +1203,6 @@ static MACHINE_CONFIG_START( pcw, driver_device )
 
 	MDRV_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MDRV_CPU_IO_MAP(pcw_keyboard_io)
-
-	MDRV_I8243_ADD("printer_8243", NULL, pcw_printer_output_w)
 
 	MDRV_MACHINE_START(pcw)
 	MDRV_MACHINE_RESET(pcw)
