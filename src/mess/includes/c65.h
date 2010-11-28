@@ -7,6 +7,7 @@
 #ifndef C65_H_
 #define C65_H_
 
+#include "includes/c64.h"
 #include "machine/6526cia.h"
 
 typedef struct
@@ -36,11 +37,11 @@ typedef struct
 	UINT8 reg;
 } expansion_ram_t;
 
-class c65_state : public driver_device
+class c65_state : public c64_state
 {
 public:
 	c65_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: c64_state(machine, config) { }
 
 	UINT8 *chargen;
 	UINT8 *interface;
@@ -48,10 +49,7 @@ public:
 	int c64mode;
 	UINT8 _6511_port;
 	UINT8 keyline;
-	UINT8 vicirq;
-	int old_level;
 	int old_value;
-	int old_data;
 	int nmilevel;
 	dma_t dma;
 	int dump_dma;
@@ -72,7 +70,7 @@ public:
 /*extern UINT8 *c65_graphics; */
 
 void c65_bankswitch (running_machine *machine);
-void c65_colorram_write (int offset, int value);
+//void c65_colorram_write (running_machine *machine, int offset, int value);
 
 int c65_dma_read(running_machine *machine, int offset);
 int c65_dma_read_color(running_machine *machine, int offset);

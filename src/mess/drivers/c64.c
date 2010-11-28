@@ -399,17 +399,17 @@ C64DTV TODO:
  *************************************/
 
 static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&c64_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE(&c64_roml)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(c64_state, memory)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(c64_state, c64_roml)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE_MEMBER(c64_state, colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&c64_romh)				/* ram or kernel rom */
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(c64_state, c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&c64_memory)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(c64_state, memory)
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")		/* ram or external roml */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3") AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -591,31 +591,34 @@ static UINT8 c64_lightpen_button_cb( running_machine *machine )
 
 static int c64_dma_read( running_machine *machine, int offset )
 {
-	if (!c64_game && c64_exrom)
+	c64_state *state = machine->driver_data<c64_state>();
+	if (!state->game && state->exrom)
 	{
 		if (offset < 0x3000)
-			return c64_memory[offset];
+			return state->memory[offset];
 
-		return c64_romh[offset & 0x1fff];
+		return state->c64_romh[offset & 0x1fff];
 	}
 
-	if (((c64_vicaddr - c64_memory + offset) & 0x7000) == 0x1000)
-		return c64_chargen[offset & 0xfff];
+	if (((state->vicaddr - state->memory + offset) & 0x7000) == 0x1000)
+		return state->chargen[offset & 0xfff];
 
-	return c64_vicaddr[offset];
+	return state->vicaddr[offset];
 }
 
 static int c64_dma_read_ultimax( running_machine *machine, int offset )
 {
+	c64_state *state = machine->driver_data<c64_state>();
 	if (offset < 0x3000)
-		return c64_memory[offset];
+		return state->memory[offset];
 
-	return c64_romh[offset & 0x1fff];
+	return state->c64_romh[offset & 0x1fff];
 }
 
 static int c64_dma_read_color( running_machine *machine, int offset )
 {
-	return c64_colorram[offset & 0x3ff] & 0xf;
+	c64_state *state = machine->driver_data<c64_state>();
+	return state->colorram[offset & 0x3ff] & 0xf;
 }
 
 static UINT8 c64_rdy_cb( running_machine *machine )
@@ -669,7 +672,7 @@ static const vic2_interface ultimax_vic2_intf = {
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c64, driver_device )
+static MACHINE_CONFIG_START( c64, c64_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
@@ -721,7 +724,7 @@ static MACHINE_CONFIG_START( c64, driver_device )
 	MDRV_FRAGMENT_ADD(c64_cartslot)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64pal, driver_device )
+static MACHINE_CONFIG_START( c64pal, c64_state )
 	MDRV_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
 	MDRV_CPU_CONFIG( c64_m6510_interface )

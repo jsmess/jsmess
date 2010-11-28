@@ -1556,21 +1556,21 @@ READ8_DEVICE_HANDLER( vic3_port_r )
     if (M)                                                      \
     {                                                           \
         if (M & 0x01)                                           \
-            colors[0] = vic3->c64_mem_r(VIC3_ADDR(0) + offset);        \
+            colors[0] = vic3->c64_mem_r(device->machine, VIC3_ADDR(0) + offset);        \
         if (M & 0x02)                                           \
-            colors[1] = vic3->c64_mem_r(VIC3_ADDR(1) + offset) << 1;     \
+            colors[1] = vic3->c64_mem_r(device->machine, VIC3_ADDR(1) + offset) << 1;     \
         if (M & 0x04)                                           \
-            colors[2] = vic3->c64_mem_r(VIC3_ADDR(2) + offset) << 2;     \
+            colors[2] = vic3->c64_mem_r(device->machine, VIC3_ADDR(2) + offset) << 2;     \
         if (M & 0x08)                                           \
-            colors[3] = vic3->c64_mem_r(VIC3_ADDR(3) + offset) << 3;     \
+            colors[3] = vic3->c64_mem_r(device->machine, VIC3_ADDR(3) + offset) << 3;     \
         if (M & 0x10)                                           \
-            colors[4] = vic3->c64_mem_r(VIC3_ADDR(4) + offset) << 4;     \
+            colors[4] = vic3->c64_mem_r(device->machine, VIC3_ADDR(4) + offset) << 4;     \
         if (M & 0x20)                                           \
-            colors[5] = vic3->c64_mem_r(VIC3_ADDR(5) + offset) << 5;     \
+            colors[5] = vic3->c64_mem_r(device->machine, VIC3_ADDR(5) + offset) << 5;     \
         if (M & 0x40)                                           \
-            colors[6] = vic3->c64_mem_r(VIC3_ADDR(6) + offset) << 6;     \
+            colors[6] = vic3->c64_mem_r(device->machine, VIC3_ADDR(6) + offset) << 6;     \
         if (M & 0x80)                                           \
-            colors[7] = vic3->c64_mem_r(VIC3_ADDR(7) + offset) << 7;     \
+            colors[7] = vic3->c64_mem_r(device->machine, VIC3_ADDR(7) + offset) << 7;     \
         for (i = 7; i >= 0; i--)                                \
         {                                                       \
             p = 0;                                              \
@@ -1647,28 +1647,28 @@ static void vic3_interlace_draw_block( running_device *device, int x, int y, int
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{
@@ -1719,28 +1719,28 @@ static void vic3_draw_block( running_device *device, int x, int y, int offset )
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{

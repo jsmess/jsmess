@@ -14,17 +14,18 @@
 #ifndef __C128_H__
 #define __C128_H__
 
+#include "includes/c64.h"
 #include "machine/6526cia.h"
 
-class c128_state : public driver_device
+class c128_state : public c64_state
 {
 public:
 	c128_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: c64_state(machine, config) { }
 
-	UINT8 *basic;
-	UINT8 *kernal;
-	UINT8 *chargen;
+	UINT8 *c128_basic;
+	UINT8 *c128_kernal;
+	UINT8 *c128_chargen;
 	UINT8 *z80;
 	UINT8 *editor;
 	UINT8 *internal_function;
@@ -45,15 +46,8 @@ public:
 	int sp1;
 	int data_out;
 	int va1617;
-	int cia1_on;
 	int monitor;
-	UINT8 vicirq;
 	int nmilevel;
-	int old_level;
-	int old_data;
-	int old_exrom;
-	int old_game;
-	emu_timer *datasette_timer;
 };
 
 

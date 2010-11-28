@@ -74,8 +74,6 @@
 #include "emu.h"
 #include "video/vic6567.h"
 
-static UINT8 rdy_cycles = 0;
-
 typedef struct _vic2_state  vic2_state;
 struct _vic2_state
 {
@@ -84,6 +82,7 @@ struct _vic2_state
 	screen_device *screen;			// screen which sets bitmap properties
 	running_device *cpu;
 
+	UINT8 rdy_cycles;
 	UINT8 reg[0x80];
 
 	int on;								/* rastering of the screen */
@@ -999,14 +998,14 @@ static TIMER_CALLBACK( pal_timer_callback )
 	vic2_state *vic2 = (vic2_state *)ptr;
 	int i;
 	UINT8 mask;
-	static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	UINT8 cpu_cycles = machine->device<cpu_device>("maincpu")->total_cycles() & 0xff;
 	UINT8 vic_cycles = (vic2->cycles_counter + 1) & 0xff;
 	vic2->cycles_counter++;
 
-//  printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,rdy_cycles);
-/*
+//  printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,vic2->rdy_cycles);
+#if 0
 if (input_code_pressed(machine, KEYCODE_X))
 {
 if (input_code_pressed_once(machine, KEYCODE_Q)) adjust[1]++;
@@ -1030,7 +1029,10 @@ if (input_code_pressed_once(machine, KEYCODE_V)) adjust[0]--;
 if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
                                 adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
 }
-*/
+#define adjust(x) adjust[x]
+#else
+#define adjust(x) 0
+#endif
 
 	switch(vic2->cycle)
 	{
@@ -1071,7 +1073,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x08) rdy_cycles += (2 + adjust[1]);
+		if (vic2->spr_dma_on & 0x08) vic2->rdy_cycles += (2 + adjust(1));
 
 		vic2->cycle++;
 		break;
@@ -1117,7 +1119,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x10) rdy_cycles += (2 + adjust[2]);
+		if (vic2->spr_dma_on & 0x10) vic2->rdy_cycles += (2 + adjust(2));
 
 		vic2->cycle++;
 		break;
@@ -1142,7 +1144,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x20) rdy_cycles += (2 + adjust[3]);
+		if (vic2->spr_dma_on & 0x20) vic2->rdy_cycles += (2 + adjust(3));
 
 		vic2->cycle++;
 		break;
@@ -1167,7 +1169,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x40) rdy_cycles += (2 + adjust[4]);
+		if (vic2->spr_dma_on & 0x40) vic2->rdy_cycles += (2 + adjust(4));
 
 		vic2->cycle++;
 		break;
@@ -1192,7 +1194,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x80) rdy_cycles += (2 + adjust[5]);
+		if (vic2->spr_dma_on & 0x80) vic2->rdy_cycles += (2 + adjust(5));
 
 		vic2->cycle++;
 		break;
@@ -1234,7 +1236,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2->raster_x = 0xfffc;
 
 		if ((vic2->rdy_workaround_cb(machine) == 0 ) && (vic2->is_bad_line))
-			rdy_cycles += (43+adjust[0]);
+			vic2->rdy_cycles += (43+adjust(0));
 
 		vic2->cycle++;
 		break;
@@ -1249,7 +1251,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2->vc = vic2->vc_base;
 
 		if ((vic2->rdy_workaround_cb(machine) == 1 ) && (vic2->is_bad_line))
-			rdy_cycles += (42+adjust[0]);
+			vic2->rdy_cycles += (42+adjust(0));
 
 		vic2->cycle++;
 		break;
@@ -1269,7 +1271,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 2 ) && (vic2->is_bad_line))
-			rdy_cycles += (41+adjust[0]);
+			vic2->rdy_cycles += (41+adjust(0));
 
 		vic2->cycle++;
 		break;
@@ -1293,7 +1295,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 3 ) && (vic2->is_bad_line))
-			rdy_cycles += (40+adjust[0]);
+			vic2->rdy_cycles += (40+adjust(0));
 
 		vic2->cycle++;
 		break;
@@ -1330,7 +1332,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2_matrix_access(machine, vic2);
 
 		if ((vic2->rdy_workaround_cb(machine) == 4 ) && (vic2->is_bad_line))
-			rdy_cycles += (40+adjust[0]);
+			vic2->rdy_cycles += (40+adjust(0));
 
 		vic2->cycle++;
 		break;
@@ -1503,7 +1505,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x01) rdy_cycles += (2 + adjust[6]);
+		if (vic2->spr_dma_on & 0x01) vic2->rdy_cycles += (2 + adjust(6));
 
 		vic2->cycle++;
 		break;
@@ -1560,7 +1562,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x02) rdy_cycles += (2 + adjust[7]);
+		if (vic2->spr_dma_on & 0x02) vic2->rdy_cycles += (2 + adjust(7));
 
 		vic2->cycle++;
 		break;
@@ -1585,7 +1587,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		else
 			vic2_resume_cpu(machine, vic2);
 
-		if (vic2->spr_dma_on & 0x04) rdy_cycles += (2 + adjust[8]);
+		if (vic2->spr_dma_on & 0x04) vic2->rdy_cycles += (2 + adjust(8));
 
 		vic2->cycle++;
 		break;
@@ -1606,10 +1608,10 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 		vic2->cycle = 1;
 	}
 
-	if ((cpu_cycles == vic_cycles) && (rdy_cycles > 0))
+	if ((cpu_cycles == vic_cycles) && (vic2->rdy_cycles > 0))
 	{
-		device_spin_until_time (machine->firstcpu, machine->device<cpu_device>("maincpu")->cycles_to_attotime(rdy_cycles));
-		rdy_cycles = 0;
+		device_spin_until_time (machine->firstcpu, machine->device<cpu_device>("maincpu")->cycles_to_attotime(vic2->rdy_cycles));
+		vic2->rdy_cycles = 0;
 	}
 
 	vic2->raster_x += 8;

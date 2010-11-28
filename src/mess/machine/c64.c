@@ -42,32 +42,10 @@
 #define log_cart 0
 
 /* expansion port lines input */
-int c64_pal;
-UINT8 c64_game, c64_exrom;
 
 /* cpu port */
-UINT8 *c64_vicaddr, *c128_vicaddr;
-UINT8 *c64_memory;
-UINT8 *c64_colorram;
-UINT8 *c64_basic;
-UINT8 *c64_kernal;
-UINT8 *c64_chargen;
-UINT8 *c64_roml = 0;
-UINT8 *c64_romh = 0;
-static UINT8 *c64_io_mirror = NULL;
 
-static UINT8 c64_port_data;
 
-static UINT8 *roml = 0, *romh = 0;
-static int ultimax;
-int c64_tape_on;
-static int c64_cia1_on;
-static int c64_io_enabled;
-static int is_sx64;				// temporary workaround until we implement full vc1541 emulation for every c64 set
-
-static UINT8 vicirq;
-static int old_level;
-static int old_data, old_exrom, old_game;
 
 static void c64_nmi( running_machine *machine )
 {
@@ -122,27 +100,30 @@ static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 
 static void c64_irq( running_machine *machine, int level )
 {
-	if (level != old_level)
+	c64_state *state = machine->driver_data<c64_state>();
+	if (level != state->old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
-		old_level = level;
+		state->old_level = level;
 	}
 }
 
 static void c64_cia0_interrupt( running_device *device, int level )
 {
-	c64_irq (device->machine, level || vicirq);
+	c64_state *state = device->machine->driver_data<c64_state>();
+	c64_irq (device->machine, level || state->vicirq);
 }
 
 void c64_vic_interrupt( running_machine *machine, int level )
 {
+	c64_state *state = machine->driver_data<c64_state>();
 	running_device *cia_0 = machine->device("cia_0");
 #if 1
-	if (level != vicirq)
+	if (level != state->vicirq)
 	{
 		c64_irq(machine, level || mos6526_irq_r(cia_0));
-		vicirq = level;
+		state->vicirq = level;
 	}
 #endif
 }
@@ -213,13 +194,14 @@ static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
+	c64_state *state = device->machine->driver_data<c64_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 	running_device *serbus = device->machine->device("iec");
 
 	cbm_iec_clk_w(serbus, device, !(data & 0x10));
 	cbm_iec_data_w(serbus, device, !(data & 0x20));
 	cbm_iec_atn_w(serbus, device, !(data & 0x08));
-	c64_vicaddr = c64_memory + helper[data & 0x03];
+	state->vicaddr = state->memory + helper[data & 0x03];
 }
 
 static void c64_cia1_interrupt( running_device *device, int level )
@@ -259,28 +241,27 @@ const mos6526_interface c64_pal_cia1 =
 
 ***********************************************/
 
-static UINT8 *c64_io_ram_w_ptr;
-static UINT8 *c64_io_ram_r_ptr;
 
 WRITE8_HANDLER( c64_write_io )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	running_device *cia_0 = space->machine->device("cia_0");
 	running_device *cia_1 = space->machine->device("cia_1");
 	running_device *sid = space->machine->device("sid6581");
 	running_device *vic2 = space->machine->device("vic2");
 
-	c64_io_mirror[offset] = data;
+	state->io_mirror[offset] = data;
 	if (offset < 0x400)
 		vic2_port_w(vic2, offset & 0x3ff, data);
 	else if (offset < 0x800)
 		sid6581_w(sid, offset & 0x3ff, data);
 	else if (offset < 0xc00)
-		c64_colorram[offset & 0x3ff] = data | 0xf0;
+		state->colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
 		mos6526_w(cia_0, offset, data);
 	else if (offset < 0xe00)
 	{
-		if (c64_cia1_on)
+		if (state->cia1_on)
 			mos6526_w(cia_1, offset, data);
 		else
 			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
@@ -293,14 +274,16 @@ WRITE8_HANDLER( c64_write_io )
 
 WRITE8_HANDLER( c64_ioarea_w )
 {
-	if (c64_io_enabled)
+	c64_state *state = space->machine->driver_data<c64_state>();
+	if (state->io_enabled)
 		c64_write_io(space, offset, data);
 	else
-		c64_io_ram_w_ptr[offset] = data;
+		state->io_ram_w_ptr[offset] = data;
 }
 
 READ8_HANDLER( c64_read_io )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	running_device *cia_0 = space->machine->device("cia_0");
 	running_device *cia_1 = space->machine->device("cia_1");
 	running_device *sid = space->machine->device("sid6581");
@@ -313,7 +296,7 @@ READ8_HANDLER( c64_read_io )
 		return sid6581_r(sid, offset & 0x3ff);
 
 	else if (offset < 0xc00)
-		return c64_colorram[offset & 0x3ff];
+		return state->colorram[offset & 0x3ff];
 
 	else if (offset < 0xd00)
 		{
@@ -325,7 +308,7 @@ READ8_HANDLER( c64_read_io )
 			return mos6526_r(cia_0, offset);
 		}
 
-	else if (c64_cia1_on && (offset < 0xe00))
+	else if (state->cia1_on && (offset < 0xe00))
 		return mos6526_r(cia_1, offset);
 
 	DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset));
@@ -335,7 +318,8 @@ READ8_HANDLER( c64_read_io )
 
 READ8_HANDLER( c64_ioarea_r )
 {
-	return c64_io_enabled ? c64_read_io(space, offset) : c64_io_ram_r_ptr[offset];
+	c64_state *state = space->machine->driver_data<c64_state>();
+	return state->io_enabled ? c64_read_io(space, offset) : state->io_ram_r_ptr[offset];
 }
 
 
@@ -454,98 +438,99 @@ configuration is active (the -GAME line is shorted to ground), the
 
 static void c64_bankswitch( running_machine *machine, int reset )
 {
+	c64_state *state = machine->driver_data<c64_state>();
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
 	int data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu")) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
-	if ((old_data == data) && (old_exrom == c64_exrom) && (old_game == c64_game) && !reset)
+	if ((state->old_data == data) && (state->old_exrom == state->exrom) && (state->old_game == state->game) && !reset)
 		return;
 
 	/* Are we in Ultimax mode? */
-	if (!c64_game && c64_exrom)
+	if (!state->game && state->exrom)
 		ultimax_mode = 1;
 
 	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
 	loram  = (data & 1) ? 1 : 0;
 	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
-	logerror("Bankswitch mode || charen, ultimax\n");
-	logerror("%d, %d, %d, %d  ||   %d,      %d  \n", loram, hiram, c64_game, c64_exrom, charen, ultimax_mode);
+	logerror("Bankswitch mode || charen, state->ultimax\n");
+	logerror("%d, %d, %d, %d  ||   %d,      %d  \n", loram, hiram, state->game, state->exrom, charen, ultimax_mode);
 
 	if (ultimax_mode)
 	{
-			c64_io_enabled = 1;		// charen has no effect in ultimax_mode
+			state->io_enabled = 1;		// charen has no effect in ultimax_mode
 
-			memory_set_bankptr(machine, "bank1", roml);
-			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
-			memory_set_bankptr(machine, "bank3", c64_memory + 0xa000);
-			memory_set_bankptr(machine, "bank4", romh);
+			memory_set_bankptr(machine, "bank1", state->roml);
+			memory_set_bankptr(machine, "bank2", state->memory + 0x8000);
+			memory_set_bankptr(machine, "bank3", state->memory + 0xa000);
+			memory_set_bankptr(machine, "bank4", state->romh);
 			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0);
 	}
 	else
 	{
 		/* 0x8000-0x9000 */
-		if (loram && hiram && !c64_exrom)
+		if (loram && hiram && !state->exrom)
 		{
-			memory_set_bankptr(machine, "bank1", roml);
-			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank1", state->roml);
+			memory_set_bankptr(machine, "bank2", state->memory + 0x8000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank1", c64_memory + 0x8000);
-			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank1", state->memory + 0x8000);
+			memory_set_bankptr(machine, "bank2", state->memory + 0x8000);
 		}
 
 		/* 0xa000 */
-		if (hiram && !c64_game && !c64_exrom)
-			memory_set_bankptr(machine, "bank3", romh);
+		if (hiram && !state->game && !state->exrom)
+			memory_set_bankptr(machine, "bank3", state->romh);
 
-		else if (loram && hiram && c64_game)
-			memory_set_bankptr(machine, "bank3", c64_basic);
+		else if (loram && hiram && state->game)
+			memory_set_bankptr(machine, "bank3", state->basic);
 
 		else
-			memory_set_bankptr(machine, "bank3", c64_memory + 0xa000);
+			memory_set_bankptr(machine, "bank3", state->memory + 0xa000);
 
 		/* 0xd000 */
 		// RAM
-		if (!loram && !hiram && (c64_game || !c64_exrom))
+		if (!loram && !hiram && (state->game || !state->exrom))
 		{
-			c64_io_enabled = 0;
-			c64_io_ram_r_ptr = c64_memory + 0xd000;
-			c64_io_ram_w_ptr = c64_memory + 0xd000;
+			state->io_enabled = 0;
+			state->io_ram_r_ptr = state->memory + 0xd000;
+			state->io_ram_w_ptr = state->memory + 0xd000;
 		}
 		// IO/RAM
-		else if (loram && !hiram && !c64_game)	// remember we cannot be in ultimax_mode, no need of !c64_exrom
+		else if (loram && !hiram && !state->game)	// remember we cannot be in ultimax_mode, no need of !state->exrom
 		{
-			c64_io_enabled = 1;
-			c64_io_ram_r_ptr = (!charen) ? c64_chargen : c64_memory + 0xd000;
-			c64_io_ram_w_ptr = c64_memory + 0xd000;
+			state->io_enabled = 1;
+			state->io_ram_r_ptr = (!charen) ? state->chargen : state->memory + 0xd000;
+			state->io_ram_w_ptr = state->memory + 0xd000;
 		}
 		// IO/C
 		else
 		{
-			c64_io_enabled = charen ? 1 : 0;
+			state->io_enabled = charen ? 1 : 0;
 
 			if (!charen)
 			{
-			c64_io_ram_r_ptr = c64_chargen;
-			c64_io_ram_w_ptr = c64_memory + 0xd000;
+			state->io_ram_r_ptr = state->chargen;
+			state->io_ram_w_ptr = state->memory + 0xd000;
 			}
 		}
 
 		/* 0xe000-0xf000 */
-		memory_set_bankptr(machine, "bank4", hiram ? c64_kernal : c64_memory + 0xe000);
-		memory_set_bankptr(machine, "bank5", c64_memory + 0xe000);
+		memory_set_bankptr(machine, "bank4", hiram ? state->kernal : state->memory + 0xe000);
+		memory_set_bankptr(machine, "bank5", state->memory + 0xe000);
 	}
 
 	/* make sure the opbase function gets called each time */
 	/* NPW 15-May-2008 - Another hack in the C64 drivers broken! */
 	/* opbase->mem_max = 0xcfff; */
 
-	old_game = c64_game;
-	old_exrom = c64_exrom;
-	old_data = data;
+	state->old_game = state->game;
+	state->old_exrom = state->exrom;
+	state->old_data = data;
 }
 
 /**
@@ -561,12 +546,12 @@ static void c64_bankswitch( running_machine *machine, int reset )
   p6,7 not available on M6510
  */
 
-static emu_timer *datasette_timer;
-
 void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 {
+	c64_state *state = device->machine->driver_data<c64_state>();
+
 	/* if line is marked as input then keep current value */
-	data = (c64_port_data & ~direction) | (data & direction);
+	data = (state->port_data & ~direction) | (data & direction);
 
 	/* resistors make P0,P1,P2 go high when respective line is changed to input */
 	if (!(direction & 0x04))
@@ -578,9 +563,9 @@ void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 	if (!(direction & 0x01))
 		data |= 0x01;
 
-	c64_port_data = data;
+	state->port_data = data;
 
-	if (c64_tape_on)
+	if (state->tape_on)
 	{
 		if (direction & 0x08)
 		{
@@ -592,29 +577,30 @@ void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 			if(!(data & 0x20))
 			{
 				cassette_change_state(device->machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+				timer_adjust_periodic(state->datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
 				cassette_change_state(device->machine->device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-				timer_reset(datasette_timer, attotime_never);
+				timer_reset(state->datasette_timer, attotime_never);
 			}
 		}
 	}
 
-	if (!ultimax)
+	if (!state->ultimax)
 		c64_bankswitch(device->machine, 0);
 
-	c64_memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
-	c64_memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
+	state->memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
+	state->memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
 
 }
 
 UINT8 c64_m6510_port_read( running_device *device, UINT8 direction )
 {
-	UINT8 data = c64_port_data;
+	c64_state *state = device->machine->driver_data<c64_state>();
+	UINT8 data = state->port_data;
 
-	if (c64_tape_on)
+	if (state->tape_on)
 	{
 		if ((cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
@@ -742,12 +728,14 @@ int c64_paddle_read( running_device *device, int which )
 
 READ8_HANDLER( c64_colorram_read )
 {
-	return c64_colorram[offset & 0x3ff];
+	c64_state *state = space->machine->driver_data<c64_state>();
+	return state->colorram[offset & 0x3ff];
 }
 
 WRITE8_HANDLER( c64_colorram_write )
 {
-	c64_colorram[offset & 0x3ff] = data | 0xf0;
+	c64_state *state = space->machine->driver_data<c64_state>();
+	state->colorram[offset & 0x3ff] = data | 0xf0;
 }
 
 TIMER_CALLBACK( c64_tape_timer )
@@ -760,94 +748,101 @@ TIMER_CALLBACK( c64_tape_timer )
 
 static void c64_common_driver_init( running_machine *machine )
 {
+	c64_state *state = machine->driver_data<c64_state>();
 	cbm_common_init();
-	c64_game = 1;
-	c64_exrom = 1;
-	old_data = -1;
+	state->game = 1;
+	state->exrom = 1;
+	state->old_data = -1;
 
-	if (!ultimax)
+	if (!state->ultimax)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
-		c64_basic    = mem + 0x10000;
-		c64_kernal   = mem + 0x12000;
-		c64_chargen  = mem + 0x14000;
-		c64_colorram = mem + 0x15000;
-		c64_roml     = mem + 0x15400;
-		c64_romh     = mem + 0x17400;
+		state->basic    = mem + 0x10000;
+		state->kernal   = mem + 0x12000;
+		state->chargen  = mem + 0x14000;
+		state->colorram = mem + 0x15000;
+		state->c64_roml     = mem + 0x15400;
+		state->c64_romh     = mem + 0x17400;
 	}
 
-	if (c64_tape_on)
-		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
+	if (state->tape_on)
+		state->datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
 
 	// "cyberload" tape loader check the e000-ffff ram; the init ram need to return different value
 	{
 		int i;
 		for (i = 0; i < 0x2000; i += 0x40)
-			memset(c64_memory + (0xe000 + i), ((i & 0x40) >> 6) * 0xff, 0x40);
+			memset(state->memory + (0xe000 + i), ((i & 0x40) >> 6) * 0xff, 0x40);
 	}
 }
 
 DRIVER_INIT( c64 )
 {
-	ultimax = 0;
-	is_sx64 = 0;
-	c64_pal = 0;
-	c64_cia1_on = 1;
-	c64_tape_on = 1;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->ultimax = 0;
+	state->is_sx64 = 0;
+	state->pal = 0;
+	state->cia1_on = 1;
+	state->tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64pal )
 {
-	ultimax = 0;
-	is_sx64 = 0;
-	c64_pal = 1;
-	c64_cia1_on = 1;
-	c64_tape_on = 1;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->ultimax = 0;
+	state->is_sx64 = 0;
+	state->pal = 1;
+	state->cia1_on = 1;
+	state->tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( ultimax )
 {
-	ultimax = 1;
-	is_sx64 = 0;
-	c64_pal = 0;
-	c64_cia1_on = 0;
-	c64_tape_on = 1;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->ultimax = 1;
+	state->is_sx64 = 0;
+	state->pal = 0;
+	state->cia1_on = 0;
+	state->tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64gs )
 {
-	ultimax = 0;
-	is_sx64 = 0;
-	c64_pal = 1;
-	c64_cia1_on = 1;
-	c64_tape_on = 0;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->ultimax = 0;
+	state->is_sx64 = 0;
+	state->pal = 1;
+	state->cia1_on = 1;
+	state->tape_on = 0;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( sx64 )
 {
-	ultimax = 0;
-	is_sx64 = 1;
-	c64_pal = 1;
-	c64_cia1_on = 1;
-	c64_tape_on = 0;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->ultimax = 0;
+	state->is_sx64 = 1;
+	state->pal = 1;
+	state->cia1_on = 1;
+	state->tape_on = 0;
 	c64_common_driver_init(machine);
 }
 
 MACHINE_START( c64 )
 {
-	c64_port_data = 0x17;
+	c64_state *state = machine->driver_data<c64_state>();
+	state->port_data = 0x17;
 
-	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
-	c64_io_enabled = 0;
+	state->io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
+	state->io_enabled = 0;
 
-	c64_vicaddr = c64_memory;
-	vicirq = 0;
+	state->vicaddr = state->memory;
+	state->vicirq = 0;
 
-	if (!ultimax)
+	if (!state->ultimax)
 		c64_bankswitch(machine, 1);
 }
 
@@ -994,49 +989,35 @@ enum {
     *****************************************/
 };
 
-#define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
-
-typedef struct {
-	int addr, size, index, start;
-} C64_ROM;
-
-typedef struct _c64_cart_t c64_cart_t;
-struct _c64_cart_t {
-	C64_ROM     bank[C64_MAX_ROMBANK];
-	INT8        game;
-	INT8        exrom;
-	UINT8       mapper;
-	UINT8       n_banks;
-};
-
-static c64_cart_t c64_cart;
-
 static DEVICE_IMAGE_UNLOAD( c64_cart )
 {
+	c64_state *state = image.device().machine->driver_data<c64_state>();
 	int i;
 
 	for (i = 0; i < C64_MAX_ROMBANK; i++)
 	{
-		c64_cart.bank[i].size = 0;
-		c64_cart.bank[i].addr = 0;
-		c64_cart.bank[i].index = 0;
-		c64_cart.bank[i].start = 0;
+		state->cart.bank[i].size = 0;
+		state->cart.bank[i].addr = 0;
+		state->cart.bank[i].index = 0;
+		state->cart.bank[i].start = 0;
 	}
 }
 
 
 static DEVICE_START( c64_cart )
 {
+	c64_state *state = device->machine->driver_data<c64_state>();
 	/* In the first slot we can load a .crt file. In this case we want
         to use game & exrom values from the header, not the default ones. */
-	c64_cart.game = -1;
-	c64_cart.exrom = -1;
-	c64_cart.mapper = GENERIC_CRT;
-	c64_cart.n_banks = 0;
+	state->cart.game = -1;
+	state->cart.exrom = -1;
+	state->cart.mapper = GENERIC_CRT;
+	state->cart.n_banks = 0;
 }
 
 static int c64_crt_load( device_image_interface &image )
 {
+	c64_state *state = image.device().machine->driver_data<c64_state>();
 	int size = image.length(), test, i = 0, ii;
 	int _80_loaded = 0, _90_loaded = 0, a0_loaded = 0, b0_loaded = 0, e0_loaded = 0, f0_loaded = 0;
 	const char *filetype = image.filetype();
@@ -1057,10 +1038,10 @@ static int c64_crt_load( device_image_interface &image )
 		/* 0x16-0x17 is Hardware type */
 		image.fseek(0x16, SEEK_SET);
 		image.fread(&c64_cart_type, 2);
-		c64_cart.mapper = BIG_ENDIANIZE_INT16(c64_cart_type);
+		state->cart.mapper = BIG_ENDIANIZE_INT16(c64_cart_type);
 
 		/* If it is unsupported cart type, warn the user */
-		switch (c64_cart.mapper)
+		switch (state->cart.mapper)
 		{
 			case SIMONS_BASIC:	/* Type #  4 */
 			case OCEAN_1:		/* Type #  5 */
@@ -1074,7 +1055,7 @@ static int c64_crt_load( device_image_interface &image )
 			case DOMARK:		/* Type # 19 */
 			case COMAL_80:		/* Type # 21 */
 			case GENERIC_CRT:		/* Type #  0 */
-				printf("Currently supported cart type (Type %d)\n", c64_cart.mapper);
+				printf("Currently supported cart type (Type %d)\n", state->cart.mapper);
 				break;
 
 			default:
@@ -1087,23 +1068,23 @@ static int c64_crt_load( device_image_interface &image )
 			case FINAL_CART_I:	/* Type # 13 */
 			case MAGIC_FORMEL:	/* Type # 14 */
 			case SUPER_SNAP_5:	/* Type # 20 */
-				printf("Currently unsupported cart type (Type %d)\n", c64_cart.mapper);
+				printf("Currently unsupported cart type (Type %d)\n", state->cart.mapper);
 				break;
 		}
 
 		/* 0x18 is EXROM */
 		image.fseek(0x18, SEEK_SET);
-		image.fread(&c64_cart.exrom, 1);
+		image.fread(&state->cart.exrom, 1);
 
 		/* 0x19 is GAME */
-		image.fread(&c64_cart.game, 1);
+		image.fread(&state->cart.game, 1);
 
 		/* We can pass to the data: it starts from 0x40 */
 		image.fseek(0x40, SEEK_SET);
 		j = 0x40;
 
 		logerror("Loading cart %s size:%.4x\n", image.filename(), size);
-		logerror("Header info: EXROM %d, GAME %d, Cart Type %d \n", c64_cart.exrom, c64_cart.game, c64_cart_type);
+		logerror("Header info: EXROM %d, GAME %d, Cart Type %d \n", state->cart.exrom, state->cart.game, c64_cart_type);
 
 
 		/* Data in a .crt image are organized in blocks called 'CHIP':
@@ -1146,16 +1127,16 @@ static int c64_crt_load( device_image_interface &image )
 			logerror("Loading CHIP data at %.4x size:%.4x\n", address, chip_data_size);
 
 			/* Store data, address & size of the CHIP block */
-			c64_cart.bank[i].addr = address;
-			c64_cart.bank[i].index = chip_bank_index;
-			c64_cart.bank[i].size = chip_data_size;
-			c64_cart.bank[i].start = new_start;
+			state->cart.bank[i].addr = address;
+			state->cart.bank[i].index = chip_bank_index;
+			state->cart.bank[i].size = chip_data_size;
+			state->cart.bank[i].start = new_start;
 
-			test = image.fread(cart_cpy + new_start, c64_cart.bank[i].size);
-			new_start += c64_cart.bank[i].size;
+			test = image.fread(cart_cpy + new_start, state->cart.bank[i].size);
+			new_start += state->cart.bank[i].size;
 
 			/* Does CHIP contain any data? */
-			if (test != c64_cart.bank[i].size)
+			if (test != state->cart.bank[i].size)
 				return IMAGE_INIT_FAIL;
 
 			/* Advance to the next CHIP block */
@@ -1178,98 +1159,98 @@ static int c64_crt_load( device_image_interface &image )
 		logerror("loading %s rom at %.4x size:%.4x\n", image.filename(), address, size);
 
 		/* Store data, address & size */
-		c64_cart.bank[0].addr = address;
-		c64_cart.bank[0].size = size;
-		c64_cart.bank[0].start = new_start;
+		state->cart.bank[0].addr = address;
+		state->cart.bank[0].size = size;
+		state->cart.bank[0].start = new_start;
 
-		test = image.fread(cart_cpy + new_start, c64_cart.bank[0].size);
-		new_start += c64_cart.bank[0].size;
+		test = image.fread(cart_cpy + new_start, state->cart.bank[0].size);
+		new_start += state->cart.bank[0].size;
 
 		/* Does cart contain any data? */
-		if (test != c64_cart.bank[0].size)
+		if (test != state->cart.bank[0].size)
 			return IMAGE_INIT_FAIL;
 	}
 
-	c64_cart.n_banks = i; // this is also needed so that we only set mappers if a cart is present!
+	state->cart.n_banks = i; // this is also needed so that we only set mappers if a cart is present!
 
 	/* If we load a .crt file, use EXROM & GAME from the header! */
-	if ((c64_cart.exrom != -1) && (c64_cart.game != -1))
+	if ((state->cart.exrom != -1) && (state->cart.game != -1))
 	{
-		c64_exrom = c64_cart.exrom;
-		c64_game  = c64_cart.game;
+		state->exrom = state->cart.exrom;
+		state->game  = state->cart.game;
 	}
 
 	/* Finally load the cart */
-	roml = c64_roml;
-	romh = c64_romh;
+	state->roml = state->c64_roml;
+	state->romh = state->c64_romh;
 
-	memset(roml, 0, 0x2000);
-	memset(romh, 0, 0x2000);
+	memset(state->roml, 0, 0x2000);
+	memset(state->romh, 0, 0x2000);
 
-	switch (c64_cart.mapper)
+	switch (state->cart.mapper)
 	{
 	default:
-		if (!c64_game && c64_exrom && (c64_cart.n_banks == 1))
+		if (!state->game && state->exrom && (state->cart.n_banks == 1))
 		{
-			memcpy(romh, cart_cpy, 0x2000);
+			memcpy(state->romh, cart_cpy, 0x2000);
 		}
 		else
 		{
 			// we first attempt to load the first 'CHIPs' with address 0x8000-0xb000 and 0xe000-0xf000, otherwise we load the first (or first two) 'CHIPs' of the image
-			for (ii = 0; ii < c64_cart.n_banks; ii++)
+			for (ii = 0; ii < state->cart.n_banks; ii++)
 			{
-				if (c64_cart.bank[ii].addr == 0x8000 && !_80_loaded)
+				if (state->cart.bank[ii].addr == 0x8000 && !_80_loaded)
 				{
-					memcpy(roml, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->roml, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					_80_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x1000)
+					if (state->cart.bank[ii].size > 0x1000)
 						_90_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x2000)
+					if (state->cart.bank[ii].size > 0x2000)
 						a0_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x3000)
+					if (state->cart.bank[ii].size > 0x3000)
 						b0_loaded = 1;
 //                  printf("addr 0x8000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
-				if (c64_cart.bank[ii].addr == 0x9000 && !_90_loaded)
+				if (state->cart.bank[ii].addr == 0x9000 && !_90_loaded)
 				{
-					memcpy(roml + 0x1000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->roml + 0x1000, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					_90_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x1000)
+					if (state->cart.bank[ii].size > 0x1000)
 						a0_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x2000)
+					if (state->cart.bank[ii].size > 0x2000)
 						b0_loaded = 1;
 //                  printf("addr 0x9000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
-				if (c64_cart.bank[ii].addr == 0xa000 && !a0_loaded)
+				if (state->cart.bank[ii].addr == 0xa000 && !a0_loaded)
 				{
-					memcpy(roml + 0x2000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->roml + 0x2000, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					a0_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x1000)
+					if (state->cart.bank[ii].size > 0x1000)
 						b0_loaded = 1;
 //                  printf("addr 0xa000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
-				if (c64_cart.bank[ii].addr == 0xb000 && !b0_loaded)
+				if (state->cart.bank[ii].addr == 0xb000 && !b0_loaded)
 				{
-					memcpy(roml + 0x3000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->roml + 0x3000, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					b0_loaded = 1;
 //                  printf("addr 0xb000: 80 %d, 90 %d, a0 %d, b0 %d\n", _80_loaded, _90_loaded, a0_loaded, b0_loaded);
 				}
 
-				if (c64_cart.bank[ii].addr == 0xe000 && !e0_loaded)
+				if (state->cart.bank[ii].addr == 0xe000 && !e0_loaded)
 				{
-					memcpy(romh, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->romh, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					e0_loaded = 1;
-					if (c64_cart.bank[ii].size > 0x1000)
+					if (state->cart.bank[ii].size > 0x1000)
 						f0_loaded = 1;
 //                  printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
 				}
 
-				if (c64_cart.bank[ii].addr == 0xf000 && !f0_loaded)
+				if (state->cart.bank[ii].addr == 0xf000 && !f0_loaded)
 				{
-					memcpy(romh + 0x1000, cart_cpy + c64_cart.bank[ii].start, c64_cart.bank[ii].size);
+					memcpy(state->romh + 0x1000, cart_cpy + state->cart.bank[ii].start, state->cart.bank[ii].size);
 					f0_loaded = 1;
 //                  printf("addr 0xe000: e0 %d, f0 %d\n", e0_loaded, f0_loaded);
 				}
@@ -1287,6 +1268,7 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 
 static DEVICE_IMAGE_LOAD( max_cart )
 {
+	c64_state *state = image.device().machine->driver_data<c64_state>();
 	int result = IMAGE_INIT_PASS;
 
 	if (image.software_entry() != NULL)
@@ -1294,24 +1276,24 @@ static DEVICE_IMAGE_LOAD( max_cart )
 		UINT32 size;
 
 		// setup Ultimax mode
-		c64_exrom = 1;
-		c64_game  = 0;
+		state->exrom = 1;
+		state->game  = 0;
 
-		roml = c64_roml;
-		romh = c64_romh;
+		state->roml = state->c64_roml;
+		state->romh = state->c64_romh;
 
-		memset(roml, 0, 0x2000);
-		memset(romh, 0, 0x2000);
+		memset(state->roml, 0, 0x2000);
+		memset(state->romh, 0, 0x2000);
 
 		// is there anything to load at 0x8000?
 		size = image.get_software_region_length("roml");
 		if (size)
-			memcpy(roml, image.get_software_region("roml"), size);
+			memcpy(state->roml, image.get_software_region("roml"), size);
 
 		// is there anything to load at 0xe000?
 		size = image.get_software_region_length("romh");
 		if (size)
-			memcpy(romh, image.get_software_region("romh"), size);
+			memcpy(state->romh, image.get_software_region("romh"), size);
 	}
 	else
 		result = c64_crt_load(image);
@@ -1322,6 +1304,7 @@ static DEVICE_IMAGE_LOAD( max_cart )
 
 static WRITE8_HANDLER( fc3_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 3
 	// working:
 	// not working:
@@ -1335,14 +1318,14 @@ static WRITE8_HANDLER( fc3_bank_w )
 			logerror("Warning: This cart type should have at most 4 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 		else
 		{
-			memcpy(roml, cart + bank * 0x4000, 0x2000);
-			memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+			memcpy(state->roml, cart + bank * 0x4000, 0x2000);
+			memcpy(state->romh, cart + bank * 0x4000 + 0x2000, 0x2000);
 /*
             if (log_cart)
             {
-                logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-                if (c64_cart.bank[bank].index != bank)
-                    logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+                logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+                if (state->cart.bank[bank].index != bank)
+                    logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
             }
 */
 		}
@@ -1351,6 +1334,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 
 static WRITE8_HANDLER( ocean1_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 5
 	// working: Double Dragon, Ghostbusters, Terminator 2
 	// not working: Pang, Robocop 2, Toki
@@ -1358,33 +1342,34 @@ static WRITE8_HANDLER( ocean1_bank_w )
 	UINT8 bank = data & 0x3f;
 	UINT8 *cart = memory_region(space->machine, "user1");
 
-	switch (c64_cart.bank[bank].addr)
+	switch (state->cart.bank[bank].addr)
 	{
 	case 0x8000:
-		memcpy(roml, cart + bank * 0x2000, c64_cart.bank[bank].size);
+		memcpy(state->roml, cart + bank * 0x2000, state->cart.bank[bank].size);
 		break;
 	case 0xa000:
-		memcpy(roml + 0x2000, cart + bank * 0x2000, c64_cart.bank[bank].size);
+		memcpy(state->roml + 0x2000, cart + bank * 0x2000, state->cart.bank[bank].size);
 		break;
 	case 0xe000:
-		memcpy(romh, cart + bank * 0x2000, c64_cart.bank[bank].size);
+		memcpy(state->romh, cart + bank * 0x2000, state->cart.bank[bank].size);
 		break;
 	default:
-		logerror("Unexpected loading address (%x) for bank %x\n", c64_cart.bank[bank].addr, bank);
+		logerror("Unexpected loading address (%x) for bank %x\n", state->cart.bank[bank].addr, bank);
 		break;
 	}
 /*
     if (log_cart)
     {
-        logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-        if (c64_cart.bank[bank].index != bank)
-            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+        logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+        if (state->cart.bank[bank].index != bank)
+            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
     }
 */
 }
 
 static WRITE8_HANDLER( funplay_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 7
 	// working:
 	// not working:
@@ -1397,16 +1382,16 @@ static WRITE8_HANDLER( funplay_bank_w )
 		logerror("Reserved value written\n");
 	else
 	{
-		/* bank number is not the value written, but c64_cart.bank[bank].index IS the value written! */
+		/* bank number is not the value written, but state->cart.bank[bank].index IS the value written! */
 		real_bank = ((bank & 0x01) << 3) + ((bank & 0x38) >> 3);
 
-		memcpy(roml, cart + real_bank * 0x2000, 0x2000);
+		memcpy(state->roml, cart + real_bank * 0x2000, 0x2000);
 /*
         if (log_cart)
         {
-            logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-            if (c64_cart.bank[bank].index != bank)
-                logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+            logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+            if (state->cart.bank[bank].index != bank)
+                logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
         }
 */
 	}
@@ -1414,6 +1399,7 @@ static WRITE8_HANDLER( funplay_bank_w )
 
 static WRITE8_HANDLER( supergames_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 8
 	// working:
 	// not working:
@@ -1423,35 +1409,36 @@ static WRITE8_HANDLER( supergames_bank_w )
 
 	if (data & 0x04)
 	{
-		c64_game = 0;
-		c64_exrom = 0;
+		state->game = 0;
+		state->exrom = 0;
 	}
 	else
 	{
-		c64_game = 0;
-		c64_exrom = 0;
+		state->game = 0;
+		state->exrom = 0;
 	}
 
 	if (data == 0xc)
 	{
-		c64_game = 1;
-		c64_exrom = 1;
+		state->game = 1;
+		state->exrom = 1;
 	}
 
 	if (bit2)
 	{
-		memcpy(roml, cart + bank * 0x4000, 0x2000);
-		memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+		memcpy(state->roml, cart + bank * 0x4000, 0x2000);
+		memcpy(state->romh, cart + bank * 0x4000 + 0x2000, 0x2000);
 	}
 	else
 	{
-		memcpy(roml, cart + bank * 0x4000, 0x2000);
-		memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+		memcpy(state->roml, cart + bank * 0x4000, 0x2000);
+		memcpy(state->romh, cart + bank * 0x4000 + 0x2000, 0x2000);
 	}
 }
 
 static WRITE8_HANDLER( c64gs_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 15
 	// working:
 	// not working: The Last Ninja Remix
@@ -1462,19 +1449,20 @@ static WRITE8_HANDLER( c64gs_bank_w )
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
-	memcpy(roml, cart + bank * 0x2000, 0x2000);
+	memcpy(state->roml, cart + bank * 0x2000, 0x2000);
 /*
     if (log_cart)
     {
-        logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-        if (c64_cart.bank[bank].index != bank)
-            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+        logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+        if (state->cart.bank[bank].index != bank)
+            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
     }
 */
 }
 
 static READ8_HANDLER( dinamic_bank_r )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 17
 	// working: Satan
 	// not working:
@@ -1485,13 +1473,13 @@ static READ8_HANDLER( dinamic_bank_r )
 	if (bank > 0xf)
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
-	memcpy(roml, cart + bank * 0x2000, 0x2000);
+	memcpy(state->roml, cart + bank * 0x2000, 0x2000);
 /*
     if (log_cart)
     {
-        logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-        if (c64_cart.bank[bank].index != bank)
-            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+        logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+        if (state->cart.bank[bank].index != bank)
+            logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
     }
 */
 	return 0;
@@ -1499,6 +1487,7 @@ static READ8_HANDLER( dinamic_bank_r )
 
 static READ8_HANDLER( zaxxon_bank_r )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 18
 	// working:
 	// not working:
@@ -1511,16 +1500,17 @@ static READ8_HANDLER( zaxxon_bank_r )
 	else
 		bank = 1;
 
-	// c64_game = 0;
-	// c64_exrom = 0;
+	// state->game = 0;
+	// state->exrom = 0;
 
-	memcpy(romh, cart + bank * 0x2000 + 0x1000, 0x2000);
+	memcpy(state->romh, cart + bank * 0x2000 + 0x1000, 0x2000);
 
 	return cart[offset & 0x0fff];
 }
 
 static WRITE8_HANDLER( domark_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 19
 	// working:
 	// not working:
@@ -1530,19 +1520,20 @@ static WRITE8_HANDLER( domark_bank_w )
 
 	if (data & 0x80)
 	{
-		c64_game = 1;
-		c64_exrom = 1;
+		state->game = 1;
+		state->exrom = 1;
 	}
 	else
 	{
-		c64_game = 1;
-		c64_exrom = 0;
-		memcpy(roml, cart + bank * 0x2000, 0x2000);
+		state->game = 1;
+		state->exrom = 0;
+		memcpy(state->roml, cart + bank * 0x2000, 0x2000);
 	}
 }
 
 static WRITE8_HANDLER( comal80_bank_w )
 {
+	c64_state *state = space->machine->driver_data<c64_state>();
 	// Type # 21
 	// working: Comal 80
 	// not working:
@@ -1557,13 +1548,13 @@ static WRITE8_HANDLER( comal80_bank_w )
 	{
 		bank &= 0x03;
 
-		memcpy(roml, cart + bank * 0x4000, 0x4000);
+		memcpy(state->roml, cart + bank * 0x4000, 0x4000);
 /*
         if (log_cart)
         {
-            logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cart.bank[bank].size, c64_cart.bank[bank].addr);
-            if (c64_cart.bank[bank].index != bank)
-                logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cart.bank[bank].index, bank);
+            logerror("bank %d of size %d successfully loaded at %d!\n", bank, state->cart.bank[bank].size, state->cart.bank[bank].addr);
+            if (state->cart.bank[bank].index != bank)
+                logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", state->cart.bank[bank].index, bank);
         }
 */
 	}
@@ -1571,9 +1562,10 @@ static WRITE8_HANDLER( comal80_bank_w )
 
 static void setup_c64_custom_mappers(running_machine *machine)
 {
+	c64_state *state = machine->driver_data<c64_state>();
 	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
-	switch (c64_cart.mapper)
+	switch (state->cart.mapper)
 	{
 		case ACTION_REPLAY:	/* Type #  1 not working */
 			break;
@@ -1633,7 +1625,8 @@ static void setup_c64_custom_mappers(running_machine *machine)
 
 MACHINE_RESET( c64 )
 {
-	if (c64_cart.n_banks)
+	c64_state *state = machine->driver_data<c64_state>();
+	if (state->cart.n_banks)
 		setup_c64_custom_mappers(machine);
 }
 

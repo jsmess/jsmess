@@ -84,15 +84,15 @@ static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0dc00, 0x0dfff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x0e000, 0x0ffff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank15")
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_BASE(&c64_colorram)
+	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_BASE_MEMBER(c65_state, colorram)
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
 	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE_MEMBER(c65_state, chargen)
-	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE(&c64_basic)
+	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE_MEMBER(c65_state, basic)
 	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_BASE_MEMBER(c65_state, interface)
-	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE(&c64_chargen)
-	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE(&c64_kernal)
+	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE_MEMBER(c65_state, chargen)
+	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE_MEMBER(c65_state, kernal)
 
 	AM_RANGE(0x30000, 0x31fff) AM_ROM /*&c65_monitor,     monitor maps to 0x6000    */
 	AM_RANGE(0x32000, 0x37fff) AM_ROM /*&c65_basic, */
@@ -236,9 +236,10 @@ static UINT8 c65_lightpen_button_cb( running_machine *machine )
 	return input_port_read(machine, "OTHER") & 0x04;
 }
 
-static UINT8 c65_c64_mem_r( int offset )
+static UINT8 c65_c64_mem_r( running_machine *machine, int offset )
 {
-	return c64_memory[offset];
+	c65_state *state = machine->driver_data<c65_state>();
+	return state->memory[offset];
 }
 
 static const vic3_interface c65_vic3_ntsc_intf = {

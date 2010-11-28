@@ -37,6 +37,8 @@ System Driver Changes:
 - [C64] Added known good dumps softlist for cartridges. Not hooked up
   to driver code yet. [Curt Coder]
 
+- [C64] Multisession fixes.  [Atari Ace]
+
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
 
 - [GENESIS] Added support for several genesis PCB carts [El Barto]

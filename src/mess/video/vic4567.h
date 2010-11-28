@@ -24,7 +24,7 @@ typedef void (*vic3_irq) (running_machine *, int);
 
 typedef void (*vic3_port_changed_callback) (running_machine *, int);
 
-typedef UINT8 (*vic3_c64mem_callback)(int offset);
+typedef UINT8 (*vic3_c64mem_callback)(running_machine *machine, int offset);
 
 typedef enum
 {
