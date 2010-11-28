@@ -48,27 +48,43 @@
 #include "sound/wave.h"
 #include "devices/messram.h"
 
+
+class rx78_state : public driver_device
+{
+public:
+	rx78_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	running_device *cassette;
+	UINT8 vram_read_bank;
+	UINT8 vram_write_bank;
+	UINT8 pal_reg[7];
+	UINT8 pri_mask;
+	UINT8 key_mux;
+};
+
+
 #define MASTER_CLOCK XTAL_28_63636MHz
 
-static running_device *rx78_cassette;
 
 static WRITE8_HANDLER( rx78_f0_w )
 {
-	cassette_output(rx78_cassette, (data & 1) ? -1.0 : +1.0);
+	rx78_state *state = space->machine->driver_data<rx78_state>();
+	cassette_output(state->cassette, (data & 1) ? -1.0 : +1.0);
 }
 
 static READ8_HANDLER( rx78_f0_r )
 {
+	rx78_state *state = space->machine->driver_data<rx78_state>();
 	UINT8 data = 0;
 
-	if (cassette_input(rx78_cassette) > 0.03)
+	if (cassette_input(state->cassette) > 0.03)
 		data++;
 
 	return data;
 }
 
 
-static UINT8 vram_read_bank,vram_write_bank,pal_reg[7],pri_mask;
 
 static VIDEO_START( rx78 )
 {
@@ -76,6 +92,7 @@ static VIDEO_START( rx78 )
 
 static VIDEO_UPDATE( rx78 )
 {
+	rx78_state *state = screen->machine->driver_data<rx78_state>();
 	UINT8 *vram = memory_region(screen->machine,"vram");
 	int x,y,count;
 
@@ -92,9 +109,9 @@ static VIDEO_UPDATE( rx78 )
 			for (i = 0; i < 8; i++)
 			{
 				/* bg color */
-				pen[0] = (pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
-				pen[1] = (pri_mask & 0x10) ? (vram[count + 0x8000] >> (i)) : 0x00;
-				pen[2] = (pri_mask & 0x20) ? (vram[count + 0xa000] >> (i)) : 0x00;
+				pen[0] = (state->pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
+				pen[1] = (state->pri_mask & 0x10) ? (vram[count + 0x8000] >> (i)) : 0x00;
+				pen[2] = (state->pri_mask & 0x20) ? (vram[count + 0xa000] >> (i)) : 0x00;
 
 				color  = ((pen[0] & 1) << 0);
 				color |= ((pen[1] & 1) << 1);
@@ -104,9 +121,9 @@ static VIDEO_UPDATE( rx78 )
 					*BITMAP_ADDR16(bitmap, y, x+i) = screen->machine->pens[color];
 
 				/* fg color */
-				pen[0] = (pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
-				pen[1] = (pri_mask & 0x02) ? (vram[count + 0x2000] >> (i)) : 0x00;
-				pen[2] = (pri_mask & 0x04) ? (vram[count + 0x4000] >> (i)) : 0x00;
+				pen[0] = (state->pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
+				pen[1] = (state->pri_mask & 0x02) ? (vram[count + 0x2000] >> (i)) : 0x00;
+				pen[2] = (state->pri_mask & 0x04) ? (vram[count + 0x4000] >> (i)) : 0x00;
 
 				color  = ((pen[0] & 1) << 0);
 				color |= ((pen[1] & 1) << 1);
@@ -122,16 +139,16 @@ static VIDEO_UPDATE( rx78 )
 	return 0;
 }
 
-static UINT8 key_mux;
 
 static READ8_HANDLER( key_r )
 {
+	rx78_state *state = space->machine->driver_data<rx78_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "JOY1P_0","JOY1P_1","JOY1P_2",
 	                                        "JOY2P_0", "JOY2P_1", "JOY2P_2", "UNUSED" };
 
-	if(key_mux == 0x30) //status read
+	if(state->key_mux == 0x30) //status read
 	{
 		int res,i;
 
@@ -142,60 +159,66 @@ static READ8_HANDLER( key_r )
 		return res;
 	}
 
-	if(key_mux >= 1 && key_mux <= 15)
-		return input_port_read(space->machine, keynames[key_mux - 1]);
+	if(state->key_mux >= 1 && state->key_mux <= 15)
+		return input_port_read(space->machine, keynames[state->key_mux - 1]);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( key_w )
 {
-	key_mux = data;
+	rx78_state *state = space->machine->driver_data<rx78_state>();
+	state->key_mux = data;
 }
 
 static READ8_HANDLER( rx78_vram_r )
 {
+	rx78_state *state = space->machine->driver_data<rx78_state>();
 	UINT8 *vram = memory_region(space->machine,"vram");
 
-	if(vram_read_bank == 0 || vram_read_bank > 6)
+	if(state->vram_read_bank == 0 || state->vram_read_bank > 6)
 		return 0xff;
 
-	return vram[offset + ((vram_read_bank - 1) * 0x2000)];
+	return vram[offset + ((state->vram_read_bank - 1) * 0x2000)];
 }
 
 static WRITE8_HANDLER( rx78_vram_w )
 {
+	rx78_state *state = space->machine->driver_data<rx78_state>();
 	UINT8 *vram = memory_region(space->machine,"vram");
 
-	if(vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
-	if(vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
-	if(vram_write_bank & 0x04) { vram[offset + 2 * 0x2000] = data; }
-	if(vram_write_bank & 0x08) { vram[offset + 3 * 0x2000] = data; }
-	if(vram_write_bank & 0x10) { vram[offset + 4 * 0x2000] = data; }
-	if(vram_write_bank & 0x20) { vram[offset + 5 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x04) { vram[offset + 2 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x08) { vram[offset + 3 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x10) { vram[offset + 4 * 0x2000] = data; }
+	if(state->vram_write_bank & 0x20) { vram[offset + 5 * 0x2000] = data; }
 }
 
 static WRITE8_HANDLER( vram_read_bank_w )
 {
-	vram_read_bank = data;
+	rx78_state *state = space->machine->driver_data<rx78_state>();
+	state->vram_read_bank = data;
 }
 
 static WRITE8_HANDLER( vram_write_bank_w )
 {
-	vram_write_bank = data;
+	rx78_state *state = space->machine->driver_data<rx78_state>();
+	state->vram_write_bank = data;
 }
 
 static WRITE8_HANDLER( vdp_reg_w )
 {
+	rx78_state *state = space->machine->driver_data<rx78_state>();
 	UINT8 r,g,b,res,i;
 
-	pal_reg[offset] = data;
+	state->pal_reg[offset] = data;
 
 	for(i=0;i<16;i++)
 	{
-		res = ((i & 1) ? pal_reg[0 + (i & 8 ? 3 : 0)] : 0) | ((i & 2) ? pal_reg[1 + (i & 8 ? 3 : 0)] : 0) | ((i & 4) ? pal_reg[2 + (i & 8 ? 3 : 0)] : 0);
-		if(res & pal_reg[6]) //color mask, TODO: check this
-			res &= pal_reg[6];
+		res = ((i & 1) ? state->pal_reg[0 + (i & 8 ? 3 : 0)] : 0) | ((i & 2) ? state->pal_reg[1 + (i & 8 ? 3 : 0)] : 0) | ((i & 4) ? state->pal_reg[2 + (i & 8 ? 3 : 0)] : 0);
+		if(res & state->pal_reg[6]) //color mask, TODO: check this
+			res &= state->pal_reg[6];
 
 		r = (res & 0x11) == 0x11 ? 0xff : ((res & 0x11) == 0x01 ? 0x7f : 0x00);
 		g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0x00);
@@ -218,7 +241,8 @@ static WRITE8_HANDLER( vdp_bg_reg_w )
 
 static WRITE8_HANDLER( vdp_pri_mask_w )
 {
-	pri_mask = data;
+	rx78_state *state = space->machine->driver_data<rx78_state>();
+	state->pri_mask = data;
 }
 
 
@@ -375,7 +399,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(rx78)
 {
-	rx78_cassette = machine->device("cassette");
+	rx78_state *state = machine->driver_data<rx78_state>();
+	state->cassette = machine->device("cassette");
 }
 
 static DEVICE_IMAGE_LOAD( rx78_cart )
@@ -426,7 +451,7 @@ static GFXDECODE_START( rx78 )
 	GFXDECODE_ENTRY( "maincpu", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( rx78, driver_device )
+static MACHINE_CONFIG_START( rx78, rx78_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
 	MDRV_CPU_PROGRAM_MAP(rx78_mem)

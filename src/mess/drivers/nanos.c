@@ -17,7 +17,20 @@
 #include "formats/basicdsk.h"
 #include "devices/messram.h"
 
-static const UINT8 *FNT;
+
+class nanos_state : public driver_device
+{
+public:
+	nanos_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	const UINT8 *FNT;
+	UINT8 key_command;
+	UINT8 last_code;
+	UINT8 key_pressed;
+};
+
+
 
 static ADDRESS_MAP_START(nanos_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
@@ -227,11 +240,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( nanos )
 {
-	FNT = memory_region(machine, "gfx1");
+	nanos_state *state = machine->driver_data<nanos_state>();
+	state->FNT = memory_region(machine, "gfx1");
 }
 
 static VIDEO_UPDATE( nanos )
 {
+	nanos_state *state = screen->machine->driver_data<nanos_state>();
 //  static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -251,7 +266,7 @@ static VIDEO_UPDATE( nanos )
 					chr = messram_get_ptr(screen->machine->device("messram"))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
-					gfx = FNT[(chr<<3) | ra ];
+					gfx = state->FNT[(chr<<3) | ra ];
 				}
 				else
 					gfx = 0;
@@ -272,17 +287,15 @@ static VIDEO_UPDATE( nanos )
 	return 0;
 }
 
-static UINT8 key_command;
-static UINT8 last_code = 0;
-static UINT8 key_pressed;
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
+	nanos_state *state = device->machine->driver_data<nanos_state>();
 	UINT8 retVal;
-	if (key_command==0)  {
-		return key_pressed;
+	if (state->key_command==0)  {
+		return state->key_pressed;
 	} else {
-		retVal = last_code;
-		last_code = 0;
+		retVal = state->last_code;
+		state->last_code = 0;
 		return retVal;
 	}
 }
@@ -295,7 +308,8 @@ static READ8_DEVICE_HANDLER (nanos_port_b_r)
 
 static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
-	key_command = BIT(data,1);
+	nanos_state *state = device->machine->driver_data<nanos_state>();
+	state->key_command = BIT(data,1);
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "maincpu"));
 	} else {
@@ -316,6 +330,7 @@ static UINT8 row_number(UINT8 code) {
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	nanos_state *state = machine->driver_data<nanos_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
 
 	int i;
@@ -323,7 +338,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT8 key_code = 0;
 	UINT8 shift = input_port_read(machine, "LINEC") & 0x02 ? 1 : 0;
 	UINT8 ctrl =  input_port_read(machine, "LINEC") & 0x01 ? 1 : 0;
-	key_pressed = 0xff;
+	state->key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
@@ -389,17 +404,18 @@ static TIMER_CALLBACK(keyboard_callback)
 					case 7: key_code = 0x0A; break; // LF
 				}
 			}
-			last_code = key_code;
+			state->last_code = key_code;
 		}
 	}
 	if (key_code==0){
-		key_pressed = 0xf7;
+		state->key_pressed = 0xf7;
 	}
 }
 
 static MACHINE_START(nanos)
 {
-	key_pressed = 0xff;
+	nanos_state *state = machine->driver_data<nanos_state>();
+	state->key_pressed = 0xff;
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
 
@@ -478,7 +494,7 @@ static GFXDECODE_START( nanos )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nanos, driver_device )
+static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(nanos_mem)

@@ -11,9 +11,20 @@
 #include "video/mc6845.h"
 #include "devices/messram.h"
 
-static UINT8 tvc_video_mode = 0;
-static UINT8 tvc_keyline = 0;
-static UINT8 tvc_flipflop;
+
+class tvc_state : public driver_device
+{
+public:
+	tvc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 video_mode;
+	UINT8 keyline;
+	UINT8 flipflop;
+	UINT8 col[4];
+};
+
+
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
@@ -74,42 +85,47 @@ static WRITE8_HANDLER( tvc_bank_w )
 
 static WRITE8_HANDLER( tvc_video_mode_w )
 {
-	tvc_video_mode = data & 0x03;
+	tvc_state *state = space->machine->driver_data<tvc_state>();
+	state->video_mode = data & 0x03;
 }
 
-static UINT8 col[4];
 
 static WRITE8_HANDLER( tvc_palette_w )
 {
+	tvc_state *state = space->machine->driver_data<tvc_state>();
 	//  0 I 0 R | 0 G 0 B
 	//  0 0 0 0 | I R G B
 	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
 
-	col[offset] = i;
+	state->col[offset] = i;
 }
 
 static WRITE8_HANDLER( tvc_keyboard_w )
 {
-	tvc_keyline = data;
+	tvc_state *state = space->machine->driver_data<tvc_state>();
+	state->keyline = data;
 }
 
 static READ8_HANDLER( tvc_keyboard_r )
 {
+	tvc_state *state = space->machine->driver_data<tvc_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
-	return input_port_read(space->machine, keynames[tvc_keyline & 0x0f]);
+	return input_port_read(space->machine, keynames[state->keyline & 0x0f]);
 }
 
 static READ8_HANDLER( tvc_flipflop_r )
 {
-	return tvc_flipflop;
+	tvc_state *state = space->machine->driver_data<tvc_state>();
+	return state->flipflop;
 }
 
 static WRITE8_HANDLER( tvc_flipflop_w )
 {
-	tvc_flipflop |= 0x10;
+	tvc_state *state = space->machine->driver_data<tvc_state>();
+	state->flipflop |= 0x10;
 }
 static READ8_HANDLER( tvc_port59_r )
 {
@@ -237,19 +253,21 @@ INPUT_PORTS_END
 
 static MACHINE_START(tvc)
 {
+	tvc_state *state = machine->driver_data<tvc_state>();
 	int i;
 
 	for (i=0; i<4; i++)
-		col[i] = i;
+		state->col[i] = i;
 
-	tvc_flipflop = 0xff;
+	state->flipflop = 0xff;
 }
 
 static MACHINE_RESET(tvc)
 {
+	tvc_state *state = machine->driver_data<tvc_state>();
 	memset(messram_get_ptr(machine->device("messram")),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
-	tvc_video_mode = 0;
+	state->video_mode = 0;
 }
 
 static VIDEO_START( tvc )
@@ -265,23 +283,24 @@ static VIDEO_UPDATE( tvc )
 
 static MC6845_UPDATE_ROW( tvc_update_row )
 {
+	tvc_state *state = device->machine->driver_data<tvc_state>();
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	switch(tvc_video_mode) {
+	switch(state->video_mode) {
 		case 0 :
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = col[(data >> 7)]; p++;
-					*p = col[(data >> 6)]; p++;
-					*p = col[(data >> 5)]; p++;
-					*p = col[(data >> 4)]; p++;
-					*p = col[(data >> 3)]; p++;
-					*p = col[(data >> 2)]; p++;
-					*p = col[(data >> 1)]; p++;
-					*p = col[(data >> 0)]; p++;
+					*p = state->col[(data >> 7)]; p++;
+					*p = state->col[(data >> 6)]; p++;
+					*p = state->col[(data >> 5)]; p++;
+					*p = state->col[(data >> 4)]; p++;
+					*p = state->col[(data >> 3)]; p++;
+					*p = state->col[(data >> 2)]; p++;
+					*p = state->col[(data >> 1)]; p++;
+					*p = state->col[(data >> 0)]; p++;
 				}
 				break;
 		case 1 :
@@ -289,14 +308,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = col[BIT(data,7)*2 + BIT(data,3)]; p++;
-					*p = col[BIT(data,7)*2 + BIT(data,3)]; p++;
-					*p = col[BIT(data,6)*2 + BIT(data,2)]; p++;
-					*p = col[BIT(data,6)*2 + BIT(data,2)]; p++;
-					*p = col[BIT(data,5)*2 + BIT(data,1)]; p++;
-					*p = col[BIT(data,5)*2 + BIT(data,1)]; p++;
-					*p = col[BIT(data,4)*2 + BIT(data,0)]; p++;
-					*p = col[BIT(data,4)*2 + BIT(data,0)]; p++;
+					*p = state->col[BIT(data,7)*2 + BIT(data,3)]; p++;
+					*p = state->col[BIT(data,7)*2 + BIT(data,3)]; p++;
+					*p = state->col[BIT(data,6)*2 + BIT(data,2)]; p++;
+					*p = state->col[BIT(data,6)*2 + BIT(data,2)]; p++;
+					*p = state->col[BIT(data,5)*2 + BIT(data,1)]; p++;
+					*p = state->col[BIT(data,5)*2 + BIT(data,1)]; p++;
+					*p = state->col[BIT(data,4)*2 + BIT(data,0)]; p++;
+					*p = state->col[BIT(data,4)*2 + BIT(data,0)]; p++;
 				}
 				break;
 		default:
@@ -304,14 +323,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = col[(data >> 4) & 0xf]; p++;
-					*p = col[(data >> 4) & 0xf]; p++;
-					*p = col[(data >> 4) & 0xf]; p++;
-					*p = col[(data >> 4) & 0xf]; p++;
-					*p = col[(data >> 0) & 0xf]; p++;
-					*p = col[(data >> 0) & 0xf]; p++;
-					*p = col[(data >> 0) & 0xf]; p++;
-					*p = col[(data >> 0) & 0xf]; p++;
+					*p = state->col[(data >> 4) & 0xf]; p++;
+					*p = state->col[(data >> 4) & 0xf]; p++;
+					*p = state->col[(data >> 4) & 0xf]; p++;
+					*p = state->col[(data >> 4) & 0xf]; p++;
+					*p = state->col[(data >> 0) & 0xf]; p++;
+					*p = state->col[(data >> 0) & 0xf]; p++;
+					*p = state->col[(data >> 0) & 0xf]; p++;
+					*p = state->col[(data >> 0) & 0xf]; p++;
 				}
 				break;
 
@@ -361,11 +380,12 @@ static const mc6845_interface tvc_crtc6845_interface =
 
 static INTERRUPT_GEN( tvc_interrupt )
 {
-	tvc_flipflop  &= ~0x10;
+	tvc_state *state = device->machine->driver_data<tvc_state>();
+	state->flipflop  &= ~0x10;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tvc, driver_device )
+static MACHINE_CONFIG_START( tvc, tvc_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3125000)
     MDRV_CPU_PROGRAM_MAP(tvc_mem)

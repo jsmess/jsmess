@@ -15,7 +15,17 @@
 #include "machine/upd7201.h"
 #include "machine/terminal.h"
 
-static UINT16* sun1_ram;
+
+class sun1_state : public driver_device
+{
+public:
+	sun1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* ram;
+};
+
+
 
 // Just hack to show output since upd7201 is not implemented yet
 
@@ -32,7 +42,7 @@ static WRITE16_HANDLER(sun1_upd7201_w)
 
 static ADDRESS_MAP_START(sun1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&sun1_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(sun1_state, ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
@@ -45,9 +55,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(sun1)
 {
+	sun1_state *state = machine->driver_data<sun1_state>();
 	UINT8* user1 = memory_region(machine, "user1");
 
-	memcpy((UINT8*)sun1_ram,user1,0x4000);
+	memcpy((UINT8*)state->ram,user1,0x4000);
 
 	machine->device("maincpu")->reset();
 }
@@ -63,7 +74,7 @@ static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 };
 
 
-static MACHINE_CONFIG_START( sun1, driver_device )
+static MACHINE_CONFIG_START( sun1, sun1_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
     MDRV_CPU_PROGRAM_MAP(sun1_mem)

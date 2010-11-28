@@ -167,18 +167,28 @@ FFFF
 #include "sound/sn76496.h"
 #include "machine/ctronics.h"
 
+
+class tutor_state : public driver_device
+{
+public:
+	tutor_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	char cartridge_enable;
+	char tape_interrupt_enable;
+	emu_timer *tape_interrupt_timer;
+	UINT8 printer_data;
+	char printer_strobe;
+};
+
+
 /* mapper state */
-static char cartridge_enable;
 
 /* tape interface state */
 static TIMER_CALLBACK(tape_interrupt_handler);
 
-static char tape_interrupt_enable;
-static emu_timer *tape_interrupt_timer;
 
 /* parallel interface state */
-static UINT8 printer_data;
-static char printer_strobe;
 
 enum
 {
@@ -189,7 +199,8 @@ enum
 
 static DRIVER_INIT(tutor)
 {
-	tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
+	tutor_state *state = machine->driver_data<tutor_state>();
+	state->tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
 
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + basic_base, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + cartridge_base, 0);
@@ -219,12 +230,13 @@ static MACHINE_START(tutor)
 
 static MACHINE_RESET(tutor)
 {
-	cartridge_enable = 0;
+	tutor_state *state = machine->driver_data<tutor_state>();
+	state->cartridge_enable = 0;
 
-	tape_interrupt_enable = 0;
+	state->tape_interrupt_enable = 0;
 
-	printer_data = 0;
-	printer_strobe = 0;
+	state->printer_data = 0;
+	state->printer_strobe = 0;
 }
 
 static INTERRUPT_GEN( tutor_vblank_interrupt )
@@ -326,6 +338,7 @@ static  READ8_HANDLER(tutor_mapper_r)
 
 static WRITE8_HANDLER(tutor_mapper_w)
 {
+	tutor_state *state = space->machine->driver_data<tutor_state>();
 	switch (offset)
 	{
 	case 0x00:
@@ -334,13 +347,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
-		cartridge_enable = 0;
+		state->cartridge_enable = 0;
 		memory_set_bank(space->machine, "bank1", 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
-		cartridge_enable = 1;
+		state->cartridge_enable = 1;
 		memory_set_bank(space->machine, "bank1", 1);
 		break;
 
@@ -372,7 +385,8 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
-	//assert(tape_interrupt_enable);
+	//tutor_state *state = machine->driver_data<tutor_state>();
+	//assert(state->tape_interrupt_enable);
 	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine->device("cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -385,6 +399,7 @@ static  READ8_HANDLER(tutor_cassette_r)
 /* memory handler */
 static WRITE8_HANDLER(tutor_cassette_w)
 {
+	tutor_state *state = space->machine->driver_data<tutor_state>();
 	if (offset & /*0x1f*/0x1e)
 		logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 
@@ -401,14 +416,14 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		case 1:
 			/* interrupt control??? */
 			//logerror("ignoring write of %d to cassette port 1\n", data);
-			if (tape_interrupt_enable != ! data)
+			if (state->tape_interrupt_enable != ! data)
 			{
-				tape_interrupt_enable = ! data;
-				if (tape_interrupt_enable)
-					timer_adjust_periodic(tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+				state->tape_interrupt_enable = ! data;
+				if (state->tape_interrupt_enable)
+					timer_adjust_periodic(state->tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 				else
 				{
-					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
+					timer_adjust_oneshot(state->tape_interrupt_timer, attotime_never, 0);
 					cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 				}
 			}
@@ -669,7 +684,7 @@ static const struct tms9995reset_param tutor_processor_config =
 	NULL		/* no IDLE callback */
 };
 
-static MACHINE_CONFIG_START( tutor, driver_device )
+static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)

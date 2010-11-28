@@ -14,7 +14,8 @@ DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 
 
-class d65010_state : public driver_device {
+class d65010_state : public driver_device
+{
 public:
 	d65010_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
@@ -34,10 +35,8 @@ public:
 
 	running_device *maincpu;
 	screen_device *screen;
+	UINT8 *ram;
 };
-
-
-static UINT8 *pv1000_ram;
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -47,7 +46,7 @@ static WRITE8_HANDLER( pv1000_gfxram_w );
 
 static ADDRESS_MAP_START( pv1000, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE( &pv1000_ram )
+	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE_MEMBER( d65010_state, ram )
 	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
@@ -220,7 +219,7 @@ static VIDEO_UPDATE( pv1000 )
 	{
 		for ( x = 0; x < 32; x++ )
 		{
-			UINT16 tile = pv1000_ram[ y * 32 + x ];
+			UINT16 tile = state->ram[ y * 32 + x ];
 
 			if ( tile < 0xe0 )
 			{

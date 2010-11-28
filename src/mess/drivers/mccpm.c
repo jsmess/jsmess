@@ -11,8 +11,18 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-static UINT8 *mccpm_ram;
-static UINT8 term_data;
+
+class mccpm_state : public driver_device
+{
+public:
+	mccpm_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+	UINT8 term_data;
+};
+
+
 
 static WRITE8_HANDLER( mccpm_f0_w )
 {
@@ -23,14 +33,15 @@ static WRITE8_HANDLER( mccpm_f0_w )
 
 static READ8_HANDLER( mccpm_f0_r )
 {
-	UINT8 ret = term_data;
-	term_data = 0;
+	mccpm_state *state = space->machine->driver_data<mccpm_state>();
+	UINT8 ret = state->term_data;
+	state->term_data = 0;
 	return ret;
 }
 
 static ADDRESS_MAP_START(mccpm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&mccpm_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(mccpm_state, ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mccpm_io , ADDRESS_SPACE_IO, 8)
@@ -47,14 +58,16 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(mccpm)
 {
+	mccpm_state *state = machine->driver_data<mccpm_state>();
 	UINT8* bios = memory_region(machine, "maincpu");
 
-	memcpy(mccpm_ram,bios, 0x1000);
+	memcpy(state->ram,bios, 0x1000);
 }
 
 static WRITE8_DEVICE_HANDLER( mccpm_kbd_put )
 {
-	term_data = data;
+	mccpm_state *state = device->machine->driver_data<mccpm_state>();
+	state->term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( mccpm_terminal_intf )
@@ -62,7 +75,7 @@ static GENERIC_TERMINAL_INTERFACE( mccpm_terminal_intf )
 	DEVCB_HANDLER(mccpm_kbd_put)
 };
 
-static MACHINE_CONFIG_START( mccpm, driver_device )
+static MACHINE_CONFIG_START( mccpm, mccpm_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(mccpm_mem)

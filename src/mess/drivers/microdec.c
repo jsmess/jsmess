@@ -12,7 +12,17 @@
 #include "devices/flopdrv.h"
 #include "machine/terminal.h"
 
-static UINT8 received_char = 0;
+
+class microdec_state : public driver_device
+{
+public:
+	microdec_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 received_char;
+};
+
+
 
 static WRITE8_HANDLER(microdec_terminal_w)
 {
@@ -22,14 +32,16 @@ static WRITE8_HANDLER(microdec_terminal_w)
 
 static READ8_HANDLER(microdec_terminal_status_r)
 {
-	if (received_char!=0) return 3; // char received
+	microdec_state *state = space->machine->driver_data<microdec_state>();
+	if (state->received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ8_HANDLER(microdec_terminal_r)
 {
-	UINT8 retVal = received_char;
-	received_char = 0;
+	microdec_state *state = space->machine->driver_data<microdec_state>();
+	UINT8 retVal = state->received_char;
+	state->received_char = 0;
 	return retVal;
 }
 
@@ -56,12 +68,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(microdec)
 {
-	received_char = 0;
+	microdec_state *state = machine->driver_data<microdec_state>();
+	state->received_char = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( microdec_kbd_put )
 {
-	received_char = data;
+	microdec_state *state = device->machine->driver_data<microdec_state>();
+	state->received_char = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( microdec_terminal_intf )
@@ -94,7 +108,7 @@ static const floppy_config microdec_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( microdec, driver_device )
+static MACHINE_CONFIG_START( microdec, microdec_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(microdec_mem)

@@ -10,7 +10,17 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
-static UINT16* tricep_ram;
+
+class tricep_state : public driver_device
+{
+public:
+	tricep_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* ram;
+};
+
+
 
 static READ16_HANDLER(tricep_terminal_r)
 {
@@ -25,7 +35,7 @@ static WRITE16_HANDLER(tricep_terminal_w)
 
 static ADDRESS_MAP_START(tricep_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&tricep_ram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(tricep_state, ram)
 	AM_RANGE(0x00fd0000, 0x00fd1fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00ff0028, 0x00ff0029) AM_READWRITE(tricep_terminal_r,tricep_terminal_w)
 ADDRESS_MAP_END
@@ -38,9 +48,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(tricep)
 {
+	tricep_state *state = machine->driver_data<tricep_state>();
 	UINT8* user1 = memory_region(machine, "user1");
 
-	memcpy((UINT8*)tricep_ram,user1,0x2000);
+	memcpy((UINT8*)state->ram,user1,0x2000);
 
 	machine->device("maincpu")->reset();
 }
@@ -54,7 +65,7 @@ static GENERIC_TERMINAL_INTERFACE( tricep_terminal_intf )
 	DEVCB_HANDLER(tricep_kbd_put)
 };
 
-static MACHINE_CONFIG_START( tricep, driver_device )
+static MACHINE_CONFIG_START( tricep, tricep_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(tricep_mem)

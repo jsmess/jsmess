@@ -79,15 +79,27 @@ Notes:
 #include "devices/messram.h"
 #include "devices/cartslot.h"
 
-static UINT8 bank[6];
+
+class prestige_state : public driver_device
+{
+public:
+	prestige_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank[6];
+};
+
+
 
 static READ8_HANDLER( bankswitch_r )
 {
-	return bank[offset];
+	prestige_state *state = space->machine->driver_data<prestige_state>();
+	return state->bank[offset];
 }
 
 static WRITE8_HANDLER( bankswitch_w )
 {
+	prestige_state *state = space->machine->driver_data<prestige_state>();
 	address_space *program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (offset)
@@ -101,7 +113,7 @@ static WRITE8_HANDLER( bankswitch_w )
 		break;
 
 	case 2:
-		if (bank[5] == 0x0c)
+		if (state->bank[5] == 0x0c)
 		{
 			memory_set_bank(space->machine, "bank3", 0x40 + BIT(data, 7));
 		}
@@ -130,7 +142,7 @@ static WRITE8_HANDLER( bankswitch_w )
 		}
 	}
 
-	bank[offset] = data;
+	state->bank[offset] = data;
 }
 
 static ADDRESS_MAP_START(prestige_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -210,7 +222,7 @@ static DEVICE_IMAGE_LOAD( prestige_cart )
 	return IMAGE_INIT_FAIL;
 }
 
-static MACHINE_CONFIG_START( prestige, driver_device )
+static MACHINE_CONFIG_START( prestige, prestige_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(prestige_mem)

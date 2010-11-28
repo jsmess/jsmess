@@ -9,13 +9,23 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static UINT8 *pcm_video_ram;
+
+class pcm_state : public driver_device
+{
+public:
+	pcm_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+};
+
+
 
 static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
     AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-    AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(&pcm_video_ram) // Video RAM
+    AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE_MEMBER(pcm_state, video_ram) // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcm_io , ADDRESS_SPACE_IO, 8)
@@ -35,6 +45,7 @@ static VIDEO_START( pcm )
 
 static VIDEO_UPDATE( pcm )
 {
+	pcm_state *state = screen->machine->driver_data<pcm_state>();
 	UINT8 code;
 	UINT8 line;
 	int y, x, j, b;
@@ -45,7 +56,7 @@ static VIDEO_UPDATE( pcm )
 	{
 		for (x = 0; x < 64; x++)
 		{
-			code = pcm_video_ram[(0x400 + y*64 + x) & 0x7ff];
+			code = state->video_ram[(0x400 + y*64 + x) & 0x7ff];
 			for(j = 0; j < 8; j++ )
 			{
 				line = gfx[code*8 + j];
@@ -60,7 +71,7 @@ static VIDEO_UPDATE( pcm )
 }
 
 
-static MACHINE_CONFIG_START( pcm, driver_device )
+static MACHINE_CONFIG_START( pcm, pcm_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
     MDRV_CPU_PROGRAM_MAP(pcm_mem)

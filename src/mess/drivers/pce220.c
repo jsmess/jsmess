@@ -14,8 +14,20 @@
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
 
-static UINT8 bank_num;
-static UINT16 lcd_index_row,lcd_index_col;
+
+class pce220_state : public driver_device
+{
+public:
+	pce220_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank_num;
+	UINT16 lcd_index_row;
+	UINT16 lcd_index_col;
+	UINT8 lcd_timer;
+};
+
+
 
 static VIDEO_START( pce220 )
 {
@@ -58,33 +70,37 @@ static READ8_HANDLER( lcd_status_r )
 
 static WRITE8_HANDLER( lcd_control_w )
 {
+	pce220_state *state = space->machine->driver_data<pce220_state>();
 	if((data & 0xb8) == 0xb8)
-		lcd_index_row = (data & 0x07);
+		state->lcd_index_row = (data & 0x07);
 	if((data & 0x40) == 0x40)
-		lcd_index_col = (data & 0x3f);
+		state->lcd_index_col = (data & 0x3f);
 }
 
 static WRITE8_HANDLER( lcd_data_w )
 {
+	pce220_state *state = space->machine->driver_data<pce220_state>();
 	UINT8 *vram = memory_region(space->machine, "lcd_vram");
 
-	vram[lcd_index_row*0x40|lcd_index_col] = data;
+	vram[state->lcd_index_row*0x40|state->lcd_index_col] = data;
 
-	gfx_element_mark_dirty(space->machine->gfx[0], (lcd_index_row*0x40|lcd_index_col)/5);
-	lcd_index_col++;
+	gfx_element_mark_dirty(space->machine->gfx[0], (state->lcd_index_row*0x40|state->lcd_index_col)/5);
+	state->lcd_index_col++;
 }
 
 static READ8_HANDLER( rom_bank_r )
 {
-	return bank_num;
+	pce220_state *state = space->machine->driver_data<pce220_state>();
+	return state->bank_num;
 }
 
 static WRITE8_HANDLER( rom_bank_w )
 {
+	pce220_state *state = space->machine->driver_data<pce220_state>();
 	UINT8 bank2 = data & 0x07; // bits 0,1,2
 	UINT8 bank1 = (data & 0x70) >> 4; // bits 4,5,6
 
-	bank_num = data;
+	state->bank_num = data;
 
 	memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "user1") + 0x4000 * bank1);
 	memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + 0x4000 * bank2);
@@ -113,7 +129,6 @@ static READ8_HANDLER( battery_status_r )
 }
 
 /* TODO */
-static UINT8 lcd_timer;
 
 static READ8_HANDLER( timer_lcd_r )
 {
@@ -122,7 +137,8 @@ static READ8_HANDLER( timer_lcd_r )
 
 static WRITE8_HANDLER( timer_lcd_w )
 {
-	lcd_timer = data & 1;
+	pce220_state *state = space->machine->driver_data<pce220_state>();
+	state->lcd_timer = data & 1;
 }
 
 static READ8_HANDLER( port15_r )
@@ -208,7 +224,7 @@ static GFXDECODE_START( pce220 )
 	GFXDECODE_ENTRY( "lcd_vram",   0x00000, test_decode,    0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pce220, driver_device )
+static MACHINE_CONFIG_START( pce220, pce220_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
     MDRV_CPU_PROGRAM_MAP(pce220_mem)

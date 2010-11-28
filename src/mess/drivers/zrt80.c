@@ -11,7 +11,17 @@
 #include "video/mc6845.h"
 #include "machine/ins8250.h"
 
-static UINT8 *video_ram;
+
+class zrt80_state : public driver_device
+{
+public:
+	zrt80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *video_ram;
+};
+
+
 
 static ADDRESS_MAP_START(zrt80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -19,7 +29,7 @@ static ADDRESS_MAP_START(zrt80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
 	AM_RANGE(0x4000, 0x43ff) AM_RAM	// Board RAM
 	// Normaly video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM	 AM_BASE(&video_ram) // Video RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM	 AM_BASE_MEMBER(zrt80_state, video_ram) // Video RAM
 
 ADDRESS_MAP_END
 
@@ -133,13 +143,14 @@ static VIDEO_UPDATE( zrt80 )
 
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
+	zrt80_state *state = device->machine->driver_data<zrt80_state>();
 	UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = video_ram[ma + column] & 0x7f;
+		UINT8 code = state->video_ram[ma + column] & 0x7f;
 		UINT16 addr = code << 4 | (ra & 0x0f);
 		UINT8 data = charrom[addr & 0x7ff];
 
@@ -204,7 +215,7 @@ static GFXDECODE_START( zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( zrt80, driver_device )
+static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(zrt80_mem)

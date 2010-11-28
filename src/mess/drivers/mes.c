@@ -9,8 +9,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static const UINT8 *FNT;
-static const UINT8 *videoram;
+
+class mes_state : public driver_device
+{
+public:
+	mes_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	const UINT8 *FNT;
+	const UINT8 *videoram;
+};
+
+
 
 static ADDRESS_MAP_START(mes_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -32,14 +42,16 @@ static MACHINE_RESET(mes)
 
 static VIDEO_START( mes )
 {
-	FNT = memory_region(machine, "chargen");
-	videoram = memory_region(machine, "maincpu")+0xf000;
+	mes_state *state = machine->driver_data<mes_state>();
+	state->FNT = memory_region(machine, "chargen");
+	state->videoram = memory_region(machine, "maincpu")+0xf000;
 }
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
 static VIDEO_UPDATE( mes )
-{	//static UINT8 framecnt=0;
+{
+	mes_state *state = screen->machine->driver_data<mes_state>();	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;
 
@@ -57,7 +69,7 @@ static VIDEO_UPDATE( mes )
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = videoram[xx++];
+					chr = state->videoram[xx++];
 
 				//	/* Take care of flashing characters */
 				//	if ((chr < 0x80) && (framecnt & 0x08))
@@ -67,7 +79,7 @@ static VIDEO_UPDATE( mes )
 						x--;
 					else
 					{
-						gfx = FNT[(chr<<4) | ra ];
+						gfx = state->FNT[(chr<<4) | ra ];
 
 						/* Display a scanline of a character */
 						*p++ = ( gfx & 0x80 ) ? 1 : 0;
@@ -87,7 +99,7 @@ static VIDEO_UPDATE( mes )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mes, driver_device )
+static MACHINE_CONFIG_START( mes, mes_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(mes_mem)

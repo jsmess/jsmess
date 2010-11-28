@@ -17,7 +17,17 @@
 #include "includes/pk8000.h"
 #include "devices/messram.h"
 
-static UINT8 keyboard_line;
+
+class pk8000_state : public driver_device
+{
+public:
+	pk8000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 keyboard_line;
+};
+
+
 
 static running_device *cassette_device_image(running_machine *machine)
 {
@@ -89,16 +99,18 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 
 static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 {
+	pk8000_state *state = device->machine->driver_data<pk8000_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	if(keyboard_line>9) {
+	if(state->keyboard_line>9) {
 		return 0xff;
 	}
-	return input_port_read(device->machine,keynames[keyboard_line]);
+	return input_port_read(device->machine,keynames[state->keyboard_line]);
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	keyboard_line = data & 0x0f;
+	pk8000_state *state = device->machine->driver_data<pk8000_state>();
+	state->keyboard_line = data & 0x0f;
 
 	speaker_level_w(device->machine->device("speaker"), BIT(data,7));
 
@@ -324,7 +336,7 @@ static const cassette_config pk8000_cassette_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( pk8000, driver_device )
+static MACHINE_CONFIG_START( pk8000, pk8000_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1780000)
     MDRV_CPU_PROGRAM_MAP(pk8000_mem)

@@ -9,11 +9,21 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
-static UINT8* plan80_video_ram;
+
+class plan80_state : public driver_device
+{
+public:
+	plan80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* video_ram;
+};
+
+
 static ADDRESS_MAP_START(plan80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&plan80_video_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(plan80_state, video_ram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -36,6 +46,7 @@ static VIDEO_START( plan80 )
 
 static VIDEO_UPDATE( plan80 )
 {
+	plan80_state *state = screen->machine->driver_data<plan80_state>();
 	UINT8 *gfx = memory_region(screen->machine, "gfx");
 	int x,y,j,b;
 	UINT16 addr;
@@ -45,7 +56,7 @@ static VIDEO_UPDATE( plan80 )
 		addr = y*64;
 		for(x = 0; x < 48; x++ )
 		{
-			UINT8 code = plan80_video_ram[addr + x];
+			UINT8 code = state->video_ram[addr + x];
 			for(j = 0; j < 8; j++ )
 			{
 				UINT8 val = gfx[code*8 + j];
@@ -79,7 +90,7 @@ static GFXDECODE_START( plan80 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( plan80, driver_device )
+static MACHINE_CONFIG_START( plan80, plan80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 2048000)
     MDRV_CPU_PROGRAM_MAP(plan80_mem)

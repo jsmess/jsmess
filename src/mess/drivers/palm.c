@@ -16,10 +16,19 @@
 #include "debugger.h"
 #include "devices/messram.h"
 
+
+class palm_state : public driver_device
+{
+public:
+	palm_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 port_f_latch;
+	UINT16 spim_data;
+};
+
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
-static UINT8 port_f_latch;
-static UINT16 spim_data;
 
 /***************************************************************************
     MACHINE HARDWARE
@@ -49,7 +58,8 @@ static INPUT_CHANGED( button_check )
 
 static WRITE8_DEVICE_HANDLER( palm_port_f_out )
 {
-    port_f_latch = data;
+	palm_state *state = device->machine->driver_data<palm_state>();
+    state->port_f_latch = data;
 }
 
 static READ8_DEVICE_HANDLER( palm_port_c_in )
@@ -59,45 +69,50 @@ static READ8_DEVICE_HANDLER( palm_port_c_in )
 
 static READ8_DEVICE_HANDLER( palm_port_f_in )
 {
-    return port_f_latch;
+	palm_state *state = device->machine->driver_data<palm_state>();
+    return state->port_f_latch;
 }
 
 static WRITE16_DEVICE_HANDLER( palm_spim_out )
 {
-    spim_data = data;
+	palm_state *state = device->machine->driver_data<palm_state>();
+    state->spim_data = data;
 }
 
 static READ16_DEVICE_HANDLER( palm_spim_in )
 {
-    return spim_data;
+	palm_state *state = device->machine->driver_data<palm_state>();
+    return state->spim_data;
 }
 
 static void palm_spim_exchange( running_device *device )
 {
+	palm_state *state = device->machine->driver_data<palm_state>();
     UINT8 x = input_port_read(device->machine, "PENX");
     UINT8 y = input_port_read(device->machine, "PENY");
 
-    switch( port_f_latch & 0x0f )
+    switch( state->port_f_latch & 0x0f )
     {
         case 0x06:
-            spim_data = (0xff - x) * 2;
+            state->spim_data = (0xff - x) * 2;
             break;
 
         case 0x09:
-            spim_data = (0xff - y) * 2;
+            state->spim_data = (0xff - y) * 2;
             break;
     }
 }
 
 static MACHINE_START( palm )
 {
+	palm_state *state = machine->driver_data<palm_state>();
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     memory_install_read_bank (space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
     memory_install_write_bank(space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 
-    state_save_register_global(machine, port_f_latch);
-    state_save_register_global(machine, spim_data);
+    state_save_register_global(machine, state->port_f_latch);
+    state_save_register_global(machine, state->spim_data);
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
 	}
@@ -171,7 +186,7 @@ static const mc68328_interface palm_dragonball_iface =
 };
 
 
-static MACHINE_CONFIG_START( palm, driver_device )
+static MACHINE_CONFIG_START( palm, palm_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */

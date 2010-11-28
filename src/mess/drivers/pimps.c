@@ -10,20 +10,32 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
+
+class pimps_state : public driver_device
+{
+public:
+	pimps_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 received_char;
+};
+
+
 // should be 8251 UART
 
-static UINT8 received_char = 0;
 
 static READ8_HANDLER(pimps_terminal_status_r)
 {
-	if (received_char!=0) return 3; // char received
+	pimps_state *state = space->machine->driver_data<pimps_state>();
+	if (state->received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ8_DEVICE_HANDLER(pimps_terminal_r)
 {
-	UINT8 retVal = received_char;
-	received_char = 0;
+	pimps_state *state = device->machine->driver_data<pimps_state>();
+	UINT8 retVal = state->received_char;
+	state->received_char = 0;
 	return retVal;
 }
 
@@ -47,12 +59,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pimps)
 {
-	received_char = 0;
+	pimps_state *state = machine->driver_data<pimps_state>();
+	state->received_char = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( pimps_kbd_put )
 {
-	received_char = data;
+	pimps_state *state = device->machine->driver_data<pimps_state>();
+	state->received_char = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
@@ -60,7 +74,7 @@ static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
 	DEVCB_HANDLER(pimps_kbd_put)
 };
 
-static MACHINE_CONFIG_START( pimps, driver_device )
+static MACHINE_CONFIG_START( pimps, pimps_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(pimps_mem)

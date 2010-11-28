@@ -34,6 +34,77 @@
 #include "devices/cartslot.h"
 #include "sound/dac.h"
 
+#define MAX_PS_TIMERS	3
+
+typedef struct
+{
+	UINT32 control;
+	UINT32 stat;
+	UINT32 valid;
+	UINT32 wait1;
+	UINT32 wait2;
+	UINT32 entry[16];
+	UINT32 serial;
+} ps_ftlb_regs_t;
+
+typedef struct
+{
+	UINT32 hold;
+	UINT32 status;
+	UINT32 enable;
+	UINT32 mask;
+} ps_intc_regs_t;
+
+typedef struct
+{
+	UINT32 period;
+	UINT32 count;
+	UINT32 control;
+	emu_timer *timer;
+} ps_timer_t;
+
+typedef struct
+{
+	ps_timer_t timer[MAX_PS_TIMERS];
+} ps_timer_regs_t;
+
+typedef struct
+{
+	UINT32 mode;
+	UINT32 control;
+} ps_clock_regs_t;
+
+#define PS_CLOCK_STEADY		0x10
+
+typedef struct
+{
+	UINT32 mode;
+	UINT32 control;
+	UINT32 time;
+	UINT32 date;
+	emu_timer *timer;
+} ps_rtc_regs_t;
+
+
+
+class pockstat_state : public driver_device
+{
+public:
+	pockstat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *lcd_buffer;
+	ps_ftlb_regs_t ftlb_regs;
+	ps_intc_regs_t intc_regs;
+	ps_timer_regs_t timer_regs;
+	ps_clock_regs_t clock_regs;
+	ps_rtc_regs_t rtc_regs;
+	UINT32 lcd_control;
+	INT32 ps_flash_write_enable_count;
+	INT32 ps_flash_write_count;
+};
+
+
 #define DEFAULT_CLOCK	2000000
 
 static const int CPU_FREQ[16] =
@@ -77,7 +148,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 #define verboselog(x,y,z,...)
 #endif
 
-static UINT32 *lcd_buffer;
 
 // Flash TLB
 static READ32_HANDLER( ps_ftlb_r );
@@ -104,25 +174,6 @@ static TIMER_CALLBACK( rtc_tick );
 static READ32_HANDLER( ps_rtc_r );
 static WRITE32_HANDLER( ps_rtc_w );
 
-typedef struct
-{
-	UINT32 control;
-	UINT32 stat;
-	UINT32 valid;
-	UINT32 wait1;
-	UINT32 wait2;
-	UINT32 entry[16];
-	UINT32 serial;
-} ps_ftlb_regs_t;
-
-typedef struct
-{
-	UINT32 hold;
-	UINT32 status;
-	UINT32 enable;
-	UINT32 mask;
-} ps_intc_regs_t;
-
 #define PS_INT_BTN_ACTION		0x00000001 // "Action button"
 #define PS_INT_BTN_RIGHT		0x00000002 // "Right button"
 #define PS_INT_BTN_LEFT			0x00000004 // "Left button"
@@ -141,63 +192,26 @@ typedef struct
 #define PS_INT_FIQ_MASK			0x00002040
 #define PS_INT_STATUS_MASK		0x0000021f
 
-#define MAX_PS_TIMERS	3
-
-typedef struct
-{
-	UINT32 period;
-	UINT32 count;
-	UINT32 control;
-	emu_timer *timer;
-} ps_timer_t;
-
-typedef struct
-{
-	ps_timer_t timer[MAX_PS_TIMERS];
-} ps_timer_regs_t;
-
-typedef struct
-{
-	UINT32 mode;
-	UINT32 control;
-} ps_clock_regs_t;
-
-#define PS_CLOCK_STEADY		0x10
-
-typedef struct
-{
-	UINT32 mode;
-	UINT32 control;
-	UINT32 time;
-	UINT32 date;
-	emu_timer *timer;
-} ps_rtc_regs_t;
-
-static ps_ftlb_regs_t ftlb_regs;
-static ps_intc_regs_t intc_regs;
-static ps_timer_regs_t timer_regs;
-static ps_clock_regs_t clock_regs;
-static ps_rtc_regs_t rtc_regs;
-
 static READ32_HANDLER( ps_ftlb_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Control = %08x & %08x\n", ftlb_regs.control, mem_mask );
-			return ftlb_regs.control | 1; // ???
+			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Control = %08x & %08x\n", state->ftlb_regs.control, mem_mask );
+			return state->ftlb_regs.control | 1; // ???
 		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_STAT) = %08x & %08x\n", ftlb_regs.stat, mem_mask );
-			return ftlb_regs.stat;
+			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_STAT) = %08x & %08x\n", state->ftlb_regs.stat, mem_mask );
+			return state->ftlb_regs.stat;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Valid Tag = %08x & %08x\n", ftlb_regs.valid, mem_mask );
-			return ftlb_regs.valid;
+			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Valid Tag = %08x & %08x\n", state->ftlb_regs.valid, mem_mask );
+			return state->ftlb_regs.valid;
 		case 0x000c/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", ftlb_regs.wait1, mem_mask );
-			return ftlb_regs.wait1;
+			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", state->ftlb_regs.wait1, mem_mask );
+			return state->ftlb_regs.wait1;
 		case 0x0010/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", ftlb_regs.wait2 | 0x04, mem_mask );
-			return ftlb_regs.wait2 | 0x04;
+			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", state->ftlb_regs.wait2 | 0x04, mem_mask );
+			return state->ftlb_regs.wait2 | 0x04;
 		case 0x0100/4:
 		case 0x0104/4:
 		case 0x0108/4:
@@ -214,11 +228,11 @@ static READ32_HANDLER( ps_ftlb_r )
 		case 0x0134/4:
 		case 0x0138/4:
 		case 0x013c/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, ftlb_regs.entry[offset - 0x100/4], mem_mask );
-			return ftlb_regs.entry[offset - 0x100/4];
+			verboselog(space->machine, 0, "ps_ftlb_r: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, state->ftlb_regs.entry[offset - 0x100/4], mem_mask );
+			return state->ftlb_regs.entry[offset - 0x100/4];
 		case 0x0300/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_SN) = %08x & %08x\n", ftlb_regs.serial, mem_mask );
-			return ftlb_regs.serial;
+			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_SN) = %08x & %08x\n", state->ftlb_regs.serial, mem_mask );
+			return state->ftlb_regs.serial;
 		default:
 			verboselog(space->machine, 0, "ps_ftlb_r: Unknown Register %08x & %08x\n", 0x06000000 + (offset << 2), mem_mask );
 			break;
@@ -228,27 +242,28 @@ static READ32_HANDLER( ps_ftlb_r )
 
 static WRITE32_HANDLER( ps_ftlb_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: FlashROM TLB Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.control);
+			COMBINE_DATA(&state->ftlb_regs.control);
 			break;
 		case 0x0004/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown (F_STAT) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.stat);
+			COMBINE_DATA(&state->ftlb_regs.stat);
 			break;
 		case 0x0008/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: FlashROM TLB Valid Tag = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.valid);
+			COMBINE_DATA(&state->ftlb_regs.valid);
 			break;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown (F_WAIT1) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.wait1);
+			COMBINE_DATA(&state->ftlb_regs.wait1);
 			break;
 		case 0x0010/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown (F_WAIT2) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.wait2);
+			COMBINE_DATA(&state->ftlb_regs.wait2);
 			break;
 		case 0x0100/4:
 		case 0x0104/4:
@@ -267,11 +282,11 @@ static WRITE32_HANDLER( ps_ftlb_w )
 		case 0x0138/4:
 		case 0x013c/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.entry[offset - 0x100/4]);
+			COMBINE_DATA(&state->ftlb_regs.entry[offset - 0x100/4]);
 			break;
 		case 0x0300/4:
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown (F_SN) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&ftlb_regs.serial);
+			COMBINE_DATA(&state->ftlb_regs.serial);
 			break;
 		default:
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown Register %08x = %08x & %08x\n", 0x06000000 + (offset << 2), data, mem_mask );
@@ -281,28 +296,30 @@ static WRITE32_HANDLER( ps_ftlb_w )
 
 static UINT32 ps_intc_get_interrupt_line(running_machine *machine, UINT32 line)
 {
-	return intc_regs.status & line;
+	pockstat_state *state = machine->driver_data<pockstat_state>();
+	return state->intc_regs.status & line;
 }
 
 static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, int state)
 {
-	//printf( "%08x %d %08x %08x %08x\n", line, state, intc_regs.hold, intc_regs.status, intc_regs.enable );
+	pockstat_state *drvstate = machine->driver_data<pockstat_state>();
+	//printf( "%08x %d %08x %08x %08x\n", line, state, drvstate->intc_regs.hold, drvstate->intc_regs.status, drvstate->intc_regs.enable );
 	if(line)
 	{
 		if(state)
 		{
-			intc_regs.status |= line & PS_INT_STATUS_MASK;
-			intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
-			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, intc_regs.status, intc_regs.hold );
+			drvstate->intc_regs.status |= line & PS_INT_STATUS_MASK;
+			drvstate->intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
+			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, drvstate->intc_regs.status, drvstate->intc_regs.hold );
 		}
 		else
 		{
-			intc_regs.status &= ~line;
-			intc_regs.hold &= ~line;
-			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, intc_regs.status, intc_regs.hold );
+			drvstate->intc_regs.status &= ~line;
+			drvstate->intc_regs.hold &= ~line;
+			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, drvstate->intc_regs.status, drvstate->intc_regs.hold );
 		}
 	}
-	if(intc_regs.hold & intc_regs.enable & PS_INT_IRQ_MASK)
+	if(drvstate->intc_regs.hold & drvstate->intc_regs.enable & PS_INT_IRQ_MASK)
 	{
 		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
@@ -310,7 +327,7 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 	{
 		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
-	if(intc_regs.hold & intc_regs.enable & PS_INT_FIQ_MASK)
+	if(drvstate->intc_regs.hold & drvstate->intc_regs.enable & PS_INT_FIQ_MASK)
 	{
 		cpu_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
@@ -322,17 +339,18 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 
 static READ32_HANDLER( ps_intc_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_intc_r: Held Interrupt = %08x & %08x\n", intc_regs.hold, mem_mask );
-			return intc_regs.hold;
+			verboselog(space->machine, 0, "ps_intc_r: Held Interrupt = %08x & %08x\n", state->intc_regs.hold, mem_mask );
+			return state->intc_regs.hold;
 		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_intc_r: Interrupt Status = %08x & %08x\n", intc_regs.status, mem_mask );
-			return intc_regs.status;
+			verboselog(space->machine, 0, "ps_intc_r: Interrupt Status = %08x & %08x\n", state->intc_regs.status, mem_mask );
+			return state->intc_regs.status;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", intc_regs.enable, mem_mask );
-			return intc_regs.enable;
+			verboselog(space->machine, 0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", state->intc_regs.enable, mem_mask );
+			return state->intc_regs.enable;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_r: Interrupt Mask (Invalid Read) = %08x & %08x\n", 0, mem_mask );
 			return 0;
@@ -348,6 +366,7 @@ static READ32_HANDLER( ps_intc_r )
 
 static WRITE32_HANDLER( ps_intc_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
@@ -358,26 +377,26 @@ static WRITE32_HANDLER( ps_intc_w )
 			break;
 		case 0x0008/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
-			intc_regs.enable |= data;
-			//COMBINE_DATA(&intc_regs.enable);
-			//intc_regs.status &= intc_regs.enable;
-			//intc_regs.hold &= intc_regs.enable;
+			state->intc_regs.enable |= data;
+			//COMBINE_DATA(&state->intc_regs.enable);
+			//state->intc_regs.status &= state->intc_regs.enable;
+			//state->intc_regs.hold &= state->intc_regs.enable;
 			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
-			intc_regs.enable &= ~data;
-			COMBINE_DATA(&intc_regs.mask);
-			//intc_regs.status &= intc_regs.enable;
-			//intc_regs.hold &= intc_regs.enable;
+			state->intc_regs.enable &= ~data;
+			COMBINE_DATA(&state->intc_regs.mask);
+			//state->intc_regs.status &= state->intc_regs.enable;
+			//state->intc_regs.hold &= state->intc_regs.enable;
 			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x0010/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
-			intc_regs.hold &= ~data;
-			intc_regs.status &= ~data;
+			state->intc_regs.hold &= ~data;
+			state->intc_regs.status &= ~data;
 			ps_intc_set_interrupt_line(space->machine, 0, 0);
-			//COMBINE_DATA(&intc_regs.acknowledge);
+			//COMBINE_DATA(&state->intc_regs.acknowledge);
 			break;
 		default:
 			verboselog(space->machine, 0, "ps_intc_w: Unknown Register %08x = %08x & %08x\n", 0x0a000000 + (offset << 2), data, mem_mask );
@@ -387,17 +406,19 @@ static WRITE32_HANDLER( ps_intc_w )
 
 static TIMER_CALLBACK( timer_tick )
 {
+	pockstat_state *state = machine->driver_data<pockstat_state>();
 	ps_intc_set_interrupt_line(machine, param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
 	//printf( "Timer %d is calling back\n", param );
-	timer_regs.timer[param].count = timer_regs.timer[param].period;
+	state->timer_regs.timer[param].count = state->timer_regs.timer[param].period;
 	ps_timer_start(machine, param);
 }
 
 static void ps_timer_start(running_machine *machine, int index)
 {
+	pockstat_state *state = machine->driver_data<pockstat_state>();
 	int divisor = 1;
 	attotime period;
-	switch(timer_regs.timer[index].control & 3)
+	switch(state->timer_regs.timer[index].control & 3)
 	{
 		case 0:
 		case 3:
@@ -410,39 +431,40 @@ static void ps_timer_start(running_machine *machine, int index)
 			divisor = 256;
 			break;
 	}
-	period = attotime_mul(ATTOTIME_IN_HZ(CPU_FREQ[clock_regs.mode & 0x0f] / 2), divisor);
-	period = attotime_mul(period, timer_regs.timer[index].count);
-	timer_adjust_oneshot(timer_regs.timer[index].timer, period, index);
+	period = attotime_mul(ATTOTIME_IN_HZ(CPU_FREQ[state->clock_regs.mode & 0x0f] / 2), divisor);
+	period = attotime_mul(period, state->timer_regs.timer[index].count);
+	timer_adjust_oneshot(state->timer_regs.timer[index].timer, period, index);
 }
 
 static READ32_HANDLER( ps_timer_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 		case 0x0010/4:
 		case 0x0020/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].period, mem_mask );
-			return timer_regs.timer[offset / (0x10/4)].period;
+			verboselog(space->machine, 0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), state->timer_regs.timer[offset / (0x10/4)].period, mem_mask );
+			return state->timer_regs.timer[offset / (0x10/4)].period;
 		case 0x0004/4:
 		case 0x0014/4:
 		case 0x0024/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].count, mem_mask );
-			if(timer_regs.timer[offset / (0x10/4)].control & 4)
+			verboselog(space->machine, 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), state->timer_regs.timer[offset / (0x10/4)].count, mem_mask );
+			if(state->timer_regs.timer[offset / (0x10/4)].control & 4)
 			{
-				timer_regs.timer[offset / (0x10/4)].count--;
-				if(timer_regs.timer[offset / (0x10/4)].count > timer_regs.timer[offset / (0x10/4)].period)
+				state->timer_regs.timer[offset / (0x10/4)].count--;
+				if(state->timer_regs.timer[offset / (0x10/4)].count > state->timer_regs.timer[offset / (0x10/4)].period)
 				{
-					timer_regs.timer[offset / (0x10/4)].count = timer_regs.timer[offset / (0x10/4)].period;
+					state->timer_regs.timer[offset / (0x10/4)].count = state->timer_regs.timer[offset / (0x10/4)].period;
 				}
-				return --timer_regs.timer[offset / (0x10/4)].count;
+				return --state->timer_regs.timer[offset / (0x10/4)].count;
 			}
-			return timer_regs.timer[offset / (0x10/4)].count;
+			return state->timer_regs.timer[offset / (0x10/4)].count;
 		case 0x0008/4:
 		case 0x0018/4:
 		case 0x0028/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].control, mem_mask );
-			return timer_regs.timer[offset / (0x10/4)].control;
+			verboselog(space->machine, 0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), state->timer_regs.timer[offset / (0x10/4)].control, mem_mask );
+			return state->timer_regs.timer[offset / (0x10/4)].control;
 		default:
 			verboselog(space->machine, 0, "ps_timer_r: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
 			break;
@@ -452,32 +474,33 @@ static READ32_HANDLER( ps_timer_r )
 
 static WRITE32_HANDLER( ps_timer_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 		case 0x0010/4:
 		case 0x0020/4:
 			verboselog(space->machine, 0, "ps_timer_w: Timer %d Period = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].period);
+			COMBINE_DATA(&state->timer_regs.timer[offset / (0x10/4)].period);
 			break;
 		case 0x0004/4:
 		case 0x0014/4:
 		case 0x0024/4:
 			verboselog(space->machine, 0, "ps_timer_w: Timer %d Count = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].count);
+			COMBINE_DATA(&state->timer_regs.timer[offset / (0x10/4)].count);
 			break;
 		case 0x0008/4:
 		case 0x0018/4:
 		case 0x0028/4:
 			verboselog(space->machine, 0, "ps_timer_w: Timer %d Control = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].control);
-			if(timer_regs.timer[offset / (0x10/4)].control & 4)
+			COMBINE_DATA(&state->timer_regs.timer[offset / (0x10/4)].control);
+			if(state->timer_regs.timer[offset / (0x10/4)].control & 4)
 			{
 				ps_timer_start(space->machine, offset / (0x10/4));
 			}
 			else
 			{
-				timer_adjust_oneshot(timer_regs.timer[offset / (0x10/4)].timer, attotime_never, offset / (0x10/4));
+				timer_adjust_oneshot(state->timer_regs.timer[offset / (0x10/4)].timer, attotime_never, offset / (0x10/4));
 			}
 			break;
 		default:
@@ -488,14 +511,15 @@ static WRITE32_HANDLER( ps_timer_w )
 
 static READ32_HANDLER( ps_clock_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_clock_r: Clock Mode = %08x & %08x\n", clock_regs.mode | 0x10, mem_mask );
-			return clock_regs.mode | PS_CLOCK_STEADY;
+			verboselog(space->machine, 0, "ps_clock_r: Clock Mode = %08x & %08x\n", state->clock_regs.mode | 0x10, mem_mask );
+			return state->clock_regs.mode | PS_CLOCK_STEADY;
 		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_clock_r: Clock Control = %08x & %08x\n", clock_regs.control, mem_mask );
-			return clock_regs.control;
+			verboselog(space->machine, 0, "ps_clock_r: Clock Control = %08x & %08x\n", state->clock_regs.control, mem_mask );
+			return state->clock_regs.control;
 		default:
 			verboselog(space->machine, 0, "ps_clock_r: Unknown Register %08x & %08x\n", 0x0b000000 + (offset << 2), mem_mask );
 			break;
@@ -505,16 +529,17 @@ static READ32_HANDLER( ps_clock_r )
 
 static WRITE32_HANDLER( ps_clock_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			verboselog(space->machine, 0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&clock_regs.mode);
-			cputag_set_clock(space->machine, "maincpu", CPU_FREQ[clock_regs.mode & 0x0f]);
+			COMBINE_DATA(&state->clock_regs.mode);
+			cputag_set_clock(space->machine, "maincpu", CPU_FREQ[state->clock_regs.mode & 0x0f]);
 			break;
 		case 0x0004/4:
 			verboselog(space->machine, 0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&clock_regs.control);
+			COMBINE_DATA(&state->clock_regs.control);
 			break;
 		default:
 			verboselog(space->machine, 0, "ps_clock_w: Unknown Register %08x = %08x & %08x\n", 0x0b000000 + (offset << 2), data, mem_mask );
@@ -524,66 +549,68 @@ static WRITE32_HANDLER( ps_clock_w )
 
 static TIMER_CALLBACK( rtc_tick )
 {
+	pockstat_state *state = machine->driver_data<pockstat_state>();
 	//printf( "RTC is calling back\n" );
 	ps_intc_set_interrupt_line(machine, PS_INT_RTC, ps_intc_get_interrupt_line(machine, PS_INT_RTC) ? 0 : 1);
-	if(!(rtc_regs.mode & 1))
+	if(!(state->rtc_regs.mode & 1))
 	{
-		rtc_regs.time++;
-		if((rtc_regs.time & 0x0000000f) == 0x0000000a)
+		state->rtc_regs.time++;
+		if((state->rtc_regs.time & 0x0000000f) == 0x0000000a)
 		{
-			rtc_regs.time &= 0xfffffff0;
-			rtc_regs.time += 0x00000010;
-			if((rtc_regs.time & 0x000000ff) == 0x00000060)
+			state->rtc_regs.time &= 0xfffffff0;
+			state->rtc_regs.time += 0x00000010;
+			if((state->rtc_regs.time & 0x000000ff) == 0x00000060)
 			{
-				rtc_regs.time &= 0xffffff00;
-				rtc_regs.time += 0x00000100;
-				if((rtc_regs.time & 0x00000f00) == 0x00000a00)
+				state->rtc_regs.time &= 0xffffff00;
+				state->rtc_regs.time += 0x00000100;
+				if((state->rtc_regs.time & 0x00000f00) == 0x00000a00)
 				{
-					rtc_regs.time &= 0xfffff0ff;
-					rtc_regs.time += 0x00001000;
-					if((rtc_regs.time & 0x0000ff00) == 0x00006000)
+					state->rtc_regs.time &= 0xfffff0ff;
+					state->rtc_regs.time += 0x00001000;
+					if((state->rtc_regs.time & 0x0000ff00) == 0x00006000)
 					{
-						rtc_regs.time &= 0xffff00ff;
-						rtc_regs.time += 0x00010000;
-						if((rtc_regs.time & 0x00ff0000) == 0x00240000)
+						state->rtc_regs.time &= 0xffff00ff;
+						state->rtc_regs.time += 0x00010000;
+						if((state->rtc_regs.time & 0x00ff0000) == 0x00240000)
 						{
-							rtc_regs.time &= 0xff00ffff;
-							rtc_regs.time += 0x01000000;
-							if((rtc_regs.time & 0x0f000000) == 0x08000000)
+							state->rtc_regs.time &= 0xff00ffff;
+							state->rtc_regs.time += 0x01000000;
+							if((state->rtc_regs.time & 0x0f000000) == 0x08000000)
 							{
-								rtc_regs.time &= 0xf0ffffff;
-								rtc_regs.time |= 0x01000000;
+								state->rtc_regs.time &= 0xf0ffffff;
+								state->rtc_regs.time |= 0x01000000;
 							}
 						}
-						else if((rtc_regs.time & 0x000f0000) == 0x000a0000)
+						else if((state->rtc_regs.time & 0x000f0000) == 0x000a0000)
 						{
-							rtc_regs.time &= 0xfff0ffff;
-							rtc_regs.time += 0x00100000;
+							state->rtc_regs.time &= 0xfff0ffff;
+							state->rtc_regs.time += 0x00100000;
 						}
 					}
 				}
 			}
 		}
 	}
-	timer_adjust_oneshot(rtc_regs.timer, ATTOTIME_IN_HZ(1), 0);
+	timer_adjust_oneshot(state->rtc_regs.timer, ATTOTIME_IN_HZ(1), 0);
 }
 
 static READ32_HANDLER( ps_rtc_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Mode = %08x & %08x\n", rtc_regs.mode, mem_mask );
-			return rtc_regs.mode;
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Mode = %08x & %08x\n", state->rtc_regs.mode, mem_mask );
+			return state->rtc_regs.mode;
 		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Control = %08x & %08x\n", rtc_regs.control, mem_mask );
-			return rtc_regs.control;
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Control = %08x & %08x\n", state->rtc_regs.control, mem_mask );
+			return state->rtc_regs.control;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Time = %08x & %08x\n", rtc_regs.time, mem_mask );
-			return rtc_regs.time;
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Time = %08x & %08x\n", state->rtc_regs.time, mem_mask );
+			return state->rtc_regs.time;
 		case 0x000c/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Date = %08x & %08x\n", rtc_regs.date, mem_mask );
-			return rtc_regs.date;
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Date = %08x & %08x\n", state->rtc_regs.date, mem_mask );
+			return state->rtc_regs.date;
 		default:
 			verboselog(space->machine, 0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
 			break;
@@ -593,107 +620,108 @@ static READ32_HANDLER( ps_rtc_r )
 
 static WRITE32_HANDLER( ps_rtc_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			verboselog(space->machine, 0, "ps_rtc_w: RTC Mode = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&rtc_regs.mode);
+			COMBINE_DATA(&state->rtc_regs.mode);
 			break;
 		case 0x0004/4:
 			verboselog(space->machine, 0, "ps_rtc_w: RTC Control = %08x & %08x\n", data, mem_mask );
-			if(rtc_regs.control == 1 && data == 1)
+			if(state->rtc_regs.control == 1 && data == 1)
 			{
-				switch(rtc_regs.mode >> 1)
+				switch(state->rtc_regs.mode >> 1)
 				{
 					case 0: // Seconds
-						rtc_regs.time += 0x00000001;
-						if((rtc_regs.time & 0x0000000f) == 0x0000000a)
+						state->rtc_regs.time += 0x00000001;
+						if((state->rtc_regs.time & 0x0000000f) == 0x0000000a)
 						{
-							rtc_regs.time &= 0xfffffff0;
-							rtc_regs.time += 0x00000010;
-							if((rtc_regs.time & 0x000000ff) == 0x00000060)
+							state->rtc_regs.time &= 0xfffffff0;
+							state->rtc_regs.time += 0x00000010;
+							if((state->rtc_regs.time & 0x000000ff) == 0x00000060)
 							{
-								rtc_regs.time &= 0xffffff00;
+								state->rtc_regs.time &= 0xffffff00;
 							}
 						}
 						break;
 					case 1: // Minutes
-						rtc_regs.time += 0x00000100;
-						if((rtc_regs.time & 0x00000f00) == 0x00000a00)
+						state->rtc_regs.time += 0x00000100;
+						if((state->rtc_regs.time & 0x00000f00) == 0x00000a00)
 						{
-							rtc_regs.time &= 0xfffff0ff;
-							rtc_regs.time += 0x00001000;
-							if((rtc_regs.time & 0x0000ff00) == 0x00006000)
+							state->rtc_regs.time &= 0xfffff0ff;
+							state->rtc_regs.time += 0x00001000;
+							if((state->rtc_regs.time & 0x0000ff00) == 0x00006000)
 							{
-								rtc_regs.time &= 0xffff00ff;
+								state->rtc_regs.time &= 0xffff00ff;
 							}
 						}
 						break;
 					case 2: // Hours
-						rtc_regs.time += 0x00010000;
-						if((rtc_regs.time & 0x00ff0000) == 0x00240000)
+						state->rtc_regs.time += 0x00010000;
+						if((state->rtc_regs.time & 0x00ff0000) == 0x00240000)
 						{
-							rtc_regs.time &= 0xff00ffff;
+							state->rtc_regs.time &= 0xff00ffff;
 						}
-						else if((rtc_regs.time & 0x000f0000) == 0x000a0000)
+						else if((state->rtc_regs.time & 0x000f0000) == 0x000a0000)
 						{
-							rtc_regs.time &= 0xfff0ffff;
-							rtc_regs.time += 0x00100000;
+							state->rtc_regs.time &= 0xfff0ffff;
+							state->rtc_regs.time += 0x00100000;
 						}
 						break;
 					case 3: // Day of the week
-						rtc_regs.time += 0x01000000;
-						if((rtc_regs.time & 0x0f000000) == 0x08000000)
+						state->rtc_regs.time += 0x01000000;
+						if((state->rtc_regs.time & 0x0f000000) == 0x08000000)
 						{
-							rtc_regs.time &= 0xf0ffffff;
-							rtc_regs.time |= 0x01000000;
+							state->rtc_regs.time &= 0xf0ffffff;
+							state->rtc_regs.time |= 0x01000000;
 						}
 						break;
 					case 4: // Day
-						rtc_regs.date += 0x00000001;
-						if((rtc_regs.date & 0x000000ff) == 0x00000032)
+						state->rtc_regs.date += 0x00000001;
+						if((state->rtc_regs.date & 0x000000ff) == 0x00000032)
 						{
-							rtc_regs.date &= 0xffffff00;
+							state->rtc_regs.date &= 0xffffff00;
 						}
-						else if((rtc_regs.date & 0x0000000f) == 0x0000000a)
+						else if((state->rtc_regs.date & 0x0000000f) == 0x0000000a)
 						{
-							rtc_regs.date &= 0xfffffff0;
-							rtc_regs.date += 0x00000010;
+							state->rtc_regs.date &= 0xfffffff0;
+							state->rtc_regs.date += 0x00000010;
 						}
 						break;
 					case 5: // Month
-						rtc_regs.date += 0x00000100;
-						if((rtc_regs.date & 0x0000ff00) == 0x00001300)
+						state->rtc_regs.date += 0x00000100;
+						if((state->rtc_regs.date & 0x0000ff00) == 0x00001300)
 						{
-							rtc_regs.date &= 0xffffff00;
-							rtc_regs.date |= 0x00000001;
+							state->rtc_regs.date &= 0xffffff00;
+							state->rtc_regs.date |= 0x00000001;
 						}
-						else if((rtc_regs.date & 0x00000f00) == 0x00000a00)
+						else if((state->rtc_regs.date & 0x00000f00) == 0x00000a00)
 						{
-							rtc_regs.date &= 0xfffff0ff;
-							rtc_regs.date += 0x00001000;
+							state->rtc_regs.date &= 0xfffff0ff;
+							state->rtc_regs.date += 0x00001000;
 						}
 						break;
 					case 6: // Year (LSB)
-						rtc_regs.date += 0x00010000;
-						if((rtc_regs.date & 0x000f0000) == 0x000a0000)
+						state->rtc_regs.date += 0x00010000;
+						if((state->rtc_regs.date & 0x000f0000) == 0x000a0000)
 						{
-							rtc_regs.date &= 0xfff0ffff;
-							rtc_regs.date += 0x00100000;
-							if((rtc_regs.date & 0x00f00000) == 0x00a00000)
+							state->rtc_regs.date &= 0xfff0ffff;
+							state->rtc_regs.date += 0x00100000;
+							if((state->rtc_regs.date & 0x00f00000) == 0x00a00000)
 							{
-								rtc_regs.date &= 0xff00ffff;
+								state->rtc_regs.date &= 0xff00ffff;
 							}
 						}
 						break;
 					case 7: // Year (MSB)
 						break;
 				}
-				rtc_regs.control = 0;
+				state->rtc_regs.control = 0;
 			}
-			else if(rtc_regs.control == 0)
+			else if(state->rtc_regs.control == 0)
 			{
-				COMBINE_DATA(&rtc_regs.control);
+				COMBINE_DATA(&state->rtc_regs.control);
 			}
 			break;
 		default:
@@ -702,15 +730,15 @@ static WRITE32_HANDLER( ps_rtc_w )
 	}
 }
 
-static UINT32 lcd_control;
 
 static READ32_HANDLER( ps_lcd_r )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_lcd_r: LCD Control = %08x & %08x\n", lcd_control | 0x100, mem_mask );
-			return lcd_control;
+			verboselog(space->machine, 0, "ps_lcd_r: LCD Control = %08x & %08x\n", state->lcd_control | 0x100, mem_mask );
+			return state->lcd_control;
 		default:
 			verboselog(space->machine, 0, "ps_lcd_r: Unknown Register %08x & %08x\n", 0x0d000000 + (offset << 2), mem_mask );
 			break;
@@ -720,11 +748,12 @@ static READ32_HANDLER( ps_lcd_r )
 
 static WRITE32_HANDLER( ps_lcd_w )
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			verboselog(space->machine, 0, "ps_lcd_w: LCD Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&lcd_control);
+			COMBINE_DATA(&state->lcd_control);
 			break;
 		default:
 			verboselog(space->machine, 0, "ps_lcd_w: Unknown Register %08x = %08x & %08x\n", 0x0d000000 + (offset << 2), data, mem_mask );
@@ -745,13 +774,14 @@ static INPUT_CHANGED( input_update )
 
 static READ32_HANDLER(ps_rombank_r)
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	INT32 bank = (offset >> 11) & 0x0f;
 	int index = 0;
 	for(index = 0; index < 32; index++)
 	{
-		if(ftlb_regs.valid & (1 << index))
+		if(state->ftlb_regs.valid & (1 << index))
 		{
-			if(ftlb_regs.entry[index] == bank)
+			if(state->ftlb_regs.entry[index] == bank)
 			{
 				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
 				return ((UINT32*)memory_region(space->machine, "flash"))[index * (0x2000/4) + (offset & (0x1fff/4))];
@@ -761,31 +791,30 @@ static READ32_HANDLER(ps_rombank_r)
 	return ((UINT32*)memory_region(space->machine, "flash"))[offset & 0x7fff];
 }
 
-static INT32 ps_flash_write_enable_count;
-static INT32 ps_flash_write_count;
 
 // Horrible hack, probably wrong
 static WRITE32_HANDLER(ps_flash_w)
 {
+	pockstat_state *state = space->machine->driver_data<pockstat_state>();
 	if(offset == (0x55a8/4))
 	{
-		ps_flash_write_enable_count++;
+		state->ps_flash_write_enable_count++;
 		return;
 	}
 	if(offset == (0x2a54/4))
 	{
-		ps_flash_write_enable_count++;
+		state->ps_flash_write_enable_count++;
 		return;
 	}
-	if(ps_flash_write_enable_count == 3)
+	if(state->ps_flash_write_enable_count == 3)
 	{
-		ps_flash_write_enable_count = 0;
-		ps_flash_write_count = 0x40;
+		state->ps_flash_write_enable_count = 0;
+		state->ps_flash_write_count = 0x40;
 		return;
 	}
-	if(ps_flash_write_count)
+	if(state->ps_flash_write_count)
 	{
-		ps_flash_write_count--;
+		state->ps_flash_write_count--;
 		COMBINE_DATA(&((UINT32*)memory_region(space->machine, "flash"))[offset]);
 	}
 }
@@ -817,7 +846,7 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x0b000000, 0x0b000007) AM_READWRITE(ps_clock_r, ps_clock_w)
 	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
 	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
-	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE(&lcd_buffer)
+	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE_MEMBER(pockstat_state, lcd_buffer)
 	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
 	AM_RANGE(0x0d800014, 0x0d800017) AM_WRITE(ps_dac_w)
 ADDRESS_MAP_END
@@ -835,63 +864,66 @@ INPUT_PORTS_END
 
 static MACHINE_START( pockstat )
 {
+	pockstat_state *state = machine->driver_data<pockstat_state>();
 	int index = 0;
 	for(index = 0; index < 3; index++)
 	{
-		timer_regs.timer[index].timer = timer_alloc(machine, timer_tick, 0);
-		timer_adjust_oneshot(timer_regs.timer[index].timer, attotime_never, index);
+		state->timer_regs.timer[index].timer = timer_alloc(machine, timer_tick, 0);
+		timer_adjust_oneshot(state->timer_regs.timer[index].timer, attotime_never, index);
 	}
 
-	rtc_regs.time = 0x01000000;
-	rtc_regs.date = 0x19990101;
+	state->rtc_regs.time = 0x01000000;
+	state->rtc_regs.date = 0x19990101;
 
-	rtc_regs.timer = timer_alloc(machine, rtc_tick, 0);
-	timer_adjust_oneshot(rtc_regs.timer, ATTOTIME_IN_HZ(1), index);
+	state->rtc_regs.timer = timer_alloc(machine, rtc_tick, 0);
+	timer_adjust_oneshot(state->rtc_regs.timer, ATTOTIME_IN_HZ(1), index);
 
-	state_save_register_global(machine, ftlb_regs.control);
-	state_save_register_global(machine, ftlb_regs.stat);
-	state_save_register_global(machine, ftlb_regs.valid);
-	state_save_register_global(machine, ftlb_regs.wait1);
-	state_save_register_global(machine, ftlb_regs.wait2);
-	state_save_register_global_array(machine, ftlb_regs.entry);
+	state_save_register_global(machine, state->ftlb_regs.control);
+	state_save_register_global(machine, state->ftlb_regs.stat);
+	state_save_register_global(machine, state->ftlb_regs.valid);
+	state_save_register_global(machine, state->ftlb_regs.wait1);
+	state_save_register_global(machine, state->ftlb_regs.wait2);
+	state_save_register_global_array(machine, state->ftlb_regs.entry);
 
-	state_save_register_global(machine, intc_regs.hold);
-	state_save_register_global(machine, intc_regs.status);
-	state_save_register_global(machine, intc_regs.enable);
-	state_save_register_global(machine, intc_regs.mask);
+	state_save_register_global(machine, state->intc_regs.hold);
+	state_save_register_global(machine, state->intc_regs.status);
+	state_save_register_global(machine, state->intc_regs.enable);
+	state_save_register_global(machine, state->intc_regs.mask);
 
-	state_save_register_global(machine, timer_regs.timer[0].period);
-	state_save_register_global(machine, timer_regs.timer[0].count);
-	state_save_register_global(machine, timer_regs.timer[0].control);
-	state_save_register_global(machine, timer_regs.timer[1].period);
-	state_save_register_global(machine, timer_regs.timer[1].count);
-	state_save_register_global(machine, timer_regs.timer[1].control);
-	state_save_register_global(machine, timer_regs.timer[2].period);
-	state_save_register_global(machine, timer_regs.timer[2].count);
-	state_save_register_global(machine, timer_regs.timer[2].control);
+	state_save_register_global(machine, state->timer_regs.timer[0].period);
+	state_save_register_global(machine, state->timer_regs.timer[0].count);
+	state_save_register_global(machine, state->timer_regs.timer[0].control);
+	state_save_register_global(machine, state->timer_regs.timer[1].period);
+	state_save_register_global(machine, state->timer_regs.timer[1].count);
+	state_save_register_global(machine, state->timer_regs.timer[1].control);
+	state_save_register_global(machine, state->timer_regs.timer[2].period);
+	state_save_register_global(machine, state->timer_regs.timer[2].count);
+	state_save_register_global(machine, state->timer_regs.timer[2].control);
 
-	state_save_register_global(machine, clock_regs.mode);
-	state_save_register_global(machine, clock_regs.control);
+	state_save_register_global(machine, state->clock_regs.mode);
+	state_save_register_global(machine, state->clock_regs.control);
 
-	state_save_register_global(machine, rtc_regs.mode);
-	state_save_register_global(machine, rtc_regs.control);
-	state_save_register_global(machine, rtc_regs.time);
-	state_save_register_global(machine, rtc_regs.date);
+	state_save_register_global(machine, state->rtc_regs.mode);
+	state_save_register_global(machine, state->rtc_regs.control);
+	state_save_register_global(machine, state->rtc_regs.time);
+	state_save_register_global(machine, state->rtc_regs.date);
 
-	state_save_register_global(machine, ps_flash_write_enable_count);
-	state_save_register_global(machine, ps_flash_write_count);
+	state_save_register_global(machine, state->ps_flash_write_enable_count);
+	state_save_register_global(machine, state->ps_flash_write_count);
 }
 
 static MACHINE_RESET( pockstat )
 {
+	pockstat_state *state = machine->driver_data<pockstat_state>();
 	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0x4000000);
 
-	ps_flash_write_enable_count = 0;
-	ps_flash_write_count = 0;
+	state->ps_flash_write_enable_count = 0;
+	state->ps_flash_write_count = 0;
 }
 
 static VIDEO_UPDATE( pockstat )
 {
+	pockstat_state *state = screen->machine->driver_data<pockstat_state>();
 	int x = 0;
 	int y = 0;
 	for(y = 0; y < 32; y++)
@@ -899,9 +931,9 @@ static VIDEO_UPDATE( pockstat )
 		UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 		for(x = 0; x < 32; x++)
 		{
-			if(lcd_control != 0) // Hack
+			if(state->lcd_control != 0) // Hack
 			{
-				if(lcd_buffer[y] & (1 << x))
+				if(state->lcd_buffer[y] & (1 << x))
 				{
 					scanline[x] = 0x00000000;
 				}
@@ -945,7 +977,7 @@ static DEVICE_IMAGE_LOAD( pockstat_flash )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( pockstat, driver_device )
+static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pockstat_mem)

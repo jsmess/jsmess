@@ -38,13 +38,12 @@ public:
 };
 
 
-static UINT8 *scv_vram;
 
 
 static ADDRESS_MAP_START( scv_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE( &scv_vram )	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE_MEMBER(scv_state, vram )	/* VRAM + 4 registers */
 
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE( "upd1771c", upd1771_w )
 
@@ -449,17 +448,17 @@ INLINE void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UIN
 }
 
 
-INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
+INLINE void draw_sprite( scv_state *state, bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
 {
 	int j;
 
 	y += clip_y * 2;
 	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
-		UINT8 pat0 = scv_vram[ tile_idx * 32 + j + 0 ];
-		UINT8 pat1 = scv_vram[ tile_idx * 32 + j + 1 ];
-		UINT8 pat2 = scv_vram[ tile_idx * 32 + j + 2 ];
-		UINT8 pat3 = scv_vram[ tile_idx * 32 + j + 3 ];
+		UINT8 pat0 = state->vram[ tile_idx * 32 + j + 0 ];
+		UINT8 pat1 = state->vram[ tile_idx * 32 + j + 1 ];
+		UINT8 pat2 = state->vram[ tile_idx * 32 + j + 2 ];
+		UINT8 pat3 = state->vram[ tile_idx * 32 + j + 3 ];
 
 		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
 		{
@@ -561,13 +560,14 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 
 static VIDEO_UPDATE( scv )
 {
+	scv_state *state = screen->machine->driver_data<scv_state>();
 	int x, y;
-	UINT8 fg = scv_vram[0x1403] >> 4;
-	UINT8 bg = scv_vram[0x1403] & 0x0f;
-	UINT8 gr_fg = scv_vram[0x1401] >> 4;
-	UINT8 gr_bg = scv_vram[0x1401] & 0x0f;
-	int clip_x = ( scv_vram[0x1402] & 0x0f ) * 2;
-	int clip_y = scv_vram[0x1402] >> 4;
+	UINT8 fg = state->vram[0x1403] >> 4;
+	UINT8 bg = state->vram[0x1403] & 0x0f;
+	UINT8 gr_fg = state->vram[0x1401] >> 4;
+	UINT8 gr_bg = state->vram[0x1401] & 0x0f;
+	int clip_x = ( state->vram[0x1402] & 0x0f ) * 2;
+	int clip_y = state->vram[0x1402] >> 4;
 
 	/* Clear the screen */
 	bitmap_fill( bitmap, cliprect, gr_bg );
@@ -578,19 +578,19 @@ static VIDEO_UPDATE( scv )
 		int text_y = 0;
 
 		if ( y < clip_y )
-			text_y = ( scv_vram[0x1400] & 0x80 ) ? 0 : 1;
+			text_y = ( state->vram[0x1400] & 0x80 ) ? 0 : 1;
 		else
-			text_y = ( scv_vram[0x1400] & 0x80 ) ? 1 : 0;
+			text_y = ( state->vram[0x1400] & 0x80 ) ? 1 : 0;
 
 		for ( x = 0; x < 32; x++ )
 		{
 			int text_x = 0;
-			UINT8 d = scv_vram[ 0x1000 + y * 32 + x ];
+			UINT8 d = state->vram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
-				text_x = ( scv_vram[0x1400] & 0x40 ) ? 0 : 1;
+				text_x = ( state->vram[0x1400] & 0x40 ) ? 0 : 1;
 			else
-				text_x = ( scv_vram[0x1400] & 0x40 ) ? 1 : 0;
+				text_x = ( state->vram[0x1400] & 0x40 ) ? 1 : 0;
 
 			if ( text_x && text_y )
 			{
@@ -600,7 +600,7 @@ static VIDEO_UPDATE( scv )
 			}
 			else
 			{
-				switch ( scv_vram[0x1400] & 0x03 )
+				switch ( state->vram[0x1400] & 0x03 )
 				{
 				case 0x01:		/* Semi graphics mode */
 					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
@@ -624,20 +624,20 @@ static VIDEO_UPDATE( scv )
 	}
 
 	/* Draw sprites if enabled */
-	if ( scv_vram[0x1400] & 0x10 )
+	if ( state->vram[0x1400] & 0x10 )
 	{
 		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = scv_vram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = scv_vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
-			UINT8 clip = scv_vram[ 0x1201 + i * 4 ] >> 4;
-			UINT8 col = scv_vram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = scv_vram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = scv_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
-			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ] & 0x7f;
-			UINT8 half = scv_vram[ 0x1203 + i * 4] & 0x80;
+			UINT8 spr_y = state->vram[ 0x1200 + i * 4 ] & 0xfe;
+			UINT8 y_32 = state->vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 clip = state->vram[ 0x1201 + i * 4 ] >> 4;
+			UINT8 col = state->vram[ 0x1201 + i * 4 ] & 0x0f;
+			UINT8 spr_x = state->vram[ 0x1202 + i * 4 ] & 0xfe;
+			UINT8 x_32 = state->vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 tile_idx = state->vram[ 0x1203 + i * 4 ] & 0x7f;
+			UINT8 half = state->vram[ 0x1203 + i * 4] & 0x80;
 			UINT8 left = 1;
 			UINT8 right = 1;
 			UINT8 top = 1;
@@ -681,33 +681,33 @@ static VIDEO_UPDATE( scv )
 			}
 
 			/* Check if 2 color sprites are enabled */
-			if ( ( scv_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
+			if ( ( state->vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
-				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
+				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 || y_32 )
 				{
 					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
 					static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
-					draw_sprite( bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
 				}
 			}
 			else
 			{
 				/* regular sprite handling */
-				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
+				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 )
 				{
-					draw_sprite( bitmap, spr_x + 16, spr_y, tile_idx + 8, col, 1, 1, top, bottom, clip );
+					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx + 8, col, 1, 1, top, bottom, clip );
 				}
 				if ( y_32 )
 				{
 					clip &= 0x07;
-					draw_sprite( bitmap, spr_x, spr_y + 16, tile_idx + 1, col, left, right, 1, 1, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx + 1, col, left, right, 1, 1, clip );
 					if ( x_32 )
 					{
-						draw_sprite( bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col, 1, 1, 1, 1, clip );
+						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col, 1, 1, 1, 1, clip );
 					}
 				}
 			}

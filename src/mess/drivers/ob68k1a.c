@@ -9,11 +9,21 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
-static UINT16* ob68k1a_ram;
+
+class ob68k1a_state : public driver_device
+{
+public:
+	ob68k1a_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* ram;
+};
+
+
 
 static ADDRESS_MAP_START(ob68k1a_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE(&ob68k1a_ram) // 32 KB RAM up to 128K
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE_MEMBER(ob68k1a_state, ram) // 32 KB RAM up to 128K
 	AM_RANGE(0x00fe0000, 0x00feffff) AM_ROM AM_REGION("user1",0)	
 ADDRESS_MAP_END
 
@@ -23,10 +33,11 @@ INPUT_PORTS_END
 
 
 static MACHINE_RESET(ob68k1a) 
-{	
+{
+	ob68k1a_state *state = machine->driver_data<ob68k1a_state>();	
 	UINT8* user1 = memory_region(machine, "user1");
 
-	memcpy((UINT8*)ob68k1a_ram,user1,0x8000);
+	memcpy((UINT8*)state->ram,user1,0x8000);
 
 	machine->device("maincpu")->reset();
 }
@@ -40,7 +51,7 @@ static VIDEO_UPDATE( ob68k1a )
     return 0;
 }
 
-static MACHINE_CONFIG_START( ob68k1a, driver_device )
+static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_10MHz)
     MDRV_CPU_PROGRAM_MAP(ob68k1a_mem)

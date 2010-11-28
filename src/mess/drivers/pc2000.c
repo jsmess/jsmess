@@ -9,9 +9,19 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static int lcd_vram_index;
-static UINT8 mux_data;
-static UINT8 *wram;
+
+class pc2000_state : public driver_device
+{
+public:
+	pc2000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int lcd_vram_index;
+	UINT8 mux_data;
+	UINT8 *wram;
+};
+
+
 
 static VIDEO_START( pc2000 )
 {
@@ -19,6 +29,7 @@ static VIDEO_START( pc2000 )
 
 static VIDEO_UPDATE( pc2000 )
 {
+	pc2000_state *state = screen->machine->driver_data<pc2000_state>();
 	int x,y;
 	UINT8 *vram = memory_region(screen->machine, "lcd_vram");
 
@@ -32,27 +43,30 @@ static VIDEO_UPDATE( pc2000 )
 		}
 	}
 
-	popmessage("%c %02x",wram[0xce4],wram[0xce4]); //dce4
+	popmessage("%c %02x",state->wram[0xce4],state->wram[0xce4]); //dce4
     return 0;
 }
 
 static WRITE8_HANDLER( lcd_vram_addr_w )
 {
-	lcd_vram_index = data;
+	pc2000_state *state = space->machine->driver_data<pc2000_state>();
+	state->lcd_vram_index = data;
 }
 
 static WRITE8_HANDLER( lcd_vram_data_w )
 {
+	pc2000_state *state = space->machine->driver_data<pc2000_state>();
 	UINT8 *vram = memory_region(space->machine, "lcd_vram");
 
-	vram[lcd_vram_index] = data;
+	vram[state->lcd_vram_index] = data;
 }
 
 
 /* TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values */
 static READ8_HANDLER( key_matrix_10_r )
 {
-	switch(mux_data)
+	pc2000_state *state = space->machine->driver_data<pc2000_state>();
+	switch(state->mux_data)
 	{
 		case 0x01: return input_port_read(space->machine, "IN0");
 		case 0x02: return input_port_read(space->machine, "IN1");
@@ -69,7 +83,8 @@ static READ8_HANDLER( key_matrix_10_r )
 
 static READ8_HANDLER( key_matrix_11_r )
 {
-	switch(mux_data)
+	pc2000_state *state = space->machine->driver_data<pc2000_state>();
+	switch(state->mux_data)
 	{
 		case 0x01: return input_port_read(space->machine, "IN8");
 		case 0x02: return input_port_read(space->machine, "IN9");
@@ -86,7 +101,8 @@ static READ8_HANDLER( key_matrix_11_r )
 
 static WRITE8_HANDLER( key_matrix_w )
 {
-	mux_data = data;
+	pc2000_state *state = space->machine->driver_data<pc2000_state>();
+	state->mux_data = data;
 }
 
 static WRITE8_HANDLER( rombank_w )
@@ -101,7 +117,7 @@ static ADDRESS_MAP_START(pc2000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_READNOP //  0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&wram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(pc2000_state, wram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("bios", 0x10000) //tied with rom bank at I/O 3
 ADDRESS_MAP_END
 
@@ -469,7 +485,7 @@ static GFXDECODE_START( pc2000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pc2000, driver_device )
+static MACHINE_CONFIG_START( pc2000, pc2000_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
     MDRV_CPU_PROGRAM_MAP(pc2000_mem)
