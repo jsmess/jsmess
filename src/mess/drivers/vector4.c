@@ -10,7 +10,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-static UINT8 received_char = 0;
+
+class vector4_state : public driver_device
+{
+public:
+	vector4_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 received_char;
+};
+
+
 
 static WRITE8_HANDLER(vector_terminal_w)
 {
@@ -20,14 +30,16 @@ static WRITE8_HANDLER(vector_terminal_w)
 
 static READ8_HANDLER(vector_terminal_status_r)
 {
-	if (received_char!=0) return 3; // char received
+	vector4_state *state = space->machine->driver_data<vector4_state>();
+	if (state->received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ8_HANDLER(vector_terminal_r)
 {
-	UINT8 retVal = received_char;
-	received_char = 0;
+	vector4_state *state = space->machine->driver_data<vector4_state>();
+	UINT8 retVal = state->received_char;
+	state->received_char = 0;
 	return retVal;
 }
 
@@ -55,13 +67,15 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vector4)
 {
-	received_char = 0;
+	vector4_state *state = machine->driver_data<vector4_state>();
+	state->received_char = 0;
 	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xe000);
 }
 
 static WRITE8_DEVICE_HANDLER( vector4_kbd_put )
 {
-	received_char = data;
+	vector4_state *state = device->machine->driver_data<vector4_state>();
+	state->received_char = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( vector4_terminal_intf )
@@ -70,7 +84,7 @@ static GENERIC_TERMINAL_INTERFACE( vector4_terminal_intf )
 };
 
 
-static MACHINE_CONFIG_START( vector4, driver_device )
+static MACHINE_CONFIG_START( vector4, vector4_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vector4_mem)

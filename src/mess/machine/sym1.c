@@ -23,8 +23,6 @@
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
 
-static UINT8 riot_port_a, riot_port_b;
-static emu_timer *led_update;
 
 
 
@@ -35,58 +33,66 @@ static emu_timer *led_update;
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_0_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 0);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 0);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_1_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 1);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 1);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_2_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 2);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 2);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_3_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 3);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 3);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_4_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 4);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 4);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 {
-	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 5);
+	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 5);
 }
 
 
 static TIMER_CALLBACK( led_refresh )
 {
-	output_set_digit_value(param, riot_port_a);
+	sym1_state *state = machine->driver_data<sym1_state>();
+	output_set_digit_value(param, state->riot_port_a);
 }
 
 
 static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 {
+	sym1_state *state = device->machine->driver_data<sym1_state>();
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(riot_port_a & 0x80)) data &= input_port_read(device->machine, "ROW-0");
-	if (!(riot_port_b & 0x01)) data &= input_port_read(device->machine, "ROW-1");
-	if (!(riot_port_b & 0x02)) data &= input_port_read(device->machine, "ROW-2");
-	if (!(riot_port_b & 0x04)) data &= input_port_read(device->machine, "ROW-3");
+	if (!(state->riot_port_a & 0x80)) data &= input_port_read(device->machine, "ROW-0");
+	if (!(state->riot_port_b & 0x01)) data &= input_port_read(device->machine, "ROW-1");
+	if (!(state->riot_port_b & 0x02)) data &= input_port_read(device->machine, "ROW-2");
+	if (!(state->riot_port_b & 0x04)) data &= input_port_read(device->machine, "ROW-3");
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -95,16 +101,17 @@ static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 
 static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 {
+	sym1_state *state = device->machine->driver_data<sym1_state>();
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
@@ -115,19 +122,21 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
+	sym1_state *state = device->machine->driver_data<sym1_state>();
 	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
 
 	/* save for later use */
-	riot_port_a = data;
+	state->riot_port_a = data;
 }
 
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
+	sym1_state *state = device->machine->driver_data<sym1_state>();
 	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
 
 	/* save for later use */
-	riot_port_b = data;
+	state->riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
 	ttl74145_w(device->machine->device("ttl74145"), 0, data & 0x0f);
@@ -277,6 +286,7 @@ const via6522_interface sym1_via2 =
 
 DRIVER_INIT( sym1 )
 {
+	sym1_state *state = machine->driver_data<sym1_state>();
 	/* wipe expansion memory banks that are not installed */
 	if (messram_get_size(machine->device("messram")) < 4*1024)
 	{
@@ -285,16 +295,17 @@ DRIVER_INIT( sym1 )
 	}
 
 	/* allocate a timer to refresh the led display */
-	led_update = timer_alloc(machine, led_refresh, NULL);
+	state->led_update = timer_alloc(machine, led_refresh, NULL);
 }
 
 
 MACHINE_RESET( sym1 )
 {
+	sym1_state *state = machine->driver_data<sym1_state>();
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
 	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
 	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
-	memory_set_bankptr(machine, "bank1", sym1_monitor + 0x800);
+	memory_set_bankptr(machine, "bank1", state->monitor + 0x800);
 	machine->device("maincpu")->reset();
 }

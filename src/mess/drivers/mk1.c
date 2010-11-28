@@ -45,13 +45,24 @@ TODO:
 #include "machine/f3853.h"
 #include "mk1.lh"
 
+
+class mk1_state : public driver_device
+{
+public:
+	mk1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 f8[2];
+	UINT8 led[4];
+};
+
+
 #define MAIN_CLOCK	1000000
 
-static UINT8 mk1_f8[2];
-static UINT8 mk1_led[4];
 
 static READ8_HANDLER( mk1_f8_r ) {
-    UINT8 data = mk1_f8[offset];
+	mk1_state *state = space->machine->driver_data<mk1_state>();
+    UINT8 data = state->f8[offset];
 
     if ( offset == 0 ) {
 		if ( data & 1 ) data |= input_port_read(space->machine, "LINE1");
@@ -87,13 +98,14 @@ static READ8_HANDLER( mk1_f8_r ) {
 }
 
 static WRITE8_HANDLER( mk1_f8_w ) {
+	mk1_state *state = space->machine->driver_data<mk1_state>();
 	/* 0 is high and allows also input */
-	mk1_f8[offset] = data;
+	state->f8[offset] = data;
 
-	if ( ! ( mk1_f8[1] & 1 ) ) mk1_led[0] = BITSWAP8( mk1_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( mk1_f8[1] & 2 ) ) mk1_led[1] = BITSWAP8( mk1_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( mk1_f8[1] & 4 ) ) mk1_led[2] = BITSWAP8( mk1_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( mk1_f8[1] & 8 ) ) mk1_led[3] = BITSWAP8( mk1_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->f8[1] & 1 ) ) state->led[0] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->f8[1] & 2 ) ) state->led[1] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->f8[1] & 4 ) ) state->led[2] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->f8[1] & 8 ) ) state->led[3] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
 }
 
 static ADDRESS_MAP_START( mk1_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -146,12 +158,13 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( mk1_update_leds )
 {
+	mk1_state *state = machine->driver_data<mk1_state>();
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
-		output_set_digit_value( i, mk1_led[i] >> 1 );
-		output_set_led_value( i, mk1_led[i] & 0x01 );
-		mk1_led[i] = 0;
+		output_set_digit_value( i, state->led[i] >> 1 );
+		output_set_led_value( i, state->led[i] & 0x01 );
+		state->led[i] = 0;
 	}
 }
 
@@ -176,7 +189,7 @@ static const f3853_interface mk1_config =
 };
 
 
-static MACHINE_CONFIG_START( mk1, driver_device )
+static MACHINE_CONFIG_START( mk1, mk1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MDRV_CPU_PROGRAM_MAP( mk1_mem)

@@ -10,6 +10,18 @@
 #include "cpu/i8008/i8008.h"
 #include "k1003.lh"
 
+
+class k1003_state : public driver_device
+{
+public:
+	k1003_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 disp_1;
+	UINT8 disp_2;
+};
+
+
 static ADDRESS_MAP_START(k1003_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000,0x07ff) AM_ROM
 	AM_RANGE(0x0800,0x17ff) AM_RAM
@@ -29,17 +41,17 @@ static READ8_HANDLER (key_r)
 	return 0x00;
 }
 
-static UINT8 disp_1;
-static UINT8 disp_2;
 
 static WRITE8_HANDLER (disp_1_w)
 {
-	disp_1 = data;
+	k1003_state *state = space->machine->driver_data<k1003_state>();
+	state->disp_1 = data;
 }
 
 static WRITE8_HANDLER (disp_2_w)
 {
-	disp_2 = data;
+	k1003_state *state = space->machine->driver_data<k1003_state>();
+	state->disp_2 = data;
 }
 
 static UINT8 bit_to_dec(UINT8 val) {
@@ -55,8 +67,9 @@ static UINT8 bit_to_dec(UINT8 val) {
 }
 static WRITE8_HANDLER (disp_w)
 {
-	output_set_digit_value(bit_to_dec(data)*2,   disp_1);
-	output_set_digit_value(bit_to_dec(data)*2+1, disp_2);
+	k1003_state *state = space->machine->driver_data<k1003_state>();
+	output_set_digit_value(bit_to_dec(data)*2,   state->disp_1);
+	output_set_digit_value(bit_to_dec(data)*2+1, state->disp_2);
 }
 
 static ADDRESS_MAP_START( k1003_io , ADDRESS_SPACE_IO, 8)
@@ -78,7 +91,7 @@ static MACHINE_RESET(k1003)
 {
 }
 
-static MACHINE_CONFIG_START( k1003, driver_device )
+static MACHINE_CONFIG_START( k1003, k1003_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8008, 800000)
     MDRV_CPU_PROGRAM_MAP(k1003_mem)

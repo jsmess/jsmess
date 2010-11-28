@@ -36,11 +36,7 @@
 #include "devices/cassette.h"
 #include "includes/pegasus.h"
 
-static UINT8 pegasus_kbd_row = 0;
-static UINT8 pegasus_kbd_irq;
 UINT8 pegasus_control_bits = 0;
-static running_device *pegasus_cass;
-static UINT8 *FNT;
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
@@ -55,23 +51,26 @@ static WRITE_LINE_DEVICE_HANDLER( pegasus_firq_clr )
 
 static READ8_DEVICE_HANDLER( pegasus_keyboard_r )
 {
+	pegasus_state *state = device->machine->driver_data<pegasus_state>();
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 	UINT8 bit,data = 0xff;
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(pegasus_kbd_row, bit)) data &= input_port_read(device->machine, keynames[bit]);
+		if (!BIT(state->kbd_row, bit)) data &= input_port_read(device->machine, keynames[bit]);
 
-	pegasus_kbd_irq = (data == 0xff) ? 1 : 0;
-	if (pegasus_control_bits & 8) data<<=4;
+	state->kbd_irq = (data == 0xff) ? 1 : 0;
+	if (state->control_bits & 8) data<<=4;
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( pegasus_keyboard_w )
 {
-	pegasus_kbd_row = data;
+	pegasus_state *state = device->machine->driver_data<pegasus_state>();
+	state->kbd_row = data;
 }
 
 static WRITE8_DEVICE_HANDLER( pegasus_controls )
 {
+	pegasus_state *state = device->machine->driver_data<pegasus_state>();
 /*  d0,d2 - not emulated
     d0 - Blank - Video blanking
     d1 - Char - select character rom or ram
@@ -79,36 +78,41 @@ static WRITE8_DEVICE_HANDLER( pegasus_controls )
     d3 - Asc - Select which half of the keyboard to read
 */
 
-	pegasus_control_bits = data;
+	state->control_bits = data;
 }
 
 static READ_LINE_DEVICE_HANDLER( pegasus_keyboard_irq )
 {
-	return pegasus_kbd_irq;
+	pegasus_state *state = device->machine->driver_data<pegasus_state>();
+	return state->kbd_irq;
 }
 
 static READ_LINE_DEVICE_HANDLER( pegasus_cassette_r )
 {
-	return cassette_input(pegasus_cass);
+	pegasus_state *state = device->machine->driver_data<pegasus_state>();
+	return cassette_input(state->cass);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
 {
-	cassette_output(pegasus_cass, state ? 1 : -1);
+	pegasus_state *drvstate = device->machine->driver_data<pegasus_state>();
+	cassette_output(drvstate->cass, state ? 1 : -1);
 }
 
 static READ8_HANDLER( pegasus_pcg_r )
 {
-	UINT8 code = pegasus_video_ram[offset] & 0x7f;
-	return FNT[(code << 4) | (~pegasus_kbd_row & 15)];
+	pegasus_state *state = space->machine->driver_data<pegasus_state>();
+	UINT8 code = state->video_ram[offset] & 0x7f;
+	return state->FNT[(code << 4) | (~state->kbd_row & 15)];
 }
 
 static WRITE8_HANDLER( pegasus_pcg_w )
 {
-//  if (pegasus_control_bits & 2)
+	pegasus_state *state = space->machine->driver_data<pegasus_state>();
+//  if (state->control_bits & 2)
 	{
-		UINT8 code = pegasus_video_ram[offset] & 0x7f;
-		FNT[(code << 4) | (~pegasus_kbd_row & 15)] = data;
+		UINT8 code = state->video_ram[offset] & 0x7f;
+		state->FNT[(code << 4) | (~state->kbd_row & 15)] = data;
 	}
 }
 
@@ -124,7 +128,7 @@ static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE_MEMBER(pegasus_state, video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
@@ -137,7 +141,7 @@ static ADDRESS_MAP_START(pegasusm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE_MEMBER(pegasus_state, video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
@@ -334,15 +338,17 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 
 static MACHINE_START( pegasus )
 {
-	pegasus_cass = machine->device("cassette");
-	FNT = memory_region(machine, "pcg");
+	pegasus_state *state = machine->driver_data<pegasus_state>();
+	state->cass = machine->device("cassette");
+	state->FNT = memory_region(machine, "pcg");
 }
 
 static MACHINE_RESET( pegasus )
 {
-	pegasus_kbd_row = 0;
-	pegasus_kbd_irq = 1;
-	pegasus_control_bits = 0;
+	pegasus_state *state = machine->driver_data<pegasus_state>();
+	state->kbd_row = 0;
+	state->kbd_irq = 1;
+	state->control_bits = 0;
 }
 
 static DRIVER_INIT( pegasus )
@@ -350,7 +356,7 @@ static DRIVER_INIT( pegasus )
 	pegasus_decrypt_rom( machine, 0xf000 );
 }
 
-static MACHINE_CONFIG_START( pegasus, driver_device )
+static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)

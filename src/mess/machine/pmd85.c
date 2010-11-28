@@ -19,29 +19,21 @@
 #include "machine/serial.h"
 #include "devices/messram.h"
 
-static UINT8 pmd85_rom_module_present = 0;
 
-static UINT8 pmd85_ppi_port_outputs[4][3];
 
-static UINT8 pmd85_startup_mem_map = 0;
-static UINT8 pmd853_memory_mapping;
 static void (*pmd85_update_memory)(running_machine *);
-static int previous_level;
-static int clk_level;
-static int clk_level_tape;
 
 enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
 enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 
-static UINT8 pmd85_model;
 
-static emu_timer * pmd85_cassette_timer;
 
 static void pmd851_update_memory(running_machine *machine)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
-	if (pmd85_startup_mem_map)
+	if (state->startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
 
@@ -82,9 +74,10 @@ static void pmd851_update_memory(running_machine *machine)
 
 static void pmd852a_update_memory(running_machine *machine)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
-	if (pmd85_startup_mem_map)
+	if (state->startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
 
@@ -118,7 +111,8 @@ static void pmd852a_update_memory(running_machine *machine)
 
 static void pmd853_update_memory(running_machine *machine)
 {
-	if (pmd85_startup_mem_map)
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	if (state->startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
 
@@ -148,15 +142,16 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr(machine,  "bank5", messram_get_ptr(machine->device("messram")) + 0x8000);
 		memory_set_bankptr(machine,  "bank6", messram_get_ptr(machine->device("messram")) + 0xa000);
 		memory_set_bankptr(machine,  "bank7", messram_get_ptr(machine->device("messram")) + 0xc000);
-		memory_set_bankptr(machine,  "bank8", pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : messram_get_ptr(machine->device("messram")) + 0xe000);
+		memory_set_bankptr(machine,  "bank8", state->pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : messram_get_ptr(machine->device("messram")) + 0xe000);
 	}
 }
 
 static void alfa_update_memory(running_machine *machine)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
-	if (pmd85_startup_mem_map)
+	if (state->startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
 
@@ -186,9 +181,10 @@ static void alfa_update_memory(running_machine *machine)
 
 static void mato_update_memory(running_machine *machine)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
-	if (pmd85_startup_mem_map)
+	if (state->startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
 
@@ -210,10 +206,11 @@ static void mato_update_memory(running_machine *machine)
 
 static void c2717_update_memory(running_machine *machine)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *mem = memory_region(machine, "maincpu");
-	if (pmd85_startup_mem_map)
+	if (state->startup_mem_map)
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
@@ -245,12 +242,13 @@ static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_porta_r )
 
 static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portb_r )
 {
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
 	static const char *const keynames[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};
 
-	return input_port_read(device->machine, keynames[(pmd85_ppi_port_outputs[0][0] & 0x0f)]) & input_port_read(device->machine, "KEY15");
+	return input_port_read(device->machine, keynames[(state->ppi_port_outputs[0][0] & 0x0f)]) & input_port_read(device->machine, "KEY15");
 }
 
 static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
@@ -260,17 +258,20 @@ static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_porta_w )
 {
-	pmd85_ppi_port_outputs[0][0] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[0][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portb_w )
 {
-	pmd85_ppi_port_outputs[0][1] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[0][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 {
-	pmd85_ppi_port_outputs[0][2] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[0][2] = data;
 	set_led_status(device->machine, PMD85_LED_2, (data & 0x08) ? 1 : 0);
 	set_led_status(device->machine, PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
@@ -285,13 +286,14 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 
 static  READ8_DEVICE_HANDLER ( mato_ppi_0_portb_r )
 {
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
 	int i;
 	UINT8 data = 0xff;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!BIT(pmd85_ppi_port_outputs[0][0], i))
+		if (!BIT(state->ppi_port_outputs[0][0], i))
 			data &= input_port_read(device->machine, keynames[i]);
 	}
 	return data;
@@ -304,7 +306,8 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 {
-	pmd85_ppi_port_outputs[0][2] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[0][2] = data;
 	set_led_status(device->machine, PMD85_LED_2, BIT(data, 3));
 	set_led_status(device->machine, PMD85_LED_3, BIT(data, 2));
 }
@@ -334,17 +337,20 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_1_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_porta_w )
 {
-	pmd85_ppi_port_outputs[1][0] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[1][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portb_w )
 {
-	pmd85_ppi_port_outputs[1][1] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[1][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portc_w )
 {
-	pmd85_ppi_port_outputs[1][2] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[1][2] = data;
 }
 
 /*******************************************************************************
@@ -376,17 +382,20 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_2_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_porta_w )
 {
-	pmd85_ppi_port_outputs[2][0] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[2][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portb_w )
 {
-	pmd85_ppi_port_outputs[2][1] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[2][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
 {
-	pmd85_ppi_port_outputs[2][2] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[2][2] = data;
 }
 
 /*******************************************************************************
@@ -446,8 +455,9 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
 	if (memory_region(device->machine, "user1") != NULL)
-		return memory_region(device->machine, "user1")[pmd85_ppi_port_outputs[3][1] | (pmd85_ppi_port_outputs[3][2] << 8)];
+		return memory_region(device->machine, "user1")[state->ppi_port_outputs[3][1] | (state->ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
 }
@@ -464,17 +474,20 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_3_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_porta_w )
 {
-	pmd85_ppi_port_outputs[3][0] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[3][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portb_w )
 {
-	pmd85_ppi_port_outputs[3][1] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[3][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 {
-	pmd85_ppi_port_outputs[3][2] = data;
+	pmd85_state *state = device->machine->driver_data<pmd85_state>();
+	state->ppi_port_outputs[3][2] = data;
 }
 
 /*******************************************************************************
@@ -502,7 +515,8 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 
 READ8_HANDLER ( pmd85_io_r )
 {
-	if (pmd85_startup_mem_map)
+	pmd85_state *state = space->machine->driver_data<pmd85_state>();
+	if (state->startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -517,14 +531,14 @@ READ8_HANDLER ( pmd85_io_r )
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (pmd85_model)
+				switch (state->model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (pmd85_rom_module_present)
+						if (state->rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
@@ -568,9 +582,10 @@ READ8_HANDLER ( pmd85_io_r )
 
 WRITE8_HANDLER ( pmd85_io_w )
 {
-	if (pmd85_startup_mem_map)
+	pmd85_state *state = space->machine->driver_data<pmd85_state>();
+	if (state->startup_mem_map)
 	{
-		pmd85_startup_mem_map = 0;
+		state->startup_mem_map = 0;
 		(*pmd85_update_memory)(space->machine);
 	}
 
@@ -584,21 +599,21 @@ WRITE8_HANDLER ( pmd85_io_w )
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
-								pmd853_memory_mapping = data & 0x01;
+								state->pmd853_memory_mapping = data & 0x01;
 								(*pmd85_update_memory)(space->machine);
 							}
 							break;
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (pmd85_model)
+				switch (state->model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (pmd85_rom_module_present)
+						if (state->rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
@@ -654,7 +669,8 @@ WRITE8_HANDLER ( pmd85_io_w )
 
  READ8_HANDLER ( mato_io_r )
 {
-	if (pmd85_startup_mem_map)
+	pmd85_state *state = space->machine->driver_data<pmd85_state>();
+	if (state->startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -676,9 +692,10 @@ WRITE8_HANDLER ( pmd85_io_w )
 
 WRITE8_HANDLER ( mato_io_w )
 {
-	if (pmd85_startup_mem_map)
+	pmd85_state *state = space->machine->driver_data<pmd85_state>();
+	if (state->startup_mem_map)
 	{
-		pmd85_startup_mem_map = 0;
+		state->startup_mem_map = 0;
 		(*pmd85_update_memory)(space->machine);
 	}
 
@@ -778,6 +795,7 @@ static void pmd85_cassette_write(running_machine *machine, int id, unsigned long
 
 static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	int data;
 	int current_level;
 
@@ -786,27 +804,27 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		/* tape reading */
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_PLAY)
 		{
-			switch (pmd85_model)
+			switch (state->model)
 			{
 				case PMD85_1:
-					if (clk_level_tape)
+					if (state->clk_level_tape)
 					{
-						previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
-						clk_level_tape = 0;
+						state->previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
+						state->clk_level_tape = 0;
 					}
 					else
 					{
 						current_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 
-						if (previous_level!=current_level)
+						if (state->previous_level!=current_level)
 						{
-							data = (!previous_level && current_level) ? 1 : 0;
+							data = (!state->previous_level && current_level) ? 1 : 0;
 
 							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
 							serial_connection_out(machine, &pmd85_cassette_serial_connection);
 							msm8251_receive_clock(machine->device("uart"));
 
-							clk_level_tape = 1;
+							state->clk_level_tape = 1;
 						}
 					}
 					return;
@@ -824,22 +842,22 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(pmd85_cassette_serial_connection.input_state);
-			data ^= clk_level_tape;
+			data ^= state->clk_level_tape;
 			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
-			if (!clk_level_tape)
+			if (!state->clk_level_tape)
 				msm8251_transmit_clock(machine->device("uart"));
 
-			clk_level_tape = clk_level_tape ? 0 : 1;
+			state->clk_level_tape = state->clk_level_tape ? 0 : 1;
 
 			return;
 		}
 
-		clk_level_tape = 1;
+		state->clk_level_tape = 1;
 
-		if (!clk_level)
+		if (!state->clk_level)
 			msm8251_transmit_clock(machine->device("uart"));
-		clk_level = clk_level ? 0 : 1;
+		state->clk_level = state->clk_level ? 0 : 1;
 	}
 }
 
@@ -857,10 +875,11 @@ DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
-	previous_level = 0;
-	clk_level = clk_level_tape = 1;
-	pmd85_cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
-	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->previous_level = 0;
+	state->clk_level = state->clk_level_tape = 1;
+	state->cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
+	timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
 	serial_connection_init(machine, &pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &pmd85_cassette_serial_connection, pmd85_cassette_write);
@@ -868,48 +887,55 @@ static void pmd85_common_driver_init (running_machine *machine)
 
 DRIVER_INIT ( pmd851 )
 {
-	pmd85_model = PMD85_1;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = PMD85_1;
 	pmd85_update_memory = pmd851_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( pmd852a )
 {
-	pmd85_model = PMD85_2A;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = PMD85_2A;
 	pmd85_update_memory = pmd852a_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( pmd853 )
 {
-	pmd85_model = PMD85_3;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = PMD85_3;
 	pmd85_update_memory = pmd853_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( alfa )
 {
-	pmd85_model = ALFA;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = ALFA;
 	pmd85_update_memory = alfa_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
 DRIVER_INIT ( mato )
 {
-	pmd85_model = MATO;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = MATO;
 	pmd85_update_memory = mato_update_memory;
 }
 
 DRIVER_INIT ( c2717 )
 {
-	pmd85_model = C2717;
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	state->model = C2717;
 	pmd85_update_memory = c2717_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	if (pmd85_model != MATO)
+	pmd85_state *state = machine->driver_data<pmd85_state>();
+	if (state->model != MATO)
 	{
 		msm8251_connect(machine->device("uart"), &pmd85_cassette_serial_connection);
 	}
@@ -918,16 +944,17 @@ static TIMER_CALLBACK( setup_machine_state )
 
 MACHINE_RESET( pmd85 )
 {
+	pmd85_state *state = machine->driver_data<pmd85_state>();
 	int i, j;
 
 	/* checking for Rom Module */
-	switch (pmd85_model)
+	switch (state->model)
 	{
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
 		case C2717:
-			pmd85_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
+			state->rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:
@@ -936,12 +963,12 @@ MACHINE_RESET( pmd85 )
 
 	for (i = 0; i < 4; i++)
 		for (j = 0; j < 3; j++)
-			pmd85_ppi_port_outputs[i][j] = 0;
+			state->ppi_port_outputs[i][j] = 0;
 
 	/* memory initialization */
 	memset(messram_get_ptr(machine->device("messram")), 0, sizeof(unsigned char)*0x10000);
-	pmd853_memory_mapping = 1;
-	pmd85_startup_mem_map = 1;
+	state->pmd853_memory_mapping = 1;
+	state->startup_mem_map = 1;
 	pmd85_update_memory(machine);
 
 	timer_set(machine, attotime_zero, NULL, 0, setup_machine_state);

@@ -20,10 +20,26 @@
 #define SYM1_CLOCK  XTAL_1MHz
 
 
+class sym1_state : public driver_device
+{
+public:
+	sym1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram_1k;
+	UINT8 *ram_2k;
+	UINT8 *ram_3k;
+	UINT8 *riot_ram;
+	UINT8 *monitor;
+	UINT8 riot_port_a;
+	UINT8 riot_port_b;
+	emu_timer *led_update;
+};
+
+
 /*----------- defined in drivers/sym1.c -----------*/
 
 /* Pointer to the monitor ROM, which includes the reset vectors for the CPU */
-extern UINT8 *sym1_monitor;
 
 
 /*----------- defined in machine/sym1.c -----------*/

@@ -15,11 +15,21 @@
 #include "machine/msm8251.h"
 #include "machine/terminal.h"
 
-static UINT16* sage2_ram;
+
+class sage2_state : public driver_device
+{
+public:
+	sage2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* ram;
+};
+
+
 
 static ADDRESS_MAP_START(sage2_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&sage2_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(sage2_state, ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00fe0000, 0x00feffff) AM_ROM AM_REGION("user1",0)
 //  AM_RANGE(0x00ffc070, 0x00ffc071 ) AM_DEVREADWRITE8("uart", msm8251_data_r,msm8251_data_w, 0xffff)
 //  AM_RANGE(0x00ffc072, 0x00ffc073 ) AM_DEVREADWRITE8("uart", msm8251_status_r,msm8251_control_w, 0xffff)
@@ -33,9 +43,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(sage2)
 {
+	sage2_state *state = machine->driver_data<sage2_state>();
 	UINT8* user1 = memory_region(machine, "user1");
 
-	memcpy((UINT8*)sage2_ram,user1,0x2000);
+	memcpy((UINT8*)state->ram,user1,0x2000);
 
 	machine->device("maincpu")->reset();
 }
@@ -49,7 +60,7 @@ static GENERIC_TERMINAL_INTERFACE( sage2_terminal_intf )
 	DEVCB_HANDLER(sage2_kbd_put)
 };
 
-static MACHINE_CONFIG_START( sage2, driver_device )
+static MACHINE_CONFIG_START( sage2, sage2_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(sage2_mem)

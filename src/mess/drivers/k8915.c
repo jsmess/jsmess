@@ -9,11 +9,21 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static UINT8 *k8915_ram;
+
+class k8915_state : public driver_device
+{
+public:
+	k8915_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+};
+
+
 
 static ADDRESS_MAP_START(k8915_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&k8915_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(k8915_state, ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( k8915_io, ADDRESS_SPACE_IO, 8 )
@@ -26,8 +36,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(k8915)
 {
+	k8915_state *state = machine->driver_data<k8915_state>();
 	UINT8* bios = memory_region(machine, "maincpu");
-	memcpy(k8915_ram,bios, 0x1000);
+	memcpy(state->ram,bios, 0x1000);
 }
 
 static VIDEO_START( k8915 )
@@ -39,7 +50,7 @@ static VIDEO_UPDATE( k8915 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( k8915, driver_device )
+static MACHINE_CONFIG_START( k8915, k8915_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
     MDRV_CPU_PROGRAM_MAP(k8915_mem)

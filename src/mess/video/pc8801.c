@@ -14,20 +14,7 @@
 /* NPW 23-Oct-2001 - Adding this so that it compiles */
 #define palette_transparent_pen	0
 
-unsigned char *pc88sr_textRAM = NULL;
-int pc8801_is_24KHz;
-static unsigned char *gVRAM = NULL;
-static int selected_vram;
-static int crtc_on, text_on, text_width, text_height, text_invert, text_color;
-static int text_cursor, text_cursorX, text_cursorY;
-static int blink_period;
-static int analog_palette;
-static int alu_1, alu_2, alu_on;
-static unsigned char alu_save0, alu_save1, alu_save2;
 
-static int dmac_fl;
-static UINT16 dmac_addr[3], dmac_size[3];
-static UINT8 dmac_flag, dmac_status;
 
 enum
 {
@@ -36,7 +23,6 @@ enum
 	noblink_block,
 	blink_block
 };
-static int cursor_mode;
 
 enum
 {
@@ -51,7 +37,6 @@ enum
 	lpeny,
 	other
 };
-static int crtc_state;
 
 enum
 {
@@ -60,9 +45,7 @@ enum
 	GRAPH_200_BW,
 	GRAPH_400_BW
 };
-static int gmode;
 
-static int disp_plane[3];
 
 #define TX_SEC		0x0001
 #define TX_BL		0x0002
@@ -79,17 +62,14 @@ static int disp_plane[3];
 #define TX_WID_MASK	0x0300
 #define TX_WID_SHIFT	8
 
-static char *graph_dirty = NULL;
-static unsigned short *attr_tmp = NULL, *attr_old = NULL, *text_old = NULL;
-static bitmap_t *wbm1, *wbm2;
 
-#define TRAM(x,y) (pc88sr_is_highspeed ? \
-	pc88sr_textRAM[(dmac_addr[2]+(x)+(y)*120)&0xfff] : \
-	pc8801_mainRAM[(dmac_addr[2]+(x)+(y)*120)&0xffff])
-#define ATTR_TMP(x,y) (attr_tmp[(x)+(y)*80])
-#define TEXT_OLD(x,y) (text_old[(x)+(y)*80])
-#define ATTR_OLD(x,y) (attr_old[(x)+(y)*80])
-#define GRP_DIRTY(x,y) (graph_dirty[(x)+(y)*80])
+#define TRAM(x,y) (state->pc88sr_is_highspeed ? \
+	state->pc88sr_textRAM[(state->dmac_addr[2]+(x)+(y)*120)&0xfff] : \
+	state->mainRAM[(state->dmac_addr[2]+(x)+(y)*120)&0xffff])
+#define ATTR_TMP(x,y) (state->attr_tmp[(x)+(y)*80])
+#define TEXT_OLD(x,y) (state->text_old[(x)+(y)*80])
+#define ATTR_OLD(x,y) (state->attr_old[(x)+(y)*80])
+#define GRP_DIRTY(x,y) (state->graph_dirty[(x)+(y)*80])
 
 INLINE void pc8801_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color )
 {
@@ -98,44 +78,46 @@ INLINE void pc8801_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color )
 
 void pc8801_video_init( running_machine *machine, int hireso )
 {
+	pc88_state *state = machine->driver_data<pc88_state>();
 	screen_device *screen = screen_first(*machine);
 	int width = screen->width();
 	int height = screen->height();
 
-	wbm1 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	wbm2 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	pc8801_is_24KHz = hireso;
-	crtc_on = 0;
-	text_on = 1;
+	state->wbm1 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->wbm2 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->is_24KHz = hireso;
+	state->crtc_on = 0;
+	state->text_on = 1;
 
-	dmac_fl = 0;
-	dmac_addr[0] = dmac_size[0] = 0;
-	dmac_addr[1] = dmac_size[1] = 0;
-	dmac_addr[2] = dmac_size[2] = 0;
-	dmac_flag = dmac_status = 0;
+	state->dmac_fl = 0;
+	state->dmac_addr[0] = state->dmac_size[0] = 0;
+	state->dmac_addr[1] = state->dmac_size[1] = 0;
+	state->dmac_addr[2] = state->dmac_size[2] = 0;
+	state->dmac_flag = state->dmac_status = 0;
 
-	gVRAM = auto_alloc_array(machine, UINT8, 0xc000);
-	pc88sr_textRAM = auto_alloc_array(machine, UINT8, 0x1000);
-	attr_tmp = auto_alloc_array(machine, UINT16, 80*25);
-	attr_old = auto_alloc_array(machine, UINT16, 80*100);
-	text_old = auto_alloc_array(machine, UINT16, 80*100);
-	graph_dirty = auto_alloc_array(machine, char, 80*100);
+	state->gVRAM = auto_alloc_array(machine, UINT8, 0xc000);
+	state->pc88sr_textRAM = auto_alloc_array(machine, UINT8, 0x1000);
+	state->attr_tmp = auto_alloc_array(machine, UINT16, 80*25);
+	state->attr_old = auto_alloc_array(machine, UINT16, 80*100);
+	state->text_old = auto_alloc_array(machine, UINT16, 80*100);
+	state->graph_dirty = auto_alloc_array(machine, char, 80*100);
 
-	memset(gVRAM, 0, 0xc000);
-	memset(pc88sr_textRAM, 0, 0x1000);
-	selected_vram = 0;
-	alu_on = 0;
-	analog_palette = 0;
+	memset(state->gVRAM, 0, 0xc000);
+	memset(state->pc88sr_textRAM, 0, 0x1000);
+	state->selected_vram = 0;
+	state->alu_on = 0;
+	state->analog_palette = 0;
 }
 
 static WRITE8_HANDLER( write_gvram )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	int x, y;
 
-	if (gVRAM[offset] != data)
+	if (state->gVRAM[offset] != data)
 	{
-		gVRAM[offset] = data;
-		switch (gmode)
+		state->gVRAM[offset] = data;
+		switch (state->gmode)
 		{
 		case GRAPH_200_COL:
 		case GRAPH_200_BW:
@@ -164,77 +146,79 @@ static WRITE8_HANDLER(write_gvram2_bank5){write_gvram(space, offset + 0x4000 * 2
 static WRITE8_HANDLER(write_gvram2_bank6){write_gvram(space, offset + 0x4000 * 2 + 0x3000, data);}
 
 
-static UINT8 read_save_alu( int x, UINT32 offset )
+static UINT8 read_save_alu( address_space *space, int x, UINT32 offset )
 {
-	alu_save0 = gVRAM[offset + 0x0000];
-	alu_save1 = gVRAM[offset + 0x4000];
-	alu_save2 = gVRAM[offset + 0x8000];
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	state->alu_save0 = state->gVRAM[offset + 0x0000];
+	state->alu_save1 = state->gVRAM[offset + 0x4000];
+	state->alu_save2 = state->gVRAM[offset + 0x8000];
 
-	return (x & 1 ? gVRAM[offset + 0x0000] : ~gVRAM[offset + 0x0000]) &
-			(x & 2 ? gVRAM[offset + 0x4000] : ~gVRAM[offset + 0x4000]) &
-			(x & 4 ? gVRAM[offset + 0x8000] : ~gVRAM[offset + 0x8000]);
+	return (x & 1 ? state->gVRAM[offset + 0x0000] : ~state->gVRAM[offset + 0x0000]) &
+			(x & 2 ? state->gVRAM[offset + 0x4000] : ~state->gVRAM[offset + 0x4000]) &
+			(x & 4 ? state->gVRAM[offset + 0x8000] : ~state->gVRAM[offset + 0x8000]);
 }
 
-static READ8_HANDLER(read_gvram_alu0_bank5){return read_save_alu(0, offset);}
-static READ8_HANDLER(read_gvram_alu0_bank6){return read_save_alu(0, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu1_bank5){return read_save_alu(1, offset);}
-static READ8_HANDLER(read_gvram_alu1_bank6){return read_save_alu(1, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu2_bank5){return read_save_alu(2, offset);}
-static READ8_HANDLER(read_gvram_alu2_bank6){return read_save_alu(2, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu3_bank5){return read_save_alu(3, offset);}
-static READ8_HANDLER(read_gvram_alu3_bank6){return read_save_alu(3, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu4_bank5){return read_save_alu(4, offset);}
-static READ8_HANDLER(read_gvram_alu4_bank6){return read_save_alu(4, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu5_bank5){return read_save_alu(5, offset);}
-static READ8_HANDLER(read_gvram_alu5_bank6){return read_save_alu(5, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu6_bank5){return read_save_alu(6, offset);}
-static READ8_HANDLER(read_gvram_alu6_bank6){return read_save_alu(6, offset + 0x3000);}
-static READ8_HANDLER(read_gvram_alu7_bank5){return read_save_alu(7, offset);}
-static READ8_HANDLER(read_gvram_alu7_bank6){return read_save_alu(7, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu0_bank5){return read_save_alu(space, 0, offset);}
+static READ8_HANDLER(read_gvram_alu0_bank6){return read_save_alu(space, 0, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu1_bank5){return read_save_alu(space, 1, offset);}
+static READ8_HANDLER(read_gvram_alu1_bank6){return read_save_alu(space, 1, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu2_bank5){return read_save_alu(space, 2, offset);}
+static READ8_HANDLER(read_gvram_alu2_bank6){return read_save_alu(space, 2, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu3_bank5){return read_save_alu(space, 3, offset);}
+static READ8_HANDLER(read_gvram_alu3_bank6){return read_save_alu(space, 3, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu4_bank5){return read_save_alu(space, 4, offset);}
+static READ8_HANDLER(read_gvram_alu4_bank6){return read_save_alu(space, 4, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu5_bank5){return read_save_alu(space, 5, offset);}
+static READ8_HANDLER(read_gvram_alu5_bank6){return read_save_alu(space, 5, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu6_bank5){return read_save_alu(space, 6, offset);}
+static READ8_HANDLER(read_gvram_alu6_bank6){return read_save_alu(space, 6, offset + 0x3000);}
+static READ8_HANDLER(read_gvram_alu7_bank5){return read_save_alu(space, 7, offset);}
+static READ8_HANDLER(read_gvram_alu7_bank6){return read_save_alu(space, 7, offset + 0x3000);}
 
 
 static WRITE8_HANDLER(write_gvram_alu0)
 {
-	switch (alu_1 & 0x11)
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	switch (state->alu_1 & 0x11)
 	{
 	case 0x00:
-		write_gvram(space, offset, gVRAM[offset] & ~data);
+		write_gvram(space, offset, state->gVRAM[offset] & ~data);
 		break;
 	case 0x01:
-		write_gvram(space, offset, gVRAM[offset] | data);
+		write_gvram(space, offset, state->gVRAM[offset] | data);
 		break;
 	case 0x10:
-		write_gvram(space, offset, gVRAM[offset] ^ data);
+		write_gvram(space, offset, state->gVRAM[offset] ^ data);
 		break;
 	case 0x11:
 		break;
 	}
 
-	switch (alu_1 & (0x11 << 1))
+	switch (state->alu_1 & (0x11 << 1))
 	{
 	case 0x00 << 1:
-		write_gvram(space, offset + 0x4000, gVRAM[offset + 0x4000] & ~data);
+		write_gvram(space, offset + 0x4000, state->gVRAM[offset + 0x4000] & ~data);
 		break;
 	case 0x01 << 1:
-		write_gvram(space, offset + 0x4000, gVRAM[offset + 0x4000] | data);
+		write_gvram(space, offset + 0x4000, state->gVRAM[offset + 0x4000] | data);
 		break;
 	case 0x10 << 1:
-		write_gvram(space, offset + 0x4000, gVRAM[offset + 0x4000] ^ data);
+		write_gvram(space, offset + 0x4000, state->gVRAM[offset + 0x4000] ^ data);
 		break;
 	case 0x11 << 1:
 		break;
 	}
 
-	switch (alu_1 & (0x11 << 2))
+	switch (state->alu_1 & (0x11 << 2))
 	{
 	case 0x00 << 2:
-		write_gvram(space, offset + 0x8000, gVRAM[offset + 0x8000] & ~data);
+		write_gvram(space, offset + 0x8000, state->gVRAM[offset + 0x8000] & ~data);
 		break;
 	case 0x01 << 2:
-		write_gvram(space, offset + 0x8000, gVRAM[offset + 0x8000] | data);
+		write_gvram(space, offset + 0x8000, state->gVRAM[offset + 0x8000] | data);
 		break;
 	case 0x10 << 2:
-		write_gvram(space, offset + 0x8000, gVRAM[offset + 0x8000] ^ data);
+		write_gvram(space, offset + 0x8000, state->gVRAM[offset + 0x8000] ^ data);
 		break;
 	case 0x11 << 2:
 		break;
@@ -243,14 +227,17 @@ static WRITE8_HANDLER(write_gvram_alu0)
 
 static WRITE8_HANDLER(write_gvram_alu1)
 {
-	write_gvram(space, offset + 0x0000 , alu_save0);
-	write_gvram(space, offset + 0x4000 , alu_save1);
-	write_gvram(space, offset + 0x8000 , alu_save2);
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	write_gvram(space, offset + 0x0000 , state->alu_save0);
+	write_gvram(space, offset + 0x4000 , state->alu_save1);
+	write_gvram(space, offset + 0x8000 , state->alu_save2);
 }
 
-static WRITE8_HANDLER(write_gvram_alu2){write_gvram(space, offset + 0x0000, alu_save1);}
+static WRITE8_HANDLER(write_gvram_alu2){
+	pc88_state *state = space->machine->driver_data<pc88_state>();write_gvram(space, offset + 0x0000, state->alu_save1);}
 
-static WRITE8_HANDLER(write_gvram_alu3){write_gvram(space, offset + 0x4000, alu_save0);}
+static WRITE8_HANDLER(write_gvram_alu3){
+	pc88_state *state = space->machine->driver_data<pc88_state>();write_gvram(space, offset + 0x4000, state->alu_save0);}
 
 
 static WRITE8_HANDLER(write_gvram_alu0_bank5){write_gvram_alu0(space, offset,data);}
@@ -265,13 +252,14 @@ static WRITE8_HANDLER(write_gvram_alu3_bank6){write_gvram_alu3(space, offset + 0
 
 int pc8801_is_vram_select( running_machine *machine )
 {
-	if (alu_on)
+	pc88_state *state = machine->driver_data<pc88_state>();
+	if (state->alu_on)
 	{
 		/* ALU mode */
-		if (alu_2 & 0x80)
+		if (state->alu_2 & 0x80)
 		{
 			/* ALU VRAM */
-			switch (alu_2 & 0x07)
+			switch (state->alu_2 & 0x07)
 			{
 			case 0:
 				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu0_bank5);
@@ -307,7 +295,7 @@ int pc8801_is_vram_select( running_machine *machine )
 				break;
     		}
 
-			switch (alu_2 & 0x30)
+			switch (state->alu_2 & 0x30)
 			{
 			case 0x00:
 				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu0_bank5);
@@ -337,11 +325,11 @@ int pc8801_is_vram_select( running_machine *machine )
 	else
 	{
 		/* old mode */
-		switch (selected_vram)
+		switch (state->selected_vram)
 		{
 		case 1:
-			memory_set_bankptr(machine, "bank5", gVRAM );
-			memory_set_bankptr(machine, "bank6", gVRAM + 0x3000 );
+			memory_set_bankptr(machine, "bank5", state->gVRAM );
+			memory_set_bankptr(machine, "bank6", state->gVRAM + 0x3000 );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram0_bank5);
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
@@ -349,8 +337,8 @@ int pc8801_is_vram_select( running_machine *machine )
 			return 1;
 
 		case 2:
-			memory_set_bankptr(machine, "bank5", gVRAM + 0x4000 );
-			memory_set_bankptr(machine, "bank6", gVRAM + 0x4000 + 0x3000 );
+			memory_set_bankptr(machine, "bank5", state->gVRAM + 0x4000 );
+			memory_set_bankptr(machine, "bank6", state->gVRAM + 0x4000 + 0x3000 );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram1_bank5);
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
@@ -358,8 +346,8 @@ int pc8801_is_vram_select( running_machine *machine )
 			return 1;
 
 		case 3:
-			memory_set_bankptr(machine, "bank5", gVRAM + 0x8000 );
-			memory_set_bankptr(machine, "bank6", gVRAM + 0x8000 + 0x3000 );
+			memory_set_bankptr(machine, "bank5", state->gVRAM + 0x8000 );
+			memory_set_bankptr(machine, "bank6", state->gVRAM + 0x8000 + 0x3000 );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram2_bank5);
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
@@ -375,20 +363,22 @@ int pc8801_is_vram_select( running_machine *machine )
 
 WRITE8_HANDLER( pc88sr_disp_32 )
 {
-	analog_palette = ((data & 0x20) != 0x00);
-	alu_on = ((data & 0x40) != 0x00);
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	state->analog_palette = ((data & 0x20) != 0x00);
+	state->alu_on = ((data & 0x40) != 0x00);
 	pc8801_update_bank(space->machine);
 }
 
 WRITE8_HANDLER( pc88sr_alu )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	switch (offset)
 	{
 	case 0:
-		alu_1 = data;
+		state->alu_1 = data;
 		break;
 	case 1:
-		alu_2 = data;
+		state->alu_2 = data;
 		break;
 	}
 	pc8801_update_bank(space->machine);
@@ -396,17 +386,19 @@ WRITE8_HANDLER( pc88sr_alu )
 
 WRITE8_HANDLER( pc88_vramsel_w )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	if (offset == 3)
-		selected_vram = 0;
+		state->selected_vram = 0;
 	else
-		selected_vram = offset + 1;
+		state->selected_vram = offset + 1;
 
 	pc8801_update_bank(space->machine);
 }
 
 READ8_HANDLER( pc88_vramtest_r )
 {
-	switch (selected_vram)
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	switch (state->selected_vram)
 	{
 	case 1:  return 0xf9;
 	case 2:  return 0xfa;
@@ -417,20 +409,22 @@ READ8_HANDLER( pc88_vramtest_r )
 
 VIDEO_START( pc8801 )
 {
-	text_width = 40;
-	text_height = 20;
-	blink_period = 24;
+	pc88_state *state = machine->driver_data<pc88_state>();
+	state->text_width = 40;
+	state->text_height = 20;
+	state->blink_period = 24;
 }
 
-#define BLOCK_YSIZE (pc8801_is_24KHz ? 4 : 2)
+#define BLOCK_YSIZE (state->is_24KHz ? 4 : 2)
 
 VIDEO_UPDATE( pc8801 )
 {
+	pc88_state *state = screen->machine->driver_data<pc88_state>();
 	int x, y, attr_new, text_new, i, a, tx, ty, oy, gx, gy, ct, cg;
 	static int blink_count;
 	int full_refresh = 1;
 
-	blink_count = (blink_count + 1) % (blink_period * 4);
+	blink_count = (blink_count + 1) % (state->blink_period * 4);
 	/* attribute expand */
 	for (y = 0; y < 25; y++)
 	{
@@ -439,7 +433,7 @@ VIDEO_UPDATE( pc8801 )
 		for (i = 0; i <= 20; i++)
 		{
 			a = TRAM(80 + i * 2 + 1, y);
-			if (text_color)
+			if (state->text_color)
 			{
 				/* color mode */
 				if (a & 0x08)
@@ -481,20 +475,20 @@ VIDEO_UPDATE( pc8801 )
 			x++;
 		};
 	}
-	if (text_cursor && (text_cursorX >= 0 || text_cursorX < 80) && (text_cursorY >= 0 || text_cursorY < 25))
+	if (state->text_cursor && (state->text_cursorX >= 0 || state->text_cursorX < 80) && (state->text_cursorY >= 0 || state->text_cursorY < 25))
 	{
-		ATTR_TMP(text_cursorX, text_cursorY) |= TX_CUR;
+		ATTR_TMP(state->text_cursorX, state->text_cursorY) |= TX_CUR;
 	}
 
 	/* display draw */
 	for (y = 0; y < 100; y++)
 	{
-		ty = y / (100 / text_height);
-		oy = y % (100 / text_height);
+		ty = y / (100 / state->text_height);
+		oy = y % (100 / state->text_height);
 		for (x = 0; x < 80; x++)
 		{
 			/* text */
-			if (text_width == 40)
+			if (state->text_width == 40)
 				tx = x & (~1);
 			else
 				tx = x;
@@ -515,27 +509,27 @@ VIDEO_UPDATE( pc8801 )
 			if (attr_new & TX_BL)
 			{
 				attr_new &= ~TX_BL;
-				if ((blink_count / blink_period) & 1)
+				if ((blink_count / state->blink_period) & 1)
 					attr_new ^= TX_REV;
 			}
 
 			if (attr_new & TX_CUR)
 			{
 				attr_new &= ~TX_CUR;
-				switch (cursor_mode)
+				switch (state->cursor_mode)
 				{
 				case noblink_underline:
 					attr_new ^= TX_UL;
 					break;
 				case blink_underline:
-					if (blink_count / blink_period)
+					if (blink_count / state->blink_period)
 						attr_new ^= TX_UL;
 					break;
 				case noblink_block:
 					attr_new ^= TX_REV;
 					break;
 				case blink_block:
-					if (blink_count / blink_period)
+					if (blink_count / state->blink_period)
 						attr_new ^= TX_REV;
 					break;
 				}
@@ -547,15 +541,15 @@ VIDEO_UPDATE( pc8801 )
 			if ((attr_new & TX_OL) && oy != 0)
 				attr_new &= ~TX_OL;
 
-			if (text_invert)
+			if (state->text_invert)
 				attr_new ^= TX_REV;
 
-			if (!crtc_on || ((dmac_flag & 0x04) == 0x00) || !text_on)
+			if (!state->crtc_on || ((state->dmac_flag & 0x04) == 0x00) || !state->text_on)
 			{
 				text_new = 0;
 				attr_new = 7 << TX_COL_SHIFT;
 			}
-			if (text_width == 40)
+			if (state->text_width == 40)
 			{
 				if (x & 1)
 					attr_new |= TX_40R;
@@ -569,7 +563,7 @@ VIDEO_UPDATE( pc8801 )
 
 			if (text_new != TEXT_OLD(x, y) || attr_new != ATTR_OLD(x, y) || GRP_DIRTY(x, y) || full_refresh)
 			{
-				plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, palette_transparent_pen);
+				plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, palette_transparent_pen);
 				ct = ((attr_new & TX_COL_MASK) >> TX_COL_SHIFT) + 8;
 				TEXT_OLD(x, y) = text_new;
 				ATTR_OLD(x, y) = attr_new;
@@ -584,48 +578,48 @@ VIDEO_UPDATE( pc8801 )
 					{
 					case TX_80:
 						if (text_new & 0x04)
-							plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 4, BLOCK_YSIZE, ct);
+							plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE, 4, BLOCK_YSIZE, ct);
 						if (text_new & 0x40)
-							plot_box(wbm2, x * 8 + 4,y * BLOCK_YSIZE, 4, BLOCK_YSIZE, ct);
+							plot_box(state->wbm2, x * 8 + 4,y * BLOCK_YSIZE, 4, BLOCK_YSIZE, ct);
 						break;
 					case TX_40L:
 						if (text_new & 0x04)
-							plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, ct);
+							plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, ct);
 						break;
 					case TX_40R:
 						if (text_new & 0x40)
-							plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, ct);
+							plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE, 8, BLOCK_YSIZE, ct);
 						break;
 					}
 				}
 				else
 				{
 					/* normal text */
-					drawgfx_transpen(wbm2, NULL, screen->machine->gfx[((attr_new & TX_WID_MASK) >> TX_WID_SHIFT) + (pc8801_is_24KHz ? 3 : 0)], text_new,
+					drawgfx_transpen(state->wbm2, NULL, screen->machine->gfx[((attr_new & TX_WID_MASK) >> TX_WID_SHIFT) + (state->is_24KHz ? 3 : 0)], text_new,
 					((attr_new & TX_REV) ? 8 : 0) + ((attr_new & TX_COL_MASK) >> TX_COL_SHIFT), 0, 0, x * 8, y * BLOCK_YSIZE, (attr_new & TX_REV) ? 1 : 0);
 				}
 				if (attr_new & TX_UL)
-					plot_box(wbm2, x * 8, y * BLOCK_YSIZE + (pc8801_is_24KHz ? 3 : 1), 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
+					plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE + (state->is_24KHz ? 3 : 1), 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
 
 				if (attr_new & TX_OL)
-					plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
+					plot_box(state->wbm2, x * 8, y * BLOCK_YSIZE, 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
 
 				/* graphics */
 				GRP_DIRTY(x, y) = 0;
-				if (pc8801_is_24KHz)
+				if (state->is_24KHz)
 				{
-					switch (gmode)
+					switch (state->gmode)
 					{
 					case GRAPH_200_COL:
 						for (gy = 0; gy < 2; gy++)
 						{
 							for (gx = 0; gx < 8; gx++)
 							{
-								cg = (((gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 7) |
-									(((gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 6) |
-									(((gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 5);
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 4 + gy * 2, cg);
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, 17);
+								cg = (((state->gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 7) |
+									(((state->gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 6) |
+									(((state->gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 5);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2, cg);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, 17);
 							}
 						}
 						break;
@@ -634,12 +628,12 @@ VIDEO_UPDATE( pc8801 )
 						{
 							for (gx = 0; gx < 8; gx++)
 							{
-								cg = (((gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[0]) ||
-									(((gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[1]) ||
-									(((gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[2]) ?
+								cg = (((state->gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[0]) ||
+									(((state->gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[1]) ||
+									(((state->gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[2]) ?
 									((attr_new & TX_COL_MASK) >> TX_COL_SHIFT) + 8 : 16;
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 4 + gy * 2, cg);
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, 17);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2, cg);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, 17);
 							}
 						}
 						break;
@@ -648,31 +642,31 @@ VIDEO_UPDATE( pc8801 )
 						{
 							for (gx = 0; gx < 8; gx++)
 							{
-								cg = ((gVRAM[(y < 50 ? 0x0000 : 0x4000) + x + (y % 50) * 4 * 80 + gy * 80] << gx) & 0x80)
-									&& disp_plane[y < 200 ? 0 : 1] ? ((attr_new&TX_COL_MASK) >> TX_COL_SHIFT) + 8 : 16;
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 4 + gy, cg);
+								cg = ((state->gVRAM[(y < 50 ? 0x0000 : 0x4000) + x + (y % 50) * 4 * 80 + gy * 80] << gx) & 0x80)
+									&& state->disp_plane[y < 200 ? 0 : 1] ? ((attr_new&TX_COL_MASK) >> TX_COL_SHIFT) + 8 : 16;
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy, cg);
 							}
 						}
 						break;
 					case GRAPH_NO:
 					default:
-						plot_box(wbm1, x * 8, y * 4, 8, 4, 16);
+						plot_box(state->wbm1, x * 8, y * 4, 8, 4, 16);
 						break;
 					}
 				}
 				else
 				{
-					switch (gmode)
+					switch (state->gmode)
 					{
 					case GRAPH_200_COL:
 						for (gy = 0; gy < 2; gy++)
 						{
 							for (gx = 0; gx < 8; gx++)
 							{
-								cg = (((gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 7) |
-									(((gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 6) |
-									(((gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 5);
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 2 + gy, cg);
+								cg = (((state->gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 7) |
+									(((state->gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 6) |
+									(((state->gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 5);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 2 + gy, cg);
 							}
 						}
 						break;
@@ -681,17 +675,17 @@ VIDEO_UPDATE( pc8801 )
 						{
 							for (gx = 0; gx < 8; gx++)
 							{
-								cg = (((gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[0]) ||
-									(((gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[1]) ||
-									(((gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && disp_plane[2]) ?
+								cg = (((state->gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[0]) ||
+									(((state->gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[1]) ||
+									(((state->gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) && state->disp_plane[2]) ?
 									((attr_new & TX_COL_MASK) >> TX_COL_SHIFT) + 8 : 16;
-								pc8801_plot_pixel(wbm1, x * 8 + gx, y * 2 + gy, cg);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 2 + gy, cg);
 							}
 						}
 						break;
 					case GRAPH_NO:
 					default:
-						plot_box(wbm1, x * 8, y * 2, 8, 2, 16);
+						plot_box(state->wbm1, x * 8, y * 2, 8, 2, 16);
 						break;
 					}
 				}
@@ -699,8 +693,8 @@ VIDEO_UPDATE( pc8801 )
 		}
 	}
 
-	copyscrollbitmap_trans(wbm1, wbm2, 0, 0, 0, 0, NULL, palette_transparent_pen);
-	copybitmap(bitmap, wbm1, 0, 0, 0, 0, NULL);
+	copyscrollbitmap_trans(state->wbm1, state->wbm2, 0, 0, 0, 0, NULL, palette_transparent_pen);
+	copybitmap(bitmap, state->wbm1, 0, 0, 0, 0, NULL);
 	return 0;
 }
 
@@ -734,6 +728,7 @@ PALETTE_INIT( pc8801 )
 
 WRITE8_HANDLER( pc88_crtc_w )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	if (offset == 1)
 	{
 		/* command */
@@ -741,13 +736,13 @@ WRITE8_HANDLER( pc88_crtc_w )
 		{
 		case 0x00:
 			/* disp stop / initilize */
-			crtc_on = 0;
-			crtc_state = parameter0;
+			state->crtc_on = 0;
+			state->crtc_state = parameter0;
 			return;
 		case 0x20:
 			/* disp on */
-			crtc_on = 1;
-			text_invert = ((data & 1) != 0x00);
+			state->crtc_on = 1;
+			state->text_invert = ((data & 1) != 0x00);
 			return;
 		case 0x40:
 		/* case 0x43: */
@@ -755,12 +750,12 @@ WRITE8_HANDLER( pc88_crtc_w )
 			return;
 		case 0x60:
 			/* get light pen point */
-			crtc_state = lpenx;
+			state->crtc_state = lpenx;
 			return;
 		case 0x80:
 			/* set cursor */
-			crtc_state = cursorx;
-			text_cursor = ((data & 1) != 0x00);
+			state->crtc_state = cursorx;
+			state->text_cursor = ((data & 1) != 0x00);
 			return;
 		default:
 			logerror("pc8801: illegal crtc command 0x%.2x.\n", data);
@@ -770,109 +765,109 @@ WRITE8_HANDLER( pc88_crtc_w )
 	else
 	{
 		/* parameter */
-		switch (crtc_state)
+		switch (state->crtc_state)
 		{
 		case parameter0:
-			crtc_state = parameter1;
+			state->crtc_state = parameter1;
 			if (data == 0xce)
 				return;
 			logerror("pc8801: illegal crtc parameter0 0x%.2x.\n", data);
 			return;
 
 		case parameter1:
-			crtc_state = parameter2;
+			state->crtc_state = parameter2;
 			switch (data & 0xc0)
 			{
 			case 0x00:
-				blink_period = 8;
+				state->blink_period = 8;
 				break;
 			case 0x40:
-				blink_period = 16;
+				state->blink_period = 16;
 				break;
 			case 0x80:
-				blink_period = 24;
+				state->blink_period = 24;
 				break;
 			case 0xc0:
-				blink_period = 32;
+				state->blink_period = 32;
 				break;
 			}
 			if ((data & 0x3f) == 0x13)
 			{
-				text_height = 20;
+				state->text_height = 20;
 				return;
 			}
 			else if ((data & 0x3f) == 0x18)
 			{
-				text_height = 25;
+				state->text_height = 25;
 				return;
 			}
 			logerror("pc8801: illegal crtc parameter1 0x%.2x.\n", data);
 			return;
 
 		case parameter2:
-			crtc_state = parameter3;
+			state->crtc_state = parameter3;
 			switch (data & 0x60)
 			{
 			case 0x00:
-				cursor_mode = noblink_underline;
+				state->cursor_mode = noblink_underline;
 				break;
 			case 0x20:
-				cursor_mode = blink_underline;
+				state->cursor_mode = blink_underline;
 				break;
 			case 0x40:
-				cursor_mode = noblink_block;
+				state->cursor_mode = noblink_block;
 				break;
 			case 0x60:
-				cursor_mode = blink_block;
+				state->cursor_mode = blink_block;
 				break;
 			}
-			if (!pc8801_is_24KHz && (data & 0x9f) == 0x09 && text_height == 20)
+			if (!state->is_24KHz && (data & 0x9f) == 0x09 && state->text_height == 20)
 				return;
-			else if (!pc8801_is_24KHz && (data & 0x9f) == 0x07 && text_height == 25)
+			else if (!state->is_24KHz && (data & 0x9f) == 0x07 && state->text_height == 25)
 				return;
-			else if (pc8801_is_24KHz && (data & 0x9f) == 0x13 && text_height == 20)
+			else if (state->is_24KHz && (data & 0x9f) == 0x13 && state->text_height == 20)
 				return;
-			else if (pc8801_is_24KHz && (data & 0x9f) == 0x0f && text_height == 25)
+			else if (state->is_24KHz && (data & 0x9f) == 0x0f && state->text_height == 25)
 				return;
 			logerror("pc8801: illegal crtc parameter2 0x%.2x.\n", data);
 			return;
 
 		case parameter3:
-			crtc_state = parameter4;
-			if (!pc8801_is_24KHz && data == 0xbe && text_height == 20)
+			state->crtc_state = parameter4;
+			if (!state->is_24KHz && data == 0xbe && state->text_height == 20)
 				return;
-			else if (!pc8801_is_24KHz && data == 0xde && text_height == 25)
+			else if (!state->is_24KHz && data == 0xde && state->text_height == 25)
 				return;
-			else if (pc8801_is_24KHz && data == 0x38 && text_height == 20)
+			else if (state->is_24KHz && data == 0x38 && state->text_height == 20)
 				return;
-			else if (pc8801_is_24KHz && data == 0x58 && text_height == 25)
+			else if (state->is_24KHz && data == 0x58 && state->text_height == 25)
 				return;
 			logerror("pc8801: illegal crtc parameter3 0x%.2x.\n", data);
 			return;
 
 		case parameter4:
-			crtc_state = other;
+			state->crtc_state = other;
 			if (data == 0x13)
 			{
-				text_color = 0;
+				state->text_color = 0;
 				return;
 			}
 			else if (data == 0x53)
 			{
-				text_color = 1;
+				state->text_color = 1;
 				return;
 			}
 			logerror("pc8801: illegal crtc parameter4 0x%.2x.\n", data);
 			return;
 
 		case cursorx:
-			crtc_state = cursory;
-			text_cursorX = data;
+			state->crtc_state = cursory;
+			state->text_cursorX = data;
 			return;
 
 		case cursory:
-			crtc_state = other;
-			text_cursorY = data;
+			state->crtc_state = other;
+			state->text_cursorY = data;
 			return;
 
 		default:
@@ -884,16 +879,17 @@ WRITE8_HANDLER( pc88_crtc_w )
 
 READ8_HANDLER( pc88_crtc_r )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	if (offset == 0)
 	{
 		/* light pen point */
-		switch (crtc_state)
+		switch (state->crtc_state)
 		{
 		case lpenx:
-			crtc_state = lpeny;
+			state->crtc_state = lpeny;
 			return 0xff;
 		case lpeny:
-			crtc_state = other;
+			state->crtc_state = other;
 			return 0xff;
 		default:
 			logerror("pc8801:illegal light pen read\n");
@@ -903,48 +899,49 @@ READ8_HANDLER( pc88_crtc_r )
 	else
 	{
 		/* status */
-		return crtc_on ? 0x10 : 0x00;
+		return state->crtc_on ? 0x10 : 0x00;
 	}
 }
 
 WRITE8_HANDLER( pc88_dmac_w )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	switch (offset)
 	{
 	case 8:
-		dmac_fl = 0;
-		dmac_flag = data;
+		state->dmac_fl = 0;
+		state->dmac_flag = data;
 		return;
 	case 1:
 	case 3:
 	case 5:
 	case 7:
-		if (dmac_fl == 0)
+		if (state->dmac_fl == 0)
 		{
-			dmac_fl = 1;
-			dmac_size[offset / 2] = (dmac_size[offset / 2] & 0xff00) | (data & 0x00ff);
+			state->dmac_fl = 1;
+			state->dmac_size[offset / 2] = (state->dmac_size[offset / 2] & 0xff00) | (data & 0x00ff);
 			return;
 		}
 		else
 		{
-			dmac_fl = 0;
-			dmac_size[offset / 2] = (dmac_size[offset / 2] & 0x00ff) | ((data << 8) & 0xff00);
+			state->dmac_fl = 0;
+			state->dmac_size[offset / 2] = (state->dmac_size[offset / 2] & 0x00ff) | ((data << 8) & 0xff00);
 			return;
 		}
 	case 0:
 	case 2:
 	case 4:
 	case 6:
-		if (dmac_fl == 0)
+		if (state->dmac_fl == 0)
 		{
-			dmac_fl = 1;
-			dmac_addr[offset / 2] = (dmac_addr[offset / 2] & 0xff00) | (data & 0x00ff);
+			state->dmac_fl = 1;
+			state->dmac_addr[offset / 2] = (state->dmac_addr[offset / 2] & 0xff00) | (data & 0x00ff);
 			return;
 		}
 		else
 		{
-			dmac_fl = 0;
-			dmac_addr[offset / 2] = (dmac_addr[offset / 2] & 0x00ff) | ((data << 8) & 0xff00);
+			state->dmac_fl = 0;
+			state->dmac_addr[offset / 2] = (state->dmac_addr[offset / 2] & 0x00ff) | ((data << 8) & 0xff00);
 			return;
 		}
 	}
@@ -952,37 +949,38 @@ WRITE8_HANDLER( pc88_dmac_w )
 
 READ8_HANDLER( pc88_dmac_r )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	switch (offset)
 	{
 	case 8:
-		return dmac_status;
+		return state->dmac_status;
 	case 1:
 	case 3:
 	case 5:
 	case 7:
-		if (dmac_fl == 0)
+		if (state->dmac_fl == 0)
 		{
-			dmac_fl = 1;
-			return (dmac_size[offset / 2] & 0x00ff);
+			state->dmac_fl = 1;
+			return (state->dmac_size[offset / 2] & 0x00ff);
 		}
 		else
 		{
-			dmac_fl = 0;
-			return ((dmac_size[offset / 2] >> 8) & 0x00ff);
+			state->dmac_fl = 0;
+			return ((state->dmac_size[offset / 2] >> 8) & 0x00ff);
 		}
 	case 0:
 	case 2:
 	case 4:
 	case 6:
-		if (dmac_fl == 0)
+		if (state->dmac_fl == 0)
 		{
-			dmac_fl = 1;
-			return (dmac_addr[offset / 2] & 0x00ff);
+			state->dmac_fl = 1;
+			return (state->dmac_addr[offset / 2] & 0x00ff);
 		}
 		else
 		{
-			dmac_fl = 0;
-			return ((dmac_addr[offset / 2] >> 8) & 0x00ff);
+			state->dmac_fl = 0;
+			return ((state->dmac_addr[offset / 2] >> 8) & 0x00ff);
 		}
 	}
 	return 0;
@@ -990,11 +988,13 @@ READ8_HANDLER( pc88_dmac_r )
 
 WRITE8_HANDLER( pc88sr_disp_30 )
 {
-	text_width = ((data & 0x01) == 0x00) ? 40 : 80;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
+	state->text_width = ((data & 0x01) == 0x00) ? 40 : 80;
 }
 
 WRITE8_HANDLER( pc88sr_disp_31 )
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	int gmode_new = GRAPH_NO;
 
 	switch (data & 0x19)
@@ -1006,7 +1006,7 @@ WRITE8_HANDLER( pc88sr_disp_31 )
 		gmode_new = GRAPH_NO;
 		break;
 	case 0x08:
-		gmode_new = pc8801_is_24KHz ? GRAPH_400_BW : GRAPH_200_BW;
+		gmode_new = state->is_24KHz ? GRAPH_400_BW : GRAPH_200_BW;
 		break;
 	case 0x09:
 		gmode_new = GRAPH_200_BW;
@@ -1017,12 +1017,13 @@ WRITE8_HANDLER( pc88sr_disp_31 )
 		break;
 	}
 
-	if (gmode != gmode_new)
-		gmode = gmode_new;
+	if (state->gmode != gmode_new)
+		state->gmode = gmode_new;
 }
 
 WRITE8_HANDLER(pc88_palette_w)
 {
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	int palno;
 	int i;
 	static int r[10],g[10],b[10];
@@ -1031,19 +1032,19 @@ WRITE8_HANDLER(pc88_palette_w)
 		palno = 16;
 	else if (offset == 1)
 	{
-		text_on = (data & 1) == 0x00;
+		state->text_on = (data & 1) == 0x00;
 
 		for (i = 0; i < 3; i++)
 		{
-			if (disp_plane[i] != ((data & (2 << i)) == 0x00))
-				disp_plane[i] = (data & (2<<i)) == 0x00;
+			if (state->disp_plane[i] != ((data & (2 << i)) == 0x00))
+				state->disp_plane[i] = (data & (2<<i)) == 0x00;
 		}
 		return;
 	}
 	else
 		palno = offset - 2;
 
-	if (analog_palette)
+	if (state->analog_palette)
 	{
 		if ((data & 0x40) == 0x00)
 		{

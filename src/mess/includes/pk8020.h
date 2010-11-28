@@ -15,11 +15,27 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
+class pk8020_state : public driver_device
+{
+public:
+	pk8020_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 color;
+	UINT8 video_page;
+	UINT8 wide;
+	UINT8 font;
+	UINT8 attr;
+	UINT8 text_attr;
+	UINT8 takt;
+	UINT8 video_page_access;
+	UINT8 portc_data;
+	UINT8 sound_gate;
+	UINT8 sound_level;
+};
+
+
 /*----------- defined in machine/pk8020.c -----------*/
-extern UINT8 pk8020_color;
-extern UINT8 pk8020_video_page;
-extern UINT8 pk8020_wide;
-extern UINT8 pk8020_font;
 extern MACHINE_RESET( pk8020 );
 extern const i8255a_interface pk8020_ppi8255_interface_1;
 extern const i8255a_interface pk8020_ppi8255_interface_2;

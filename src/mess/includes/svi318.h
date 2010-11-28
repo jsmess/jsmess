@@ -13,6 +13,52 @@
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 
+typedef struct
+{
+	/* general */
+	UINT8	svi318;		/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
+	/* memory */
+	UINT8	*empty_bank;
+	UINT8	bank_switch;
+	UINT8	bankLow;
+	UINT8	bankHigh1;
+	UINT8	*bankLow_ptr;
+	UINT8	bankLow_read_only;
+	UINT8	*bankHigh1_ptr;
+	UINT8	bankHigh1_read_only;
+	UINT8	*bankHigh2_ptr;
+	UINT8	bankHigh2_read_only;
+	/* keyboard */
+	UINT8	keyboard_row;
+	/* SVI-806 80 column card */
+	UINT8	svi806_present;
+	UINT8	svi806_ram_enabled;
+	region_info	*svi806_ram;
+	UINT8	*svi806_gfx;
+} SVI_318;
+
+typedef struct
+{
+	UINT8 driveselect;
+	int drq;
+	int irq;
+	UINT8 heads[2];
+} SVI318_FDC_STRUCT;
+
+
+class svi318_state : public driver_device
+{
+public:
+	svi318_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	SVI_318 svi;
+	UINT8 *pcart;
+	UINT32 pcart_rom_size;
+	SVI318_FDC_STRUCT fdc;
+};
+
+
 /*----------- defined in machine/svi318.c -----------*/
 
 extern const i8255a_interface svi318_ppi8255_interface;

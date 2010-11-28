@@ -10,10 +10,22 @@
 #include "machine/pit8253.h"
 #include "machine/i8255a.h"
 
+class pp01_state : public driver_device
+{
+public:
+	pp01_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 video_scroll;
+	UINT8 memory_block[16];
+	UINT8 video_write_mode;
+	UINT8 key_line;
+};
+
+
 /*----------- defined in machine/pp01.c -----------*/
 extern const struct pit8253_config pp01_pit8253_intf;
 extern const i8255a_interface pp01_ppi8255_interface;
-extern UINT8 pp01_video_scroll;
 extern MACHINE_START( pp01 );
 extern MACHINE_RESET( pp01 );
 extern WRITE8_HANDLER (pp01_mem_block_w);

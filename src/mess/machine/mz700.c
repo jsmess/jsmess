@@ -423,17 +423,16 @@ WRITE8_HANDLER( mz700_bank_6_w )
 /************************ PIT ************************************************/
 
 /* Timer 0 is the clock for the speaker output */
-static UINT8 speaker_level = 0;
-static UINT8 prev_state = 0;
 
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
+	mz_state *drvstate = device->machine->driver_data<mz_state>();
 	running_device *speaker = device->machine->device("speaker");
-	if((prev_state==0) && (state==1)) {
-		speaker_level ^= 1;
+	if((drvstate->prev_state==0) && (state==1)) {
+		drvstate->speaker_level ^= 1;
 	}
-	prev_state = state;
-	speaker_level_w( speaker, speaker_level);
+	drvstate->prev_state = state;
+	speaker_level_w( speaker, drvstate->speaker_level);
 }
 
 /* timer 2 is the AM/PM (12 hour) interrupt */
@@ -554,11 +553,8 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
  *
  ******************************************************************************/
 
-static UINT16 mz800_ramaddr = 0;
 //static UINT8 mz800_display_mode = 0;
 //static UINT8 mz800_port_e8 = 0;
-static UINT8 mz800_palette[4];
-static UINT8 mz800_palette_bank;
 
 
 /***************************************************************************
@@ -622,10 +618,11 @@ READ8_HANDLER( mz800_crtc_r )
 /* port EA */
  READ8_HANDLER( mz800_ramdisk_r )
 {
+	mz_state *state = space->machine->driver_data<mz_state>();
 	UINT8 *mem = memory_region(space->machine, "user1");
-	UINT8 data = mem[mz800_ramaddr];
-	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", mz800_ramaddr, data),space->machine);
-	if (mz800_ramaddr++ == 0)
+	UINT8 data = mem[state->mz800_ramaddr];
+	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", state->mz800_ramaddr, data),space->machine);
+	if (state->mz800_ramaddr++ == 0)
 		LOG(1,"mz800_ramdisk_r",("address wrap 0000\n"),space->machine);
     return data;
 }
@@ -674,33 +671,36 @@ WRITE8_HANDLER( mz800_scroll_border_w )
 /* port EA */
 WRITE8_HANDLER( mz800_ramdisk_w )
 {
+	mz_state *state = space->machine->driver_data<mz_state>();
 	UINT8 *mem = memory_region(space->machine, "user1");
-	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", mz800_ramaddr, data),space->machine);
-	mem[mz800_ramaddr] = data;
-	if (mz800_ramaddr++ == 0)
+	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", state->mz800_ramaddr, data),space->machine);
+	mem[state->mz800_ramaddr] = data;
+	if (state->mz800_ramaddr++ == 0)
 		LOG(1,"mz800_ramdisk_w",("address wrap 0000\n"),space->machine);
 }
 
 /* port EB */
 WRITE8_HANDLER( mz800_ramaddr_w )
 {
-	mz800_ramaddr = (cpu_get_reg(space->machine->device("maincpu"), Z80_BC) & 0xff00) | (data & 0xff);
-	LOG(1,"mz800_ramaddr_w",("%04X\n", mz800_ramaddr),space->machine);
+	mz_state *state = space->machine->driver_data<mz_state>();
+	state->mz800_ramaddr = (cpu_get_reg(space->machine->device("maincpu"), Z80_BC) & 0xff00) | (data & 0xff);
+	LOG(1,"mz800_ramaddr_w",("%04X\n", state->mz800_ramaddr),space->machine);
 }
 
 /* port F0 */
 WRITE8_HANDLER( mz800_palette_w )
 {
+	mz_state *state = space->machine->driver_data<mz_state>();
 	if (data & 0x40)
 	{
-        mz800_palette_bank = data & 3;
-		LOG(1,"mz800_palette_w",("bank: %d\n", mz800_palette_bank),space->machine);
+        state->mz800_palette_bank = data & 3;
+		LOG(1,"mz800_palette_w",("bank: %d\n", state->mz800_palette_bank),space->machine);
     }
 	else
 	{
 		int idx = (data >> 4) & 3;
 		int val = data & 15;
 		LOG(1,"mz800_palette_w",("palette[%d] <- %d\n", idx, val),space->machine);
-		mz800_palette[idx] = val;
+		state->mz800_palette[idx] = val;
 	}
 }

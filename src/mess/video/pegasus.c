@@ -192,10 +192,11 @@ static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line, UINT8 pcg_mode, UINT8 *FN
 
 VIDEO_UPDATE( pegasus )
 {
+	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
 	UINT16 addr,xpos,x,y;
 	UINT8 b,j,l,code,inv;
 	UINT8 *FNT = memory_region(screen->machine, "pcg");
-	UINT8 pcg_mode = pegasus_control_bits & 2;
+	UINT8 pcg_mode = state->control_bits & 2;
 
 	for(y = 0; y < 16; y++ )
 	{
@@ -203,7 +204,7 @@ VIDEO_UPDATE( pegasus )
 		xpos = 0;
 		for(x = 0; x < 32; x++ )
 		{
-			code = pegasus_video_ram[addr|x];
+			code = state->video_ram[addr|x];
 			inv = (code >> 7) ^ 1;
 			for(j = 0; j < 16; j++ )
 			{

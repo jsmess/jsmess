@@ -47,6 +47,11 @@ public:
 	int screen; 			/* screen designation */
 	UINT8 *colorram;
 	UINT8 *videoram;
+	UINT8 speaker_level;
+	UINT8 prev_state;
+	UINT16 mz800_ramaddr;
+	UINT8 mz800_palette[4];
+	UINT8 mz800_palette_bank;
 };
 
 

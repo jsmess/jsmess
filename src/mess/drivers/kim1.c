@@ -88,10 +88,20 @@ change from 1 to 0.
 #include "kim1.lh"
 
 
-static UINT8		kim1_u2_port_b;
-static UINT8		kim1_311_output;
-static UINT32		kim1_cassette_high_count;
-static UINT8		kim1_led_time[6];
+class kim1_state : public driver_device
+{
+public:
+	kim1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 u2_port_b;
+	UINT8 _311_output;
+	UINT32 cassette_high_count;
+	UINT8 led_time[6];
+};
+
+
+
 
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
@@ -159,9 +169,10 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 {
+	kim1_state *state = device->machine->driver_data<kim1_state>();
 	UINT8	data = 0xff;
 
-	switch( ( kim1_u2_port_b >> 1 ) & 0x0f )
+	switch( ( state->u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
 		data = input_port_read(device->machine, "LINE0");
@@ -179,30 +190,33 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
 {
-	UINT8 idx = ( kim1_u2_port_b >> 1 ) & 0x0f;
+	kim1_state *state = device->machine->driver_data<kim1_state>();
+	UINT8 idx = ( state->u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
 		if ( data & 0x80 )
 		{
 			output_set_digit_value( idx-4, data & 0x7f );
-			kim1_led_time[idx - 4] = 15;
+			state->led_time[idx - 4] = 15;
 		}
 	}
 }
 
 static READ8_DEVICE_HANDLER( kim1_u2_read_b )
 {
+	kim1_state *state = device->machine->driver_data<kim1_state>();
 	if ( mos6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
 
-	return 0x7F | ( kim1_311_output ^ 0x80 );
+	return 0x7F | ( state->_311_output ^ 0x80 );
 }
 
 
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 {
-	kim1_u2_port_b = data;
+	kim1_state *state = device->machine->driver_data<kim1_state>();
+	state->u2_port_b = data;
 
 	if ( data & 0x20 )
 	{
@@ -233,32 +247,34 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 
 static TIMER_CALLBACK( kim1_cassette_input )
 {
+	kim1_state *state = machine->driver_data<kim1_state>();
 	double tap_val = cassette_input( machine->device("cassette") );
 
 	if ( tap_val <= 0 )
 	{
-		if ( kim1_cassette_high_count )
+		if ( state->cassette_high_count )
 		{
-			kim1_311_output = ( kim1_cassette_high_count < 8 ) ? 0x80 : 0;
-			kim1_cassette_high_count = 0;
+			state->_311_output = ( state->cassette_high_count < 8 ) ? 0x80 : 0;
+			state->cassette_high_count = 0;
 		}
 	}
 
 	if ( tap_val > 0 )
 	{
-		kim1_cassette_high_count++;
+		state->cassette_high_count++;
 	}
 }
 
 
 static TIMER_CALLBACK( kim1_update_leds )
 {
+	kim1_state *state = machine->driver_data<kim1_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
 	{
-		if ( kim1_led_time[i] )
-			kim1_led_time[i]--;
+		if ( state->led_time[i] )
+			state->led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -267,9 +283,10 @@ static TIMER_CALLBACK( kim1_update_leds )
 
 static MACHINE_START( kim1 )
 {
-	state_save_register_item(machine, "kim1", NULL, 0, kim1_u2_port_b );
-	state_save_register_item(machine, "kim1", NULL, 0, kim1_311_output );
-	state_save_register_item(machine, "kim1", NULL, 0, kim1_cassette_high_count );
+	kim1_state *state = machine->driver_data<kim1_state>();
+	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
+	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
+	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
 	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
 	timer_pulse(machine,  ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
 }
@@ -277,16 +294,17 @@ static MACHINE_START( kim1 )
 
 static MACHINE_RESET( kim1 )
 {
+	kim1_state *state = machine->driver_data<kim1_state>();
 	int i;
 
 
 	for ( i = 0; i < 6; i++ )
 	{
-		kim1_led_time[i] = 0;
+		state->led_time[i] = 0;
 	}
 
-	kim1_311_output = 0;
-	kim1_cassette_high_count = 0;
+	state->_311_output = 0;
+	state->cassette_high_count = 0;
 }
 
 
@@ -299,7 +317,7 @@ static const cassette_config kim1_cassette_config =
 };
 
 
-static MACHINE_CONFIG_START( kim1, driver_device )
+static MACHINE_CONFIG_START( kim1, kim1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map)

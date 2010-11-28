@@ -298,7 +298,7 @@ static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","svi318_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( svi318, driver_device )
+static MACHINE_CONFIG_START( svi318, svi318_state )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi318_mem)
@@ -404,7 +404,7 @@ static GFXDECODE_START( svi328 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, svi328_charlayout, 0, 9 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( svi328_806, driver_device )
+static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem)

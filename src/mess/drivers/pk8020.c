@@ -197,7 +197,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pk8020, driver_device )
+static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_20MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(pk8020_mem)

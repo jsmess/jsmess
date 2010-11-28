@@ -24,11 +24,6 @@
 
 
 /* pointers to memory locations */
-UINT8 *sym1_monitor;
-static UINT8 *sym1_ram_1k;
-static UINT8 *sym1_ram_2k;
-static UINT8 *sym1_ram_3k;
-static UINT8 *sym1_riot_ram;
 
 
 
@@ -39,13 +34,13 @@ static UINT8 *sym1_riot_ram;
 
 static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM                              /* U12/U13 RAM */
-	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_BASE(&sym1_ram_1k)
-	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_BASE(&sym1_ram_2k)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_BASE(&sym1_ram_3k)
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_BASE(&sym1_monitor)       /* U20 Monitor ROM */
+	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(sym1_state, ram_1k)
+	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_BASE_MEMBER(sym1_state, ram_2k)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_BASE_MEMBER(sym1_state, ram_3k)
+	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_BASE_MEMBER(sym1_state, monitor)       /* U20 Monitor ROM */
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)      /* U25 VIA #1 */
 	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)  /* U27 RIOT */
-	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
+	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_BASE_MEMBER(sym1_state, riot_ram)  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)      /* U29 VIA #3 */
 	AM_RANGE(0xb000, 0xefff) AM_ROM
@@ -122,7 +117,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 
 
-static MACHINE_CONFIG_START( sym1, driver_device )
+static MACHINE_CONFIG_START( sym1, sym1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(sym1_map)

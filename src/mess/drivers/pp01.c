@@ -195,7 +195,7 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pp01, driver_device )
+static MACHINE_CONFIG_START( pp01, pp01_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(pp01_mem)

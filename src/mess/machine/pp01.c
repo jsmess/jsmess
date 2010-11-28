@@ -12,32 +12,31 @@
 #include "includes/pp01.h"
 #include "devices/messram.h"
 
-static UINT8 memory_block[16];
-UINT8 pp01_video_scroll;
-static UINT8 pp01_video_write_mode;
 
 WRITE8_HANDLER( pp01_video_write_mode_w )
 {
-	pp01_video_write_mode = data & 0x0f;
+	pp01_state *state = space->machine->driver_data<pp01_state>();
+	state->video_write_mode = data & 0x0f;
 }
 
 static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
+	pp01_state *state = machine->driver_data<pp01_state>();
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
 
-	if (BIT(pp01_video_write_mode,3)) {
+	if (BIT(state->video_write_mode,3)) {
 		// Copy mode
-		if(BIT(pp01_video_write_mode,0)) {
+		if(BIT(state->video_write_mode,0)) {
 			messram_get_ptr(machine->device("messram"))[0x6000+offset+addroffset] = data;
 		} else {
 			messram_get_ptr(machine->device("messram"))[0x6000+offset+addroffset] = 0;
 		}
-		if(BIT(pp01_video_write_mode,1)) {
+		if(BIT(state->video_write_mode,1)) {
 			messram_get_ptr(machine->device("messram"))[0xa000+offset+addroffset] = data;
 		} else {
 			messram_get_ptr(machine->device("messram"))[0xa000+offset+addroffset] = 0;
 		}
-		if(BIT(pp01_video_write_mode,2)) {
+		if(BIT(state->video_write_mode,2)) {
 			messram_get_ptr(machine->device("messram"))[0xe000+offset+addroffset] = data;
 		} else {
 			messram_get_ptr(machine->device("messram"))[0xe000+offset+addroffset] = 0;
@@ -132,23 +131,26 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 
 MACHINE_RESET( pp01 )
 {
+	pp01_state *state = machine->driver_data<pp01_state>();
 	int i;
-	memset(memory_block,0xff,16);
+	memset(state->memory_block,0xff,16);
 	for(i=0;i<16;i++) {
-		memory_block[i] = 0xff;
+		state->memory_block[i] = 0xff;
 		pp01_set_memory(machine, i, 0xff);
 	}
 }
 
 WRITE8_HANDLER (pp01_mem_block_w)
 {
-	memory_block[offset] = data;
+	pp01_state *state = space->machine->driver_data<pp01_state>();
+	state->memory_block[offset] = data;
 	pp01_set_memory(space->machine, offset, data);
 }
 
 READ8_HANDLER (pp01_mem_block_r)
 {
-	return	memory_block[offset];
+	pp01_state *state = space->machine->driver_data<pp01_state>();
+	return	state->memory_block[offset];
 }
 
 MACHINE_START(pp01)
@@ -187,22 +189,24 @@ const struct pit8253_config pp01_pit8253_intf =
 
 static READ8_DEVICE_HANDLER (pp01_8255_porta_r )
 {
-	return pp01_video_scroll;
+	pp01_state *state = device->machine->driver_data<pp01_state>();
+	return state->video_scroll;
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 {
-	pp01_video_scroll = data;
+	pp01_state *state = device->machine->driver_data<pp01_state>();
+	state->video_scroll = data;
 }
 
-static UINT8 pp01_key_line = 0;
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
+	pp01_state *state = device->machine->driver_data<pp01_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (input_port_read(device->machine,keynames[pp01_key_line]) & 0x3F) | (input_port_read(device->machine,"LINEALL") & 0xC0);
+	return (input_port_read(device->machine,keynames[state->key_line]) & 0x3F) | (input_port_read(device->machine,"LINEALL") & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 {
@@ -212,7 +216,8 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 
 static WRITE8_DEVICE_HANDLER (pp01_8255_portc_w )
 {
-	pp01_key_line = data & 0x0f;
+	pp01_state *state = device->machine->driver_data<pp01_state>();
+	state->key_line = data & 0x0f;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portc_r )

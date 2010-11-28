@@ -16,6 +16,7 @@ VIDEO_START( pk8020 )
 
 VIDEO_UPDATE( pk8020 )
 {
+	pk8020_state *state = screen->machine->driver_data<pk8020_state>();
 	int y, x, b, j;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 
@@ -26,12 +27,12 @@ VIDEO_UPDATE( pk8020 )
 			UINT8 chr = messram_get_ptr(screen->machine->device("messram"))[x +(y*64) + 0x40000];
 			UINT8 attr= messram_get_ptr(screen->machine->device("messram"))[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
-				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (pk8020_video_page * 0xC000);
+				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (state->video_page * 0xC000);
 				UINT8 code1 = messram_get_ptr(screen->machine->device("messram"))[addr];
 				UINT8 code2 = messram_get_ptr(screen->machine->device("messram"))[addr + 0x4000];
 				UINT8 code3 = messram_get_ptr(screen->machine->device("messram"))[addr + 0x8000];
-				UINT8 code4 = gfx[((chr<<4) + j) + (pk8020_font*0x1000)];
-				if(attr) code4 ^= 0xff;
+				UINT8 code4 = gfx[((chr<<4) + j) + (state->font*0x1000)];
+				if (attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)
 				{
 					UINT8 col = (((code4 >> b) & 0x01) ? 0x08 : 0x00);
