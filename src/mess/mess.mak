@@ -920,7 +920,6 @@ $(MESSOBJ)/exidy.a:				\
 	$(MESS_MACHINE)/exidy.o		\
 	$(MESS_FORMATS)/exidydsk.o	\
 	$(MESS_DRIVERS)/exidy.o		\
-	$(MESS_VIDEO)/exidy.o		\
 
 $(MESSOBJ)/fairch.a:			\
 	$(MESS_VIDEO)/channelf.o	\

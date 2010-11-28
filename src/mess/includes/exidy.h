@@ -53,10 +53,4 @@ MACHINE_RESET( exidy );
 Z80BIN_EXECUTE( exidy );
 SNAPSHOT_LOAD( exidy );
 
-
-/*----------- defined in video/exidy.c -----------*/
-
-VIDEO_UPDATE( exidy );
-
-
 #endif /* EXIDY_H_ */
