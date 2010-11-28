@@ -176,7 +176,7 @@ static void terminal_scroll_line(running_device *device)
 	terminal_state *term = get_safe_token(device);
 
 	memcpy(term->buffer,term->buffer+TERMINAL_WIDTH,(TERMINAL_HEIGHT-1)*TERMINAL_WIDTH);
-	memset(term->buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0,TERMINAL_WIDTH);
+	memset(term->buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0x20,TERMINAL_WIDTH);
 }
 
 static void terminal_write_char(running_device *device,UINT8 data) {
@@ -184,12 +184,14 @@ static void terminal_write_char(running_device *device,UINT8 data) {
 
 	term->buffer[term->y_pos*TERMINAL_WIDTH+term->x_pos] = data;
 	term->x_pos++;
-	if (term->x_pos > TERMINAL_WIDTH) {
+	if (term->x_pos >= TERMINAL_WIDTH)
+	{
 		term->x_pos = 0;
 		term->y_pos++;
-		if (term->y_pos==TERMINAL_HEIGHT) {
+		if (term->y_pos >= TERMINAL_HEIGHT)
+		{
 			terminal_scroll_line(device);
-			term->y_pos = (TERMINAL_HEIGHT-1);
+			term->y_pos = TERMINAL_HEIGHT-1;
 		}
 	}
 }
@@ -205,37 +207,45 @@ static void terminal_clear(running_device *device) {
 WRITE8_DEVICE_HANDLER ( terminal_write )
 {
 	terminal_state *term = get_safe_token(device);
-	if (data > 0x1f) {
+	if (data > 0x1f)
+	{
 		// printable char
 		if (data!=0x7f) terminal_write_char(device,data);
-	} else {
-		switch(data) {
+	}
+	else
+	{
+		switch(data)
+		{
 			case 0x07 : // bell
-						break;
-			case 0x08:	if (term->x_pos!=0) {
-							term->x_pos--;
-						}
-						break;
-			case 0x09:  do {
-							term->x_pos ++;
-						} while ((term->x_pos % 8)!=0);
-						break;
+					break;
+
+			case 0x08:	if (term->x_pos) term->x_pos--;
+					break;
+
+			case 0x09:	term->x_pos ++;
+					term->x_pos += term->x_pos % 8;
+					if (term->x_pos >= TERMINAL_WIDTH)
+						term->x_pos = TERMINAL_WIDTH-1;
+					break;
+
 			case 0x0a:	term->y_pos++;
-						term->x_pos = 0;
-						if (term->y_pos==TERMINAL_HEIGHT) {
-							terminal_scroll_line(device);
-							term->y_pos = (TERMINAL_HEIGHT-1);
-						};
-						break;
-			case 0x0b:  if (term->y_pos!=0) {
-							term->y_pos--;
-						}
-						break;
+					term->x_pos = 0;
+					if (term->y_pos >= TERMINAL_HEIGHT)
+					{
+						terminal_scroll_line(device);
+						term->y_pos = TERMINAL_HEIGHT-1;
+					}
+					break;
+
+			case 0x0b:	if (term->y_pos) term->y_pos--;
+					break;
+
 			case 0x0d:	term->x_pos = 0;
-						break;
-			case 0x1e:  term->x_pos = 0;
-						term->y_pos = 0;
-						break;
+					break;
+
+			case 0x1e:	term->x_pos = 0;
+					term->y_pos = 0;
+					break;
 		}
 	}
 }
@@ -245,27 +255,55 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 ***************************************************************************/
 static void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 code;
-	int y, c, x, b;
 	terminal_state *term = get_safe_token(device);
+	UINT8 options = input_port_read(device->machine, "TERM_CONF");
+	UINT16 cursor = term->y_pos * TERMINAL_WIDTH + term->x_pos;
+	static UINT8 framecnt=0;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+
+	framecnt++;
 
 	for (y = 0; y < TERMINAL_HEIGHT; y++)
 	{
-		for (c = 0; c < 10; c++)
+		for (ra = 0; ra < 10; ra++)
 		{
-			int horpos = 0;
-			for (x = 0; x < TERMINAL_WIDTH; x++)
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + TERMINAL_WIDTH; x++)
 			{
-				code = terminal_font[term->buffer[y*TERMINAL_WIDTH + x] *16 + c];
-				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  (code >> 7) & 0x01;
-				for (b = 6; b >= 0; b--)
+				chr = term->buffer[x];
+				gfx = terminal_font[(chr<<4) | ra ];
+
+				if ((x == cursor) && (options & 1)) // at cursor position and want a cursor
 				{
-					*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  ((code >> b) | (code >> (b+1))) & 0x01;
+					if ((options & 2) || (ra == 9)) // block, or underline & at bottom line
+					{
+						if ((options & 4) && (framecnt & 8)) // want blink & time to blink
+						{
+						}
+						else
+						{
+							if (options & 8)
+								gfx ^= 0xff; // invert
+							else
+								gfx |= 0xff; // overwrite
+						}
+					}
 				}
-				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  code & 0x01;
-				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  0;
+						
+				/* Display a scanline of a character */
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
 			}
 		}
+		ma+=TERMINAL_WIDTH;
 	}
 }
 
@@ -400,13 +438,13 @@ static VIDEO_UPDATE(terminal )
 
 MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MDRV_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(TERMINAL_WIDTH*10, TERMINAL_HEIGHT*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*10-1, 0, TERMINAL_HEIGHT*10-1)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
+	MDRV_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
 	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(terminal)
 	MDRV_VIDEO_UPDATE(terminal)
@@ -581,6 +619,20 @@ INPUT_PORTS_START( generic_terminal )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) PORT_CHAR(10)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+
+	PORT_START("TERM_CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Cursor")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	PORT_CONFNAME( 0x02, 0x02, "Type")
+	PORT_CONFSETTING(    0x00, "Underline")
+	PORT_CONFSETTING(    0x02, "Block")
+	PORT_CONFNAME( 0x04, 0x04, "Blinking")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x04, DEF_STR(Yes))
+	PORT_CONFNAME( 0x08, 0x08, "Invert")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x08, DEF_STR(Yes))
 INPUT_PORTS_END
 
 DEFINE_LEGACY_DEVICE(GENERIC_TERMINAL, terminal);
