@@ -41,23 +41,22 @@ Ports:
 
 
 static READ8_HANDLER( jupiter_io_r );
-static WRITE8_HANDLER( jupiter_port_fe_w );
+static WRITE8_HANDLER( jupiter_io_w );
 static WRITE8_HANDLER( jupiter_expram_w );
-static WRITE8_HANDLER( jupiter_vh_charram_w );
 
 
 /* memory w/r functions */
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, videoram)
-	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_WRITE(jupiter_vh_charram_w) AM_BASE_MEMBER(jupiter_state, charram)
+	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, charram) AM_REGION("maincpu", 0x2c00)
 	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4800, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE_MEMBER(jupiter_state, expram)			/* Expansion RAM */
 ADDRESS_MAP_END
 
 /* port i/o functions */
 static ADDRESS_MAP_START( jupiter_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( jupiter_io_r, jupiter_port_fe_w )
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( jupiter_io_r, jupiter_io_w )
 ADDRESS_MAP_END
 
 
@@ -178,10 +177,10 @@ static READ8_HANDLER( jupiter_io_r )
 }
 
 
-static WRITE8_HANDLER( jupiter_port_fe_w )
+static WRITE8_HANDLER( jupiter_io_w )
 {
 	running_device *speaker = space->machine->device("speaker");
-//  cassette_output( machine->device("cassette"), 1 );
+//  cassette_output( space->machine->device("cassette"), 1 );
 	speaker_level_w(speaker,1);
 }
 
@@ -204,14 +203,6 @@ static WRITE8_HANDLER( jupiter_expram_w )
 
 /* graphics output */
 
-static PALETTE_INIT( jupiter )
-{
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
-	palette_set_color(machine,2,RGB_WHITE); /* white */
-	palette_set_color(machine,3,RGB_BLACK); /* black */
-}
-
 
 static const gfx_layout jupiter_charlayout =
 {
@@ -227,23 +218,7 @@ static const gfx_layout jupiter_charlayout =
 
 static GFXDECODE_START( jupiter )
 	GFXDECODE_ENTRY( "maincpu", 0x2c00, jupiter_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "maincpu", 0x2c00, jupiter_charlayout, 2, 1 )
 GFXDECODE_END
-
-
-static WRITE8_HANDLER( jupiter_vh_charram_w )
-{
-	jupiter_state *state = space->machine->driver_data<jupiter_state>();
-	if(data == state->charram[offset])
-		return; /* no change */
-
-	state->charram[offset] = data;
-
-	/* decode character graphics again */
-	offset >>= 3;
-	gfx_element_mark_dirty(space->machine->gfx[0], offset);
-	gfx_element_mark_dirty(space->machine->gfx[1], offset);
-}
 
 
 static TIMER_CALLBACK( jupiter_set_irq_callback )
@@ -277,29 +252,40 @@ static VIDEO_START( jupiter )
 static VIDEO_UPDATE( jupiter )
 {
 	jupiter_state *state = screen->machine->driver_data<jupiter_state>();
+	UINT8 *charram = state->charram;
 	UINT8 *videoram = state->videoram;
-	int offs;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
 
-	for(offs = 0; offs < 768; offs++)
+	for (y = 0; y < 24; y++)
 	{
-		int code = videoram[offs];
-		int sx, sy;
+		for (ra = 0; ra < 8; ra++)
+		{
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
-		sy = (offs / 32) << 3;
-		sx = (offs % 32) << 3;
+			for (x = ma; x < ma+32; x++)
+			{
+				chr = videoram[x];
 
-		drawgfx_opaque(bitmap, NULL, ( code & 0x80 ) ? screen->machine->gfx[1] : screen->machine->gfx[0],
-			code & 0x7f, 0, 0,0, sx,sy);
+				/* get pattern of pixels for that character scanline */
+				gfx = charram[((chr&0x7f)<<3) | ra] ^ ((chr&0x80) ? 0xff : 0);
+
+				/* Display a scanline of a character (8 pixels) */
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+			}
+		}
+		ma+=32;
 	}
-
 	return 0;
 }
 
-static DRIVER_INIT( jupiter )
-{
-	jupiter_state *state = machine->driver_data<jupiter_state>();
-	state->charram = memory_region(machine, "maincpu")+0x2c00;
-}
 
 static const cassette_config jupiter_cassette_config =
 {
@@ -325,8 +311,8 @@ static MACHINE_CONFIG_START( jupiter, jupiter_state )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_6_5MHz, 416, 0, 256, 264, 0, 192 )
 
 	MDRV_GFXDECODE( jupiter )
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(jupiter)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START( jupiter )
 	MDRV_VIDEO_UPDATE( jupiter )
@@ -352,4 +338,4 @@ ROM_START (jupiter)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY   FULLNAME */
-COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,	"Jupiter Cantab",  "Jupiter Ace" , 0 )
+COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  0,	"Jupiter Cantab",  "Jupiter Ace" , 0 )
