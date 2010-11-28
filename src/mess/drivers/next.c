@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+class next_state : public driver_device
+{
+public:
+	next_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(next_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
@@ -34,7 +44,7 @@ static VIDEO_UPDATE( next )
     return 0;
 }
 
-static MACHINE_CONFIG_START( next, driver_device )
+static MACHINE_CONFIG_START( next, next_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68030, XTAL_25MHz)
     MDRV_CPU_PROGRAM_MAP(next_mem)

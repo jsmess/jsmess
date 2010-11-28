@@ -210,6 +210,16 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/ti99/gromport.h"
 #include "machine/ti99/mecmouse.h"
 
+
+class ti99_8_state : public driver_device
+{
+public:
+	ti99_8_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*
     Memory map - see description above
 */
@@ -571,7 +581,7 @@ MACHINE_RESET( ti99_8 )
 {
 }
 
-static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
+static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
@@ -616,7 +626,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ti99_8_50hz, driver_device )
+static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)

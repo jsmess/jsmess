@@ -40,6 +40,16 @@
 #include "machine/ti99/mecmouse.h"
 #include "machine/ti99/handset.h"
 
+
+class ti99_4x_state : public driver_device
+{
+public:
+	ti99_4x_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*
     Memory map
 */
@@ -784,7 +794,7 @@ MACHINE_RESET( ti99_4a )
 {
 }
 
-static MACHINE_CONFIG_START( ti99_4_60hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -834,7 +844,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, driver_device )
 	MDRV_HANDSET_ADD( "handset", "tms9901" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti99_4_50hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -880,7 +890,7 @@ static MACHINE_CONFIG_START( ti99_4_50hz, driver_device )
 	MDRV_HANDSET_ADD( "handset", "tms9901" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti99_4a_60hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -924,7 +934,7 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, driver_device )
 	MDRV_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti99_4a_50hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
@@ -979,7 +989,7 @@ TIMER_DEVICE_CALLBACK( ti99_4ev_scanline_interrupt )
 	v9938_interrupt(timer.machine, 0);
 }
 
-static MACHINE_CONFIG_START( ti99_4ev_60hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)

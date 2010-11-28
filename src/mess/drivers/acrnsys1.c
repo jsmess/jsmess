@@ -15,6 +15,16 @@
 #include "acrnsys1.lh"
 
 
+class acrnsys1_state : public driver_device
+{
+public:
+	acrnsys1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 /***************************************************************************
     KEYBOARD HANDLING
 ***************************************************************************/
@@ -153,7 +163,7 @@ static const ins8154_interface ins8154_b1 =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( acrnsys1, driver_device )
+static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map)

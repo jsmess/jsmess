@@ -3,6 +3,16 @@
 #include "machine/abc99.h"
 #include "devices/messram.h"
 
+
+class abc1600_state : public driver_device
+{
+public:
+	abc1600_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 #define M68008_TAG "m68008"
 
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -16,7 +26,7 @@ static VIDEO_UPDATE( abc1600 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( abc1600, driver_device )
+static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68008_TAG, M68008, 8000000)
 	MDRV_CPU_PROGRAM_MAP(abc1600_mem)

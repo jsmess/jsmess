@@ -57,6 +57,16 @@ TODO:
 #include "sound/es5503.h"
 #include "machine/68681.h"
 
+
+class esq1_state : public driver_device
+{
+public:
+	esq1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static void esq1_doc_irq(running_device *device, int state)
 {
 }
@@ -149,7 +159,7 @@ static const duart68681_config duart_config =
 	1000000, 1000000, // IP5, IP6
 };
 
-static MACHINE_CONFIG_START( esq1, driver_device )
+static MACHINE_CONFIG_START( esq1, esq1_state )
 	MDRV_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
 	MDRV_CPU_PROGRAM_MAP(esq1_map)
 

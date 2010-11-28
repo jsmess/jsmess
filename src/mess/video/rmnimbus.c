@@ -31,7 +31,6 @@
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 
-static UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 
 #define WIDTH_MASK      0x07
 #define XOR_MASK        0x08
@@ -39,7 +38,6 @@ static UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 
 // Offsets of nimbus video registers within register array
 
-#define NO_VIDREGS      (0x30/2)
 #define reg000          0x00
 #define reg002          0x01
 #define reg004          0x02
@@ -65,43 +63,38 @@ static UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 #define reg02C          0x16
 #define reg02E          0x17
 
-#define FG_COLOUR       (vidregs[reg024]&0x0F)
-#define BG_COLOUR       ((vidregs[reg024]&0xF0)>>4)
+#define FG_COLOUR       (state->vidregs[reg024]&0x0F)
+#define BG_COLOUR       ((state->vidregs[reg024]&0xF0)>>4)
 
-#define IS_80COL        (vidregs[reg026]&MASK_4080)
-#define IS_XOR          (vidregs[reg022]&XOR_MASK)
+#define IS_80COL        (state->vidregs[reg026]&MASK_4080)
+#define IS_XOR          (state->vidregs[reg022]&XOR_MASK)
 
 
-static UINT16 vidregs[NO_VIDREGS];
 
-static UINT8   bpp;            // Bits / pixel
-static UINT16  pixel_mask;
-static UINT8   hs_count;
 
 #define DEBUG_TEXT  0x01
 #define DEBUG_DB    0x02
 #define DEBUG_PIXEL 0x04
 
-#define DEBUG_SET(flags)    ((debug_video & (flags))==(flags))
-static UINT32 debug_video;
+#define DEBUG_SET(flags)    ((state->debug_video & (flags))==(flags))
 
-static UINT8 get_pixel(UINT16 x, UINT16 y);
-static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
-static UINT16 read_pixel_data(UINT16 x, UINT16 y);
-static UINT16 read_reg_00A(void);
+static UINT8 get_pixel(rmnimbus_state *state, UINT16 x, UINT16 y);
+static UINT16 read_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT8 width);
+static UINT16 read_pixel_data(rmnimbus_state *state, UINT16 x, UINT16 y);
+static UINT16 read_reg_00A(rmnimbus_state *state);
 
-static void set_pixel(UINT16 x, UINT16 y, UINT8 colour);
-static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
-static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
-static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
-static void write_reg_004(void);
-static void write_reg_006(void);
-static void write_reg_010(void);
-static void write_reg_012(void);
-static void write_reg_014(void);
-static void write_reg_01A(void);
-static void write_reg_01C(void);
-static void write_reg_026(void);
+static void set_pixel(rmnimbus_state *state, UINT16 x, UINT16 y, UINT8 colour);
+static void write_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data, UINT8 width);
+static void write_pixel_data(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data);
+static void move_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data, UINT8 width);
+static void write_reg_004(rmnimbus_state *state);
+static void write_reg_006(rmnimbus_state *state);
+static void write_reg_010(rmnimbus_state *state);
+static void write_reg_012(rmnimbus_state *state);
+static void write_reg_014(rmnimbus_state *state);
+static void write_reg_01A(rmnimbus_state *state);
+static void write_reg_01C(rmnimbus_state *state);
+static void write_reg_026(rmnimbus_state *state);
 static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno);
 
 static void video_debug(running_machine *machine, int ref, int params, const char *param[]);
@@ -114,37 +107,38 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 
 READ16_HANDLER (nimbus_video_io_r)
 {
+	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
     int     pc=cpu_get_pc(space->cpu);
     UINT16  result;
 
     switch (offset)
     {
-        case    reg000  : result=vidregs[reg000]; break;
-        case    reg002  : result=vidregs[reg002]; break;
-        case    reg004  : result=vidregs[reg004]; break;
-        case    reg006  : result=vidregs[reg006]; break;
-        case    reg008  : result=vidregs[reg008]; break;
-        case    reg00A  : result=read_reg_00A(); break;
-        case    reg00C  : result=vidregs[reg00C]; break;
-        case    reg00E  : result=vidregs[reg00E]; break;
+        case    reg000  : result=state->vidregs[reg000]; break;
+        case    reg002  : result=state->vidregs[reg002]; break;
+        case    reg004  : result=state->vidregs[reg004]; break;
+        case    reg006  : result=state->vidregs[reg006]; break;
+        case    reg008  : result=state->vidregs[reg008]; break;
+        case    reg00A  : result=read_reg_00A(state); break;
+        case    reg00C  : result=state->vidregs[reg00C]; break;
+        case    reg00E  : result=state->vidregs[reg00E]; break;
 
-        case    reg010  : result=vidregs[reg010]; break;
-        case    reg012  : result=vidregs[reg012]; break;
-        case    reg014  : result=vidregs[reg014]; break;
-        case    reg016  : result=vidregs[reg016]; break;
-        case    reg018  : result=vidregs[reg018]; break;
-        case    reg01A  : result=vidregs[reg01A]; break;
-        case    reg01C  : result=vidregs[reg01C]; break;
-        case    reg01E  : result=vidregs[reg01E]; break;
+        case    reg010  : result=state->vidregs[reg010]; break;
+        case    reg012  : result=state->vidregs[reg012]; break;
+        case    reg014  : result=state->vidregs[reg014]; break;
+        case    reg016  : result=state->vidregs[reg016]; break;
+        case    reg018  : result=state->vidregs[reg018]; break;
+        case    reg01A  : result=state->vidregs[reg01A]; break;
+        case    reg01C  : result=state->vidregs[reg01C]; break;
+        case    reg01E  : result=state->vidregs[reg01E]; break;
 
-        case    reg020  : result=vidregs[reg020]; break;
-        case    reg022  : result=vidregs[reg022]; break;
-        case    reg024  : result=vidregs[reg024]; break;
-        case    reg026  : result=vidregs[reg026]; break;
-        case    reg028  : result=hs_count; break; //result=vidregs[reg028]; break;
-        case    reg02A  : result=vidregs[reg02A]; break;
-        case    reg02C  : result=vidregs[reg02C]; break;
-        case    reg02E  : result=vidregs[reg02E]; break;
+        case    reg020  : result=state->vidregs[reg020]; break;
+        case    reg022  : result=state->vidregs[reg022]; break;
+        case    reg024  : result=state->vidregs[reg024]; break;
+        case    reg026  : result=state->vidregs[reg026]; break;
+        case    reg028  : result=state->hs_count; break; //result=state->vidregs[reg028]; break;
+        case    reg02A  : result=state->vidregs[reg02A]; break;
+        case    reg02C  : result=state->vidregs[reg02C]; break;
+        case    reg02E  : result=state->vidregs[reg02E]; break;
         default         : result=0; break;
     }
 
@@ -154,22 +148,22 @@ READ16_HANDLER (nimbus_video_io_r)
     return result;
 }
 
-static UINT8 get_pixel(UINT16 x, UINT16 y)
+static UINT8 get_pixel(rmnimbus_state *state, UINT16 x, UINT16 y)
 {
     UINT8   result = 0;
 
     if((x<SCREEN_WIDTH_PIXELS) && (y<SCREEN_HEIGHT_LINES))
     {
         if(IS_80COL)
-            result=video_mem[x][y];
+            result=state->video_mem[x][y];
         else
-            result=video_mem[x*2][y];
+            result=state->video_mem[x*2][y];
     }
 
     return result;
 }
 
-static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width)
+static UINT16 read_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT8 width)
 {
     UINT16  result = 0;
     UINT16  mask;
@@ -178,37 +172,37 @@ static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width)
     UINT8   shifts;
 
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
-        logerror("read_pixel_line(x=%04X, y=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,width,bpp,pixel_mask);
+        logerror("read_pixel_line(x=%04X, y=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,width,state->bpp,state->pixel_mask);
 
-    shifts=width-bpp;
+    shifts=width-state->bpp;
 
-    for(mask=pixel_mask, pixel_x=(x*(width/bpp)); mask>0; mask=(mask>>bpp), pixel_x++)
+    for(mask=state->pixel_mask, pixel_x=(x*(width/state->bpp)); mask>0; mask=(mask>>state->bpp), pixel_x++)
     {
-        colour=get_pixel(pixel_x,y);
+        colour=get_pixel(state,pixel_x,y);
 
-        if(bpp==1)
+        if(state->bpp==1)
             colour=((colour==FG_COLOUR) ? 1 : 0) << shifts;
         else
             colour=colour << shifts;
 
         result=(result & ~mask)  | colour;
 
-        shifts-=bpp;
+        shifts-=state->bpp;
     }
 
     return result;
 }
 
-static UINT16 read_pixel_data(UINT16 x, UINT16 y)
+static UINT16 read_pixel_data(rmnimbus_state *state, UINT16 x, UINT16 y)
 {
     UINT16  result=0;
 
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
-        logerror("read_pixel_data(x=%04X, y=%04X), reg022=%04X\n",x,y,vidregs[reg022]);
+        logerror("read_pixel_data(x=%04X, y=%04X), reg022=%04X\n",x,y,state->vidregs[reg022]);
 
     if(IS_80COL)
     {
-        switch (vidregs[reg022] & WIDTH_MASK)
+        switch (state->vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : break;
 
@@ -222,8 +216,8 @@ static UINT16 read_pixel_data(UINT16 x, UINT16 y)
 
             case 0x05   : break;
 
-            case 0x06   : bpp=2; pixel_mask=0xC000;
-                          result=read_pixel_line(x,y,16);
+            case 0x06   : state->bpp=2; state->pixel_mask=0xC000;
+                          result=read_pixel_line(state,x,y,16);
                           break;
 
             case 0x07   : break;
@@ -231,7 +225,7 @@ static UINT16 read_pixel_data(UINT16 x, UINT16 y)
     }
     else /* 40 Col */
     {
-        switch (vidregs[reg022] & WIDTH_MASK)
+        switch (state->vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : break;
 
@@ -245,8 +239,8 @@ static UINT16 read_pixel_data(UINT16 x, UINT16 y)
 
             case 0x05   : break;
 
-            case 0x06   : bpp=4; pixel_mask=0xF000;
-                          result=read_pixel_line(x,y,16);
+            case 0x06   : state->bpp=4; state->pixel_mask=0xF000;
+                          result=read_pixel_line(state,x,y,16);
                           break;
 
             case 0x07   : break;
@@ -256,9 +250,9 @@ static UINT16 read_pixel_data(UINT16 x, UINT16 y)
     return result;
 }
 
-static UINT16 read_reg_00A(void)
+static UINT16 read_reg_00A(rmnimbus_state *state)
 {
-    return read_pixel_data(++vidregs[reg002],vidregs[reg00C]);
+    return read_pixel_data(state, ++state->vidregs[reg002],state->vidregs[reg00C]);
 }
 
 
@@ -274,6 +268,7 @@ static UINT16 read_reg_00A(void)
 
 WRITE16_HANDLER (nimbus_video_io_w)
 {
+	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
     int pc=cpu_get_pc(space->cpu);
 
     if(offset<reg028)
@@ -287,28 +282,28 @@ WRITE16_HANDLER (nimbus_video_io_w)
 
     switch (offset)
     {
-        case    reg000  : vidregs[reg000]=data; break;
-        case    reg002  : vidregs[reg002]=data; break;
-        case    reg004  : vidregs[reg004]=data; write_reg_004(); break;
-        case    reg006  : vidregs[reg006]=data; write_reg_006(); break;
-        case    reg008  : vidregs[reg008]=data; break;
-        case    reg00A  : vidregs[reg00A]=data; break;
-        case    reg00C  : vidregs[reg00C]=data; break;
-        case    reg00E  : vidregs[reg00E]=data; break;
+        case    reg000  : state->vidregs[reg000]=data; break;
+        case    reg002  : state->vidregs[reg002]=data; break;
+        case    reg004  : state->vidregs[reg004]=data; write_reg_004(state); break;
+        case    reg006  : state->vidregs[reg006]=data; write_reg_006(state); break;
+        case    reg008  : state->vidregs[reg008]=data; break;
+        case    reg00A  : state->vidregs[reg00A]=data; break;
+        case    reg00C  : state->vidregs[reg00C]=data; break;
+        case    reg00E  : state->vidregs[reg00E]=data; break;
 
-        case    reg010  : vidregs[reg010]=data; write_reg_010(); break;
-        case    reg012  : vidregs[reg012]=data; write_reg_012(); break;
-        case    reg014  : vidregs[reg014]=data; write_reg_014(); break;
-        case    reg016  : vidregs[reg016]=data; break;
-        case    reg018  : vidregs[reg018]=data; break;
-        case    reg01A  : vidregs[reg01A]=data; write_reg_01A(); break;
-        case    reg01C  : vidregs[reg01C]=data; write_reg_01C();break;
-        case    reg01E  : vidregs[reg01E]=data; break;
+        case    reg010  : state->vidregs[reg010]=data; write_reg_010(state); break;
+        case    reg012  : state->vidregs[reg012]=data; write_reg_012(state); break;
+        case    reg014  : state->vidregs[reg014]=data; write_reg_014(state); break;
+        case    reg016  : state->vidregs[reg016]=data; break;
+        case    reg018  : state->vidregs[reg018]=data; break;
+        case    reg01A  : state->vidregs[reg01A]=data; write_reg_01A(state); break;
+        case    reg01C  : state->vidregs[reg01C]=data; write_reg_01C(state);break;
+        case    reg01E  : state->vidregs[reg01E]=data; break;
 
-        case    reg020  : vidregs[reg020]=data; break;
-        case    reg022  : vidregs[reg022]=data; break;
-        case    reg024  : vidregs[reg024]=data; break;
-        case    reg026  : vidregs[reg026]=data; write_reg_026(); break;
+        case    reg020  : state->vidregs[reg020]=data; break;
+        case    reg022  : state->vidregs[reg022]=data; break;
+        case    reg024  : state->vidregs[reg024]=data; break;
+        case    reg026  : state->vidregs[reg026]=data; write_reg_026(state); break;
         case    reg028  : change_palette(space->machine,0,data,reg028); break;
         case    reg02A  : change_palette(space->machine,1,data,reg02A); break;
         case    reg02C  : change_palette(space->machine,2,data,reg02C); break;
@@ -318,7 +313,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
     }
 }
 
-static void set_pixel(UINT16 x, UINT16 y, UINT8 colour)
+static void set_pixel(rmnimbus_state *state, UINT16 x, UINT16 y, UINT8 colour)
 {
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("set_pixel(x=%04X, y=%04X, colour=%04X), IS_XOR=%02X\n",x,y,colour,IS_XOR);
@@ -329,19 +324,19 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 colour)
     if((x<SCREEN_WIDTH_PIXELS) && (y<SCREEN_HEIGHT_LINES))
     {
         if(IS_XOR)
-            video_mem[x][y]^=colour;
+            state->video_mem[x][y]^=colour;
         else
-            video_mem[x][y]=colour;
+            state->video_mem[x][y]=colour;
     }
 }
 
-static void set_pixel40(UINT16 x, UINT16 y, UINT8 colour)
+static void set_pixel40(rmnimbus_state *state, UINT16 x, UINT16 y, UINT8 colour)
 {
-    set_pixel((x*2),y,colour);
-    set_pixel((x*2)+1,y,colour);
+    set_pixel(state, (x*2),y,colour);
+    set_pixel(state, (x*2)+1,y,colour);
 }
 
-static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
+static void write_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data, UINT8 width)
 {
     UINT16  mask;
     UINT16  pixel_x;
@@ -349,29 +344,29 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
     UINT8   shifts;
 
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
-        logerror("write_pixel_line(x=%04X, y=%04X, data=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,data,width,bpp,pixel_mask);
+        logerror("write_pixel_line(x=%04X, y=%04X, data=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,data,width,state->bpp,state->pixel_mask);
 
-    shifts=width-bpp;
+    shifts=width-state->bpp;
 
-    for(mask=pixel_mask, pixel_x=(x*(width/bpp)); mask>0; mask=(mask>>bpp), pixel_x++)
+    for(mask=state->pixel_mask, pixel_x=(x*(width/state->bpp)); mask>0; mask=(mask>>state->bpp), pixel_x++)
     {
-        if(bpp==1)
+        if(state->bpp==1)
             colour=(data & mask) ? FG_COLOUR : BG_COLOUR;
         else
             colour=(data & mask) >> shifts;
 
-        //logerror("write_pixel_line: data=%04X, mask=%04X, shifts=%02X, bpp=%02X colour=%02X\n",data,mask,shifts,bpp,colour);
+        //logerror("write_pixel_line: data=%04X, mask=%04X, shifts=%02X, bpp=%02X colour=%02X\n",data,mask,shifts,state->bpp,colour);
 
         if(IS_80COL)
-            set_pixel(pixel_x,y,colour);
+            set_pixel(state,pixel_x,y,colour);
         else
-            set_pixel40(pixel_x,y,colour);
+            set_pixel40(state,pixel_x,y,colour);
 
-        shifts-=bpp;
+        shifts-=state->bpp;
     }
 }
 
-static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
+static void move_pixel_line(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data, UINT8 width)
 {
     UINT16  pixelno;
     UINT16  pixelx;
@@ -384,7 +379,7 @@ static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
         pixelx=(x*width)+pixelno;
         if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
             logerror("pixelx=%04X\n",pixelx);
-        video_mem[pixelx][vidregs[reg020]]=video_mem[pixelx][y];
+        state->video_mem[pixelx][state->vidregs[reg020]]=state->video_mem[pixelx][y];
     }
 }
 
@@ -415,130 +410,130 @@ static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
     1   pixels are xor'ed onto the screen
 */
 
-static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
+static void write_pixel_data(rmnimbus_state *state, UINT16 x, UINT16 y, UINT16    data)
 {
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
-        logerror("write_pixel_data(x=%04X, y=%04X, data=%04X), reg022=%04X\n",x,y,data,vidregs[reg022]);
+        logerror("write_pixel_data(x=%04X, y=%04X, data=%04X), reg022=%04X\n",x,y,data,state->vidregs[reg022]);
 
     if(IS_80COL)
     {
-        switch (vidregs[reg022] & WIDTH_MASK)
+        switch (state->vidregs[reg022] & WIDTH_MASK)
         {
-            case 0x00   : bpp=1; pixel_mask=0x8000;
-                          write_pixel_line(x,y,data,16);
+            case 0x00   : state->bpp=1; state->pixel_mask=0x8000;
+                          write_pixel_line(state,x,y,data,16);
                           break;
 
-            case 0x01   : bpp=1; pixel_mask=0x80;
-                          write_pixel_line(x,y,data,8);
+            case 0x01   : state->bpp=1; state->pixel_mask=0x80;
+                          write_pixel_line(state,x,y,data,8);
                           break;
 
-            case 0x02   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8);
+            case 0x02   : state->bpp=1; state->pixel_mask=0x0080;
+                          write_pixel_line(state,x,y,data,8);
                           break;
 
-            case 0x03   : bpp=1;
-                          set_pixel(x,y,FG_COLOUR);
+            case 0x03   : state->bpp=1;
+                          set_pixel(state,x,y,FG_COLOUR);
                           break;
 
-            case 0x04   : bpp=2; pixel_mask=0xC0;
-                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
+            case 0x04   : state->bpp=2; state->pixel_mask=0xC0;
+                          write_pixel_line(state,x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
                           break;
 
-            case 0x05   : move_pixel_line(x,y,data,16);
+            case 0x05   : move_pixel_line(state,x,y,data,16);
                           break;
 
-            case 0x06   : bpp=2; pixel_mask=0xC000;
-                          write_pixel_line(x,y,data,16);
+            case 0x06   : state->bpp=2; state->pixel_mask=0xC000;
+                          write_pixel_line(state,x,y,data,16);
                           break;
 
-            case 0x07   : bpp=1;
-                          set_pixel(x,y,FG_COLOUR);
+            case 0x07   : state->bpp=1;
+                          set_pixel(state,x,y,FG_COLOUR);
                           break;
         }
     }
     else /* 40 Col */
     {
-        switch (vidregs[reg022] & WIDTH_MASK)
+        switch (state->vidregs[reg022] & WIDTH_MASK)
         {
-            case 0x00   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8);
+            case 0x00   : state->bpp=1; state->pixel_mask=0x0080;
+                          write_pixel_line(state,x,y,data,8);
                           break;
 
-            case 0x01   : bpp=2; pixel_mask=0xC0;
-                          write_pixel_line(x,y,data,8);
+            case 0x01   : state->bpp=2; state->pixel_mask=0xC0;
+                          write_pixel_line(state,x,y,data,8);
                           break;
 
-            case 0x02   : bpp=1; pixel_mask=0x0080;
-                          set_pixel40(x,y,FG_COLOUR);
+            case 0x02   : state->bpp=1; state->pixel_mask=0x0080;
+                          set_pixel40(state,x,y,FG_COLOUR);
                           break;
 
-            case 0x03   : bpp=1;
-                          set_pixel(x,y,FG_COLOUR);
+            case 0x03   : state->bpp=1;
+                          set_pixel(state,x,y,FG_COLOUR);
                           break;
 
-            case 0x04   : bpp=4; pixel_mask=0xF0;
-                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
+            case 0x04   : state->bpp=4; state->pixel_mask=0xF0;
+                          write_pixel_line(state,x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
                           break;
 
-            case 0x05   : move_pixel_line(x,y,data,16);
+            case 0x05   : move_pixel_line(state,x,y,data,16);
                           break;
 
-            case 0x06   : bpp=4; pixel_mask=0xF000;
-                          write_pixel_line(x,y,data,16);
+            case 0x06   : state->bpp=4; state->pixel_mask=0xF000;
+                          write_pixel_line(state,x,y,data,16);
                           break;
 
-            case 0x07   : bpp=1;
-                          set_pixel(x,y,FG_COLOUR);
+            case 0x07   : state->bpp=1;
+                          set_pixel(state,x,y,FG_COLOUR);
                           break;
         }
     }
 }
 
-static void write_reg_004(void)
+static void write_reg_004(rmnimbus_state *state)
 {
-    vidregs[reg002]=0;
-    vidregs[reg00C]++;
+    state->vidregs[reg002]=0;
+    state->vidregs[reg00C]++;
 }
 
-static void write_reg_006(void)
+static void write_reg_006(rmnimbus_state *state)
 {
-    vidregs[reg00C]++;
-    vidregs[reg002]=vidregs[reg006];
+    state->vidregs[reg00C]++;
+    state->vidregs[reg002]=state->vidregs[reg006];
 }
 
-static void write_reg_010(void)
+static void write_reg_010(rmnimbus_state *state)
 {
-    write_pixel_data(vidregs[reg002],vidregs[reg00C],vidregs[reg010]);
+    write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg00C],state->vidregs[reg010]);
 }
 
-static void write_reg_012(void)
+static void write_reg_012(rmnimbus_state *state)
 {
     // I dunno if this is actually what is happening as the regs seem to be write only....
     // doing this however does seem to make some programs (worms from the welcom disk)
     // work correctly.
-    vidregs[reg002]=vidregs[reg012];
+    state->vidregs[reg002]=state->vidregs[reg012];
 
-    write_pixel_data(vidregs[reg012],vidregs[reg00C],FG_COLOUR);
+    write_pixel_data(state, state->vidregs[reg012],state->vidregs[reg00C],FG_COLOUR);
 }
 
-static void write_reg_014(void)
+static void write_reg_014(rmnimbus_state *state)
 {
-    write_pixel_data(vidregs[reg002],vidregs[reg00C]++,vidregs[reg014]);
+    write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg00C]++,state->vidregs[reg014]);
 }
 
-static void write_reg_01A(void)
+static void write_reg_01A(rmnimbus_state *state)
 {
-    write_pixel_data(++vidregs[reg002],vidregs[reg00C],vidregs[reg01A]);
+    write_pixel_data(state, ++state->vidregs[reg002],state->vidregs[reg00C],state->vidregs[reg01A]);
 }
 
-static void write_reg_01C(void)
+static void write_reg_01C(rmnimbus_state *state)
 {
     // I dunno if this is actually what is happening as the regs seem to be write only....
     // doing this however does seem to make some programs (welcome from the welcom disk,
     // and others using the standard RM box menus) work correctly.
-    vidregs[reg00C]=vidregs[reg01C];
+    state->vidregs[reg00C]=state->vidregs[reg01C];
 
-    write_pixel_data(vidregs[reg002],vidregs[reg01C],FG_COLOUR);
+    write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg01C],FG_COLOUR);
 }
 
 /*
@@ -546,14 +541,15 @@ static void write_reg_01C(void)
     bit 5 contains the 40/80 column (320/640 pixel) flag.
 */
 
-static void write_reg_026(void)
+static void write_reg_026(rmnimbus_state *state)
 {
     if(DEBUG_SET(DEBUG_TEXT))
-        logerror("reg 026 write, border_colour=%02X\n",vidregs[reg026] & 0x0F);
+        logerror("reg 026 write, border_colour=%02X\n",state->vidregs[reg026] & 0x0F);
 }
 
 static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno)
 {
+	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
     UINT8   colourno;
     UINT16  mask;
     UINT8   shifts;
@@ -562,8 +558,8 @@ static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours,
     UINT8   first;
 
     // for the register's data has changed update it, and then update the pallette, else do nothing.
-    if(vidregs[regno]!=colours)
-        vidregs[regno]=colours;
+    if(state->vidregs[regno]!=colours)
+        state->vidregs[regno]=colours;
     else
         return;
 
@@ -589,38 +585,41 @@ static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours,
 
 static void video_debug(running_machine *machine, int ref, int params, const char *param[])
 {
+	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
     if(params>0)
     {
-        sscanf(param[0],"%d",&debug_video);
+        sscanf(param[0],"%d",&state->debug_video);
     }
     else
     {
         debug_console_printf(machine,"Error usage : nimbus_vid_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_video);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_video);
     }
 }
 
 static void video_regdump(running_machine *machine, int ref, int params, const char *param[])
 {
+	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
     int regno;
 
     for(regno=0;regno<0x08;regno++)
     {
         debug_console_printf(machine,"reg%03X=%04X reg%03X=%04X reg%03X=%04X\n",
-                regno*2,vidregs[regno],
-                (regno+0x08)*2,vidregs[regno+0x08],
-                (regno+0x10)*2,vidregs[regno+0x10]);
+                regno*2,state->vidregs[regno],
+                (regno+0x08)*2,state->vidregs[regno+0x08],
+                (regno+0x10)*2,state->vidregs[regno+0x10]);
 
         logerror("reg%03X=%04X reg%03X=%04X reg%03X=%04X\n",
-                regno*2,vidregs[regno],
-                (regno+0x08)*2,vidregs[regno+0x08],
-                (regno+0x10)*2,vidregs[regno+0x10]);
+                regno*2,state->vidregs[regno],
+                (regno+0x08)*2,state->vidregs[regno+0x08],
+                (regno+0x10)*2,state->vidregs[regno+0x10]);
     }
 }
 
 VIDEO_START( nimbus )
 {
-    debug_video=0;
+	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+    state->debug_video=0;
 
     logerror("VIDEO_START\n");
 
@@ -633,11 +632,12 @@ VIDEO_START( nimbus )
 
 VIDEO_RESET( nimbus )
 {
+	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
     // When we reset clear the video registers and video memory.
-    memset(&vidregs,0x00,sizeof(vidregs));
-    memset(&video_mem,0,sizeof(video_mem));
+    memset(&state->vidregs,0x00,sizeof(state->vidregs));
+    memset(&state->video_mem,0,sizeof(state->video_mem));
 
-    bpp=4;          // bits per pixel
+    state->bpp=4;          // bits per pixel
     logerror("Video reset\n");
 }
 
@@ -649,17 +649,18 @@ VIDEO_EOF( nimbus )
 
 VIDEO_UPDATE( nimbus )
 {
+	rmnimbus_state *state = screen->machine->driver_data<rmnimbus_state>();
     int     XCoord;
     int     YCoord = screen->vpos();
 
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
     {
-        *BITMAP_ADDR16(bitmap, YCoord, XCoord)=video_mem[XCoord][YCoord];
+        *BITMAP_ADDR16(bitmap, YCoord, XCoord)=state->video_mem[XCoord][YCoord];
     }
 
-    hs_count++;
-    if((hs_count & 0x000F)>0x0A)
-        hs_count&=0xFFF0;
+    state->hs_count++;
+    if((state->hs_count & 0x000F)>0x0A)
+        state->hs_count&=0xFFF0;
 
     return 0;
 }

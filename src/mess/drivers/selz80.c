@@ -13,8 +13,18 @@
 #include "cpu/z80/z80.h"
 #include "selz80.lh"
 
-static UINT8 selz80_digit;
-static UINT8 selz80_segment;
+
+class selz80_state : public driver_device
+{
+public:
+	selz80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 digit;
+	UINT8 segment;
+};
+
+
 
 static READ8_HANDLER( selz80_00_r )
 {
@@ -28,17 +38,19 @@ static READ8_HANDLER( selz80_01_r )
 
 static WRITE8_HANDLER( selz80_01_w )
 {
+	selz80_state *state = space->machine->driver_data<selz80_state>();
 	if ((data & 0xc0)==0x80)
 	{
-		selz80_digit = data & 7;
-		output_set_digit_value(selz80_digit, selz80_segment);
+		state->digit = data & 7;
+		output_set_digit_value(state->digit, state->segment);
 	}
 }
 
 static WRITE8_HANDLER( selz80_00_w )
 {
-	selz80_segment = BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4);
-	output_set_digit_value(selz80_digit, selz80_segment);
+	selz80_state *state = space->machine->driver_data<selz80_state>();
+	state->segment = BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	output_set_digit_value(state->digit, state->segment);
 }
 
 static ADDRESS_MAP_START(selz80_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -70,7 +82,7 @@ static MACHINE_RESET(selz80)
 {
 }
 
-static MACHINE_CONFIG_START( selz80, driver_device )
+static MACHINE_CONFIG_START( selz80, selz80_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(selz80_mem)

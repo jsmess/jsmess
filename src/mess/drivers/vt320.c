@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "devices/messram.h"
+
+
+class vt320_state : public driver_device
+{
+public:
+	vt320_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
 /*
 
 Partlist :
@@ -62,7 +72,7 @@ static VIDEO_UPDATE( vt320 )
 }
 
 
-static MACHINE_CONFIG_START( vt320, driver_device )
+static MACHINE_CONFIG_START( vt320, vt320_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8051, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(vt320_mem)

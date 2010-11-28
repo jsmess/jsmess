@@ -12,6 +12,16 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/terminal.h"
 
+
+class swtpc_state : public driver_device
+{
+public:
+	swtpc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static WRITE8_HANDLER(swtpc_terminal_w)
 {
 	running_device *devconf = space->machine->device("terminal");
@@ -45,7 +55,7 @@ static GENERIC_TERMINAL_INTERFACE( swtpc_terminal_intf )
 	DEVCB_HANDLER(swtpc_kbd_put)
 };
 
-static MACHINE_CONFIG_START( swtpc, driver_device )
+static MACHINE_CONFIG_START( swtpc, swtpc_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(swtpc_mem)

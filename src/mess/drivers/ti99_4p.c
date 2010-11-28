@@ -63,6 +63,16 @@
 #include "machine/ti99/sgcpu.h"
 #include "machine/ti99/peribox.h"
 
+
+class ti99_4p_state : public driver_device
+{
+public:
+	ti99_4p_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("sgcpu_board", sgcpu_r, sgcpu_w )
 ADDRESS_MAP_END
@@ -263,7 +273,7 @@ INTERRUPT_GEN( ti99_4p_hblank_interrupt )
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz, driver_device )
+static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)

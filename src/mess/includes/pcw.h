@@ -18,11 +18,36 @@
 #define PCW_SCREEN_HEIGHT	(PCW_DISPLAY_HEIGHT  + (PCW_BORDER_HEIGHT<<1))
 
 
-/*----------- defined in drivers/pcw.c -----------*/
+class pcw_state : public driver_device
+{
+public:
+	pcw_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern unsigned int roller_ram_addr;
-extern unsigned short roller_ram_offset;
-extern unsigned char pcw_vdu_video_control_register;
+	int boot;
+	int system_status;
+	int fdc_interrupt_code;
+	int interrupt_counter;
+	UINT8 banks[4];
+	unsigned char bank_force;
+	UINT8 timer_irq_flag;
+	UINT8 nmi_flag;
+	UINT8 printer_command;
+	UINT8 printer_data;
+	UINT8 printer_status;
+	UINT8 printer_headpos;
+	UINT16 kb_scan_row;
+	UINT8 mcu_keyboard_data[16];
+	UINT8 mcu_transmit_reset_seq;
+	UINT8 mcu_transmit_count;
+	UINT8 mcu_selected;
+	UINT8 mcu_buffer;
+	UINT8 mcu_prev;
+	unsigned int roller_ram_addr;
+	unsigned short roller_ram_offset;
+	unsigned char vdu_video_control_register;
+};
+
 
 /*----------- defined in video/pcw.c -----------*/
 

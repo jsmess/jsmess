@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+
+class iq151_state : public driver_device
+{
+public:
+	iq151_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(iq151_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xefff ) AM_RAM
@@ -69,7 +79,7 @@ static GFXDECODE_START( iq151 )
 	GFXDECODE_ENTRY( "chargen", 0x0400, iq151_64_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( iq151, driver_device )
+static MACHINE_CONFIG_START( iq151, iq151_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(iq151_mem)

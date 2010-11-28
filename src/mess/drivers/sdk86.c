@@ -15,6 +15,16 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
+
+class sdk86_state : public driver_device
+{
+public:
+	sdk86_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(sdk86_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM
@@ -42,7 +52,7 @@ static VIDEO_UPDATE( sdk86 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( sdk86, driver_device )
+static MACHINE_CONFIG_START( sdk86, sdk86_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
     MDRV_CPU_PROGRAM_MAP(sdk86_mem)

@@ -11,6 +11,16 @@
 #include "machine/6551.h"
 #include "machine/terminal.h"
 
+
+class mits680b_state : public driver_device
+{
+public:
+	mits680b_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(mits680b_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAM // 1024 bytes RAM
@@ -38,7 +48,7 @@ static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
 	DEVCB_HANDLER(mits680b_kbd_put)
 };
 
-static MACHINE_CONFIG_START( mits680b, driver_device )
+static MACHINE_CONFIG_START( mits680b, mits680b_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
     MDRV_CPU_PROGRAM_MAP(mits680b_mem)

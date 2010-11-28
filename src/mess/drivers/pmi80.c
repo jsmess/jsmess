@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+
+class pmi80_state : public driver_device
+{
+public:
+	pmi80_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(pmi80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
@@ -37,7 +47,7 @@ static VIDEO_UPDATE( pmi80 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( pmi80, driver_device )
+static MACHINE_CONFIG_START( pmi80, pmi80_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(pmi80_mem)

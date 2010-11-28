@@ -64,6 +64,16 @@
 #include "machine/i2cmem.h"
 #include "devices/messram.h"
 
+
+class a310_state : public driver_device
+{
+public:
+	a310_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
 {
 	if (state)
@@ -249,7 +259,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
-static MACHINE_CONFIG_START( a310, driver_device )
+static MACHINE_CONFIG_START( a310, a310_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(a310_mem)

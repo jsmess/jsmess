@@ -10,6 +10,16 @@
 #include "cpu/m68000/m68000.h"
 
 
+class a3000_state : public driver_device
+{
+public:
+	a3000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -40,7 +50,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( a3000, driver_device )
+static MACHINE_CONFIG_START( a3000, a3000_state )
 	MDRV_CPU_ADD("maincpu", M68030, XTAL_U104 / 2)
 	MDRV_CPU_PROGRAM_MAP(a3000_mem)
 

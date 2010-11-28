@@ -21,6 +21,16 @@
 #include "cpu/m68000/m68000.h"
 #include "video/generic.h"
 
+
+class hp16500_state : public driver_device
+{
+public:
+	hp16500_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(hp16500_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00600000, 0x0063ffff) AM_RAM
@@ -36,7 +46,7 @@ static VIDEO_UPDATE( hp16500 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hp16500, driver_device )
+static MACHINE_CONFIG_START( hp16500, hp16500_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(hp16500_map)

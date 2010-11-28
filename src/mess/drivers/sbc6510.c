@@ -20,6 +20,16 @@
 #include "machine/6526cia.h"
 #include "sound/ay8910.h"
 
+
+class sbc6510_state : public driver_device
+{
+public:
+	sbc6510_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(sbc6510_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
@@ -72,7 +82,7 @@ const mos6526_interface sbc6510_ntsc_cia0 =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( sbc6510, driver_device )
+static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MDRV_CPU_CONFIG( sbc6510_m6510_interface )

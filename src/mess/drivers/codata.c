@@ -10,6 +10,16 @@
 #include "cpu/m68000/m68000.h"
 
 
+class codata_state : public driver_device
+{
+public:
+	codata_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 static ADDRESS_MAP_START(codata_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
@@ -32,7 +42,7 @@ static VIDEO_UPDATE( codata )
     return 0;
 }
 
-static MACHINE_CONFIG_START( codata, driver_device )
+static MACHINE_CONFIG_START( codata, codata_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
     MDRV_CPU_PROGRAM_MAP(codata_mem)

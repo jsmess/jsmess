@@ -11,6 +11,16 @@
 #include "machine/i8255a.h"
 #include "machine/terminal.h"
 
+
+class basic52_state : public driver_device
+{
+public:
+	basic52_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(basic52_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -59,7 +69,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL					/* Port C write */
 };
 
-static MACHINE_CONFIG_START( basic31, driver_device )
+static MACHINE_CONFIG_START( basic31, basic52_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
@@ -74,7 +84,7 @@ static MACHINE_CONFIG_START( basic31, driver_device )
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( basic52, driver_device )
+static MACHINE_CONFIG_START( basic52, basic52_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)

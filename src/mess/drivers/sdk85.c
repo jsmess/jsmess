@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+
+class sdk85_state : public driver_device
+{
+public:
+	sdk85_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(sdk85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor rom (A14)
@@ -40,7 +50,7 @@ static VIDEO_UPDATE( sdk85 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( sdk85, driver_device )
+static MACHINE_CONFIG_START( sdk85, sdk85_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(sdk85_mem)

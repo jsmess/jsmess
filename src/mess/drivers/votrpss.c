@@ -61,6 +61,16 @@
 #include "cpu/z80/z80.h"
 #include "votrpss.lh"
 
+
+class votrpss_state : public driver_device
+{
+public:
+	votrpss_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /* Components */
 //#include "sound/ay8910.h"
 //#include "sound/votrax.h"
@@ -132,7 +142,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrpss, driver_device )
+static MACHINE_CONFIG_START( votrpss, votrpss_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
     MDRV_CPU_PROGRAM_MAP(z80_mem)

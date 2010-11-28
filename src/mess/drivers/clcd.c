@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
+
+class clcd_state : public driver_device
+{
+public:
+	clcd_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(clcd_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
@@ -38,7 +48,7 @@ static VIDEO_UPDATE( clcd )
     return 0;
 }
 
-static MACHINE_CONFIG_START( clcd, driver_device )
+static MACHINE_CONFIG_START( clcd, clcd_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6502, 2000000) // really M65C102
     MDRV_CPU_PROGRAM_MAP(clcd_mem)

@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+class indiana_state : public driver_device
+{
+public:
+	indiana_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(indiana_mem, ADDRESS_SPACE_PROGRAM, 32)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x7f800000) AM_ROM AM_REGION("user1",0) // 64Kb of EPROM
@@ -40,7 +50,7 @@ static VIDEO_UPDATE( indiana )
     return 0;
 }
 
-static MACHINE_CONFIG_START( indiana, driver_device )
+static MACHINE_CONFIG_START( indiana, indiana_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68030, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(indiana_mem)

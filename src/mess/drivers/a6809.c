@@ -15,6 +15,16 @@
 #include "video/saa5050.h"
 #include "video/mc6845.h"
 
+
+class a6809_state : public driver_device
+{
+public:
+	a6809_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(a6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
@@ -90,7 +100,7 @@ static const via6522_interface via_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 
-static MACHINE_CONFIG_START( a6809, driver_device )
+static MACHINE_CONFIG_START( a6809, a6809_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(a6809_mem)

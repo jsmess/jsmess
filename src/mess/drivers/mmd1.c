@@ -11,6 +11,16 @@
 #include "mmd1.lh"
 #include "mmd2.lh"
 
+
+class mmd1_state : public driver_device
+{
+public:
+	mmd1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static WRITE8_HANDLER (mmd1_port0_w)
 {
 	output_set_value("p0_7", BIT(data,7) ? 0 : 1);
@@ -161,7 +171,7 @@ static MACHINE_RESET(mmd2)
 {
 }
 
-static MACHINE_CONFIG_START( mmd1, driver_device )
+static MACHINE_CONFIG_START( mmd1, mmd1_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd1_mem)
@@ -173,7 +183,7 @@ static MACHINE_CONFIG_START( mmd1, driver_device )
 	MDRV_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mmd2, driver_device )
+static MACHINE_CONFIG_START( mmd2, mmd1_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd2_mem)

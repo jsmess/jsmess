@@ -17,6 +17,16 @@
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
 
+
+class apogee_state : public driver_device
+{
+public:
+	apogee_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /* Address maps */
 static ADDRESS_MAP_START(apogee_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
@@ -151,7 +161,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( apogee, driver_device )
+static MACHINE_CONFIG_START( apogee, apogee_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(apogee_mem)

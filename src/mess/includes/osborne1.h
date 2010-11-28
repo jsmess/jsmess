@@ -9,6 +9,34 @@
 
 #include "machine/6821pia.h"
 
+class osborne1_state : public driver_device
+{
+public:
+	osborne1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8	bank2_enabled;
+	UINT8	bank3_enabled;
+	UINT8	*bank4_ptr;
+	UINT8	*empty_4K;
+	/* IRQ states */
+	int		pia_0_irq_state;
+	int		pia_1_irq_state;
+	/* video related */
+	UINT8	new_start_x;
+	UINT8	new_start_y;
+	emu_timer	*video_timer;
+	UINT8	*charrom;
+	UINT8	charline;
+	UINT8	start_y;
+	/* bankswitch setting */
+	UINT8	bankswitch;
+	UINT8	in_irq_handler;
+	/* beep state */
+	UINT8	beep;
+};
+
+
 /*----------- defined in machine/osborne1.c -----------*/
 
 extern const pia6821_interface osborne1_ieee_pia_config;

@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 
+
+class elektor_state : public driver_device
+{
+public:
+	elektor_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(elektor_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
@@ -37,7 +47,7 @@ static VIDEO_UPDATE( elektor )
     return 0;
 }
 
-static MACHINE_CONFIG_START( elektor, driver_device )
+static MACHINE_CONFIG_START( elektor, elektor_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(elektor_mem)

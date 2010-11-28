@@ -68,6 +68,7 @@ public:
 	emu_timer *beep_clear;
 
 	/* LCD */
+	UINT8 cursor_blink;
 	UINT8 lcd_on;
 	UINT8 lcd_map[32][120];
 	UINT8 scroll_min;
@@ -856,9 +857,8 @@ static PALETTE_INIT( x07 )
 static VIDEO_UPDATE( x07 )
 {
 	t6834_state *state = screen->machine->driver_data<t6834_state>();
-	static UINT8 cursor_blink = 0;
 
-	cursor_blink++;
+	state->cursor_blink++;
 
 	if (state->lcd_on)
 		for(int y = 0; y < 4; y++)
@@ -867,7 +867,7 @@ static VIDEO_UPDATE( x07 )
 			for(int x = 0; x < 20; x++)
 			{
 				int px = x * 6;
-				if(state->cur_on && (cursor_blink & 0x20) && state->cur_x == x && state->cur_y == y)
+				if(state->cur_on && (state->cursor_blink & 0x20) && state->cur_x == x && state->cur_y == y)
 				{
 					for(int l = 0; l < 8; l++)
 					{

@@ -15,6 +15,16 @@
 #include "cpu/z80/z80daisy.h"
 #include "devices/cartslot.h"
 
+
+class bbcbc_state : public driver_device
+{
+public:
+	bbcbc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 #define MAIN_CLOCK XTAL_4_433619MHz
 
 
@@ -161,7 +171,7 @@ static MACHINE_RESET( bbcbc )
 }
 
 
-static MACHINE_CONFIG_START( bbcbc, driver_device )
+static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg)
 	MDRV_CPU_IO_MAP( bbcbc_io)

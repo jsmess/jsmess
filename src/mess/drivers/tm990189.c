@@ -73,6 +73,7 @@ public:
 	device_image_interface *rs232_fp;
 	UINT8 rs232_rts;
 	emu_timer *rs232_input_timer;
+	UINT8 bogus_read_save;
 };
 
 
@@ -514,8 +515,8 @@ static void idle_callback(running_device *device, int state)
 
 static  READ8_HANDLER(video_vdp_r)
 {
+	tm990189_state *state = space->machine->driver_data<tm990189_state>();
 	int reply = 0;
-	static UINT8 bogus_read_save;
 
 	/* When the tms9980 reads @>2000 or @>2001, it actually does a word access:
     it reads @>2000 first, then @>2001.  According to schematics, both access
@@ -537,9 +538,9 @@ static  READ8_HANDLER(video_vdp_r)
 		reply = TMS9928A_vram_r(space, 0);
 
 	if (!(offset & 1))
-		bogus_read_save = reply;
+		state->bogus_read_save = reply;
 	else
-		reply = bogus_read_save;
+		reply = state->bogus_read_save;
 
 	return reply;
 }

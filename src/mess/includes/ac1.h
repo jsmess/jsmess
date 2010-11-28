@@ -9,6 +9,15 @@
 
 #include "machine/z80pio.h"
 
+class ac1_state : public driver_device
+{
+public:
+	ac1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*----------- defined in machine/ac1.c -----------*/
 
 DRIVER_INIT( ac1 );

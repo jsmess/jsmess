@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 
+
+class p112_state : public driver_device
+{
+public:
+	p112_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(p112_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x07fff) AM_ROM
@@ -38,7 +48,7 @@ static VIDEO_UPDATE( p112 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( p112, driver_device )
+static MACHINE_CONFIG_START( p112, p112_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z180, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(p112_mem)

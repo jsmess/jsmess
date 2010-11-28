@@ -132,6 +132,16 @@ TODO:  - The UPD7810 core is missing analog port emulation
 #include "ex800.lh"
 
 
+class ex800_state : public driver_device
+{
+public:
+	ex800_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 #define PA0 (data & 0x01)
 #define PA1 (data & 0x02)
 #define PA2 (data & 0x04)
@@ -418,7 +428,7 @@ static const UPD7810_CONFIG ex800_cpu_config =
 ******************************************************************************/
 
 
-static MACHINE_CONFIG_START( ex800, driver_device )
+static MACHINE_CONFIG_START( ex800, ex800_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)

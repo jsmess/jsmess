@@ -29,6 +29,16 @@
 #include "sound/beep.h"
 
 
+class p8k_state : public driver_device
+{
+public:
+	p8k_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 static ADDRESS_MAP_START(p8k_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xffff) AM_RAM
@@ -489,7 +499,7 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( p8k, driver_device )
+static MACHINE_CONFIG_START( p8k, p8k_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz )
 	MDRV_CPU_CONFIG(p8k_daisy_chain)
@@ -531,7 +541,7 @@ static MACHINE_CONFIG_START( p8k, driver_device )
 	MDRV_VIDEO_UPDATE(p8k)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( p8k_16, driver_device )
+static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
 	MDRV_CPU_CONFIG(p8k_16_daisy_chain)

@@ -10,6 +10,16 @@
 #include "cpu/mcs51/mcs51.h"
 #include "devices/messram.h"
 
+
+class vt220_state : public driver_device
+{
+public:
+	vt220_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(vt220_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -36,7 +46,7 @@ static VIDEO_UPDATE( vt220 )
 }
 
 
-static MACHINE_CONFIG_START( vt220, driver_device )
+static MACHINE_CONFIG_START( vt220, vt220_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8051, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(vt220_mem)

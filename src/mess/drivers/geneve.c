@@ -206,6 +206,16 @@
 #include "sound/sn76496.h"
 #include "machine/ti99/peribox.h"
 
+
+class geneve_state : public driver_device
+{
+public:
+	geneve_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*
     memory map
 */
@@ -455,7 +465,7 @@ MACHINE_RESET( geneve )
 {
 }
 
-static MACHINE_CONFIG_START( geneve_60hz, driver_device )
+static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 12000000)

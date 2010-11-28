@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 
+
+class d6809_state : public driver_device
+{
+public:
+	d6809_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(d6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0xdfff) AM_RAM
@@ -37,7 +47,7 @@ static VIDEO_UPDATE( d6809 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( d6809, driver_device )
+static MACHINE_CONFIG_START( d6809, d6809_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(d6809_mem)

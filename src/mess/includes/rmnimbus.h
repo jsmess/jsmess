@@ -13,9 +13,189 @@
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
+#define num_ioports 0x80
+#define NIMBUS_KEYROWS      11
+#define KEYBOARD_QUEUE_SIZE 32
+
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
 #define SCREEN_NO_COLOURS       16
+
+#define NO_VIDREGS      (0x30/2)
+
+/* Nimbus sub-bios structures for debugging */
+
+typedef struct
+{
+	UINT16  ofs_brush;
+	UINT16  seg_brush;
+	UINT16  ofs_data;
+	UINT16  seg_data;
+	UINT16  count;
+} t_area_params;
+
+typedef struct
+{
+	UINT16  ofs_font;
+	UINT16  seg_font;
+	UINT16  ofs_data;
+	UINT16  seg_data;
+	UINT16  x;
+	UINT16  y;
+	UINT16  length;
+} t_plot_string_params;
+
+typedef struct
+{
+	UINT16  style;
+	UINT16  style_index;
+	UINT16  colour1;
+	UINT16  colour2;
+	UINT16  transparency;
+	UINT16  boundary_spec;
+	UINT16  boundary_colour;
+	UINT16  save_colour;
+} t_nimbus_brush;
+
+#define SCREEN_WIDTH_PIXELS     640
+#define SCREEN_HEIGHT_LINES     250
+#define SCREEN_NO_COLOURS       16
+
+
+/* 80186 internal stuff */
+struct mem_state
+{
+	UINT16	    lower;
+	UINT16	    upper;
+	UINT16	    middle;
+	UINT16	    middle_size;
+	UINT16	    peripheral;
+};
+
+struct timer_state
+{
+	UINT16	    control;
+	UINT16	    maxA;
+	UINT16	    maxB;
+	UINT16	    count;
+	emu_timer   *int_timer;
+	emu_timer   *time_timer;
+	UINT8	    time_timer_active;
+	attotime	last_time;
+};
+
+struct dma_state
+{
+	UINT32	    source;
+	UINT32	    dest;
+	UINT16	    count;
+	UINT16	    control;
+	UINT8	    finished;
+	emu_timer   *finish_timer;
+};
+
+struct intr_state
+{
+	UINT8	pending;
+	UINT16	ack_mask;
+	UINT16	priority_mask;
+	UINT16	in_service;
+	UINT16	request;
+	UINT16	status;
+	UINT16	poll_status;
+	UINT16	timer;
+	UINT16	dma[2];
+	UINT16	ext[4];
+	UINT16  ext_vector[2]; // external vectors, when in cascade mode
+};
+
+typedef struct
+{
+	struct timer_state	timer[3];
+	struct dma_state	dma[2];
+	struct intr_state	intr;
+	struct mem_state	mem;
+} i186_state;
+
+typedef struct
+{
+	UINT8       keyrows[NIMBUS_KEYROWS];
+	emu_timer   *keyscan_timer;
+	UINT8       queue[KEYBOARD_QUEUE_SIZE];
+	UINT8       head;
+	UINT8       tail;
+}  keyboard_t;
+
+// Static data related to Floppy and SCSI hard disks
+typedef struct
+{
+	UINT8   reg400;
+	UINT8   reg410_in;
+	UINT8   reg410_out;
+	UINT8   reg418;
+
+	UINT8   drq_ff;
+	UINT8   int_ff;
+} nimbus_drives_t;
+
+/* 8031 Peripheral controler */
+typedef struct
+{
+	UINT8   ipc_in;
+	UINT8   ipc_out;
+	UINT8   status_in;
+	UINT8   status_out;
+	UINT8   int_8c_pending;
+	UINT8   int_8e_pending;
+	UINT8   int_8f_pending;
+} ipc_interface_t;
+
+/* Mouse/Joystick */
+typedef struct
+{
+	UINT8   mouse_px;
+	UINT8   mouse_py;
+
+	UINT8   mouse_x;
+	UINT8   mouse_y;
+	UINT8   mouse_pc;
+	UINT8   mouse_pcx;
+	UINT8   mouse_pcy;
+
+	UINT8   intstate_x;
+	UINT8   intstate_y;
+
+	UINT8   reg0a4;
+
+	emu_timer   *mouse_timer;
+} _mouse_joy_state;
+
+
+class rmnimbus_state : public driver_device
+{
+public:
+	rmnimbus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 debug_machine;
+	i186_state i186;
+	keyboard_t keyboard;
+	nimbus_drives_t nimbus_drives;
+	ipc_interface_t ipc_interface;
+	UINT8 mcu_reg080;
+	UINT8 iou_reg092;
+	UINT8 last_playmode;
+	_mouse_joy_state nimbus_mouse;
+	UINT8 ay8910_a;
+	UINT16 IOPorts[num_ioports];
+	UINT8 sio_int_state;
+	UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
+	UINT16 vidregs[NO_VIDREGS];
+	UINT8 bpp;
+	UINT16 pixel_mask;
+	UINT8 hs_count;
+	UINT32 debug_video;
+};
 
 
 /*----------- defined in drivers/rmnimbus.c -----------*/
@@ -101,8 +281,6 @@ WRITE8_HANDLER( nimbus_mcu_w );
 /* Z80 SIO for keyboard */
 
 #define Z80SIO_TAG		    "z80sio"
-#define NIMBUS_KEYROWS      11
-#define KEYBOARD_QUEUE_SIZE 32
 
 extern const z80sio_interface nimbus_sio_intf;
 
@@ -138,11 +316,11 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state);
 #define FDC_DRQ_MASK    0x80
 #define FDC_DRIVE_MASK  (FDC_DRIVE0_MASK | FDC_DRIVE1_MASK | FDC_DRIVE2_MASK | FDC_DRIVE3_MASK)
 
-#define FDC_SIDE()          ((nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
-#define FDC_MOTOR()         ((nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
-#define FDC_DRIVE()         (scsibus_driveno(nimbus_drives.reg400 & FDC_DRIVE_MASK))
-#define HDC_DRQ_ENABLED()   ((nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
-#define FDC_DRQ_ENABLED()   ((nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
+#define FDC_SIDE()          ((state->nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
+#define FDC_MOTOR()         ((state->nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
+#define FDC_DRIVE()         (scsibus_driveno(state->nimbus_drives.reg400 & FDC_DRIVE_MASK))
+#define HDC_DRQ_ENABLED()   ((state->nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
+#define FDC_DRQ_ENABLED(state)   ((state->nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 
 /* Masks for port 0x410 read*/
 
@@ -166,7 +344,7 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state);
 #define HDC_RESET_MASK  0x01
 #define HDC_SEL_MASK    0x02
 #define HDC_IRQ_MASK    0x04
-#define HDC_IRQ_ENABLED()   ((nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
+#define HDC_IRQ_ENABLED(state)   ((state->nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
 
 
 #define SCSI_ID_NONE    0x80
@@ -236,7 +414,7 @@ enum
 READ8_HANDLER( nimbus_mouse_js_r );
 WRITE8_HANDLER( nimbus_mouse_js_w );
 
-#define MOUSE_INT_ENABLED()     ((iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
+#define MOUSE_INT_ENABLED(state)     (((state)->iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
 
 /*----------- defined in video/rmnimbus.c -----------*/
@@ -254,39 +432,5 @@ VIDEO_RESET( nimbus );
 #define BLUE                    2
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
-
-/* Nimbus sub-bios structures for debugging */
-
-typedef struct
-{
-    UINT16  ofs_brush;
-    UINT16  seg_brush;
-    UINT16  ofs_data;
-    UINT16  seg_data;
-    UINT16  count;
-} t_area_params;
-
-typedef struct
-{
-    UINT16  ofs_font;
-    UINT16  seg_font;
-    UINT16  ofs_data;
-    UINT16  seg_data;
-    UINT16  x;
-    UINT16  y;
-    UINT16  length;
-} t_plot_string_params;
-
-typedef struct
-{
-    UINT16  style;
-    UINT16  style_index;
-    UINT16  colour1;
-    UINT16  colour2;
-    UINT16  transparency;
-    UINT16  boundary_spec;
-    UINT16  boundary_colour;
-    UINT16  save_colour;
-} t_nimbus_brush;
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))

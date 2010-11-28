@@ -15,6 +15,16 @@
 #include "et3400.lh"
 
 
+class et3400_state : public driver_device
+{
+public:
+	et3400_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
+
 static READ8_HANDLER( et3400_keypad_r )
 {
 	UINT8 data = 0xff;
@@ -85,7 +95,7 @@ static INPUT_PORTS_START( et3400 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( et3400, driver_device )
+static MACHINE_CONFIG_START( et3400, et3400_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, XTAL_4MHz / 8 )
 	MDRV_CPU_PROGRAM_MAP(et3400_mem)

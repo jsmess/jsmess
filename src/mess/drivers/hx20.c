@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
+
+class hx20_state : public driver_device
+{
+public:
+	hx20_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(ehx20_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM // I/O
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -78,7 +88,7 @@ static GFXDECODE_START( hx20 )
 	GFXDECODE_ENTRY( "maincpu", 0xfe20, hx20_3_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ehx20, driver_device )
+static MACHINE_CONFIG_START( ehx20, hx20_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",HD63701, 614000) // HD6301
     MDRV_CPU_PROGRAM_MAP(ehx20_mem)

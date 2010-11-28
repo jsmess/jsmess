@@ -22,6 +22,17 @@
 #include "video/i8275.h"
 
 
+class rt1715_state : public driver_device
+{
+public:
+	rt1715_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int led1_val;
+	int led2_val;
+};
+
+
 /***************************************************************************
     FLOPPY
 ***************************************************************************/
@@ -39,18 +50,18 @@ static WRITE8_HANDLER( rt1715_floppy_enable )
 /* si/so led */
 static READ8_HANDLER( k7658_led1_r )
 {
-	static int led1_val = 0;
-	led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", cpuexec_describe_context(space->machine), led1_val);
+	rt1715_state *state = space->machine->driver_data<rt1715_state>();
+	state->led1_val ^= 1;
+	logerror("%s: k7658_led1_r %02x\n", cpuexec_describe_context(space->machine), state->led1_val);
 	return 0xff;
 }
 
 /* caps led */
 static READ8_HANDLER( k7658_led2_r )
 {
-	static int led2_val = 0;
-	led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", cpuexec_describe_context(space->machine), led2_val);
+	rt1715_state *state = space->machine->driver_data<rt1715_state>();
+	state->led2_val ^= 1;
+	logerror("%s: k7658_led2_r %02x\n", cpuexec_describe_context(space->machine), state->led2_val);
 	return 0xff;
 }
 
@@ -299,7 +310,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ NULL }
 };
 
-static MACHINE_CONFIG_START( rt1715, driver_device )
+static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(rt1715_mem)

@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+
+class prof180x_state : public driver_device
+{
+public:
+	prof180x_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(prof180x_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
@@ -37,7 +47,7 @@ static VIDEO_UPDATE( prof180x )
     return 0;
 }
 
-static MACHINE_CONFIG_START( prof180x, driver_device )
+static MACHINE_CONFIG_START( prof180x, prof180x_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // HD64180
     MDRV_CPU_PROGRAM_MAP(prof180x_mem)

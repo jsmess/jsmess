@@ -39,6 +39,16 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
+
+class dm7000_state : public driver_device
+{
+public:
+	dm7000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*
  Memory map for the IBM "Redwood-4" STB03xxx evaluation board.
 
@@ -82,7 +92,7 @@ static VIDEO_UPDATE( dm7000 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( dm7000, driver_device )
+static MACHINE_CONFIG_START( dm7000, dm7000_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",PPC403GA, 252000000) // Should be PPC405
     MDRV_CPU_PROGRAM_MAP(dm7000_mem)

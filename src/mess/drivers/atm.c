@@ -9,6 +9,16 @@
 #include "machine/beta.h"
 #include "devices/messram.h"
 
+
+class atm_state : public driver_device
+{
+public:
+	atm_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 DIRECT_UPDATE_HANDLER( atm_direct )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();

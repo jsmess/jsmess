@@ -10,6 +10,16 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 
+
+class ipds_state : public driver_device
+{
+public:
+	ipds_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(ipds_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -85,7 +95,7 @@ static GFXDECODE_START( ipds )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ipds, driver_device )
+static MACHINE_CONFIG_START( ipds, ipds_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipds_mem)

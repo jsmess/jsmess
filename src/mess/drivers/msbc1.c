@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+class msbc1_state : public driver_device
+{
+public:
+	msbc1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(msbc1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00007fff) AM_ROM AM_REGION("user1",0)
@@ -33,7 +43,7 @@ static VIDEO_UPDATE( msbc1 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( msbc1, driver_device )
+static MACHINE_CONFIG_START( msbc1, msbc1_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(msbc1_mem)

@@ -9,6 +9,7 @@
 typedef struct _terminal_state terminal_state;
 struct _terminal_state
 {
+	UINT8 framecnt;
 	UINT8 buffer[TERMINAL_WIDTH*TERMINAL_HEIGHT];
 	UINT8 x_pos;
 	UINT8 y_pos;
@@ -258,11 +259,10 @@ static void generic_terminal_update(running_device *device, bitmap_t *bitmap, co
 	terminal_state *term = get_safe_token(device);
 	UINT8 options = input_port_read(device->machine, "TERM_CONF");
 	UINT16 cursor = term->y_pos * TERMINAL_WIDTH + term->x_pos;
-	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-	framecnt++;
+	term->framecnt++;
 
 	for (y = 0; y < TERMINAL_HEIGHT; y++)
 	{
@@ -279,7 +279,7 @@ static void generic_terminal_update(running_device *device, bitmap_t *bitmap, co
 				{
 					if ((options & 2) || (ra == 9)) // block, or underline & at bottom line
 					{
-						if ((options & 4) && (framecnt & 8)) // want blink & time to blink
+						if ((options & 4) && (term->framecnt & 8)) // want blink & time to blink
 						{
 						}
 						else

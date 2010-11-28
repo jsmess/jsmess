@@ -50,6 +50,7 @@ PALETTE_INIT( pcw )
 ***************************************************************************/
 VIDEO_UPDATE( pcw )
 {
+	pcw_state *state = screen->machine->driver_data<pcw_state>();
 	int x,y,b;
 	unsigned short roller_ram_offs;
 	unsigned char *roller_ram_ptr;
@@ -59,7 +60,7 @@ VIDEO_UPDATE( pcw )
 	pen1 = 1;
 
 	/* invert? */
-	if (pcw_vdu_video_control_register & (1<<7))
+	if (state->vdu_video_control_register & (1<<7))
 	{
 		/* yes */
 		pen1^=1;
@@ -67,7 +68,7 @@ VIDEO_UPDATE( pcw )
 	}
 
 	/* video enable? */
-	if ((pcw_vdu_video_control_register & (1<<6))!=0)
+	if ((state->vdu_video_control_register & (1<<6))!=0)
 	{
 		rectangle rect;
 
@@ -88,7 +89,7 @@ VIDEO_UPDATE( pcw )
 		/* yes */
 
 		/* offset to start in table */
-		roller_ram_offs = (roller_ram_offset<<1);
+		roller_ram_offs = (state->roller_ram_offset<<1);
 
 		for (y=0; y<256; y++)
 		{
@@ -98,7 +99,7 @@ VIDEO_UPDATE( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = messram_get_ptr(screen->machine->device("messram")) + roller_ram_addr + roller_ram_offs;
+			roller_ram_ptr = messram_get_ptr(screen->machine->device("messram")) + state->roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */

@@ -14,6 +14,16 @@
 #include "cpu/t11/t11.h"
 #include "devices/messram.h"
 
+
+class vt240_state : public driver_device
+{
+public:
+	vt240_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(vt240_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -42,7 +52,7 @@ static VIDEO_UPDATE( vt240 )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( vt240, driver_device )
+static MACHINE_CONFIG_START( vt240, vt240_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vt240_mem)

@@ -10,6 +10,16 @@
 #include "cpu/v810/v810.h"
 #include "video/vdc.h"
 
+
+class pcfx_state : public driver_device
+{
+public:
+	pcfx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START( pcfx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM	/* RAM */
 	AM_RANGE( 0x80700000, 0x807FFFFF ) AM_NOP	/* EXTIO */
@@ -44,7 +54,7 @@ static MACHINE_RESET( pcfx )
 }
 
 
-static MACHINE_CONFIG_START( pcfx, driver_device )
+static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MDRV_CPU_ADD( "maincpu", V810, 21477270 )
 	MDRV_CPU_PROGRAM_MAP( pcfx_mem)
 	MDRV_CPU_IO_MAP( pcfx_io)

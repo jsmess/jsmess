@@ -148,7 +148,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( homelab, driver_device )
+static MACHINE_CONFIG_START( homelab, homelab_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(homelab2_mem)

@@ -76,6 +76,16 @@ TODO :
 #include "machine/990_tap.h"
 #include "video/911_vdt.h"
 
+
+class ti990_10_state : public driver_device
+{
+public:
+	ti990_10_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static MACHINE_START( ti990_10 )
 {
 	MACHINE_START_CALL( ti990_hdc );
@@ -194,7 +204,7 @@ static const ti990_tpc_interface ti990_tpc =
 	ti990_set_int9
 };
 
-static MACHINE_CONFIG_START( ti990_10, driver_device )
+static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)

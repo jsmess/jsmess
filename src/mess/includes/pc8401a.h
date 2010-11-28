@@ -43,6 +43,7 @@ public:
 	running_device *sed1330;
 	running_device *mc6845;
 	running_device *lcd;
+	UINT8 key_latch;
 };
 
 /* ---------- defined in video/pc8401a.c ---------- */

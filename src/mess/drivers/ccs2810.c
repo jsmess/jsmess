@@ -10,6 +10,16 @@
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 
+
+class ccs2810_state : public driver_device
+{
+public:
+	ccs2810_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(ccs2810_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
@@ -50,7 +60,7 @@ static const ins8250_interface ccs2810_com_interface =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ccs2810, driver_device )
+static MACHINE_CONFIG_START( ccs2810, ccs2810_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(ccs2810_mem)

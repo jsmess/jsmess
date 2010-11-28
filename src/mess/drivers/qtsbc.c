@@ -12,8 +12,18 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-static UINT8 *qtsbc_ram;
-static UINT8 term_data;
+
+class qtsbc_state : public driver_device
+{
+public:
+	qtsbc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+	UINT8 term_data;
+};
+
+
 
 static WRITE8_HANDLER( qtsbc_06_w )
 {
@@ -24,8 +34,9 @@ static WRITE8_HANDLER( qtsbc_06_w )
 
 static READ8_HANDLER( qtsbc_06_r )
 {
-	UINT8 ret = term_data;
-	term_data = 0;
+	qtsbc_state *state = space->machine->driver_data<qtsbc_state>();
+	UINT8 ret = state->term_data;
+	state->term_data = 0;
 	return ret;
 }
 
@@ -36,7 +47,7 @@ static READ8_HANDLER( qtsbc_43_r )
 
 static ADDRESS_MAP_START(qtsbc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE(&qtsbc_ram) AM_REGION("maincpu",0)
+	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE_MEMBER(qtsbc_state, ram) AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qtsbc_io , ADDRESS_SPACE_IO, 8)
@@ -54,13 +65,15 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(qtsbc)
 {
+	qtsbc_state *state = machine->driver_data<qtsbc_state>();
 	UINT8* bios = memory_region(machine, "maincpu")+0x10000;
-	memcpy(qtsbc_ram,bios, 0x800);
+	memcpy(state->ram,bios, 0x800);
 }
 
 static WRITE8_DEVICE_HANDLER( qtsbc_kbd_put )
 {
-	term_data = data;
+	qtsbc_state *state = device->machine->driver_data<qtsbc_state>();
+	state->term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( qtsbc_terminal_intf )
@@ -68,7 +81,7 @@ static GENERIC_TERMINAL_INTERFACE( qtsbc_terminal_intf )
 	DEVCB_HANDLER(qtsbc_kbd_put)
 };
 
-static MACHINE_CONFIG_START( qtsbc, driver_device )
+static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
 	MDRV_CPU_PROGRAM_MAP(qtsbc_mem)

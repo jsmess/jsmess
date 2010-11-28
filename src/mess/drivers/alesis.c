@@ -12,6 +12,16 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
+
+class alesis_state : public driver_device
+{
+public:
+	alesis_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(hr16_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -49,7 +59,7 @@ static VIDEO_UPDATE( alesis )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hr16, driver_device )
+static MACHINE_CONFIG_START( hr16, alesis_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(hr16_mem)
@@ -71,7 +81,7 @@ static MACHINE_CONFIG_START( hr16, driver_device )
 	MDRV_VIDEO_UPDATE(alesis)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sr16, driver_device )
+static MACHINE_CONFIG_START( sr16, alesis_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sr16_mem)

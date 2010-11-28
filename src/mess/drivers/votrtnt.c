@@ -18,6 +18,16 @@
 #include "sound/votrax.h"
 #include "machine/6850acia.h"
 
+
+class votrtnt_state : public driver_device
+{
+public:
+	votrtnt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /* Devices */
 
 
@@ -58,7 +68,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrtnt, driver_device )
+static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
     MDRV_CPU_PROGRAM_MAP(6802_mem)

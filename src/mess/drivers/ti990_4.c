@@ -46,6 +46,16 @@ TODO:
 #endif
 #include "devices/flopdrv.h"
 
+
+class ti990_4_state : public driver_device
+{
+public:
+	ti990_4_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static MACHINE_RESET(ti990_4)
 {
 	ti990_hold_load(machine);
@@ -217,7 +227,7 @@ static const floppy_config ti990_4_floppy_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ti990_4, driver_device )
+static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)

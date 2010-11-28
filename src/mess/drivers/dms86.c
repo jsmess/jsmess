@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
+
+class dms86_state : public driver_device
+{
+public:
+	dms86_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(dms86_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
@@ -37,7 +47,7 @@ static VIDEO_UPDATE( dms86 )
     return 0;
 }
 
-static MACHINE_CONFIG_START( dms86, driver_device )
+static MACHINE_CONFIG_START( dms86, dms86_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(dms86_mem)

@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/t11/t11.h"
 
+
+class uknc_state : public driver_device
+{
+public:
+	uknc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(uknc_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_RAM  // RAM
@@ -45,7 +55,7 @@ static const struct t11_setup t11_data =
 };
 
 
-static MACHINE_CONFIG_START( uknc, driver_device )
+static MACHINE_CONFIG_START( uknc, uknc_state )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 8000000)
 	MDRV_CPU_CONFIG(t11_data)
