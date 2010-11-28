@@ -20,12 +20,24 @@ public:
 	UINT8 *ccs_ram;
 };
 
+static UINT8 term_data;
 
+static READ8_HANDLER( ccs2422_10_r )
+{
+	UINT8 ret = term_data;
+	term_data = 0;
+	return ret;
+}
 
-static WRITE8_HANDLER(ccs2422_terminal_w)
+static READ8_HANDLER( ccs2422_11_r )
+{
+	return 4 | ((term_data) ? 1 : 0);
+}
+
+static WRITE8_HANDLER(ccs2422_10_w)
 {
 	running_device *devconf = space->machine->device("terminal");
-	terminal_write(devconf,0,data);
+	terminal_write(devconf,0,data & 0x7f);
 }
 
 static ADDRESS_MAP_START(ccs2422_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -36,7 +48,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ccs2422_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ccs2422_terminal_w)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(ccs2422_10_r,ccs2422_10_w)
+	AM_RANGE(0x11, 0x11) AM_READ(ccs2422_11_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -56,6 +69,7 @@ static MACHINE_RESET(ccs2422)
 
 static WRITE8_DEVICE_HANDLER( ccs2422_kbd_put )
 {
+	term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
@@ -64,21 +78,21 @@ static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
 };
 
 static MACHINE_CONFIG_START( ccs2422, ccs2422_state )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(ccs2422_mem)
-    MDRV_CPU_IO_MAP(ccs2422_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(ccs2422_mem)
+	MDRV_CPU_IO_MAP(ccs2422_io)
 
-    MDRV_MACHINE_RESET(ccs2422)
+	MDRV_MACHINE_RESET(ccs2422)
 
-    /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MDRV_FRAGMENT_ADD( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ccs2422_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ccs2422 )
-    ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "2422b.u24", 0x0000, 0x0800, CRC(6cf22e31) SHA1(9aa3327cd8c23d0eab82cb6519891aff13ebe1d0))
 	ROM_LOAD( "2422.u23",  0x0900, 0x0100, CRC(b279cada) SHA1(6cc6e00ec49ba2245c8836d6f09266b09d6e7648))
 	ROM_LOAD( "2422.u22",  0x0a00, 0x0100, CRC(e41858bb) SHA1(0be53725032ebea16e32cb720f099551a357e761))
