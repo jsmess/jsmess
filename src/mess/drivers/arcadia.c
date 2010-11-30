@@ -531,7 +531,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( arcadia, driver_device )
+static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem)

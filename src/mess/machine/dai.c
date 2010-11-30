@@ -25,20 +25,15 @@
 #define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 
 /* Discrete I/O devices */
-UINT8 dai_noise_volume;
-UINT8 dai_osc_volume[3];
-static UINT8 dai_paddle_select;
-static UINT8 dai_paddle_enable;
-static UINT8 dai_cassette_motor[2];
-static running_device *dai_tms5501;
 
 
 /* Memory */
 
 WRITE8_HANDLER( dai_stack_interrupt_circuit_w )
 {
-	tms5501_sensor (dai_tms5501, 1);
-	tms5501_sensor (dai_tms5501, 0);
+	dai_state *state = space->machine->driver_data<dai_state>();
+	tms5501_sensor (state->tms5501, 1);
+	tms5501_sensor (state->tms5501, 0);
 }
 
 static void dai_update_memory(running_machine *machine, int dai_rom_bank)
@@ -51,17 +46,17 @@ static TIMER_CALLBACK(dai_bootstrap_callback)
 	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0xc000);
 }
 
-static UINT8 dai_keyboard_scan_mask = 0;
 
 static UINT8 dai_keyboard_read (running_device *device)
 {
+	dai_state *state = device->machine->driver_data<dai_state>();
 	UINT8 data = 0x00;
 	int i;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	for (i = 0; i < 8; i++)
 	{
-		if (dai_keyboard_scan_mask & (1 << i))
+		if (state->keyboard_scan_mask & (1 << i))
 			data |= input_port_read(device->machine, keynames[i]);
 	}
 	return data;
@@ -69,7 +64,8 @@ static UINT8 dai_keyboard_read (running_device *device)
 
 static void dai_keyboard_write (running_device *device, UINT8 data)
 {
-	dai_keyboard_scan_mask = data;
+	dai_state *state = device->machine->driver_data<dai_state>();
+	state->keyboard_scan_mask = data;
 }
 
 static void dai_interrupt_callback(running_device *device, int intreq, UINT8 vector)
@@ -100,19 +96,22 @@ I8255A_INTERFACE( dai_ppi82555_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( dai_pit_out0 )
 {
-	dai_set_input(device->machine, 0, state);
+	dai_state *drvstate = device->machine->driver_data<dai_state>();
+	dai_set_input(drvstate->sound, 0, state);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( dai_pit_out1 )
 {
-	dai_set_input(device->machine, 1, state);
+	dai_state *drvstate = device->machine->driver_data<dai_state>();
+	dai_set_input(drvstate->sound, 1, state);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( dai_pit_out2 )
 {
-	dai_set_input(device->machine, 2, state);
+	dai_state *drvstate = device->machine->driver_data<dai_state>();
+	dai_set_input(drvstate->sound, 2, state);
 }
 
 
@@ -139,12 +138,15 @@ const struct pit8253_config dai_pit8253_intf =
 
 static TIMER_CALLBACK( dai_timer )
 {
-	tms5501_set_pio_bit_7 (dai_tms5501, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
+	dai_state *state = machine->driver_data<dai_state>();
+	tms5501_set_pio_bit_7 (state->tms5501, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
 }
 
 MACHINE_START( dai )
 {
-	dai_tms5501 = machine->device("tms5501");
+	dai_state *state = machine->driver_data<dai_state>();
+	state->sound = machine->device("custom");
+	state->tms5501 = machine->device("tms5501");
 
 	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
 	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
@@ -210,27 +212,26 @@ READ8_HANDLER( dai_io_discrete_devices_r )
 
 WRITE8_HANDLER( dai_io_discrete_devices_w )
 {
+	dai_state *state = space->machine->driver_data<dai_state>();
 	switch(offset & 0x000f) {
 	case 0x04:
-		dai_osc_volume[0] = data&0x0f;
-		dai_osc_volume[1] = (data&0xf0)>>4;
+		dai_set_volume(state->sound, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
-		dai_osc_volume[2] = data&0x0f;
-		dai_noise_volume = (data&0xf0)>>4;
+		dai_set_volume(state->sound, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
 		break;
 
 	case 0x06:
-		dai_paddle_select = (data&0x06)>>2;
-		dai_paddle_enable = (data&0x08)>>3;
-		dai_cassette_motor[0] = (data&0x10)>>4;
-		dai_cassette_motor[1] = (data&0x20)>>5;
-		cassette_change_state(space->machine->device("cassette"), dai_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		state->paddle_select = (data&0x06)>>2;
+		state->paddle_enable = (data&0x08)>>3;
+		state->cassette_motor[0] = (data&0x10)>>4;
+		state->cassette_motor[1] = (data&0x20)>>5;
+		cassette_change_state(space->machine->device("cassette"), state->cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		cassette_output(space->machine->device("cassette"), (data & 0x01) ? -1.0 : 1.0);
 		dai_update_memory (space->machine, (data&0xc0)>>6);
 		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");

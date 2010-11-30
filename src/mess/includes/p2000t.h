@@ -15,6 +15,11 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 port_101f;
+	UINT8 port_202f;
+	UINT8 port_303f;
+	UINT8 port_707f;
+	INT8 frame_count;
 };
 
 

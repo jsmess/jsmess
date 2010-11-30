@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "machine/pit8253.h"
-#include "includes/dai.h"
 #include "streams.h"
 #include "includes/special.h"
 

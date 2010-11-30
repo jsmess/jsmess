@@ -41,7 +41,6 @@
 
 /* Fake Keyboard */
 
-static UINT8 key_latch;
 
 static void pc8401a_keyboard_scan(running_machine *machine)
 {
@@ -58,7 +57,7 @@ static void pc8401a_keyboard_scan(running_machine *machine)
 		if (data != 0xff)
 		{
 			strobe = 1;
-			key_latch = data;
+			state->key_latch = data;
 		}
 	}
 
@@ -337,7 +336,8 @@ static READ8_HANDLER( port70_r )
 
 static READ8_HANDLER( port71_r )
 {
-	return key_latch;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	return state->key_latch;
 }
 
 static WRITE8_HANDLER( port70_w )
@@ -349,8 +349,9 @@ static WRITE8_HANDLER( port70_w )
 
 static WRITE8_HANDLER( port71_w )
 {
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 	cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
-	key_latch = data;
+	state->key_latch = data;
 }
 
 /* Memory Maps */

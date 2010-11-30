@@ -16,9 +16,21 @@
 
 static STREAM_UPDATE( dai_sh_update );
 
-static sound_stream *mixer_channel;
+typedef struct _dai_sound_state dai_sound_state;
+struct _dai_sound_state
+{
+	sound_stream *mixer_channel;
+	int dai_input[3];
+	UINT8 osc_volume[3];
+	UINT8 noise_volume;
+};
 
-static int dai_input[3];
+INLINE dai_sound_state *get_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == DAI);
+	return (dai_sound_state *) downcast<legacy_device_base *>(device)->token();
+}
 
 static const UINT16 dai_osc_volume_table[] = {
 					   0,  500, 1000, 1500,
@@ -34,25 +46,44 @@ static const UINT16 dai_noise_volume_table[] = {
 					  2500, 3000, 3500, 4000
 };
 
-void dai_set_input(running_machine *machine, int index, int state)
+void dai_set_volume(running_device *device, int offset, UINT8 data)
 {
-	stream_update( mixer_channel );
+	dai_sound_state *sndstate = get_token(device);
 
-	dai_input[index] = state;
+	switch (offset)
+	{
+	case 0x04:
+		sndstate->osc_volume[0] = data&0x0f;
+		sndstate->osc_volume[1] = (data&0xf0)>>4;
+		break;
+
+	case 0x05:
+		sndstate->osc_volume[2] = data&0x0f;
+		sndstate->noise_volume = (data&0xf0)>>4;
+	}
+}
+
+void dai_set_input(running_device *device, int index, int state)
+{
+	dai_sound_state *sndstate = get_token(device);
+	stream_update( sndstate->mixer_channel );
+
+	sndstate->dai_input[index] = state;
 }
 
 
 static DEVICE_START(dai_sound)
 {
-	dai_input[0] = dai_input[1] = dai_input[2] = 0;
+	dai_sound_state *state = get_token(device);
 
-	mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
+	state->mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
 
 	logerror ("sample rate: %d\n", device->machine->sample_rate);
 }
 
 static STREAM_UPDATE( dai_sh_update )
 {
+	dai_sound_state *state = get_token(device);
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
 	INT16 channel_2_signal;
@@ -60,9 +91,9 @@ static STREAM_UPDATE( dai_sh_update )
 	stream_sample_t *sample_left = outputs[0];
 	stream_sample_t *sample_right = outputs[1];
 
-	channel_0_signal = dai_input[0] ? dai_osc_volume_table[dai_osc_volume[0]] : -dai_osc_volume_table[dai_osc_volume[0]];
-	channel_1_signal = dai_input[1] ? dai_osc_volume_table[dai_osc_volume[1]] : -dai_osc_volume_table[dai_osc_volume[1]];
-	channel_2_signal = dai_input[2] ? dai_osc_volume_table[dai_osc_volume[2]] : -dai_osc_volume_table[dai_osc_volume[2]];
+	channel_0_signal = state->dai_input[0] ? dai_osc_volume_table[state->osc_volume[0]] : -dai_osc_volume_table[state->osc_volume[0]];
+	channel_1_signal = state->dai_input[1] ? dai_osc_volume_table[state->osc_volume[1]] : -dai_osc_volume_table[state->osc_volume[1]];
+	channel_2_signal = state->dai_input[2] ? dai_osc_volume_table[state->osc_volume[2]] : -dai_osc_volume_table[state->osc_volume[2]];
 
 	while (samples--)
 	{
@@ -83,7 +114,7 @@ static STREAM_UPDATE( dai_sh_update )
 
 		/* noise channel */
 
-		*sample_left += mame_rand(device->machine)&0x01 ? dai_noise_volume_table[dai_noise_volume] : -dai_noise_volume_table[dai_noise_volume];
+		*sample_left += mame_rand(device->machine)&0x01 ? dai_noise_volume_table[state->noise_volume] : -dai_noise_volume_table[state->noise_volume];
 
 		sample_left++;
 		sample_right++;
@@ -96,6 +127,9 @@ DEVICE_GET_INFO( dai_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dai_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dai_sound);	break;
 

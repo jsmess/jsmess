@@ -111,6 +111,7 @@ public:
 	int *videoULA_pallet_lookup;
 	int x_screen_offset;
 	int y_screen_offset;
+	void (*draw_function)(running_machine *machine);
 };
 
 

@@ -17,8 +17,6 @@
 static void BBC_draw_hi_res(running_machine* machine);
 static void BBC_draw_teletext(running_machine *machine);
 
-static void (*draw_function)(running_machine* machine);
-
 static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
 
 /************************************************************************
@@ -276,7 +274,7 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 			state->emulation_pixels_per_real_pixel=3;
 			state->x_screen_offset=-154;
 			state->y_screen_offset=0;
-			draw_function=*BBC_draw_teletext;
+			state->draw_function=*BBC_draw_teletext;
 		} else {
 			// this is the number of BBC pixels held in each byte
 			state->pixels_per_byte=pixels_per_byte_set[state->videoULA_characters_per_line|(state->videoULA_6845_clock_rate<<2)];
@@ -286,7 +284,7 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 			state->emulation_pixels_per_real_pixel=emulation_pixels_per_real_pixel_set[state->videoULA_characters_per_line];
 			state->x_screen_offset=-96;
 			state->y_screen_offset=-11;
-			draw_function=*BBC_draw_hi_res;
+			state->draw_function=*BBC_draw_hi_res;
 		}
 
 		break;
@@ -602,7 +600,7 @@ VIDEO_UPDATE( bbc )
 	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
 	while((!state->BBC_VSync)&&(c<60000))
 	{
-		if ((state->y_screen_pos>=cliprect->min_y) && (state->y_screen_pos<=cliprect->max_y)) (draw_function)(screen->machine);
+		if ((state->y_screen_pos>=cliprect->min_y) && (state->y_screen_pos<=cliprect->max_y)) (state->draw_function)(screen->machine);
 
 		// and check the cursor
 		if (state->VideoULA_CR) BBC_Clock_CR(state);
@@ -660,7 +658,7 @@ static void common_init(running_machine *machine)
 
 	state->BBC_Video_RAM = memory_region(machine, "maincpu");
 	state->vidmem_RAM = state->vidmem;
-	draw_function = *BBC_draw_hi_res;
+	state->draw_function = *BBC_draw_hi_res;
 }
 
 VIDEO_START( bbca )

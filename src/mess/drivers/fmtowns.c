@@ -564,8 +564,8 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 
 static TIMER_CALLBACK( poll_keyboard )
 {
-	const char* kb_ports[4] = { "key1", "key2", "key3", "key4" };
-	static UINT32 kb_prev[4];
+	towns_state *state = machine->driver_data<towns_state>();
+	static const char *const kb_ports[4] = { "key1", "key2", "key3", "key4" };
 	int port,bit;
 	UINT8 scan;
 	UINT32 portval;
@@ -576,7 +576,7 @@ static TIMER_CALLBACK( poll_keyboard )
 		portval = input_port_read(machine,kb_ports[port]);
 		for(bit=0;bit<32;bit++)
 		{
-			if(((portval & (1<<bit))) != ((kb_prev[port] & (1<<bit))))
+			if(((portval & (1<<bit))) != ((state->kb_prev[port] & (1<<bit))))
 			{  // bit changed
 				if((portval & (1<<bit)) == 0)  // release
 					towns_kb_sendcode(machine,scan,1);
@@ -585,7 +585,7 @@ static TIMER_CALLBACK( poll_keyboard )
 			}
 			scan++;
 		}
-		kb_prev[port] = portval;
+		state->kb_prev[port] = portval;
 	}
 }
 
@@ -896,8 +896,6 @@ static READ32_HANDLER(towns_padport_r)
 static WRITE32_HANDLER(towns_pad_mask_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	static UINT8 prev;
-	static UINT8 prev_x,prev_y;
 	UINT8 current_x,current_y;
 	UINT32 type = input_port_read(space->machine,"ctrltype");
 
@@ -906,75 +904,75 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 		state->towns_pad_mask = (data & 0x00ff0000) >> 16;
 		if((type & 0x0f) == 0x02)  // mouse
 		{
-			if((state->towns_pad_mask & 0x10) != 0 && (prev & 0x10) == 0)
+			if((state->towns_pad_mask & 0x10) != 0 && (state->prev_pad_mask & 0x10) == 0)
 			{
 				if(state->towns_mouse_output == MOUSE_START)
 				{
 					state->towns_mouse_output = MOUSE_X_HIGH;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					state->towns_mouse_x = prev_x - current_x;
-					state->towns_mouse_y = prev_y - current_y;
-					prev_x = current_x;
-					prev_y = current_y;
+					state->towns_mouse_x = state->prev_x - current_x;
+					state->towns_mouse_y = state->prev_y - current_y;
+					state->prev_x = current_x;
+					state->prev_y = current_y;
 				}
 				else
 					state->towns_mouse_output++;
 				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			if((state->towns_pad_mask & 0x10) == 0 && (prev & 0x10) != 0)
+			if((state->towns_pad_mask & 0x10) == 0 && (state->prev_pad_mask & 0x10) != 0)
 			{
 				if(state->towns_mouse_output == MOUSE_START)
 				{
 					state->towns_mouse_output = MOUSE_SYNC;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					state->towns_mouse_x = prev_x - current_x;
-					state->towns_mouse_y = prev_y - current_y;
-					prev_x = current_x;
-					prev_y = current_y;
+					state->towns_mouse_x = state->prev_x - current_x;
+					state->towns_mouse_y = state->prev_y - current_y;
+					state->prev_x = current_x;
+					state->prev_y = current_y;
 				}
 				else
 					state->towns_mouse_output++;
 				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			prev = state->towns_pad_mask;
+			state->prev_pad_mask = state->towns_pad_mask;
 		}
 		if((type & 0xf0) == 0x20)  // mouse
 		{
-			if((state->towns_pad_mask & 0x20) != 0 && (prev & 0x20) == 0)
+			if((state->towns_pad_mask & 0x20) != 0 && (state->prev_pad_mask & 0x20) == 0)
 			{
 				if(state->towns_mouse_output == MOUSE_START)
 				{
 					state->towns_mouse_output = MOUSE_X_HIGH;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					state->towns_mouse_x = prev_x - current_x;
-					state->towns_mouse_y = prev_y - current_y;
-					prev_x = current_x;
-					prev_y = current_y;
+					state->towns_mouse_x = state->prev_x - current_x;
+					state->towns_mouse_y = state->prev_y - current_y;
+					state->prev_x = current_x;
+					state->prev_y = current_y;
 				}
 				else
 					state->towns_mouse_output++;
 				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			if((state->towns_pad_mask & 0x20) == 0 && (prev & 0x20) != 0)
+			if((state->towns_pad_mask & 0x20) == 0 && (state->prev_pad_mask & 0x20) != 0)
 			{
 				if(state->towns_mouse_output == MOUSE_START)
 				{
 					state->towns_mouse_output = MOUSE_SYNC;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					state->towns_mouse_x = prev_x - current_x;
-					state->towns_mouse_y = prev_y - current_y;
-					prev_x = current_x;
-					prev_y = current_y;
+					state->towns_mouse_x = state->prev_x - current_x;
+					state->towns_mouse_y = state->prev_y - current_y;
+					state->prev_x = current_x;
+					state->prev_y = current_y;
 				}
 				else
 					state->towns_mouse_output++;
 				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			prev = state->towns_pad_mask;
+			state->prev_pad_mask = state->towns_pad_mask;
 		}
 	}
 }

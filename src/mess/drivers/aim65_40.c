@@ -131,7 +131,7 @@ static const via6522_interface kb_via_intf =
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aim65_40, driver_device )
+static MACHINE_CONFIG_START( aim65_40, aim65_40_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(aim65_40_mem)

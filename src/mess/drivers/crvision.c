@@ -1038,7 +1038,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision, driver_device )
+    MACHINE_CONFIG_START( creativision, crvision_state )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( creativision, crvision_state )
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( ntsc, driver_device )
+    MACHINE_CONFIG_DERIVED( ntsc, creativision )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, creativision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( pal, driver_device )
+    MACHINE_CONFIG_DERIVED( pal, creativision )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( pal, creativision )
@@ -1112,7 +1112,7 @@ static MACHINE_CONFIG_DERIVED( pal, creativision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( lasr2001, driver_device )
+    MACHINE_CONFIG_START( lasr2001, crvision_state )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( lasr2001, crvision_state )

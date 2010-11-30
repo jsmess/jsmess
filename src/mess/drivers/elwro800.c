@@ -30,6 +30,23 @@
 #include "formats/tzx_cas.h"
 #include "devices/messram.h"
 
+
+class elwro800_state : public spectrum_state
+{
+public:
+	elwro800_state(running_machine &machine, const driver_device_config_base &config)
+		: spectrum_state(machine, config) { }
+
+	/* for elwro800 */
+	/* RAM mapped at 0 */
+	UINT8 ram_at_0000;
+
+	/* NR signal */
+	UINT8 NR;
+	UINT8 df_on_databus;
+};
+
+
 /*************************************
  *
  * When RAM is mapped at 0x0000 - 0x1fff (in CP/J mode), reading a location 66 with /M1=0
@@ -39,7 +56,7 @@
  *************************************/
 DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	elwro800_state *state = machine->driver_data<elwro800_state>();
 	if (state->ram_at_0000 && address == 0x66)
 	{
 		direct.explicit_configure(0x66, 0x66, 0, &state->df_on_databus);
@@ -89,7 +106,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	UINT8 cs;
 	UINT8 ls175;
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	elwro800_state *state = machine->driver_data<elwro800_state>();
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -207,7 +224,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 {
 	UINT8 *prom = memory_region(space->machine, "proms");
 	UINT8 cs = prom[offset & 0x1ff];
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	elwro800_state *state = space->machine->driver_data<elwro800_state>();
 
 	if (!BIT(cs,0))
 	{
@@ -490,7 +507,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(elwro800)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	elwro800_state *state = machine->driver_data<elwro800_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
 	state->df_on_databus = 0xdf;
@@ -551,7 +568,7 @@ static GFXDECODE_START( elwro800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( elwro800, spectrum_state )
+static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */

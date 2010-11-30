@@ -21,8 +21,6 @@
 
 
 
-static void (*pmd85_update_memory)(running_machine *);
-
 enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
 enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 
@@ -586,7 +584,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 	if (state->startup_mem_map)
 	{
 		state->startup_mem_map = 0;
-		(*pmd85_update_memory)(space->machine);
+		(*state->update_memory)(space->machine);
 	}
 
 	switch (offset & 0x0c)
@@ -600,7 +598,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							if ((offset & 0x03) == 0x03)
 							{
 								state->pmd853_memory_mapping = data & 0x01;
-								(*pmd85_update_memory)(space->machine);
+								(*state->update_memory)(space->machine);
 							}
 							break;
 				}
@@ -696,7 +694,7 @@ WRITE8_HANDLER ( mato_io_w )
 	if (state->startup_mem_map)
 	{
 		state->startup_mem_map = 0;
-		(*pmd85_update_memory)(space->machine);
+		(*state->update_memory)(space->machine);
 	}
 
 	switch (offset & 0x0c)
@@ -889,7 +887,7 @@ DRIVER_INIT ( pmd851 )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = PMD85_1;
-	pmd85_update_memory = pmd851_update_memory;
+	state->update_memory = pmd851_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
@@ -897,7 +895,7 @@ DRIVER_INIT ( pmd852a )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = PMD85_2A;
-	pmd85_update_memory = pmd852a_update_memory;
+	state->update_memory = pmd852a_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
@@ -905,7 +903,7 @@ DRIVER_INIT ( pmd853 )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = PMD85_3;
-	pmd85_update_memory = pmd853_update_memory;
+	state->update_memory = pmd853_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
@@ -913,7 +911,7 @@ DRIVER_INIT ( alfa )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = ALFA;
-	pmd85_update_memory = alfa_update_memory;
+	state->update_memory = alfa_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
@@ -921,14 +919,14 @@ DRIVER_INIT ( mato )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = MATO;
-	pmd85_update_memory = mato_update_memory;
+	state->update_memory = mato_update_memory;
 }
 
 DRIVER_INIT ( c2717 )
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->model = C2717;
-	pmd85_update_memory = c2717_update_memory;
+	state->update_memory = c2717_update_memory;
 	pmd85_common_driver_init(machine);
 }
 
@@ -969,7 +967,7 @@ MACHINE_RESET( pmd85 )
 	memset(messram_get_ptr(machine->device("messram")), 0, sizeof(unsigned char)*0x10000);
 	state->pmd853_memory_mapping = 1;
 	state->startup_mem_map = 1;
-	pmd85_update_memory(machine);
+	state->update_memory(machine);
 
 	timer_set(machine, attotime_zero, NULL, 0, setup_machine_state);
 

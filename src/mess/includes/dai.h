@@ -13,6 +13,22 @@
 #define DAI_DEBUG	1
 
 
+class dai_state : public driver_device
+{
+public:
+	dai_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 paddle_select;
+	UINT8 paddle_enable;
+	UINT8 cassette_motor[2];
+	running_device *sound;
+	running_device *tms5501;
+	UINT8 keyboard_scan_mask;
+	unsigned short _4_colours_palette[4];
+};
+
+
 /*----------- defined in machine/dai.c -----------*/
 
 extern const struct pit8253_config dai_pit8253_intf;
@@ -26,8 +42,6 @@ WRITE8_HANDLER( dai_io_discrete_devices_w );
 WRITE8_HANDLER( dai_stack_interrupt_circuit_w );
 READ8_HANDLER( dai_amd9511_r );
 WRITE8_HANDLER( dai_amd9511_w );
-extern UINT8 dai_noise_volume;
-extern UINT8 dai_osc_volume[3];
 
 
 /*----------- defined in video/dai.c -----------*/
@@ -43,7 +57,8 @@ PALETTE_INIT( dai );
 
 DECLARE_LEGACY_SOUND_DEVICE(DAI, dai_sound);
 
-void dai_set_input(running_machine *machine, int index, int state);
+void dai_set_input(running_device *device, int index, int state);
+void dai_set_volume(running_device *device, int offset, UINT8 data);
 
 
 #endif /* DAI_H_ */

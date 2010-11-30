@@ -283,84 +283,39 @@ static const UINT8 chars[0x40][8]={
     // 8x user defined
 };
 
-static struct {
-    int line;
-    int charline;
-    int shift;
-    int ad_delay;
-    int ad_select;
-    int ypos;
-    int graphics;
-    int doublescan;
-    int lines26;
-    int multicolor;
-    struct { int x, y; } pos[4];
-    UINT8 bg[262][16+2*XPOS/8];
-    UINT8 rectangle[0x40][8];
-    UINT8 chars[0x40][8];
-    int breaker;
-    union {
-	UINT8 data[0x400];
-	struct	{
-			// 0x1800
-			UINT8 chars1[13][16];
-			UINT8 ram1[2][16];
-			struct	{
-				UINT8 y,x;
-			} pos[4];
-			UINT8 ram2[4];
-			UINT8 vpos;
-			UINT8 sound1, sound2;
-			UINT8 char_line;
-			// 0x1900
-			UINT8 pad1a, pad1b, pad1c, pad1d;
-			UINT8 pad2a, pad2b, pad2c, pad2d;
-			UINT8 keys, unmapped3[0x80-9];
-			UINT8 chars[8][8];
-			UINT8 unknown[0x38];
-			UINT8 pal[4];
-			UINT8 collision_bg,
-			collision_sprite;
-			UINT8 ad[2];
-			// 0x1a00
-			UINT8 chars2[13][16];
-			UINT8 ram3[3][16];
-	} d;
-    } reg;
-    bitmap_t *bitmap;
-} arcadia_video={ 0 };
-
 VIDEO_START( arcadia )
 {
+	arcadia_state *state = machine->driver_data<arcadia_state>();
 	int i;
-	memcpy(&arcadia_video.chars, chars, sizeof(chars));
+	memcpy(&state->chars, chars, sizeof(chars));
 	for (i=0; i<0x40; i++)
 	{
-		arcadia_video.rectangle[i][0]=0;
-		arcadia_video.rectangle[i][4]=0;
-		if (i&1) arcadia_video.rectangle[i][0]|=3;
-		if (i&2) arcadia_video.rectangle[i][0]|=0x1c;
-		if (i&4) arcadia_video.rectangle[i][0]|=0xe0;
-		if (i&8) arcadia_video.rectangle[i][4]|=3;
-		if (i&0x10) arcadia_video.rectangle[i][4]|=0x1c;
-		if (i&0x20) arcadia_video.rectangle[i][4]|=0xe0;
-		arcadia_video.rectangle[i][1]=arcadia_video.rectangle[i][2]=arcadia_video.rectangle[i][3]=arcadia_video.rectangle[i][0];
-		arcadia_video.rectangle[i][5]=arcadia_video.rectangle[i][6]=arcadia_video.rectangle[i][7]=arcadia_video.rectangle[i][4];
+		state->rectangle[i][0]=0;
+		state->rectangle[i][4]=0;
+		if (i&1) state->rectangle[i][0]|=3;
+		if (i&2) state->rectangle[i][0]|=0x1c;
+		if (i&4) state->rectangle[i][0]|=0xe0;
+		if (i&8) state->rectangle[i][4]|=3;
+		if (i&0x10) state->rectangle[i][4]|=0x1c;
+		if (i&0x20) state->rectangle[i][4]|=0xe0;
+		state->rectangle[i][1]=state->rectangle[i][2]=state->rectangle[i][3]=state->rectangle[i][0];
+		state->rectangle[i][5]=state->rectangle[i][6]=state->rectangle[i][7]=state->rectangle[i][4];
 	}
 
 	{
 		screen_device *screen = screen_first(*machine);
 		int width = screen->width();
 		int height = screen->height();
-		arcadia_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	}
 }
 
 READ8_HANDLER(arcadia_video_r)
 {
+	arcadia_state *state = space->machine->driver_data<arcadia_state>();
     UINT8 data=0;
     switch (offset) {
-    case 0xff: data=arcadia_video.charline|0xf0;break;
+    case 0xff: data=state->charline|0xf0;break;
     case 0x100: data=input_port_read(space->machine, "controller1_col1");break;
     case 0x101: data=input_port_read(space->machine, "controller1_col2");break;
     case 0x102: data=input_port_read(space->machine, "controller1_col3");break;
@@ -372,13 +327,13 @@ READ8_HANDLER(arcadia_video_r)
     case 0x108: data=input_port_read(space->machine, "panel");break;
 #if 0
     case 0x1fe:
-	if (arcadia_video.ad_select)
+	if (state->ad_select)
 		data=input_port_read(space->machine, "controller1_joy_y")<<3;
 	else
 		data=input_port_read(space->machine, "controller1_joy_x")<<3;
 	break;
     case 0x1ff:
-	if (arcadia_video.ad_select)
+	if (state->ad_select)
 		data=input_port_read(space->machine, "controller2_joy_y")<<3;
 	else
 		data=input_port_read(space->machine, "controller2_joy_x")<<3;
@@ -386,7 +341,7 @@ READ8_HANDLER(arcadia_video_r)
 #else
     case 0x1fe:
 	data = 0x80;
-	if (arcadia_video.ad_select) {
+	if (state->ad_select) {
 	    if (input_port_read(space->machine, "joysticks")&0x10) data=0;
 	    if (input_port_read(space->machine, "joysticks")&0x20) data=0xff;
 	} else {
@@ -396,7 +351,7 @@ READ8_HANDLER(arcadia_video_r)
 	break;
     case 0x1ff:
 	data = 0x6f; // 0x7f too big for alien invaders (movs right)
-	if (arcadia_video.ad_select) {
+	if (state->ad_select) {
 	    if (input_port_read(space->machine, "joysticks")&0x1) data=0;
 	    if (input_port_read(space->machine, "joysticks")&0x2) data=0xff;
 	} else {
@@ -406,32 +361,33 @@ READ8_HANDLER(arcadia_video_r)
 	break;
 #endif
     default:
-	data=arcadia_video.reg.data[offset];
+	data=state->reg.data[offset];
     }
     return data;
 }
 
 WRITE8_HANDLER(arcadia_video_w)
 {
-	arcadia_video.reg.data[offset]=data;
+	arcadia_state *state = space->machine->driver_data<arcadia_state>();
+	state->reg.data[offset]=data;
 	switch (offset)
 	{
 		case 0xfc:
-			arcadia_video.ypos=255-data+YPOS;
+			state->ypos=255-data+YPOS;
 			break;
 		case 0xfd:
 			arcadia_soundport_w(space->machine->device("custom"), offset&3, data);
-			arcadia_video.multicolor=data&0x80;
+			state->multicolor=data&0x80;
 			break;
 		case 0xfe:
 			arcadia_soundport_w(space->machine->device("custom"), offset&3, data);
-			arcadia_video.shift=(data>>5);
+			state->shift=(data>>5);
 			break;
 		case 0xf0: case 0xf2: case 0xf4: case 0xf6:
-			arcadia_video.pos[(offset>>1)&3].y=(data^0xff)+1;
+			state->pos[(offset>>1)&3].y=(data^0xff)+1;
 			break;
 		case 0xf1: case 0xf3: case 0xf5: case 0xf7:
-			arcadia_video.pos[(offset>>1)&3].x=data-43;
+			state->pos[(offset>>1)&3].x=data-43;
 			break;
 		case 0x180: case 0x181: case 0x182: case 0x183: case 0x184: case 0x185: case 0x186: case 0x187:
 		case 0x188: case 0x189: case 0x18a: case 0x18b: case 0x18c: case 0x18d: case 0x18e: case 0x18f:
@@ -441,15 +397,15 @@ WRITE8_HANDLER(arcadia_video_w)
 		case 0x1a8: case 0x1a9: case 0x1aa: case 0x1ab: case 0x1ac: case 0x1ad: case 0x1ae: case 0x1af:
 		case 0x1b0: case 0x1b1: case 0x1b2: case 0x1b3: case 0x1b4: case 0x1b5: case 0x1b6: case 0x1b7:
 		case 0x1b8: case 0x1b9: case 0x1ba: case 0x1bb: case 0x1bc: case 0x1bd: case 0x1be: case 0x1bf:
-			arcadia_video.chars[0x38|((offset>>3)&7)][offset&7]=data;
+			state->chars[0x38|((offset>>3)&7)][offset&7]=data;
 			break;
 		case 0x1f8:
-			arcadia_video.lines26=data&0x40;
-			arcadia_video.graphics=data&0x80;
+			state->lines26=data&0x40;
+			state->graphics=data&0x80;
 			break;
 		case 0x1f9:
-			arcadia_video.doublescan=!(data&0x80);
-			arcadia_video.ad_delay=10;
+			state->doublescan=!(data&0x80);
+			state->ad_delay=10;
 			break;
 	}
 }
@@ -457,38 +413,39 @@ WRITE8_HANDLER(arcadia_video_w)
 INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 *ch, int charcode,
 			      int y, int x)
 {
+	arcadia_state *state = machine->driver_data<arcadia_state>();
     int k,b,cc,sc, colour;
-    if (arcadia_video.multicolor)
+    if (state->multicolor)
 	{
 		if (charcode&0x40)
-			cc=((arcadia_video.reg.d.pal[1]>>3)&7);
+			cc=((state->reg.d.pal[1]>>3)&7);
 		else
-			cc=((arcadia_video.reg.d.pal[0]>>3)&7);
+			cc=((state->reg.d.pal[0]>>3)&7);
 
 		if (charcode&0x80)
-			sc=(arcadia_video.reg.d.pal[1]&7);
+			sc=(state->reg.d.pal[1]&7);
 		else
-			sc=(arcadia_video.reg.d.pal[0]&7);
+			sc=(state->reg.d.pal[0]&7);
 
     }
 	else
 	{
-	   cc=((arcadia_video.reg.d.pal[1]>>3)&1)|((charcode>>5)&6);
-	   sc=(arcadia_video.reg.d.pal[1]&7);
+	   cc=((state->reg.d.pal[1]>>3)&1)|((charcode>>5)&6);
+	   sc=(state->reg.d.pal[1]&7);
     }
 	colour = (((sc << 3) | cc) + 4);
 
-    if (arcadia_video.doublescan)
+    if (state->doublescan)
 	{
 	for (k=0; (k<8)&&(y<bitmap->height); k++, y+=2)
 		{
 	    b=ch[k];
-	    arcadia_video.bg[y][x>>3]|=b>>(x&7);
-	    arcadia_video.bg[y][(x>>3)+1]|=b<<(8-(x&7));
+	    state->bg[y][x>>3]|=b>>(x&7);
+	    state->bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
             if (y+1<bitmap->height) {
-                arcadia_video.bg[y+1][x>>3]|=b>>(x&7);
-                arcadia_video.bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
+                state->bg[y+1][x>>3]|=b>>(x&7);
+                state->bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
                 drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
                         0,0,x,y);
                 drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
@@ -501,8 +458,8 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
 	for (k=0; (k<8)&&(y<bitmap->height); k++, y++)
 		{
 	    b=ch[k];
-            arcadia_video.bg[y][x>>3]|=b>>(x&7);
-	    arcadia_video.bg[y][(x>>3)+1]|=b<<(8-(x&7));
+            state->bg[y][x>>3]|=b>>(x&7);
+	    state->bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
 	    drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
 		    0,0,x,y);
@@ -513,17 +470,18 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
 INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
 				 int y, UINT8 chars1[16])
 {
+	arcadia_state *state = machine->driver_data<arcadia_state>();
     int x, ch, j, h;
-    int graphics=arcadia_video.graphics;
-    h=arcadia_video.doublescan?16:8;
+    int graphics=state->graphics;
+    h=state->doublescan?16:8;
 
-    if (bitmap->height-arcadia_video.line<h)
-		h=bitmap->height-arcadia_video.line;
+    if (bitmap->height-state->line<h)
+		h=bitmap->height-state->line;
 
-	plot_box(bitmap, 0, y, bitmap->width, h, (arcadia_video.reg.d.pal[1]&7));
-    memset(arcadia_video.bg[y], 0, sizeof(arcadia_video.bg[0])*h);
+	plot_box(bitmap, 0, y, bitmap->width, h, (state->reg.d.pal[1]&7));
+    memset(state->bg[y], 0, sizeof(state->bg[0])*h);
 
-	for (x=XPOS+arcadia_video.shift, j=0; j<16;j++,x+=8)
+	for (x=XPOS+state->shift, j=0; j<16;j++,x+=8)
 	{
 		ch=chars1[j];
 // hangman switches with 0x40
@@ -539,23 +497,23 @@ INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
 			}
 		}
 		if (graphics)
-			arcadia_draw_char(machine, bitmap, arcadia_video.rectangle[ch&0x3f], ch, y, x);
+			arcadia_draw_char(machine, bitmap, state->rectangle[ch&0x3f], ch, y, x);
 		else
-			arcadia_draw_char(machine, bitmap, arcadia_video.chars[ch&0x3f], ch, y, x);
+			arcadia_draw_char(machine, bitmap, state->chars[ch&0x3f], ch, y, x);
     }
 }
 
-static int arcadia_sprite_collision(int n1, int n2)
+static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
 {
     int k, b1, b2, x;
-    if (arcadia_video.pos[n1].x+8<=arcadia_video.pos[n2].x) return FALSE;
-    if (arcadia_video.pos[n1].x>=arcadia_video.pos[n2].x+8) return FALSE;
+    if (state->pos[n1].x+8<=state->pos[n2].x) return FALSE;
+    if (state->pos[n1].x>=state->pos[n2].x+8) return FALSE;
     for (k=0; k<8; k++) {
-	if (arcadia_video.pos[n1].y+k<arcadia_video.pos[n2].y) continue;
-	if (arcadia_video.pos[n1].y+k>=arcadia_video.pos[n2].y+8) break;
-	x=arcadia_video.pos[n1].x-arcadia_video.pos[n2].x;
-	b1=arcadia_video.reg.d.chars[n1][k];
-	b2=arcadia_video.reg.d.chars[n2][arcadia_video.pos[n1].y+k-arcadia_video.pos[n2].y];
+	if (state->pos[n1].y+k<state->pos[n2].y) continue;
+	if (state->pos[n1].y+k>=state->pos[n2].y+8) break;
+	x=state->pos[n1].x-state->pos[n2].x;
+	b1=state->reg.d.chars[n1][k];
+	b2=state->reg.d.chars[n2][state->pos[n1].y+k-state->pos[n2].y];
 	if (x<0) b2>>=-x;
 	if (x>0) b1>>=x;
 	if (b1&b2) return TRUE;
@@ -565,46 +523,47 @@ static int arcadia_sprite_collision(int n1, int n2)
 
 static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
+	arcadia_state *state = machine->driver_data<arcadia_state>();
     int i, k, x, y, color=0;
     UINT8 b;
 
-    arcadia_video.reg.d.collision_bg|=0xf;
-    arcadia_video.reg.d.collision_sprite|=0x3f;
+    state->reg.d.collision_bg|=0xf;
+    state->reg.d.collision_sprite|=0x3f;
     for (i=0; i<4; i++)
 	{
 	int doublescan = FALSE;
-	if (arcadia_video.pos[i].y<=-YPOS) continue;
-	if (arcadia_video.pos[i].y>=bitmap->height-YPOS-8) continue;
-	if (arcadia_video.pos[i].x<=-XPOS) continue;
-	if (arcadia_video.pos[i].x>=128+XPOS-8) continue;
+	if (state->pos[i].y<=-YPOS) continue;
+	if (state->pos[i].y>=bitmap->height-YPOS-8) continue;
+	if (state->pos[i].x<=-XPOS) continue;
+	if (state->pos[i].x>=128+XPOS-8) continue;
 
 	switch (i)
 	{
 	case 0:
-	    color=(arcadia_video.reg.d.pal[3]>>3)&7;
-	    doublescan=arcadia_video.reg.d.pal[3]&0x80?FALSE:TRUE;
+	    color=(state->reg.d.pal[3]>>3)&7;
+	    doublescan=state->reg.d.pal[3]&0x80?FALSE:TRUE;
 	    break;
 	case 1:
-	    color=arcadia_video.reg.d.pal[3]&7;
-	    doublescan=arcadia_video.reg.d.pal[3]&0x40?FALSE:TRUE;
+	    color=state->reg.d.pal[3]&7;
+	    doublescan=state->reg.d.pal[3]&0x40?FALSE:TRUE;
 	    break;
 	case 2:
-	    color=(arcadia_video.reg.d.pal[2]>>3)&7;
-	    doublescan=arcadia_video.reg.d.pal[2]&0x80?FALSE:TRUE;
+	    color=(state->reg.d.pal[2]>>3)&7;
+	    doublescan=state->reg.d.pal[2]&0x80?FALSE:TRUE;
 	    break;
 	case 3:
-	    color=arcadia_video.reg.d.pal[2]&7;
-	    doublescan=arcadia_video.reg.d.pal[2]&0x40?FALSE:TRUE;
+	    color=state->reg.d.pal[2]&7;
+	    doublescan=state->reg.d.pal[2]&0x40?FALSE:TRUE;
 	    break;
 	}
 	for (k=0; k<8; k++)
 	{
 		int j, m;
-	    b=arcadia_video.reg.d.chars[i][k];
-	    x=arcadia_video.pos[i].x+XPOS;
+	    b=state->reg.d.chars[i][k];
+	    x=state->pos[i].x+XPOS;
 	    if (!doublescan)
 		{
-		y=arcadia_video.pos[i].y+YPOS+k;
+		y=state->pos[i].y+YPOS+k;
 		for (j=0,m=0x80; j<8; j++, m>>=1)
 		{
 			if (b & m)
@@ -615,7 +574,7 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 	    }
 		else
 		{
-		y=arcadia_video.pos[i].y+YPOS+k*2;
+		y=state->pos[i].y+YPOS+k*2;
 		for (j=0,m=0x80; j<8; j++, m>>=1)
 		{
 			if (b & m)
@@ -625,83 +584,86 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 			}
 		}
 	    }
-	    if (arcadia_video.reg.d.collision_bg&(1<<i))
+	    if (state->reg.d.collision_bg&(1<<i))
 		{
-			if ( (b<<(8-(x&7))) & ((arcadia_video.bg[y][x>>3]<<8)
-								|arcadia_video.bg[y][(x>>3)+1]) )
-				arcadia_video.reg.d.collision_bg&=~(1<<i);
+			if ( (b<<(8-(x&7))) & ((state->bg[y][x>>3]<<8)
+								|state->bg[y][(x>>3)+1]) )
+				state->reg.d.collision_bg&=~(1<<i);
 	    }
 	}
     }
-    if (arcadia_sprite_collision(0,1)) arcadia_video.reg.d.collision_sprite&=~1;
-    if (arcadia_sprite_collision(0,2)) arcadia_video.reg.d.collision_sprite&=~2;
-    if (arcadia_sprite_collision(0,3)) arcadia_video.reg.d.collision_sprite&=~4;
-    if (arcadia_sprite_collision(1,2)) arcadia_video.reg.d.collision_sprite&=~8;
-    if (arcadia_sprite_collision(1,3)) arcadia_video.reg.d.collision_sprite&=~0x10; //guess
-    if (arcadia_sprite_collision(2,3)) arcadia_video.reg.d.collision_sprite&=~0x20; //guess
+    if (arcadia_sprite_collision(state,0,1)) state->reg.d.collision_sprite&=~1;
+    if (arcadia_sprite_collision(state,0,2)) state->reg.d.collision_sprite&=~2;
+    if (arcadia_sprite_collision(state,0,3)) state->reg.d.collision_sprite&=~4;
+    if (arcadia_sprite_collision(state,1,2)) state->reg.d.collision_sprite&=~8;
+    if (arcadia_sprite_collision(state,1,3)) state->reg.d.collision_sprite&=~0x10; //guess
+    if (arcadia_sprite_collision(state,2,3)) state->reg.d.collision_sprite&=~0x20; //guess
 }
 
 INTERRUPT_GEN( arcadia_video_line )
 {
+	arcadia_state *state = device->machine->driver_data<arcadia_state>();
 	screen_device *screen = screen_first(*device->machine);
 	int width = screen->width();
 
-	if (arcadia_video.ad_delay<=0)
-	arcadia_video.ad_select=arcadia_video.reg.d.pal[1]&0x40;
-	else arcadia_video.ad_delay--;
+	if (state->ad_delay<=0)
+	state->ad_select=state->reg.d.pal[1]&0x40;
+	else state->ad_delay--;
 
-	arcadia_video.line++;
-	arcadia_video.line%=262;
+	state->line++;
+	state->line%=262;
 	// unbelievable, reflects only charline, but alien invaders uses it for
 	// alien scrolling
 
-	if (arcadia_video.line<arcadia_video.ypos)
+	if (state->line<state->ypos)
 	{
-		plot_box(arcadia_video.bitmap, 0, arcadia_video.line, width, 1, (arcadia_video.reg.d.pal[1])&7);
-		memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
+		plot_box(state->bitmap, 0, state->line, width, 1, (state->reg.d.pal[1])&7);
+		memset(state->bg[state->line], 0, sizeof(state->bg[0]));
 	}
 	else
 	{
-		int h=arcadia_video.doublescan?16:8;
+		int h=state->doublescan?16:8;
 
-		arcadia_video.charline=(arcadia_video.line-arcadia_video.ypos)/h;
+		state->charline=(state->line-state->ypos)/h;
 
-		if (arcadia_video.charline<13)
+		if (state->charline<13)
 		{
-			if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0)
+			if (((state->line-state->ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(device->machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
-					arcadia_video.reg.d.chars1[arcadia_video.charline]);
+				arcadia_vh_draw_line(device->machine, state->bitmap, state->charline*h+state->ypos,
+					state->reg.d.chars1[state->charline]);
 			}
 		}
 		else
-			if (arcadia_video.lines26 && (arcadia_video.charline<26))
+			if (state->lines26 && (state->charline<26))
 			{
-				if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0)
+				if (((state->line-state->ypos)&(h-1))==0)
 				{
-					arcadia_vh_draw_line(device->machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
-						arcadia_video.reg.d.chars2[arcadia_video.charline-13]);
+					arcadia_vh_draw_line(device->machine, state->bitmap, state->charline*h+state->ypos,
+						state->reg.d.chars2[state->charline-13]);
 				}
-			arcadia_video.charline-=13;
+			state->charline-=13;
 			}
 			else
 			{
-			arcadia_video.charline=0xd;
-			plot_box(arcadia_video.bitmap, 0, arcadia_video.line, width, 1, (arcadia_video.reg.d.pal[1])&7);
-			memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
+			state->charline=0xd;
+			plot_box(state->bitmap, 0, state->line, width, 1, (state->reg.d.pal[1])&7);
+			memset(state->bg[state->line], 0, sizeof(state->bg[0]));
 			}
 	}
-	if (arcadia_video.line==261)
-		arcadia_draw_sprites(device->machine, arcadia_video.bitmap);
+	if (state->line==261)
+		arcadia_draw_sprites(device->machine, state->bitmap);
 }
 
 READ8_HANDLER(arcadia_vsync_r)
 {
-    return arcadia_video.line>=216?0x80:0;
+	arcadia_state *state = space->machine->driver_data<arcadia_state>();
+    return state->line>=216?0x80:0;
 }
 
 VIDEO_UPDATE( arcadia )
 {
-	copybitmap(bitmap, arcadia_video.bitmap, 0, 0, 0, 0, cliprect);
+	arcadia_state *state = screen->machine->driver_data<arcadia_state>();
+	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

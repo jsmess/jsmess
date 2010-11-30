@@ -60,6 +60,7 @@ public:
 	READ16_MEMBER ( ti68k_io2_r );
 	WRITE16_MEMBER ( flash_w );
 	READ16_MEMBER ( flash_r );
+	UINT64 timer;
 };
 
 #endif // TI89_H_

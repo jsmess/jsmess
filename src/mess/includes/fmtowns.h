@@ -145,6 +145,10 @@ class towns_state : public driver_device
 	running_device* hd2;
 	running_device* hd3;
 	running_device* hd4;
+	UINT32 kb_prev[4];
+	UINT8 prev_pad_mask;
+	UINT8 prev_x;
+	UINT8 prev_y;
 };
 
 void towns_update_video_banks(address_space*);

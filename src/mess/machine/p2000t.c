@@ -32,14 +32,6 @@
 
 #define P2000M_707F_DISA	0x01
 
-static struct
-{
-	UINT8 port_101f;
-	UINT8 port_202f;
-	UINT8 port_303f;
-	UINT8 port_707f;
-} p2000t_ports;
-
 /*
     Keyboard port 0x0x
 
@@ -52,12 +44,13 @@ static struct
 */
 READ8_HANDLER (	p2000t_port_000f_r )
 {
+	p2000t_state *state = space->machine->driver_data<p2000t_state>();
 	static const char *const keynames[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
 		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
 	};
 
-	if (p2000t_ports.port_101f & P2000M_101F_KEYINT)
+	if (state->port_101f & P2000M_101F_KEYINT)
 	{
 		return (input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") &
 		input_port_read(space->machine, "KEY2") & input_port_read(space->machine, "KEY3") &
@@ -105,7 +98,8 @@ READ8_HANDLER (	p2000t_port_202f_r )
 */
 WRITE8_HANDLER ( p2000t_port_101f_w )
 {
-	p2000t_ports.port_101f = data;
+	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	state->port_101f = data;
 }
 
 /*
@@ -122,7 +116,8 @@ WRITE8_HANDLER ( p2000t_port_101f_w )
 */
 WRITE8_HANDLER ( p2000t_port_303f_w )
 {
-	p2000t_ports.port_303f = data;
+	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	state->port_303f = data;
 }
 
 /*
@@ -161,7 +156,8 @@ WRITE8_HANDLER ( p2000t_port_505f_w )
 */
 WRITE8_HANDLER ( p2000t_port_707f_w )
 {
-	p2000t_ports.port_707f = data;
+	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	state->port_707f = data;
 }
 
 WRITE8_HANDLER ( p2000t_port_888b_w ) {}

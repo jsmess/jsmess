@@ -25,9 +25,9 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *ram;
+	UINT8 term_data;
 };
 
-static UINT8 term_data;
 
 static WRITE8_HANDLER( czk80_80_w )
 {
@@ -38,8 +38,9 @@ static WRITE8_HANDLER( czk80_80_w )
 
 static READ8_HANDLER( czk80_80_r )
 {
-	UINT8 ret = term_data;
-	term_data = 0;
+	czk80_state *state = space->machine->driver_data<czk80_state>();
+	UINT8 ret = state->term_data;
+	state->term_data = 0;
 	return ret;
 }
 
@@ -50,7 +51,8 @@ static READ8_HANDLER( czk80_c0_r )
 
 static READ8_HANDLER( czk80_81_r )
 {
-	return 1 | ((term_data) ? 2 : 0);
+	czk80_state *state = space->machine->driver_data<czk80_state>();
+	return 1 | ((state->term_data) ? 2 : 0);
 }
 
 static ADDRESS_MAP_START(czk80_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -82,7 +84,8 @@ static MACHINE_RESET(czk80)
 
 static WRITE8_DEVICE_HANDLER( czk80_kbd_put )
 {
-	term_data = data;
+	czk80_state *state = device->machine->driver_data<czk80_state>();
+	state->term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( czk80_terminal_intf )

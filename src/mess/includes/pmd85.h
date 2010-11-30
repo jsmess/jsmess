@@ -24,6 +24,7 @@ public:
 	int clk_level_tape;
 	UINT8 model;
 	emu_timer * cassette_timer;
+	void (*update_memory)(running_machine *);
 };
 
 

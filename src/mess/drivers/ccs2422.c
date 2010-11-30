@@ -18,20 +18,22 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *ccs_ram;
+	UINT8 term_data;
 };
 
-static UINT8 term_data;
 
 static READ8_HANDLER( ccs2422_10_r )
 {
-	UINT8 ret = term_data;
-	term_data = 0;
+	ccs2422_state *state = space->machine->driver_data<ccs2422_state>();
+	UINT8 ret = state->term_data;
+	state->term_data = 0;
 	return ret;
 }
 
 static READ8_HANDLER( ccs2422_11_r )
 {
-	return 4 | ((term_data) ? 1 : 0);
+	ccs2422_state *state = space->machine->driver_data<ccs2422_state>();
+	return 4 | ((state->term_data) ? 1 : 0);
 }
 
 static WRITE8_HANDLER(ccs2422_10_w)
@@ -69,7 +71,8 @@ static MACHINE_RESET(ccs2422)
 
 static WRITE8_DEVICE_HANDLER( ccs2422_kbd_put )
 {
-	term_data = data;
+	ccs2422_state *state = device->machine->driver_data<ccs2422_state>();
+	state->term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )

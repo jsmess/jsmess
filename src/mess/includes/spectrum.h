@@ -84,14 +84,6 @@ public:
 	UINT8 *screen_location;
 
 	int ROMSelection;
-
-	/* for elwro800 */
-	/* RAM mapped at 0 */
-	UINT8 ram_at_0000;
-
-	/* NR signal */
-	UINT8 NR;
-	UINT8 df_on_databus;
 };
 
 
