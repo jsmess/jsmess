@@ -943,17 +943,16 @@ VIDEO_UPDATE( lisa )
 	return 0;
 }
 
-
+#if 0	// we can execute directly out of read handlers now, so this shouldn't be necessary any more.  #if 0'd for documentation until we get everything working.
 DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 {
 	/* upper 7 bits -> segment # */
 	int segment = (address >> 17) & 0x7f;
-
 	int the_seg = seg;
 
 	address &= 0xffffff;
-	/*logerror("logical address%lX\n", address);*/
 
+	printf("lisa: logical address %x\n", address);
 
 	if (setup)
 	{
@@ -965,12 +964,11 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 		{
 			if (address & 0x008000)
 			{	/* MMU register : BUS error ??? */
-				logerror("illegal opbase address%lX\n", (long) address);
+				printf("illegal opbase address %lX\n", (long) address);
 			}
 			else
 			{	/* system ROMs */
-				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_rom_ptr - (address & 0xffc000));
-				/*logerror("ROM (setup mode)\n");*/
+				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_rom_ptr - (address & 0x3fff));
 			}
 
 			return -1;
@@ -979,8 +977,10 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	}
 
 	if (cpu_get_reg(machine->device("maincpu"), M68K_SR) & 0x2000)
+	{   				  
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
+	}
 
 	{
 		int seg_offset = address & 0x01ffff;
@@ -996,10 +996,10 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			if (seg_offset > mmu_regs[the_seg][segment].slim)
 			{
 				/* out of segment limits : bus error */
-				logerror("illegal opbase address%lX\n", (long) address);
+				printf("illegal opbase address%lX\n", (long) address);
 			}
 			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_ram_ptr + mapped_address - address);
-			/*logerror("RAM\n");*/
+			printf("RAM\n");
 			break;
 
 		case RAM_stack_r:
@@ -1007,28 +1007,19 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 		case IO:			/* I/O : bus error ??? */
 		case invalid:		/* unmapped segment */
 			/* bus error */
-			logerror("illegal opbase address%lX\n", (long) address);
+			printf("illegal opbase address%lX\n", (long) address);
 			break;
 
 		case special_IO:
 			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, lisa_rom_ptr + (mapped_address & 0x003fff) - address);
-			/*logerror("ROM\n");*/
+			printf("ROM\n");
 			break;
 		}
 	}
 
-
-	/*logerror("resulting offset%lX\n", answer);*/
-
 	return -1;
 }
-
-DIRECT_UPDATE_HANDLER (lisa_fdc_OPbaseoverride)
-{
-	/* 8kb of address space -> wraparound */
-	return (address & 0x1fff);
-}
-
+#endif
 
 /* should save PRAM to file */
 /* TODO : save time difference with host clock, set default date, etc */
@@ -1147,22 +1138,16 @@ MACHINE_RESET( lisa )
 {
 	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
 	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
-
 	videoROM_ptr = memory_region(machine, "gfx1");
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
-	cputag_get_address_space(machine, "fdccpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_fdc_OPbaseoverride, *machine));
-
-	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
+//	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
+//	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
-
 	setup = 1;
-
 	seg = 0;
 
 	/* init parity */
-
 	diag2 = 0;
 	test_parity = 0;
 	parity_error_pending = 0;
@@ -1189,8 +1174,13 @@ MACHINE_RESET( lisa )
 	/* initialize floppy */
 	{
 		if (lisa_features.floppy_hardware == sony_lisa2)
+		{
 			sony_set_enable_lines(machine->device("fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
+		}
 	}
+
+	/* reset 68k to pick up proper vectors from MMU */
+	devtag_reset(machine, "maincpu");
 }
 
 INTERRUPT_GEN( lisa_interrupt )
@@ -1507,8 +1497,7 @@ READ16_HANDLER ( lisa_r )
 			}
 			else
 			{	/* system ROMs */
-				answer = ((UINT16*)lisa_rom_ptr)[offset & 0x001fff];
-
+				answer = ((UINT16*)lisa_rom_ptr)[(offset & 0x001fff)];
 				/*logerror("dst address in ROM (setup mode)\n");*/
 			}
 

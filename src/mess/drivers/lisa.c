@@ -28,6 +28,7 @@ static ADDRESS_MAP_START(lisa_map, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&lisa_fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0800, 0x0fff) AM_NOP
@@ -36,6 +37,7 @@ static ADDRESS_MAP_START(lisa_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa210_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&lisa_fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_NOP										/* nothing, or RAM wrap-around ??? */
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
