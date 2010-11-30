@@ -293,14 +293,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = state->col[(data >> 7)]; p++;
-					*p = state->col[(data >> 6)]; p++;
-					*p = state->col[(data >> 5)]; p++;
-					*p = state->col[(data >> 4)]; p++;
-					*p = state->col[(data >> 3)]; p++;
-					*p = state->col[(data >> 2)]; p++;
-					*p = state->col[(data >> 1)]; p++;
-					*p = state->col[(data >> 0)]; p++;
+					*p++ = state->col[(data >> 7)];
+					*p++ = state->col[(data >> 6)];
+					*p++ = state->col[(data >> 5)];
+					*p++ = state->col[(data >> 4)];
+					*p++ = state->col[(data >> 3)];
+					*p++ = state->col[(data >> 2)];
+					*p++ = state->col[(data >> 1)];
+					*p++ = state->col[(data >> 0)];
 				}
 				break;
 		case 1 :
@@ -308,14 +308,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = state->col[BIT(data,7)*2 + BIT(data,3)]; p++;
-					*p = state->col[BIT(data,7)*2 + BIT(data,3)]; p++;
-					*p = state->col[BIT(data,6)*2 + BIT(data,2)]; p++;
-					*p = state->col[BIT(data,6)*2 + BIT(data,2)]; p++;
-					*p = state->col[BIT(data,5)*2 + BIT(data,1)]; p++;
-					*p = state->col[BIT(data,5)*2 + BIT(data,1)]; p++;
-					*p = state->col[BIT(data,4)*2 + BIT(data,0)]; p++;
-					*p = state->col[BIT(data,4)*2 + BIT(data,0)]; p++;
+					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
+					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
+					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
+					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
+					*p++ = state->col[BIT(data,5)*2 + BIT(data,1)];
+					*p++ = state->col[BIT(data,5)*2 + BIT(data,1)];
+					*p++ = state->col[BIT(data,4)*2 + BIT(data,0)];
+					*p++ = state->col[BIT(data,4)*2 + BIT(data,0)];
 				}
 				break;
 		default:
@@ -323,14 +323,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
-					*p = state->col[(data >> 4) & 0xf]; p++;
-					*p = state->col[(data >> 4) & 0xf]; p++;
-					*p = state->col[(data >> 4) & 0xf]; p++;
-					*p = state->col[(data >> 4) & 0xf]; p++;
-					*p = state->col[(data >> 0) & 0xf]; p++;
-					*p = state->col[(data >> 0) & 0xf]; p++;
-					*p = state->col[(data >> 0) & 0xf]; p++;
-					*p = state->col[(data >> 0) & 0xf]; p++;
+					*p++ = state->col[(data >> 4) & 0xf];
+					*p++ = state->col[(data >> 4) & 0xf];
+					*p++ = state->col[(data >> 4) & 0xf];
+					*p++ = state->col[(data >> 4) & 0xf];
+					*p++ = state->col[(data >> 0) & 0xf];
+					*p++ = state->col[(data >> 0) & 0xf];
+					*p++ = state->col[(data >> 0) & 0xf];
+					*p++ = state->col[(data >> 0) & 0xf];
 				}
 				break;
 

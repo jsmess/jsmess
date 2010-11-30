@@ -115,14 +115,14 @@ static VIDEO_UPDATE( uts20 )
 				}
 
 				/* Display a scanline of a character */
-				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
 			}
 		}
 		ma+=80;

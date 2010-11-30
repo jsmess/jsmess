@@ -363,14 +363,14 @@ static VIDEO_UPDATE( exidy )
 				gfx = RAM[0xf800 | (chr<<3) | ra];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
 			}
 		}
 		ma+=64;

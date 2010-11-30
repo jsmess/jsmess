@@ -58,13 +58,13 @@ VIDEO_UPDATE( kayproii )
 					gfx = 0xff;
 
 				/* Display a scanline of a character (7 pixels) */
-				*p = 0; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
-				*p = 0; p++;
+				*p++ = 0;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = 0;
 			}
 		}
 		ma+=128;
@@ -104,13 +104,13 @@ VIDEO_UPDATE( omni2 )
 					gfx = 0xff;
 
 				/* Display a scanline of a character (7 pixels) */
-				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
+				*p++ = ( gfx & 0x40 ) ? 0 : 1;
+				*p++ = ( gfx & 0x20 ) ? 0 : 1;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
 			}
 		}
 		ma+=128;
@@ -199,14 +199,14 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 			gfx = state->FNT[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
-		*p = ( gfx & 0x80 ) ? fg : bg; p++;
-		*p = ( gfx & 0x40 ) ? fg : bg; p++;
-		*p = ( gfx & 0x20 ) ? fg : bg; p++;
-		*p = ( gfx & 0x10 ) ? fg : bg; p++;
-		*p = ( gfx & 0x08 ) ? fg : bg; p++;
-		*p = ( gfx & 0x04 ) ? fg : bg; p++;
-		*p = ( gfx & 0x02 ) ? fg : bg; p++;
-		*p = ( gfx & 0x01 ) ? fg : bg; p++;
+		*p++ = ( gfx & 0x80 ) ? fg : bg;
+		*p++ = ( gfx & 0x40 ) ? fg : bg;
+		*p++ = ( gfx & 0x20 ) ? fg : bg;
+		*p++ = ( gfx & 0x10 ) ? fg : bg;
+		*p++ = ( gfx & 0x08 ) ? fg : bg;
+		*p++ = ( gfx & 0x04 ) ? fg : bg;
+		*p++ = ( gfx & 0x02 ) ? fg : bg;
+		*p++ = ( gfx & 0x01 ) ? fg : bg;
 	}
 }
 

@@ -251,14 +251,14 @@ static VIDEO_UPDATE( bcs3 )
 					gfx = 0;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
+				*p++ = ( gfx & 0x80 ) ? 0 : 1;
+				*p++ = ( gfx & 0x40 ) ? 0 : 1;
+				*p++ = ( gfx & 0x20 ) ? 0 : 1;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
 			}
 		}
 		ma+=28;
@@ -297,14 +297,14 @@ static VIDEO_UPDATE( bcs3a )
 					gfx = 0;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
+				*p++ = ( gfx & 0x80 ) ? 0 : 1;
+				*p++ = ( gfx & 0x40 ) ? 0 : 1;
+				*p++ = ( gfx & 0x20 ) ? 0 : 1;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
 			}
 		}
 		ma+=30;
@@ -341,14 +341,14 @@ static VIDEO_UPDATE( bcs3b )
 					gfx = 0;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
+				*p++ = ( gfx & 0x80 ) ? 0 : 1;
+				*p++ = ( gfx & 0x40 ) ? 0 : 1;
+				*p++ = ( gfx & 0x20 ) ? 0 : 1;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
 			}
 		}
 		ma+=41;
@@ -385,14 +385,14 @@ static VIDEO_UPDATE( bcs3c )
 					gfx = 0;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x80 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
+				*p++ = ( gfx & 0x80 ) ? 0 : 1;
+				*p++ = ( gfx & 0x40 ) ? 0 : 1;
+				*p++ = ( gfx & 0x20 ) ? 0 : 1;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
 			}
 		}
 		ma+=30;

@@ -651,13 +651,13 @@ bool xerox820_state::video_update(screen_device &screen, bitmap_t &bitmap, const
 					gfx = 0xff;
 
 				/* Display a scanline of a character (7 pixels) */
-				*p = 0; p++;
-				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
-				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
-				*p = 0; p++;
+				*p++ = 0;
+				*p++ = ( gfx & 0x10 ) ? 0 : 1;
+				*p++ = ( gfx & 0x08 ) ? 0 : 1;
+				*p++ = ( gfx & 0x04 ) ? 0 : 1;
+				*p++ = ( gfx & 0x02 ) ? 0 : 1;
+				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = 0;
 			}
 		}
 		ma+=128;
