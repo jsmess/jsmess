@@ -330,7 +330,10 @@ int sony_read_status(running_device *device)
 			break;
 		case 0x0e:	/* Tachometer */
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
-			result = ((int) (attotime_to_double(timer_get_time(device->machine)) / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
+			if (cur_image)
+			{
+				result = ((int) (attotime_to_double(timer_get_time(device->machine)) / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
+			}
 			break;
 		case 0x0f:	/* 400k/800k: Drive installed: 0=drive connected, 1=drive not connected */
 				/* FDHD: Inserted disk density: 0=HD, 1=DD */
