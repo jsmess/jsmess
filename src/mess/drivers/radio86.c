@@ -85,6 +85,16 @@ static ADDRESS_MAP_START(mikron2_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(impuls03_mem, ADDRESS_SPACE_PROGRAM, 8)
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
+    AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Basic ROM
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
+    AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
+ADDRESS_MAP_END
+
 /* Input ports */
 INPUT_PORTS_START( radio86 )
 	PORT_START("LINE0")
@@ -371,14 +381,12 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( radio16, radio86 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86_16_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radiorom, radio86 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86rom_mem)
@@ -391,7 +399,6 @@ static MACHINE_CONFIG_DERIVED( radiorom, radio86 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radioram, radio86 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(radio86ram_mem)
@@ -400,7 +407,6 @@ static MACHINE_CONFIG_DERIVED( radioram, radio86 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(rk7007_io)
@@ -409,7 +415,6 @@ static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(rk7007_io)
@@ -418,10 +423,15 @@ static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mikron2, radio86 )
-
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mikron2_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( impuls03, radio86 )
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(impuls03_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -508,6 +518,15 @@ ROM_START( kr03 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("kr03-dd12.rf2", 0x0000, 0x0800, CRC(085F4259) SHA1(11c5829b072a00961ad936c26559fb63bf2dc896))
 ROM_END
+
+ROM_START( impuls03 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )    
+	ROM_LOAD( "imp03bas.rom", 0xa000, 0x2000, CRC(b13b2de4) SHA1(9af8c49d72ca257bc34cad3c62e530730929702e))
+	ROM_LOAD( "imp03mon.rom", 0xf800, 0x0800, CRC(8c591ce4) SHA1(8e8e9cba6b3123d74218b92f4b4210606ba53376))
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
+ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
@@ -521,3 +540,4 @@ COMP( 1986, spektr01, radio86, 0,	radio86,	radio86, radio86,  "<unknown>", "Spek
 COMP( 1986, rk7007,   radio86, 0,	rk7007, 	ms7007,  radio86,  "<unknown>", "Radio-86RK (MS7007)",	0)
 COMP( 1986, rk700716, radio86, 0,	rk700716,	ms7007,  radio86,  "<unknown>", "Radio-86RK (MS7007 16K RAM)",	0)
 COMP( 1986, mikron2,  radio86, 0,	mikron2,	radio86, radio86,  "<unknown>", "Mikron-2",	0)
+COMP( 1986, impuls03,  radio86, 0,	impuls03,	radio86, radio86,  "<unknown>", "Impuls-03",	0)

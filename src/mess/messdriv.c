@@ -1366,6 +1366,7 @@ const game_driver * const drivers[] =
 	DRIVER( apogee )
 	DRIVER( mikrosha )
 	DRIVER( partner )
+	DRIVER( impuls03 )
 
 	/* Homelab */
 	DRIVER (homelab2)

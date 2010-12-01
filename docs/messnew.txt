@@ -4,7 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Homebrew Z80 Computer by Kun-Szabo Marton [Miodrag Milanovic]
 - Microbee TeleTerm [Robbbert]
-
+- Impuls-03 [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:
