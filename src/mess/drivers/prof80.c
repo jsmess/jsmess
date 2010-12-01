@@ -1278,20 +1278,9 @@ static const speaker_interface grip_speaker_interface =
 	speaker_levels
 };
 
-static VIDEO_START( prof80 )
-{
-}
-
-static VIDEO_UPDATE( prof80 )
-{
-	return 0;
-}
-
-
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( prof80, prof80_state )
-
     /* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
     MDRV_CPU_PROGRAM_MAP(prof80_mem)
@@ -1300,23 +1289,20 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MDRV_MACHINE_START(prof80)
 	MDRV_MACHINE_RESET(prof80)
 
+    /* video hardware */
+    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MDRV_SCREEN_SIZE(640, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
+
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
 	MDRV_UPD765A_ADD(UPD765_TAG, prof80_upd765_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
-
-    /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-
-    MDRV_VIDEO_START(prof80)
-    MDRV_VIDEO_UPDATE(prof80)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1324,11 +1310,10 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grip, prof80 )
-
+    /* basic machine hardware */
     MDRV_CPU_MODIFY(Z80_TAG)
     MDRV_CPU_IO_MAP(prof80_grip_io)
 
-    /* basic machine hardware */
 	MDRV_CPU_ADD(GRIP_Z80_TAG, Z80, XTAL_16MHz/4)
 	MDRV_CPU_CONFIG(grip_daisy_chain)
     MDRV_CPU_PROGRAM_MAP(grip_mem)
@@ -1364,7 +1349,6 @@ static MACHINE_CONFIG_DERIVED( grip3, grip )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grip5, grip )
-
     /* basic machine hardware */
 	MDRV_CPU_MODIFY(GRIP_Z80_TAG)
     MDRV_CPU_IO_MAP(grip5_io)

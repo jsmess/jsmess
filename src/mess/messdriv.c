@@ -1549,6 +1549,7 @@ const game_driver * const drivers[] =
 	DRIVER( prof80g31 )
 	DRIVER( prof80g562 )
 	DRIVER( prof180x )
+	DRIVER( prof181x )
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
