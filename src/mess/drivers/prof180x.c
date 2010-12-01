@@ -27,7 +27,7 @@
 #include "devices/messram.h"
 #include "machine/ctronics.h"
 #include "machine/upd765.h"
-#include "includes/prof180.h"
+#include "includes/prof180x.h"
 
 void prof180x_state::bankswitch()
 {
