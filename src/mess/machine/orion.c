@@ -173,7 +173,7 @@ MACHINE_RESET ( orion128 )
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xf000);
 	state->orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
-	radio86_init_keyboard();
+	radio86_init_keyboard(machine);
 }
 
 static WRITE8_HANDLER ( orion_disk_control_w )
@@ -377,7 +377,7 @@ MACHINE_RESET ( orionz80 )
 	state->speaker = 0;
 	state->orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
-	radio86_init_keyboard();
+	radio86_init_keyboard(machine);
 }
 
 INTERRUPT_GEN( orionz80_interrupt )
@@ -535,7 +535,7 @@ static WRITE8_HANDLER ( orionpro_memory_page_w )
 MACHINE_RESET ( orionpro )
 {
 	orion_state *state = machine->driver_data<orion_state>();
-	radio86_init_keyboard();
+	radio86_init_keyboard(machine);
 
 	state->orion128_video_page = 0;
 	state->orion128_video_mode = 0;

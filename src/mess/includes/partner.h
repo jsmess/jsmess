@@ -11,11 +11,11 @@
 #include "machine/i8257.h"
 #include "machine/wd17xx.h"
 
-class partner_state : public driver_device
+class partner_state : public radio86_state
 {
 public:
 	partner_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: radio86_state(machine, config) { }
 
 	UINT8 mem_page;
 	UINT8 win_mem_page;

@@ -29,20 +29,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&lisa_fdc_ram)				/* RAM (shared with 68000) */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0800, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_BASE(&lisa_fdc_rom)				/* ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_BASE_MEMBER(lisa_state, fdc_rom)				/* ROM */
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa210_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&lisa_fdc_ram)				/* RAM (shared with 68000) */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_NOP										/* nothing, or RAM wrap-around ??? */
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0c00, 0x0fff) AM_NOP										/* nothing, or IO port wrap-around ??? */
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_BASE(&lisa_fdc_rom)				/* ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_BASE_MEMBER(lisa_state, fdc_rom)				/* ROM */
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
@@ -114,7 +114,7 @@ static const floppy_config lisa_floppy_config =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_CONFIG_START( lisa, driver_device )
+static MACHINE_CONFIG_START( lisa, lisa_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MDRV_CPU_PROGRAM_MAP(lisa_map)

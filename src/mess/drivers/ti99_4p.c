@@ -55,7 +55,6 @@
 
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
-#include "audio/spchroms.h"
 #include "machine/ti99/peribox.h"
 
 #include "devices/cassette.h"

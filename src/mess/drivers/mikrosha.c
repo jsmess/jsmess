@@ -19,11 +19,11 @@
 #include "includes/radio86.h"
 
 
-class mikrosha_state : public driver_device
+class mikrosha_state : public radio86_state
 {
 public:
 	mikrosha_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: radio86_state(machine, config) { }
 
 };
 

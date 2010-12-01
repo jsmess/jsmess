@@ -11,6 +11,22 @@
 #include "machine/i8257.h"
 #include "video/i8275.h"
 
+class radio86_state : public driver_device
+{
+public:
+	radio86_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 tape_value;
+	UINT8 mikrosha_font_page;
+	int keyboard_mask;
+	UINT8* radio_ram_disk;
+	UINT8 romdisk_lsb;
+	UINT8 romdisk_msb;
+	UINT8 disk_sel;
+};
+
+
 /*----------- defined in drivers/radio86.c -----------*/
 
 INPUT_PORTS_EXTERN( radio86 );
@@ -43,14 +59,11 @@ extern const i8275_interface apogee_i8275_interface;
 extern WRITE8_HANDLER ( radio86_pagesel );
 extern const i8257_interface radio86_dma;
 
-extern UINT8 radio86_tape_value;
 
-extern void radio86_init_keyboard(void);
+extern void radio86_init_keyboard(running_machine *machine);
 
 
 /*----------- defined in video/radio86.c -----------*/
-
-extern UINT8 mikrosha_font_page;
 
 extern I8275_DISPLAY_PIXELS(radio86_display_pixels);
 extern I8275_DISPLAY_PIXELS(partner_display_pixels);

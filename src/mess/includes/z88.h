@@ -38,7 +38,7 @@
 
 #define Z88_SNOOZE_TRIGGER 2
 
-struct blink_hw
+typedef struct
 {
 	int z88_state;
 	int pb[4];
@@ -73,7 +73,7 @@ struct blink_hw
 	/* tim3 = 256 minute counter */
 	/* tim4 = 64k minute counter */
 	int tim[5];
-};
+} blink_hw_t;
 
 
 class z88_state : public driver_device
@@ -84,12 +84,9 @@ public:
 
 	int frame_number;
 	int flash_invert;
+	blink_hw_t blink;
 };
 
-
-/*----------- defined in drivers/z88.c -----------*/
-
-extern struct blink_hw z88_blink;
 
 /*----------- defined in video/z88.c -----------*/
 

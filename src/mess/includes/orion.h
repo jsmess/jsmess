@@ -7,13 +7,14 @@
 #ifndef ORION_H_
 #define ORION_H_
 
+#include "includes/radio86.h"
 #include "machine/i8255a.h"
 
-class orion_state : public driver_device
+class orion_state : public radio86_state
 {
 public:
 	orion_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: radio86_state(machine, config) { }
 
 	UINT8 orion128_video_mode;
 	UINT8 orion128_video_page;

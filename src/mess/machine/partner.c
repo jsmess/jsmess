@@ -23,7 +23,8 @@
 /* Driver initialization */
 DRIVER_INIT( partner )
 {
-	radio86_tape_value = 0x80;
+	partner_state *state = machine->driver_data<partner_state>();
+	state->tape_value = 0x80;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( partner_wd17xx_drq_w )
