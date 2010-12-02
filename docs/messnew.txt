@@ -47,6 +47,8 @@ System Driver Changes:
 
 - [H8] Progressed from skeleton to almost working. [Robbbert]
 
+- [PC8201] Added support for 128KB ROM cassettes. [Curt Coder]
+
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
   that control when the beam will reach the aim area, to run the function
   that checks if the pixel displayed is bright enough to activate the 
@@ -59,6 +61,8 @@ System Driver Changes:
   one or both the lens screens (remember that you can enable lens views by 
   selecting the Segascope views from the Video Options menu). The option 
   is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
+
+- [TANDY200] Limited video RAM to 8 KB per hardware. [Curt Coder]
 
 
 
@@ -89,8 +93,9 @@ Source Changes:
   [Atari Ace]
 
 - Refactored the following drivers to define ADDRESS_MAP_MODERN:
-  abc80, advision, amu880, bw12, bw2, mm1m6, sg1000, tandy2k, v1050, 
-  victor9k, vidbrain, xerox820, xor100. [Curt Coder]
+  abc80, advision, amu880, bw12, bw14, bw2, kc85, trsm100, tandy102,
+  tandy200, pc8201a, mm1m6, sg1000, sc3000, sf7000, tandy2k, v1050, 
+  victor9k, vidbrain, xerox820, xerox820ii, xor100. [Curt Coder]
 
 
 

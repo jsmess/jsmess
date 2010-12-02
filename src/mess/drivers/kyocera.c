@@ -34,7 +34,6 @@
     - IM6042 UART
     - pc8201 48K RAM option
     - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
-    - pc8201 128K ROM cartridge
     - pc8201 NEC PC-8233 floppy controller
     - pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
     - trsm100 Tandy Portable Disk Drive (TPDD: 100k 3?", TPDD2: 200k 3?") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
@@ -42,8 +41,7 @@
     - trsm100 RS232/modem select
     - tandy200 UART8251
     - tandy200 RTC alarm
-    - tandy200 TCM5089 sound
-	- tandy200 LCDC has only 8K of video RAM
+    - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
 
 */
@@ -59,18 +57,17 @@
     B8255      071  113   Video interface port B (8255)
     C8255      072  114   Video interface port C (8255)
     CW8255     073  115   Video interface command/mode port (8255)
-    ROMAH      080  128   128k ROM select and MSBIT of address
-    ROMAL      084  132   Lowest 8 bits of extended ROM address
-    ROMAM      088  136   Middle eight bits of 128k ROM address
-    ROMRD      08C  140   Read data port for 128k ROM
 
 */
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/kyocera.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 #include "machine/ctronics.h"
 #include "machine/upd1990a.h"
 #include "machine/i8155.h"
@@ -79,301 +76,8 @@
 #include "video/hd44102.h"
 #include "video/hd61830.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
-
-static running_device *cassette_device_image(running_machine *machine)
-{
-	return machine->device(CASSETTE_TAG);
-}
 
 /* Read/Write Handlers */
-
-static READ8_HANDLER( pc8201_bank_r )
-{
-	/*
-
-        bit     signal      description
-
-        0       LADR1       select address 0 to 7fff
-        1       LADR2       select address 0 to 7fff
-        2       HADR1       select address 8000 to ffff
-        3       HADR2       select address 8000 to ffff
-        4
-        5
-        6       SELB        serial interface status bit 1
-        7       SELA        serial interface status bit 0
-
-    */
-
-	kc85_state *state = space->machine->driver_data<kc85_state>();
-
-	return (state->iosel << 5) | state->bank;
-}
-
-static void pc8201_bankswitch(running_machine *machine, UINT8 data)
-{
-	kc85_state *state = machine->driver_data<kc85_state>();
-
-	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
-
-	int rom_bank = data & 0x03;
-	int ram_bank = (data >> 2) & 0x03;
-
-	state->bank = data & 0x0f;
-
-	if (rom_bank > 1)
-	{
-		/* RAM */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-	}
-	else
-	{
-		/* ROM */
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0 );
-	}
-
-	memory_set_bank(machine, "bank1", rom_bank);
-
-	switch (ram_bank)
-	{
-	case 0:
-		if (messram_get_size(machine->device("messram")) > 16 * 1024)
-		{
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
-		}
-		else
-		{
-			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
-			memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
-		}
-		break;
-
-	case 1:
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
-		break;
-
-	case 2:
-		if (messram_get_size(machine->device("messram")) > 32 * 1024)
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
-		else
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
-		break;
-
-	case 3:
-		if (messram_get_size(machine->device("messram")) > 64 * 1024)
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
-		else
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
-		break;
-	}
-
-	memory_set_bank(machine, "bank2", ram_bank);
-}
-
-static WRITE8_HANDLER( pc8201_bank_w )
-{
-	/*
-
-        bit     signal      description
-
-        0       LADR1       select address 0 to 7fff
-        1       LADR2       select address 0 to 7fff
-        2       HADR1       select address 8000 to ffff
-        3       HADR2       select address 8000 to ffff
-        4
-        5
-        6
-        7
-
-    */
-
-	pc8201_bankswitch(space->machine, data & 0x0f);
-}
-
-static WRITE8_HANDLER( pc8201_ctrl_w )
-{
-	/*
-
-        bit     signal      description
-
-        0
-        1
-        2
-        3       REMOTE      cassette motor
-        4       TSTB        RTC strobe
-        5       PSTB        printer strobe
-        6       SELB        serial interface select bit 1
-        7       SELA        serial interface select bit 0
-
-    */
-
-	kc85_state *state = space->machine->driver_data<kc85_state>();
-
-	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-
-	/* RTC strobe */
-	upd1990a_stb_w(state->upd1990a, BIT(data, 4));
-
-	/* printer strobe */
-	centronics_strobe_w(state->centronics, BIT(data, 5));
-
-	/* serial interface select */
-	state->iosel = data >> 5;
-}
-
-static WRITE8_HANDLER( uart_ctrl_w )
-{
-	/*
-
-        bit     signal      description
-
-        0       SBS         stop bit select
-        1       EPE         even parity enable
-        2       PI          parity inhibit
-        3       CLS1        character length select bit 1
-        4       CLS2        character length select bit 2
-        5
-        6
-        7
-
-    */
-#if 0
-    kc85_state *state = space->machine->driver_data<kc85_state>();
-
-    im6402_sbs_w(state->im6402, BIT(data, 0));
-    im6402_epe_w(state->im6402, BIT(data, 1));
-    im6402_pi_w(state->im6402, BIT(data, 2));
-    im6402_cls1_w(state->im6402, BIT(data, 3));
-    im6402_cls2_w(state->im6402, BIT(data, 4));
-#endif
-}
-
-static READ8_HANDLER( uart_status_r )
-{
-	/*
-
-        bit     signal      description
-
-        0       CD          carrier detect
-        1       OE          overrun error
-        2       FE          framing error
-        3       PE          parity error
-        4       TBRE        transmit buffer register empty
-        5       RP
-        6       +5V
-        7       _LPS        low power sensor
-
-    */
-#if 0
-    kc85_state *state = space->machine->driver_data<kc85_state>();
-
-    UINT8 data = 0;
-
-    int cd = im6402_cd_r(state->im6402);
-    int oe = im6402_oe_r(state->im6402);
-    int fe = im6402_fe_r(state->im6402);
-    int pe = im6402_pe_r(state->im6402);
-    int tbre = im6402_tbre_r(state->im6402);
-
-    data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
-
-    return data;
-#endif
-
-	return 0xf0;
-}
-
-static READ8_HANDLER( pc8201_uart_status_r )
-{
-	/*
-
-        bit     signal      description
-
-        0       _DCD/_RD    data carrier detect / ring detect
-        1       OE          overrun error
-        2       FE          framing error
-        3       PE          parity error
-        4       TBRE        transmit buffer register empty
-        5       RP
-        6       +5V
-        7       _LPS        low power signal
-
-    */
-#if 0
-    kc85_state *state = space->machine->driver_data<kc85_state>();
-
-    UINT8 data = 0;
-
-    int cd = im6402_cd_r(state->im6402);
-    int oe = im6402_oe_r(state->im6402);
-    int fe = im6402_fe_r(state->im6402);
-    int pe = im6402_pe_r(state->im6402);
-    int tbre = im6402_tbre_r(state->im6402);
-
-    data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
-
-    return data;
-#endif
-
-	return 0xf0;
-}
-
-static WRITE8_HANDLER( modem_w )
-{
-	/*
-
-        bit     signal      description
-
-        0                   telephone line signal selection relay output
-        1       EN          MC14412 enable output
-        2
-        3
-        4
-        5
-        6
-        7
-
-    */
-#if 0
-    kc85_state *state = space->machine->driver_data<kc85_state>();
-
-    mc14412_en_w(state->mc14412, BIT(data, 1));
-#endif
-}
-
-static WRITE8_HANDLER( kc85_ctrl_w )
-{
-	/*
-
-        bit     signal      description
-
-        0       _STROM      ROM selection (0=standard, 1=option)
-        1       _STROBE     printer strobe output
-        2       STB         RTC strobe output
-        3       _REMOTE     cassette motor
-        4
-        5
-        6
-        7
-
-    */
-
-	kc85_state *state = space->machine->driver_data<kc85_state>();
-
-	/* ROM bank selection */
-	memory_set_bank(space->machine, "bank1", BIT(data, 0));
-
-	/* printer strobe */
-	centronics_strobe_w(state->centronics, BIT(data, 1));
-
-	/* RTC strobe */
-	upd1990a_stb_w(state->upd1990a, BIT(data, 2));
-
-	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-}
 
 static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
 {
@@ -392,30 +96,385 @@ static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
 	return data;
 }
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER( pc8201_state::bank_r )
 {
-	kc85_state *state = space->machine->driver_data<kc85_state>();
+	/*
 
-	return read_keyboard(space->machine, state->keylatch);
+        bit     signal      description
+
+        0       LADR1       select address 0 to 7fff
+        1       LADR2       select address 0 to 7fff
+        2       HADR1       select address 8000 to ffff
+        3       HADR2       select address 8000 to ffff
+        4
+        5
+        6       SELB        serial interface status bit 1
+        7       SELA        serial interface status bit 0
+
+    */
+
+	return (m_iosel << 5) | m_bank;
 }
 
-static READ8_HANDLER( tandy200_bank_r )
+void pc8201_state::bankswitch(UINT8 data)
 {
-	tandy200_state *state = space->machine->driver_data<tandy200_state>();
-
-	return state->bank;
-}
-
-static WRITE8_HANDLER( tandy200_bank_w )
-{
-	tandy200_state *state = space->machine->driver_data<tandy200_state>();
-
-	address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
 
-	state->bank = data & 0x0f;
+	m_bank = data & 0x0f;
+
+	if (rom_bank > 1)
+	{
+		/* RAM */
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+	}
+	else
+	{
+		/* ROM */
+		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0 );
+	}
+
+	memory_set_bank(machine, "bank1", rom_bank);
+
+	switch (ram_bank)
+	{
+	case 0:
+		if (messram_get_size(m_ram) > 16 * 1024)
+		{
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+		}
+		else
+		{
+			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+			memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
+		}
+		break;
+
+	case 1:
+		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		break;
+
+	case 2:
+		if (messram_get_size(m_ram) > 32 * 1024)
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+		else
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		break;
+
+	case 3:
+		if (messram_get_size(m_ram) > 64 * 1024)
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+		else
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		break;
+	}
+
+	memory_set_bank(machine, "bank2", ram_bank);
+}
+
+WRITE8_MEMBER( pc8201_state::bank_w )
+{
+	/*
+
+        bit     signal      description
+
+        0       LADR1       select address 0 to 7fff
+        1       LADR2       select address 0 to 7fff
+        2       HADR1       select address 8000 to ffff
+        3       HADR2       select address 8000 to ffff
+        4
+        5
+        6
+        7
+
+    */
+
+	bankswitch(data);
+}
+
+WRITE8_MEMBER( pc8201_state::scp_w )
+{
+	/*
+
+        bit     signal      description
+
+        0
+        1
+        2
+        3       REMOTE      cassette motor
+        4       TSTB        RTC strobe
+        5       PSTB        printer strobe
+        6       SELB        serial interface select bit 1
+        7       SELA        serial interface select bit 0
+
+    */
+
+	/* cassette motor */
+	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	/* RTC strobe */
+	upd1990a_stb_w(m_rtc, BIT(data, 4));
+
+	/* printer strobe */
+	centronics_strobe_w(m_centronics, BIT(data, 5));
+
+	/* serial interface select */
+	m_iosel = data >> 5;
+}
+
+WRITE8_MEMBER( kc85_state::uart_ctrl_w )
+{
+	/*
+
+        bit     signal      description
+
+        0       SBS         stop bit select
+        1       EPE         even parity enable
+        2       PI          parity inhibit
+        3       CLS1        character length select bit 1
+        4       CLS2        character length select bit 2
+        5
+        6
+        7
+
+    */
+/*
+    m_uart->sbs_w(BIT(data, 0));
+    m_uart->epe_w(BIT(data, 1));
+    m_uart->pi_w(BIT(data, 2));
+    m_uart->cls1_w(BIT(data, 3));
+    m_uart->cls2_w(BIT(data, 4));
+*/
+}
+
+READ8_MEMBER( kc85_state::uart_status_r )
+{
+	/*
+
+        bit     signal      description
+
+        0       CD          carrier detect
+        1       OE          overrun error
+        2       FE          framing error
+        3       PE          parity error
+        4       TBRE        transmit buffer register empty
+        5       RP
+        6       +5V
+        7       _LPS        low power sensor
+
+    */
+
+	UINT8 data = 0x40;
+
+	// carrier detect
+	//data |= m_uart->cd_r();
+
+	// overrun error
+	//data |= m_uart->oe_r() << 1;
+
+	// framing error
+	//data |= m_uart->fe_r() << 2;
+
+	// parity error
+	//data |= m_uart->pe_r() << 3;
+
+	// transmit buffer register empty
+	//data |= m_uart->tbre_r() << 4;
+
+	// rp TODO
+	data |= 0x20;
+
+	// low power sensor
+	data |= BIT(input_port_read(machine, "BATTERY"), 0) << 7;
+
+	return data;
+}
+
+READ8_MEMBER( pc8201_state::uart_status_r )
+{
+	/*
+
+        bit     signal      description
+
+        0       _DCD/_RD    data carrier detect / ring detect
+        1       OE          overrun error
+        2       FE          framing error
+        3       PE          parity error
+        4       TBRE        transmit buffer register empty
+        5       RP
+        6       +5V
+        7       _LPS        low power signal
+
+    */
+
+	UINT8 data = 0x40;
+
+	// data carrier detect / ring detect
+	//data |= m_uart->cd_r();
+
+	// overrun error
+	//data |= m_uart->oe_r() << 1;
+
+	// framing error
+	//data |= m_uart->fe_r() << 2;
+
+	// parity error
+	//data |= m_uart->pe_r() << 3;
+
+	// transmit buffer register empty
+	//data |= m_uart->tbre_r() << 4;
+
+	// rp TODO
+	data |= 0x20;
+
+	// low power sensor
+	data |= BIT(input_port_read(machine, "BATTERY"), 0) << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( pc8201_state::romah_w )
+{
+	/*
+
+        bit     signal
+
+        0       A16
+        1       ROM SEL
+        2       
+        3       
+        4       
+        5       
+        6       
+        7       
+
+    */
+
+	// ROM address bit 16
+	m_rom_addr = (BIT(data, 0) << 16) | (m_rom_addr & 0xffff);
+
+	// ROM select
+	m_rom_sel = BIT(data, 1);
+}
+
+WRITE8_MEMBER( pc8201_state::romal_w )
+{
+	/*
+
+        bit     signal
+
+        0       A0
+        1       A1
+        2       A2
+        3       A3
+        4       A4
+        5       A5
+        6       A6
+        7       A7
+
+    */
+
+	m_rom_addr = (m_rom_addr & 0x1ff00) | data;
+}
+
+WRITE8_MEMBER( pc8201_state::romam_w )
+{
+	/*
+
+        bit     signal
+
+        0       A8
+        1       A9
+        2       A10
+        3       A11
+        4       A12
+        5       A13
+        6       A14
+        7       A15
+
+    */
+
+	m_rom_addr = (m_rom_addr & 0x100ff) | (data << 8);
+}
+
+READ8_MEMBER( pc8201_state::romrd_r )
+{
+	UINT8 data = 0xff;
+
+	if (m_rom_sel)
+	{
+		data = memory_region(machine, "option")[m_rom_addr & 0x1ffff];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( kc85_state::modem_w )
+{
+	/*
+
+        bit     signal      description
+
+        0                   telephone line signal selection relay output
+        1       EN          MC14412 enable output
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
+
+	//m_modem->en_w(BIT(data, 1));
+}
+
+WRITE8_MEMBER( kc85_state::ctrl_w )
+{
+	/*
+
+        bit     signal      description
+
+        0       _STROM      ROM selection (0=standard, 1=option)
+        1       _STROBE     printer strobe output
+        2       STB         RTC strobe output
+        3       _REMOTE     cassette motor
+        4
+        5
+        6
+        7
+
+    */
+
+	/* ROM bank selection */
+	memory_set_bank(machine, "bank1", BIT(data, 0));
+
+	/* printer strobe */
+	centronics_strobe_w(m_centronics, BIT(data, 1));
+
+	/* RTC strobe */
+	upd1990a_stb_w(m_rtc, BIT(data, 2));
+
+	/* cassette motor */
+	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
+
+READ8_MEMBER( kc85_state::keyboard_r )
+{
+	return read_keyboard(machine, m_keylatch);
+}
+
+void tandy200_state::bankswitch(UINT8 data)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	int rom_bank = data & 0x03;
+	int ram_bank = (data >> 2) & 0x03;
+
+	m_bank = data & 0x0f;
 
 	if (rom_bank == 3)
 	{
@@ -426,10 +485,10 @@ static WRITE8_HANDLER( tandy200_bank_w )
 	{
 		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
-		memory_set_bank(space->machine, "bank1", rom_bank);
+		memory_set_bank(machine, "bank1", rom_bank);
 	}
 
-	if (messram_get_size(space->machine->device("messram")) < ((ram_bank + 1) * 24 * 1024))
+	if (messram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
 		memory_unmap_readwrite(program, 0xa000, 0xffff, 0, 0);
@@ -437,18 +496,26 @@ static WRITE8_HANDLER( tandy200_bank_w )
 	else
 	{
 		memory_install_readwrite_bank(program, 0xa000, 0xffff, 0, 0, "bank2");
-		memory_set_bank(space->machine, "bank2", ram_bank);
+		memory_set_bank(machine, "bank2", ram_bank);
 	}
 }
 
-static READ8_HANDLER( tandy200_stbk_r )
+READ8_MEMBER( tandy200_state::bank_r )
 {
-	tandy200_state *state = space->machine->driver_data<tandy200_state>();
-
-	return read_keyboard(space->machine, state->keylatch);
+	return m_bank;
 }
 
-static WRITE8_HANDLER( tandy200_stbk_w )
+WRITE8_MEMBER( tandy200_state::bank_w )
+{
+	bankswitch(data);
+}
+
+READ8_MEMBER( tandy200_state::stbk_r )
+{
+	return read_keyboard(machine, m_keylatch);
+}
+
+WRITE8_MEMBER( tandy200_state::stbk_w )
 {
 	/*
 
@@ -465,119 +532,112 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 
     */
 
-	tandy200_state *state = space->machine->driver_data<tandy200_state>();
-
 	/* printer strobe */
-	centronics_strobe_w(state->centronics, BIT(data, 0));
+	centronics_strobe_w(m_centronics, BIT(data, 0));
 
 	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(m_cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-static READ8_HANDLER( lcd_r )
+READ8_MEMBER( kc85_state::lcd_r )
 {
-	kc85_state *state = space->machine->driver_data<kc85_state>();
-
 	UINT8 data = 0;
-	int i;
 
-	for (i = 0; i < 10; i++)
-	{
-		data |= hd44102_r(state->hd44102[i], offset);
-	}
+	data |= hd44102_r(m_lcdc0, offset);
+	data |= hd44102_r(m_lcdc1, offset);
+	data |= hd44102_r(m_lcdc2, offset);
+	data |= hd44102_r(m_lcdc3, offset);
+	data |= hd44102_r(m_lcdc4, offset);
+	data |= hd44102_r(m_lcdc5, offset);
+	data |= hd44102_r(m_lcdc6, offset);
+	data |= hd44102_r(m_lcdc7, offset);
+	data |= hd44102_r(m_lcdc8, offset);
+	data |= hd44102_r(m_lcdc9, offset);
 
 	return data;
 }
 
-static WRITE8_HANDLER( lcd_w )
+WRITE8_MEMBER( kc85_state::lcd_w )
 {
-	kc85_state *state = space->machine->driver_data<kc85_state>();
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		hd44102_w(state->hd44102[i], offset, data);
-	}
+	hd44102_w(m_lcdc0, offset, data);
+	hd44102_w(m_lcdc1, offset, data);
+	hd44102_w(m_lcdc2, offset, data);
+	hd44102_w(m_lcdc3, offset, data);
+	hd44102_w(m_lcdc4, offset, data);
+	hd44102_w(m_lcdc5, offset, data);
+	hd44102_w(m_lcdc6, offset, data);
+	hd44102_w(m_lcdc7, offset, data);
+	hd44102_w(m_lcdc8, offset, data);
+	hd44102_w(m_lcdc9, offset, data);
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8, kc85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8, pc8201_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8, tandy200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8, kc85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, data_r, data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, ctrl_w)
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
-//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
-//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
+static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8, kc85_state )
+	AM_IMPORT_FROM(kc85_io)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8, pc8201_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
-//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional 128K ROM cartridge
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8201_ctrl_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_bank_r, pc8201_bank_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_uart_status_r, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x03) AM_WRITE(romah_w)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0x03) AM_WRITE(romal_w)
+	AM_RANGE(0x88, 0x88) AM_MIRROR(0x03) AM_WRITE(romam_w)
+	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0x03) AM_READ(romrd_r)
+	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(scp_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, data_r, data_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE_BASE(kc85_state, uart_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ_BASE(kc85_state, keyboard_r)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE_BASE(kc85_state, lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8, tandy200_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_stbk_r, tandy200_stbk_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, data_r, data_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE_MODERN(HD61830_TAG, hd61830_device, status_r, control_w)
+	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE_LEGACY(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
+//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(stbk_r, stbk_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
+	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
 ADDRESS_MAP_END
-/*
-static ADDRESS_MAP_START( tandy200_lcdc, 0, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
-*/
 
 /* Input Ports */
 
@@ -671,6 +731,11 @@ static INPUT_PORTS_START( kc85 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
+	PORT_CONFSETTING( 0x00, "Low Battery" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8201a )
@@ -836,33 +901,7 @@ static RP5C01A_INTERFACE( tandy200_rp5c01a_intf )
 
 /* 8155 Interface */
 
-static READ8_DEVICE_HANDLER( kc85_8155_port_c_r )
-{
-	/*
-
-        bit     description
-
-        0       serial data input from clock chip
-        1       _BUSY signal from printer
-        2       BUSY signal from printer
-        3       data from BCR
-        4       _CTS from RS232
-        5       _DSR from RS232
-
-    */
-
-	kc85_state *state = device->machine->driver_data<kc85_state>();
-
-	UINT8 data = 0;
-
-	data |= upd1990a_data_out_r(state->upd1990a);
-	data |= centronics_not_busy_r(state->centronics) << 1;
-	data |= centronics_busy_r(state->centronics) << 2;
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
+WRITE8_MEMBER( kc85_state::i8155_pa_w )
 {
 	/*
 
@@ -879,30 +918,28 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
 
     */
 
-	kc85_state *state = device->machine->driver_data<kc85_state>();
-
 	/* keyboard */
-	state->keylatch = (state->keylatch & 0x100) | data;
+	m_keylatch = (m_keylatch & 0x100) | data;
 
 	/* LCD */
-	hd44102_cs2_w(state->hd44102[0], BIT(data, 0));
-	hd44102_cs2_w(state->hd44102[1], BIT(data, 1));
-	hd44102_cs2_w(state->hd44102[2], BIT(data, 2));
-	hd44102_cs2_w(state->hd44102[3], BIT(data, 3));
-	hd44102_cs2_w(state->hd44102[4], BIT(data, 4));
-	hd44102_cs2_w(state->hd44102[5], BIT(data, 5));
-	hd44102_cs2_w(state->hd44102[6], BIT(data, 6));
-	hd44102_cs2_w(state->hd44102[7], BIT(data, 7));
+	hd44102_cs2_w(m_lcdc0, BIT(data, 0));
+	hd44102_cs2_w(m_lcdc1, BIT(data, 1));
+	hd44102_cs2_w(m_lcdc2, BIT(data, 2));
+	hd44102_cs2_w(m_lcdc3, BIT(data, 3));
+	hd44102_cs2_w(m_lcdc4, BIT(data, 4));
+	hd44102_cs2_w(m_lcdc5, BIT(data, 5));
+	hd44102_cs2_w(m_lcdc6, BIT(data, 6));
+	hd44102_cs2_w(m_lcdc7, BIT(data, 7));
 
 	/* RTC */
-	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
-	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
-	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
-	upd1990a_clk_w(state->upd1990a, BIT(data, 3));
-	upd1990a_data_in_w(state->upd1990a, BIT(data, 4));
+	upd1990a_c0_w(m_rtc, BIT(data, 0));
+	upd1990a_c1_w(m_rtc, BIT(data, 1));
+	upd1990a_c2_w(m_rtc, BIT(data, 2));
+	upd1990a_clk_w(m_rtc, BIT(data, 3));
+	upd1990a_data_in_w(m_rtc, BIT(data, 4));
 }
 
-static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
+WRITE8_MEMBER( kc85_state::i8155_pb_w )
 {
 	/*
 
@@ -910,57 +947,34 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
 
         0                   LCD chip select 8, key scan 8
         1                   LCD chip select 9
-        2                   beeper data output
-        3       _RS232      modem select (0=RS232, 1=modem)
-        4       PCS         soft power off
-        5                   beeper data input select (0=data from 8155 TO, 1=data from PB2)
+        2       _MC         melody control output
+        3       DCD/_RD     RS232 DCD/_RD select (0=RS232, 1=modem)
+        4       APO         auto power off output
+        5       BELL        buzzer output (0=ring, 1=not ring)
         6       _DTR        RS232 data terminal ready output
         7       _RTS        RS232 request to send output
 
     */
 
-	kc85_state *state = device->machine->driver_data<kc85_state>();
-
 	/* keyboard */
-	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
+	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
 
 	/* LCD */
-	hd44102_cs2_w(state->hd44102[8], BIT(data, 0));
-	hd44102_cs2_w(state->hd44102[9], BIT(data, 1));
+	hd44102_cs2_w(m_lcdc8, BIT(data, 0));
+	hd44102_cs2_w(m_lcdc9, BIT(data, 1));
 
 	/* beeper */
-	state->buzzer = BIT(data, 2);
-	state->bell = BIT(data, 5);
+	m_buzzer = BIT(data, 2);
+	m_bell = BIT(data, 5);
 
-	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
+	if (m_buzzer) speaker_level_w(m_speaker, m_bell);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( kc85_8155_to_w )
-{
-	kc85_state *driver_state = device->machine->driver_data<kc85_state>();
-
-	if (!driver_state->buzzer && driver_state->bell)
-	{
-		speaker_level_w(driver_state->speaker, state);
-	}
-}
-
-static I8155_INTERFACE( kc85_8155_intf )
-{
-	DEVCB_NULL,								/* port A read */
-	DEVCB_HANDLER(kc85_8155_port_a_w),		/* port A write */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(kc85_8155_port_b_w),		/* port B write */
-	DEVCB_HANDLER(kc85_8155_port_c_r),		/* port C read */
-	DEVCB_NULL,								/* port C write */
-	DEVCB_LINE(kc85_8155_to_w)				/* timer output */
-};
-
-static READ8_DEVICE_HANDLER( pc8201_8155_port_c_r )
+READ8_MEMBER( kc85_state::i8155_pc_r )
 {
 	/*
 
-        bit     signal      description
+        bit     description
 
         0       CDI         clock data input
         1       SLCT        _BUSY signal from printer
@@ -971,87 +985,38 @@ static READ8_DEVICE_HANDLER( pc8201_8155_port_c_r )
 
     */
 
-	kc85_state *state = device->machine->driver_data<kc85_state>();
-
 	UINT8 data = 0;
 
-	data |= upd1990a_data_out_r(state->upd1990a);
-	data |= centronics_not_busy_r(state->centronics) << 1;
-	data |= centronics_busy_r(state->centronics) << 2;
+	// clock data input
+	data |= upd1990a_data_out_r(m_rtc);
+
+	// centronics busy
+	data |= centronics_not_busy_r(m_centronics) << 1;
+	data |= centronics_busy_r(m_centronics) << 2;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
+WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 {
-	/*
-
-        bit     signal      description
-
-        0                   LCD chip select 8, key scan 8
-        1                   LCD chip select 9
-        2       _MC         melody control output
-        3       DCD/_RD     RS232 DCD/_RD select
-        4       APO         auto power off output
-        5       BELL        buzzer output (0=ring, 1=not ring)
-        6       _DTR        RS232 data terminal ready output
-        7       _RTS        RS232 request to send output
-
-    */
-
-	kc85_state *state = device->machine->driver_data<kc85_state>();
-
-	/* keyboard */
-	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
-
-	/* LCD */
-	hd44102_cs2_w(state->hd44102[8], BIT(data, 0));
-	hd44102_cs2_w(state->hd44102[9], BIT(data, 1));
-
-	/* beeper */
-	state->buzzer = BIT(data, 2);
-	state->bell = BIT(data, 5);
-
-	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
+	if (!m_buzzer && m_bell)
+	{
+		speaker_level_w(m_speaker, state);
+	}
 }
 
-static I8155_INTERFACE( pc8201_8155_intf )
+static I8155_INTERFACE( kc85_8155_intf )
 {
-	DEVCB_NULL,								/* port A read */
-	DEVCB_HANDLER(kc85_8155_port_a_w),		/* port A write */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(pc8201_8155_port_b_w),	/* port B write */
-	DEVCB_HANDLER(pc8201_8155_port_c_r),	/* port C read */
-	DEVCB_NULL,								/* port C write */
-	DEVCB_LINE(kc85_8155_to_w)				/* timer output */
+	DEVCB_NULL,											/* port A read */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pa_w),		/* port A write */
+	DEVCB_NULL,											/* port B read */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pb_w),		/* port B write */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pc_r),		/* port C read */
+	DEVCB_NULL,											/* port C write */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state, i8155_to_w)	/* timer output */
 };
 
-static READ8_DEVICE_HANDLER( tandy200_8155_port_c_r )
-{
-	/*
-
-        bit     signal  description
-
-        0       _LPS    low power sense input
-        1       _BUSY   not busy input
-        2       BUSY    busy input
-        3       BCR     bar code reader data input
-        4       CD      carrier detect input
-        5       CDBD    carrier detect break down input
-
-    */
-
-	tandy200_state *state = device->machine->driver_data<tandy200_state>();
-
-	UINT8 data = 0x01;
-
-	data |= centronics_not_busy_r(state->centronics) << 1;
-	data |= centronics_busy_r(state->centronics) << 2;
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( tandy200_8155_port_a_w )
+WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 {
 	/*
 
@@ -1068,14 +1033,12 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_a_w )
 
     */
 
-	tandy200_state *state = device->machine->driver_data<tandy200_state>();
+	centronics_data_w(m_centronics, 0, data);
 
-	centronics_data_w(state->centronics, 0, data);
-
-	state->keylatch = (state->keylatch & 0x100) | data;
+	m_keylatch = (m_keylatch & 0x100) | data;
 }
 
-static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
+WRITE8_MEMBER( tandy200_state::i8155_pb_w )
 {
 	/*
 
@@ -1092,37 +1055,56 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
 
     */
 
-	tandy200_state *state = device->machine->driver_data<tandy200_state>();
-
 	/* keyboard */
-	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
+	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
 
 	/* beeper */
-	state->buzzer = BIT(data, 2);
-	state->bell = BIT(data, 5);
+	m_buzzer = BIT(data, 2);
+	m_bell = BIT(data, 5);
 
-	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
+	if (m_buzzer) speaker_level_w(m_speaker, m_bell);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tandy200_8155_to_w )
+READ8_MEMBER( tandy200_state::i8155_pc_r )
 {
-	tandy200_state *driver_state = device->machine->driver_data<tandy200_state>();
+	/*
 
-	if (!driver_state->buzzer && driver_state->bell)
+        bit     signal  description
+
+        0       _LPS    low power sense input
+        1       _BUSY   not busy input
+        2       BUSY    busy input
+        3       BCR     bar code reader data input
+        4       CD      carrier detect input
+        5       CDBD    carrier detect break down input
+
+    */
+
+	UINT8 data = 0x01;
+
+	data |= centronics_not_busy_r(m_centronics) << 1;
+	data |= centronics_busy_r(m_centronics) << 2;
+
+	return data;
+}
+
+WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
+{
+	if (!m_buzzer && m_bell)
 	{
-		speaker_level_w(driver_state->speaker, state);
+		speaker_level_w(m_speaker, state);
 	}
 }
 
 static I8155_INTERFACE( tandy200_8155_intf )
 {
-	DEVCB_NULL,								/* port A read */
-	DEVCB_HANDLER(tandy200_8155_port_a_w),	/* port A write */
-	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(tandy200_8155_port_b_w),	/* port B write */
-	DEVCB_HANDLER(tandy200_8155_port_c_r),	/* port C read */
-	DEVCB_NULL,								/* port C write */
-	DEVCB_LINE(tandy200_8155_to_w)			/* timer output */
+	DEVCB_NULL,												/* port A read */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pa_w),		/* port A write */
+	DEVCB_NULL,												/* port B read */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pb_w),		/* port B write */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pc_r),		/* port C read */
+	DEVCB_NULL,												/* port C write */
+	DEVCB_DRIVER_LINE_MEMBER(tandy200_state, i8155_to_w)	/* timer output */
 };
 
 /* MSM8251 Interface */
@@ -1136,21 +1118,13 @@ static const msm8251_interface tandy200_msm8251_interface =
 
 /* Machine Drivers */
 
-static MACHINE_START( kc85 )
+void kc85_state::machine_start()
 {
-	kc85_state *state = machine->driver_data<kc85_state>();
-
-	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
-
-	/* find devices */
-	state->upd1990a = machine->device(UPD1990A_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
+	upd1990a_cs_w(m_rtc, 1);
+	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
 	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
@@ -1160,7 +1134,7 @@ static MACHINE_START( kc85 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(machine->device("messram")))
+	switch (messram_get_size(m_ram))
 	{
 	case 16 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
@@ -1172,66 +1146,52 @@ static MACHINE_START( kc85 )
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->buzzer);
-	state_save_register_global(machine, state->bell);
+	state_save_register_global(machine, m_bank);
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_buzzer);
+	state_save_register_global(machine, m_bell);
 }
 
-static MACHINE_START( pc8201 )
+void pc8201_state::machine_start()
 {
-	kc85_state *state = machine->driver_data<kc85_state>();
-
-	/* find devices */
-	state->upd1990a = machine->device(UPD1990A_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	UINT8 *ram = messram_get_ptr(m_ram);
 
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
+	upd1990a_cs_w(m_rtc, 1);
+	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(machine->device("messram")) + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank1", 2, 2, ram + 0x8000, 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
-	memory_configure_bank(machine, "bank2", 2, 2, messram_get_ptr(machine->device("messram")) + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 1, ram, 0);
+	memory_configure_bank(machine, "bank2", 2, 2, ram + 0x8000, 0x8000);
 	memory_set_bank(machine, "bank2", 0);
 
-	pc8201_bankswitch(machine, 0);
+	bankswitch(0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->buzzer);
-	state_save_register_global(machine, state->bell);
-	state_save_register_global(machine, state->iosel);
+	state_save_register_global(machine, m_bank);
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_buzzer);
+	state_save_register_global(machine, m_bell);
+	state_save_register_global(machine, m_iosel);
 }
 
-static MACHINE_START( trsm100 )
+void trsm100_state::machine_start()
 {
-	kc85_state *state = machine->driver_data<kc85_state>();
-
-	address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
-
-	/* find devices */
-	state->upd1990a = machine->device(UPD1990A_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
+	upd1990a_cs_w(m_rtc, 1);
+	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
 	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
@@ -1241,7 +1201,7 @@ static MACHINE_START( trsm100 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(machine->device("messram")))
+	switch (messram_get_size(m_ram))
 	{
 	case 8 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xcfff, 0, 0);
@@ -1263,25 +1223,18 @@ static MACHINE_START( trsm100 )
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->buzzer);
-	state_save_register_global(machine, state->bell);
+	state_save_register_global(machine, m_bank);
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_buzzer);
+	state_save_register_global(machine, m_bell);
 }
 
-static MACHINE_START( tandy200 )
+void tandy200_state::machine_start()
 {
-	tandy200_state *state = machine->driver_data<tandy200_state>();
-
-	/* find devices */
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
-
 	/* configure ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8085_TAG) + 0x10000, 0);
@@ -1289,15 +1242,15 @@ static MACHINE_START( tandy200 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(machine->device("messram")), 0x6000);
+	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(m_ram), 0x6000);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->tp);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->buzzer);
-	state_save_register_global(machine, state->bell);
+	state_save_register_global(machine, m_bank);
+	state_save_register_global(machine, m_tp);
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_buzzer);
+	state_save_register_global(machine, m_bell);
 }
 
 static const cassette_config kc85_cassette_config =
@@ -1310,29 +1263,29 @@ static const cassette_config kc85_cassette_config =
 
 static WRITE_LINE_DEVICE_HANDLER( kc85_sod_w )
 {
-	cassette_output(cassette_device_image(device->machine), state ? +1.0 : -1.0);
+	cassette_output(device, state ? +1.0 : -1.0);
 }
 
 static READ_LINE_DEVICE_HANDLER( kc85_sid_r )
 {
-	return cassette_input(cassette_device_image(device->machine)) > 0.0;
+	return cassette_input(device) > 0.0;
 }
 
 static I8085_CONFIG( kc85_i8085_config )
 {
 	DEVCB_NULL,				/* STATUS changed callback */
 	DEVCB_NULL,				/* INTE changed callback */
-	DEVCB_LINE(kc85_sid_r),	/* SID changed callback (I8085A only) */
-	DEVCB_LINE(kc85_sod_w)	/* SOD changed callback (I8085A only) */
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, kc85_sid_r),	/* SID changed callback (I8085A only) */
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, kc85_sod_w)	/* SOD changed callback (I8085A only) */
 };
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
 	tandy200_state *state = timer.machine->driver_data<tandy200_state>();
 
-	cputag_set_input_line(timer.machine, I8085_TAG, I8085_RST75_LINE, state->tp);
+	cpu_set_input_line(state->m_maincpu, I8085_RST75_LINE, state->m_tp);
 
-	state->tp = !state->tp;
+	state->m_tp = !state->m_tp;
 }
 
 static MACHINE_CONFIG_START( kc85, kc85_state )
@@ -1341,8 +1294,6 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MDRV_CPU_PROGRAM_MAP(kc85_mem)
 	MDRV_CPU_IO_MAP(kc85_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)
-
-	MDRV_MACHINE_START( kc85 )
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(kc85_video)
@@ -1355,11 +1306,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	/* devices */
 	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-
-	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-
-	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
@@ -1373,14 +1320,12 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8201, kc85_state )
+static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
 	MDRV_CPU_IO_MAP(pc8201_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)
-
-	MDRV_MACHINE_START(pc8201)
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(kc85_video)
@@ -1391,17 +1336,18 @@ static MACHINE_CONFIG_START( pc8201, kc85_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, pc8201_8155_intf)
+	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-
-	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-
-	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+
+	/* 128KB ROM cassette */
+	MDRV_CARTSLOT_ADD("cart2")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
@@ -1411,18 +1357,35 @@ static MACHINE_CONFIG_START( pc8201, kc85_state )
 	MDRV_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trsm100, kc85 )
+static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY(I8085_TAG)
+	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
+	MDRV_CPU_PROGRAM_MAP(kc85_mem)
 	MDRV_CPU_IO_MAP(trsm100_io)
+	MDRV_CPU_CONFIG(kc85_i8085_config)
 
-	MDRV_MACHINE_START(trsm100)
+	/* video hardware */
+	MDRV_FRAGMENT_ADD(kc85_video)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
+	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 //  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
+	/* option ROM cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
@@ -1433,15 +1396,12 @@ static MACHINE_CONFIG_DERIVED( tandy102, trsm100 )
 	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
 	MDRV_CPU_IO_MAP(tandy200_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)
-
-	MDRV_MACHINE_START( tandy200 )
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(tandy200_video)
@@ -1485,7 +1445,7 @@ ROM_START( kc85 )
 	ROM_LOAD( "kc85rom.bin", 0x0000, 0x8000, CRC(8a9ddd6b) SHA1(9d18cb525580c9e071e23bc3c472380aa46356c0) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 // This BIOS is 99% bad: it contains no Japanese keyboard layout and if you enter the following BASIC program
@@ -1498,7 +1458,10 @@ ROM_START( pc8201 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, BAD_DUMP CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
 	
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
+
+	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( pc8201a )
@@ -1506,7 +1469,10 @@ ROM_START( pc8201a )
 	ROM_LOAD( "pc8201rom.rom", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
+
+	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( trsm100 )
@@ -1521,7 +1487,7 @@ ROM_START( trsm100 )
 	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( m10 )
@@ -1530,7 +1496,7 @@ ROM_START( m10 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( tandy102 )
@@ -1538,7 +1504,7 @@ ROM_START( tandy102 )
 	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( tandy200 )

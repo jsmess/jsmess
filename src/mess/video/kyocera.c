@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
@@ -9,49 +11,25 @@ static PALETTE_INIT( kc85 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
-static VIDEO_START( kc85 )
+bool kc85_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	kc85_state *state = machine->driver_data<kc85_state>();
-
-	/* find devices */
-	state->hd44102[0] = machine->device("m1");
-	state->hd44102[1] = machine->device("m2");
-	state->hd44102[2] = machine->device("m3");
-	state->hd44102[3] = machine->device("m4");
-	state->hd44102[4] = machine->device("m5");
-	state->hd44102[5] = machine->device("m6");
-	state->hd44102[6] = machine->device("m7");
-	state->hd44102[7] = machine->device("m8");
-	state->hd44102[8] = machine->device("m9");
-	state->hd44102[9] = machine->device("m10");
-}
-
-static VIDEO_UPDATE( kc85 )
-{
-	kc85_state *state = screen->machine->driver_data<kc85_state>();
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		hd44102_update(state->hd44102[i], bitmap, cliprect);
-	}
+	hd44102_update(m_lcdc0, &bitmap, &cliprect);
+	hd44102_update(m_lcdc1, &bitmap, &cliprect);
+	hd44102_update(m_lcdc2, &bitmap, &cliprect);
+	hd44102_update(m_lcdc3, &bitmap, &cliprect);
+	hd44102_update(m_lcdc4, &bitmap, &cliprect);
+	hd44102_update(m_lcdc5, &bitmap, &cliprect);
+	hd44102_update(m_lcdc6, &bitmap, &cliprect);
+	hd44102_update(m_lcdc7, &bitmap, &cliprect);
+	hd44102_update(m_lcdc8, &bitmap, &cliprect);
+	hd44102_update(m_lcdc9, &bitmap, &cliprect);
 
 	return 0;
 }
 
-static VIDEO_START( tandy200 )
+bool tandy200_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	tandy200_state *state = machine->driver_data<tandy200_state>();
-
-	/* find devices */
-	state->hd61830 = machine->device<hd61830_device>(HD61830_TAG);
-}
-
-static VIDEO_UPDATE( tandy200 )
-{
-	tandy200_state *state = screen->machine->driver_data<tandy200_state>();
-
-	state->hd61830->update_screen(bitmap, cliprect);
+	m_lcdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -61,6 +39,11 @@ static HD61830_INTERFACE( lcdc_intf )
 	SCREEN_TAG,
 	DEVCB_NULL
 };
+
+static ADDRESS_MAP_START( tandy200_lcdc, 0, 8, tandy200_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( kc85_video )
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -74,19 +57,16 @@ MACHINE_CONFIG_FRAGMENT( kc85_video )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kc85)
 
-	MDRV_VIDEO_START(kc85)
-	MDRV_VIDEO_UPDATE(kc85)
-
-	MDRV_HD44102_ADD( "m1", SCREEN_TAG,   0,  0)
-	MDRV_HD44102_ADD( "m2", SCREEN_TAG,  50,  0)
-	MDRV_HD44102_ADD( "m3", SCREEN_TAG, 100,  0)
-	MDRV_HD44102_ADD( "m4", SCREEN_TAG, 150,  0)
-	MDRV_HD44102_ADD( "m5", SCREEN_TAG, 200,  0)
-	MDRV_HD44102_ADD( "m6", SCREEN_TAG,   0, 32)
-	MDRV_HD44102_ADD( "m7", SCREEN_TAG,  50, 32)
-	MDRV_HD44102_ADD( "m8", SCREEN_TAG, 100, 32)
-	MDRV_HD44102_ADD( "m9", SCREEN_TAG, 150, 32)
-	MDRV_HD44102_ADD("m10", SCREEN_TAG, 200, 32)
+	MDRV_HD44102_ADD(HD44102_0_TAG, SCREEN_TAG,   0,  0)
+	MDRV_HD44102_ADD(HD44102_1_TAG, SCREEN_TAG,  50,  0)
+	MDRV_HD44102_ADD(HD44102_2_TAG, SCREEN_TAG, 100,  0)
+	MDRV_HD44102_ADD(HD44102_3_TAG, SCREEN_TAG, 150,  0)
+	MDRV_HD44102_ADD(HD44102_4_TAG, SCREEN_TAG, 200,  0)
+	MDRV_HD44102_ADD(HD44102_5_TAG, SCREEN_TAG,   0, 32)
+	MDRV_HD44102_ADD(HD44102_6_TAG, SCREEN_TAG,  50, 32)
+	MDRV_HD44102_ADD(HD44102_7_TAG, SCREEN_TAG, 100, 32)
+	MDRV_HD44102_ADD(HD44102_8_TAG, SCREEN_TAG, 150, 32)
+	MDRV_HD44102_ADD(HD44102_9_TAG, SCREEN_TAG, 200, 32)
 
 //  MDRV_HD44103_MASTER_ADD("m11", SCREEN_TAG, CAP_P(18), RES_K(100), HD44103_FS_HIGH, HD44103_DUTY_1_32)
 //  MDRV_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
@@ -104,8 +84,6 @@ MACHINE_CONFIG_FRAGMENT( tandy200_video )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kc85)
 
-	MDRV_VIDEO_START(tandy200)
-	MDRV_VIDEO_UPDATE(tandy200)
-
 	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
+	MDRV_DEVICE_ADDRESS_MAP(0, tandy200_lcdc)
 MACHINE_CONFIG_END
