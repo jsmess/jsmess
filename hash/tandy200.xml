@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Option ROM booting instructions:
 
-<softwarelist name="tandy200_cart" description="Tandy 200 Option ROM">
+1. Start BASIC
+2. Type CALL 61167,2
+-->
+<softwarelist name="tandy200" description="Tandy 200 Option ROMs">
   <software name="r2c">
     <description>ROM2/Cleuseau</description>
     <year>198?</year>

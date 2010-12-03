@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Option ROM booting instructions:
 
-<softwarelist name="pc8201_cart" description="NEC PC-8201 Option ROM">
+1. Start BASIC
+2. Type POKE 63911,1:EXEC 62394
+-->
+<softwarelist name="pc8201" description="NEC PC-8201(A) Option ROMs">
   <software name="r2c">
     <description>ROM2/Cleuseau</description>
     <year>198?</year>
@@ -9,7 +14,7 @@
 
     <part name="cart" interface="pc8201_cart">
       <dataarea name="rom" size="0x8000">
-        <rom name="r2cnec.bin" size="0x8000" crc="66A30B04" sha1="8E9AACCF70F73DEE1D86060D11587B80437866E1" offset="0x0000" />
+        <rom name="r2cnec.bin" size="0x8000" crc="66a30b04" sha1="8e9aaccf70f73dee1d86060d11587b80437866e1" offset="0x0000" />
       </dataarea>
     </part>
   </software>
