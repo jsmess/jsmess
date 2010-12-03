@@ -153,7 +153,7 @@
     </part>
   </software>
   
-  <software name="pagefox">
+  <software name="pgfox_fi">
     <!-- 
       |===========================|
       |=|                         |
@@ -224,7 +224,21 @@
     </part>
   </software>
 
-  <software name="gscard">
+  <software name="pthelp">
+    <!-- 
+     -->
+    <description>Print Technik-Help</description>
+    <year>19??</year>
+    <publisher>&lt;unknown&gt;</publisher>
+
+    <part name="cart" interface="c64_cart">
+      <dataarea name="rom" size="0x1000">
+        <rom name="shelp$.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gscard16">
     <description>Game Saver Card v1.6</description>
     <year>198?</year>
     <publisher>&lt;unknown&gt;</publisher>
