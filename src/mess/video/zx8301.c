@@ -295,6 +295,8 @@ WRITE8_MEMBER( zx8301_device::data_w )
 
 void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 {
+	int x = 0;
+
 	for (int word = 0; word < 64; word++)
 	{
 		UINT8 byte_high = readbyte(da++);
@@ -302,7 +304,6 @@ void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
-			int x = 0;
 			int red = BIT(byte_low, 7);
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
@@ -322,6 +323,8 @@ void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 
 void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 {
+	int x = 0;
+
 	for (int word = 0; word < 64; word++)
 	{
 		UINT8 byte_high = readbyte(da++);
@@ -329,7 +332,6 @@ void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 
 		for (int pixel = 0; pixel < 4; pixel++)
 		{
-			int x = 0;
 			int red = BIT(byte_low, 7);
 			int green = BIT(byte_high, 7);
 			int blue = BIT(byte_low, 6);
