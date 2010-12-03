@@ -76,19 +76,35 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 
 	if (mode == PROCESS_LOAD)
 	{
-		/* must this be full size */
-		if (flags & ROM_FULLSIZE)
+		if (image->software_entry() == NULL)
 		{
-			if (image->length() != length)
-				return IMAGE_INIT_FAIL;
+			/* must this be full size */
+			if (flags & ROM_FULLSIZE)
+			{
+				if (image->length() != length)
+					return IMAGE_INIT_FAIL;
+			}
+
+			/* read the ROM */
+			pos = read_length = image->fread(ptr, length);
+
+			/* reset the ROM to the initial point. */
+			/* eventually, we could add a flag to allow the ROM to continue instead of restarting whenever a new cart region is present */
+			image->fseek(0, SEEK_SET);
 		}
+		else
+		{
+			/* must this be full size */
+			if (flags & ROM_FULLSIZE)
+			{
+				if (image->get_software_region_length("rom") != length)
+					return IMAGE_INIT_FAIL;
+			}
 
-		/* read the ROM */
-		pos = read_length = image->fread(ptr, length);
-
-		/* reset the ROM to the initial point. */
-		/* eventually, we could add a flag to allow the ROM to continue instead of restarting whenever a new cart region is present */
-		image->fseek(0, SEEK_SET);
+			/* read the ROM */
+			pos = read_length = image->get_software_region_length("rom");
+			memcpy(ptr, image->get_software_region("rom"), read_length);
+		}
 
 		/* do we need to mirror the ROM? */
 		if (flags & ROM_MIRROR)
