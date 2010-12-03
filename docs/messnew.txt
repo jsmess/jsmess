@@ -16,6 +16,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
+- DEC DCT11-EM
 - Dream 6800 [Robbbert]
 - Tektronix 4107A/4109A [Lord Nightmare, Balrog, Curt Coder]
 - PHUNSY (Philipse Universal System)

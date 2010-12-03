@@ -1810,5 +1810,6 @@ const game_driver * const drivers[] =
 	DRIVER( phunsy )
 	DRIVER( ob68k1a )
 	DRIVER( vta2000 )
+	DRIVER( dct11em )
 	
 #endif /* DRIVER_RECURSIVE */
