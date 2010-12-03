@@ -1153,7 +1153,7 @@ const game_driver * const drivers[] =
 	//DRIVER( vt125 ) /* 1981 Digital Equipment Corporation */
 	DRIVER( vt131 ) /* 1981 Digital Equipment Corporation */
 	//DRIVER( vt132 ) /* 1978 Digital Equipment Corporation */
-	//DRIVER( vt180 ) /* 1981 Digital Equipment Corporation */
+	DRIVER( vt180 ) /* 1981 Digital Equipment Corporation */
 	DRIVER( vt220 ) /* 1983 Digital Equipment Corporation */
 	DRIVER( vt320 ) /* 1987 Digital Equipment Corporation */
 	DRIVER( vt520 ) /* 1994 Digital Equipment Corporation */

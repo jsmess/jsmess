@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "video/vtvideo.h"
 #include "vt100.lh"
@@ -48,6 +49,16 @@ static ADDRESS_MAP_START(vt100_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // Program memory expansion ROM (4 * 2K)
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Program memory expansion ROM (1 * 8K)
     // 0xc000, 0xffff is unassigned
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(vt180_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
+	AM_RANGE( 0x2000, 0xffff ) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vt180_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 // 0 - XMIT flag H
@@ -398,6 +409,12 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( vt180, vt100 )
+	MDRV_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
+	MDRV_CPU_PROGRAM_MAP(vt180_mem)
+    MDRV_CPU_IO_MAP(vt180_io)	
+MACHINE_CONFIG_END
+
 /* VT1xx models:
  * VT100 - 1978 base model. the 'later' rom is from 1979 or 1980.
  *    The vt100 had a whole series of -XX models branching off of it; the
@@ -714,8 +731,8 @@ ROM_START( vt180 )
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 
 	ROM_REGION(0x10000, "z80cpu", 0) // z80 daughterboard
-	ROM_LOAD( "23-017e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
-	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
+	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))	
+	ROM_LOAD( "23-017e3-00.bin", 0x1000, 0x1000, CRC(4bdd2398) SHA1(84f288def6c143a2d2ed9dedf947c862c66bb18e))	
 ROM_END
 
 /* Driver */
@@ -732,4 +749,4 @@ COMP( 1978, vt110,  vt100,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Cor
 COMP( 1981, vt125,  vt100,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT125",		GAME_NOT_WORKING)
 COMP( 1981, vt131,  /*vt101*/0, 0,  vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
 //COMP( 1979, vt132,  vt100,   0,    vt100,   vt100,     0,      "Digital Equipment Corporation",   "VT132",      GAME_NOT_WORKING)
-COMP( 1983, vt180,  vt100,   0,     vt100,   vt100, 	 0, 	 "Digital Equipment Corporation",   "VT180",		GAME_NOT_WORKING)
+COMP( 1983, vt180,  vt100,   0,     vt180,   vt100, 	 0, 	 "Digital Equipment Corporation",   "VT180",		GAME_NOT_WORKING)
