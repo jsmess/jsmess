@@ -290,6 +290,7 @@ PCB Layouts missing
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
+#include "formats/msx_dsk.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
@@ -1041,7 +1042,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_cartslot )
 	MDRV_CARTSLOT_UNLOAD(msx_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( msx, driver_device )
+static MACHINE_CONFIG_START( msx, msx_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(msx_memory_map)
@@ -1101,7 +1102,7 @@ MACHINE_CONFIG_END
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
-static MACHINE_CONFIG_START( msx2, driver_device )
+static MACHINE_CONFIG_START( msx2, msx_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(msx_memory_map)

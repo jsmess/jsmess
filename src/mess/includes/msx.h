@@ -12,7 +12,12 @@
 
 #define MSX_MAX_CARTS	(2)
 
-typedef struct {
+class msx_state : public driver_device
+{
+public:
+	msx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
 	/* PSG */
 	int psg_b;
 	int opll_active;
@@ -41,12 +46,11 @@ typedef struct {
 	UINT8 superloadrunner_bank;
 	UINT8 korean90in1_bank;
 	UINT8 *top_page;
-} MSX;
+};
 
 
 /*----------- defined in machine/msx.c -----------*/
 
-extern MSX msx1;
 extern const i8255a_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
@@ -79,9 +83,6 @@ WRITE8_HANDLER ( msx_rtc_reg_w );
 WRITE8_HANDLER ( msx_rtc_latch_w );
 WRITE8_HANDLER ( msx_90in1_w );
 
-/* disk functions */
-FLOPPY_OPTIONS_EXTERN(msx);
-
 /* new memory emulation */
 WRITE8_HANDLER (msx_page0_w);
 WRITE8_HANDLER (msx_page0_1_w);
@@ -100,12 +101,5 @@ WRITE8_HANDLER (msx_ram_mapper_w);
  READ8_HANDLER (msx_ram_mapper_r);
  READ8_HANDLER (msx_kanji_r);
 WRITE8_HANDLER (msx_kanji_w);
-
-void msx_memory_map_all (running_machine *machine);
-void msx_memory_map_page (running_machine *machine, int page);
-void msx_memory_init (running_machine *machine);
-void msx_memory_set_carts (void);
-void msx_memory_reset (running_machine *machine);
-
 
 #endif /* __MSX_H__ */

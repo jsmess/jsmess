@@ -100,8 +100,7 @@ Some bugs left :
 /* Devices */
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "includes/msx_slot.h"
-#include "includes/msx.h"  /* MSX floppy device load */
+#include "formats/msx_dsk.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

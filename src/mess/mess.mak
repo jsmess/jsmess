@@ -524,6 +524,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/ap_dsk35.o	\
 	$(MESS_FORMATS)/hect_tap.o	\
 	$(MESS_FORMATS)/ti99_dsk.o	\
+	$(MESS_FORMATS)/msx_dsk.o	\
 
 
 

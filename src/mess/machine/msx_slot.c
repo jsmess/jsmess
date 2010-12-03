@@ -30,6 +30,7 @@
 
 static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 {
+	msx_state *state = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch (page)
 	{
@@ -62,7 +63,7 @@ static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 		break;
 	case 8:
 		memory_set_bankptr (machine,"bank11", mem);
-		msx1.top_page = mem;
+		state->top_page = mem;
 		break;
 	}
 }
@@ -81,8 +82,9 @@ MSX_SLOT_RESET(empty)
 
 MSX_SLOT_MAP(empty)
 {
-	msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
-	msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
+	msx_state *drvstate = machine->driver_data<msx_state>();
+	msx_cpu_setbank (machine, page * 2 + 1, drvstate->empty);
+	msx_cpu_setbank (machine, page * 2 + 2, drvstate->empty);
 }
 
 MSX_SLOT_INIT(rom)
@@ -121,9 +123,10 @@ MSX_SLOT_INIT(ram)
 
 MSX_SLOT_MAP(ram)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem = state->mem + (page - state->start_page) * 0x4000;
 
-	msx1.ram_pages[page] = mem;
+	drvstate->ram_pages[page] = mem;
 	msx_cpu_setbank (machine, page * 2 + 1, mem);
 	msx_cpu_setbank (machine, page * 2 + 2, mem + 0x2000);
 }
@@ -179,20 +182,22 @@ MSX_SLOT_INIT(rammm)
 
 MSX_SLOT_RESET(rammm)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	int i;
 
 	for (i=0; i<4; i++)
 	{
-		msx1.ram_mapper[i] = 3 - i;
+		drvstate->ram_mapper[i] = 3 - i;
 	}
 }
 
 MSX_SLOT_MAP(rammm)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem = state->mem +
-			0x4000 * (msx1.ram_mapper[page] & state->bank_mask);
+			0x4000 * (drvstate->ram_mapper[page] & state->bank_mask);
 
-	msx1.ram_pages[page] = mem;
+	drvstate->ram_pages[page] = mem;
 	msx_cpu_setbank (machine, page * 2 + 1, mem);
 	msx_cpu_setbank (machine, page * 2 + 2, mem + 0x2000);
 }
@@ -218,10 +223,11 @@ MSX_SLOT_RESET(msxdos2)
 
 MSX_SLOT_MAP(msxdos2)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (page != 1)
 	{
-		msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
-		msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
+		msx_cpu_setbank (machine, page * 2 + 1, drvstate->empty);
+		msx_cpu_setbank (machine, page * 2 + 2, drvstate->empty);
 	}
 	else
 	{
@@ -294,12 +300,13 @@ MSX_SLOT_MAP(konami)
 
 MSX_SLOT_WRITE(konami)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	switch (addr)
 	{
 	case 0x6000:
 		state->banks[1] = val & state->bank_mask;
 		slot_konami_map (machine, state, 1);
-		if (msx1.state[0] == state)
+		if (drvstate->state[0] == state)
 		{
 			slot_konami_map (machine, state, 0);
 		}
@@ -307,7 +314,7 @@ MSX_SLOT_WRITE(konami)
 	case 0x8000:
 		state->banks[2] = val & state->bank_mask;
 		slot_konami_map (machine, state, 2);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_konami_map (machine, state, 3);
 		}
@@ -315,7 +322,7 @@ MSX_SLOT_WRITE(konami)
 	case 0xa000:
 		state->banks[3] = val & state->bank_mask;
 		slot_konami_map (machine, state, 2);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_konami_map (machine, state, 3);
 		}
@@ -402,12 +409,13 @@ MSX_SLOT_MAP(konami_scc)
 
 MSX_SLOT_WRITE(konami_scc)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (addr >= 0x5000 && addr < 0x5800)
 	{
 		state->banks[0] = val & state->bank_mask;
 		slot_konami_scc_map (machine, state, 1);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_konami_scc_map (machine, state, 3);
 		}
@@ -416,7 +424,7 @@ MSX_SLOT_WRITE(konami_scc)
 	{
 		state->banks[1] = val & state->bank_mask;
 		slot_konami_scc_map (machine, state, 1);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_konami_scc_map (machine, state, 3);
 		}
@@ -426,7 +434,7 @@ MSX_SLOT_WRITE(konami_scc)
 		state->banks[2] = val & state->bank_mask;
 		state->cart.scc.active = ((val & 0x3f) == 0x3f);
 		slot_konami_scc_map (machine, state, 2);
-		if (msx1.state[0] == state)
+		if (drvstate->state[0] == state)
 		{
 			slot_konami_scc_map (machine, state, 0);
 		}
@@ -467,7 +475,7 @@ MSX_SLOT_WRITE(konami_scc)
 	{
 		state->banks[3] = val & state->bank_mask;
 		slot_konami_scc_map (machine, state, 2);
-		if (msx1.state[0] == state)
+		if (drvstate->state[0] == state)
 		{
 			slot_konami_scc_map (machine, state, 0);
 		}
@@ -507,11 +515,12 @@ MSX_SLOT_RESET(ascii8)
 
 MSX_SLOT_MAP(ascii8)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem + state->banks[0] * 0x2000);
@@ -522,13 +531,14 @@ MSX_SLOT_MAP(ascii8)
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(ascii8)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	int bank;
 
 	if (addr >= 0x6000 && addr < 0x8000)
@@ -540,7 +550,7 @@ MSX_SLOT_WRITE(ascii8)
 		{
 			slot_ascii8_map (machine, state, 1);
 		}
-		else if (msx1.state[2] == state)
+		else if (drvstate->state[2] == state)
 		{
 			slot_ascii8_map (machine, state, 2);
 		}
@@ -580,13 +590,14 @@ MSX_SLOT_RESET(ascii16)
 
 MSX_SLOT_MAP(ascii16)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
 
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		mem = state->mem + state->banks[0] * 0x4000;
@@ -599,13 +610,14 @@ MSX_SLOT_MAP(ascii16)
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(ascii16)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x6000 && addr < 0x6800)
 	{
 		state->banks[0] = val & state->bank_mask;
@@ -614,7 +626,7 @@ MSX_SLOT_WRITE(ascii16)
 	else if (addr >= 0x7000 && addr < 0x7800)
 	{
 		state->banks[1] = val & state->bank_mask;
-		if (msx1.state[2] == state)
+		if (drvstate->state[2] == state)
 		{
 			slot_ascii16_map (machine, state, 2);
 		}
@@ -661,13 +673,13 @@ MSX_SLOT_RESET(ascii8_sram)
 	for (i=0; i<4; i++) state->banks[i] = i;
 }
 
-static UINT8 *ascii8_sram_bank_select (slot_state *state, int bankno)
+static UINT8 *ascii8_sram_bank_select (msx_state *drvstate, slot_state *state, int bankno)
 {
 	int bank = state->banks[bankno];
 
 	if (bank & state->cart.sram.empty_mask)
 	{
-		return msx1.empty;
+		return drvstate->empty;
 	}
 	else if (bank & state->cart.sram.sram_mask)
 	{
@@ -681,28 +693,30 @@ static UINT8 *ascii8_sram_bank_select (slot_state *state, int bankno)
 
 MSX_SLOT_MAP(ascii8_sram)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
-		msx_cpu_setbank (machine, 3, ascii8_sram_bank_select (state, 0));
-		msx_cpu_setbank (machine, 4, ascii8_sram_bank_select (state, 1));
+		msx_cpu_setbank (machine, 3, ascii8_sram_bank_select (drvstate, state, 0));
+		msx_cpu_setbank (machine, 4, ascii8_sram_bank_select (drvstate, state, 1));
 		break;
 	case 2:
-		msx_cpu_setbank (machine, 5, ascii8_sram_bank_select (state, 2));
-		msx_cpu_setbank (machine, 6, ascii8_sram_bank_select (state, 3));
+		msx_cpu_setbank (machine, 5, ascii8_sram_bank_select (drvstate, state, 2));
+		msx_cpu_setbank (machine, 6, ascii8_sram_bank_select (drvstate, state, 3));
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(ascii8_sram)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	int bank;
 
 	if (addr >= 0x6000 && addr < 0x8000)
@@ -714,7 +728,7 @@ MSX_SLOT_WRITE(ascii8_sram)
 		{
 			slot_ascii8_sram_map (machine, state, 1);
 		}
-		else if (msx1.state[2] == state)
+		else if (drvstate->state[2] == state)
 		{
 			slot_ascii8_sram_map (machine, state, 2);
 		}
@@ -827,13 +841,13 @@ MSX_SLOT_RESET(ascii16_sram)
 	for (i=0; i<2; i++) state->banks[i] = i;
 }
 
-static UINT8 *ascii16_sram_bank_select (slot_state *state, int bankno)
+static UINT8 *ascii16_sram_bank_select (msx_state *drvstate, slot_state *state, int bankno)
 {
 	int bank = state->banks[bankno];
 
 	if (bank & state->cart.sram.empty_mask)
 	{
-		return msx1.empty;
+		return drvstate->empty;
 	}
 	else if (bank & state->cart.sram.sram_mask)
 	{
@@ -847,32 +861,34 @@ static UINT8 *ascii16_sram_bank_select (slot_state *state, int bankno)
 
 MSX_SLOT_MAP(ascii16_sram)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
 
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
-		mem = ascii16_sram_bank_select (state, 0);
+		mem = ascii16_sram_bank_select (drvstate, state, 0);
 		msx_cpu_setbank (machine, 3, mem);
 		msx_cpu_setbank (machine, 4, mem + 0x2000);
 		break;
 	case 2:
-		mem = ascii16_sram_bank_select (state, 1);
+		mem = ascii16_sram_bank_select (drvstate, state, 1);
 		msx_cpu_setbank (machine, 5, mem);
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(ascii16_sram)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x6000 && addr < 0x6800)
 	{
 		state->banks[0] = val;
@@ -881,7 +897,7 @@ MSX_SLOT_WRITE(ascii16_sram)
 	else if (addr >= 0x7000 && addr < 0x7800)
 	{
 		state->banks[1] = val;
-		if (msx1.state[2] == state)
+		if (drvstate->state[2] == state)
 		{
 			slot_ascii16_sram_map (machine, state, 2);
 		}
@@ -994,13 +1010,14 @@ MSX_SLOT_RESET(rtype)
 
 MSX_SLOT_MAP(rtype)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
 
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		mem = state->mem + 15 * 0x4000;
@@ -1013,13 +1030,14 @@ MSX_SLOT_MAP(rtype)
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(rtype)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x7000 && addr < 0x8000)
 	{
 		int data ;
@@ -1033,7 +1051,7 @@ MSX_SLOT_WRITE(rtype)
 			data = val & 0x0f;
 		}
 		state->banks[0] = data;
-		if (msx1.state[2] == state)
+		if (drvstate->state[2] == state)
 		{
 			slot_rtype_map (machine, state, 2);
 		}
@@ -1118,6 +1136,7 @@ MSX_SLOT_MAP(gmaster2)
 
 MSX_SLOT_WRITE(gmaster2)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x6000 && addr < 0x7000)
 	{
 		if (val & 0x10)
@@ -1130,7 +1149,7 @@ MSX_SLOT_WRITE(gmaster2)
 		}
 		state->banks[1] = val;
 		slot_gmaster2_map (machine, state, 1);
-		if (msx1.state[0] == state)
+		if (drvstate->state[0] == state)
 		{
 			slot_gmaster2_map (machine, state, 0);
 		}
@@ -1147,7 +1166,7 @@ MSX_SLOT_WRITE(gmaster2)
 		}
 		state->banks[2] = val;
 		slot_gmaster2_map (machine, state, 2);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_gmaster2_map (machine, state, 3);
 		}
@@ -1164,7 +1183,7 @@ MSX_SLOT_WRITE(gmaster2)
 		}
 		state->banks[3] = val;
 		slot_gmaster2_map (machine, state, 2);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_gmaster2_map (machine, state, 3);
 		}
@@ -1258,6 +1277,7 @@ MSX_SLOT_RESET(diskrom)
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
@@ -1265,14 +1285,15 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 	case 1: return wd17xx_track_r (fdc, 0);
 	case 2: return wd17xx_sector_r (fdc, 0);
 	case 3: return wd17xx_data_r (fdc, 0);
-	case 7: return msx1.dsk_stat;
+	case 7: return state->dsk_stat;
 	default:
-		return msx1.state[1]->mem[offset + 0x3ff8];
+		return state->state[1]->mem[offset + 0x3ff8];
 	}
 }
 
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	running_device *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7f8)
 	{
@@ -1287,9 +1308,9 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 		case 0x7fb:
 			return wd17xx_data_r (fdc, 0);
 		case 0x7ff:
-			return msx1.dsk_stat;
+			return state->dsk_stat;
 		default:
-			return msx1.state[2]->mem[offset + 0x3800];
+			return state->state[2]->mem[offset + 0x3800];
 		}
 	}
 	else
@@ -1300,12 +1321,13 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 
 MSX_SLOT_MAP(diskrom)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
@@ -1313,13 +1335,13 @@ MSX_SLOT_MAP(diskrom)
 		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, msx_diskrom_page1_r);
 		break;
 	case 2:
-		msx_cpu_setbank (machine, 5, msx1.empty);
-		msx_cpu_setbank (machine, 6, msx1.empty);
+		msx_cpu_setbank (machine, 5, drvstate->empty);
+		msx_cpu_setbank (machine, 6, drvstate->empty);
 		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, msx_diskrom_page2_r);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 		break;
 	}
 }
@@ -1383,6 +1405,7 @@ MSX_SLOT_RESET(diskrom2)
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
@@ -1390,14 +1413,15 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 	case 1: return wd17xx_track_r(fdc, 0);
 	case 2: return wd17xx_sector_r(fdc, 0);
 	case 3: return wd17xx_data_r(fdc, 0);
-	case 4: return msx1.dsk_stat;
+	case 4: return state->dsk_stat;
 	default:
-		return msx1.state[1]->mem[offset + 0x3ff8];
+		return state->state[1]->mem[offset + 0x3ff8];
 	}
 }
 
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	running_device *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7b8)
 	{
@@ -1412,9 +1436,9 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 		case 0x7bb:
 			return wd17xx_data_r (fdc, 0);
 		case 0x7bc:
-			return msx1.dsk_stat;
+			return state->dsk_stat;
 		default:
-			return msx1.state[2]->mem[offset + 0x3800];
+			return state->state[2]->mem[offset + 0x3800];
 		}
 	}
 	else
@@ -1425,12 +1449,13 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 
 MSX_SLOT_MAP(diskrom2)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
@@ -1438,13 +1463,13 @@ MSX_SLOT_MAP(diskrom2)
 		memory_install_read8_handler(space, 0x7fb8, 0x7fbc, 0, 0, msx_diskrom2_page1_r);
 		break;
 	case 2:
-		msx_cpu_setbank (machine, 5, msx1.empty);
-		msx_cpu_setbank (machine, 6, msx1.empty);
+		msx_cpu_setbank (machine, 5, drvstate->empty);
+		msx_cpu_setbank (machine, 6, drvstate->empty);
 		memory_install_read8_handler(space, 0xb800, 0xbfbc, 0, 0, msx_diskrom2_page2_r);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
@@ -1503,11 +1528,12 @@ MSX_SLOT_RESET(synthesizer)
 
 MSX_SLOT_MAP(synthesizer)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
@@ -1518,8 +1544,8 @@ MSX_SLOT_MAP(synthesizer)
 		msx_cpu_setbank (machine, 6, state->mem + 0x6000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
@@ -1581,6 +1607,7 @@ MSX_SLOT_MAP(majutsushi)
 
 MSX_SLOT_WRITE(majutsushi)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x5000 && addr < 0x6000)
 	{
 		dac_data_w (machine->device("dac"), val);
@@ -1589,7 +1616,7 @@ MSX_SLOT_WRITE(majutsushi)
 	{
 		state->banks[1] = val & 0x0f;
 		slot_majutsushi_map (machine, state, 1);
-		if (msx1.state[0] == state)
+		if (drvstate->state[0] == state)
 		{
 			slot_konami_map (machine, state, 0);
 		}
@@ -1598,7 +1625,7 @@ MSX_SLOT_WRITE(majutsushi)
 	{
 		state->banks[addr < 0xa000 ? 2 : 3] = val & 0x0f;
 		slot_majutsushi_map (machine, state, 2);
-		if (msx1.state[3] == state)
+		if (drvstate->state[3] == state)
 		{
 			slot_konami_map (machine, state, 3);
 		}
@@ -1651,12 +1678,13 @@ MSX_SLOT_INIT(fmpac)
 
 MSX_SLOT_RESET(fmpac)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	int i;
 
 	state->banks[0] = 0;
 	state->cart.fmpac.sram_active = 0;
 	state->cart.fmpac.opll_active = 0;
-	msx1.opll_active = 0;
+	drvstate->opll_active = 0;
 	for (i=0; i<=state->bank_mask; i++)
 	{
 		state->mem[0x3ff6 + i * 0x4000] = 0;
@@ -1674,6 +1702,7 @@ MSX_SLOT_RESET(fmpac)
 
 MSX_SLOT_MAP(fmpac)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (page == 1)
 	{
 		if (state->cart.fmpac.sram_active)
@@ -1689,13 +1718,14 @@ MSX_SLOT_MAP(fmpac)
 	}
 	else
 	{
-		msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
-		msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
+		msx_cpu_setbank (machine, page * 2 + 1, drvstate->empty);
+		msx_cpu_setbank (machine, page * 2 + 2, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(fmpac)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, data;
 
@@ -1733,11 +1763,11 @@ MSX_SLOT_WRITE(fmpac)
 		}
 		state->cart.fmpac.mem[0x3ff6] = data;
 		state->cart.fmpac.opll_active = val & 1;
-		if ((msx1.opll_active ^ val) & 1)
+		if ((drvstate->opll_active ^ val) & 1)
 		{
 			logerror ("FM-PAC: OPLL %sactivated\n", val & 1 ? "" : "de");
 		}
-		msx1.opll_active = val & 1;
+		drvstate->opll_active = val & 1;
 		break;
 	case 0x7ff7:
 		state->banks[0] = val & state->bank_mask;
@@ -1843,23 +1873,25 @@ MSX_SLOT_INIT(superloadrunner)
 
 MSX_SLOT_RESET(superloadrunner)
 {
-	msx1.superloadrunner_bank = 0;
+	msx_state *drvstate = machine->driver_data<msx_state>();
+	drvstate->superloadrunner_bank = 0;
 }
 
 MSX_SLOT_MAP(superloadrunner)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (page == 2)
 	{
 		UINT8 *mem = state->mem +
-				(msx1.superloadrunner_bank & state->bank_mask) * 0x4000;
+				(drvstate->superloadrunner_bank & state->bank_mask) * 0x4000;
 
 		msx_cpu_setbank (machine, 5, mem);
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
 	}
 	else
 	{
-		msx_cpu_setbank (machine, page * 2 + 1, msx1.empty);
-		msx_cpu_setbank (machine, page * 2 + 2, msx1.empty);
+		msx_cpu_setbank (machine, page * 2 + 1, drvstate->empty);
+		msx_cpu_setbank (machine, page * 2 + 2, drvstate->empty);
 	}
 }
 
@@ -1884,6 +1916,7 @@ MSX_SLOT_RESET(crossblaim)
 
 MSX_SLOT_MAP(crossblaim)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
 
 	/* This might look odd, but it's what happens on the real cartridge */
@@ -1898,8 +1931,8 @@ MSX_SLOT_MAP(crossblaim)
 		}
 		else
 		{
-			msx_cpu_setbank (machine, 1, msx1.empty);
-			msx_cpu_setbank (machine, 2, msx1.empty);
+			msx_cpu_setbank (machine, 1, drvstate->empty);
+			msx_cpu_setbank (machine, 2, drvstate->empty);
 		}
 		break;
 	case 1:
@@ -1919,28 +1952,29 @@ MSX_SLOT_MAP(crossblaim)
 		}
 		else
 		{
-			msx_cpu_setbank (machine, 7, msx1.empty);
-			msx_cpu_setbank (machine, 8, msx1.empty);
+			msx_cpu_setbank (machine, 7, drvstate->empty);
+			msx_cpu_setbank (machine, 8, drvstate->empty);
 		}
 	}
 }
 
 MSX_SLOT_WRITE(crossblaim)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 block = val & 3;
 
 	if (!block) block = 1;
 	state->banks[0] = block;
 
-	if (msx1.state[0] == state)
+	if (drvstate->state[0] == state)
 	{
 		slot_crossblaim_map (machine, state, 0);
 	}
-	if (msx1.state[2] == state)
+	if (drvstate->state[2] == state)
 	{
 		slot_crossblaim_map (machine, state, 2);
 	}
-	if (msx1.state[3] == state)
+	if (drvstate->state[3] == state)
 	{
 		slot_crossblaim_map (machine, state, 3);
 	}
@@ -1981,11 +2015,12 @@ MSX_SLOT_RESET(korean80in1)
 
 MSX_SLOT_MAP(korean80in1)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem + state->banks[0] * 0x2000);
@@ -1996,13 +2031,14 @@ MSX_SLOT_MAP(korean80in1)
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(korean80in1)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	int bank;
 
 	if (addr >= 0x4000 && addr < 0x4004)
@@ -2014,7 +2050,7 @@ MSX_SLOT_WRITE(korean80in1)
 		{
 			slot_korean80in1_map (machine, state, 1);
 		}
-		else if (msx1.state[2] == state)
+		else if (drvstate->state[2] == state)
 		{
 			slot_korean80in1_map (machine, state, 2);
 		}
@@ -2046,28 +2082,30 @@ MSX_SLOT_INIT(korean90in1)
 
 MSX_SLOT_RESET(korean90in1)
 {
-	msx1.korean90in1_bank = 0;
+	msx_state *drvstate = machine->driver_data<msx_state>();
+	drvstate->korean90in1_bank = 0;
 }
 
 MSX_SLOT_MAP(korean90in1)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
-	UINT8 mask = (msx1.korean90in1_bank & 0xc0) == 0x80 ? 0x3e : 0x3f;
+	UINT8 mask = (drvstate->korean90in1_bank & 0xc0) == 0x80 ? 0x3e : 0x3f;
 	mem = state->mem +
-		((msx1.korean90in1_bank & mask) & state->bank_mask) * 0x4000;
+		((drvstate->korean90in1_bank & mask) & state->bank_mask) * 0x4000;
 
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		msx_cpu_setbank (machine, 3, mem);
 		msx_cpu_setbank (machine, 4, mem + 0x2000);
 		break;
 	case 2:
-		switch (msx1.korean90in1_bank & 0xc0)
+		switch (drvstate->korean90in1_bank & 0xc0)
 		{
 		case 0x80: /* 32 kb mode */
 			mem += 0x4000;
@@ -2082,8 +2120,8 @@ MSX_SLOT_MAP(korean90in1)
 		}
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
@@ -2120,13 +2158,14 @@ MSX_SLOT_RESET(korean126in1)
 
 MSX_SLOT_MAP(korean126in1)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	UINT8 *mem;
 
 	switch (page)
 	{
 	case 0:
-		msx_cpu_setbank (machine, 1, msx1.empty);
-		msx_cpu_setbank (machine, 2, msx1.empty);
+		msx_cpu_setbank (machine, 1, drvstate->empty);
+		msx_cpu_setbank (machine, 2, drvstate->empty);
 		break;
 	case 1:
 		mem = state->mem + state->banks[0] * 0x4000;
@@ -2139,13 +2178,14 @@ MSX_SLOT_MAP(korean126in1)
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
 		break;
 	case 3:
-		msx_cpu_setbank (machine, 7, msx1.empty);
-		msx_cpu_setbank (machine, 8, msx1.empty);
+		msx_cpu_setbank (machine, 7, drvstate->empty);
+		msx_cpu_setbank (machine, 8, drvstate->empty);
 	}
 }
 
 MSX_SLOT_WRITE(korean126in1)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	if (addr >= 0x4000 && addr < 0x4002)
 	{
 		int bank = addr & 1;
@@ -2154,7 +2194,7 @@ MSX_SLOT_WRITE(korean126in1)
 		{
 			slot_korean126in1_map (machine, state, 1);
 		}
-		else if (msx1.state[2] == state)
+		else if (drvstate->state[2] == state)
 		{
 			slot_korean126in1_map (machine, state, 2);
 		}
@@ -2193,13 +2233,14 @@ MSX_SLOT_RESET(soundcartridge)
 
 static  READ8_HANDLER (soundcartridge_scc)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	int reg;
 
 
 	if (offset >= 0x7e0)
 	{
-		return msx1.state[2]->mem[
-				msx1.state[2]->banks[2] * 0x2000 + 0x1800 + offset];
+		return state->state[2]->mem[
+				state->state[2]->banks[2] * 0x2000 + 0x1800 + offset];
 	}
 
 	reg = offset & 0xff;
@@ -2229,12 +2270,13 @@ static  READ8_HANDLER (soundcartridge_scc)
 
 static  READ8_HANDLER (soundcartridge_sccp)
 {
+	msx_state *state = space->machine->driver_data<msx_state>();
 	int reg;
 
 	if (offset >= 0x7e0)
 	{
-		return msx1.state[2]->mem[
-				msx1.state[2]->banks[3] * 0x2000 + 0x1800 + offset];
+		return state->state[2]->mem[
+				state->state[2]->banks[3] * 0x2000 + 0x1800 + offset];
 	}
 
 	reg = offset & 0xff;
@@ -2289,6 +2331,7 @@ MSX_SLOT_MAP(soundcartridge)
 
 MSX_SLOT_WRITE(soundcartridge)
 {
+	msx_state *drvstate = machine->driver_data<msx_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
@@ -2307,7 +2350,7 @@ MSX_SLOT_WRITE(soundcartridge)
 			state->banks[0] = val & state->bank_mask;
 			state->cart.sccp.banks_saved[0] = val;
 			slot_soundcartridge_map (machine, state, 1);
-			if (msx1.state[3] == state)
+			if (drvstate->state[3] == state)
 			{
 				slot_soundcartridge_map (machine, state, 3);
 			}
@@ -2323,7 +2366,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		{
 			state->banks[1] = val & state->bank_mask;
 			state->cart.sccp.banks_saved[1] = val;
-			if (msx1.state[3] == state)
+			if (drvstate->state[3] == state)
 			{
 				slot_soundcartridge_map (machine, state, 3);
 			}
@@ -2344,7 +2387,7 @@ MSX_SLOT_WRITE(soundcartridge)
 					(((val & 0x3f) == 0x3f) && !(state->cart.sccp.mode & 0x20));
 
 			slot_soundcartridge_map (machine, state, 2);
-			if (msx1.state[0] == state)
+			if (drvstate->state[0] == state)
 			{
 				slot_soundcartridge_map (machine, state, 0);
 			}
@@ -2396,7 +2439,7 @@ MSX_SLOT_WRITE(soundcartridge)
 			state->cart.sccp.sccp_active =
 					(val & 0x80) && (state->cart.sccp.mode & 0x20);
 			slot_soundcartridge_map (machine, state, 2);
-			if (msx1.state[0] == state)
+			if (drvstate->state[0] == state)
 			{
 				slot_soundcartridge_map (machine, state, 0);
 			}
