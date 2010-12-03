@@ -1313,6 +1313,10 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("trsm100_cart")
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1345,11 +1349,16 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pc8201_cart")
 
 	/* 128KB ROM cassette */
 	MDRV_CARTSLOT_ADD("cart2")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pc8201_cart2")
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "pc8201")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1383,6 +1392,10 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("trsm100_cart")
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1420,17 +1433,17 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
 	MDRV_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
 //  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
-
-	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-
-	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("tandy200_cart")
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "tandy200")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
