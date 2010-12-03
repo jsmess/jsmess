@@ -11,180 +11,298 @@
 
     TODO:
 
-    - use resnet for colors
+	- wait state on memory access during video update
     - proper video timing
+	- get rid of flash timer
 
 */
 
 #include "emu.h"
 #include "zx8301.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 #define LOG 0
 
+
+// low resolution palette
 static const int ZX8301_COLOR_MODE4[] = { 0, 2, 4, 7 };
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _zx8301_t zx8301_t;
-struct _zx8301_t
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type ZX8301 = zx8301_device_config::static_alloc_device_config;
+
+
+// default address map
+static ADDRESS_MAP_START( zx8301, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  zx8301_device_config - constructor
+//-------------------------------------------------
+
+zx8301_device_config::zx8301_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "Sinclair ZX8301", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301))
 {
-	devcb_resolved_read8		in_ram_func;
-	devcb_resolved_write8		out_ram_func;
-	devcb_resolved_write_line	out_vsync_func;
-
-	screen_device *screen;	/* screen */
-
-	int dispoff;					/* display off */
-	int mode8;						/* mode8 active */
-	int base;						/* video ram base address */
-	int flash;						/* flash */
-	int vsync;						/* vertical sync */
-	int vda;						/* valid data address */
-
-	/* timers */
-	emu_timer *flash_timer;			/* flash timer */
-	emu_timer *vsync_timer;			/* vertical sync timer */
-
-	running_device *cpu;
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE zx8301_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-
-	return (zx8301_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const zx8301_interface *get_interface(running_device *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *zx8301_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	assert((device->type() == ZX8301));
-	return (const zx8301_interface *) device->baseconfig().static_config();
+	return global_alloc(zx8301_device_config(mconfig, tag, owner, clock));
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8301_flash_tick )
--------------------------------------------------*/
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
 
-static TIMER_CALLBACK( zx8301_flash_tick )
+device_t *zx8301_device_config::alloc_device(running_machine &machine) const
 {
-	zx8301_t *zx8301 = get_safe_token((running_device *)ptr);
-
-	zx8301->flash = !zx8301->flash;
+	return auto_alloc(&machine, zx8301_device(machine, *this));
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8301_vsync_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( zx8301_vsync_tick )
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *zx8301_device_config::memory_space_config(int spacenum) const
 {
-	zx8301_t *zx8301 = get_safe_token((running_device *)ptr);
-
-	//zx8301->vsync = !zx8301->vsync;
-
-	devcb_call_write_line(&zx8301->out_vsync_func, zx8301->vsync);
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
-/*-------------------------------------------------
-    PALETTE_INIT( zx8301 )
--------------------------------------------------*/
 
-PALETTE_INIT( zx8301 )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void zx8301_device_config::device_config_complete()
 {
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 ); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff ); // blue
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff ); // magenta
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00 ); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff ); // cyan
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 ); // yellow
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff ); // white
+	// inherit a copy of the static data
+	const zx8301_interface *intf = reinterpret_cast<const zx8301_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<zx8301_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&out_vsync_func, 0, sizeof(out_vsync_func));
+	}
 }
 
-/*-------------------------------------------------
-    zx8301_control_w - display control register
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( zx8301_control_w )
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 zx8301_device::readbyte(offs_t address)
 {
-	zx8301_t *zx8301 = get_safe_token(device);
+	return space()->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void zx8301_device::writebyte(offs_t address, UINT8 data)
+{
+	space()->write_byte(address, data);
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  zx8301_device - constructor
+//-------------------------------------------------
+
+zx8301_device::zx8301_device(running_machine &_machine, const zx8301_device_config &config)
+    : device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+	  m_dispoff(1),
+	  m_mode8(0),
+	  m_base(0),
+	  m_flash(1),
+	  m_vsync(1),
+	  m_vda(0),
+      m_config(config)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void zx8301_device::device_start()
+{
+	// get the CPU
+	m_cpu = machine->device<cpu_device>(m_config.cpu_tag);
+	assert(m_cpu != NULL);
+
+	// get the screen device
+	m_screen = machine->device<screen_device>(m_config.screen_tag);
+	assert(m_screen != NULL);
+
+	// resolve callbacks
+    devcb_resolve_write_line(&m_out_vsync_func, &m_config.out_vsync_func, this);
+	
+	// allocate timers
+	m_vsync_timer = device_timer_alloc(*this, TIMER_VSYNC);
+	m_flash_timer = device_timer_alloc(*this, TIMER_FLASH);
+
+	// adjust timer periods
+	timer_adjust_periodic(m_vsync_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
+	timer_adjust_periodic(m_flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
+
+	// register for state saving
+	state_save_register_device_item(this, 0, m_dispoff);
+	state_save_register_device_item(this, 0, m_mode8);
+	state_save_register_device_item(this, 0, m_base);
+ 	state_save_register_device_item(this, 0, m_flash);
+	state_save_register_device_item(this, 0, m_vsync);
+	state_save_register_device_item(this, 0, m_vda);
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VSYNC:
+		//m_vsync = !m_vsync;
+		devcb_call_write_line(&m_out_vsync_func, m_vsync);
+		break;
+
+	case TIMER_FLASH:
+		m_flash = !m_flash;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  control_w - display control register
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8301_device::control_w )
+{
+	/*
+
+		bit		description
+
+		0
+		1		display off
+		2
+		3		graphics mode
+		4
+		5
+		6
+		7		display base address
+
+	*/
 
 	if (LOG) logerror("ZX8301 Control: %02x\n", data);
 
-	zx8301->dispoff = BIT(data, 1);
-	zx8301->mode8 = BIT(data, 3);
-	zx8301->base = BIT(data, 7);
+	// display off
+	m_dispoff = BIT(data, 1);
+
+	// graphics mode
+	m_mode8 = BIT(data, 3);
+
+	// display base address
+	m_base = BIT(data, 7);
 }
 
-/*-------------------------------------------------
-    zx8301_ram_r - RAM access
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( zx8301_ram_r )
+//-------------------------------------------------
+//  data_r - RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( zx8301_device::data_r )
 {
-	zx8301_t *zx8301 = get_safe_token(device);
-
 	if (LOG) logerror("ZX8301 RAM Read: %06x\n", offset);
 
-	if (zx8301->vda)
+	if (m_vda)
 	{
-		cpu_spinuntil_time(zx8301->cpu, zx8301->screen->time_until_pos(256, 0));
+		cpu_spinuntil_time(m_cpu, m_screen->time_until_pos(256, 0));
 	}
 
-	return devcb_call_read8(&zx8301->in_ram_func, offset);
+	return readbyte(offset);
 }
 
-/*-------------------------------------------------
-    zx8301_ram_w - RAM access
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( zx8301_ram_w )
+//-------------------------------------------------
+//  data_w - RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8301_device::data_w )
 {
-	zx8301_t *zx8301 = get_safe_token(device);
-
 	if (LOG) logerror("ZX8301 RAM Write: %06x = %02x\n", offset, data);
 
-	if (zx8301->vda)
+	if (m_vda)
 	{
-		cpu_spinuntil_time(zx8301->cpu, zx8301->screen->time_until_pos(256, 0));
+		cpu_spinuntil_time(m_cpu, m_screen->time_until_pos(256, 0));
 	}
 
-	devcb_call_write8(&zx8301->out_ram_func, offset, data);
+	writebyte(offset, data);
 }
 
-/*-------------------------------------------------
-    zx8301_draw_line_mode4 - high resolution
-    line drawing routine
--------------------------------------------------*/
 
-static void zx8301_draw_line_mode4(running_device *device, bitmap_t *bitmap, int y, UINT16 da)
+//-------------------------------------------------
+//  draw_line_mode4 - draw mode 4 line
+//-------------------------------------------------
+
+void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 {
-	zx8301_t *zx8301 = get_safe_token(device);
-
-	int word, pixel, x = 0;
-
-	for (word = 0; word < 64; word++)
+	for (int word = 0; word < 64; word++)
 	{
-		UINT8 byte_high = devcb_call_read8(&zx8301->in_ram_func, da++);
-		UINT8 byte_low = devcb_call_read8(&zx8301->in_ram_func, da++);
+		UINT8 byte_high = readbyte(da++);
+		UINT8 byte_low = readbyte(da++);
 
-		for (pixel = 0; pixel < 8; pixel++)
+		for (int pixel = 0; pixel < 8; pixel++)
 		{
+			int x = 0;
 			int red = BIT(byte_low, 7);
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
@@ -197,24 +315,21 @@ static void zx8301_draw_line_mode4(running_device *device, bitmap_t *bitmap, int
 	}
 }
 
-/*-------------------------------------------------
-    zx8301_draw_line_mode4 - low resolution
-    line drawing routine
--------------------------------------------------*/
 
-static void zx8301_draw_line_mode8(running_device *device, bitmap_t *bitmap, int y, UINT16 da)
+//-------------------------------------------------
+//  draw_line_mode8 - draw mode 8 line
+//-------------------------------------------------
+
+void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 {
-	zx8301_t *zx8301 = get_safe_token(device);
-
-	int word, pixel, x = 0;
-
-	for (word = 0; word < 64; word++)
+	for (int word = 0; word < 64; word++)
 	{
-		UINT8 byte_high = devcb_call_read8(&zx8301->in_ram_func, da++);
-		UINT8 byte_low = devcb_call_read8(&zx8301->in_ram_func, da++);
+		UINT8 byte_high = readbyte(da++);
+		UINT8 byte_low = readbyte(da++);
 
-		for (pixel = 0; pixel < 4; pixel++)
+		for (int pixel = 0; pixel < 4; pixel++)
 		{
+			int x = 0;
 			int red = BIT(byte_low, 7);
 			int green = BIT(byte_high, 7);
 			int blue = BIT(byte_low, 6);
@@ -222,7 +337,7 @@ static void zx8301_draw_line_mode8(running_device *device, bitmap_t *bitmap, int
 
 			int color = (green << 2) | (red << 1) | blue;
 
-			if (flash && zx8301->flash)
+			if (flash && m_flash)
 			{
 				color = 0;
 			}
@@ -236,127 +351,33 @@ static void zx8301_draw_line_mode8(running_device *device, bitmap_t *bitmap, int
 	}
 }
 
-/*-------------------------------------------------
-    zx8301_draw_screen - draw screen
--------------------------------------------------*/
 
-static void zx8301_draw_screen(running_device *device, bitmap_t *bitmap)
+//-------------------------------------------------
+//  update_screen -
+//-------------------------------------------------
+
+void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	zx8301_t *zx8301 = get_safe_token(device);
-
-	UINT32 da = zx8301->base << 15;
-	int y;
-
-	zx8301->vda = 1;
-
-	for (y = 0; y < 256; y++)
+	if (!m_dispoff)
 	{
-		if (zx8301->mode8)
+		UINT32 da = m_base << 15;
+
+		for (int y = 0; y < 256; y++)
 		{
-			zx8301_draw_line_mode8(device, bitmap, y, da);
+			if (m_mode8)
+			{
+				draw_line_mode8(bitmap, y, da);
+			}
+			else
+			{
+				draw_line_mode4(bitmap, y, da);
+			}
+
+			da += 128;
 		}
-		else
-		{
-			zx8301_draw_line_mode4(device, bitmap, y, da);
-		}
-
-		da += 128;
-	}
-
-	zx8301->vda = 0;
-}
-
-/*-------------------------------------------------
-    zx8301_draw_screen - screen update
--------------------------------------------------*/
-
-void zx8301_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	zx8301_t *zx8301 = get_safe_token(device);
-
-	if (!zx8301->dispoff)
-	{
-		zx8301_draw_screen(device, bitmap);
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(zx8301->screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
 	}
 }
-
-/*-------------------------------------------------
-    DEVICE_START( zx8301 )
--------------------------------------------------*/
-
-static DEVICE_START( zx8301 )
-{
-	zx8301_t *zx8301 = get_safe_token(device);
-	const zx8301_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&zx8301->in_ram_func, &intf->in_ram_func, device);
-	devcb_resolve_write8(&zx8301->out_ram_func, &intf->out_ram_func, device);
-	devcb_resolve_write_line(&zx8301->out_vsync_func, &intf->out_vsync_func, device);
-
-	/* set initial values */
-	zx8301->vsync = 1;
-
-	/* get the cpu */
-	zx8301->cpu = device->machine->device(intf->cpu_tag);
-
-	/* get the screen device */
-	zx8301->screen = device->machine->device<screen_device>(intf->screen_tag);
-	assert(zx8301->screen != NULL);
-
-	/* create the timers */
-	zx8301->vsync_timer = timer_alloc(device->machine, zx8301_vsync_tick, (void *)device);
-	timer_adjust_periodic(zx8301->vsync_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50)); // HACK
-
-	zx8301->flash_timer = timer_alloc(device->machine, zx8301_flash_tick, (void *)device);
-	timer_adjust_periodic(zx8301->flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
-
-	/* register for state saving */
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->dispoff);
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->mode8);
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->base);
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->flash);
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->vsync);
-	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->vda);
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( zx8301 )
--------------------------------------------------*/
-
-static DEVICE_RESET( zx8301 )
-{
-//  zx8301_t *zx8301 = get_safe_token(device);
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( zx8301 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( zx8301 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(zx8301_t);						break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(zx8301);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(zx8301);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Sinclair ZX8301");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Sinclair QL");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(ZX8301, zx8301);

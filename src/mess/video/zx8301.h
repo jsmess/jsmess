@@ -30,17 +30,25 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __ZX8301__
 #define __ZX8301__
 
 #include "emu.h"
-#include "devcb.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ZX8301, zx8301);
+
+///*************************************************************************
+//	MACROS / CONSTANTS
+///*************************************************************************
+
+
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
 
 #define MDRV_ZX8301_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, ZX8301, _clock) \
@@ -49,41 +57,108 @@ DECLARE_LEGACY_DEVICE(ZX8301, zx8301);
 #define ZX8301_INTERFACE(name) \
 	const zx8301_interface(name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _zx8301_interface zx8301_interface;
-struct _zx8301_interface
+
+///*************************************************************************
+//	TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> zx8301_interface
+
+struct zx8301_interface
 {
-	const char *cpu_tag;		/* cpu we are working with */
-	const char *screen_tag;		/* screen we are acting on */
+	const char *cpu_tag;
+	const char *screen_tag;
 
-	/* this gets called for every memory read */
-	devcb_read8			in_ram_func;
-
-	/* this gets called for every memory write */
-	devcb_write8		out_ram_func;
-
-	/* this gets called for every change of the VSYNC pin (pin 11) */
 	devcb_write_line	out_vsync_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* register access */
-WRITE8_DEVICE_HANDLER( zx8301_control_w );
 
-/* palette initialization */
-PALETTE_INIT( zx8301 );
+// ======================> zx8301_device_config
 
-/* memory access */
-READ8_DEVICE_HANDLER( zx8301_ram_r );
-WRITE8_DEVICE_HANDLER( zx8301_ram_w );
+class zx8301_device_config :   public device_config,
+								public device_config_memory_interface,
+                                public zx8301_interface
+{
+    friend class zx8301_device;
 
-/* screen update */
-void zx8301_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+    // construction/destruction
+    zx8301_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
+};
+
+
+
+// ======================> zx8301_device
+
+class zx8301_device :	public device_t,
+						public device_memory_interface
+{
+    friend class zx8301_device_config;
+
+    // construction/destruction
+    zx8301_device(running_machine &_machine, const zx8301_device_config &_config);
+
+public:
+	DECLARE_WRITE8_MEMBER( control_w );
+    DECLARE_READ8_MEMBER( data_r );
+    DECLARE_WRITE8_MEMBER( data_w );
+
+	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	inline UINT8 readbyte(offs_t address);
+	inline void writebyte(offs_t address, UINT8 data);
+
+	void draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da);
+	void draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da);
+
+private:
+	static const device_timer_id TIMER_VSYNC = 0;
+	static const device_timer_id TIMER_FLASH = 1;
+
+	devcb_resolved_write_line	m_out_vsync_func;
+
+	cpu_device *m_cpu;
+	screen_device *m_screen;
+	address_space *m_data;
+
+	int m_dispoff;					// display off
+	int m_mode8;					// mode8 active
+	int m_base;						// video ram base address
+	int m_flash;					// flash
+	int m_vsync;					// vertical sync
+	int m_vda;						// valid data address
+
+	emu_timer *m_vsync_timer;		// vertical sync timer
+	emu_timer *m_flash_timer;		// flash timer
+
+	const zx8301_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type ZX8301;
+
+
 
 #endif
