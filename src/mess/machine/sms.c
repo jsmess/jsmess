@@ -124,7 +124,7 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 {
 	sms_state *state = machine->driver_data<sms_state>();
 	const int r_x_r = LGUN_RADIUS * LGUN_RADIUS;
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 	int beam_x = screen->hpos();
 	int beam_y = screen->vpos();
@@ -175,7 +175,7 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 		else
 			break;
 	}
-	timer_adjust_oneshot(timer, screen_first(*machine)->time_until_pos(beam_y, beam_x), 0);
+	timer_adjust_oneshot(timer, machine->first_screen()->time_until_pos(beam_y, beam_x), 0);
 
 	return result;
 }
@@ -183,7 +183,7 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 static UINT8 sms_vdp_hcount( running_machine *machine )
 {
 	UINT8 tmp;
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int hpos = screen->hpos();
 
 	/* alternative method: pass HCounter test, but some others fail */
@@ -238,8 +238,8 @@ static UINT16 screen_vpos_nonscaled( screen_device *screen, int scaled_vpos )
 static void lphaser1_sensor_check( running_machine *machine )
 {
 	sms_state *state = machine->driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER0"));
-	const int y = screen_vpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER1"));
+	const int x = screen_hpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER0"));
+	const int y = screen_vpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER1"));
 
 	if (lgun_bright_aim_area(machine, state->lphaser_1_timer, x, y))
 	{
@@ -254,8 +254,8 @@ static void lphaser1_sensor_check( running_machine *machine )
 static void lphaser2_sensor_check( running_machine *machine )
 {
 	sms_state *state = machine->driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER2"));
-	const int y = screen_vpos_nonscaled(screen_first(*machine), input_port_read(machine, "LPHASER3"));
+	const int x = screen_hpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER2"));
+	const int y = screen_vpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER3"));
 	
 	if (lgun_bright_aim_area(machine, state->lphaser_2_timer, x, y))
 	{
@@ -1941,7 +1941,7 @@ static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
 VIDEO_START( sms1 )
 {
 	sms_state *state = machine->driver_data<sms_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	
@@ -2006,7 +2006,7 @@ VIDEO_UPDATE( sms )
 VIDEO_START( gamegear )
 {
 	sms_state *state = machine->driver_data<sms_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	

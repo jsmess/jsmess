@@ -405,7 +405,7 @@ WRITE8_HANDLER ( zx81_io_w )
     FE = turn on NMI generator
     FF = write HSYNC and cass data */
 
-	screen_device *screen = screen_first(*space->machine);
+	screen_device *screen = space->machine->first_screen();
 	int height = screen->height();
 	UINT8 offs = offset & 0xff;
 

@@ -171,7 +171,7 @@ void asr733_init(running_machine *machine)
 
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *, int state))
 {
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();

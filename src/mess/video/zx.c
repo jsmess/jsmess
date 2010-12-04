@@ -39,7 +39,7 @@ int ula_scanline_count = 0;
 void zx_ula_bkgnd(running_machine *machine, int color)
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();
@@ -99,7 +99,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
      * An NMI is issued on the ZX81 every 64us for the blanked
      * scanlines at the top and bottom of the display.
      */
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int height = screen->height();
 	const rectangle r1 = screen->visible_area();
 	rectangle r;
@@ -136,7 +136,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param)
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int offs0 = offs & 0x7fff;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 chr = rom[offs0];

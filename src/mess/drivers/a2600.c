@@ -1676,7 +1676,7 @@ static const struct tia_interface tia_interface_pal =
 static MACHINE_START( a2600 )
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	state->current_screen_height = screen->height();
 	state->extra_RAM =	machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
@@ -1687,7 +1687,7 @@ static MACHINE_START( a2600 )
 static MACHINE_START( a2600p )
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	state->current_screen_height = screen->height();
 	state->extra_RAM = machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );

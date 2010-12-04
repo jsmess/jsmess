@@ -52,7 +52,7 @@ static UINT8 thom_hires_better;
 
 static int thom_update_screen_size( running_machine *machine )
 {
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 	UINT8 p = input_port_read(machine, "vconfig");
 	int new_w, new_h, changed = 0;

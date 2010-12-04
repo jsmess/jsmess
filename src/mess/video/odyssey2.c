@@ -565,7 +565,7 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 VIDEO_START( odyssey2 )
 {
 	odyssey2_state *state = machine->driver_data<odyssey2_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 

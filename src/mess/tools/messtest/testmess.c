@@ -224,16 +224,16 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		if (filerr == FILERR_NONE)
 		{
 			/* choose a screen */
-			screen_device *screen = screen_first(*machine);
+			screen_device *screen = machine->first_screen();
 			while((screen != NULL) && !machine->render().is_live(*screen))
 			{
-				screen = screen_next(screen);
+				screen = screen->next_screen();
 			}
 
 			/* did we find a live screen? */
 			if (screen != NULL)
 			{
-				screen_save_snapshot(screen->machine, screen, fp);
+				screen->machine->video().save_snapshot(screen, *fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else

@@ -713,12 +713,12 @@ static char *GameInfoScreen(UINT nIndex)
 	}
 	else
 	{
-		const screen_device_config *screen = screen_first(config);
+		const screen_device_config *screen = config.first_screen();
 		if (screen == NULL) {
 			strcpy(buf, "Screenless Game"); 
 		}
 		else {
-			for (; screen != NULL; screen = screen_next(screen)) {
+			for (; screen != NULL; screen = screen->next_screen()) {
 				char tmpbuf[256];
 				const rectangle &visarea = screen->visible_area();
 

@@ -284,7 +284,7 @@ static TIMER_CALLBACK(update_signal)
 VIDEO_START(vectrex)
 {
 	vectrex_state *state = machine->driver_data<vectrex_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 
 	state->x_center=((visarea.max_x - visarea.min_x) / 2) << 16;
@@ -484,7 +484,7 @@ WRITE8_HANDLER(raaspec_led_w)
 VIDEO_START(raaspec)
 {
 	vectrex_state *state = machine->driver_data<vectrex_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 
 	state->x_center=((visarea.max_x - visarea.min_x) / 2) << 16;

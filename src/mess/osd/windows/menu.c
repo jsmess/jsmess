@@ -1292,11 +1292,11 @@ static void prepare_menus(HWND wnd)
 		joystick_menu_setup = 1;
 	}
 
-	frameskip = video_get_frameskip();
+	frameskip = window->machine->video().frameskip();
 
 	orientation = window->target->orientation();
 
-	speed = video_get_throttle() ? video_get_speed_factor() : 0;
+	speed = window->machine->video().throttled() ? window->machine->video().speed_factor() : 0;
 
 	has_config		= input_has_input_class(window->machine, INPUT_CLASS_CONFIG);
 	has_dipswitch	= input_has_input_class(window->machine, INPUT_CLASS_DIPSWITCH);
@@ -1448,15 +1448,15 @@ static void prepare_menus(HWND wnd)
 //  set_seped
 //============================================================
 
-static void set_speed(int speed)
+static void set_speed(running_machine *machine, int speed)
 {
 	if (speed != 0)
 	{
-		video_set_speed_factor(speed);
+		machine->video().set_speed_factor(speed);
 		options_set_int(mame_options(), OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE);
 	}
 
-	video_set_throttle(speed != 0);
+	machine->video().set_throttled(speed != 0);
 	options_set_bool(mame_options(), OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE);
 }
 
@@ -1722,7 +1722,7 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_FILE_SAVESCREENSHOT:
-			video_save_active_screen_snapshots(window->machine);
+			window->machine->video().save_active_screen_snapshots();
 			break;
 
 		case ID_FILE_EXIT_NEWUI:
@@ -1824,7 +1824,7 @@ static int invoke_command(HWND wnd, UINT command)
 #endif
 
 		case ID_FRAMESKIP_AUTO:
-			video_set_frameskip(-1);
+			window->machine->video().set_frameskip(-1);
 			options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE);
 			break;
 
@@ -1837,34 +1837,34 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_THROTTLE_50:
-			set_speed(50);
+			set_speed(window->machine, 50);
 			break;
 
 		case ID_THROTTLE_100:
-			set_speed(100);
+			set_speed(window->machine, 100);
 			break;
 
 		case ID_THROTTLE_200:
-			set_speed(200);
+			set_speed(window->machine, 200);
 			break;
 
 		case ID_THROTTLE_500:
-			set_speed(500);
+			set_speed(window->machine, 500);
 			break;
 
 		case ID_THROTTLE_1000:
-			set_speed(1000);
+			set_speed(window->machine, 1000);
 			break;
 
 		case ID_THROTTLE_UNTHROTTLED:
-			set_speed(0);
+			set_speed(window->machine, 0);
 			break;
 
 		default:
 			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count()))
 			{
 				// change frameskip
-				video_set_frameskip(command - ID_FRAMESKIP_0);
+				window->machine->video().set_frameskip(command - ID_FRAMESKIP_0);
 				options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE);
 				options_set_int(mame_options(), OPTION_FRAMESKIP, command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE);
 			}

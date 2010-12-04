@@ -395,7 +395,7 @@ static void glyph_print(running_machine *machine, bitmap_t *bitmap, INT32 x, INT
     va_list arg_list;
     char buf[32768];
     INT32 index = 0;
-    screen_device *screen = screen_first(*machine);
+    screen_device *screen = machine->first_screen();
     const rectangle &visarea = screen->visible_area();
 
     va_start( arg_list, msg );

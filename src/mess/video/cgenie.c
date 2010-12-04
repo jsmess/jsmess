@@ -21,7 +21,7 @@
 VIDEO_START( cgenie )
 {
 	cgenie_state *state = machine->driver_data<cgenie_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 

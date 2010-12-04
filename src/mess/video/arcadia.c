@@ -303,7 +303,7 @@ VIDEO_START( arcadia )
 	}
 
 	{
-		screen_device *screen = screen_first(*machine);
+		screen_device *screen = machine->first_screen();
 		int width = screen->width();
 		int height = screen->height();
 		state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -603,7 +603,7 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 INTERRUPT_GEN( arcadia_video_line )
 {
 	arcadia_state *state = device->machine->driver_data<arcadia_state>();
-	screen_device *screen = screen_first(*device->machine);
+	screen_device *screen = device->machine->first_screen();
 	int width = screen->width();
 
 	if (state->ad_delay<=0)

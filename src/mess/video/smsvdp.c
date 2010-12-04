@@ -163,7 +163,7 @@ static void set_display_settings( running_device *device )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
-	screen_device *screen = screen_first(*device->machine);
+	screen_device *screen = device->machine->first_screen();
 	int height = screen->height();
 	int M1, M2, M3, M4;
 	M1 = smsvdp->reg[0x01] & 0x10;
@@ -1427,7 +1427,7 @@ static DEVICE_START( smsvdp )
 	smsvdp_t *smsvdp = get_safe_token(device);
 	const smsvdp_interface *intf = get_interface(device);
 
-	screen_device *screen = screen_first(*device->machine);
+	screen_device *screen = device->machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 

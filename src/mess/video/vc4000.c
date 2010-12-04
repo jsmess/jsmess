@@ -27,7 +27,7 @@
 VIDEO_START(vc4000)
 {
 	vc4000_state *state = machine->driver_data<vc4000_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	int i;
@@ -518,7 +518,7 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 {
 	vc4000_state *state = machine->driver_data<vc4000_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	int i, j, m, x, line=state->video.line-20;

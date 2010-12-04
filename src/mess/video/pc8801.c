@@ -79,7 +79,7 @@ INLINE void pc8801_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color )
 void pc8801_video_init( running_machine *machine, int hireso )
 {
 	pc88_state *state = machine->driver_data<pc88_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
 

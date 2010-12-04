@@ -224,7 +224,7 @@ static VIDEO_UPDATE( tm990_189 )
 static VIDEO_START( tm990_189_v )
 {
 	tm990189_state *state = machine->driver_data<tm990189_state>();
-	screen_device *screen = screen_first(*machine);
+	screen_device *screen = machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when

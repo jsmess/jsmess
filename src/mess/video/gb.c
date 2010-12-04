@@ -489,7 +489,7 @@ static void gb_update_scanline( running_machine *machine )
 			{
 				if ( gb_lcd.current_line < 144 )
 				{
-					screen_device *screen = screen_first(*machine);
+					screen_device *screen = machine->first_screen();
 					rectangle r1;
 					const rectangle &r = screen->visible_area();
 					r1.min_y = r1.max_y = gb_lcd.current_line;
@@ -1158,7 +1158,7 @@ static void cgb_update_scanline ( running_machine *machine )
 			{
 				if ( gb_lcd.current_line < 144 )
 				{
-					screen_device *screen = screen_first(*machine);
+					screen_device *screen = machine->first_screen();
 					rectangle r;
 					const rectangle &r1 = screen->visible_area();
 					r.min_x = r1.min_x;

@@ -258,7 +258,7 @@ static void mbee_video_kbd_scan( running_machine *machine, int param )
 READ8_HANDLER ( m6545_status_r )
 {
 	mbee_state *state = space->machine->driver_data<mbee_state>();
-	screen_device *screen = screen_first(*space->machine);
+	screen_device *screen = space->machine->first_screen();
 	const rectangle &visarea = screen->visible_area();
 
 	UINT8 data = state->sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe

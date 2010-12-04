@@ -320,7 +320,7 @@ const char * GetDriverFilename(int nIndex)
 
 BOOL isDriverVector(const machine_config *config)
 {
-	const screen_device_config *screen  = screen_first(*config);
+	const screen_device_config *screen  = config->first_screen();
 
 	if (screen != NULL) {
 		// parse "vector.ini" for vector games 
@@ -334,9 +334,9 @@ BOOL isDriverVector(const machine_config *config)
 
 int numberOfScreens(const machine_config *config)
 {
-	const screen_device_config *screen  = screen_first(*config);
+	const screen_device_config *screen  = config->first_screen();
 	int i=0;
-	for (; screen != NULL; screen = screen_next(screen)) {
+	for (; screen != NULL; screen = screen->next_screen()) {
 		i++;
 	}
 	return i;	
