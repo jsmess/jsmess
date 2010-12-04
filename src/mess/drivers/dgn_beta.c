@@ -41,7 +41,6 @@ documentation still exists.
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "includes/coco.h"
 #include "includes/dgn_beta.h"
 #include "machine/6551.h"
 #include "formats/coco_dsk.h"

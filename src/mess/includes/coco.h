@@ -29,6 +29,48 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _coco3_scanline_record coco3_scanline_record;
+struct _coco3_scanline_record
+{
+	UINT8 ff98;
+	UINT8 ff99;
+	UINT8 ff9a;
+	UINT8 index;
+
+	UINT8 palette[16];
+
+	UINT8 data[160];
+};
+
+typedef struct _coco3_video coco3_video;
+struct _coco3_video
+{
+	/* Info set up on initialization */
+	UINT32 composite_palette[64];
+	UINT32 rgb_palette[64];
+	UINT8 fontdata[128][8];
+	emu_timer *gime_fs_timer;
+
+	/* CoCo 3 palette status */
+	UINT8 palette_ram[16];
+	UINT32 palette_colors[16];
+
+	/* Incidentals */
+	UINT32 legacy_video;
+	UINT32 top_border_scanlines;
+	UINT32 display_scanlines;
+	UINT32 video_position;
+	UINT8 line_in_row;
+	UINT8 blink;
+	UINT8 dirty[2];
+	UINT8 video_type;
+
+	/* video state; every scanline the video state for the scanline is copied
+     * here and only rendered in VIDEO_UPDATE */
+	coco3_scanline_record scanlines[384];
+};
+
+
 class coco_state : public driver_device
 {
 public:
@@ -44,6 +86,45 @@ public:
 	running_device *pia_0;
 	running_device *pia_1;
 	running_device *pia_2;
+	UINT8 *rom;
+	int dclg_state;
+	int dclg_output_h;
+	int dclg_output_v;
+	int dclg_timer;
+	UINT8 (*update_keyboard)(running_machine *machine);
+	emu_timer *update_keyboard_timer;
+	emu_timer *mux_sel1_timer;
+	emu_timer *mux_sel2_timer;
+	UINT8 mux_sel1;
+	UINT8 mux_sel2;
+	UINT8 bitbanger_output_value;
+	UINT8 bitbanger_input_value;
+	UINT8 dac_value;
+	int dgnalpha_just_reset;
+	UINT8 *bas_rom_bank;
+	UINT8 *bottom_32k;
+	timer_fired_func recalc_interrupts;
+	int hiresjoy_ca;
+	attotime hiresjoy_xtransitiontime;
+	attotime hiresjoy_ytransitiontime;
+	int dclg_previous_bit;
+	void (*printer_out)(running_machine *machine, int data);
+};
+
+class coco3_state : public coco_state
+{
+public:
+	coco3_state(running_machine &machine, const driver_device_config_base &config)
+		: coco_state(machine, config) { }
+
+	int enable_64k;
+	UINT8 mmu[16];
+	UINT8 interupt_line;
+	emu_timer *gime_timer;
+	UINT8 gimereg[16];
+	UINT8 gime_firq;
+	UINT8 gime_irq;
+	coco3_video *video;
 };
 
 
@@ -66,8 +147,8 @@ VIDEO_START( coco3 );
 VIDEO_START( coco3p );
 VIDEO_UPDATE( coco3 );
 WRITE8_HANDLER ( coco3_palette_w );
-UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask);
-void coco3_vh_blink(void);
+UINT32 coco3_get_video_base(running_machine *machine, UINT8 ff9d_mask, UINT8 ff9e_mask);
+void coco3_vh_blink(running_machine *machine);
 
 
 /*----------- defined in machine/coco.c -----------*/
@@ -87,7 +168,6 @@ extern const pia6821_interface dgnalpha_pia_intf_1;
 extern const pia6821_interface dgnalpha_pia_intf_2;
 extern const sam6883_interface coco_sam_intf;
 extern const sam6883_interface coco3_sam_intf;
-extern UINT8 coco3_gimereg[16];
 
 MACHINE_START( dragon32 );
 MACHINE_START( dragon64 );

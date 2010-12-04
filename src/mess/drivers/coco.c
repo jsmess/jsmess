@@ -1144,7 +1144,7 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( coco3, coco_state )
+static MACHINE_CONFIG_START( coco3, coco3_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco3_map)
