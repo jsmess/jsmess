@@ -12,9 +12,22 @@
 #define CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
+class pc1401_state : public driver_device
+{
+public:
+	pc1401_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 portc;
+	UINT8 outa;
+	UINT8 outb;
+	int power;
+	UINT8 reg[0x100];
+};
+
+
 /*----------- defined in machine/pc1401.c -----------*/
 
-extern UINT8 pc1401_portc;
 int pc1401_reset(running_device *device);
 int pc1401_brk(running_device *device);
 void pc1401_outa(running_device *device, int data);

@@ -2,16 +2,12 @@
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
-#include "includes/pc1401.h"
 #include "includes/pc1403.h"
 #include "devices/messram.h"
 
 /* C-CE while reset, program will not be destroyed! */
 
-static UINT8 outa;
-UINT8 pc1403_portc;
 
-static int power; /* simulates pressed cce when mess is started */
 
 
 /*
@@ -20,11 +16,11 @@ static int power; /* simulates pressed cce when mess is started */
    port 3:
      bits 0..6 keyboard output select matrix line
 */
-static UINT8 asic[4];
 
 WRITE8_HANDLER(pc1403_asic_write)
 {
-    asic[offset>>9]=data;
+	pc1403_state *state = space->machine->driver_data<pc1403_state>();
+    state->asic[offset>>9]=data;
     switch( (offset>>9) ){
     case 0/*0x3800*/:
 	// output
@@ -43,7 +39,8 @@ WRITE8_HANDLER(pc1403_asic_write)
 
 READ8_HANDLER(pc1403_asic_read)
 {
-    UINT8 data=asic[offset>>9];
+	pc1403_state *state = space->machine->driver_data<pc1403_state>();
+    UINT8 data=state->asic[offset>>9];
     switch( (offset>>9) ){
     case 0: case 1: case 2:
 	logerror ("asic read %.4x %.2x\n",offset, data);
@@ -54,59 +51,61 @@ READ8_HANDLER(pc1403_asic_read)
 
 void pc1403_outa(running_device *device, int data)
 {
-    outa=data;
+	pc1403_state *state = device->machine->driver_data<pc1403_state>();
+    state->outa=data;
 }
 
 int pc1403_ina(running_device *device)
 {
-    UINT8 data=outa;
+	pc1403_state *state = device->machine->driver_data<pc1403_state>();
+    UINT8 data=state->outa;
 
-    if (asic[3] & 0x01)
+    if (state->asic[3] & 0x01)
 		data |= input_port_read(device->machine, "KEY0");
 
-    if (asic[3] & 0x02)
+    if (state->asic[3] & 0x02)
 		data |= input_port_read(device->machine, "KEY1");
 
-    if (asic[3] & 0x04)
+    if (state->asic[3] & 0x04)
 		data |= input_port_read(device->machine, "KEY2");
 
-    if (asic[3] & 0x08)
+    if (state->asic[3] & 0x08)
 		data |= input_port_read(device->machine, "KEY3");
 
-    if (asic[3] & 0x10)
+    if (state->asic[3] & 0x10)
 		data |= input_port_read(device->machine, "KEY4");
 
-    if (asic[3] & 0x20)
+    if (state->asic[3] & 0x20)
 		data |= input_port_read(device->machine, "KEY5");
 
-    if (asic[3] & 0x40)
+    if (state->asic[3] & 0x40)
 		data |= input_port_read(device->machine, "KEY6");
 
-    if (outa & 0x01)
+    if (state->outa & 0x01)
 	{
 		data |= input_port_read(device->machine, "KEY7");
 
 		/* At Power Up we fake a 'C-CE' pressure */
-		if (power)
+		if (state->power)
 			data |= 0x02;
 	}
 
-    if (outa & 0x02)
+    if (state->outa & 0x02)
 		data |= input_port_read(device->machine, "KEY8");
 
-    if (outa & 0x04)
+    if (state->outa & 0x04)
 		data |= input_port_read(device->machine, "KEY9");
 
-    if (outa & 0x08)
+    if (state->outa & 0x08)
 		data |= input_port_read(device->machine, "KEY10");
 
-    if (outa & 0x10)
+    if (state->outa & 0x10)
 		data |= input_port_read(device->machine, "KEY11");
 
-    if (outa & 0x20)
+    if (state->outa & 0x20)
 		data |= input_port_read(device->machine, "KEY12");
 
-    if (outa & 0x40)
+    if (state->outa & 0x40)
 		data |= input_port_read(device->machine, "KEY13");
 
     return data;
@@ -115,7 +114,8 @@ int pc1403_ina(running_device *device)
 #if 0
 int pc1403_inb(void)
 {
-	int data = outb;
+	pc1403_state *state = machine->driver_data<pc140_state>();
+	int data = state->outb;
 
 	if (input_port_read(machine, "KEY13"))
 		data |= 1;
@@ -126,7 +126,8 @@ int pc1403_inb(void)
 
 void pc1403_outc(running_device *device, int data)
 {
-    pc1403_portc = data;
+	pc1403_state *state = device->machine->driver_data<pc1403_state>();
+    state->portc = data;
 //    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(device->machine->device("maincpu")), data);
 }
 
@@ -167,17 +168,19 @@ NVRAM_HANDLER( pc1403 )
 
 static TIMER_CALLBACK(pc1403_power_up)
 {
-	power=0;
+	pc1403_state *state = machine->driver_data<pc1403_state>();
+	state->power=0;
 }
 
 DRIVER_INIT( pc1403 )
 {
+	pc1403_state *state = machine->driver_data<pc1403_state>();
 	int i;
 	UINT8 *gfx=memory_region(machine, "gfx1");
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	power = 1;
+	state->power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));

@@ -49,12 +49,6 @@ PALETTE_INIT( pocketc )
 }
 
 
-VIDEO_START( pocketc )
-{
-	pocketc_state *state = machine->driver_data<pocketc_state>();
-	state->videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
-}
-
 /* Draw an indicator (DEG, SHIFT, etc) */
 void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
 {

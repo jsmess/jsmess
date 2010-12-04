@@ -715,12 +715,7 @@ static const sc61860_cpu_core pc1401_config =
 	pc1401_outc
 };
 
-static MACHINE_CONFIG_START( pc1401, pocketc_state )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
-	MDRV_CPU_CONFIG(pc1401_config)
-
+static MACHINE_CONFIG_FRAGMENT( pocketc )
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_NVRAM_HANDLER( pc1401 )
@@ -743,11 +738,19 @@ static MACHINE_CONFIG_START( pc1401, pocketc_state )
 	MDRV_PALETTE_LENGTH(8*2)
 	MDRV_PALETTE_INIT( pocketc )
 
-	MDRV_VIDEO_START( pocketc )
-	MDRV_VIDEO_UPDATE( pc1401 )
-
 	/* sound hardware */
 	/*MDRV_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( pc1401, pc1401_state )
+	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
+	MDRV_CPU_CONFIG(pc1401_config)
+
+	MDRV_FRAGMENT_ADD(pocketc)
+
+	MDRV_VIDEO_UPDATE( pc1401 )
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1402, pc1401 )
@@ -757,16 +760,18 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1251_config =
 {
-    NULL, pc1251_brk, NULL,
-    pc1251_ina, pc1251_outa,
-    pc1251_inb, pc1251_outb,
-    pc1251_outc
+	NULL, pc1251_brk, NULL,
+	pc1251_ina, pc1251_outa,
+	pc1251_inb, pc1251_outb,
+	pc1251_outc
 };
 
-static MACHINE_CONFIG_DERIVED( pc1250, pc1401 )
-	MDRV_CPU_MODIFY( "maincpu" )
+static MACHINE_CONFIG_START( pc1250, pc1251_state )
+	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP( pc1250_mem)
 	MDRV_CPU_CONFIG( pc1251_config )
+
+	MDRV_FRAGMENT_ADD(pocketc)
 
 	MDRV_NVRAM_HANDLER( pc1251 )
 
@@ -826,16 +831,18 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1350_config =
 {
-    NULL, pc1350_brk,NULL,
-    pc1350_ina, pc1350_outa,
-    pc1350_inb, pc1350_outb,
-    pc1350_outc
+	NULL, pc1350_brk,NULL,
+	pc1350_ina, pc1350_outa,
+	pc1350_inb, pc1350_outb,
+	pc1350_outc
 };
 
-static MACHINE_CONFIG_DERIVED( pc1350, pc1401 )
-	MDRV_CPU_MODIFY( "maincpu" )
+static MACHINE_CONFIG_START( pc1350, pc1350_state )
+	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP( pc1350_mem)
 	MDRV_CPU_CONFIG( pc1350_config )
+
+	MDRV_FRAGMENT_ADD( pocketc )
 
 	MDRV_MACHINE_START( pc1350 )
 	MDRV_NVRAM_HANDLER( pc1350 )
@@ -859,13 +866,19 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1403_config =
 {
-    NULL, pc1403_brk, NULL,
-    pc1403_ina, pc1403_outa,
-    NULL,NULL,
-    pc1403_outc
+	NULL, pc1403_brk, NULL,
+	pc1403_ina, pc1403_outa,
+	NULL,NULL,
+	pc1403_outc
 };
 
-static MACHINE_CONFIG_DERIVED( pc1403, pc1401 )
+static MACHINE_CONFIG_START( pc1403, pc1403_state )
+	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
+	MDRV_CPU_CONFIG(pc1401_config)
+
+	MDRV_FRAGMENT_ADD( pocketc )
+
 	MDRV_CPU_REPLACE( "maincpu", SC61860, 256000 )
 	MDRV_CPU_PROGRAM_MAP( pc1403_mem)
 	MDRV_CPU_CONFIG( pc1403_config )

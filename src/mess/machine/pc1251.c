@@ -6,64 +6,64 @@
 
 /* C-CE while reset, program will not be destroyed! */
 
-static UINT8 outa,outb;
 
-static int power; /* simulates pressed cce when mess is started */
 
 void pc1251_outa(running_device *device, int data)
 {
-	outa=data;
+	pc1251_state *state = device->machine->driver_data<pc1251_state>();
+	state->outa = data;
 }
 
 void pc1251_outb(running_device *device, int data)
 {
-	outb=data;
+	pc1251_state *state = device->machine->driver_data<pc1251_state>();
+	state->outb = data;
 }
 
 void pc1251_outc(running_device *device, int data)
 {
-
 }
 
 int pc1251_ina(running_device *device)
 {
-	int data = outa;
+	pc1251_state *state = device->machine->driver_data<pc1251_state>();
+	int data = state->outa;
 	running_machine *machine = device->machine;
 
-	if (outb & 0x01)
+	if (state->outb & 0x01)
 	{
 		data |= input_port_read(machine, "KEY0");
 
 		/* At Power Up we fake a 'CL' pressure */
-		if (power)
+		if (state->power)
 			data |= 0x02;		// problem with the deg lcd
 	}
 
-	if (outb & 0x02)
+	if (state->outb & 0x02)
 		data |= input_port_read(machine, "KEY1");
 
-	if (outb & 0x04)
+	if (state->outb & 0x04)
 		data |= input_port_read(machine, "KEY2");
 
-	if (outa & 0x01)
+	if (state->outa & 0x01)
 		data |= input_port_read(machine, "KEY3");
 
-	if (outa & 0x02)
+	if (state->outa & 0x02)
 		data |= input_port_read(machine, "KEY4");
 
-	if (outa & 0x04)
+	if (state->outa & 0x04)
 		data |= input_port_read(machine, "KEY5");
 
-	if (outa & 0x08)
+	if (state->outa & 0x08)
 		data |= input_port_read(machine, "KEY6");
 
-	if (outa & 0x10)
+	if (state->outa & 0x10)
 		data |= input_port_read(machine, "KEY7");
 
-	if (outa & 0x20)
+	if (state->outa & 0x20)
 		data |= input_port_read(machine, "KEY8");
 
-	if (outa & 0x40)
+	if (state->outa & 0x40)
 		data |= input_port_read(machine, "KEY9");
 
 	return data;
@@ -71,9 +71,10 @@ int pc1251_ina(running_device *device)
 
 int pc1251_inb(running_device *device)
 {
-	int data = outb;
+	pc1251_state *state = device->machine->driver_data<pc1251_state>();
+	int data = state->outb;
 
-	if (outb & 0x08)
+	if (state->outb & 0x08)
 		data |= (input_port_read(device->machine, "MODE") & 0x07);
 
 	return data;
@@ -115,16 +116,18 @@ NVRAM_HANDLER( pc1251 )
 
 static TIMER_CALLBACK(pc1251_power_up)
 {
-	power = 0;
+	pc1251_state *state = machine->driver_data<pc1251_state>();
+	state->power = 0;
 }
 
 DRIVER_INIT( pc1251 )
 {
+	pc1251_state *state = machine->driver_data<pc1251_state>();
 	int i;
 	UINT8 *gfx = memory_region(machine, "gfx1");
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	power = 1;
+	state->power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
 }
 

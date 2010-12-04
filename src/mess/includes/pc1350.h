@@ -12,6 +12,19 @@
 #define PC1350_CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
+class pc1350_state : public driver_device
+{
+public:
+	pc1350_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 outa;
+	UINT8 outb;
+	int power;
+	UINT8 reg[0x1000];
+};
+
+
 /*----------- defined in machine/pc1350.c -----------*/
 
 void pc1350_outa(running_device *device, int data);
@@ -32,7 +45,7 @@ READ8_HANDLER(pc1350_lcd_read);
 WRITE8_HANDLER(pc1350_lcd_write);
 VIDEO_UPDATE( pc1350 );
 
-int pc1350_keyboard_line_r(void);
+int pc1350_keyboard_line_r(running_machine *machine);
 
 
 #endif /* PC1350_H_ */

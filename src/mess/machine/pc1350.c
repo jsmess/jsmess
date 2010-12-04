@@ -5,18 +5,18 @@
 #include "includes/pc1350.h"
 #include "devices/messram.h"
 
-static UINT8 outa,outb;
 
-static int power; /* simulates pressed cce when mess is started */
 
 void pc1350_outa(running_device *device, int data)
 {
-	outa=data;
+	pc1350_state *state = device->machine->driver_data<pc1350_state>();
+	state->outa=data;
 }
 
 void pc1350_outb(running_device *device, int data)
 {
-	outb=data;
+	pc1350_state *state = device->machine->driver_data<pc1350_state>();
+	state->outb=data;
 }
 
 void pc1350_outc(running_device *device, int data)
@@ -26,9 +26,10 @@ void pc1350_outc(running_device *device, int data)
 
 int pc1350_ina(running_device *device)
 {
+	pc1350_state *state = device->machine->driver_data<pc1350_state>();
 	running_machine *machine = device->machine;
-	int data = outa;
-	int t = pc1350_keyboard_line_r();
+	int data = state->outa;
+	int t = pc1350_keyboard_line_r(machine);
 
 	if (t & 0x01)
 		data |= input_port_read(machine, "KEY0");
@@ -48,28 +49,28 @@ int pc1350_ina(running_device *device)
 	if (t & 0x20)
 		data |= input_port_read(machine, "KEY5");
 
-	if (outa & 0x01)
+	if (state->outa & 0x01)
 		data |= input_port_read(machine, "KEY6");
 
-	if (outa & 0x02)
+	if (state->outa & 0x02)
 		data |= input_port_read(machine, "KEY7");
 
-	if (outa & 0x04)
+	if (state->outa & 0x04)
 	{
 		data |= input_port_read(machine, "KEY8");
 
 		/* At Power Up we fake a 'CLS' pressure */
-		if (power)
+		if (state->power)
 			data |= 0x08;
 	}
 
-	if (outa & 0x08)
+	if (state->outa & 0x08)
 		data |= input_port_read(machine, "KEY9");
 
-	if (outa & 0x10)
+	if (state->outa & 0x10)
 		data |= input_port_read(machine, "KEY10");
 
-	if (outa & 0xc0)
+	if (state->outa & 0xc0)
 		data |= input_port_read(machine, "KEY11");
 
 	// missing lshift
@@ -79,7 +80,8 @@ int pc1350_ina(running_device *device)
 
 int pc1350_inb(running_device *device)
 {
-	int data=outb;
+	pc1350_state *state = device->machine->driver_data<pc1350_state>();
+	int data=state->outb;
 	return data;
 }
 
@@ -114,14 +116,16 @@ NVRAM_HANDLER( pc1350 )
 
 static TIMER_CALLBACK(pc1350_power_up)
 {
-	power=0;
+	pc1350_state *state = machine->driver_data<pc1350_state>();
+	state->power=0;
 }
 
 MACHINE_START( pc1350 )
 {
+	pc1350_state *state = machine->driver_data<pc1350_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	power = 1;
+	state->power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
