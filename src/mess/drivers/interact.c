@@ -17,35 +17,34 @@
     This in turn gets upgraded (2HR, HRX, MX). The line is finally
     retired in about 1985.
 
-        Hector 2HR+
-        Victor
-        Hector 2HR
-        Hector HRX
-        Hector MX40c
-        Hector MX80c
-        Hector 1
-        Interact
+		Hector 2HR+
+		Victor
+		Hector 2HR
+		Hector HRX
+		Hector MX40c
+		Hector MX80c
+		Hector 1
+		Interact
 
-        29/10/2009 Update skeleton to functional machine
-                          by yo_fr       (jj.stac@aliceadsl.fr)
+		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+		31/06/2009 Video - Robbbert
 
-               => add Keyboard,
-               => add color,
-               => add cassette (24/12/09 add the *.K7 and *.FOR format for the file and castools),
-               => add sn76477 sound and 1bit sound,
-               => add joysticks (stick, pot, fire)
-               => add BR/HR switching
-               => add bank switch for HRX
-               => add device MX80c and bank switching for the ROM
-       03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-               => add the port mapping for keyboard
+		29/10/2009 Update skeleton to functional machine
+					by yo_fr			(jj.stac @ aliceadsl.fr)
 
-      don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thanks to Daniel!)
-
-    TODO : Add the cartridge function,
-           Adjust the one shot and A/D timing (sn76477)
-
+				=> add Keyboard,
+				=> add color,
+				=> add cassette,
+				=> add sn76477 sound and 1bit sound,
+				=> add joysticks (stick, pot, fire)
+				=> add BR/HR switching
+				=> add bank switch for HRX
+				=> add device MX80c and bank switching for the ROM
+    Importante note : the keyboard function add been piked from
+					DChector project : http://dchector.free.fr/ made by DanielCoulom
+					(thank's Daniel)
+	TODO :	Add the cartridge function,
+			Adjust the one shot and A/D timing (sn76477)
 ****************************************************************************/
 /* Mapping for joystick see hec2hrp.c*/
 
@@ -58,6 +57,7 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/sn76477.h"   /* for sn sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
+#include "machine/upd765.h"	/* for floppy disc controller */
 
 #include "includes/hec2hrp.h"
 
@@ -67,7 +67,6 @@ class interact_state : public driver_device
 public:
 	interact_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-
 	UINT8 *videoram;
 };
 
@@ -85,7 +84,7 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
- /*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
+	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(interact_state, videoram)
@@ -117,7 +116,7 @@ DISCRETE_SOUND_END
 
 static MACHINE_RESET(interact)
 {
-	hec2hrp_reset(machine, 0);
+	hector_reset(machine, 0, 0);
 }
 
 static MACHINE_START(interact)
@@ -321,5 +320,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1979, interact, 0, 		0,   interact,	interact, 0,	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
+COMP(1979, interact, 0, 		0,	interact,	interact, 0,	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
 COMP(1983, hector1,  interact,	0,	 hector1,	interact, 0,	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)

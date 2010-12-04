@@ -71,7 +71,7 @@ System Driver Changes:
 
 - [TRSM100] Added a software list for option ROMs. [Curt Coder]
 
-
+- [HECTOR] Added Disc2 support [JJ Stacino]
 
 Imgtool Changes:
 ----------------

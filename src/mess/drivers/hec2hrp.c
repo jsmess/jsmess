@@ -1,43 +1,49 @@
 /***************************************************************************
 
-        Hector 2HR+
-        Victor
-        Hector 2HR
-        Hector HRX
-        Hector MX40c
-        Hector MX80c
+		Hector 2HR+
+		Victor
+		Hector 2HR
+		Hector HRX
+		Hector MX40c
+		Hector MX80c
+		Hector 1
+		Interact
 
-    These machines can load and run cassettes for the interact / hector1.
-    hec2hr - press 2 then 1
-    hec2hrp - press 2 then 1
-    hec2hrx - press 5 then 1
-    hec2mx40 - press 5 then 1
-    hec2mx80 - not compatible
-    victor - press R then L
+	These machines can load and run cassettes for the interact / hector1.
+	hec2hr - press 2 then 1
+	hec2hrp - press 2 then 1
+	hec2hrx - press 5 then 1
+	hec2mx40 - press 5 then 1
+	hec2mx80 - not compatible
+	victor - press R then L
 
-        12/05/2009 Skeleton driver - Micko
-       31/06/2009 Video - Robbbert
+		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+		31/06/2009 Video - Robbbert
 
-        29/10/2009 Update skeleton to functional machine
-                          by yo_fr       (jj.stac@aliceadsl.fr)
+		29/10/2009 Update skeleton to functional machine
+					by yo_fr			(jj.stac @ aliceadsl.fr)
 
-               => add Keyboard,
-               => add color,
-               => add cassette(24/12/09 add the *.K7 and *.FOR format for the file and castools),
-               => add sn76477 sound and 1bit sound,
-               => add joysticks (stick, pot, fire)
-               => add BR/HR switching
-               => add bank switch for HRX
-               => add device MX80c and bank switching for the ROM
-       03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-               => add the port mapping for keyboard
+				=> add Keyboard,
+				=> add color,
+				=> add cassette,
+				=> add sn76477 sound and 1bit sound,
+				=> add joysticks (stick, pot, fire)
+				=> add BR/HR switching
+				=> add bank switch for HRX
+				=> add device MX80c and bank switching for the ROM
+    Importante note : the keyboard function add been piked from
+					DChector project : http://dchector.free.fr/ made by DanielCoulom
+					(thank's Daniel)
+		03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+				=> add the port mapping for keyboard
+		20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
 
-      don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thanks to Daniel!)
+		don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
+		(and thanks to Daniel!)
 
-    TODO : Add the cartridge function,
-           Add diskette support,
-           Adjust the one shot and A/D timing (sn76477)
+	TODO :	Add the cartridge function,
+			Add diskette support, (done !)
+			Adjust the one shot and A/D timing (sn76477)
 ****************************************************************************/
 /* Joystick 1 :
  clavier numerique :
@@ -56,9 +62,10 @@
 
  Fire <0> on numpad
  Pot => INS /SUPPR
- Cassette : wav file (1 way, 16 bits, 44100hz)
-             K7 file  (For data and games)
-           FOR file (for forth screen data)
+ 
+ Cassette :	wav file (1 way, 16 bits, 44100hz)
+			K7 file  (For data and games)
+			FOR file (for forth screen data)
 */
 
 #include "emu.h"
@@ -77,31 +84,64 @@
 #include "includes/hec2hrp.h"
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hecdisk2_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(hecdisc2_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 
-    /* Hardward address mapping*/
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM AM_REGION("disk2cpu", 0)				/* rom memory ->passage en RAM pour ecriture en zone 0x0066 */
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( hector_disk2_r, hector_disk2_w)/* ram memory */
+	/* Hardward address mapping*/
+	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank3") /*zone with ROM at start up, RAM later*/
+
+	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hecdisk2_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( hecdisc2_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x030,0x03f) AM_READWRITE( hector_disk2_io30_port_r, hector_disk2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE( hector_disk2_io40_port_r, hector_disk2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE( hector_disk2_io50_port_r, hector_disk2_io50_port_w )
-	AM_RANGE(0x060,0x060) AM_READWRITE( hector_disk2_io60_port_r, hector_disk2_io60_port_w )
-	AM_RANGE(0x061,0x061) AM_READWRITE( hector_disk2_io61_port_r, hector_disk2_io61_port_w )
-	AM_RANGE(0x070,0x07f) AM_READWRITE( hector_disk2_io70_port_r, hector_disk2_io70_port_w )
+	// ROM Page managing
+	AM_RANGE(0x000,0x00f) AM_READWRITE( hector_disc2_io00_port_r, hector_disc2_io00_port_w )
+	// RS232 - 8251 managing
+	AM_RANGE(0x020,0x02f) AM_READWRITE( hector_disc2_io20_port_r, hector_disc2_io20_port_w )
+	// Hector communication managing
+	AM_RANGE(0x030,0x03f) AM_READWRITE( hector_disc2_io30_port_r, hector_disc2_io30_port_w )
+	AM_RANGE(0x040,0x04f) AM_READWRITE( hector_disc2_io40_port_r, hector_disc2_io40_port_w )
+	AM_RANGE(0x050,0x05f) AM_READWRITE( hector_disc2_io50_port_r, hector_disc2_io50_port_w )
+	// uPD765 link:
+	AM_RANGE(0x060,0x060) AM_DEVREAD	 ("upd765",upd765_status_r			  )
+//	AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
+//	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
+AM_RANGE(0x061,0x061) AM_READWRITE( hector_disc2_io61_port_r, hector_disc2_io61_port_w )//patched version
+AM_RANGE(0x070,0x07F) AM_READWRITE( hector_disc2_io70_port_r, hector_disc2_io70_port_w )//patched version
 ADDRESS_MAP_END
+
 /*****************************************************************************/
 static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Hardware address mapping*/
+//	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROM
+
+	/* Video br mapping*/
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, videoram)
+	/* continous RAM*/
+	AM_RANGE(0x4A00,0xbfff) AM_RAM
+	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
+	AM_RANGE(0xc000,0xffff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, hector_videoram)
+ADDRESS_MAP_END
+
+/*****************************************************************************/
+static ADDRESS_MAP_START(hec2hrx_mem, ADDRESS_SPACE_PROGRAM, 8)
+/*****************************************************************************/
+	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
@@ -119,17 +159,18 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1")
+	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE_MEMBER(hec2hrp_state, hector_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrx_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
@@ -142,17 +183,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mx80_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0xff)// sure ?
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ef) AM_WRITE(     hector_mx80_io_port_w )
+	AM_RANGE(0x0f0,0x0f3) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 
-	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( hec2hrp )
 	/* keyboard input */
 	PORT_START("KEY0") /* [0] - port 3000 @ 0 */
-	    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\\') PORT_CHAR('|')
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\\') PORT_CHAR('|')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")			PORT_CODE(KEYCODE_SPACE)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")			PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")			PORT_CODE(KEYCODE_TAB)
@@ -243,79 +285,60 @@ INPUT_PORTS_END
 static MACHINE_START( hec2hrp )
 /*****************************************************************************/
 {
-	UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
-	UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
-	UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-//    cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT / NMI...
-
-    // Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
-
-    // Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-
-/******************************************************SPECIFIQUE MX ***************************/
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]  , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, &ROM1[0x0000] , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-/******************************************************SPECIFIQUE MX ***************************/
-	hector_init(machine);
-}
-
-/*****************************************************************************/
-static MACHINE_START( hec2hrx )
-/*****************************************************************************/
-{
-	UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
-	UINT8 *RAMD2 = memory_region(machine, "disk2cpu"); // pointer to mess ram
-	UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
-	UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
-	UINT32 index=0;
-//Patch rom possible !
-//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
-
-//Initialisation ROM
-	while (index <0x01001) 
-	{	
-		hector_Disk2memory[index] = RAMD2[index];
-		index++;
-	}
-	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_RESET, PULSE_LINE);
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-//    cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT / NMI...
-
-    // Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
-
-    // Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-
-/******************************************************SPECIFIQUE MX ***************************/
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]  , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, &ROM1[0x0000] , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-/******************************************************SPECIFIQUE MX ***************************/
-	hector_init(machine);
-	hector_disk2_init(machine); // Init of the Disk II !
+	hector_init(machine);	
 }
 
 static MACHINE_RESET(hec2hrp)
 {
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-	hec2hrp_reset(machine, 1);
+	// Machines init
+	hector_reset(machine, 1, 0);
 }
+/*****************************************************************************/
+static MACHINE_START( hec2hrx )
+/*****************************************************************************/
+{
+	UINT8 *RAM   = memory_region(machine, "maincpu"  );	// pointer to mess ram
+	//Patch rom possible !
+	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
+	// Memory install for bank switching
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
+
+	// Set bank HECTOR_BANK_PROG as basic bank
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+
+/******************************************************SPECIFIQUE MX ***************************/
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]                    , 0); // Mess ram
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, memory_region(machine, "page1") , 0); // Rom page 1
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, memory_region(machine, "page2") , 0); // Rom page 2
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+/******************************************************SPECIFIQUE MX ***************************/
+
+/*************************************************SPECIFIQUE DISK II ***************************/
+	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, memory_region(machine, "rom_disc2") , 0); // ROM
+	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, memory_region(machine, "disc2mem" ) , 0); // RAM
+	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+/*************************************************SPECIFIQUE DISK II ***************************/
+
+	// As video HR ram is in bank, use extern memory
+	hec2hrp_state *state = machine->driver_data<hec2hrp_state>();
+	state->hector_videoram  = hector_videoram;
+
+	hector_init(machine);
+	hector_disc2_init(machine); // Init of the Disc II !
+}
 static MACHINE_RESET(hec2hrx)
 {
+	//Hector Memory
 	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-	hec2hrx_reset(machine, 1);
+	//DISK II Memory
+	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+
+	// Machines init
+	hector_reset(machine, 1, 1);
+	hector_disc2_reset(machine);
 }
 
 /* Cassette definition */
@@ -374,7 +397,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    /* Gestion cassette*/
+	/* Gestion cassette*/
 	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
@@ -417,7 +440,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-   /* Gestion cassette*/
+	/* Gestion cassette*/
 	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
@@ -430,19 +453,19 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
+	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MDRV_CPU_IO_MAP(hec2mx40_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
+
+	/* Disc II unit */
+	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MDRV_CPU_IO_MAP(hecdisc2_io)
+	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 	MDRV_MACHINE_RESET(hec2hrx)
 	MDRV_MACHINE_START(hec2hrx)
-
-	/* Disk II unit */
-	MDRV_CPU_ADD("disk2cpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hecdisk2_mem)
-	MDRV_CPU_IO_MAP(hecdisk2_io)
-//	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_UPD765A_ADD("upd765", hector_disk2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(hector_disk2_floppy_config)
+	
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -467,7 +490,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    /* Gestion cassette*/
+	/* Gestion cassette*/
 	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
@@ -479,19 +502,18 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 /*****************************************************************************/
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
+	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MDRV_CPU_IO_MAP(hec2hrx_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
 	MDRV_MACHINE_RESET(hec2hrx)
 	MDRV_MACHINE_START(hec2hrx)
 
-	/* Disk II unit */
-	MDRV_CPU_ADD("disk2cpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hecdisk2_mem)
-	MDRV_CPU_IO_MAP(hecdisk2_io)
-	MDRV_UPD765A_ADD("upd765", hector_disk2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(hector_disk2_floppy_config)
-
+	/* Disc II unit */
+	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MDRV_CPU_IO_MAP(hecdisc2_io)
+	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -500,7 +522,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-    MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
@@ -518,8 +540,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
-    MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	// Gestion cassette
+	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -530,11 +552,18 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
+	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MDRV_CPU_IO_MAP(hec2mx80_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_MACHINE_RESET(hec2hrp)
-	MDRV_MACHINE_START(hec2hrp)
+	MDRV_MACHINE_RESET(hec2hrx)
+	MDRV_MACHINE_START(hec2hrx)
+	
+	/* Disc II unit */
+	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MDRV_CPU_IO_MAP(hecdisc2_io)
+	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -560,13 +589,13 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-   /* Gestion cassette*/
+	/* Gestion cassette*/
 	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
-MACHINE_CONFIG_END
+	MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( hec2hr )
@@ -588,16 +617,22 @@ ROM_START( hec2hrp )
 	ROM_LOAD( "hector2hrp.rom", 0x0000, 0x4000, CRC(983f52e4) SHA1(71695941d689827356042ee52ffe55ce7e6b8ecd))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
-ROM_END
+	ROM_REGION( 0x10000, "disc2cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
+
+	ROM_END
 
 ROM_START( hec2hrx )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "hector2hrx.rom", 0x0000, 0x4000, CRC(f047c521) SHA1(744336b2acc76acd7c245b562bdc96dca155b066))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
-	ROM_REGION( 0x10000, "disk2cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "disc2cpu", ROMREGION_ERASEFF )
+	
+	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
-ROM_END
+	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
+	ROM_END
 
 ROM_START( hec2mx80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -606,7 +641,11 @@ ROM_START( hec2mx80 )
 	ROM_LOAD( "mx80c_page1.rom", 0x0000, 0x4000, CRC(4615f57c) SHA1(5de291bf3ae0320915133b99f1a088cb56c41658))
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx80c_page2.rom" , 0x0000,0x4000, CRC(2D5D975E) SHA1(48307132E0F3FAD0262859BB8142D108F694A436))
-ROM_END
+	
+	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
+	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
+	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
+	ROM_END
 
 ROM_START( hec2mx40 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -615,20 +654,21 @@ ROM_START( hec2mx40 )
 	ROM_LOAD( "mx40c_page1.rom", 0x0000, 0x4000, CRC(192a76fa) SHA1(062aa6df0b554b85774d4b5edeea8496a4baca35))
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx40c_page2.rom" , 0x0000,0x4000, CRC(ef1b2654) SHA1(66624ea040cb7ede4720ad2eca0738d0d3bad89a))
-	ROM_REGION( 0x10000, "disk2cpu", ROMREGION_ERASEFF )
-//	ROM_REGION( 0x10000, "rom_disk2", ROMREGION_ERASEFF ) // Marche avec cela sauf ecr en ram !!!!
+
+	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 //	ROM_LOAD( "d360k.bin" , 0x0000,0x4000, CRC(2454eacb) SHA1(dc0d5a7d5891a7e422d9d142a2419527bb15dfd5))
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 //	ROM_LOAD( "d200k.bin" , 0x0000,0x4000, CRC(e2801377) SHA1(0926df5b417ecd8013e35c71b76780c5a25c1cbf))
+	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
 
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1983, hec2hrp,  0, interact,    hec2hrp,	hec2hrp, 0, 	 "Micronique",   "Hector 2HR+",	GAME_IMPERFECT_SOUND)
-COMP(1980, victor,   hec2hrp, 0,     hec2hrp,   hec2hrp, 0,      "Micronique",   "Victor",	GAME_IMPERFECT_SOUND)
-COMP(1983, hec2hr ,  hec2hrp, 0,     hec2hr,	hec2hrp, 0, 	 "Micronique",   "Hector 2HR",	GAME_IMPERFECT_SOUND)
-COMP(1984, hec2hrx,  hec2hrp, 0,     hec2hrx,	hec2hrp, 0, 	 "Micronique",   "Hector HRX",	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx80, hec2hrp, 0,     hec2mx80,	hec2hrp, 0, 	 "Micronique",   "Hector MX 80c" ,	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx40, hec2hrp, 0,     hec2mx40,	hec2hrp, 0, 	 "Micronique",   "Hector MX 40c" ,	GAME_IMPERFECT_SOUND)
+/*	YEAR	NAME	PARENT		COMPAT		MACHINE		INPUT	INIT	COMPANY			FULLNAME			FLAGS */
+COMP(1983,	hec2hrp,	0,		interact,	hec2hrp,	hec2hrp,0,		"Micronique",	"Hector 2HR+",		GAME_IMPERFECT_SOUND)
+COMP(1980,	victor,		hec2hrp, 0,			hec2hrp,	hec2hrp,0,		"Micronique",	"Victor",			GAME_IMPERFECT_SOUND)
+COMP(1983,	hec2hr,		hec2hrp, 0,			hec2hr,		hec2hrp,0,		 "Micronique",	"Hector 2HR",		GAME_IMPERFECT_SOUND)
+COMP(1984,	hec2hrx,	hec2hrp, 0,			hec2hrx,	hec2hrp,0,		 "Micronique",	"Hector HRX + Disc2",		GAME_IMPERFECT_SOUND)
+COMP(1985,	hec2mx80,	hec2hrp, 0,			hec2mx80,	hec2hrp,0,		 "Micronique",	"Hector MX 80c + Disc2" ,	GAME_IMPERFECT_SOUND)
+COMP(1985,	hec2mx40,	hec2hrp, 0,			hec2mx40,	hec2hrp,0,		 "Micronique",	"Hector MX 40c + Disc2" ,	GAME_IMPERFECT_SOUND)

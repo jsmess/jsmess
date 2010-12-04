@@ -1,4 +1,4 @@
-/*******************************************************/
+ï»¿/*******************************************************/
 /************ HECDISK2.C  in machine  ******************/
 /*******************************************************/
 
@@ -8,30 +8,28 @@
         Hector MX80c
 
 		JJStacino  jj.stacino@aliceadsl.fr
-		
-	26/09/2010 : first sending with bug2 (the first "dir" command finih with a crash of the Z80 disk II proc)
-*/
-/* explication bug 1.
-A Y E : Les interruptions pour venir en 6C4 se font à un rythme trop grand : des que le processeur
-à envoyé la commande au uPD celui ci repond NMI.
-sans laisser le temps au prog d'avancer !!!
-Ensuite à chaque pas apres un IN j'ai une nouvelle interruption sans avoir termine la precedente. C'est
-pourquoi en visu cela ne fait que de in en 6b4 sans jamais pouvoir aller en inc HL !!! Le positonnement de
-HL se faisant apres le pop HL de x0687 - e ne se faisait pas !!!! 
-(ff09 etait l'adresse du dernier octet de commande au uPD !!!
-bug 2 : Revoir les interruptionse & NMI.
+
+	15/02/2010 : Start of the disc2 project! JJStacino
+	26/09/2010 : first sending with bug2 (the first "dir" command finih with a crash of the Z80 disc II proc) JJStacino
+	01/11/2010 : first time ending boot sequence, probleme on the CP/M lauch JJStacino
+	20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+	28/11/2010 : Found at Bratislava that the disk writing with TRANS X: is NOT WORKING (the exchange Hector=>Disc2 ok)
 */
 
 #include "emu.h"
 
-#include "sound/sn76477.h"   /* for sn sound*/
-#include "sound/wave.h"      /* for K7 sound*/
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h"	/* for floppy disc controller */
+#include "sound/sn76477.h"		/* for sn sound*/
+#include "sound/wave.h"			/* for K7 sound*/
+#include "sound/discrete.h"		/* for 1 Bit sound*/
+#include "machine/upd765.h"		/* for floppy disc controller */
 #include "formats/basicdsk.h"
 #include "cpu/z80/z80.h"
 
 #include "includes/hec2hrp.h"
+
+#ifndef hector_trace 
+// hector_trace = 1  // Useful to trace the exchange z80<=>uPD765
+#endif
 
 /* Disquette timer*/
 static TIMER_CALLBACK( Callback_DMA_irq );
@@ -39,284 +37,386 @@ static emu_timer *DMA_timer;
 static TIMER_CALLBACK( Callback_INT_irq );
 static emu_timer *INT_timer;
 
-
 /* Callback uPD request */
-static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq );
+//UPD765_DMA_REQUEST( hector_disc2_fdc_dma_irq );
+static WRITE_LINE_DEVICE_HANDLER( disc2_fdc_interrupt );
+static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq );
 
-UINT8 hector_Disk2memory[0x10000];  /* Memory space for Disk II unit*/
-//UINT8 Mem_RNMI =0xff;
 /* Buffer of the 74374 (IC1 and IC4) linked to the Hector port */
-UINT8 hector_disk2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (disk2_data_read) */
-UINT8 hector_disk2_data_w_ready=0x0; /* =ff when Disk 2 Port 40 had send a data in write buffer (disk2_data_write) */
-UINT8 hector_disk2_data_read=0;    /* Data send by Hector to Disk 2 when PC2=true */
-UINT8 hector_disk2_data_write=0;   /* Data send by Disk 2 to Hector when Write Port I/O 40 */
-static UINT8 disk2_RNMI = 0;		/* State of I/O 50 D5 = authorization for INT / NMI */
-static int NMI_current_state=0;
-static int INT_current_state=0;
-static const int Time_arq = 4000; 
+UINT8 hector_disc2_data_r_ready;/* =ff when PC2 = true and data in read buffer (hector_disc2_data_read) */
+UINT8 hector_disc2_data_w_ready;/* =ff when Disc 2 Port 40 had send a data in write buffer (hector_disc2_data_write) */
+UINT8 hector_disc2_data_read;	/* Data send by Hector to Disc 2 when PC2=true */
+UINT8 hector_disc2_data_write;	/* Data send by Disc 2 to Hector when Write Port I/O 40 */
+UINT8 hector_disc2_RNMI; 		/* State of I/O 50 D5 = authorization for INT / NMI */
+static int NMI_current_state;
 
-/* Fonctionnement du uPD765 : 
+// useful for patch uPD765 result----start
+static int hector_cmd_0, hector_cmd_1, hector_cmd_2, hector_cmd_3, hector_cmd_4 ;
+static int hector_cmd_5, hector_cmd_6, hector_cmd_7, hector_cmd_8, hector_cmd_9 ;
+static int hector_nb_cde = 0;
+static int hector_flag_result = 0;
+#ifdef hector_trace 
+static int print =0;
+#endif
+// useful for patch uPD765 result----end
 
-               * ecriture du N° de comande suivi des octets necessaire a la commande (selon doc uPD) OUT ($61)
-               * Lecture ou ecriture des data en dma :
-                         Demande DMA uPD => Z80 : NMI,
-                         Lecture  octet IN  ($70) par le Z80 => DRQ uPD ou
-                         Ecriture octet OUT ($70) par le Z80 => DRQ uPD
-               * En fin d'execution commande => INT.
-               * ff12 = 12 lors de l'INT,
-               * Sortie du programme d'attente => vers lecture compte rendu
-               * Lecture des octets de compte rendu IN ($61)
-
-*/
-                         
-FLOPPY_OPTIONS_START( hector_disk2 )
-	FLOPPY_OPTION( disk2_h, "td0", "Disk II Micronique disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([00]))
-FLOPPY_OPTIONS_END
-/* Lorsque systemMX.td0 est traduit avec TD02IMD : 
-IMD TD 1.5 5.25 LD MFM S-step, 1 sides 9/08/2009 20:10:17
-HECTOR SYSTEM CP/M 2.2 Disk
+/* How uPD765 works: 
+		* First we send at uPD the string of command (p.e. 9 bytes for read starting by 0x46) on port 60h 
+				between each byte, check the authorization of the uPD by reading the status register
+		* When the command is finish, the data arrive with DMA interrupt, then:
+				If read: in port 70 to retrieve the data,
+				If write: in port 70 send the data
+		* When all data had been send the uPD launch an INT
+		* The Z80 Disc2 writes in FF12 a flag
+		* if the flag is set, end of DMA function,
+		* At this point the Z80 can read the RESULT in port 61h
 */
 
-/* Hector Disk II uPD765 interface use interrupts and DMA! */
-const upd765_interface hector_disk2_upd765_interface =
+/*****************************************************************************/
+/******  Management of the floppy images 200Ko and 800Ko *********************/
+/*****************************************************************************/
+/* For the 200Ko disk :
+		512 bytes per sectors,
+		10  sector per track,
+		From sector =0 to sector 9,
+		40  tracks,
+		1 Head
+	This format can be extract from a real disc with anadisk (*.IMG format rename in *.HE2).
+*/
+static FLOPPY_IDENTIFY(hector_disc2_dsk200_identify)
 {
-	DEVCB_LINE(hector_disk2_fdc_interrupt),
-	DEVCB_LINE(disk2_fdc_dma_irq),
-	NULL,  //	disk2_fdc_get_image,
-	UPD765_RDY_PIN_NOT_CONNECTED,  //NOT_
+	*vote = (floppy_image_size(floppy) == (1*40*10*512)) ? 100 : 0;
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static FLOPPY_CONSTRUCT(hector_disc2_dsk200_construct)
+{
+	struct basicdsk_geometry geometry;
+	memset(&geometry, 0, sizeof(geometry));
+	geometry.heads = 1;
+	geometry.first_sector_id = 0;
+	geometry.sector_length = 512;
+	geometry.tracks = 40;
+	geometry.sectors = 10;
+	return basicdsk_construct(floppy, &geometry);
+}
+/* For the 720Ko disk :
+		512 bytes per sectors,
+		9  sector per track,
+		From sector =0 to sector 8,
+		80  tracks,
+		2 Head
+	This format can be extract from a real disc with anadisk (*.IMG format rename in *.HE7).
+*/
+static FLOPPY_IDENTIFY(hector_disc2_dsk720_identify)
+{
+	*vote = (floppy_image_size(floppy) == (2*80*9*512)) ? 100 : 0;
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static FLOPPY_CONSTRUCT(hector_disc2_dsk720_construct)
+{
+	struct basicdsk_geometry geometry;
+	memset(&geometry, 0, sizeof(geometry));
+	geometry.heads = 2;
+	geometry.first_sector_id = 0;
+	geometry.sector_length = 512;
+	geometry.tracks = 80;
+	geometry.sectors = 9;
+	return basicdsk_construct(floppy, &geometry);
+
+}/* For the 800Ko disk :
+		512 bytes per sectors,
+		10  sector per track,
+		From sector =0 to sector 9,
+		80  tracks
+		2 Heads
+	This format can be extract from a real disk with anadisk (*.IMG format rename in *.HE2).
+*/
+
+static FLOPPY_IDENTIFY(hector_disc2_dsk800_identify)
+{
+	*vote = (floppy_image_size(floppy) == (2*80*10*512)) ? 100 : 0;
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static FLOPPY_CONSTRUCT(hector_disc2_dsk800_construct)
+{
+	struct basicdsk_geometry geometry;
+	memset(&geometry, 0, sizeof(geometry));
+	geometry.heads = 2;
+	geometry.first_sector_id = 0;
+	geometry.sector_length = 512;
+	geometry.tracks = 80;
+	geometry.sectors = 10;
+	return basicdsk_construct(floppy, &geometry);
+}
+
+FLOPPY_OPTIONS_START( hector_disc2 )
+	FLOPPY_OPTION( hector_dsk, "HE2", "hector disc2 floppy disk image 200K", hector_disc2_dsk200_identify, hector_disc2_dsk200_construct, NULL)
+	FLOPPY_OPTION( hector_dsk, "HE7", "hector disc2 floppy disk image 720K", hector_disc2_dsk720_identify, hector_disc2_dsk720_construct, NULL)
+	FLOPPY_OPTION( hector_dsk, "HE8", "hector disc2 floppy disk image 800K", hector_disc2_dsk800_identify, hector_disc2_dsk800_construct, NULL)
+FLOPPY_OPTIONS_END
+
+// Define the hardware of the disk 
+ const floppy_config hector_disc2_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(hector_disc2),
+	NULL
+};
+
+/*****************************************************************************/
+/******  Management of the uPD765 for interface with floppy images************/
+/*****************************************************************************/
+/* Hector Disc II uPD765 interface use interrupts and DMA! */
+const upd765_interface hector_disc2_upd765_interface =
+{
+	DEVCB_LINE(disc2_fdc_interrupt),
+	DEVCB_LINE(hector_disc2_fdc_dma_irq),
+	NULL, 
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-// Source  : System.cfg
-//Capacité 	Faces 	Densité Codage Pistes Secteurs 	Taille  	Lecteurs / Ordinateurs 
-//	(Ko)											(octet)
-//	200 		1 	DD 		MFM 	40		10 		512 		Micronique Hector 
-//	800 		2 	DD 		MFM 	80 		10 		512 		Micronique Hector 
-const floppy_config hector_disk2_floppy_config =
+/*****************************************************************************/
+/****  Management of the interrupts (NMI and INT)between uPD765 and Z80 ******/
+/*****************************************************************************/
+static void valid_interrupt( running_machine *machine)
 {
-	DEVCB_NULL,  // 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,    //DSHD, for other 800Ko disk
-	FLOPPY_OPTIONS_NAME(hector_disk2),
-	//FLOPPY_OPTIONS_NAME(default),
-	NULL 
-};
+/* Called at each rising state of NMI or RNMI ! */
 
-WRITE8_HANDLER( hector_disk2_w )
-{
-//if ((offset >= 0x0fff)) // || (offset == 0x066) || (offset == 0x067) || (offset == 0x068))
-	hector_Disk2memory[offset]= data;
-
-	/* Autorisation d'ecriture uniquement dans les zones autorisees
-	if (offset == 0x066)
-		hector_Disk2memory[offset]= data;
-	if (offset == 0x067)
-		hector_Disk2memory[offset]= data;
-	if (offset == 0x068)
-		hector_Disk2memory[offset]= data;
-	if (offset == 0x038)
-		hector_Disk2memory[offset]= data;
-	if (offset == 0x039)
-		hector_Disk2memory[offset]= data;
-	if (offset == 0x03A)
-		hector_Disk2memory[offset]= data;*/
-}
-
-READ8_HANDLER( hector_disk2_r )
-{
-	UINT8 data =0;
-	data = hector_Disk2memory[offset];
-	//if (offset == 0xff6b)
-		//data = 0x0ff; // force mode verbose on Hector !
-	return data;
-}
-
-static void valid_interrupt(running_machine *machine)
-{
-	/* Called at each rising state of INT / NMI and RNMI ! */
-
-	/* Take NMI / INT  only if RNMI ok*/
-
-	/* Checking for NMI interrupt */
-	if ((disk2_RNMI ==0x00) && (NMI_current_state!=0))
+/* Take NMI only if RNMI ok*/
+if ((hector_disc2_RNMI==1) &&  (NMI_current_state==1))  
 	{
-		cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, CLEAR_LINE); // NMI...
-		timer_adjust_oneshot(DMA_timer, ATTOTIME_IN_NSEC(Time_arq), 0 );
-		/*Time_arq = 4000;*/ //  6900us for next step !
-		NMI_current_state=0; /* clear the current request*/
-	}
-
-	/* Checking for INT interrupt */
-	if ((disk2_RNMI ==0x00) && (INT_current_state!=0))
-	{
-		cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, CLEAR_LINE); //INT...
-		timer_adjust_oneshot(INT_timer, ATTOTIME_IN_MSEC(400), 0 ); //2010  =  8000
-		INT_current_state=0; /* clear the current request*/
-		//printf("\nLancement interruption !");
+		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, CLEAR_LINE); // Clear NMI...
+		timer_adjust_oneshot(DMA_timer, ATTOTIME_IN_USEC(6), 0 );//a little time to let the Z80 terminate he's previous job !
+		NMI_current_state=0;
 	}
 }
 
-void hector_disk2_init(running_machine *machine)
+void hector_disc2_init( running_machine *machine)
 {
-       DMA_timer = timer_alloc(machine, Callback_DMA_irq, 0);
-       INT_timer = timer_alloc(machine, Callback_INT_irq, 0);
+	DMA_timer = timer_alloc(machine, Callback_DMA_irq, 0);
+	INT_timer = timer_alloc(machine, Callback_INT_irq, 0);
 }
 
 static TIMER_CALLBACK( Callback_DMA_irq )
 {
 	/* To generate the NMI signal (late) when uPD DMA request*/
-	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
-
+	cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
+	hector_nb_cde =0; // clear the cde lenght
 }
+
 static TIMER_CALLBACK( Callback_INT_irq )
 {
-	/* To generate the INT signal (late) when uPD INT request*/
-	cputag_set_input_line(machine, "disk2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);  //INT...
+	/* To generate the INT signal (late) when uPD DMA request*/
+	cputag_set_input_line(/*device->*/machine, "disc2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
-     
-/* upd765 INT is connected to interrupt of Z80 */
-WRITE_LINE_DEVICE_HANDLER( hector_disk2_fdc_interrupt )
+
+/* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization*/
+static WRITE_LINE_DEVICE_HANDLER( disc2_fdc_interrupt )
 {
-	INT_current_state = state;
+	cputag_set_input_line(device->machine, "disc2cpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	if (state)
+		timer_adjust_oneshot(INT_timer, ATTOTIME_IN_USEC(500), 0 );//a little time to let the Z80 terminate he's previous job !
+}
+
+static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq )
+{
+	/* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization*/
+	/* Here the most difficult on this machine : 
+	The DMA request come with the uPD765 "soft" imediately,
+	against the true hard uPD765. In the real life, the uPD had
+	to seach for the sector before !
+	So, we had to memorize the signal (the DMA is a pulse)
+	until disc2's Z80 is ready to take the NMI interupt (when
+	he had set the RNMI authorization) !      */
+	
+    if (state==1)
+		NMI_current_state = state;                   
 	valid_interrupt(device->machine);
 }
 
-/* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization*/
-static WRITE_LINE_DEVICE_HANDLER( disk2_fdc_dma_irq )
+// RESET the disc2 Unit !
+void hector_disc2_reset(running_machine *machine)
 {
-     NMI_current_state = state;                  
-     valid_interrupt(device->machine);
-}
-/////////////////////////////////////
-// Port handling of the Disk II unit
-/////////////////////////////////////
-READ8_HANDLER( hector_disk2_io30_port_r )
-{
-	return hector_disk2_data_r_ready;
+	// Initialization Disc2 unit
+	cputag_set_input_line(machine, "disc2cpu" , INPUT_LINE_RESET, PULSE_LINE);
+	//switch ON and OFF the reset line uPD
+	upd765_reset_w(machine->device("upd765"), 1);
+	upd765_reset_w(machine->device("upd765"), 0);
+	// Select ROM memory to cold restart
+	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+
+	// Clear the Hardware's buffers
+	hector_disc2_data_r_ready=0x0; 	/* =ff when PC2 = true and data in read buffer (hector_disc2_data_read) */
+	hector_disc2_data_w_ready=0x0; 	/* =ff when Disc 2 Port 40 had send a data in write buffer (hector_disc2_data_write) */
+	hector_disc2_data_read=0;		/* Data send by Hector to Disc 2 when PC2=true */
+	hector_disc2_data_write=0;		/* Data send by Disc 2 to Hector when Write Port I/O 40 */
+	hector_disc2_RNMI = 0;			/* State of I/O 50 D5 = authorization for INT / NMI */
+	NMI_current_state=0;			/* Clear the DMA active request */
 }
 
-WRITE8_HANDLER( hector_disk2_io30_port_w )
+/*****************************************************************************/
+/********************  Port handling of the Z80 Disc II unit *****************/
+/*****************************************************************************/
+READ8_HANDLER( hector_disc2_io00_port_r)
 {
+	/* Switch Disc 2 to RAM to let full RAM acces */
+	memory_set_bank(space->machine, "bank3", DISCII_BANK_RAM);
+	return 0;
+}
+WRITE8_HANDLER( hector_disc2_io00_port_w)
+{
+	/* Switch Disc 2 to RAM to let full RAM acces */
+	memory_set_bank(space->machine, "bank3", DISCII_BANK_RAM);
+}
+READ8_HANDLER( hector_disc2_io20_port_r)
+{
+	// You can implemente the 8251 chip communication here !
+	return 0;
+}
+WRITE8_HANDLER( hector_disc2_io20_port_w)
+{
+	// You can implemente the 8251 chip communication here !
+}
+READ8_HANDLER( hector_disc2_io30_port_r)
+{
+	return hector_disc2_data_r_ready;
+}
+WRITE8_HANDLER( hector_disc2_io30_port_w)
+{
+	// Nothing here !
 }
 
-READ8_HANDLER( hector_disk2_io40_port_r )
+READ8_HANDLER( hector_disc2_io40_port_r) 
+{
+	/* Read data send by Hector, by Disc2*/
+	hector_disc2_data_r_ready = 0x00;	/* Clear memory info read ready*/
+	return hector_disc2_data_read;		/* send the data !*/
+}
+
+WRITE8_HANDLER( hector_disc2_io40_port_w)	/* Write data send by Disc2, to Hector*/
+{
+	hector_disc2_data_write = data;		/* Memorization data*/
+	hector_disc2_data_w_ready = 0x80;	/* Memorization data write ready in D7*/
+}
+
+READ8_HANDLER( hector_disc2_io50_port_r)	/*Read memory info write ready*/
+{
+	return hector_disc2_data_w_ready;
+}
+
+WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
+{
+
+	running_device *fdc = space->machine->device("upd765");
+
+	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
+	floppy_mon_w(floppy_get_device(space->machine, 0), BIT(data, 0));	// Moteur floppy A:
+	floppy_mon_w(floppy_get_device(space->machine, 1), BIT(data, 1));	// Moteur floppy B:
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), FLOPPY_DRIVE_READY,!BIT(data, 0));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), FLOPPY_DRIVE_READY,!BIT(data, 1));
+
+	/* Write bit TC uPD765 on D4 of port I/O 50 */
+	upd765_tc_w(fdc, BIT(data, 4));  // Seems not used...
+
+
+	/* Authorization interrupt and NMI with RNMI signal*/
+	hector_disc2_RNMI = BIT(data, 5);
+
+	/* if RNMI is OK, try to lauch an NMI*/
+	if (hector_disc2_RNMI)
+		valid_interrupt(space->machine);
+}
+
+//Here we must take the exchange with uPD against AM_DEVREADWRITE
+// Because we had to add D6 = 1 when write is done with 0x28 in ST0 back 
+
+//	AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
+READ8_HANDLER( hector_disc2_io61_port_r)  
 {
 	UINT8 data;
-
-	data = hector_disk2_data_read;
-	hector_disk2_data_r_ready = 0x00; /* Raz memoire info read dispo*/
-	return data;   /* send thez data !*/
-}
-
-WRITE8_HANDLER( hector_disk2_io40_port_w )
-{
-	/* Write a data */
-	hector_disk2_data_write = data;	/* Memorisation donnee*/
-	hector_disk2_data_w_ready = 0xff;  /* Memorisation donnee dispo*/
-}
-
-READ8_HANDLER( hector_disk2_io50_port_r )
-{
-	return hector_disk2_data_w_ready;
-}
-
-WRITE8_HANDLER( hector_disk2_io50_port_w )
-{
-	/* FDC Motor Control - Bit 0/1 defines the state of the FDD motor:
-                * "1" the FDD motor will be active.
-                * "0" the FDD motor will be in-active.*/
-
 	running_device *fdc = space->machine->device("upd765");
+	data = upd765_data_r(fdc,0); //Get the result
 
-	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
-	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
-
-	upd765_tc_w(fdc, ASSERT_LINE);
-
-	/* Ecriture bit TC uPD765 sur D4 du port 50 */
-	if (BIT(data, 4))
-		upd765_tc_w(fdc, 1);
-	else
-		upd765_tc_w(fdc, 0);
-
-	/* Authorization interrupt and NMI */
-	if BIT(data, 5)
-		disk2_RNMI=0xff;
-	else
-		disk2_RNMI=0x00;
-
-/* if the programm give the authorization => try to interrupt and NMI ! */
-	//if (disk2_RNMI==0xff)
-		//valid_interrupt(space->machine);
-  
+// if ST0 == 0x28 (drive A:) or 0x29 (drive B:) => add 0x40
+// and correct the ST1 and ST2 (patch)
+	if ((hector_flag_result == 3) & ((data==0x28) | (data==0x29)) ) // are we in the problem?
+	{
+		data=data + 0x40;
+		hector_flag_result--;
+	}
+	// Nothing to do in over case!
+	if (hector_flag_result == 3)
+		hector_flag_result = 0;
+	
+	if ((hector_flag_result == 2) & (data==0x00) )
+	{
+		data=/*data +*/ 0x04;
+		hector_flag_result--;
+	}
+	if ((hector_flag_result == 1) & (data==0x00) )
+	{
+		data=/*data + */0x10;
+		hector_flag_result=0; // End !
+	}
+	#ifdef hector_trace 
+	if (print==1)
+		printf(" _%x",data);
+	#endif
+	hector_nb_cde =0; // clear the cde lenght
+	return data;
 }
-
-
-READ8_HANDLER( hector_disk2_io60_port_r )
+WRITE8_HANDLER( hector_disc2_io61_port_w)
 {
-	/* Lecture du status uPD*/
-	UINT8 data=0;
-	running_device *fdc = space->machine->device("upd765");
- 
-	data = upd765_status_r(fdc, 0);
+/* Data useful to patch the RESULT in case of write command */
+hector_cmd_9=hector_cmd_8;  //hector_cmd_8 = Cde number when hector_nb_cde = 9
+hector_cmd_8=hector_cmd_7;  //hector_cmd_7 = Drive
+hector_cmd_7=hector_cmd_6;  //hector_cmd_6 = C
+hector_cmd_6=hector_cmd_5;  //hector_cmd_5 = H
+hector_cmd_5=hector_cmd_4;  //hector_cmd_4 = R
+hector_cmd_4=hector_cmd_3;  //hector_cmd_3 = N
+hector_cmd_3=hector_cmd_2;  //hector_cmd_2 = EOT
+hector_cmd_2=hector_cmd_1;  //hector_cmd_1 = GPL
+hector_cmd_1=hector_cmd_0;  //hector_cmd_0 = DTL
+hector_cmd_0 = data;
+// Increase the lenght cde!
+hector_nb_cde++;
 
-	return data;  
-}
-
-READ8_HANDLER( hector_disk2_io61_port_r )
+// check if current commande is write cmde.
+if (((hector_cmd_8 & 0x1f)== 0x05)  & (hector_nb_cde==9) ) /*Detect wrtie commande*/
+	hector_flag_result = 3; // here we are!
+#ifdef hector_trace 
+if (hector_nb_cde==6 ) /*Detect 1 octet command*/
 {
-	/* Lecture d'une data uPD*/
-	UINT8 data=0;
-	running_device *fdc = space->machine->device("upd765");
- 
-	data=upd765_data_r(fdc, 0); /* when pin A0 =1 */
+	printf("\n commande = %x, %x, %x, %x, %x, %x Result = ", hector_cmd_5, hector_cmd_4, hector_cmd_3, hector_cmd_2, hector_cmd_1, data );
+	print=1;
+}
+else 
+	print=0;
+#endif
 
-	return data;  
+running_device *fdc = space->machine->device("upd765");
+upd765_data_w(fdc,0, data); 
 }
 
-WRITE8_HANDLER( hector_disk2_io60_port_w )
+//	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
+READ8_HANDLER( hector_disc2_io70_port_r) // Gestion du DMA
 {
-	/* Ecriture du status uPD ??? impossible ! */
+	UINT8 data;
 	running_device *fdc = space->machine->device("upd765");
-
-	upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
+	data = upd765_dack_r(fdc,0);
+	return data;
 }
-
-WRITE8_HANDLER( hector_disk2_io61_port_w )
-{
-	/* Ecriture d'une data uPD*/
-	running_device *fdc = space->machine->device("upd765");
-
-	upd765_data_w(fdc, 0,data);  //upd765_data_w(device, offset, data);
-}
-
-READ8_HANDLER( hector_disk2_io70_port_r )
-{
-	/* Read DMA Data of FDC */
-	UINT8 data=0;
-	//UINT16 hlreg;/*Used to debug*/
-
-	running_device *fdc = space->machine->device("upd765");
-	data=upd765_dack_r(fdc, 1); /* when pin A0 =1*/
-	//hlreg = cpu_get_reg(space->machine->device("disk2cpu"), Z80_HL); // voir H   L
-
-	//printf("%c",hlreg);
-	return data;  
-}
-
-WRITE8_HANDLER( hector_disk2_io70_port_w )
+WRITE8_HANDLER( hector_disc2_io70_port_w)
 {
 	running_device *fdc = space->machine->device("upd765");
-	/* Write DMA Data on FDC */
-	upd765_dack_w(fdc, 0,data);
+	upd765_dack_w(fdc,0, data); 
 }
