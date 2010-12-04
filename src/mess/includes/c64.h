@@ -67,6 +67,7 @@ public:
 	UINT8 *io_ram_w_ptr;
 	UINT8 *io_ram_r_ptr;
 	c64_cart_t cart;
+	int nmilevel;
 };
 
 

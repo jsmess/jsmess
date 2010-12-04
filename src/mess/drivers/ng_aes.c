@@ -40,6 +40,31 @@
 #include "neogeo.lh"
 
 
+// CD-ROM / DMA control registers
+typedef struct
+{
+	UINT8 area_sel;
+	UINT8 pcm_bank_sel;
+	UINT8 spr_bank_sel;
+	UINT32 addr_source; // target if in fill mode
+	UINT32 addr_target;
+	UINT16 fill_word;
+	UINT32 word_count;
+	UINT16 dma_mode[10];
+} neocd_ctrl_t;
+
+class ng_aes_state : public neogeo_state
+{
+public:
+	ng_aes_state(running_machine &machine, const driver_device_config_base &config)
+		: neogeo_state(machine, config) { }
+
+	UINT8 *memcard_data;
+	neocd_ctrl_t neocd_ctrl;
+};
+
+
+
 #define LOG_VIDEO_SYSTEM		(0)
 #define LOG_CPU_COMM			(0)
 #define LOG_MAIN_CPU_BANKING	(1)
@@ -56,21 +81,7 @@
  *
  *************************************/
 
-static UINT8 *memcard_data;
 //static UINT16 *save_ram;
-
-// CD-ROM / DMA control registers
-struct _neocd_ctrl
-{
-	UINT8 area_sel;
-	UINT8 pcm_bank_sel;
-	UINT8 spr_bank_sel;
-	UINT32 addr_source; // target if in fill mode
-	UINT32 addr_target;
-	UINT16 fill_word;
-	UINT32 word_count;
-	UINT16 dma_mode[10];
-} neocd_ctrl;
 
 /*************************************
  *
@@ -479,10 +490,11 @@ static CUSTOM_INPUT( get_memcard_status )
 
 static READ16_HANDLER( memcard_r )
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	UINT16 ret;
 
 	if (memcard_present(space->machine) != -1)
-		ret = memcard_data[offset] | 0xff00;
+		ret = state->memcard_data[offset] | 0xff00;
 	else
 		ret = 0xffff;
 
@@ -492,43 +504,47 @@ static READ16_HANDLER( memcard_r )
 
 static WRITE16_HANDLER( memcard_w )
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (memcard_present(space->machine) != -1)
-			memcard_data[offset] = data;
+			state->memcard_data[offset] = data;
 	}
 }
 
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
 static READ16_HANDLER( neocd_memcard_r )
 {
-	return memcard_data[offset] | 0xff00;
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
+	return state->memcard_data[offset] | 0xff00;
 }
 
 
 static WRITE16_HANDLER( neocd_memcard_w )
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		memcard_data[offset] = data;
+		state->memcard_data[offset] = data;
 	}
 }
 
 static MEMCARD_HANDLER( neogeo )
 {
+	ng_aes_state *state = machine->driver_data<ng_aes_state>();
 	switch (action)
 	{
 	case MEMCARD_CREATE:
-		memset(memcard_data, 0, MEMCARD_SIZE);
-		mame_fwrite(file, memcard_data, MEMCARD_SIZE);
+		memset(state->memcard_data, 0, MEMCARD_SIZE);
+		mame_fwrite(file, state->memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_INSERT:
-		mame_fread(file, memcard_data, MEMCARD_SIZE);
+		mame_fread(file, state->memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_EJECT:
-		mame_fwrite(file, memcard_data, MEMCARD_SIZE);
+		mame_fwrite(file, state->memcard_data, MEMCARD_SIZE);
 		break;
 	}
 }
@@ -885,64 +901,66 @@ static WRITE16_HANDLER( system_control_w )
 
 static void neocd_do_dma(address_space* space)
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	// TODO: Proper DMA timing and control
 	int count;
 //  UINT16 word;
 
-	switch(neocd_ctrl.dma_mode[0])
+	switch(state->neocd_ctrl.dma_mode[0])
 	{
 	case 0xffdd:
-		for(count=0;count<neocd_ctrl.word_count;count++)
+		for(count=0;count<state->neocd_ctrl.word_count;count++)
 		{
-			//word = space->read_word(neocd_ctrl.addr_source);
-			space->write_word(neocd_ctrl.addr_source+(count*2),neocd_ctrl.fill_word);
+			//word = space->read_word(state->neocd_ctrl.addr_source);
+			space->write_word(state->neocd_ctrl.addr_source+(count*2),state->neocd_ctrl.fill_word);
 		}
 		logerror("CTRL: DMA word-fill transfer of %i bytes\n",count*2);
 		break;
 	case 0xfef5:
-		for(count=0;count<neocd_ctrl.word_count;count++)
+		for(count=0;count<state->neocd_ctrl.word_count;count++)
 		{
-			//word = space->read_word(neocd_ctrl.addr_source);
-			space->write_word(neocd_ctrl.addr_source+(count*4),(neocd_ctrl.addr_source+(count*4)) >> 16);
-			space->write_word(neocd_ctrl.addr_source+(count*4)+2,(neocd_ctrl.addr_source+(count*4)) & 0xffff);
+			//word = space->read_word(state->neocd_ctrl.addr_source);
+			space->write_word(state->neocd_ctrl.addr_source+(count*4),(state->neocd_ctrl.addr_source+(count*4)) >> 16);
+			space->write_word(state->neocd_ctrl.addr_source+(count*4)+2,(state->neocd_ctrl.addr_source+(count*4)) & 0xffff);
 		}
 		logerror("CTRL: DMA mode 2 transfer of %i bytes\n",count*4);
 		break;
 	case 0xcffd:
-		for(count=0;count<neocd_ctrl.word_count;count++)
+		for(count=0;count<state->neocd_ctrl.word_count;count++)
 		{
-			//word = space->read_word(neocd_ctrl.addr_source);
-			space->write_word(neocd_ctrl.addr_source+(count*8),((neocd_ctrl.addr_source+(count*8)) >> 24) | 0xff00);
-			space->write_word(neocd_ctrl.addr_source+(count*8)+2,((neocd_ctrl.addr_source+(count*8)) >> 16) | 0xff00);
-			space->write_word(neocd_ctrl.addr_source+(count*8)+4,((neocd_ctrl.addr_source+(count*8)) >> 8) | 0xff00);
-			space->write_word(neocd_ctrl.addr_source+(count*8)+6,(neocd_ctrl.addr_source+(count*8)) | 0xff00);
+			//word = space->read_word(state->neocd_ctrl.addr_source);
+			space->write_word(state->neocd_ctrl.addr_source+(count*8),((state->neocd_ctrl.addr_source+(count*8)) >> 24) | 0xff00);
+			space->write_word(state->neocd_ctrl.addr_source+(count*8)+2,((state->neocd_ctrl.addr_source+(count*8)) >> 16) | 0xff00);
+			space->write_word(state->neocd_ctrl.addr_source+(count*8)+4,((state->neocd_ctrl.addr_source+(count*8)) >> 8) | 0xff00);
+			space->write_word(state->neocd_ctrl.addr_source+(count*8)+6,(state->neocd_ctrl.addr_source+(count*8)) | 0xff00);
 		}
 		logerror("CTRL: DMA mode 3 transfer of %i bytes\n",count*8);
 		break;
 	default:
-		logerror("CTRL: Unknown DMA transfer mode %04x\n",neocd_ctrl.dma_mode[0]);
+		logerror("CTRL: Unknown DMA transfer mode %04x\n",state->neocd_ctrl.dma_mode[0]);
 	}
 }
 
 static READ16_HANDLER( neocd_control_r )
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 
 	switch(offset)
 	{
 	case 0x64/2: // source address, high word
-		return (neocd_ctrl.addr_source >> 16) & 0xffff;
+		return (state->neocd_ctrl.addr_source >> 16) & 0xffff;
 	case 0x66/2: // source address, low word
-		return neocd_ctrl.addr_source & 0xffff;
+		return state->neocd_ctrl.addr_source & 0xffff;
 	case 0x68/2: // target address, high word
-		return (neocd_ctrl.addr_target >> 16) & 0xffff;
+		return (state->neocd_ctrl.addr_target >> 16) & 0xffff;
 	case 0x6a/2: // target address, low word
-		return neocd_ctrl.addr_target & 0xffff;
+		return state->neocd_ctrl.addr_target & 0xffff;
 	case 0x6c/2: // fill word
-		return neocd_ctrl.fill_word;
+		return state->neocd_ctrl.fill_word;
 	case 0x70/2: // word count
-		return (neocd_ctrl.word_count >> 16) & 0xffff;
+		return (state->neocd_ctrl.word_count >> 16) & 0xffff;
 	case 0x72/2:
-		return neocd_ctrl.word_count & 0xffff;
+		return state->neocd_ctrl.word_count & 0xffff;
 	case 0x7e/2:  // DMA parameters
 	case 0x80/2:
 	case 0x82/2:
@@ -952,18 +970,18 @@ static READ16_HANDLER( neocd_control_r )
 	case 0x8a/2:
 	case 0x8c/2:
 	case 0x8e/2:
-		return neocd_ctrl.dma_mode[offset-(0x7e/2)];
+		return state->neocd_ctrl.dma_mode[offset-(0x7e/2)];
 		break;
 	case 0x105/2:
-		return neocd_ctrl.area_sel;
+		return state->neocd_ctrl.area_sel;
 	case 0x11c/2:
 		logerror("CTRL: Read region code.\n");
 		return 0x0600;  // we'll just force USA region for now
 	case 0x1a0/2:
-		return neocd_ctrl.spr_bank_sel;
+		return state->neocd_ctrl.spr_bank_sel;
 		break;
 	case 0x1a2/2:
-		return neocd_ctrl.pcm_bank_sel;
+		return state->neocd_ctrl.pcm_bank_sel;
 		break;
 	default:
 		logerror("CTRL: Read offset %04x\n",offset);
@@ -974,6 +992,7 @@ static READ16_HANDLER( neocd_control_r )
 
 static WRITE16_HANDLER( neocd_control_w )
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	switch(offset)
 	{
 	case 0x60/2: // Start DMA transfer
@@ -981,32 +1000,32 @@ static WRITE16_HANDLER( neocd_control_w )
 			neocd_do_dma(space);
 		break;
 	case 0x64/2: // source address, high word
-		neocd_ctrl.addr_source = (neocd_ctrl.addr_source & 0x0000ffff) | (data << 16);
-		logerror("CTRL: Set source address to %08x\n",neocd_ctrl.addr_source);
+		state->neocd_ctrl.addr_source = (state->neocd_ctrl.addr_source & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set source address to %08x\n",state->neocd_ctrl.addr_source);
 		break;
 	case 0x66/2: // source address, low word
-		neocd_ctrl.addr_source = (neocd_ctrl.addr_source & 0xffff0000) | data;
-		logerror("CTRL: Set source address to %08x\n",neocd_ctrl.addr_source);
+		state->neocd_ctrl.addr_source = (state->neocd_ctrl.addr_source & 0xffff0000) | data;
+		logerror("CTRL: Set source address to %08x\n",state->neocd_ctrl.addr_source);
 		break;
 	case 0x68/2: // target address, high word
-		neocd_ctrl.addr_target = (neocd_ctrl.addr_target & 0x0000ffff) | (data << 16);
-		logerror("CTRL: Set target address to %08x\n",neocd_ctrl.addr_target);
+		state->neocd_ctrl.addr_target = (state->neocd_ctrl.addr_target & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set target address to %08x\n",state->neocd_ctrl.addr_target);
 		break;
 	case 0x6a/2: // target address, low word
-		neocd_ctrl.addr_target = (neocd_ctrl.addr_target & 0xffff0000) | data;
-		logerror("CTRL: Set target address to %08x\n",neocd_ctrl.addr_target);
+		state->neocd_ctrl.addr_target = (state->neocd_ctrl.addr_target & 0xffff0000) | data;
+		logerror("CTRL: Set target address to %08x\n",state->neocd_ctrl.addr_target);
 		break;
 	case 0x6c/2: // fill word
-		neocd_ctrl.fill_word = data;
+		state->neocd_ctrl.fill_word = data;
 		logerror("CTRL: Set fill word to %04x\n",data);
 		break;
 	case 0x70/2: // word count
-		neocd_ctrl.word_count = (neocd_ctrl.word_count & 0x0000ffff) | (data << 16);
-		logerror("CTRL: Set word count to %i\n",neocd_ctrl.word_count);
+		state->neocd_ctrl.word_count = (state->neocd_ctrl.word_count & 0x0000ffff) | (data << 16);
+		logerror("CTRL: Set word count to %i\n",state->neocd_ctrl.word_count);
 		break;
 	case 0x72/2: // word count (low word)
-		neocd_ctrl.word_count = (neocd_ctrl.word_count & 0xffff0000) | data;
-		logerror("CTRL: Set word count to %i\n",neocd_ctrl.word_count);
+		state->neocd_ctrl.word_count = (state->neocd_ctrl.word_count & 0xffff0000) | data;
+		logerror("CTRL: Set word count to %i\n",state->neocd_ctrl.word_count);
 		break;
 	case 0x7e/2:  // DMA parameters
 	case 0x80/2:
@@ -1017,11 +1036,11 @@ static WRITE16_HANDLER( neocd_control_w )
 	case 0x8a/2:
 	case 0x8c/2:
 	case 0x8e/2:
-		neocd_ctrl.dma_mode[offset-(0x7e/2)] = data;
+		state->neocd_ctrl.dma_mode[offset-(0x7e/2)] = data;
 		logerror("CTRL: DMA parameter %i set to %04x\n",offset-(0x7e/2),data);
 		break;
 	case 0x104/2:
-		neocd_ctrl.area_sel = data & 0x00ff;
+		state->neocd_ctrl.area_sel = data & 0x00ff;
 		logerror("CTRL: 0xExxxxx set to area %i\n",data & 0xff);
 		break;
 	case 0x140/2:  // end sprite transfer
@@ -1036,11 +1055,11 @@ static WRITE16_HANDLER( neocd_control_w )
 		video_reset_neogeo(space->machine);
 		break;
 	case 0x1a0/2:
-		neocd_ctrl.spr_bank_sel = data & 0xff;
+		state->neocd_ctrl.spr_bank_sel = data & 0xff;
 		logerror("CTRL: Sprite area set to bank %i\n",data & 0xff);
 		break;
 	case 0x1a2/2:
-		neocd_ctrl.pcm_bank_sel = data & 0xff;
+		state->neocd_ctrl.pcm_bank_sel = data & 0xff;
 		logerror("CTRL: PCM area set to bank %i\n",data & 0xff);
 		break;
 	default:
@@ -1055,22 +1074,23 @@ static WRITE16_HANDLER( neocd_control_w )
 
 static READ16_HANDLER(neocd_transfer_r)
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	UINT16 ret = 0x0000;
 	UINT8* Z80 = memory_region(space->machine,"audiocpu");
 	UINT8* PCM = memory_region(space->machine,"ymsnd");
 	UINT8* FIX = memory_region(space->machine,"fixed");
 	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
 
-	switch(neocd_ctrl.area_sel)
+	switch(state->neocd_ctrl.area_sel)
 	{
 	case NEOCD_AREA_AUDIO:
 		ret = Z80[offset & 0xffff];
 		break;
 	case NEOCD_AREA_PCM:
-		ret = PCM[offset + (0x100000*neocd_ctrl.pcm_bank_sel)];
+		ret = PCM[offset + (0x100000*state->neocd_ctrl.pcm_bank_sel)];
 		break;
 	case NEOCD_AREA_SPR:
-		ret = SPR[offset + (0x80000*neocd_ctrl.spr_bank_sel)];
+		ret = SPR[offset + (0x80000*state->neocd_ctrl.spr_bank_sel)];
 		break;
 	case NEOCD_AREA_FIX:
 		ret = FIX[offset & 0x1ffff] | 0xff00;
@@ -1082,21 +1102,22 @@ static READ16_HANDLER(neocd_transfer_r)
 
 static WRITE16_HANDLER(neocd_transfer_w)
 {
+	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	UINT8* Z80 = memory_region(space->machine,"audiocpu");
 	UINT8* PCM = memory_region(space->machine,"ymsnd");
 	UINT8* FIX = memory_region(space->machine,"fixed");
 	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
 
-	switch(neocd_ctrl.area_sel)
+	switch(state->neocd_ctrl.area_sel)
 	{
 	case NEOCD_AREA_AUDIO:
 		Z80[offset & 0xffff] = data & 0xff;
 		break;
 	case NEOCD_AREA_PCM:
-		PCM[offset + (0x100000*neocd_ctrl.pcm_bank_sel)] = data & 0xff;
+		PCM[offset + (0x100000*state->neocd_ctrl.pcm_bank_sel)] = data & 0xff;
 		break;
 	case NEOCD_AREA_SPR:
-		COMBINE_DATA(SPR+(offset + (0x80000*neocd_ctrl.spr_bank_sel)));
+		COMBINE_DATA(SPR+(offset + (0x80000*state->neocd_ctrl.spr_bank_sel)));
 		break;
 	case NEOCD_AREA_FIX:
 		FIX[offset & 0x1ffff] = data & 0xff;
@@ -1252,15 +1273,17 @@ static void common_machine_start(running_machine* machine)
 
 static MACHINE_START( neogeo )
 {
+	ng_aes_state *state = machine->driver_data<ng_aes_state>();
 	common_machine_start(machine);
 
 	/* initialize the memcard data structure */
-	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
-	state_save_register_global_pointer(machine, memcard_data, 0x0800);
+	state->memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
+	state_save_register_global_pointer(machine, state->memcard_data, 0x0800);
 }
 
 static MACHINE_START(neocd)
 {
+	ng_aes_state *state = machine->driver_data<ng_aes_state>();
 	UINT8* ROM = memory_region(machine,"mainbios");
 	UINT8* RAM = memory_region(machine,"maincpu");
 	UINT8* Z80bios = memory_region(machine,"audiobios");
@@ -1271,8 +1294,8 @@ static MACHINE_START(neocd)
 
 	/* initialize the memcard data structure */
 	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */
-	memcard_data = auto_alloc_array_clear(machine, UINT8, 0x2000);
-	state_save_register_global_pointer(machine, memcard_data, 0x2000);
+	state->memcard_data = auto_alloc_array_clear(machine, UINT8, 0x2000);
+	state_save_register_global_pointer(machine, state->memcard_data, 0x2000);
 
 	// copy initial 68k vectors into RAM
 	memcpy(RAM,ROM,0x80);
@@ -1683,7 +1706,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( neogeo, neogeo_state )
+static MACHINE_CONFIG_START( neogeo, ng_aes_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)

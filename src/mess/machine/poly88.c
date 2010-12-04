@@ -7,10 +7,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/poly88.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "machine/serial.h"
+#include "includes/poly88.h"
 
 
 static TIMER_CALLBACK(poly88_usart_timer_callback)
@@ -134,11 +133,11 @@ static IRQ_CALLBACK (poly88_irq_callback)
 }
 
 
-static struct serial_connection poly88_cassette_serial_connection;
 
 static void poly88_cassette_write(running_machine *machine, int id, unsigned long state)
 {
-	poly88_cassette_serial_connection.input_state = state;
+	poly88_state *drvstate = machine->driver_data<poly88_state>();
+	drvstate->cassette_serial_connection.input_state = state;
 }
 
 static TIMER_CALLBACK(poly88_cassette_timer_callback)
@@ -166,8 +165,8 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 						{
 							data = (!state->previous_level && current_level) ? 1 : 0;
 //data = current_level;
-							set_out_data_bit(poly88_cassette_serial_connection.State, data);
-							serial_connection_out(machine, &poly88_cassette_serial_connection);
+							set_out_data_bit(state->cassette_serial_connection.State, data);
+							serial_connection_out(machine, &state->cassette_serial_connection);
 							msm8251_receive_clock(machine->device("uart"));
 
 							state->clk_level_tape = 1;
@@ -178,7 +177,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		/* tape writing */
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
-			data = get_in_data_bit(poly88_cassette_serial_connection.input_state);
+			data = get_in_data_bit(state->cassette_serial_connection.input_state);
 			data ^= state->clk_level_tape;
 			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
@@ -201,7 +200,8 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	msm8251_connect(machine->device("uart"), &poly88_cassette_serial_connection);
+	poly88_state *state = machine->driver_data<poly88_state>();
+	msm8251_connect(machine->device("uart"), &state->cassette_serial_connection);
 }
 
 DRIVER_INIT ( poly88 )
@@ -212,8 +212,8 @@ DRIVER_INIT ( poly88 )
 	state->cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
 	timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
 
-	serial_connection_init(machine, &poly88_cassette_serial_connection);
-	serial_connection_set_in_callback(machine, &poly88_cassette_serial_connection, poly88_cassette_write);
+	serial_connection_init(machine, &state->cassette_serial_connection);
+	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, poly88_cassette_write);
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }

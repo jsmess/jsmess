@@ -16,7 +16,6 @@
 #include "includes/pmd85.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"
-#include "machine/serial.h"
 #include "devices/messram.h"
 
 
@@ -784,11 +783,11 @@ I8255A_INTERFACE( mato_ppi8255_interface )
 	DEVCB_HANDLER(mato_ppi_0_portc_w)
 };
 
-static struct serial_connection pmd85_cassette_serial_connection;
 
 static void pmd85_cassette_write(running_machine *machine, int id, unsigned long state)
 {
-	pmd85_cassette_serial_connection.input_state = state;
+	pmd85_state *drvstate = machine->driver_data<pmd85_state>();
+	drvstate->cassette_serial_connection.input_state = state;
 }
 
 static TIMER_CALLBACK(pmd85_cassette_timer_callback)
@@ -818,8 +817,8 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 						{
 							data = (!state->previous_level && current_level) ? 1 : 0;
 
-							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
-							serial_connection_out(machine, &pmd85_cassette_serial_connection);
+							set_out_data_bit(state->cassette_serial_connection.State, data);
+							serial_connection_out(machine, &state->cassette_serial_connection);
 							msm8251_receive_clock(machine->device("uart"));
 
 							state->clk_level_tape = 1;
@@ -839,7 +838,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		/* tape writing */
 		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
-			data = get_in_data_bit(pmd85_cassette_serial_connection.input_state);
+			data = get_in_data_bit(state->cassette_serial_connection.input_state);
 			data ^= state->clk_level_tape;
 			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
@@ -879,8 +878,8 @@ static void pmd85_common_driver_init (running_machine *machine)
 	state->cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
 	timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
-	serial_connection_init(machine, &pmd85_cassette_serial_connection);
-	serial_connection_set_in_callback(machine, &pmd85_cassette_serial_connection, pmd85_cassette_write);
+	serial_connection_init(machine, &state->cassette_serial_connection);
+	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, pmd85_cassette_write);
 }
 
 DRIVER_INIT ( pmd851 )
@@ -935,7 +934,7 @@ static TIMER_CALLBACK( setup_machine_state )
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	if (state->model != MATO)
 	{
-		msm8251_connect(machine->device("uart"), &pmd85_cassette_serial_connection);
+		msm8251_connect(machine->device("uart"), &state->cassette_serial_connection);
 	}
 }
 

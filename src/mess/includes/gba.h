@@ -203,6 +203,7 @@ public:
 
 	int fifo_a_ptr, fifo_b_ptr, fifo_a_in, fifo_b_in;
 	UINT8 fifo_a[20], fifo_b[20];
+	UINT32 xferscan[7][240+2048];
 };
 
 /*----------- defined in video/gba.c -----------*/

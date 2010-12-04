@@ -75,7 +75,6 @@ Notes:
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
 #include "machine/msm8251.h"
-#include "machine/serial.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"

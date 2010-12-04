@@ -243,7 +243,6 @@ XR22-050-3B Pinout
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "devices/messram.h"
-#include "machine/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/abcbus.h"

@@ -78,7 +78,7 @@ void msm8251_receive_clock(running_device *device);
 
 /* connecting to serial output */
 void msm8251_connect_to_serial_device(running_device *device, running_device *image);
-void msm8251_connect(running_device *device, struct serial_connection *other_connection);
+void msm8251_connect(running_device *device, serial_connection *other_connection);
 
 void msm8251_receive_character(running_device *device, UINT8 ch);
 

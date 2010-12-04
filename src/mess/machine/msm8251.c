@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "msm8251.h"
-#include "machine/serial.h"
 
 
 /***************************************************************************
@@ -45,15 +44,15 @@ struct _msm8251_t
 	UINT8 data;
 
 	/* receive reg */
-	struct serial_receive_register receive_reg;
+	serial_receive_register receive_reg;
 	/* transmit reg */
-	struct serial_transmit_register transmit_reg;
+	serial_transmit_register transmit_reg;
 
-	struct data_form data_form;
+	data_form form;
 
 	/* the serial connection that data is transfered over */
 	/* this is usually connected to the serial device */
-	struct serial_connection connection;
+	serial_connection connection;
 };
 
 
@@ -186,7 +185,7 @@ void msm8251_receive_clock(running_device *device)
 
 		if (uart->receive_reg.flags & RECEIVE_REGISTER_FULL)
 		{
-			receive_register_extract(&uart->receive_reg, &uart->data_form);
+			receive_register_extract(&uart->receive_reg, &uart->form);
 			msm8251_receive_character(device, uart->receive_reg.byte_received);
 		}
 	}
@@ -213,7 +212,7 @@ void msm8251_transmit_clock(running_device *device)
 			if ((uart->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)!=0)
 			{
 				/* set it up */
-				transmit_register_setup(&uart->transmit_reg, &uart->data_form, uart->data);
+				transmit_register_setup(&uart->transmit_reg, &uart->form, uart->data);
 				/* msm8251 transmit reg now empty */
 				uart->status |=MSM8251_STATUS_TX_EMPTY;
 				/* ready for next transmit */
@@ -487,20 +486,20 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 					}
 				}
 
-				uart->data_form.word_length = ((data>>2) & 0x03)+5;
-				uart->data_form.parity = SERIAL_PARITY_NONE;
+				uart->form.word_length = ((data>>2) & 0x03)+5;
+				uart->form.parity = SERIAL_PARITY_NONE;
 				switch ((data>>6) & 0x03)
 				{
 					case 0:
 					case 1:
-						uart->data_form.stop_bit_count =  1;
+						uart->form.stop_bit_count =  1;
 						break;
 					case 2:
 					case 3:
-						uart->data_form.stop_bit_count =  2;
+						uart->form.stop_bit_count =  2;
 						break;
 				}
-				receive_register_setup(&uart->receive_reg, &uart->data_form);
+				receive_register_setup(&uart->receive_reg, &uart->form);
 
 
 #if 0
@@ -777,7 +776,7 @@ void msm8251_connect_to_serial_device(running_device *device, running_device *im
     msm8251_connect
 -------------------------------------------------*/
 
-void msm8251_connect(running_device *device, struct serial_connection *other_connection)
+void msm8251_connect(running_device *device, serial_connection *other_connection)
 {
 	msm8251_t *uart = get_token(device);
 	serial_connection_link(device->machine, &uart->connection, other_connection);

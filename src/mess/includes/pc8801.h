@@ -99,6 +99,8 @@ public:
 	unsigned short *text_old;
 	bitmap_t *wbm1;
 	bitmap_t *wbm2;
+	int blink_count;
+	struct { UINT8 r,g,b; } pal[10];
 };
 
 /*----------- defined in machine/pc8801.c -----------*/

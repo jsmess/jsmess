@@ -49,15 +49,15 @@
 
 static void c64_nmi( running_machine *machine )
 {
-	static int nmilevel = 0;
+	c64_state *state = machine->driver_data<c64_state>();
 	running_device *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 
-		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
 	}
 }
 

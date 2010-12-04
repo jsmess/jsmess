@@ -381,7 +381,7 @@ static void thom_set_caps_led ( running_machine *machine, int led )
 
 
 
-static struct serial_connection to7_io_line;
+static serial_connection to7_io_line;
 
 static DEVICE_START( thom_serial_cc90323 )
 {

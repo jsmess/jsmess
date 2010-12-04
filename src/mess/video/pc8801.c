@@ -421,10 +421,9 @@ VIDEO_UPDATE( pc8801 )
 {
 	pc88_state *state = screen->machine->driver_data<pc88_state>();
 	int x, y, attr_new, text_new, i, a, tx, ty, oy, gx, gy, ct, cg;
-	static int blink_count;
 	int full_refresh = 1;
 
-	blink_count = (blink_count + 1) % (state->blink_period * 4);
+	state->blink_count = (state->blink_count + 1) % (state->blink_period * 4);
 	/* attribute expand */
 	for (y = 0; y < 25; y++)
 	{
@@ -509,7 +508,7 @@ VIDEO_UPDATE( pc8801 )
 			if (attr_new & TX_BL)
 			{
 				attr_new &= ~TX_BL;
-				if ((blink_count / state->blink_period) & 1)
+				if ((state->blink_count / state->blink_period) & 1)
 					attr_new ^= TX_REV;
 			}
 
@@ -522,14 +521,14 @@ VIDEO_UPDATE( pc8801 )
 					attr_new ^= TX_UL;
 					break;
 				case blink_underline:
-					if (blink_count / state->blink_period)
+					if (state->blink_count / state->blink_period)
 						attr_new ^= TX_UL;
 					break;
 				case noblink_block:
 					attr_new ^= TX_REV;
 					break;
 				case blink_block:
-					if (blink_count / state->blink_period)
+					if (state->blink_count / state->blink_period)
 						attr_new ^= TX_REV;
 					break;
 				}
@@ -1026,7 +1025,6 @@ WRITE8_HANDLER(pc88_palette_w)
 	pc88_state *state = space->machine->driver_data<pc88_state>();
 	int palno;
 	int i;
-	static int r[10],g[10],b[10];
 
 	if (offset == 0)
 		palno = 16;
@@ -1048,19 +1046,19 @@ WRITE8_HANDLER(pc88_palette_w)
 	{
 		if ((data & 0x40) == 0x00)
 		{
-			b[offset] = ((data << 5) & 0xe0) | ((data << 2) & 0x1c) | ((data >> 1) & 0x03);
-			r[offset] = ((data << 2) & 0xe0) | ((data >> 1) & 0x1c) | ((data >> 4) & 0x03);
+			state->pal[offset].b = ((data << 5) & 0xe0) | ((data << 2) & 0x1c) | ((data >> 1) & 0x03);
+			state->pal[offset].r = ((data << 2) & 0xe0) | ((data >> 1) & 0x1c) | ((data >> 4) & 0x03);
 		}
 		else
 		{
-			g[offset] = ((data << 5) & 0xe0) | ((data << 2) & 0x1c) | ((data >> 1) & 0x03);
+			state->pal[offset].g = ((data << 5) & 0xe0) | ((data << 2) & 0x1c) | ((data >> 1) & 0x03);
 		}
 	}
 	else
 	{
-		b[offset] = (data & 1) ? 0xff : 0x00;
-		r[offset] = (data & 2) ? 0xff : 0x00;
-		g[offset] = (data & 4) ? 0xff : 0x00;
+		state->pal[offset].b = (data & 1) ? 0xff : 0x00;
+		state->pal[offset].r = (data & 2) ? 0xff : 0x00;
+		state->pal[offset].g = (data & 4) ? 0xff : 0x00;
 	}
-	colortable_palette_set_color(space->machine->colortable, palno, MAKE_RGB(r[offset], g[offset], b[offset]));
+	colortable_palette_set_color(space->machine->colortable, palno, MAKE_RGB(state->pal[offset].r, state->pal[offset].g, state->pal[offset].b));
 }

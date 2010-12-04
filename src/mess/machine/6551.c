@@ -37,14 +37,14 @@ struct _acia6551_t
 
 	void	(*irq_callback)(int);
 
-	struct data_form data_form;
+	data_form form;
 
 	/* receive register */
-	struct serial_receive_register	receive_reg;
+	serial_receive_register	receive_reg;
 	/* transmit register */
-	struct serial_transmit_register transmit_reg;
+	serial_transmit_register transmit_reg;
 
-	struct serial_connection connection;
+	serial_connection connection;
 };
 
 
@@ -106,7 +106,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 
 	if (acia->receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
-		receive_register_extract(&acia->receive_reg, &acia->data_form);
+		receive_register_extract(&acia->receive_reg, &acia->form);
 		acia_6551_receive_char(device, acia->receive_reg.byte_received);
 	}
 
@@ -117,7 +117,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 		if (acia->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
 		{
 			/* set it up */
-			transmit_register_setup(&acia->transmit_reg, &acia->data_form, acia->transmit_data_register);
+			transmit_register_setup(&acia->transmit_reg, &acia->form, acia->transmit_data_register);
 			/* acia transmit reg now empty */
 			acia->status_register |=(1<<4);
 			/* and refresh ints */
@@ -293,19 +293,19 @@ static void acia_6551_update_data_form(running_device *device)
 {
 	acia6551_t *acia = get_token(device);
 
-	acia->data_form.word_length = 8-((acia->control_register>>5) & 0x03);
-	acia->data_form.stop_bit_count = (acia->control_register>>7)+1;
+	acia->form.word_length = 8-((acia->control_register>>5) & 0x03);
+	acia->form.stop_bit_count = (acia->control_register>>7)+1;
 
 	if (acia->command_register & (1<<5))
 	{
-		acia->data_form.parity = SERIAL_PARITY_ODD;
+		acia->form.parity = SERIAL_PARITY_ODD;
 	}
 	else
 	{
-		acia->data_form.parity = SERIAL_PARITY_NONE;
+		acia->form.parity = SERIAL_PARITY_NONE;
 	}
 
-	receive_register_setup(&acia->receive_reg, &acia->data_form);
+	receive_register_setup(&acia->receive_reg, &acia->form);
 }
 
 

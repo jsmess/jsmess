@@ -37,7 +37,8 @@ setup serial interface software in driver and let the transfer begin */
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* a read/write bit stream. used to transmit data and to receive data */
-struct data_stream
+typedef struct _data_stream data_stream;
+struct _data_stream
 {
 	/* pointer to buffer */
 	unsigned char *pData;
@@ -54,20 +55,20 @@ typedef struct _serial_t serial_t;
 struct _serial_t
 {
 	/* transmit data bit-stream */
-	struct data_stream transmit;
+	data_stream transmit;
 	/* receive data bit-stream */
-	struct data_stream receive;
+	data_stream receive;
 
 	/* register to receive data */
-	struct serial_receive_register	receive_reg;
+	serial_receive_register	receive_reg;
 	/* register to transmit data */
-	struct serial_transmit_register transmit_reg;
+	serial_transmit_register transmit_reg;
 
 	/* connection to transmit/receive data over */
-	struct serial_connection connection;
+	serial_connection connection;
 
 	/* data form to transmit/receive */
-	struct data_form data_form;
+	data_form form;
 
 	int transmit_state;
 
@@ -138,9 +139,9 @@ void serial_device_setup(running_device *device, int baud_rate, int num_data_bit
 	serial_t *ser = get_safe_token(device);
 
 	ser->BaudRate = baud_rate;
-	ser->data_form.word_length = num_data_bits;
-	ser->data_form.stop_bit_count = stop_bit_count;
-	ser->data_form.parity = parity_code;
+	ser->form.word_length = num_data_bits;
+	ser->form.stop_bit_count = stop_bit_count;
+	ser->form.parity = parity_code;
 	ser->timer = timer_alloc(device->machine, serial_device_baud_rate_callback, (void *)device);
 
 	serial_connection_init(device->machine,&ser->connection);
@@ -157,7 +158,7 @@ void serial_device_setup(running_device *device, int baud_rate, int num_data_bit
 	serial_connection_out(device->machine,&ser->connection);
 	transmit_register_reset(&ser->transmit_reg);
 	receive_register_reset(&ser->receive_reg);
-	receive_register_setup(&ser->receive_reg, &ser->data_form);
+	receive_register_setup(&ser->receive_reg, &ser->form);
 }
 
 
@@ -194,7 +195,7 @@ void serial_device_set_transmit_state(running_device *device, int state)
 }
 
 /* get a bit from input stream */
-static int	data_stream_get_data_bit_from_data_byte(struct data_stream *stream)
+static int data_stream_get_data_bit_from_data_byte(data_stream *stream)
 {
 	int data_bit;
 	int data_byte;
@@ -230,7 +231,7 @@ static int	data_stream_get_data_bit_from_data_byte(struct data_stream *stream)
 }
 
 
-void	receive_register_setup(struct serial_receive_register *receive, struct data_form *data_form)
+void receive_register_setup(serial_receive_register *receive, data_form *data_form)
 {
 	receive->bit_count = data_form->word_length + data_form->stop_bit_count;
 
@@ -246,7 +247,7 @@ void	receive_register_setup(struct serial_receive_register *receive, struct data
 /* for them */
 
 /* receive a bit */
-void	receive_register_update_bit(struct serial_receive_register *receive, int bit)
+void receive_register_update_bit(serial_receive_register *receive, int bit)
 {
 	int previous_bit;
 
@@ -296,7 +297,7 @@ void	receive_register_update_bit(struct serial_receive_register *receive, int bi
 	}
 }
 
-void	receive_register_reset(struct serial_receive_register *receive_reg)
+void receive_register_reset(serial_receive_register *receive_reg)
 {
 	receive_reg->bit_count_received = 0;
 	receive_reg->flags &=~RECEIVE_REGISTER_FULL;
@@ -304,7 +305,7 @@ void	receive_register_reset(struct serial_receive_register *receive_reg)
 	receive_reg->flags |= RECEIVE_REGISTER_WAITING_FOR_START_BIT;
 }
 
-void	receive_register_extract(struct serial_receive_register *receive_reg, struct data_form *data_form)
+void receive_register_extract(serial_receive_register *receive_reg, data_form *data_form)
 {
 	unsigned long data_shift;
 	UINT8 data;
@@ -370,13 +371,13 @@ void	receive_register_extract(struct serial_receive_register *receive_reg, struc
 
 /***** TRANSMIT REGISTER *****/
 
-void	transmit_register_reset(struct serial_transmit_register *transmit_reg)
+void transmit_register_reset(serial_transmit_register *transmit_reg)
 {
 	transmit_reg->flags |=TRANSMIT_REGISTER_EMPTY;
 }
 
 /* used to construct data in stream format */
-static void transmit_register_add_bit(struct serial_transmit_register *transmit_reg, int bit)
+static void transmit_register_add_bit(serial_transmit_register *transmit_reg, int bit)
 {
 	/* combine bit */
 	transmit_reg->register_data = transmit_reg->register_data<<1;
@@ -387,7 +388,7 @@ static void transmit_register_add_bit(struct serial_transmit_register *transmit_
 
 
 /* generate data in stream format ready for transfer */
-void transmit_register_setup(struct serial_transmit_register *transmit_reg, struct data_form *data_form,unsigned char data_byte)
+void transmit_register_setup(serial_transmit_register *transmit_reg, data_form *data_form,unsigned char data_byte)
 {
 	int i;
 	unsigned char transmit_data;
@@ -436,7 +437,7 @@ void transmit_register_setup(struct serial_transmit_register *transmit_reg, stru
 
 
 /* get a bit from the transmit register */
-static int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg)
+static int transmit_register_get_data_bit(serial_transmit_register *transmit_reg)
 {
 	int bit;
 
@@ -457,7 +458,7 @@ static int transmit_register_get_data_bit(struct serial_transmit_register *trans
 }
 
 
-void	transmit_register_send_bit(running_machine *machine, struct serial_transmit_register *transmit_reg, struct serial_connection *connection)
+void transmit_register_send_bit(running_machine *machine, serial_transmit_register *transmit_reg, serial_connection *connection)
 {
 	int data;
 
@@ -479,14 +480,14 @@ static void serial_protocol_none_sent_char(running_device *device)
 
 	/* generate byte to transmit */
 	data_byte = 0;
-	for (i=0; i<ser->data_form.word_length; i++)
+	for (i=0; i<ser->form.word_length; i++)
 	{
 		data_byte = data_byte<<1;
 		bit = data_stream_get_data_bit_from_data_byte(&ser->transmit);
 		data_byte = data_byte|bit;
 	}
 	/* setup register */
-	transmit_register_setup(&ser->transmit_reg,&ser->data_form, data_byte);
+	transmit_register_setup(&ser->transmit_reg,&ser->form, data_byte);
 
 	logerror("serial device transmitted char: %02x\n",data_byte);
 }
@@ -501,7 +502,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 	if (ser->receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
 		//logerror("SERIAL DEVICE\n");
-		receive_register_extract(&ser->receive_reg, &ser->data_form);
+		receive_register_extract(&ser->receive_reg, &ser->form);
 
 		logerror("serial device receive char: %02x\n",ser->receive_reg.byte_received);
 	}
@@ -522,7 +523,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 }
 
 /* connect the specified connection to this serial device */
-void serial_device_connect(running_device *device, struct serial_connection *connection)
+void serial_device_connect(running_device *device, serial_connection *connection)
 {
 	serial_t *ser = get_safe_token(device);
 	serial_connection_link(device->machine, connection, &ser->connection);
@@ -561,7 +562,7 @@ static int serial_device_load_internal(device_image_interface &image, unsigned c
 }
 
 /* reset position in stream */
-static void data_stream_reset(struct data_stream *stream)
+static void data_stream_reset(data_stream *stream)
 {
 	/* reset byte offset */
 	stream->ByteCount= 0;
@@ -570,7 +571,7 @@ static void data_stream_reset(struct data_stream *stream)
 }
 
 /* free stream */
-static void data_stream_free(struct data_stream *stream)
+static void data_stream_free(data_stream *stream)
 {
 	if (stream->pData!=NULL)
 	{
@@ -581,7 +582,7 @@ static void data_stream_free(struct data_stream *stream)
 }
 
 /* initialise stream */
-static void data_stream_init(struct data_stream *stream, unsigned char *pData, unsigned long DataLength)
+static void data_stream_init(data_stream *stream, unsigned char *pData, unsigned long DataLength)
 {
 	stream->pData = pData;
 	stream->DataLength = DataLength;
@@ -688,20 +689,20 @@ static unsigned long serial_connection_spin_bits(unsigned long input_status)
 
 
 /* setup callbacks for connection */
-void	serial_connection_init(running_machine *machine, struct serial_connection *connection)
+void serial_connection_init(running_machine *machine, serial_connection *connection)
 {
 	connection->out_callback = NULL;
 	connection->in_callback = NULL;
 }
 
 /* set callback which will be executed when in status has changed */
-void	serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status))
+void serial_connection_set_in_callback(running_machine *machine, serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status))
 {
 	connection->in_callback = in_cb;
 }
 
 /* output new state through connection */
-void	serial_connection_out(running_machine *machine, struct serial_connection *connection)
+void serial_connection_out(running_machine *machine, serial_connection *connection)
 {
 	if (connection->out_callback!=NULL)
 	{
@@ -714,7 +715,7 @@ void	serial_connection_out(running_machine *machine, struct serial_connection *c
 }
 
 /* join two serial connections together */
-void	serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b)
+void serial_connection_link(running_machine *machine, serial_connection *connection_a, serial_connection *connection_b)
 {
 	/* both connections should have their in connection setup! */
 	/* the in connection is the callback they use to update their state based

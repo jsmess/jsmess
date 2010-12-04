@@ -1766,7 +1766,6 @@ void gba_draw_scanline(running_machine *machine, int y)
 	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 	int i, x;
-	static UINT32 xferscan[7][240+2048];	// up to 1024 pixels of slop on either side to allow easier clip handling
 	gba_state *state = machine->driver_data<gba_state>();
 	UINT8 submode = 0;
 	int bpp = 0;
@@ -1810,11 +1809,11 @@ void gba_draw_scanline(running_machine *machine, int y)
 			break;
 	}
 
-	gba_draw_scanline_modes[state->DISPCNT & 7][submode](machine, state, y, &xferscan[0][1024], &xferscan[1][1024], &xferscan[2][1024], &xferscan[3][1024], &xferscan[4][1024], &xferscan[5][1024], &xferscan[6][1024], bpp);
+	gba_draw_scanline_modes[state->DISPCNT & 7][submode](machine, state, y, &state->xferscan[0][1024], &state->xferscan[1][1024], &state->xferscan[2][1024], &state->xferscan[3][1024], &state->xferscan[4][1024], &state->xferscan[5][1024], &state->xferscan[6][1024], bpp);
 
 	for(x = 0; x < 240; x++)
 	{
-		scanline[x] = xferscan[6][1024 + x] & 0x7fff;
+		scanline[x] = state->xferscan[6][1024 + x] & 0x7fff;
 	}
 
 	return;
