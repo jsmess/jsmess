@@ -412,7 +412,7 @@ static const mc6845_interface mc6845_intf =
 static TIMER_CALLBACK( keyboard_callback )
 {
 	bml3_state *state = machine->driver_data<bml3_state>();
-	const char* portnames[3] = { "key1","key2","key3" };
+	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	scancode = 0;
 

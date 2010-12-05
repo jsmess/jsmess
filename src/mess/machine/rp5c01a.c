@@ -212,7 +212,7 @@ WRITE8_DEVICE_HANDLER( rp5c01a_w )
 
 static void advance_seconds(rp5c01a_t *rp5c01a)
 {
-	int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	static const int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	int seconds = (rp5c01a->reg[RP5C01A_MODE_TIME][RP5C01A_REGISTER_10_SECOND] * 10) + rp5c01a->reg[RP5C01A_MODE_TIME][RP5C01A_REGISTER_1_SECOND];
 	int minutes = (rp5c01a->reg[RP5C01A_MODE_TIME][RP5C01A_REGISTER_10_MINUTE] * 10) + rp5c01a->reg[RP5C01A_MODE_TIME][RP5C01A_REGISTER_1_MINUTE];

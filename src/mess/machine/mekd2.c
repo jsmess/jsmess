@@ -562,7 +562,7 @@ DRIVER_INIT( mekd2 )
 
 DEVICE_IMAGE_LOAD( mekd2_cart )
 {
-	const char magic[] = "MEK6800D2";
+	static const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
 	UINT8 ident, *RAM = memory_region(image.device().machine, "maincpu");

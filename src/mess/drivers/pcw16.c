@@ -168,7 +168,7 @@ static WRITE8_HANDLER(pcw16_palette_w)
 }
 
 
-static const char *pcw16_write_handler_dram[4] =
+static const char *const pcw16_write_handler_dram[4] =
 {
 	"bank5",
 	"bank6",
@@ -176,7 +176,7 @@ static const char *pcw16_write_handler_dram[4] =
 	"bank8"
 };
 
-static const char *pcw16_read_handler_dram[4] =
+static const char *const pcw16_read_handler_dram[4] =
 {
 	"bank1",
 	"bank2",

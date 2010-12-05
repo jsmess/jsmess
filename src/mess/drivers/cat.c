@@ -307,7 +307,7 @@ static VIDEO_UPDATE( cat )
 			}
 		}
 	} else {
-		rectangle black_area = {0, 672 - 1, 0, 344 - 1};
+		static const rectangle black_area = {0, 672 - 1, 0, 344 - 1};
 		bitmap_fill(bitmap, &black_area, 0);
 	}
 	return 0;

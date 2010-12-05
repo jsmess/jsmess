@@ -1121,14 +1121,11 @@ static int d64_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 
 static int x64_image_create(const imgtool_module *mod, imgtool_stream *f, const ResolvedOption *options_)
 {
-	struct {
-		unsigned char data[0x40];
-	} x64_header={
+	static const unsigned char x64_header[40] =
 		{ 0x43, 0x15, 0x41, 0x64,
 		  0x01, 0x02, 0x01, 0x23,
 		  0x01
-		}
-	};
+		};
 	if (stream_write(f, &x64_header, sizeof(x64_header)) != sizeof(x64_header))
 		return  IMGTOOLERR_WRITEERROR;
 

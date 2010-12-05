@@ -441,16 +441,15 @@ static VIDEO_UPDATE( pc6001m2 )
 				for(i=0;i<4;i++)
 				{
 					int pen[2];
+#if 0
+					/* palette reference: */
+					static const UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
+						0x02, 0x06, 0x03, 0x07,
+						0x08, 0x0c, 0x09, 0x0d,
+						0x0a, 0x0e, 0x0b, 0x0f };
 
-					/*
-                    palette reference:
-                    UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
-                                        0x02, 0x06, 0x03, 0x07,
-                                        0x08, 0x0c, 0x09, 0x0d,
-                                        0x0a, 0x0e, 0x0b, 0x0f };
-
-                    color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
-                    */
+					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
+#endif
 
 					pen[0] = state->video_ram[count+0x0000] >> (6-i*2) & 3;
 					pen[1] = state->video_ram[count+0x2000] >> (6-i*2) & 3;
@@ -484,13 +483,12 @@ static VIDEO_UPDATE( pc6001m2 )
 				for(i=0;i<8;i++)
 				{
 					int pen[2];
+#if 0
+					/* palette reference: */
+					static const UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
 
-					/*
-                    palette reference:
-                    UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
-
-                    color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
-                    */
+					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
+#endif
 
 					pen[0] = state->video_ram[count+0x0000] >> (7-i) & 1;
 					pen[1] = state->video_ram[count+0x2000] >> (7-i) & 1;
@@ -664,7 +662,7 @@ static VIDEO_UPDATE( pc6001sr )
 static WRITE8_HANDLER ( pc6001_system_latch_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
+	static const UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
 	state->video_ram =  state->ram + startaddr[(data >> 1) & 0x03] - 0x8000;
 
@@ -1193,7 +1191,7 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-//  UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
+	//static const UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
 
 	state->ex_vram_bank = data;
 	vram_bank_change(space->machine,(state->ex_vram_bank & 0x06) | ((state->sys_latch & 0x06) << 4));
@@ -1457,7 +1455,7 @@ static READ8_HANDLER( pc6001sr_bank_rn_r )
 static WRITE8_HANDLER( pc6001sr_bank_rn_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	const char* bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
+	static const char *const bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	UINT8 bank_num;
 
@@ -1881,7 +1879,7 @@ static const ay8910_interface pc6001_ay_interface =
 
 static UINT8 check_keyboard_press(running_machine *machine)
 {
-	const char* portnames[3] = { "key1","key2","key3" };
+	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	UINT8 shift_pressed,caps_lock;
 	scancode = 0;

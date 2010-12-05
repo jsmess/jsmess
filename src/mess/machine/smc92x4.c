@@ -654,7 +654,7 @@ static void update_id_regs(running_device *device, chrn_id_hd id)
 	// Flags for current head register. Note that the sizes are not in
 	// sequence (128, 256, 512, 1024). This is only interesting for AT
 	// mode.
-	UINT8 sizeflag[] = { 0x60, 0x00, 0x20, 0x40 };
+	static const UINT8 sizeflag[] = { 0x60, 0x00, 0x20, 0x40 };
 	smc92x4_state *w = get_safe_token(device);
 
 	w->register_r[CURRENT_CYLINDER] = id.C & 0xff;

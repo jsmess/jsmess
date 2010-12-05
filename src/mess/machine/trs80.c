@@ -462,7 +462,7 @@ WRITE8_HANDLER( trs80m4_e9_w )
     EEh    9600
     FFh    19200 */
 
-	int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
+	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 	ay31015_set_receiver_clock( state->ay31015, baud_clock[data & 0x0f]);
 	ay31015_set_transmitter_clock( state->ay31015, baud_clock[data>>4]);
 }

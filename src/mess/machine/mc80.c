@@ -103,7 +103,7 @@ WRITE8_HANDLER( mc8030_vis_w )
 	// reg B
 	//
 	UINT16 addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
-	UINT8 val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+	static const UINT8 val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 	int c = offset & 1;
 	state->mc8030_video_mem[addr] = state->mc8030_video_mem[addr] | (val[data & 7]*c);
 

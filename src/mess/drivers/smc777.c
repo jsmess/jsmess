@@ -593,7 +593,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( keyboard_callback )
 {
 	smc777_state *state = machine->driver_data<smc777_state>();
-	const char* portnames[3] = { "key1","key2","key3" };
+	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	//UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
 	scancode = 0;

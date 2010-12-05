@@ -496,8 +496,8 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
        so it could be burned in a arcadia 2001 cartridge
        activate it and use debugger to save patched version */
 	// not enough yet (some pointers stored as data?)
-	struct { UINT16 address; UINT8 old; UINT8 new; }
-	int i:
+	int i;
+	static const struct { UINT16 address; UINT8 old; UINT8 new; }
 	patch[]= {
 		{ 0x0077,0x40,0x20 },
 		{ 0x011e,0x40,0x20 },

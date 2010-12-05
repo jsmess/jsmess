@@ -116,7 +116,7 @@ static void poll_mouse(running_device *device);
 static void read_key_if_possible(genboard_state *board);
 static UINT8 get_recent_key(running_device *device);
 
-static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 INLINE genboard_state *get_safe_token(running_device *device)
 {

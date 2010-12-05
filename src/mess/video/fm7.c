@@ -494,7 +494,7 @@ static void fm7_alu_function(fm7_state *state, UINT32 offset)
 static UINT32 fm7_line_set_pixel(fm7_state *state, int x, int y)
 {
 	UINT32 addr;
-	UINT8 pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
+	static const UINT8 pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
 
 
 	if(state->video.modestatus & 0x40) // 320 pixels wide

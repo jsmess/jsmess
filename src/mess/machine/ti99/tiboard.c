@@ -36,8 +36,8 @@ typedef struct _tiboard_state
 
 } tiboard_state;
 
-static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-static const char *keynames8[] = {
+static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+static const char *const keynames8[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};

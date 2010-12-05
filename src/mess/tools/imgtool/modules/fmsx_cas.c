@@ -67,7 +67,7 @@ static int fmsx_cas_image_init(const imgtool_module *mod, imgtool_stream *f, img
 	CAS_IMAGE *image;
 	int len;
 	char *pbase;
-	char default_name[] = "msxtape";
+	static const char default_name[] = "msxtape";
 
 	image = (CAS_IMAGE*)malloc (sizeof (CAS_IMAGE) );
 	if (!image) return IMGTOOLERR_OUTOFMEMORY;

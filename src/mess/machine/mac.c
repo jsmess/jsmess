@@ -417,7 +417,7 @@ void mac_state::v8_resize()
 	{	
 		address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
-		UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
+		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// force unmap of entire RAM region
 		memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
@@ -3293,7 +3293,7 @@ DRIVER_INIT(maciix)
 
 void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 {
-	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
+	static const UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
 	mac_state *mac = machine->driver_data<mac_state>();
 
 	slot -= 9;

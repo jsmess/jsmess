@@ -2020,7 +2020,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     /* Memory dump */
     addr = 0;
-    const UINT8 banks[] = { 5, 2, 0, 1, 3, 4, 6, 7 };
+    static const UINT8 banks[] = { 5, 2, 0, 1, 3, 4, 6, 7 };
     logerror("Loading %05X bytes of RAM at %04X\n", 8*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 8; i++)
     {

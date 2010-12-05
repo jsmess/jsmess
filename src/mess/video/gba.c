@@ -230,7 +230,7 @@ static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypo
 static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
 {
 	UINT32 base, mapbase, size;
-	INT32 sizes[4] = { 128, 256, 512, 1024 };
+	static const INT32 sizes[4] = { 128, 256, 512, 1024 };
 	INT32 cx, cy, x, pixx, pixy;
 	UINT8 *mgba_vram = (UINT8 *)state->gba_vram;
 	UINT32 tile;

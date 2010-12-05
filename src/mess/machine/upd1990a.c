@@ -384,7 +384,7 @@ READ_LINE_DEVICE_HANDLER( upd1990a_tp_r )
 
 static void advance_seconds(upd1990a_t *upd1990a)
 {
-	int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	static const int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	int seconds = bcd_to_integer(upd1990a->time_counter[0]);
 	int minutes = bcd_to_integer(upd1990a->time_counter[1]);

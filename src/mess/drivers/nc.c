@@ -318,10 +318,10 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 }
 
 
-static const char *nc_bankhandler_r[]={
+static const char *const nc_bankhandler_r[]={
 "bank1", "bank2", "bank3", "bank4"};
 
-static const char *nc_bankhandler_w[]={
+static const char *const nc_bankhandler_w[]={
 "bank5", "bank6", "bank7", "bank8"};
 
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)

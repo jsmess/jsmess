@@ -671,8 +671,8 @@ static DEVICE_STOP( ti99_hfdc )
 static DEVICE_RESET( ti99_hfdc )
 {
 	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(device)->token();
-	const char *flopname[] = {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3};
-	const char *hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
+	static const char *const flopname[] = {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3};
+	static const char *const hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
 
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_HFDC)

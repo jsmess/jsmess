@@ -605,10 +605,10 @@ static READ32_HANDLER( s3c240x_pwm_r )
 static void s3c240x_pwm_start( running_machine *machine, int timer)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
-	const int mux_table[] = { 2, 4, 8, 16};
-	const int prescaler_shift[] = { 0, 0, 8, 8, 8};
-	const int mux_shift[] = { 0, 4, 8, 12, 16};
-	const int tcon_shift[] = { 0, 8, 12, 16, 20};
+	static const int mux_table[] = { 2, 4, 8, 16 };
+	static const int prescaler_shift[] = { 0, 0, 8, 8, 8 };
+	static const int mux_shift[] = { 0, 4, 8, 12, 16 };
+	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
 	const UINT32 *regs = &state->s3c240x_pwm_regs[3+timer*3];
 	UINT32 prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
@@ -649,7 +649,7 @@ static void s3c240x_pwm_stop( running_machine *machine, int timer)
 static void s3c240x_pwm_recalc( running_machine *machine, int timer)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
-	const int tcon_shift[] = { 0, 8, 12, 16, 20};
+	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
 	if (state->s3c240x_pwm_regs[2] & (1 << tcon_shift[timer]))
 	{
 		s3c240x_pwm_start( machine, timer);
@@ -700,7 +700,7 @@ static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	int ch = param;
-	const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
+	static const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
 	verboselog( machine, 2, "PWM %d timer callback\n", ch);
 	if (BITS( state->s3c240x_pwm_regs[1], 23, 20) == (ch + 1))
 	{
@@ -731,7 +731,7 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 	UINT32 curr_tc, curr_src, curr_dst;
 	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
-	const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3};
+	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	verboselog( machine, 5, "DMA %d trigger\n", dma);
 	curr_tc = BITS( regs[3], 19, 0);
 	curr_src = BITS( regs[4], 28, 0);
@@ -1460,7 +1460,7 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 		{
 			int interrupt_pending_flag;
 #if 0
-			const int div_table[] = { 16, 512};
+			static const int div_table[] = { 16, 512 };
 			int enable_interrupt, transmit_clock_value, tx_clock_source_selection
 			double clock;
 			transmit_clock_value = (data >> 0) & 0xF;
@@ -1552,7 +1552,7 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 static void s3c240x_iis_start( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
-	const UINT32 codeclk_table[] = { 256, 384};
+	static const UINT32 codeclk_table[] = { 256, 384 };
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
 	verboselog( machine, 1, "IIS start\n");

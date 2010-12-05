@@ -489,7 +489,7 @@ static WRITE8_HANDLER( socrates_scroll_w )
 static rgb_t socrates_create_color(UINT8 color)
 {
   rgb_t composedcolor;
-  double lumatable[256] = {
+  static const double lumatable[256] = {
     LUMA_COL_0
     LUMA_COL_COMMON
     LUMA_COL_2
@@ -507,7 +507,7 @@ static rgb_t socrates_create_color(UINT8 color)
     LUMA_COL_COMMON
     LUMA_COL_F
   };
-  double chromaintensity[256] = {
+  static const double chromaintensity[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     CHROMA_COL_COMMON
     CHROMA_COL_2
@@ -543,7 +543,7 @@ static rgb_t socrates_create_color(UINT8 color)
      E: blue-purple (more blue than color 1, 120 is closest)
      F: grey-thru-white (0 assumed chroma)
   */
-  double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+  static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
   int chromaindex = color&0x0F;
   int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
   double finalY, finalI, finalQ, finalR, finalG, finalB;

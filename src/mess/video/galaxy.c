@@ -127,7 +127,7 @@ VIDEO_UPDATE( galaxy )
 	timer_adjust_periodic(state->gal_video_timer, attotime_zero, 0, attotime_never);
 	if (state->interrupts_enabled == FALSE)
 	{
-		rectangle black_area = {0, 384 - 1, 0, 208 - 1};
+		static const rectangle black_area = {0, 384 - 1, 0, 208 - 1};
 		bitmap_fill(screen->machine->generic.tmpbitmap, &black_area, 0);
 	}
 	state->interrupts_enabled = FALSE;

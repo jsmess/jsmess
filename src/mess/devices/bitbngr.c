@@ -115,9 +115,9 @@ static UINT32 native_input(running_device *bitbanger, void *buffer, UINT32 lengt
 const char *bitbanger_mode_string(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
-   static const char *modes[] = {"Printer", "Modem"};
+	static const char *const modes[] = {"Printer", "Modem"};
 
-   return(modes[bi->mode]);
+	return(modes[bi->mode]);
 }
 
 
@@ -163,10 +163,10 @@ bool bitbanger_dec_mode(running_device *device, bool test)
 const char *bitbanger_tune_string(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
-   static const char *tunes[] = {"-2.0%", "-1.75%", "-1.5%", "-1.25%", "-1.0%", "-0.75%", "-0.5", "-0.25%", "\xc2\xb1""0%",
+	static const char *const tunes[] = {"-2.0%", "-1.75%", "-1.5%", "-1.25%", "-1.0%", "-0.75%", "-0.5", "-0.25%", "\xc2\xb1""0%",
                                  "+0.25%",  "+0.5%", "+0.75%", "+1.0%", "+1.25%", "+1.5%", "+1.75%", "+2.0%"};
 
-   return(tunes[bi->tune]);
+	return(tunes[bi->tune]);
 }
 
 
@@ -176,10 +176,10 @@ const char *bitbanger_tune_string(running_device *device)
 static float bitbanger_tune_value(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
-   float tunes[] = {0.97f, 0.9825f, 0.985f, 0.9875f, 0.99f, 0.9925f, 0.995f, 0.9975f, 1.0f,
+	static const float tunes[] = {0.97f, 0.9825f, 0.985f, 0.9875f, 0.99f, 0.9925f, 0.995f, 0.9975f, 1.0f,
                   1.0025f, 1.005f, 1.0075f, 1.01f, 1.0125f, 1.015f, 1.0175f, 1.02f};
 
-   return(tunes[bi->tune]);
+	return(tunes[bi->tune]);
 }
 
 
@@ -190,10 +190,10 @@ static float bitbanger_tune_value(running_device *device)
 static UINT32 bitbanger_baud_value(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
-   float bauds[] = { 150.0f, 300.0f, 600.0f, 1200.0f, 2400.0f, 4800.0f, 9600.0f,
+	static const float bauds[] = { 150.0f, 300.0f, 600.0f, 1200.0f, 2400.0f, 4800.0f, 9600.0f,
             14400.0f, 28800.0f, 38400.0f, 57600.0f, 115200.0f};
-   float result = bitbanger_tune_value(device) * bauds[bi->baud];
-   return (UINT32)result;
+	float result = bitbanger_tune_value(device) * bauds[bi->baud];
+	return (UINT32)result;
 }
 
 
@@ -204,10 +204,10 @@ static UINT32 bitbanger_baud_value(running_device *device)
 const char *bitbanger_baud_string(running_device *device)
 {
 	bitbanger_token *bi = get_token(device);
-   static const char *bauds[] = { "150", "300", "600", "1200", "2400", "4800",
+	static const char *const bauds[] = { "150", "300", "600", "1200", "2400", "4800",
                      "9600", "14400", "28800", "38400", "57600", "115200"};
 
-   return(bauds[bi->baud]);
+	return(bauds[bi->baud]);
 }
 
 
@@ -304,7 +304,7 @@ static void bitbanger_bytes_to_bits_81N(running_device *img, UINT8 **buffer, UIN
    static UINT8 bit_buffer[1000];
    UINT32 byte_buffer_size, bit_buffer_size;
    int i, j;
-   const UINT8 bitmask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+   static const UINT8 bitmask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
    bit_buffer_size = 0;
    byte_buffer_size = 100;

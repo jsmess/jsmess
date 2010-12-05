@@ -278,7 +278,7 @@ VIDEO_UPDATE( lnw80 )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
-	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
+	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");

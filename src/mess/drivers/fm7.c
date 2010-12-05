@@ -1260,12 +1260,12 @@ static void key_press(running_machine* machine, UINT16 scancode)
 static void fm7_keyboard_poll_scan(running_machine* machine)
 {
 	fm7_state *state = machine->driver_data<fm7_state>();
-	const char* portnames[3] = { "key1","key2","key3" };
+	static const char *const portnames[3] = { "key1","key2","key3" };
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
 	UINT32 modifiers = input_port_read(machine,"key_modifiers");
-	UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
+	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
@@ -1306,7 +1306,7 @@ static void fm7_keyboard_poll_scan(running_machine* machine)
 static TIMER_CALLBACK( fm7_keyboard_poll )
 {
 	fm7_state *state = machine->driver_data<fm7_state>();
-	const char* portnames[3] = { "key1","key2","key3" };
+	static const char *const portnames[3] = { "key1","key2","key3" };
 	int x,y;
 	int bit = 0;
 	int mod = 0;

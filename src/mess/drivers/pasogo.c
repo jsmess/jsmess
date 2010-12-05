@@ -401,7 +401,7 @@ static VIDEO_UPDATE( pasogo )
 {
 	//static int width=-1,height=-1;
 	UINT8 *rom = memory_region(screen->machine, "maincpu")+0xb8000;
-	UINT16 c[]={ 3, 0 };
+	static const UINT16 c[]={ 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
 	int w=640;

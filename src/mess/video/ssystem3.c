@@ -206,8 +206,8 @@ VIDEO_UPDATE( ssystem3 )
 	ssystem3_draw_led(bitmap, state->lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, state->lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (input_port_read(screen->machine, "Configuration")&1) { // state->playfield(optional device)
-	  const int lcd_signs_on[]={
+	if (input_port_read(screen->machine, "Configuration")&1) { // playfield(optional device)
+	  static const int lcd_signs_on[]={
 	    0, // empty
 	    1, // bauer
 	    3, // springer

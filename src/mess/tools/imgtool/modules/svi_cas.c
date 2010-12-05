@@ -68,7 +68,7 @@ static int svi_cas_image_init(const imgtool_module *mod, imgtool_stream *f, imgt
 	CAS_IMAGE *image;
 	int len, i;
 	char *pbase;
-	char default_name[] = "svitape";
+	static const char default_name[] = "svitape";
 
 	image = (CAS_IMAGE*)malloc (sizeof (CAS_IMAGE) );
 	if (!image) return IMGTOOLERR_OUTOFMEMORY;

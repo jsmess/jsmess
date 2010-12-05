@@ -41,7 +41,7 @@ public:
 
 
 #if 0
-static const char* gp2x_regnames[0x200] =
+static const char *const gp2x_regnames[0x200] =
 {
 	"DPC Control",
 	"PAD Control",

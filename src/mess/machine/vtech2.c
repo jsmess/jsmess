@@ -64,7 +64,7 @@ static const write8_space_func mwa_bank_soft[4] =
 };
 
 /* read banked memory (plain ROM/RAM) */
-static const char* mra_bank_hard[4] =
+static const char *const mra_bank_hard[4] =
 {
     "bank1",  /* mapped in 0000-3fff */
     "bank2",  /* mapped in 4000-7fff */
@@ -73,7 +73,7 @@ static const char* mra_bank_hard[4] =
 };
 
 /* write banked memory (plain ROM/RAM) */
-static const char* mwa_bank_hard[4] =
+static const char *const mwa_bank_hard[4] =
 {
     "bank1",  /* mapped in 0000-3fff */
     "bank2",  /* mapped in 4000-7fff */

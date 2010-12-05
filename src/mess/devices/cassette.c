@@ -343,7 +343,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	double position, length;
 	cassette_state uistate;
 	running_device *dev;
-	UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
+	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
 
 	/* abort if we should not be showing the image */
 	if (!image.exists())

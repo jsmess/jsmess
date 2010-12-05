@@ -421,7 +421,7 @@ void tms9901_sg_set_int2(running_machine *machine, int state)
 /***************************************************************************
     Keyboard/tape control
 ****************************************************************************/
-static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 /*
     Called by the 9901 core whenever the state of INTREQ and IC0-3 changes

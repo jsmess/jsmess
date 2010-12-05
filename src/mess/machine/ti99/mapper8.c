@@ -559,7 +559,7 @@ static DEVICE_START( mapper8 )
 	mapper->logindex = 0;
 	mapper->physindex = 0;
 
-	const char *list[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
+	static const char *const list[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
 	while (!done)
 	{
 		void *dev = NULL;

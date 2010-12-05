@@ -1372,7 +1372,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 
 	for (i = 0; i < count; i++)
 	{
-		static const char *handler[] =
+		static const char *const handler[] =
 		{
 			"bank1",
 			"bank2",

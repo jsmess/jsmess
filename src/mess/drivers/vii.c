@@ -568,7 +568,7 @@ static void spg_do_dma(running_machine *machine, UINT32 len)
 
 static READ16_HANDLER( vii_io_r )
 {
-	static const char *gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
+	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
 
 	vii_state *state = space->machine->driver_data<vii_state>();
@@ -639,7 +639,7 @@ static READ16_HANDLER( vii_io_r )
 
 static WRITE16_HANDLER( vii_io_w )
 {
-	static const char *gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
+	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
 
 	vii_state *state = space->machine->driver_data<vii_state>();
