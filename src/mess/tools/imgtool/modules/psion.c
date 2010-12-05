@@ -408,7 +408,7 @@ static imgtoolerr_t datapack_create( imgtool_image *image, imgtool_stream *strea
 {
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
-	static const UINT8 pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
+	UINT8 pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
 	UINT16 checksum;
 
 	pack_head[0] |= (option_resolution_lookup_int(opts, 'R')) ? 0x00 : 0x02;

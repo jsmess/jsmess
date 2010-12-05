@@ -301,7 +301,7 @@ static int is_leap(int year)
 /* Convert amiga time to standard time */
 static time_t amiga_crack_time(amiga_date *date)
 {
-	static const int month_days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	int month_days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	int year = 1978, month = 1, year_days = 365; /* base date */
 	int day = date->days;
 	struct tm t;
@@ -317,12 +317,11 @@ static time_t amiga_crack_time(amiga_date *date)
     }
 
     /* then the month */
-    if (is_leap(year))
-		month_days[1] = 29;
-
     while(day >= month_days[month-1])
     {
         day -= month_days[month-1];
+        if (month == 2 && is_leap(year))
+           day -= 1;
         month++;
     }
 
