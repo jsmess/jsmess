@@ -23,6 +23,8 @@ Skeleton drivers:
 - Omnibyte OB68K1A
 - Commodore 386 SX-16
 - VTA-2000 Terminal
+- AT&T 3B1
+
 
 
 System Driver Changes:

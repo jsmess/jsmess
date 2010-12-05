@@ -478,6 +478,9 @@ const game_driver * const drivers[] =
 	DRIVER( falcon )    /* Atari Falcon030    */
 	DRIVER( falcon40 )  /* Atari Falcon040 (prototype)    */
 
+	/* AT&T */
+	DRIVER( 3b1 )		/* 3B1 "Unix PC" */
+
 	/* Commodore */
 	DRIVER( kim1 )	  /* Commodore (MOS) KIM-1 1975    */
 	DRIVER( sym1 )	  /* Synertek SYM-1    */

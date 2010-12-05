@@ -264,6 +264,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/at.a \
 	$(MESSOBJ)/atari.a \
+	$(MESSOBJ)/att.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
@@ -667,6 +668,9 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_AUDIO)/lynx.o		\
 	$(MESS_MACHINE)/lynx.o		\
 	$(MESS_DRIVERS)/portfoli.o	\
+
+$(MESSOBJ)/att.a:				\
+	$(MESS_DRIVERS)/unixpc.o	\
 
 $(MESSOBJ)/bally.a:				\
 	$(MAME_VIDEO)/astrocde.o	\
