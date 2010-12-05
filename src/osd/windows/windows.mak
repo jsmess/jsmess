@@ -235,7 +235,7 @@ endif
 LDFLAGS += -static-libgcc
 
 # add the windows libraries
-LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8 -lws2_32
+LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8

@@ -258,10 +258,6 @@ image_error_t legacy_image_device_base::load_image_by_path(UINT32 open_flags, co
             err = IMAGE_ERROR_ALREADYOPEN;
             break;
 
-        case FILERR_SOCKET_ERROR:
-            err = IMAGE_ERROR_SOCKETNOTFOUND;
-            break;
-        
         case FILERR_FAILURE:
         case FILERR_TOO_MANY_FILES:
         case FILERR_INVALID_DATA:
