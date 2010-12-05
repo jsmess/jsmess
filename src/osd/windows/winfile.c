@@ -42,6 +42,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <winsock.h>
 #include <winioctl.h>
 #include <tchar.h>
 #include <stdlib.h>
@@ -59,9 +60,17 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+enum _osd_file_kind
+{
+	regular_file,
+	socket_file
+};
+
 struct _osd_file
 {
+	_osd_file_kind		file_kind;
 	HANDLE		handle;
+	int		sockfd;
 	TCHAR		filename[1];
 };
 
@@ -76,12 +85,25 @@ static DWORD create_path_recursive(const TCHAR *path);
 
 
 //============================================================
+//  GLOBALS
+//============================================================
+
+static int socket_count = 0;
+
+
+//============================================================
 //  INLINE FUNCTIONS
 //============================================================
 
 INLINE int is_path_to_physical_drive(const char *path)
 {
 	return (_strnicmp(path, "\\\\.\\physicaldrive", 17) == 0);
+}
+
+
+INLINE int is_path_to_socket(const char *path)
+{
+	return (_strnicmp(path, "\\\\.\\socket", 10) == 0);
 }
 
 
@@ -120,6 +142,66 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	for (src = t_path; *src != 0; src++)
 		*dst++ = *src;//(*src == '/') ? '\\' : *src;
 	*dst++ = 0;
+
+	// attempt to open a socket connection
+	if (is_path_to_socket(path))
+	{
+		WSADATA wsaData;
+		char hostname[256];
+		struct hostent *localhost;
+		struct sockaddr_in sai;
+		int flag = 1;
+		int port;
+
+		(*file)->file_kind = socket_file;
+
+		if( socket_count == 0 )
+		{
+			if (WSAStartup(MAKEWORD(1,1), &wsaData) != 0)
+			{
+				filerr = FILERR_INVALID_ACCESS;
+				goto error;
+			}
+		}
+
+		socket_count++;
+
+		sscanf( path+strlen("\\\\.\\socket"), ":%255[^:]:%d", hostname, &port );
+
+		if (((*file)->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		{
+			filerr = FILERR_SOCKET_ERROR;
+			goto error;
+		}
+
+		if (setsockopt((*file)->sockfd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag)) == -1)
+		{
+			filerr = FILERR_SOCKET_ERROR;
+			goto error;
+		}
+
+		localhost = gethostbyname(hostname);
+
+		memset(&sai, 0, sizeof(sai));
+		sai.sin_family = AF_INET;
+		sai.sin_port = htons(port);
+		sai.sin_addr = *((struct in_addr *)localhost->h_addr);
+
+		if (connect((*file)->sockfd, (struct sockaddr *)&sai, sizeof(struct sockaddr)) == -1)
+		{
+			filerr = FILERR_SOCKET_ERROR;
+			goto error;
+		}
+
+		*filesize = 0;
+
+		filerr = FILERR_NONE;
+		goto error;
+	}
+	else
+	{
+		(*file)->file_kind = regular_file;
+	}
 
 	// select the file open modes
 	if (openflags & OPEN_FLAG_WRITE)
@@ -193,24 +275,60 @@ error:
 
 file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
-	LONG upper = offset >> 32;
-	DWORD result;
-
-	// attempt to set the file pointer
-	result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
-	if (result == INVALID_SET_FILE_POINTER)
+	if (file->file_kind == regular_file)
 	{
-		DWORD error = GetLastError();
-		if (error != NO_ERROR)
-			return win_error_to_file_error(error);
-	}
+		LONG upper = offset >> 32;
+		DWORD result;
 
-	// then perform the read
-	if (!ReadFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_file_error(GetLastError());
-	if (actual != NULL)
-		*actual = result;
-	return FILERR_NONE;
+		// attempt to set the file pointer
+		result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
+		if (result == INVALID_SET_FILE_POINTER)
+		{
+			DWORD error = GetLastError();
+			if (error != NO_ERROR)
+				return win_error_to_file_error(error);
+		}
+
+		// then perform the read
+		if (!ReadFile(file->handle, buffer, length, &result, NULL))
+			return win_error_to_file_error(GetLastError());
+		if (actual != NULL)
+			*actual = result;
+		return FILERR_NONE;
+	}
+	else if (file->file_kind == socket_file)
+	{
+		ssize_t result;
+		struct timeval timeout;
+		fd_set readfds;
+
+		FD_ZERO(&readfds);
+		FD_SET(file->sockfd, &readfds);
+		timeout.tv_sec = timeout.tv_usec = 0;
+
+		if (select(file->sockfd + 1, &readfds, NULL, NULL, &timeout) < 0)
+		{
+			return win_error_to_file_error(GetLastError());
+		}
+		else if (FD_ISSET(file->sockfd, &readfds))
+		{
+			result = recv(file->sockfd, (char *)buffer, length, 0);
+		}
+		else
+			return FILERR_FAILURE;
+
+		if (result < 0)
+			return win_error_to_file_error(GetLastError());
+
+		if (actual != NULL )
+			*actual = result;
+
+		return FILERR_NONE;
+	}
+	else
+	{
+		return FILERR_INVALID_ACCESS;
+	}
 }
 
 
@@ -220,24 +338,45 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 
 file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
-	LONG upper = offset >> 32;
-	DWORD result;
-
-	// attempt to set the file pointer
-	result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
-	if (result == INVALID_SET_FILE_POINTER)
+	if (file->file_kind == regular_file)
 	{
-		DWORD error = GetLastError();
-		if (error != NO_ERROR)
-			return win_error_to_file_error(error);
-	}
+		LONG upper = offset >> 32;
+		DWORD result;
 
-	// then perform the read
-	if (!WriteFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_file_error(GetLastError());
-	if (actual != NULL)
-		*actual = result;
-	return FILERR_NONE;
+		// attempt to set the file pointer
+		result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
+		if (result == INVALID_SET_FILE_POINTER)
+		{
+			DWORD error = GetLastError();
+			if (error != NO_ERROR)
+				return win_error_to_file_error(error);
+		}
+
+		// then perform the read
+		if (!WriteFile(file->handle, buffer, length, &result, NULL))
+			return win_error_to_file_error(GetLastError());
+		if (actual != NULL)
+			*actual = result;
+		return FILERR_NONE;
+	}
+	else if (file->file_kind == socket_file)
+	{
+		UINT32 result;
+
+		result = send(file->sockfd, (const char *)buffer, length, 0);
+
+		if (result < 0)
+			return win_error_to_file_error(GetLastError());
+
+		if (actual != NULL )
+			*actual = result;
+
+		return FILERR_NONE;
+	}
+	else
+	{
+		return FILERR_INVALID_ACCESS;
+	}
 }
 
 
@@ -248,7 +387,24 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 file_error osd_close(osd_file *file)
 {
 	// close the file handle and free the file structure
-	CloseHandle(file->handle);
+	if (file->file_kind == regular_file)
+	{
+		CloseHandle(file->handle);
+	}
+	else if (file->file_kind == socket_file)
+	{
+		closesocket(file->sockfd);
+		socket_count--;
+
+		if( socket_count == 0 )
+		{
+			WSACleanup();
+		}
+	}
+	else
+	{
+	}
+
 	free(file);
 	return FILERR_NONE;
 }

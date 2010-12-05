@@ -292,6 +292,7 @@ static const char *const messages[] =
 	"File not found",
 	"Invalid image",
 	"File already open",
+	"Socket not openable",
 	"Unspecified error"
 };
 

@@ -34,6 +34,7 @@ public:
 	double send_baud_rate;
 	double recv_baud_rate;
 	UINT8 key_scan;
+	UINT8 key_code;
 };
 
 
@@ -59,6 +60,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vt180_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 // 0 - XMIT flag H
@@ -78,6 +80,17 @@ static READ8_HANDLER(vt100_flags_r)
 	return retVal;
 }
 
+static UINT8 bit_sel(UINT8 data) {
+	if (!BIT(data,7)) return 0x70;
+	if (!BIT(data,6)) return 0x60;
+	if (!BIT(data,5)) return 0x50;
+	if (!BIT(data,4)) return 0x40;
+	if (!BIT(data,3)) return 0x30;
+	if (!BIT(data,2)) return 0x20;
+	if (!BIT(data,1)) return 0x10;
+	if (!BIT(data,0)) return 0x00;
+	return 0;
+}
 
 static TIMER_CALLBACK(keyboard_callback)
 {
@@ -90,13 +103,15 @@ static TIMER_CALLBACK(keyboard_callback)
 		"LINEC", "LINED", "LINEE", "LINEF"
 	};
 	UINT8 code;
-	if (state->key_scan == 1) {
+	if (state->key_scan) {
 		for(i = 0; i < 16; i++)
 		{
 			code =	input_port_read(machine, keynames[i]);
 			if (code!=0xff) {
 				state->keyboard_int = 1;
+				state->key_code = i | bit_sel(code);
 				cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+				break;
 			}
 		}
 	}
@@ -122,7 +137,8 @@ static WRITE8_HANDLER(vt100_keyboard_w)
 
 static READ8_HANDLER(vt100_keyboard_r)
 {
-	return 0x7f;
+	vt100_state *state = space->machine->driver_data<vt100_state>();
+	return state->key_code;
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
@@ -307,7 +323,7 @@ static IRQ_CALLBACK(vt100_irq_callback)
 
 static MACHINE_START(vt100)
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(800), NULL, 0, keyboard_callback);
 }
 
 static MACHINE_RESET(vt100)
@@ -391,8 +407,8 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*10, 30*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 30*10-1)
+	MDRV_SCREEN_SIZE(132*10, 30*10)
+	MDRV_SCREEN_VISIBLE_AREA(0, 132*10-1, 0, 30*10-1)
 	MDRV_GFXDECODE(vt100)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_green)
