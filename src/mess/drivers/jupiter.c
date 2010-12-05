@@ -28,8 +28,8 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/cartslot.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "formats/jupi_tap.h"
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, videoram)
 	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, charram) AM_REGION("maincpu", 0x2c00)
 	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE_MEMBER(jupiter_state, expram)			/* Expansion RAM */
+	AM_RANGE(0x4000, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE_MEMBER(jupiter_state, expram) /* Expansion RAM */
 ADDRESS_MAP_END
 
 /* port i/o functions */
@@ -189,9 +189,7 @@ static WRITE8_HANDLER( jupiter_io_w )
 static WRITE8_HANDLER( jupiter_expram_w )
 {
 	jupiter_state *state = space->machine->driver_data<jupiter_state>();
-	if (space->machine->phase() == MACHINE_PHASE_INIT)
-		state->expram[offset] = data;
-	else
+
 	if ( offset > 0x4000 )
 	{
 		if ( input_port_read(space->machine, "CFG") >= 1 )
@@ -326,12 +324,9 @@ static MACHINE_CONFIG_START( jupiter, jupiter_state )
 	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* Devices */
 	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
-
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("ace")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(jupiter_ace)
+	MDRV_SNAPSHOT_ADD("snapshot", jupiter, "ace", 1)
 MACHINE_CONFIG_END
 
 

@@ -32,19 +32,13 @@ public:
 	UINT8 *charram;
 	UINT8 *expram;
 	jupiter_tape_t tape;
-	UINT8 *data;
-	int data_type;
 };
 
 
 /*----------- defined in machine/jupiter.c -----------*/
 
-DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride );
-MACHINE_START( jupiter );
 
-DEVICE_IMAGE_LOAD( jupiter_ace );
-DEVICE_IMAGE_LOAD( jupiter_tap );
-DEVICE_IMAGE_UNLOAD( jupiter_tap );
+SNAPSHOT_LOAD(jupiter);
 
 
 /*----------- defined in video/jupiter.c -----------*/
