@@ -65,8 +65,8 @@ typedef struct _tn_ide_state
 
 	int		tms9995_mode;
 
-	UINT8	input_latch;
-	UINT8	output_latch;
+	UINT16	input_latch;
+	UINT16	output_latch;
 
 	UINT8	*ram;
 
@@ -190,7 +190,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = (addr & 1) ? (card->input_latch >> 8) : card->input_latch;
+				reply = ((addr & 1) ? (card->input_latch >> 8) : card->input_latch) & 0xff;
 				break;
 			case 3:		/* IDE registers set 2 (CS3Fx) */
 				if (card->tms9995_mode ? (!(addr & 1)) : (addr & 1))
@@ -201,7 +201,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = (addr & 1) ? (card->input_latch >> 8) : card->input_latch;
+				reply = ((addr & 1) ? (card->input_latch >> 8) : card->input_latch) & 0xff;
 				break;
 			}
 		}
