@@ -379,20 +379,6 @@ static const ins8250_interface avigo_com_interface =
 	NULL
 };
 
-/* this is needed because this driver uses handlers in memory that gets executed */
-DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
-{
-	avigo_state *state = machine->driver_data<avigo_state>();
-	void *opbase_ptr;
-
-	opbase_ptr = state->banked_opbase[address / 0x4000];
-	if (opbase_ptr != NULL)
-	{
-		direct.explicit_configure(0x0000, 0xffff, 0xffff, (UINT8*)opbase_ptr);
-		address = ~0;
-	}
-	return address;
-}
 
 static MACHINE_RESET( avigo )
 {
@@ -409,8 +395,8 @@ static MACHINE_RESET( avigo )
 	state->flashes[2] = machine->device<intelfsh8_device>("flash2");
 
 	/* initialize flash contents */
-	memcpy(memory_region(machine, "maincpu")+0x10000, state->flashes[0]->space()->get_read_ptr(0), 0x100000);
-	memcpy(memory_region(machine, "maincpu")+0x110000, state->flashes[1]->space()->get_read_ptr(0), 0x100000);
+	memcpy(state->flashes[0]->space()->get_read_ptr(0), memory_region(machine, "maincpu")+0x10000, 0x100000);
+	memcpy(state->flashes[1]->space()->get_read_ptr(0), memory_region(machine, "maincpu")+0x110000, 0x100000);
 
 	state->stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
 	state->stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
@@ -434,8 +420,6 @@ static MACHINE_RESET( avigo )
 
 	/* clear */
 	memset(messram_get_ptr(machine->device("messram")), 0, 128*1024);
-
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(avigo_opbase_handler, *machine));
 
 	addr = (unsigned char *)state->flashes[0]->space()->get_read_ptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
