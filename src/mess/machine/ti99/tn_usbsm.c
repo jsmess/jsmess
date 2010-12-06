@@ -52,9 +52,9 @@ typedef struct _tn_usbsm_state
 	int		cru_register;
 	int		tms9995_mode;
 
-	UINT8	input_latch;
+	UINT16	input_latch;
 
-	UINT8	output_latch;
+	UINT16	output_latch;
 	UINT16	*ram;
 
 	/* Callback lines to the main system. */
@@ -269,7 +269,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 		}
 
 		/* return latched input */
-		*value = (offset & 1) ? card->input_latch : (card->input_latch >> 8);
+		*value = ((offset & 1) ? (card->input_latch) : (card->input_latch >> 8)) & 0xff;
 	}
 }
 
