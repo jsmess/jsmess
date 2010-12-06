@@ -9536,8 +9536,37 @@ Among undumped protos & special release
 		<year>1994</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-01" /> <!-- also found with SHVC-BJ3M-10 pcb -->
+			<feature name="u3" value="64K SRAM" />
+			<feature name="u4" value="MAD-1" />
+			<feature name="u5" value="CIC" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
 			<dataarea name="rom" size="3145728">
-				<rom name="final fantasy vi (japan).sfc" size="3145728" crc="45ef5ac8" sha1="1c6a6dd90d3463f4532202199885a2c0e9a485f6" offset="000000" />
+				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
+				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
+			</dataarea>
+ 		</part>
+ 	</software>
+
+	<software name="ffant6a" cloneof="ffant3">
+		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
+		<description>Final Fantasy VI (Jpn, Alt)</description>
+		<year>1994</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-3J3M-01" />
+			<feature name="u4" value="64K SRAM" />
+			<feature name="u5" value="74LS139" />
+			<feature name="u6" value="MAD-1" />
+			<feature name="u7" value="CIC" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_serial" value="920214" />
+			<dataarea name="rom" size="3145728 ">		
+				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
+				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="100000" />
+				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
 			</dataarea>
 		</part>
 	</software>
