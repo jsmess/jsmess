@@ -70,6 +70,25 @@ INLINE const vt_video_interface *get_interface(running_device *device)
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+static void vt_video_recompute_parameters(running_device *device)
+{
+	vt_video_t *vt = get_safe_token(device);
+	int horiz_pix_total = 0;
+	int vert_pix_total = 0;
+	rectangle visarea;
+
+	horiz_pix_total = vt->columns * 10;
+	vert_pix_total  = 25 * 10;
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = horiz_pix_total - 1;
+	visarea.max_y = vert_pix_total - 1;
+
+	vt->screen->configure(horiz_pix_total, vert_pix_total, visarea,
+				vt->screen->frame_period().attoseconds);
+}
 READ8_DEVICE_HANDLER( vt_video_lba7_r )
 {
 	vt_video_t *vt = get_safe_token(device);
@@ -131,10 +150,14 @@ WRITE8_DEVICE_HANDLER( vt_video_dc011_w )
 {
 	vt_video_t *vt = get_safe_token(device);
 	if (BIT(data,5)==0) {
+		UINT8 col = vt->columns;
 		if (BIT(data,4)==0) {
 			vt->columns = 80;
 		} else {
 			vt->columns = 132;
+		}
+		if (col!=vt->columns) {
+			vt_video_recompute_parameters(device);
 		}
 		vt->interlaced = 1;
 	} else {
