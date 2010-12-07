@@ -22,8 +22,10 @@ public:
 /*----------- defined in machine/sapi1.c -----------*/
 
 extern DRIVER_INIT( sapi1 );
+extern DRIVER_INIT( sapizps3 );
 extern MACHINE_START( sapi1 );
 extern MACHINE_RESET( sapi1 );
+extern MACHINE_RESET( sapizps3 );
 
 extern READ8_HANDLER (sapi1_keyboard_r );
 extern WRITE8_HANDLER(sapi1_keyboard_w );
