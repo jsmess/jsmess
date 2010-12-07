@@ -498,6 +498,21 @@ ADDRESS_MAP_END
  Input Ports
 ******************************************************************************/
 
+static INPUT_CHANGED( fidelz80_trigger_reset )
+{
+	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
+
+	cpu_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static INPUT_CHANGED( abc_trigger_reset )
+{
+	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
+
+	cpu_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( fidelz80 )
 	PORT_START("LEVEL")		// cc10 only
 		PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
@@ -505,7 +520,7 @@ static INPUT_PORTS_START( fidelz80 )
 		PORT_CONFSETTING( 0x80, "3" )
 
 	PORT_START("LINE1")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED(fidelz80_trigger_reset, 0)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5)
@@ -581,7 +596,7 @@ static INPUT_PORTS_START( abc )
 
 	PORT_START("LINE8")
 		PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED(abc_trigger_reset, 0)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("BR") PORT_CODE(KEYCODE_T)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DL") PORT_CODE(KEYCODE_L)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clubs") PORT_CODE(KEYCODE_4_PAD)
