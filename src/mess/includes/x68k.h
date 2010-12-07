@@ -42,7 +42,7 @@ public:
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT16>	m_nvram;
+	required_shared_ptr<UINT32>	m_nvram;
 	struct
 	{
 		int sram_writeprotect;
