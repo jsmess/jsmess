@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/messram.h"
+#include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
 #include "unixpc.lh"
 
 
@@ -27,19 +29,29 @@ public:
 	unixpc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, "messram")
+		  m_ram(*this, "messram"),
+		  m_wd2797(*this, "wd2797"),
+		  m_floppy(*this, FLOPPY_0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<running_device> m_ram;
+	required_device<running_device> m_wd2797;
+	required_device<running_device> m_floppy;
 
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset();
 
+	DECLARE_READ16_MEMBER( line_printer_r );
 	DECLARE_WRITE16_MEMBER( misc_control_w );
+	DECLARE_WRITE16_MEMBER( disk_control_w );
 	DECLARE_WRITE16_MEMBER( romlmap_w );
 
+	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
+
+	UINT16 *m_mapram;
 	UINT16 *m_videoram;
 };
 
@@ -72,12 +84,53 @@ void unixpc_state::machine_reset()
     MISC
 ***************************************************************************/
 
+READ16_MEMBER( unixpc_state::line_printer_r )
+{
+	UINT16 data = 0;
+
+	data |= 1; // no dial tone detected
+	data |= 1 << 1; // no parity error
+	data |= 0 << 2; // hdc intrq
+	data |= wd17xx_intrq_r(m_wd2797) << 3;
+
+	logerror("line_printer_r: %04x\n", data);
+
+	return data;
+}
+
 WRITE16_MEMBER( unixpc_state::misc_control_w )
 {
+	logerror("misc_control_w: %04x\n", data);
+
 	output_set_value("led_0", !BIT(data,  8));
 	output_set_value("led_1", !BIT(data,  9));
 	output_set_value("led_2", !BIT(data, 10));
 	output_set_value("led_3", !BIT(data, 11));
+}
+
+
+/***************************************************************************
+    FLOPPY
+***************************************************************************/
+
+WRITE16_MEMBER( unixpc_state::disk_control_w )
+{
+	logerror("disk_control_w: %04x\n", data);
+
+	floppy_mon_w(m_floppy, !BIT(data, 5));
+
+	// bit 6 = floppy selected / not selected
+	wd17xx_set_drive(m_wd2797, 0);
+}
+
+WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )
+{
+	logerror("wd2797_intrq_w: %d\n", state);
+}
+
+WRITE_LINE_MEMBER( unixpc_state::wd2797_drq_w )
+{
+	logerror("wd2797_drq_w: %d\n", state);
 }
 
 
@@ -102,9 +155,13 @@ bool unixpc_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 
 static ADDRESS_MAP_START( unixpc_mem, ADDRESS_SPACE_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE(m_mapram)
 	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x470000, 0x470001) AM_READ(line_printer_r)
 	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
+	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8_LEGACY("wd2797", wd17xx_r, wd17xx_w, 0x00ff)
 	AM_RANGE(0xe43000, 0xe43001) AM_WRITE(romlmap_w)
 ADDRESS_MAP_END
 
@@ -120,6 +177,26 @@ INPUT_PORTS_END
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
+
+static const floppy_config unixpc_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSDD,
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
+static const wd17xx_interface unixpc_wd17xx_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(unixpc_state, wd2797_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(unixpc_state, wd2797_drq_w),
+	{ FLOPPY_0, NULL, NULL, NULL }
+};
 
 static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	// basic machine hardware
@@ -141,6 +218,10 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1M")
 	MDRV_RAM_EXTRA_OPTIONS("2M")
+
+	// floppy
+	MDRV_WD2797_ADD("wd2797", unixpc_wd17xx_intf)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_config)
 MACHINE_CONFIG_END
 
 
