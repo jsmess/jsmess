@@ -1452,7 +1452,6 @@ WRITE8_HANDLER( snes_w_bank6 )
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
 				int mask = (state->cart[0].sram - 1) | 0xff0000; /* Limit SRAM size to what's actually present */
-//              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
 				snes_ram[0x800000 + (offset & mask)] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */

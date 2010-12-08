@@ -27,6 +27,15 @@ public:
 	int coll_bit0, coll_bit1, coll_bit2, coll_bit3, coll_bit6;
 	int rougien_gfxbank1, rougien_gfxbank2;
 
+	/* sound-related */
+	UINT32   adpcm_pos;
+	UINT32   adpcm_end;
+	UINT8    adpcm_idle;
+	int      adpcm_data;
+	UINT8    adpcm_trigger;
+	UINT8    adpcm_rom_sel;
+	UINT8    adpcm_play_reg;
+
 	/* devices */
 	running_device *maincpu;
 	running_device *ay1;

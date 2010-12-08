@@ -21,9 +21,9 @@ Known A-board revisions:
 
 NAME                                                     Year  B-board #       B-board PALs      C-board #            CPS-B #          C-board PALs
 -------------------------------------------------------  ----  ---------  ---------------------  -----------  -----------------------  ------------
-Forgotten Worlds (World, B-Board 88621B-2)               1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (World)                                 1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88618B-2)                       88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
-Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                            88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
@@ -42,7 +42,7 @@ Dynasty Wars (USA, B-Board 89624B-?)                           89624B-?   TK24B1
 Tenchi wo Kurau (Japan)                                        88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
 
 Willow (USA)                                             1989  89624B-3   WL24B            LWIO  88622-C-4    CPS-B-03  DL-0411-10003  None
-Willow (Japan, English)                                        89624B-?   WL24B            LWIO  ?            CPS-B-03  DL-0411-10003
+Willow (Japan, English)                                        89624B-3   WL24B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 Willow (Japan, Japanese)                                       88622B-3   WL22B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 
 U.N. Squadron (USA)                                      1989  89624B-3   AR24B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
@@ -75,13 +75,14 @@ Magic Sword: Heroic Fantasy (Japan 900623)                     89625B-1   MS22B 
 
 Carrier Air Wing (World 901009)                          1990  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 Carrier Air Wing (World 901012)                                89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
-Carrier Air Wing (USA 901012)                                  89624B-?   CA24B            IOB1  ?            CPS-B-16  DL-0411-10011
+Carrier Air Wing (USA 901012)                                  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 U.S. Navy (Japan 901012)                                       89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 
 Nemo (World 901130)                                      1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                            89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
 Street Fighter II: The World Warrior (World 910214)      1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910228)            90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (World 910522)            90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
 Street Fighter II: The World Warrior (USA 910206)              90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (USA 910214)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -99,6 +100,7 @@ Three Wonders* (USA 910520)                                    89624B-3   RT24B 
 Wonder 3* (Japan 910520)                                       89625B-1   RT22B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
 
 The King of Dragons* (World 910711)                      1991  90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+The King of Dragons* (World 910805)                            90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (USA 910910)                              90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 89625B-1)          89625B-1   KD22B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 90629B-3)          90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -148,7 +150,7 @@ The Punisher* (World 930422)                             1993  91635B-2   PS63B 
 The Punisher* (USA 930422)                                     91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 The Punisher* (Japan 930422)                                   91634B-?   PS63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 
-Saturday Night Slam Masters* (World 930713)              1993  91635B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+Saturday Night Slam Masters* (World 930713)              1993  91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Saturday Night Slam Masters* (USA 930713)                      91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Muscle Bomber: The Body Explosion* (Japan 930713)              91634B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 
@@ -165,7 +167,8 @@ Pang! 3 (Euro 950511, not encrypted)                     1995  94916-10   CP1B1F
 Pang! 3 (Euro 950601)                                          94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)          94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
-Mega Man: The Power Battle (CPS1, Asia 951006)           1995  91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Mega Man: The Power Battle (CPS1, USA 951006)            1995  91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Mega Man: The Power Battle (CPS1, Asia 951006)                 91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Rockman: The Power Battle (CPS1, Japan 950922)                 91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 
@@ -1288,7 +1291,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"area88r",     CPS_B_21_DEF, mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
 	{"mercs",       CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"mercsua",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
+	{"mercsur1",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsj",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },	// wrong, this set uses O222B, still non dumped
 	{"msword",      CPS_B_13,     mapper_MS24B },
 	{"mswordr1",    CPS_B_13,     mapper_MS24B },
@@ -1304,6 +1307,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"cawingj",     CPS_B_16,     mapper_CA22B },	// equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },
 	{"sf2eb",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ua",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ub",       CPS_B_17,     mapper_STF29,  0x36 },
@@ -1325,6 +1329,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
 	{"3wondersh",   CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodja",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	// wrong, this set uses KD22B, still non dumped
@@ -1399,6 +1404,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"qadj",        CPS_B_21_DEF, mapper_QD63B,  0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
 	{"qtono2j",     CPS_B_21_DEF, mapper_qtono2j,0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
 	{"megaman",     CPS_B_21_DEF, mapper_RCM63B },
+	{"megamana",    CPS_B_21_DEF, mapper_RCM63B },
 	{"rockmanj",    CPS_B_21_DEF, mapper_RCM63B },
 	{"pnickj",      CPS_B_21_DEF, mapper_PKB10B },
 	{"pang3",       CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9KA still not dumped
@@ -1979,7 +1985,7 @@ static TILE_GET_INFO( get_tile0_info )
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
 
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
-         roms have been mixed to be reproduced (ffightua) -- it looks like each column
+         roms have been mixed to be reproduced (ffightub) -- it looks like each column
          should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 

@@ -1123,11 +1123,11 @@ static INPUT_PORTS_START( timesold )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN5")  /* player 1 12-way rotary control */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN5")  /* player 1 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
-	PORT_START("IN6")  /* player 2 12-way rotary control */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN6")  /* player 2 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
 /* Same as 'timesold' but different default settings for the "Language" Dip Switch */
@@ -1173,11 +1173,11 @@ static INPUT_PORTS_START( btlfield )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN5")  /* player 1 12-way rotary control */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN5")  /* player 1 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
-	PORT_START("IN6")  /* player 2 12-way rotary control */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN6")  /* player 2 12-way rotary control - converted in controls_r() */
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( btlfieldb )
@@ -1198,6 +1198,14 @@ static INPUT_PORTS_START( btlfieldb )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:1" )
+
+	/* Bootleg does not appear to have rotary gun direction movements */
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skysoldr )
@@ -3075,6 +3083,7 @@ static DRIVER_INIT( sstingry )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( kyros )
@@ -3101,6 +3110,7 @@ static DRIVER_INIT( paddlema )
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->microcontroller_id = 0;
 	state->coin_id = 0;				// Not needed !
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( timesold )
@@ -3109,6 +3119,7 @@ static DRIVER_INIT( timesold )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( timesold1 )
@@ -3117,6 +3128,7 @@ static DRIVER_INIT( timesold1 )
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( btlfield )
@@ -3125,6 +3137,7 @@ static DRIVER_INIT( btlfield )
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( btlfieldb )
@@ -3143,6 +3156,7 @@ static DRIVER_INIT( skysoldr )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( goldmedl )
@@ -3151,6 +3165,7 @@ static DRIVER_INIT( goldmedl )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //AT
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( goldmedla )
@@ -3160,6 +3175,7 @@ static DRIVER_INIT( goldmedla )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( skyadvnt )
@@ -3168,6 +3184,7 @@ static DRIVER_INIT( skyadvnt )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( skyadvntu )
@@ -3176,6 +3193,7 @@ static DRIVER_INIT( skyadvntu )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( gangwarsu )
@@ -3185,6 +3203,7 @@ static DRIVER_INIT( gangwarsu )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( gangwars )
@@ -3194,6 +3213,7 @@ static DRIVER_INIT( gangwars )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( sbasebal )
@@ -3223,6 +3243,7 @@ static DRIVER_INIT( sbasebal )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;	// Same as 'gangwars' ?
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( tnextspc )
@@ -3231,6 +3252,7 @@ static DRIVER_INIT( tnextspc )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x890a;
 	state->coin_id = 0;				// Not needed !
+	state->game_id = 0;
 }
 
 /******************************************************************************/

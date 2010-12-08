@@ -726,7 +726,7 @@ static const UINT8 atari_palette[256*3] =
 
 
 /* Initialise the palette */
-static PALETTE_INIT( atari )
+static PALETTE_INIT( mess_atari )
 {
 	int i;
 
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / 3)
-	MDRV_PALETTE_INIT(atari)
+	MDRV_PALETTE_INIT(mess_atari)
 
 	MDRV_VIDEO_START(atari)
 	MDRV_VIDEO_UPDATE(atari)

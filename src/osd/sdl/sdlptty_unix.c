@@ -14,7 +14,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <pty.h>
+#if defined(SDLMAME_FREEBSD) || defined(SDLMAME_DRAGONFLY)
+# include <termios.h>
+# include <libutil.h>
+#elif defined(SDLMAME_NETBSD)
+# include <util.h>
+#elif defined(SDLMAME_OPENBSD)
+# include <termios.h>
+# include <util.h>
+#elif defined(SDLMAME_LINUX)
+# include <pty.h>
+#endif
 
 #include "sdlfile.h"
 
@@ -62,7 +72,7 @@ file_error sdl_read_ptty(osd_file *file, void *buffer, UINT64 offset, UINT32 cou
 
 file_error sdl_write_ptty(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-	UINT32 result;  
+	UINT32 result;
 	result = write(file->handle, buffer, count);
 
 	if (result < 0)
