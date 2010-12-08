@@ -177,7 +177,7 @@ static MACHINE_START( mk1 )
 
 static void mk1_interrupt( running_device *device, UINT16 addr, int level )
 {
-	cpu_set_input_line_vector(device->machine->device("maincpu"), 0, addr );
+	cpu_set_input_line_vector(device->machine->device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
 
 	cputag_set_input_line(device->machine,"maincpu", F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }
