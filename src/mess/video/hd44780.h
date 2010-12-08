@@ -79,7 +79,7 @@ protected:
 private:
 	// internal helper
 	void set_busy_flag(UINT16 usec);
-
+	void update_ac(void);
 	// internal state
 	const hd44780_device_config &m_config;
 	static const device_timer_id BUSY_TIMER = 0;

@@ -114,7 +114,7 @@ void hd44780_device::device_start()
 	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
 	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
 
-	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(500), 0, ATTOTIME_IN_MSEC(500));
+	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(409), 0, ATTOTIME_IN_MSEC(409));
 
 	state_save_register_device_item( this, 0, ac);
 	state_save_register_device_item( this, 0, ac_mode);
@@ -173,24 +173,6 @@ void hd44780_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch(id)
 	{
 		case BUSY_TIMER:
-			if (data_bus_flag)
-			{
-				int new_ac = ac + direction;
-
-				ac = (new_ac < 0) ? 0 : ((new_ac > 0x7f) ? 0x7f : new_ac);
-
-				if (ac_mode == 0)
-				{
-					cursor_pos = ac;
-
-					// display is shifted only after a write
-					if (shift_on && data_bus_flag == 1)
-						disp_shift += direction;
-				}
-
-				data_bus_flag = 0;
-			}
-
 			busy_flag = 0;
 			break;
 
@@ -205,6 +187,7 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 	busy_flag = 1;
 
 	timer_adjust_oneshot( m_busy_timer, ATTOTIME_IN_USEC( usec ), 0 );
+
 }
 
 //**************************************************************************
@@ -364,20 +347,25 @@ UINT8 hd44780_device::control_read(offs_t offset)
 	return busy_flag<<7 || ac&0x7f;
 }
 
+void hd44780_device::update_ac(void) // data_bus_flag was left as global so old savestates will work
+{
+int new_ac = ac + direction;
+ac = (new_ac < 0) ? 0 : ((new_ac > 0x7f) ? 0x7f : new_ac);
+if (ac_mode == 0) {
+	cursor_pos = ac;
+	// display is shifted only after a write
+	if (shift_on && data_bus_flag == 1)	disp_shift += direction;
+}
+	data_bus_flag = 0;
+}
+
+
 void hd44780_device::data_write(offs_t offset, UINT8 data)
 {
-	static int lastac = 0;
-	if (lastac != ac_mode) {
-		lastac = ac_mode;
-	}
-
-	if (ac_mode == 0)
-		ddram[ac] = data;
-	else {
-		cgram[ac] = data;
-	}
+	if (ac_mode == 0) ddram[ac] = data;
+	else cgram[ac] = data;
 	data_bus_flag = 1;
-
+	update_ac();
 	set_busy_flag(41);
 }
 
@@ -392,6 +380,7 @@ UINT8 hd44780_device::data_read(offs_t offset)
 	}
 
 	data_bus_flag = 2;
+	update_ac();
 
 	set_busy_flag(41);
 
