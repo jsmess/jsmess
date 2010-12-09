@@ -21,6 +21,14 @@ INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 VIDEO_START( pcw )
 {
+	pcw_state *state = machine->driver_data<pcw_state>();
+	rectangle rect;
+	rect.min_x = rect.min_y = 0;
+	rect.max_x = PCW_PRINTER_WIDTH - 1;
+	rect.max_y = PCW_PRINTER_HEIGHT - 1;
+
+	state->prn_output = auto_bitmap_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT,BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(state->prn_output,&rect,1);
 }
 
 /* two colours */
@@ -56,125 +64,144 @@ VIDEO_UPDATE( pcw )
 	unsigned char *roller_ram_ptr;
 	int pen0,pen1;
 
-	pen0 = 0;
-	pen1 = 1;
-
-	/* invert? */
-	if (state->vdu_video_control_register & (1<<7))
+	if(screen == screen->machine->device("screen"))
 	{
-		/* yes */
-		pen1^=1;
-		pen0^=1;
-	}
+		pen0 = 0;
+		pen1 = 1;
 
-	/* video enable? */
-	if ((state->vdu_video_control_register & (1<<6))!=0)
-	{
-		rectangle rect;
+		/* invert? */
+	    if (state->vdu_video_control_register & (1<<7))
+	    {
+	        /* yes */
+	        pen1^=1;
+	        pen0^=1;
+	    }
 
-		/* render top border */
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = PCW_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, pen0);
-
-		/* render bottom border */
-		rect.min_x = 0;
-		rect.min_y = PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = rect.min_y + PCW_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, pen0);
-
-		/* yes */
-
-		/* offset to start in table */
-		roller_ram_offs = (state->roller_ram_offset<<1);
-
-		for (y=0; y<256; y++)
+	    /* video enable? */
+		if ((state->vdu_video_control_register & (1<<6))!=0)
 		{
-			int by;
-			unsigned short line_data;
-			unsigned char *line_ptr;
+			rectangle rect;
 
-			x = PCW_BORDER_WIDTH;
+			/* render top border */
+			rect.min_x = 0;
+			rect.min_y = 0;
+			rect.max_x = PCW_SCREEN_WIDTH;
+			rect.max_y = PCW_BORDER_HEIGHT;
+			bitmap_fill(bitmap, &rect, pen0);
 
-			roller_ram_ptr = messram_get_ptr(screen->machine->device("messram")) + state->roller_ram_addr + roller_ram_offs;
+			/* render bottom border */
+			rect.min_x = 0;
+			rect.min_y = PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT;
+			rect.max_x = PCW_SCREEN_WIDTH;
+			rect.max_y = rect.min_y + PCW_BORDER_HEIGHT;
+			bitmap_fill(bitmap, &rect, pen0);
 
-			/* get line address */
-			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
-			line_data = ((unsigned char *)roller_ram_ptr)[0] | (((unsigned char *)roller_ram_ptr)[1]<<8);
+			/* offset to start in table */
+			roller_ram_offs = (state->roller_ram_offset<<1);
 
-			/* calculate address of pixel data */
-			line_ptr = messram_get_ptr(screen->machine->device("messram")) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
-
-			for (by=0; by<90; by++)
+			for (y=0; y<256; y++)
 			{
-				unsigned char byte;
+				int by;
+				unsigned short line_data;
+				unsigned char *line_ptr;
 
-				byte = line_ptr[0];
+				x = PCW_BORDER_WIDTH;
 
-				for (b=0; b<8; b++)
+				roller_ram_ptr = messram_get_ptr(screen->machine->device("messram")) + state->roller_ram_addr + roller_ram_offs;
+
+				/* get line address */
+				/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
+				line_data = ((unsigned char *)roller_ram_ptr)[0] | (((unsigned char *)roller_ram_ptr)[1]<<8);
+
+				/* calculate address of pixel data */
+				line_ptr = messram_get_ptr(screen->machine->device("messram")) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
+
+				for (by=0; by<90; by++)
 				{
-					if (byte & 0x080)
-					{
-						pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen1);
-					}
-					else
-					{
-						pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen0);
+					unsigned char byte;
 
+					byte = line_ptr[0];
+
+					for (b=0; b<8; b++)
+					{
+						if (byte & 0x080)
+						{
+							pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen1);
+						}
+						else
+						{
+							pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen0);
+
+						}
+						byte = byte<<1;
 					}
-					byte = byte<<1;
+
+					x = x + 8;
+
+
+					line_ptr = line_ptr+8;
 				}
 
-				x = x + 8;
+				/* update offset, wrap within 512 byte range */
+				roller_ram_offs+=2;
+				roller_ram_offs&=511;
 
-
-				line_ptr = line_ptr+8;
 			}
 
-			/* update offset, wrap within 512 byte range */
-			roller_ram_offs+=2;
-			roller_ram_offs&=511;
+			/* render border */
+			/* 8 pixels either side of display */
+			for (y=0; y<256; y++)
+			{
+				pcw_plot_pixel(bitmap, 0, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 1, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 2, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 3, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 4, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 5, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 6, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, 7, y+PCW_BORDER_HEIGHT, pen0);
 
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+0, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+1, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+2, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+3, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+4, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+5, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+6, y+PCW_BORDER_HEIGHT, pen0);
+				pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+7, y+PCW_BORDER_HEIGHT, pen0);
+			}
 		}
-
-		/* render border */
-		/* 8 pixels either side of display */
-		for (y=0; y<256; y++)
+		else
 		{
-			pcw_plot_pixel(bitmap, 0, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 1, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 2, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 3, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 4, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 5, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 6, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, 7, y+PCW_BORDER_HEIGHT, pen0);
+			/* not video - render whole lot in pen 0 */
+			rectangle rect;
 
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+0, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+1, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+2, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+3, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+4, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+5, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+6, y+PCW_BORDER_HEIGHT, pen0);
-			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+7, y+PCW_BORDER_HEIGHT, pen0);
+			/* render top border */
+			rect.min_x = 0;
+			rect.min_y = 0;
+			rect.max_x = PCW_SCREEN_WIDTH;
+			rect.max_y = PCW_SCREEN_HEIGHT;
+
+			bitmap_fill(bitmap, &rect, pen0);
 		}
 	}
 	else
 	{
-		/* not video - render whole lot in pen 0 */
+		// printer output
 		rectangle rect;
-
-		/* render top border */
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = PCW_SCREEN_HEIGHT;
-
-		bitmap_fill(bitmap, &rect, pen0);
+		INT32 feed;
+		rect.min_x = rect.min_y = 0;
+		rect.max_x = PCW_PRINTER_WIDTH - 1;
+		rect.max_y = PCW_PRINTER_HEIGHT - 1;
+		feed = -(state->paper_feed / 2);
+		copyscrollbitmap(bitmap,state->prn_output,0,NULL,1,&feed,&rect);
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-3,state->printer_headpos) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos-1) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos-1) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos+1) = 0;
+		*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos+1) = 0;
 	}
 	return 0;
 }

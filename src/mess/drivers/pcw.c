@@ -105,19 +105,15 @@
 #include "sound/beep.h"
 #include "devices/messram.h"
 
+#include "pcw.lh"
+
 #define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
+static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
+
 static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt );
-
-// pointer to pcw ram
-// flag to indicate if boot-program is enabled/disabled
-// code for CPU int type generated when FDC int is triggered
-
-
-
-
-
 
 static void pcw_update_interrupt_counter(pcw_state *state)
 {
@@ -669,6 +665,23 @@ static WRITE8_HANDLER(pcw_fdc_w)
 }
 
 /* TODO: Implement the printer for PCW8256, PCW8512,PCW9256*/
+static void pcw_printer_fire_pins(running_machine* machine, UINT16 pins)
+{
+	pcw_state *state = machine->driver_data<pcw_state>();
+	int x,line;
+	INT32 feed = (state->paper_feed / 2);
+
+	for(x=feed+PCW_PRINTER_HEIGHT-16;x<feed+PCW_PRINTER_HEIGHT-7;x++)
+	{
+		line = x % PCW_PRINTER_HEIGHT;
+		if((pins & 0x01) == 0)
+			*BITMAP_ADDR16(state->prn_output,line,state->printer_headpos) = (UINT16)(pins & 0x01);
+		pins >>= 1;
+	}
+//	if(state->printer_headpos < PCW_PRINTER_WIDTH)
+//		state->printer_headpos++;
+}
+
 static WRITE8_HANDLER(pcw_printer_data_w)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
@@ -712,46 +725,141 @@ static  READ8_HANDLER(pcw_printer_status_r)
 }
 
 /* MCU handlers */
+/* I/O ports: (likely to be completely wrong...)
+ * (write)
+ * all are active low
+ * P1: pins 0-7
+ * P2 bit 0: pin 8
+ * P2 bit 1: serial shift/store clock
+ * P2 bit 2: serial shift store data
+ * P2 bit 3: serial shift/store strobe
+ * P2 bit 4: print head motor
+ * P2 bit 5: paper feed motor
+ * P2 bit 6: fire pins
+ * (read)
+ * P2 bit 7: bail bar status (0 if out)
+ * T0: Paper sensor (?)
+ * T1: Print head location (1 if not at left margin)
+ */
 static READ8_HANDLER(mcu_printer_p1_r)
 {
+	pcw_state *state = space->machine->driver_data<pcw_state>();
 //	logerror("PRN: MCU reading data from P1\n");
-	return 0x00;
+	return state->printer_pins & 0x00ff;
 }
 
 static WRITE8_HANDLER(mcu_printer_p1_w)
 {
-	logerror("PRN: MCU writing %02x to P1\n",data);
+	pcw_state *state = space->machine->driver_data<pcw_state>();
+	state->printer_pins = (state->printer_pins & 0x0100) | data;
+	//popmessage("PRN: Print head position = %i",state->printer_headpos);
+	logerror("PRN: MCU writing %02x to P1 [%03x]\n",data,state->printer_pins);
 }
 
 static READ8_HANDLER(mcu_printer_p2_r)
 {
 	UINT8 ret = 0x00;
+	pcw_state *state = space->machine->driver_data<pcw_state>();
 //	logerror("PRN: MCU reading data from P2\n");
-	ret |= 0x80;
+	ret |= 0x80;  // make sure bail bar is in
+	ret |= (state->printer_p2 & 0x70);
+	ret |= (state->printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
+	ret |= 0x0e;
 	return ret;
 }
 
 static WRITE8_HANDLER(mcu_printer_p2_w)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-//	logerror("PRN: MCU writing %02x to P2\n",data);
-	if((data & 0x20) == 0)
-		state->printer_headpos = 1;  // move head
-	if((data & 0x10) == 0)
-		state->printer_headpos = 0;
+	static UINT8 prev;
+
+	//logerror("PRN: MCU writing %02x to P2\n",data);
+	state->printer_p2 = data & 0x70;
+
+	if((data & 0x40) == 0 && (prev & 0x40) != 0)
+		pcw_printer_fire_pins(space->machine,state->printer_pins);
+
+	// handle shift/store
+	state->printer_serial = data & 0x04;  // data
+	if((data & 0x02) != 0)  // clock
+	{
+		state->printer_shift <<= 1;
+		if(state->printer_serial == 0)
+			state->printer_shift &= ~0x01;
+		else
+			state->printer_shift |= 0x01;
+	}
+	if((data & 0x08) != 0)  // strobe
+	{
+		state->printer_shift_output = state->printer_shift;
+		if((state->printer_p2 & 0x10) == 0)  // print head motor active
+		{
+			UINT8 stepper_state = (state->printer_shift_output >> 4) & 0x0f;
+			if(stepper_state == full_step_table[(state->head_motor_state + 1) & 0x03])
+			{
+				state->printer_headpos += 2;
+				state->head_motor_state++;
+			}
+			if(stepper_state == half_step_table[(state->head_motor_state + 1) & 0x03])
+			{
+				state->printer_headpos += 1;
+				state->head_motor_state++;
+			}
+			if(stepper_state == full_step_table[(state->head_motor_state - 1) & 0x03])
+			{
+				state->printer_headpos -= 2;
+				state->head_motor_state--;
+			}
+			if(stepper_state == half_step_table[(state->head_motor_state - 1) & 0x03])
+			{
+				state->printer_headpos -= 1;
+				state->head_motor_state--;
+			}
+			if(state->printer_headpos < 0)
+				state->printer_headpos = 0;
+			if(state->printer_headpos > PCW_PRINTER_WIDTH)
+				state->printer_headpos = PCW_PRINTER_WIDTH;
+			state->head_motor_state &= 0x03;
+		}
+		if((state->printer_p2 & 0x20) == 0)  // line feed motor active
+		{
+			UINT8 stepper_state = state->printer_shift_output & 0x0f;
+			if(stepper_state == full_step_table[(state->linefeed_motor_state + 1) & 0x03])
+			{
+				state->paper_feed++;
+				state->linefeed_motor_state++;
+			}
+			if(stepper_state == half_step_table[(state->linefeed_motor_state + 1) & 0x03])
+			{
+				state->paper_feed++;
+				state->linefeed_motor_state++;
+			}
+			state->linefeed_motor_state &= 0x03;
+		}
+	}
+	if(data & 0x01)
+		state->printer_pins |= 0x0100;
+	else
+		state->printer_pins &= ~0x0100;
+	prev = data;
+	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",data & 0x40 ? " " : "6",data & 0x20 ? " " : "5",data & 0x10 ? " " : "4",state->printer_shift_output,state->printer_headpos);
 }
 
-// Paper sensor?
+// Paper sensor
 static READ8_HANDLER(mcu_printer_t1_r)
 {
 	return 1;
 }
 
-// Print head location? (0 if at left margin, otherwise 1)
+// Print head location (0 if at left margin, otherwise 1)
 static READ8_HANDLER(mcu_printer_t0_r)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-	return state->printer_headpos;
+
+	if(state->printer_headpos == 0)
+		return 0;
+	else
+		return 1;
 }
 
 /*
@@ -967,6 +1075,8 @@ static MACHINE_RESET( pcw )
 	state->printer_command = 0xff;
 	state->printer_data = 0x00;
 	state->printer_headpos = 0x00; // bring printer head to left margin
+	state->printer_shift = 0;
+	state->printer_shift_output = 0;
 }
 
 static DRIVER_INIT(pcw)
@@ -1196,16 +1306,19 @@ static const floppy_config pcw_floppy_config =
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3400000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map)
 	MDRV_CPU_IO_MAP(pcw_io)
-	MDRV_QUANTUM_TIME(HZ(50))
+//	MDRV_QUANTUM_TIME(HZ(50))
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
 	MDRV_CPU_IO_MAP(pcw_printer_io)
+	MDRV_QUANTUM_PERFECT_CPU("printer_mcu")
 
 	MDRV_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MDRV_CPU_IO_MAP(pcw_keyboard_io)
+	MDRV_QUANTUM_PERFECT_CPU("keyboard_mcu")
 
 	MDRV_MACHINE_START(pcw)
 	MDRV_MACHINE_RESET(pcw)
@@ -1237,7 +1350,24 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pcw_512, pcw )
+static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
+	MDRV_SCREEN_ADD("printer",RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MDRV_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+
+	MDRV_DEFAULT_LAYOUT( layout_pcw )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
+	MDRV_SCREEN_ADD("printer",RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MDRV_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+
+	MDRV_DEFAULT_LAYOUT( layout_pcw )
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
@@ -1264,7 +1394,7 @@ MACHINE_CONFIG_END
 ROM_START(pcw8256)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x400,"printer_mcu",0)  // i8041
+	ROM_REGION(0x400,"printer_mcu",0)  // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
@@ -1273,7 +1403,7 @@ ROM_END
 ROM_START(pcw8512)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x400,"printer_mcu",0)  // i8041
+	ROM_REGION(0x400,"printer_mcu",0)  // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
@@ -1282,8 +1412,8 @@ ROM_END
 ROM_START(pcw9256)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041
-	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot-matrix (does this model have different MCU code?)
+	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
 ROM_END
@@ -1291,7 +1421,7 @@ ROM_END
 ROM_START(pcw9512)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel
 	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
@@ -1300,7 +1430,7 @@ ROM_END
 ROM_START(pcw10)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel
 	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
@@ -1310,8 +1440,8 @@ ROM_END
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
 /*     YEAR NAME        PARENT  COMPAT  MACHINE   INPUT INIT    COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,		0,		pcw,	  pcw,	pcw,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256,	0,		pcw_512,  pcw,	pcw,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
-COMP( 1987, pcw9256,   pcw8256,	0,		pcw,	  pcw,	pcw,		"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
+COMP( 1985, pcw8256,   0,		0,		pcw8256,  pcw,	pcw,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
+COMP( 1985, pcw8512,   pcw8256,	0,		pcw8512,  pcw,	pcw,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
+COMP( 1987, pcw9256,   pcw8256,	0,		pcw8256,  pcw,	pcw,		"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
 COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
 COMP( 1993, pcw10,	   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
