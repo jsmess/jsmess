@@ -386,6 +386,7 @@ DRVLIBS = \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
+	$(MESSOBJ)/tektroni.a \
 	$(MESSOBJ)/telenova.a \
 	$(MESSOBJ)/telercas.a \
 	$(MESSOBJ)/tem.a \
@@ -1495,6 +1496,10 @@ $(MESSOBJ)/teamconc.a:			\
 	$(MESS_VIDEO)/comquest.o	\
 	$(MESS_DRIVERS)/comquest.o	\
 
+$(MESSOBJ)/tektroni.a:			\
+	$(MESS_DRIVERS)/tek405x.o	\
+	$(MESS_DRIVERS)/tek410x.o	\
+
 $(MESSOBJ)/telenova.a:			\
 	$(MESS_DRIVERS)/compis.o	\
 	$(MESS_MACHINE)/compis.o	\
@@ -1739,7 +1744,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/systec.o	\
-	$(MESS_DRIVERS)/tek410x.o	\
 	$(MESS_DRIVERS)/tim011.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/tvc.o		\

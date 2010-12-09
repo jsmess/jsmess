@@ -18,6 +18,7 @@ New System Drivers Supported:
 - Advanced Bridge Challenger (not working) [Kevtris, Lord Nightmare, Sandro Ronco]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Ausbaufaehiger Mikrocomputer mit dem U 880 [Curt Coder]
@@ -37,6 +38,8 @@ Skeleton drivers:
 - Mephisto Berlin Pro (London) 68020 24 Mhz
 - VTA-2000 Terminal
 - AT&T 3B1
+- Tektronix 4051 [Curt Coder]
+- Tektronix 4052A [Curt Coder]
 
 
 System Driver Changes:
