@@ -1741,6 +1741,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/sage2.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/selz80.o	\
+	$(MESS_DRIVERS)/sm1800.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/systec.o	\

@@ -1817,5 +1817,6 @@ const game_driver * const drivers[] =
 	DRIVER( ob68k1a )
 	DRIVER( vta2000 )
 	DRIVER( dct11em )
+	DRIVER( sm1800 )
 	
 #endif /* DRIVER_RECURSIVE */

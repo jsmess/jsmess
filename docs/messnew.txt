@@ -40,7 +40,7 @@ Skeleton drivers:
 - AT&T 3B1
 - Tektronix 4051 [Curt Coder]
 - Tektronix 4052A [Curt Coder]
-
+- SM1800 Terminal
 
 System Driver Changes:
 ----------------------
