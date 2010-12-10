@@ -1430,8 +1430,8 @@ ROM_END
 ROM_START(pcw10)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel
-	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot matrix
+	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
 ROM_END
@@ -1444,4 +1444,4 @@ COMP( 1985, pcw8256,   0,		0,		pcw8256,  pcw,	pcw,	"Amstrad plc", "PCW8256",		GA
 COMP( 1985, pcw8512,   pcw8256,	0,		pcw8512,  pcw,	pcw,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
 COMP( 1987, pcw9256,   pcw8256,	0,		pcw8256,  pcw,	pcw,		"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
 COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
-COMP( 1993, pcw10,	   pcw8256,	0,		pcw9512,  pcw,	pcw,		"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
+COMP( 1993, pcw10,	   pcw8256,	0,		pcw8512,  pcw,	pcw,		"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
