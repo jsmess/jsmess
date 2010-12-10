@@ -13,12 +13,10 @@
     TODO:
 
 	- bank switch
-	- ram expansion
 	- keyboard
-	- ieee488
 	- video (persistent vector display)
 	- joystick
-	- tape
+	- magnetic tape storage (3M 300)
 	- communications backpack
 	- 4051E01 ROM expander
 
@@ -32,8 +30,16 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ieee488.h"
+#include "machine/rs232.h"
+#include "sound/speaker.h"
 #include "video/vector.h"
 #include "includes/tek405x.h"
+
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 enum {
 	LBS_RBC = 0,	// ROM Bank Control
@@ -46,13 +52,129 @@ enum {
 	LBS_BSX_R		// Bank Switch Expander (Select Right ROM Expander Unit)
 };
 
-/* Read/Write Handlers */
 
-WRITE8_MEMBER( tek4051_state::lbs_w )
+
+//**************************************************************************
+//	INTERRUPTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  update_irq -
+//-------------------------------------------------
+
+void tek4051_state::update_irq()
+{
+	int state = m_kb_pia_irqa | m_kb_pia_irqb | m_x_pia_irqa | m_x_pia_irqb | m_gpib_pia_irqa | m_gpib_pia_irqb | m_com_pia_irqa | m_com_pia_irqb | m_acia_irq;
+
+	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state);
+}
+
+
+//-------------------------------------------------
+//  update_nmi - 
+//-------------------------------------------------
+
+void tek4051_state::update_nmi()
+{
+	int state = m_y_pia_irqa | m_y_pia_irqb | m_tape_pia_irqa | m_tape_pia_irqb;
+
+	cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+}
+
+
+
+//**************************************************************************
+//	KEYBOARD
+//**************************************************************************
+
+//-------------------------------------------------
+//  scan_keyboard - scan keyboard
+//-------------------------------------------------
+
+void tek4051_state::scan_keyboard()
 {
 }
 
-/* Memory Maps */
+
+//-------------------------------------------------
+//  TIMER_DEVICE_CALLBACK( keyboard_tick )
+//-------------------------------------------------
+
+static TIMER_DEVICE_CALLBACK( keyboard_tick )
+{
+	tek4051_state *state = timer.machine->driver_data<tek4051_state>();
+
+	state->scan_keyboard();
+}
+
+
+
+//**************************************************************************
+//	MEMORY BANKING
+//**************************************************************************
+
+//-------------------------------------------------
+//  bankswitch - 
+//-------------------------------------------------
+
+void tek4051_state::bankswitch(UINT8 data)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	//int d = data & 0x07;
+	int lbs = (data >> 3) & 0x07;
+
+	switch (lbs)
+	{
+	case LBS_RBC:
+		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, memory_region(machine, MC6800_TAG) + 0x800);
+		break;
+
+	case LBS_BSOFL:
+		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, memory_region(machine, "020_0147_00"));
+		break;
+
+	case LBS_BSCOM:
+		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, memory_region(machine, "672_0799_08"));
+		break;
+
+	default:
+		memory_unmap_readwrite(program, 0x8800, 0xa7ff, 0, 0);
+	}
+}
+
+
+WRITE8_MEMBER( tek4051_state::lbs_w )
+{
+	/*
+
+		bit		description
+		
+		0		ROM Expander Slot Address
+		1		ROM Expander Slot Address
+		2		ROM Expander Slot Address
+		3		Bank Switch
+		4		Bank Switch
+		5		Bank Switch
+		6		
+		7		
+
+	*/
+
+	logerror("LBS %02x\n", data);
+
+	bankswitch(data);
+}
+
+
+
+//**************************************************************************
+//	ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( tek4051_mem )
+//-------------------------------------------------
 
 static ADDRESS_MAP_START( tek4051_mem, ADDRESS_SPACE_PROGRAM, 8, tek4051_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -70,17 +192,27 @@ static ADDRESS_MAP_START( tek4051_mem, ADDRESS_SPACE_PROGRAM, 8, tek4051_state )
 //	AM_RANGE(0x87c8, 0x87cb) XPC2
 //	AM_RANGE(0x87cc, 0x87cf) XPC3
 //	AM_RANGE(0x87d0, 0x87d3) XPC4
-//	AM_RANGE(0x8800, 0xa7ff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8800, 0xa7ff) AM_ROM AM_REGION(MC6800_TAG, 0x800)
 	AM_RANGE(0xa800, 0xffff) AM_ROM AM_REGION(MC6800_TAG, 0x2800)
 ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( tek4052_mem )
+//-------------------------------------------------
 
 static ADDRESS_MAP_START( tek4052_mem, ADDRESS_SPACE_PROGRAM, 8, tek4052_state )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tek4052_io, ADDRESS_SPACE_IO, 8, tek4052_state )
-ADDRESS_MAP_END
 
-/* Input Ports */
+
+//**************************************************************************
+//	INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( tek4051 )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( tek4051 )
 	PORT_START("Y0")
@@ -242,127 +374,778 @@ static INPUT_PORTS_START( tek4051 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TTY LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 INPUT_PORTS_END
 
-/* Video */
+
+
+//**************************************************************************
+//	VIDEO
+//**************************************************************************
+
+//-------------------------------------------------
+//  VIDEO_START( tek4051 )
+//-------------------------------------------------
 
 void tek4051_state::video_start()
 {
 }
 
+
+//-------------------------------------------------
+//  VIDEO_START( tek4052 )
+//-------------------------------------------------
+
 void tek4052_state::video_start()
 {
 }
 
-/* Devices */
+
+
+//**************************************************************************
+//	DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  pia6821_interface x_pia_intf
+//-------------------------------------------------
+
+READ8_MEMBER( tek4051_state::x_pia_pa_r )
+{
+	/*
+
+		bit		description
+		
+		PA0		
+		PA1		
+		PA2		DRBUSY-0
+		PA3		VPULSE-1
+		PA4		
+		PA5		
+		PA6		
+		PA7		
+
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( tek4051_state::x_pia_pa_w )
+{
+	/*
+
+		bit		description
+		
+		PA0		X D/A
+		PA1		X D/A
+		PA2		
+		PA3		
+		PA4		ERASE-0
+		PA5		COPY-0
+		PA6		VECTOR-0
+		PA7		VEN-1
+
+	*/
+}
+
+WRITE8_MEMBER( tek4051_state::x_pia_pb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		X D/A
+		PB1		X D/A
+		PB2		X D/A
+		PB3		X D/A
+		PB4		X D/A
+		PB5		X D/A
+		PB6		X D/A
+		PB7		X D/A
+
+	*/
+}
+
+WRITE_LINE_MEMBER( tek4051_state::adot_w )
+{
+}
+
+READ_LINE_MEMBER( tek4051_state::viewcause_r )
+{
+	return 0;
+}
+
+WRITE_LINE_MEMBER( tek4051_state::bufclk_w )
+{
+}
+
+WRITE_LINE_MEMBER( tek4051_state::x_pia_irqa_w )
+{
+	m_x_pia_irqa = state;
+	update_irq();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::x_pia_irqb_w )
+{
+	m_x_pia_irqb = state;
+	update_irq();
+}
 
 static const pia6821_interface x_pia_intf =
 {
+	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, viewcause_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pa_w),
+	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, adot_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, bufclk_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, x_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, x_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  pia6821_interface y_pia_intf
+//-------------------------------------------------
+
+READ8_MEMBER( tek4051_state::sa_r )
+{
+	/*
+
+		bit		description
+		
+		PA0		SA0
+		PA1		SA1
+		PA2		SA2
+		PA3		SA3
+		PA4		SA4
+		PA5		SA5
+		PA6		SA6
+		PA7		SA7
+
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( tek4051_state::y_pia_pa_w )
+{
+	/*
+
+		bit		description
+		
+		PA0		Y D/A
+		PA1		Y D/A
+		PA2		Y CHAR D/A
+		PA3		Y CHAR D/A
+		PA4		Y CHAR D/A
+		PA5		X CHAR D/A
+		PA6		X CHAR D/A
+		PA7		X CHAR D/A
+
+	*/
+}
+
+WRITE8_MEMBER( tek4051_state::sb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		SB0
+		PB1		SB1
+		PB2		SB2
+		PB3		SB3
+		PB4		SB4
+		PB5		SB5
+		PB6		SB6
+		PB7		SB7
+
+	*/
+}
+
+READ_LINE_MEMBER( tek4051_state::rdbyte_r )
+{
+	return 0;
+}
+
+READ_LINE_MEMBER( tek4051_state::mdata_r )
+{
+	return 0;
+}
+
+READ_LINE_MEMBER( tek4051_state::fmark_r )
+{
+	return 0;
+}
+
+WRITE_LINE_MEMBER( tek4051_state::sot_w )
+{
+}
+
+WRITE_LINE_MEMBER( tek4051_state::y_pia_irqa_w )
+{
+	m_y_pia_irqa = state;
+	update_nmi();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::y_pia_irqb_w )
+{
+	m_y_pia_irqb = state;
+	update_nmi();
+}
 
 static const pia6821_interface y_pia_intf =
 {
+	DEVCB_DRIVER_MEMBER(tek4051_state, sa_r),
 	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, rdbyte_r),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, mdata_r),
 	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, fmark_r),
+	DEVCB_DRIVER_MEMBER(tek4051_state, y_pia_pa_w),
+	DEVCB_DRIVER_MEMBER(tek4051_state, sb_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, sot_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, y_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, y_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  pia6821_interface kb_pia_intf
+//-------------------------------------------------
+
+READ8_MEMBER( tek4051_state::kb_pia_pa_r )
+{
+	/*
+
+		bit		description
+		
+		PA0		KC0-1
+		PA1		KC1-1
+		PA2		KC2-1
+		PA3		KC3-1
+		PA4		KC4-1
+		PA5		KC5-1
+		PA6		KC6-1
+		PA7		TTY-0
+
+	*/
+
+	UINT8 data = 0;
+	UINT8 special = input_port_read(machine, "SPECIAL");
+
+	// keyboard column
+	data = m_kc;
+
+	// TTY lock
+	data |= BIT(special, 3) << 7;
+
+	return data;
+}
+
+READ8_MEMBER( tek4051_state::kb_pia_pb_r )
+{
+	/*
+
+		bit		description
+		
+		PB0		SHIFT-0
+		PB1		CTRL-0
+		PB2		
+		PB3		LOAD-0
+		PB4		
+		PB5		
+		PB6		
+		PB7		
+
+	*/
+
+	UINT8 data = 0;
+	UINT8 special = input_port_read(machine, "SPECIAL");
+
+	// shift
+	data |= (BIT(special, 0) & BIT(special, 1));
+
+	// ctrl
+	data |= BIT(special, 2) << 1;
+
+	return data;
+}
+
+WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		
+		PB1		
+		PB2		
+		PB3		
+		PB4		EOI-1
+		PB5		BREAK-1
+		PB6		I/O-1
+		PB7		BUSY-1/REN-0/SPEAKER
+
+	*/
+
+	// lamps
+	output_set_led_value(1, !BIT(data, 5));
+	output_set_led_value(2, !BIT(data, 6));
+	output_set_led_value(3, !BIT(data, 7));
+
+	// end or identify	
+	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 4));
+
+	// speaker
+	speaker_level_w(m_speaker, !BIT(data, 7));
+
+	// remote enable
+	ieee488_ren_w(m_ieee, m_gpib_pia, !BIT(data, 7));
+}
+
+READ_LINE_MEMBER( tek4051_state::key_r )
+{
+	return m_key;
+}
+
+WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
+{
+}
+
+WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqa_w )
+{
+	m_kb_pia_irqa = state;
+	update_irq();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqb_w )
+{
+	m_kb_pia_irqb = state;
+	update_irq();
+}
 
 static const pia6821_interface kb_pia_intf =
 {
+	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pa_r),
+	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pb_r),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, key_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_halt_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  pia6821_interface tape_pia_intf
+//-------------------------------------------------
+
+READ8_MEMBER( tek4051_state::tape_pia_pa_r )
+{
+	/*
+
+		bit		description
+		
+		PA0		DELAY OUT-1
+		PA1		
+		PA2		TUTS-1
+		PA3		SAFE-1
+		PA4		SAFE-1
+		PA5		JOYSTICK
+		PA6		FILFND-1
+		PA7		JOYSTICK
+
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( tek4051_state::tape_pia_pa_w )
+{
+	/*
+
+		bit		description
+		
+		PA0		
+		PA1		LDCLK-1
+		PA2		
+		PA3		
+		PA4		
+		PA5		XERR-1
+		PA6		
+		PA7		YERR-1
+
+	*/
+}
+
+WRITE8_MEMBER( tek4051_state::tape_pia_pb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		WR-0
+		PB1		FAST-1
+		PB2		REV-1
+		PB3		DRTAPE-0
+		PB4		GICG-1
+		PB5		FICG-1
+		PB6		WENABLE-1
+		PB7		FSENABLE-0
+
+	*/
+}
+
+READ_LINE_MEMBER( tek4051_state::rmark_r )
+{
+	return 0;
+}
+
+READ_LINE_MEMBER( tek4051_state::lohole_r )
+{
+	return 0;
+}
+
+READ_LINE_MEMBER( tek4051_state::filfnd_r )
+{
+	return 0;
+}
+
+READ_LINE_MEMBER( tek4051_state::uphole_r )
+{
+	return 0;
+}
+
+WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqa_w )
+{
+	m_tape_pia_irqa = state;
+	update_nmi();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
+{
+	m_tape_pia_irqb = state;
+	update_nmi();
+}
 
 static const pia6821_interface tape_pia_intf =
 {
+	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pa_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, rmark_r),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, lohole_r),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, filfnd_r),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, uphole_r),
+	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pa_w),
+	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, tape_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, tape_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  pia6821_interface gpib_pia_intf
+//-------------------------------------------------
+
+WRITE8_MEMBER( tek4051_state::dio_w )
+{
+	/*
+
+		bit		description
+		
+		PA0		DIO1-1
+		PA1		DIO2-1
+		PA2		DIO3-1
+		PA3		DIO4-1
+		PA4		DIO5-1
+		PA5		DIO6-1
+		PA6		DIO7-1
+		PA7		DIO8-1
+
+	*/
+
+	if (m_talk)
+	{
+		ieee488_dio_w(m_ieee, m_gpib_pia, data);
+	}
+}
+
+READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
+{
+	/*
+
+		bit		description
+		
+		PB0		
+		PB1		
+		PB2		
+		PB3		
+		PB4		NRFD
+		PB5		SRQ-1
+		PB6		DAV-1
+		PB7		NDAC
+
+	*/
+
+	UINT8 data = 0;
+
+	// service request
+	data |= ieee488_srq_r(m_ieee) << 5;
+
+	// data valid
+	data |= ieee488_dav_r(m_ieee) << 6;
+
+	if (!m_talk)
+	{
+		// not ready for data
+		data |= ieee488_nrfd_r(m_ieee) << 4;
+
+		// not data acknowledged
+		data |= ieee488_ndac_r(m_ieee) << 7;
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		EOI-1
+		PB1		IFC-1
+		PB2		
+		PB3		ATN-0
+		PB4		NRFD
+		PB5		
+		PB6		
+		PB7		NDAC
+
+	*/
+
+	// end or identify
+	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 0));
+
+	// interface clear
+	ieee488_ifc_w(m_ieee, m_gpib_pia, !BIT(data, 1));
+
+	// attention
+	ieee488_atn_w(m_ieee, m_gpib_pia, BIT(data, 3));
+
+	if (m_talk)
+	{
+		// not ready for data
+		ieee488_nrfd_w(m_ieee, m_gpib_pia, !BIT(data, 4));
+
+		// not data acknowledged
+		ieee488_ndac_w(m_ieee, m_gpib_pia, !BIT(data, 7));
+	}
+}
+
+WRITE_LINE_MEMBER( tek4051_state::talk_w )
+{
+	m_talk = state;
+
+	if (!m_talk)
+	{
+		ieee488_dio_w(m_ieee, m_gpib_pia, 0xff);
+		ieee488_nrfd_w(m_ieee, m_gpib_pia, 1);
+		ieee488_ndac_w(m_ieee, m_gpib_pia, 1);
+	}
+}
+
+WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqa_w )
+{
+	m_gpib_pia_irqa = state;
+	update_irq();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
+{
+	m_gpib_pia_irqb = state;
+	update_irq();
+}
 
 static const pia6821_interface gpib_pia_intf =
 {
+	DEVCB_DEVICE_HANDLER(IEEE488_TAG, ieee488_dio_r),
+	DEVCB_DRIVER_MEMBER(tek4051_state, gpib_pia_pb_r),
+	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_eoi_r),
+	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_srq_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(tek4051_state, dio_w),
+	DEVCB_DRIVER_MEMBER(tek4051_state, gpib_pia_pb_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, talk_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, gpib_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, gpib_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  pia6821_interface com_pia_intf
+//-------------------------------------------------
+
+WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
+{
+	/*
+
+		bit		description
+		
+		PA0		
+		PA1		
+		PA2		
+		PA3		Bank Switch Register
+		PA4		Bank Switch Register
+		PA5		Bank Switch Register
+		PA6		
+		PA7		
+
+	*/
+
+	bankswitch(data);
+}
+
+READ8_MEMBER( tek4051_state::com_pia_pb_r )
+{
+	/*
+
+		bit		description
+		
+		PB0		SRX
+		PB1		DTR
+		PB2		RTS
+		PB3		
+		PB4		
+		PB5		
+		PB6		
+		PB7		
+
+	*/
+
+	UINT8 data = 0;
+
+	// data terminal ready
+	//data |= rs232_dtr_r(m_rs232) << 1;
+
+	// request to send
+	//data |= rs232_rts_r(m_rs232) << 2;
+
+	return data;
+}
+
+WRITE8_MEMBER( tek4051_state::com_pia_pb_w )
+{
+	/*
+
+		bit		description
+		
+		PB0		
+		PB1		
+		PB2		
+		PB3		CTS
+		PB4		STXA-C
+		PB5		Baud Rate Select
+		PB6		Baud Rate Select
+		PB7		Baud Rate Select
+
+	*/
+	
+	// clear to send
+	//rs232_cts_w(m_rs232, BIT(data, 3));
+
+	// baud rate select
+	int osc = BIT(data, 7) ? 28160 : 38400;
+	int div = 1;
+
+	switch ((data >> 5) & 0x03)
+	{
+	case 2:	div = 4; break;
+	case 3:	div = 2; break;
+	}
+
+	int clock = osc / div;
+
+	m_acia->set_tx_clock(clock);
+	m_acia->set_rx_clock(clock);
+}
+
+WRITE_LINE_MEMBER( tek4051_state::com_pia_irqa_w )
+{
+	m_com_pia_irqa = state;
+	update_irq();
+}
+
+WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
+{
+	m_com_pia_irqb = state;
+	update_irq();
+}
 
 static const pia6821_interface com_pia_intf =
 {
 	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_r),
+	DEVCB_NULL, // SRX (RS-232 pin 12)
+	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_dtr_r),
+	DEVCB_NULL,
+	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_rts_r),
+	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pa_w),
+	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, com_pia_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, com_pia_irqb_w)
 };
+
+
+//-------------------------------------------------
+//  ACIA6850_INTERFACE( acia_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( tek4051_state::acia_irq_w )
+{
+	m_acia_irq = state;
+	update_irq();
+}
 
 static ACIA6850_INTERFACE( acia_intf )
 {
 	0,
 	0,
+	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_td_r),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_w),
+	DEVCB_LINE_GND,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE_GND,
+	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, acia_irq_w)
 };
+
+
+//-------------------------------------------------
+//  IEEE488_DAISY( ieee488_daisy )
+//-------------------------------------------------
 
 static IEEE488_DAISY( ieee488_daisy )
 {
@@ -370,25 +1153,66 @@ static IEEE488_DAISY( ieee488_daisy )
 	{ NULL}
 };
 
-/* Machine Initialization */
+
+
+//**************************************************************************
+//	MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( tek4051 )
+//-------------------------------------------------
 
 void tek4051_state::machine_start()
 {
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	// configure RAM
+	switch (messram_get_size(m_ram))
+	{
+	case 8*1024:
+		memory_unmap_readwrite(program, 0x2000, 0x7fff, 0, 0);
+		break;
+
+	case 16*1024:
+		memory_unmap_readwrite(program, 0x4000, 0x7fff, 0, 0);
+		break;
+
+	case 24*1024:
+		memory_unmap_readwrite(program, 0x6000, 0x7fff, 0, 0);
+		break;
+	}
+
+	// register for state saving
+//	state_save_register_global(machine, );
 }
+
+
+//-------------------------------------------------
+//  MACHINE_START( tek4052 )
+//-------------------------------------------------
 
 void tek4052_state::machine_start()
 {
 }
 
-/* Machine Driver */
+
+
+//**************************************************************************
+//	MACHINE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( tek4051 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_START( tek4051, tek4051_state )
     // basic machine hardware
-	MDRV_CPU_ADD(MC6800_TAG, M6800, 1000000) // XTAL_12_5MHz / ?
+	MDRV_CPU_ADD(MC6800_TAG, M6800, XTAL_12_5MHz/15)
     MDRV_CPU_PROGRAM_MAP(tek4051_mem)
 
     // video hardware
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MDRV_SCREEN_ADD(SCREEN_TAG, VECTOR)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -399,7 +1223,13 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_VIDEO_UPDATE(vector)
 
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	// devices
+	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(XTAL_12_5MHz/15/4))
 	MDRV_PIA6821_ADD(MC6820_X_TAG, x_pia_intf)
 	MDRV_PIA6821_ADD(MC6820_Y_TAG, y_pia_intf)
 	MDRV_PIA6821_ADD(MC6820_KB_TAG, kb_pia_intf)
@@ -408,6 +1238,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MDRV_PIA6821_ADD(MC6820_COM_TAG, com_pia_intf)
 	MDRV_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+	//MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// internal ram
 	MDRV_RAM_ADD("messram")
@@ -415,16 +1246,20 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MDRV_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tek4052, tek4051_state )
-    /* basic machine hardware */
-	MDRV_CPU_ADD(MC6800_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
-    MDRV_CPU_PROGRAM_MAP(tek4052_mem)
-    MDRV_CPU_IO_MAP(tek4052_io)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+//-------------------------------------------------
+//  MACHINE_CONFIG( tek4052 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( tek4052, tek4052_state )
+    // basic machine hardware
+	MDRV_CPU_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
+    MDRV_CPU_PROGRAM_MAP(tek4052_mem)
+
+    // video hardware
+    MDRV_SCREEN_ADD(SCREEN_TAG, VECTOR)
     MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(1024, 780)
     MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
@@ -432,20 +1267,38 @@ static MACHINE_CONFIG_START( tek4052, tek4051_state )
 	MDRV_PALETTE_INIT(monochrome_green)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_VIDEO_UPDATE(vector)
+	
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* internal ram */
+	// internal ram
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( tek4054 )
+//-------------------------------------------------
 /*
-static MACHINE_CONFIG_START( tek4054, tek4051_state )
+static MACHINE_CONFIG_START( tek4054, tek4052_state )
     MDRV_SCREEN_SIZE(4096, 3125)
     MDRV_SCREEN_VISIBLE_AREA(0, 4096-1, 0, 3125-1)
 MACHINE_CONFIG_END
 */
 
-/* ROMs */
+
+
+//**************************************************************************
+//	ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( tek4051 )
+//-------------------------------------------------
 
 ROM_START( tek4051 )
 	ROM_REGION( 0x8000, MC6800_TAG, 0 )
@@ -466,11 +1319,11 @@ ROM_START( tek4051 )
 	ROM_LOAD( "156-0673-xx.u391", 0x7000, 0x0800, CRC(ee1f5d4c) SHA1(a6fb8347a0dfa94268f091fb7ca091c8bfabeabd) ) // -01 or -02 or -03 ?
 	ROM_LOAD( "156-0674-xx.u295", 0x7800, 0x0800, CRC(50582341) SHA1(1a028176e5d5ca83012e2f75e9daad88cd7d8fc3) ) // -01 or -02 ?
 	
-	ROM_REGION( 0x2000, "overflow", 0 ) // overflow backpack
+	ROM_REGION( 0x2000, "020_0147_00", 0 ) // Firmware Backpack (020-0147-00)
 	ROM_LOAD( "156-0747-xx.u101", 0x0000, 0x0800, CRC(9e1facc1) SHA1(7e7a118c3e8c49630f630ee02c3de843dd95d7e1) ) // -00 or -01 ?
 	ROM_LOAD( "156-0748-xx.u201", 0x0800, 0x0800, CRC(be42bfbf) SHA1(23575b411bd9dcb7d7116628820096e3064ff93b) ) // -00 or -01 ?
 
-	ROM_REGION( 0x2000, "com", 0 ) // communications backpack
+	ROM_REGION( 0x2000, "021_0188_00", 0 ) // Communications Backpack (021-0188-00)
 	ROM_LOAD( "156-0712-00.u101", 0x0000, 0x0800, NO_DUMP )
 	ROM_LOAD( "156-0712-01.u101", 0x0000, 0x0800, NO_DUMP )
 	ROM_LOAD( "156-0713-00.u111", 0x0800, 0x0800, NO_DUMP )
@@ -489,8 +1342,13 @@ ROM_START( tek4051 )
 	ROM_LOAD( "4051r06", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( tek4052a )
+//-------------------------------------------------
+
 ROM_START( tek4052a )
-	ROM_REGION( 0x3800, AM2901A_TAG, 0 ) // ALU 670-7705-00
+	ROM_REGION( 0x3800, AM2901A_TAG, 0 ) // ALU 670-7705-00 microcode
 	ROM_LOAD( "160-1689-00.u340", 0x0000, 0x0800, CRC(97ff62d4) SHA1(e25b495fd1b3f8a5bfef5c8f20efacde8366e89c) )
 	ROM_LOAD( "160-1688-00.u335", 0x0800, 0x0800, CRC(19033422) SHA1(0f6ea45be5123701940331c4278bcdc5db4f4147) )
 	ROM_LOAD( "160-1687-00.u330", 0x1000, 0x0800, CRC(3b2e37dd) SHA1(294b626d0022fbf9bec50680b6b932f21a3cb049) )
@@ -499,7 +1357,7 @@ ROM_START( tek4052a )
 	ROM_LOAD( "160-1694-00.u305", 0x2800, 0x0800, CRC(c33ae212) SHA1(25ed4cc3600391fbc93bb46c92d3f64ca2aca58e) )
 	ROM_LOAD( "160-1693-00.u300", 0x3000, 0x0800, CRC(651b7af2) SHA1(7255c682cf74f2e77661d77c8406b36a567eea46) )
 
-	ROM_REGION( 0x14000, "memory", 0 ) // Memory Access Sequencer 672-0799-08
+	ROM_REGION( 0x14000, "672_0799_08", 0 ) // Memory Access Sequencer 672-0799-08
 	ROM_LOAD16_BYTE( "160-1698-00.u810", 0x00000, 0x2000, CRC(fd0b8bc3) SHA1(ea9caa151295024267a467ba636ad41aa0c517d3) )
 	ROM_LOAD16_BYTE( "160-1682-00.u893", 0x00001, 0x2000, CRC(d54104ef) SHA1(b796c320c8f96f6e4b845718bfb62ccb5903f2db) )
 	ROM_LOAD16_BYTE( "160-1699-00.u820", 0x04000, 0x2000, CRC(59cc6c2e) SHA1(b6d85cdfaaef360af2a4fc44eae55e512bb08b21) )
@@ -531,9 +1389,13 @@ ROM_START( tek4052a )
 	ROM_LOAD( "transera.da", 0x0000, 0x0800, CRC(1c16e4da) SHA1(6d6ea0c5c68bab8e6a885b3cb05aa591f7754c56) )
 ROM_END
 
-/* System Drivers */
+
+
+//**************************************************************************
+//	SYSTEM DRIVERS
+//**************************************************************************
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1975, tek4051,	0,			0,		tek4051,	tek4051,	0,		"Tektronix",	"Tektronix 4051",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1978, tek4052a,	tek4051,	0,		tek4052,	tek4051,	0,		"Tektronix",	"Tektronix 4052A",	GAME_NOT_WORKING | GAME_NO_SOUND )
-//COMP( 197?, tek4054,	tek4051,	0,		tek4054,	tek4054,	0,		"Tektronix",	"Tektronix 4054",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1975, tek4051,	0,			0,		tek4051,	tek4051,	0,		"Tektronix",	"Tektronix 4051",	GAME_NOT_WORKING )
+COMP( 1978, tek4052a,	tek4051,	0,		tek4052,	tek4051,	0,		"Tektronix",	"Tektronix 4052A",	GAME_NOT_WORKING )
+//COMP( 1979, tek4054,	tek4051,	0,		tek4054,	tek4054,	0,		"Tektronix",	"Tektronix 4054",	GAME_NOT_WORKING )
