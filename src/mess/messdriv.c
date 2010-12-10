@@ -1818,5 +1818,6 @@ const game_driver * const drivers[] =
 	DRIVER( vta2000 )
 	DRIVER( dct11em )
 	DRIVER( sm1800 )
+	DRIVER( mikrolab )
 	
 #endif /* DRIVER_RECURSIVE */

@@ -41,6 +41,7 @@ Skeleton drivers:
 - Tektronix 4051 [Curt Coder]
 - Tektronix 4052A [Curt Coder]
 - SM1800 Terminal
+- Mikrolab KR580IK80
 
 System Driver Changes:
 ----------------------
