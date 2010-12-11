@@ -1,6 +1,6 @@
 /****************************************************************************
 
-    ay31015.c by Robbbert, May 2008
+    ay31015.c by Robbbert, May 2008. Bugs fixed by Judge.
 
     Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A), and AY-6-1013 UARTs
     The HD6402 UART is compatible with the AY-3-1015 UART.
@@ -9,12 +9,6 @@
 
     It supports independent receive and transmit clocks,
     and transmission and reception can occur simultaneously if desired.
-
-    Note to any MESSDEVs who might happen to stray here:
-
-    - If you find bugs, please fix them yourself.
-    - If you want to convert it to a DEVICE, please do so.
-    - If you want to add support for multiple instances, please do so.
 
 *****************************************************************************
 
@@ -32,18 +26,6 @@ It is not clear in the documentation as to which settings will reset the device.
     To be safe, we will always reset whenever the control register changes.
 
     Also, it not clear exactly what happens under various error conditions.
-    What we do is:
-    1. During receive the stop bit processing is cut short, so we can better
-    synchronise the next byte.
-    2. If a framing error occurs, we do not signal DAV, but instead skip
-    the bad byte and start looking for the next.
-
-    This device has only been tested successfully at 300 baud, with 8 bits,
-    2 stop bits and no parity.
-
-    The bit order of the status and control registers is set up to suit the
-    Exidy driver. If you wish to use it for some other driver, use the BITSWAP8
-    macro in your driver.
 
 ********************************************************************************
 
