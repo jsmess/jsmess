@@ -18,6 +18,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *video_ram;
+	UINT8 *charrom;
 };
 
 
@@ -47,6 +48,8 @@ static MACHINE_RESET(h19)
 
 static VIDEO_START( h19 )
 {
+	h19_state *state = machine->driver_data<h19_state>();
+	state->charrom = memory_region(machine, "chargen");
 }
 
 static VIDEO_UPDATE( h19 )
@@ -59,25 +62,35 @@ static VIDEO_UPDATE( h19 )
 static MC6845_UPDATE_ROW( h19_update_row )
 {
 	h19_state *state = device->machine->driver_data<h19_state>();
-	UINT8 *charrom = memory_region(device->machine, "chargen");
+	UINT8 chr,gfx;
+	UINT16 mem,x;
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	int column, bit;
-
-	for (column = 0; column < x_count; column++)
+	for (x = 0; x < x_count; x++)
 	{
-		UINT8 code = state->video_ram[((ma + column) & 0x7ff)];
-		UINT16 addr = code << 4 | (ra & 0x0f);
-		UINT8 data = charrom[addr & 0x7ff];
+		UINT8 inv=0;
+		if (x == cursor_x) inv=0xff;
+		mem = (ma + x) & 0xfff;
+		chr = state->video_ram[mem];
 
-		for (bit = 0; bit < 8; bit++)
+		if (chr & 0x80)
 		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) ? 1 : 0;
-
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-
-			data <<= 1;
+			inv ^= 0xff;
+			chr &= 0x7f;
 		}
+
+		/* get pattern of pixels for that character scanline */
+		gfx = state->charrom[(chr<<4) | ra] ^ inv;
+
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = ( gfx & 0x80 ) ? 1 : 0;
+		*p++ = ( gfx & 0x40 ) ? 1 : 0;
+		*p++ = ( gfx & 0x20 ) ? 1 : 0;
+		*p++ = ( gfx & 0x10 ) ? 1 : 0;
+		*p++ = ( gfx & 0x08 ) ? 1 : 0;
+		*p++ = ( gfx & 0x04 ) ? 1 : 0;
+		*p++ = ( gfx & 0x02 ) ? 1 : 0;
+		*p++ = ( gfx & 0x01 ) ? 1 : 0;
 	}
 }
 
