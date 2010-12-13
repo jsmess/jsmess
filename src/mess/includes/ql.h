@@ -35,7 +35,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
-	required_device<running_device> m_zx8302;
+	required_device<zx8302_device> m_zx8302;
 	required_device<running_device> m_speaker;
 	required_device<running_device> m_ram;
 

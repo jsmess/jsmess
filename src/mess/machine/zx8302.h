@@ -7,107 +7,195 @@
 
 **********************************************************************
                             _____   _____
-                 ERASE   1 |*    \_/     | 40
+                 ERASE   1 |*    \_/     | 40  Vdd
                EXTINTL   2 |             | 39  DB4
                 MDRDWL   3 |             | 38  DB5
-                         4 |             | 37  DB0
+                NETOUT   4 |             | 37  DB0
                 BAUDX4   5 |             | 36  DB1
-                NETOUT   6 |             | 35  COMDATA
-                         7 |             | 34  MDSELDH
+                 DTR1L   6 |             | 35  COMDATA
+                 CTS2L   7 |             | 34  MDSELDH
                  DCSML   8 |             | 33  MDSELCKH
-                         9 |             | 32  VSYNCH
+                  ROWL   9 |             | 32  VSYNCH
                  PCENL  10 |    ZX8302   | 31  XTAL2
-                        11 |     ULA     | 30  XTAL1
+                   Vdd  11 |     ULA     | 30  XTAL1
                    DB2  12 |             | 29
-                        13 |             | 28  RESETOUTL
-                        14 |             | 27  DB7
+                  TXD1  13 |             | 28  RESETOUTL
+                  TXD2  14 |             | 27  DB7
                     A5  15 |             | 26  IPL1L
                  NETIN  16 |             | 25  CLKCPU
                     A1  17 |             | 24  DB3
                     A0  18 |             | 23  DB6
                   RAW2  19 |             | 22  COMCTL
-             RESETOUTL  20 |_____________| 21  RAW1
+                   GND  20 |_____________| 21  RAW1
 
 **********************************************************************/
+
+#pragma once
 
 #ifndef __ZX8302__
 #define __ZX8302__
 
-#include "devcb.h"
+#include "emu.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ZX8302, zx8302);
 
-#define MDRV_ZX8302_ADD(_tag, _clock, _config) \
+///*************************************************************************
+//	MACROS / CONSTANTS
+///*************************************************************************
+
+
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MDRV_ZX8302_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, ZX8302, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+	MDRV_DEVICE_CONFIG(_intrf)
 
 #define ZX8302_INTERFACE(name) \
-	const zx8302_interface(name) =
+	const zx8302_interface (name)=
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _zx8302_interface zx8302_interface;
-struct _zx8302_interface
+
+///*************************************************************************
+//	TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> zx8302_interface
+
+struct zx8302_interface
 {
-	int rtc_clock;				/* the RTC clock (pin 30) of the chip */
+	int rtc_clock;				// the RTC clock (pin 30) of the chip
 
-	const char *mdv1_tag;		/* microdrive 1 */
-	const char *mdv2_tag;		/* microdrive 2 */
-
-	/* this gets called for every change of the IPL1L pin (pin 26) */
 	devcb_write_line	out_ipl1l_func;
-
-	/* this gets called for every change of the BAUDX4 pin (pin 5) */
 	devcb_write_line	out_baudx4_func;
-
-	/* this gets called for every write of the COMDATA pin (pin 35) */
 	devcb_write_line	out_comdata_func;
+	devcb_write_line	out_txd1_func;
+	devcb_write_line	out_txd2_func;
+	devcb_read_line		in_dtr1_func;
+	devcb_read_line		in_cts2_func;
+	devcb_write_line	out_netout_func;
+	devcb_read_line		in_netin_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* real time clock */
-READ8_DEVICE_HANDLER( zx8302_rtc_r );
-WRITE8_DEVICE_HANDLER( zx8302_rtc_w );
 
-/* control */
-WRITE8_DEVICE_HANDLER( zx8302_control_w );
+// ======================> zx8302_device_config
 
-/* microdrive track data */
-READ8_DEVICE_HANDLER( zx8302_mdv_track_r );
+class zx8302_device_config :   public device_config,
+                                public zx8302_interface
+{
+    friend class zx8302_device;
 
-/* status */
-READ8_DEVICE_HANDLER( zx8302_status_r );
+    // construction/destruction
+    zx8302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-/* IPC command */
-WRITE8_DEVICE_HANDLER( zx8302_ipc_command_w );
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
 
-/* microdrive control */
-WRITE8_DEVICE_HANDLER( zx8302_mdv_control_w );
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
 
-/* interrupt status */
-READ8_DEVICE_HANDLER( zx8302_irq_status_r );
 
-/* interrupt acknowledge */
-WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w );
+// ======================> zx8302_device
 
-/* serial data */
-WRITE8_DEVICE_HANDLER( zx8302_data_w );
+class zx8302_device :  public device_t
+{
+    friend class zx8302_device_config;
 
-/* vertical sync */
-WRITE_LINE_DEVICE_HANDLER( zx8302_vsync_w );
+    // construction/destruction
+    zx8302_device(running_machine &_machine, const zx8302_device_config &_config);
 
-/* communication control */
-WRITE_LINE_DEVICE_HANDLER( zx8302_comctl_w );
+public:
+	DECLARE_READ8_MEMBER( rtc_r );
+	DECLARE_WRITE8_MEMBER( rtc_w );
+	DECLARE_WRITE8_MEMBER( control_w );
+	DECLARE_READ8_MEMBER( mdv_track_r );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( ipc_command_w );
+	DECLARE_WRITE8_MEMBER( mdv_control_w );
+	DECLARE_READ8_MEMBER( irq_status_r );
+	DECLARE_WRITE8_MEMBER( irq_acknowledge_w );
+	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+	DECLARE_WRITE_LINE_MEMBER( comctl_w );
+	DECLARE_WRITE_LINE_MEMBER( comdata_w );
+	DECLARE_WRITE_LINE_MEMBER( extint_w );
 
-/* communication data */
-WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w );
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	inline void trigger_interrupt(UINT8 line);
+	inline void transmit_ipc_data();
+	inline void transmit_bit(int state);
+	inline void transmit_serial_data();
+
+private:
+	static const device_timer_id TIMER_TXD = 0;
+	static const device_timer_id TIMER_BAUDX4 = 1;
+	static const device_timer_id TIMER_RTC = 2;
+	static const device_timer_id TIMER_GAP = 3;
+	static const device_timer_id TIMER_IPC = 4;
+
+	devcb_resolved_write_line	m_out_ipl1l_func;
+	devcb_resolved_write_line	m_out_baudx4_func;
+	devcb_resolved_write_line	m_out_comdata_func;
+	devcb_resolved_write_line	m_out_txd1_func;
+	devcb_resolved_write_line	m_out_txd2_func;
+	devcb_resolved_read_line	m_in_dtr1_func;
+	devcb_resolved_read_line	m_in_cts2_func;
+	devcb_resolved_write_line	m_out_netout_func;
+	devcb_resolved_read_line	m_in_netin_func;
+
+	// registers
+	UINT8 m_idr;					// IPC data register
+	UINT8 m_tcr;					// transfer control register
+	UINT8 m_tdr;					// transfer data register
+	UINT8 m_irq;					// interrupt register
+	UINT32 m_ctr;					// counter register
+	UINT8 m_status;					// status register
+
+	// IPC communication state
+	int m_comdata;					// communication data
+	int m_comctl;					// communication control
+	int m_ipc_state;				// communication state
+	int m_ipc_rx;					// receiving data from IPC
+	int m_ipc_busy;					// IPC busy
+	int m_baudx4;					// IPC baud x4
+
+	// serial transmit state
+	int m_tx_bits;					// bits transmitted
+
+	// microdrive state
+	int m_mdrdw;					// read/write
+	int m_mdselck;					// select clock
+	int m_mdseld;					// select data
+	int m_erase;					// erase head
+	int m_mdv_motor;				// selected motor
+	UINT8 m_mdv_data[2];			// track data register
+	int m_track;					// current track
+
+	// timers
+	emu_timer *m_txd_timer;			// transmit timer
+	emu_timer *m_baudx4_timer;		// baud x4 timer
+	emu_timer *m_rtc_timer;			// real time clock timer
+	emu_timer *m_gap_timer;			// microdrive gap timer
+	emu_timer *m_ipc_timer;			// delayed IPC command timer
+
+	const zx8302_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type ZX8302;
+
+
 
 #endif

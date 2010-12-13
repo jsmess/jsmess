@@ -9,201 +9,152 @@
 
 /*
 
-    TODO:
+	TODO:
 
-    - microdrive
-    - RTC register write
-    - serial data latching?
-    - transmit interrupt timing
-    - interface interrupt
+	- set time
+	- read from microdrive
+	- write to microdrive
+	- DTR/CTS handling
+	- network
 
 */
 
 #include "emu.h"
-#include "zx8302.h"
-#include "devices/microdrv.h"
 #include <time.h>
+#include "devices/microdrv.h"
+#include "machine/devhelpr.h"
+#include "zx8302.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 #define LOG 0
 
+
+// IPC serial state
 enum
 {
-	ZX8302_IPC_START,
-	ZX8302_IPC_DATA,
-	ZX8302_IPC_STOP
+	IPC_START,
+	IPC_DATA,
+	IPC_STOP
 };
 
-#define ZX8302_BAUD_19200	0x00
-#define ZX8302_BAUD_9600	0x01
-#define ZX8302_BAUD_4800	0x02
-#define ZX8302_BAUD_2400	0x03
-#define ZX8302_BAUD_1200	0x04
-#define ZX8302_BAUD_600		0x05
-#define ZX8302_BAUD_300		0x06
-#define ZX8302_BAUD_75		0x07
-#define ZX8302_BAUD_MASK	0x07
 
-#define ZX8302_MODE_SER1	0x00
-#define ZX8302_MODE_SER2	0x08
-#define ZX8302_MODE_MDV		0x10
-#define ZX8302_MODE_NET		0x18
-#define ZX8302_MODE_MASK	0x18
+// baud rate
+static const int BAUD_19200				= 0x00;
+static const int BAUD_9600				= 0x01;
+static const int BAUD_4800				= 0x02;
+static const int BAUD_2400				= 0x03;
+static const int BAUD_1200				= 0x04;
+static const int BAUD_600				= 0x05;
+static const int BAUD_300				= 0x06;
+static const int BAUD_75				= 0x07;
+static const int BAUD_MASK				= 0x07;
 
-#define ZX8302_INT_GAP			0x01
-#define ZX8302_INT_INTERFACE	0x02
-#define ZX8302_INT_TRANSMIT		0x04
-#define ZX8302_INT_FRAME		0x08
-#define ZX8302_INT_EXTERNAL		0x10
 
-#define ZX8302_STATUS_NETWORK_PORT		0x01
-#define ZX8302_STATUS_TX_BUFFER_FULL	0x02
-#define ZX8302_STATUS_RX_BUFFER_FULL	0x04
-#define ZX8302_STATUS_MICRODRIVE_GAP	0x08
+// transmit mode
+static const int MODE_SER1				= 0x00;
+static const int MODE_SER2				= 0x08;
+static const int MODE_MDV				= 0x10;
+static const int MODE_NET				= 0x18;
+static const int MODE_MASK				= 0x18;
 
-#define ZX8302_TXD_START	0
-#define ZX8302_TXD_STOP		9
-#define ZX8302_TXD_STOP2	10
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+// interrupts
+static const int INT_GAP				= 0x01;
+static const int INT_INTERFACE			= 0x02;
+static const int INT_TRANSMIT			= 0x04;
+static const int INT_FRAME				= 0x08;
+static const int INT_EXTERNAL			= 0x10;
 
-typedef struct _zx8302_t zx8302_t;
-struct _zx8302_t
+
+// status register
+static const int STATUS_NETWORK_PORT	= 0x01;
+static const int STATUS_TX_BUFFER_FULL	= 0x02;
+static const int STATUS_RX_BUFFER_FULL	= 0x04;
+static const int STATUS_MICRODRIVE_GAP	= 0x08;
+
+
+// transmit bits
+static const int TXD_START				= 0;
+static const int TXD_STOP				= 9;
+static const int TXD_STOP2				= 10;
+
+
+// Monday 1st January 1979 00:00:00 UTC
+static const int RTC_BASE_ADJUST		= 283996800;
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type ZX8302 = zx8302_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(zx8302, "Sinclair ZX8302")
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void zx8302_device_config::device_config_complete()
 {
-	devcb_resolved_write_line	out_ipl1l_func;
-	devcb_resolved_write_line	out_baudx4_func;
-	devcb_resolved_write_line	out_comdata_func;
+	// inherit a copy of the static data
+	const zx8302_interface *intf = reinterpret_cast<const zx8302_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<zx8302_interface *>(this) = *intf;
 
-	/* registers */
-	UINT8 idr;						/* IPC data register */
-	UINT8 tcr;						/* transfer control register */
-	UINT8 tdr;						/* transfer data register */
-	UINT8 irq;						/* interrupt register */
-	UINT32 ctr;						/* counter register */
-	UINT8 status;					/* status register */
-
-	/* IPC communication state */
-	int comdata;					/* communication data */
-	int comctl;						/* communication control */
-	int ipc_state;					/* communication state */
-	int ipc_rx;						/* receiving data from IPC */
-	int ipc_busy;					/* IPC busy */
-	int baudx4;						/* IPC baud x4 */
-
-	/* serial transmit state */
-	int tx_bits;					/* bits transmitted */
-	int ser1_rxd;					/* serial 1 receive */
-	int ser1_cts;					/* serial 1 clear to send */
-	int ser2_txd;					/* serial 2 transmit */
-	int ser2_dtr;					/* serial 2 data terminal ready */
-	int netout;						/* ZXNet output */
-	int netin;						/* ZXNet input */
-
-	/* microdrive state */
-	int mdrdw;						/* read/write */
-	int mdselck;					/* select clock */
-	int mdseld;						/* select data */
-	int erase;						/* erase head */
-
-	int mdv_motor;					/* selected motor */
-	int mdv_offset[8];				/* image offset */
-
-	UINT8 *mdv_image[8];			/* image */
-
-	/* timers */
-	emu_timer *txd_timer;			/* transmit timer */
-	emu_timer *ipc_timer;			/* baud x4 timer */
-	emu_timer *rtc_timer;			/* real time clock timer */
-	emu_timer *gap_timer;			/* microdrive gap timer */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE zx8302_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-
-	return (zx8302_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-INLINE const zx8302_interface *get_interface(running_device *device)
-{
-	assert(device != NULL);
-	assert((device->type() == ZX8302));
-	return (const zx8302_interface *) device->baseconfig().static_config();
-}
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    zx8302_interrupt - interrupt line manager
--------------------------------------------------*/
-
-static void zx8302_interrupt(running_device *device, UINT8 line)
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	zx8302->irq |= line;
-	devcb_call_write_line(&zx8302->out_ipl1l_func, ASSERT_LINE);
-}
-
-/*-------------------------------------------------
-    zx8302_irq_status_r - interrupt status
-    register
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( zx8302_irq_status_r )
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	return zx8302->irq;
-}
-
-/*-------------------------------------------------
-    zx8302_irq_acknowledge_w - interrupt
-    acknowledge
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w )
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	zx8302->irq &= ~data;
-
-	if (LOG) logerror("ZX8302 Interrupt Acknowledge: %02x\n", data);
-
-	if (!zx8302->irq)
+	// or initialize to defaults if none provided
+	else
 	{
-		devcb_call_write_line(&zx8302->out_ipl1l_func, CLEAR_LINE);
+		memset(&out_ipl1l_func, 0, sizeof(out_ipl1l_func));
+		memset(&out_baudx4_func, 0, sizeof(out_baudx4_func));
+		memset(&out_comdata_func, 0, sizeof(out_comdata_func));
+		memset(&out_txd1_func, 0, sizeof(out_txd1_func));
+		memset(&out_txd2_func, 0, sizeof(out_txd2_func));
+		memset(&in_dtr1_func, 0, sizeof(in_dtr1_func));
+		memset(&in_cts2_func, 0, sizeof(in_cts2_func));
+		memset(&out_netout_func, 0, sizeof(out_netout_func));
+		memset(&in_netin_func, 0, sizeof(in_netin_func));
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8302_ipc_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( zx8302_ipc_tick )
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  trigger_interrupt - 
+//-------------------------------------------------
+
+inline void zx8302_device::trigger_interrupt(UINT8 line)
 {
-	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
+	m_irq |= line;
 
-	zx8302->baudx4 = !zx8302->baudx4;
-	devcb_call_write_line(&zx8302->out_baudx4_func, zx8302->baudx4);
+	devcb_call_write_line(&m_out_ipl1l_func, ASSERT_LINE);
 }
 
-/*-------------------------------------------------
-    zx8302_ipc_comm_tick - IPC serial transfer
--------------------------------------------------*/
 
-static void zx8302_ipc_comm_tick(running_device *device)
+//-------------------------------------------------
+//  transmit_ipc_data - transmit IPC data
+//-------------------------------------------------
+
+inline void zx8302_device::transmit_ipc_data()
 {
 	/*
 
@@ -230,406 +181,292 @@ static void zx8302_ipc_comm_tick(running_device *device)
 
     */
 
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	switch (zx8302->ipc_state)
+	switch (m_ipc_state)
 	{
-	case ZX8302_IPC_START:
-		if (LOG) logerror("ZX8302 COMDATA START W: %x\n", 0);
+	case IPC_START:
+		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
 
-		devcb_call_write_line(&zx8302->out_comdata_func, 0);
-		zx8302->ipc_busy = 1;
-		zx8302->ipc_state = ZX8302_IPC_DATA;
+		devcb_call_write_line(&m_out_comdata_func, 0);
+		m_ipc_busy = 1;
+		m_ipc_state = IPC_DATA;
 		break;
 
-	case ZX8302_IPC_DATA:
-		if (LOG) logerror("ZX8302 COMDATA W: %x\n", BIT(zx8302->idr, 1));
+	case IPC_DATA:
+		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
 
-		zx8302->comdata = BIT(zx8302->idr, 1);
-		devcb_call_write_line(&zx8302->out_comdata_func, zx8302->comdata);
-		zx8302->ipc_state = ZX8302_IPC_STOP;
+		m_comdata = BIT(m_idr, 1);
+		devcb_call_write_line(&m_out_comdata_func, m_comdata);
+		m_ipc_state = IPC_STOP;
 		break;
 
-	case ZX8302_IPC_STOP:
-		if (!zx8302->ipc_rx)
+	case IPC_STOP:
+		if (!m_ipc_rx)
 		{
-			if (LOG) logerror("ZX8302 COMDATA STOP W: %x\n", 1);
+			if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
 
-			devcb_call_write_line(&zx8302->out_comdata_func, 1);
-			zx8302->ipc_busy = 0;
-			zx8302->ipc_state = ZX8302_IPC_START;
+			devcb_call_write_line(&m_out_comdata_func, 1);
+			m_ipc_busy = 0;
+			m_ipc_state = IPC_START;
 		}
 		break;
 	}
 }
 
-/*-------------------------------------------------
-    zx8302_comctl_w - IPC COMCTL accessor
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( zx8302_comctl_w )
+//-------------------------------------------------
+//  transmit_bit - transmit serial bit
+//-------------------------------------------------
+
+inline void zx8302_device::transmit_bit(int state)
 {
-	if (LOG) logerror("IPC COMCTL W: %x\n", state);
-
-	if (state == 1)
+	switch (m_tcr & MODE_MASK)
 	{
-		zx8302_ipc_comm_tick(device);
-	}
-}
-
-/*-------------------------------------------------
-    zx8302_comctl_w - IPC COMDATA accessor
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w )
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	if (LOG) logerror("IPC COMDATA W: %x\n", state);
-
-	if (zx8302->ipc_state == ZX8302_IPC_DATA || zx8302->ipc_state == ZX8302_IPC_STOP)
-	{
-		if (zx8302->ipc_rx)
-		{
-			zx8302->ipc_rx = 0;
-			zx8302->ipc_busy = 0;
-			zx8302->ipc_state = ZX8302_IPC_START;
-		}
-		else
-		{
-			zx8302->ipc_rx = 1;
-			zx8302->comdata = state;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8302_delayed_ipc_command )
--------------------------------------------------*/
-
-static TIMER_CALLBACK( zx8302_delayed_ipc_command )
-{
-	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
-
-	zx8302->idr = param;
-	zx8302->ipc_state = ZX8302_IPC_START;
-	zx8302->ipc_rx = 0;
-
-	zx8302_ipc_comm_tick((running_device *)ptr);
-}
-
-/*-------------------------------------------------
-    zx8302_ipc_command_w - IPC command register
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( zx8302_ipc_command_w )
-{
-	if (LOG) logerror("ZX8302 IPC Command: %02x\n", data);
-
-	if (data != 0x01)
-	{
-		timer_set(device->machine,ATTOTIME_IN_NSEC(480), (void *) device, data, zx8302_delayed_ipc_command);
-	}
-}
-
-/*-------------------------------------------------
-    zx8302_txd - IPC serial transmit
--------------------------------------------------*/
-
-static WRITE_LINE_DEVICE_HANDLER( zx8302_txd )
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	switch (zx8302->tcr & ZX8302_MODE_MASK)
-	{
-	case ZX8302_MODE_SER1:
-		zx8302->ser1_rxd = state;
+	case MODE_SER1:
+		devcb_call_write_line(&m_out_txd1_func, state);
 		break;
 
-	case ZX8302_MODE_SER2:
-		zx8302->ser2_txd = state;
+	case MODE_SER2:
+		devcb_call_write_line(&m_out_txd2_func, state);
 		break;
 
-	case ZX8302_MODE_MDV:
+	case MODE_MDV:
 		// TODO
 		break;
 
-	case ZX8302_MODE_NET:
-		zx8302->netout = state;
+	case MODE_NET:
+		devcb_call_write_line(&m_out_netout_func, state);
 		break;
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8302_txd_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( zx8302_txd_tick )
+//-------------------------------------------------
+//  transmit_data - transmit serial data
+//-------------------------------------------------
+
+inline void zx8302_device::transmit_serial_data()
 {
-	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
-
-	switch (zx8302->tx_bits)
+	switch (m_tx_bits)
 	{
-	case ZX8302_TXD_START:
-		if (!(zx8302->irq & ZX8302_INT_TRANSMIT))
+	case TXD_START:
+		if (!(m_irq & INT_TRANSMIT))
 		{
-			zx8302_txd((running_device *)ptr, 0);
-			zx8302->tx_bits++;
+			transmit_bit(0);
+			m_tx_bits++;
 		}
 		break;
 
 	default:
-		zx8302_txd((running_device *)ptr, BIT(zx8302->tdr, 0));
-		zx8302->tdr >>= 1;
-		zx8302->tx_bits++;
+		transmit_bit(BIT(m_tdr, 0));
+		m_tdr >>= 1;
+		m_tx_bits++;
 		break;
 
-	case ZX8302_TXD_STOP:
-		zx8302_txd((running_device *)ptr, 1);
-		zx8302->tx_bits++;
+	case TXD_STOP:
+		transmit_bit(1);
+		m_tx_bits++;
 		break;
 
-	case ZX8302_TXD_STOP2:
-		zx8302_txd((running_device *)ptr, 1);
-		zx8302->tx_bits = ZX8302_TXD_START;
-		zx8302->status &= ~ZX8302_STATUS_TX_BUFFER_FULL;
-		zx8302_interrupt((running_device *)ptr, ZX8302_INT_TRANSMIT);
+	case TXD_STOP2:
+		transmit_bit(1);
+		m_tx_bits = TXD_START;
+		m_status &= ~STATUS_TX_BUFFER_FULL;
+		trigger_interrupt(INT_TRANSMIT);
 		break;
 	}
 }
 
-/*-------------------------------------------------
-    zx8302_data_w - transmit data register
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( zx8302_data_w )
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  zx8302_device - constructor
+//-------------------------------------------------
+
+zx8302_device::zx8302_device(running_machine &_machine, const zx8302_device_config &config)
+    : device_t(_machine, config),
+	  m_idr(1),
+	  m_irq(0),
+	  m_ctr(time(NULL) + RTC_BASE_ADJUST),
+	  m_status(0),
+	  m_comdata(1),
+	  m_comctl(1),
+	  m_ipc_state(0),
+	  m_ipc_rx(0),
+	  m_ipc_busy(0),
+	  m_track(0),
+      m_config(config)
 {
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	if (LOG) logerror("ZX8302 Data Register: %02x\n", data);
-
-	zx8302->tdr = data;
-	zx8302->status |= ZX8302_STATUS_TX_BUFFER_FULL;
 }
 
-/*-------------------------------------------------
-    zx8302_control_w - serial control register
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( zx8302_control_w )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void zx8302_device::device_start()
 {
-	zx8302_t *zx8302 = get_safe_token(device);
+	// resolve callbacks
+	devcb_resolve_write_line(&m_out_ipl1l_func, &m_config.out_ipl1l_func, this);
+	devcb_resolve_write_line(&m_out_baudx4_func, &m_config.out_baudx4_func, this);
+	devcb_resolve_write_line(&m_out_comdata_func, &m_config.out_comdata_func, this);
+	devcb_resolve_write_line(&m_out_txd1_func, &m_config.out_txd1_func, this);
+	devcb_resolve_write_line(&m_out_txd2_func, &m_config.out_txd2_func, this);
+	devcb_resolve_read_line(&m_in_dtr1_func, &m_config.in_dtr1_func, this);
+	devcb_resolve_read_line(&m_in_cts2_func, &m_config.in_cts2_func, this);
+	devcb_resolve_write_line(&m_out_netout_func, &m_config.out_netout_func, this);
+	devcb_resolve_read_line(&m_in_netin_func, &m_config.in_netin_func, this);
 
-	int baud = (19200 >> (data & ZX8302_BAUD_MASK));
-	int baudx4 = baud * 4;
+	// allocate timers
+	m_txd_timer = device_timer_alloc(*this, TIMER_TXD);
+	m_baudx4_timer = device_timer_alloc(*this, TIMER_BAUDX4);
+	m_rtc_timer = device_timer_alloc(*this, TIMER_RTC);
+	m_gap_timer = device_timer_alloc(*this, TIMER_GAP);
+	m_ipc_timer = device_timer_alloc(*this, TIMER_IPC);
 
-	if (LOG) logerror("ZX8302 Transmit Control Register: %02x\n", data);
+	timer_adjust_periodic(m_rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.rtc_clock / 32768));
+	timer_adjust_periodic(m_gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
 
-	zx8302->tcr = data;
-
-	timer_adjust_periodic(zx8302->txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
-	timer_adjust_periodic(zx8302->ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
+	// register for state saving
+	state_save_register_device_item(this, 0, m_idr);
+	state_save_register_device_item(this, 0, m_tcr);
+	state_save_register_device_item(this, 0, m_tdr);
+	state_save_register_device_item(this, 0, m_irq);
+	state_save_register_device_item(this, 0, m_ctr);
+	state_save_register_device_item(this, 0, m_status);
+	state_save_register_device_item(this, 0, m_comdata);
+	state_save_register_device_item(this, 0, m_comctl);
+	state_save_register_device_item(this, 0, m_ipc_state);
+	state_save_register_device_item(this, 0, m_ipc_rx);
+	state_save_register_device_item(this, 0, m_ipc_busy);
+	state_save_register_device_item(this, 0, m_baudx4);
+	state_save_register_device_item(this, 0, m_tx_bits);
+	state_save_register_device_item(this, 0, m_mdrdw);
+	state_save_register_device_item(this, 0, m_mdselck);
+	state_save_register_device_item(this, 0, m_mdseld);
+	state_save_register_device_item(this, 0, m_erase);
+	state_save_register_device_item(this, 0, m_mdv_motor);
+	state_save_register_device_item_array(this, 0, m_mdv_data);
+	state_save_register_device_item(this, 0, m_track);
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8302_rtc_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( zx8302_rtc_tick )
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void zx8302_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
+	switch (id)
+	{
+	case TIMER_TXD:
+		transmit_serial_data();
+		break;
 
-	zx8302->ctr++;
+	case TIMER_BAUDX4:
+		m_baudx4 = !m_baudx4;
+		devcb_call_write_line(&m_out_baudx4_func, m_baudx4);
+		break;
+
+	case TIMER_RTC:
+		m_ctr++;
+		break;
+
+	case TIMER_GAP:
+		if (m_mdv_motor)
+		{
+			trigger_interrupt(INT_GAP);
+		}
+		break;
+
+	case TIMER_IPC:
+		m_idr = param;
+		m_ipc_state = IPC_START;
+		m_ipc_rx = 0;
+
+		transmit_ipc_data();
+		break;
+	}
 }
 
-/*-------------------------------------------------
-    zx8302_rtc_r - clock register read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( zx8302_rtc_r )
+//-------------------------------------------------
+//  rtc_r - real time clock read
+//-------------------------------------------------
+
+READ8_MEMBER( zx8302_device::rtc_r )
 {
-	zx8302_t *zx8302 = get_safe_token(device);
+	UINT8 data = 0;
 
 	switch (offset)
 	{
 	case 0:
-		return (zx8302->ctr >> 24) & 0xff;
+		data = (m_ctr >> 24) & 0xff;
 	case 1:
-		return (zx8302->ctr >> 16) & 0xff;
+		data = (m_ctr >> 16) & 0xff;
 	case 2:
-		return (zx8302->ctr >> 8) & 0xff;
+		data = (m_ctr >> 8) & 0xff;
 	case 3:
-		return zx8302->ctr;
-	}
-
-	return 0;
-}
-
-/*-------------------------------------------------
-    zx8302_rtc_w - clock register write
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( zx8302_rtc_w )
-{
-//  zx8302_t *zx8302 = get_safe_token(device);
-
-	if (LOG) logerror("ZX8302 Real Time Clock Register: %02x\n", data);
-}
-
-/*-------------------------------------------------
-    TIMER_CALLBACK( zx8302_gap_tick )
--------------------------------------------------*/
-
-static TIMER_CALLBACK( zx8302_gap_tick )
-{
-	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
-
-	if (zx8302->mdv_motor)
-	{
-		zx8302_interrupt((running_device *)ptr, ZX8302_INT_GAP);
-	}
-}
-
-/*-------------------------------------------------
-    zx8302_get_selected_microdrive - gets the
-    index of the selected microdrive
--------------------------------------------------*/
-
-static int zx8302_get_selected_microdrive(running_device *device)
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-    int i;
-
-    for (i = 0; i < 8; i++)
-    {
-        if (BIT(zx8302->mdv_motor, i)) return 7 - i;
-    }
-
-    return 0;
-}
-
-/*-------------------------------------------------
-    zx8302_get_microdrive_status - gets the
-    status of the selected microdrive
--------------------------------------------------*/
-
-static UINT8 zx8302_get_microdrive_status(running_device *device)
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	int drive = zx8302_get_selected_microdrive(device);
-	UINT8 status = 0;
-
-	if (zx8302->mdv_motor)
-	{
-		switch (zx8302->mdv_offset[drive] % MDV_SECTOR_LENGTH)
-		{
-		case MDV_OFFSET_HEADER_PREAMBLE:
-			zx8302->status &= ~ZX8302_STATUS_MICRODRIVE_GAP;
-			zx8302->mdv_offset[drive] += MDV_PREAMBLE_LENGTH;
-			break;
-
-		case MDV_OFFSET_HEADER:
-			zx8302->status |= ZX8302_STATUS_RX_BUFFER_FULL;
-			break;
-
-		case MDV_OFFSET_DATA_PREAMBLE:
-			zx8302->status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
-			zx8302->mdv_offset[drive] += MDV_PREAMBLE_LENGTH;
-			break;
-
-		case MDV_OFFSET_DATA:
-			zx8302->status |= ZX8302_STATUS_RX_BUFFER_FULL;
-			break;
-
-		case MDV_OFFSET_GAP:
-			zx8302->status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
-			zx8302->status |= ZX8302_STATUS_MICRODRIVE_GAP;
-			zx8302->mdv_offset[drive] += MDV_GAP_LENGTH;
-			break;
-		}
-	}
-
-	return status;
-}
-
-/*-------------------------------------------------
-    zx8302_mdv_track_r - microdrive data register
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( zx8302_mdv_track_r )
-{
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	int drive = zx8302_get_selected_microdrive(device);
-	UINT8 data = zx8302->mdv_image[drive][zx8302->mdv_offset[drive]];
-
-	zx8302->mdv_offset[drive]++;
-
-	if (zx8302->mdv_offset[drive] == MDV_IMAGE_LENGTH)
-	{
-		zx8302->mdv_offset[drive] = 0;
+		data = m_ctr & 0xff;
 	}
 
 	return data;
 }
 
-/*-------------------------------------------------
-    zx8302_mdv_control_w - microdrive control
-    register
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( zx8302_mdv_control_w )
+//-------------------------------------------------
+//  rtc_w - real time clock write
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::rtc_w )
 {
-	zx8302_t *zx8302 = get_safe_token(device);
-
-	/*
-
-        bit     description
-
-        0       MDSELDH
-        1       MDSELCKH
-        2       MDRDWL
-        3       ERASE
-        4
-        5
-        6
-        7
-
-    */
-
-	if (LOG) logerror("ZX8302 Microdrive Control Register: %02x\n", data);
-
-	zx8302->mdseld = BIT(data, 0);
-	zx8302->mdselck = BIT(data, 1);
-	zx8302->mdrdw = BIT(data, 2) ? 0 : 1;
-	zx8302->erase = BIT(data, 3);
-
-	// Microdrive selection shift register
-
-	if (zx8302->mdselck)
-	{
-		int drive = 0;
-
-		zx8302->mdv_motor >>= 1;
-		zx8302->mdv_motor |= (zx8302->mdseld << 7);
-
-		drive = zx8302_get_selected_microdrive(device);
-
-		zx8302->mdv_offset[drive] = 0;
-		zx8302->status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
-	}
+	if (LOG) logerror("ZX8302 '%s' Set Real Time Clock: %02x\n", tag(), data);
 }
 
-/*-------------------------------------------------
-    zx8302_status_r - status register
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( zx8302_status_r )
+//-------------------------------------------------
+//  control_w - serial transmit clock
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::control_w )
 {
-	zx8302_t *zx8302 = get_safe_token(device);
+	if (LOG) logerror("ZX8302 '%s' Transmit Control: %02x\n", tag(), data);
 
+	int baud = (19200 >> (data & BAUD_MASK));
+	int baudx4 = baud * 4;
+
+	m_tcr = data;
+
+	timer_adjust_periodic(m_txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
+	timer_adjust_periodic(m_baudx4_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
+}
+
+
+//-------------------------------------------------
+//  mdv_track_r - microdrive track data
+//-------------------------------------------------
+
+READ8_MEMBER( zx8302_device::mdv_track_r )
+{
+	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag(), m_track, m_mdv_data[m_track]);
+
+	UINT8 data = m_mdv_data[m_track];
+
+	m_track = !m_track;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  status_r - status register
+//-------------------------------------------------
+
+READ8_MEMBER( zx8302_device::status_r )
+{
 	/*
 
         bit     description
@@ -647,135 +484,192 @@ READ8_DEVICE_HANDLER( zx8302_status_r )
 
 	UINT8 data = 0;
 
-	data |= zx8302->comdata << 7;
-	data |= zx8302->ipc_busy << 6;
-	data |= zx8302->ser1_cts << 5;
-	data |= zx8302->ser2_dtr << 4;
-	data |= zx8302_get_microdrive_status(device);
-	data |= zx8302->status;
+	// TODO network port
 
-	if (LOG) logerror("ZX8302 Status Register: %02x\n", data);
+	// serial status
+	data |= m_status;
+
+	// TODO microdrive GAP
+
+	// data terminal ready
+	data |= devcb_call_read_line(&m_in_dtr1_func) << 4;
+
+	// clear to send
+	data |= devcb_call_read_line(&m_in_cts2_func) << 5;
+
+	// IPC busy
+	data |= m_ipc_busy << 6;
+
+	// COMDATA
+	data |= m_comdata << 7;
+
+	if (LOG) logerror("ZX8302 '%s' Status: %02x\n", tag(), data);
 
 	return data;
 }
 
-/*-------------------------------------------------
-    zx8302_vsync_w - vertical sync accessor
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( zx8302_vsync_w )
+//-------------------------------------------------
+//  ipc_command_w - IPC command
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::ipc_command_w )
+{
+	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
+
+	if (data != 0x01)
+	{
+		timer_adjust_oneshot(m_ipc_timer, ATTOTIME_IN_NSEC(480), data);
+	}
+}
+
+
+//-------------------------------------------------
+//  mdv_control_w - microdrive control
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::mdv_control_w )
+{
+	/*
+
+        bit     description
+
+        0       MDSELDH
+        1       MDSELCKH
+        2       MDRDWL
+        3       ERASE
+        4
+        5
+        6
+        7
+
+    */
+
+	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
+
+	m_mdseld = BIT(data, 0);
+	m_mdselck = BIT(data, 1);
+	m_mdrdw = BIT(data, 2) ? 0 : 1;
+	m_erase = BIT(data, 3);
+
+	// Microdrive selection shift register
+	if (m_mdselck)
+	{
+		m_mdv_motor >>= 1;
+		m_mdv_motor |= (m_mdseld << 7);
+
+		m_status &= ~STATUS_RX_BUFFER_FULL;
+	}
+}
+
+
+//-------------------------------------------------
+//  irq_status_r - interrupt status
+//-------------------------------------------------
+
+READ8_MEMBER( zx8302_device::irq_status_r )
+{
+	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
+
+	return m_irq;
+}
+
+
+//-------------------------------------------------
+//  irq_acknowledge_w - interrupt acknowledge
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::irq_acknowledge_w )
+{
+	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
+
+	m_irq &= ~data;
+
+	if (!m_irq)
+	{
+		devcb_call_write_line(&m_out_ipl1l_func, CLEAR_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  data_w - transmit buffer
+//-------------------------------------------------
+
+WRITE8_MEMBER( zx8302_device::data_w )
+{
+	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag(), data);
+
+	m_tdr = data;
+	m_status |= STATUS_TX_BUFFER_FULL;
+}
+
+
+//-------------------------------------------------
+//  vsync_w - vertical sync
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( zx8302_device::vsync_w )
 {
 	if (state)
 	{
-		zx8302_interrupt(device, ZX8302_INT_FRAME);
-		if (LOG) logerror("ZX8302 Frame Interrupt\n");
+		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
+
+		trigger_interrupt(INT_FRAME);
 	}
 }
 
-/*-------------------------------------------------
-    DEVICE_START( zx8302 )
--------------------------------------------------*/
 
-static DEVICE_START( zx8302 )
+//-------------------------------------------------
+//  comctl_w - IPC COMCTL
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( zx8302_device::comctl_w )
 {
-	zx8302_t *zx8302 = get_safe_token(device);
-	const zx8302_interface *intf = get_interface(device);
-	int i;
+	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
-	/* resolve callbacks */
-	devcb_resolve_write_line(&zx8302->out_ipl1l_func, &intf->out_ipl1l_func, device);
-	devcb_resolve_write_line(&zx8302->out_baudx4_func, &intf->out_baudx4_func, device);
-	devcb_resolve_write_line(&zx8302->out_comdata_func, &intf->out_comdata_func, device);
-
-	/* set initial values */
-	zx8302->comctl = 1;
-	zx8302->comdata = 1;
-	zx8302->idr = 1;
-
-	zx8302->ctr = time(NULL) + 283996800;
-
-	/* allocate microdrive images */
-	for (i = 0; i < 8; i++)
+	if (state)
 	{
-		zx8302->mdv_image[i] = auto_alloc_array(device->machine, UINT8, MDV_IMAGE_LENGTH);
+		transmit_ipc_data();
 	}
-
-	/* create the timers */
-	zx8302->txd_timer = timer_alloc(device->machine, zx8302_txd_tick, (void *)device);
-	zx8302->ipc_timer = timer_alloc(device->machine, zx8302_ipc_tick, (void *)device);
-	zx8302->rtc_timer = timer_alloc(device->machine, zx8302_rtc_tick, (void *)device);
-	zx8302->gap_timer = timer_alloc(device->machine, zx8302_gap_tick, (void *)device);
-
-	timer_adjust_periodic(zx8302->rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->rtc_clock/32768));
-	timer_adjust_periodic(zx8302->gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
-
-	/* register for state saving */
-
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->idr);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tcr);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tdr);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->irq);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ctr);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->status);
-
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->comdata);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->comctl);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_state);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_rx);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_busy);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->baudx4);
-
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tx_bits);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser1_rxd);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser1_cts);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser2_txd);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser2_dtr);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->netout);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->netin);
-
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdrdw);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdselck);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdseld);
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->erase);
-
-	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdv_motor);
-	state_save_register_item_array(device->machine, "zx8302", device->tag(), 0, zx8302->mdv_offset);
 }
 
-/*-------------------------------------------------
-    DEVICE_RESET( zx8301 )
--------------------------------------------------*/
 
-static DEVICE_RESET( zx8302 )
+//-------------------------------------------------
+//  comdata_w - IPC COMDATA
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( zx8302_device::comdata_w )
 {
-//  zx8302_t *zx8302 = get_safe_token(device);
+	if (LOG) logerror("ZX8302 '%s' COMDATA: %x\n", tag(), state);
 
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( zx8301 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( zx8302 )
-{
-	switch (state)
+	if (m_ipc_state == IPC_DATA || m_ipc_state == IPC_STOP)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(zx8302_t);						break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(zx8302);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(zx8302);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Sinclair ZX8302");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Sinclair QL");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+		if (m_ipc_rx)
+		{
+			m_ipc_rx = 0;
+			m_ipc_busy = 0;
+			m_ipc_state = IPC_START;
+		}
+		else
+		{
+			m_ipc_rx = 1;
+			m_comdata = state;
+		}
 	}
 }
 
-DEFINE_LEGACY_DEVICE(ZX8302, zx8302);
+
+//-------------------------------------------------
+//  extint_w - external interrupt
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( zx8302_device::extint_w )
+{
+	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag(), state);
+
+	if (state == ASSERT_LINE)
+	{
+		trigger_interrupt(INT_EXTERNAL);
+	}
+}

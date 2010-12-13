@@ -58,8 +58,8 @@
 
 WRITE8_MEMBER( ql_state::ipc_w )
 {
-	zx8302_comctl_w(m_zx8302, 0);
-	zx8302_comctl_w(m_zx8302, 1);
+	m_zx8302->comctl_w(0);
+	m_zx8302->comctl_w(1);
 }
 
 WRITE8_MEMBER( ql_state::ipc_port1_w )
@@ -133,7 +133,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 
 	m_comdata = BIT(data, 7);
 
-	zx8302_comdata_w(m_zx8302, BIT(data, 7));
+	m_zx8302->comdata_w(BIT(data, 7));
 }
 
 READ8_MEMBER( ql_state::ipc_port2_r )
@@ -202,14 +202,14 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // 16K Cartridge ROM
 	AM_RANGE(0x010000, 0x017fff) AM_UNMAP // 32K Expansion I/O
-	AM_RANGE(0x018000, 0x018003) AM_DEVREAD_LEGACY(ZX8302_TAG, zx8302_rtc_r)
-	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE_LEGACY(ZX8302_TAG, zx8302_rtc_w)
-	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE_LEGACY(ZX8302_TAG, zx8302_control_w)
-	AM_RANGE(0x018003, 0x018003) AM_DEVWRITE_LEGACY(ZX8302_TAG, zx8302_ipc_command_w)
-	AM_RANGE(0x018020, 0x018020) AM_DEVREADWRITE_LEGACY(ZX8302_TAG, zx8302_status_r, zx8302_mdv_control_w)
-	AM_RANGE(0x018021, 0x018021) AM_DEVREADWRITE_LEGACY(ZX8302_TAG, zx8302_irq_status_r, zx8302_irq_acknowledge_w)
-	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE_LEGACY(ZX8302_TAG, zx8302_mdv_track_r, zx8302_data_w)
-	AM_RANGE(0x018023, 0x018023) AM_DEVREAD_LEGACY(ZX8302_TAG, zx8302_mdv_track_r) AM_WRITENOP
+	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
+	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
+	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
+	AM_RANGE(0x018003, 0x018003) AM_DEVWRITE(ZX8302_TAG, zx8302_device, ipc_command_w)
+	AM_RANGE(0x018020, 0x018020) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, status_r, mdv_control_w)
+	AM_RANGE(0x018021, 0x018021) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, irq_status_r, irq_acknowledge_w)
+	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
+	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
 	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
@@ -459,7 +459,7 @@ static ZX8301_INTERFACE( ql_zx8301_intf )
 {
 	M68008_TAG,
 	SCREEN_TAG,
-	DEVCB_DEVICE_LINE(ZX8302_TAG, zx8302_vsync_w)
+	DEVCB_DEVICE_LINE_MEMBER(ZX8302_TAG, zx8302_device, vsync_w)
 };
 
 /* ZX8302 Interface */
@@ -477,11 +477,15 @@ WRITE_LINE_MEMBER( ql_state::ql_comdata_w )
 static ZX8302_INTERFACE( ql_zx8302_intf )
 {
 	X2,
-	MDV1_TAG,
-	MDV2_TAG,
 	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w)
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static PALETTE_INIT( ql )
