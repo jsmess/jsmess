@@ -4,10 +4,13 @@
 
         30/08/2010 Skeleton driver
 
+        When it says DIAGNOSTIC RAZ P, press enter.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/terminal.h"
 
 
 class k8915_state : public driver_device
@@ -16,71 +19,175 @@ public:
 	k8915_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
+	UINT8 *videoram;
+	UINT8 *charrom;
+	UINT8 framecnt;
+	UINT8 term_data;
+	UINT8 k8915_53;
 };
 
+static READ8_HANDLER( k8915_52_r )
+{
+// get data from ascii keyboard
+	k8915_state *state = space->machine->driver_data<k8915_state>();
+	state->k8915_53 = 0;	
+	return state->term_data;
+}
 
+static READ8_HANDLER( k8915_53_r )
+{
+// keyboard status
+	k8915_state *state = space->machine->driver_data<k8915_state>();
+	return state->k8915_53;
+}
+
+static WRITE8_HANDLER( k8915_a8_w )
+{
+// seems to switch ram and rom around.
+	if (data == 0x87)
+		memory_set_bank(space->machine, "boot", 0); // ram at 0000
+	else
+		memory_set_bank(space->machine, "boot", 1); // rom at 0000
+}
 
 static ADDRESS_MAP_START(k8915_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(k8915_state, ram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(k8915_state, videoram)
+	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( k8915_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x52, 0x52) AM_READ(k8915_52_r)
+	AM_RANGE(0x53, 0x53) AM_READ(k8915_53_r)
+	AM_RANGE(0xa8, 0xa8) AM_WRITE(k8915_a8_w)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( k8915 )
+static INPUT_PORTS_START( k8915 )
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static MACHINE_RESET(k8915)
 {
-	k8915_state *state = machine->driver_data<k8915_state>();
-	UINT8* bios = memory_region(machine, "maincpu");
-	memcpy(state->ram,bios, 0x1000);
+	memory_set_bank(machine, "boot", 1);
+}
+
+static DRIVER_INIT(k8915)
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
 }
 
 static VIDEO_START( k8915 )
 {
+	k8915_state *state = machine->driver_data<k8915_state>();
+	state->charrom = memory_region(machine, "chargen");
 }
 
 static VIDEO_UPDATE( k8915 )
 {
+	k8915_state *state = screen->machine->driver_data<k8915_state>();
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+
+	state->framecnt++;
+
+	for (y = 0; y < 25; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 80; x++)
+			{
+				gfx = 0;
+
+				if (ra < 9)
+				{
+					chr = state->videoram[x];
+
+					/* Take care of flashing characters */
+					if ((chr & 0x80) && (state->framecnt & 0x08))
+						chr = 0x20;
+
+					chr &= 0x7f;
+
+					gfx = state->charrom[(chr<<4) | ra ];
+				}
+
+				/* Display a scanline of a character */
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+			}
+		}
+		ma+=80;
+	}
 	return 0;
 }
 
+PALETTE_INIT( k8915 )
+{
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color(machine, 1, MAKE_RGB(0, 220, 0)); /* green */
+}
+
+static WRITE8_DEVICE_HANDLER( k8915_kbd_put )
+{
+	k8915_state *state = device->machine->driver_data<k8915_state>();
+	state->term_data = data;
+	state->k8915_53 = 1;
+}
+
+static GENERIC_TERMINAL_INTERFACE( k8915_terminal_intf )
+{
+	DEVCB_HANDLER(k8915_kbd_put)
+};
+
 static MACHINE_CONFIG_START( k8915, k8915_state )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(k8915_mem)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_PROGRAM_MAP(k8915_mem)
 	MDRV_CPU_IO_MAP(k8915_io)
 
-    MDRV_MACHINE_RESET(k8915)
+	MDRV_MACHINE_RESET(k8915)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192) /* border size not accurate */
-	MDRV_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+	MDRV_SCREEN_SIZE(640, 250)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(k8915)
 
-    MDRV_VIDEO_START(k8915)
-    MDRV_VIDEO_UPDATE(k8915)
+	MDRV_VIDEO_START(k8915)
+	MDRV_VIDEO_UPDATE(k8915)
+
+	MDRV_GENERIC_TERMINAL_ADD("terminal", k8915_terminal_intf) // keyboard only
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( k8915 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "k8915.bin", 0x0000, 0x1000, CRC(ca70385f) SHA1(a34c14adae9be821678aed7f9e33932ee1f3e61c))
+	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "k8915.bin", 0x10000, 0x1000, CRC(ca70385f) SHA1(a34c14adae9be821678aed7f9e33932ee1f3e61c))
+
+	/* character generator not dumped, using the one from 'c10' for now */
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0, 	k8915,	k8915,	 0, 	  "Robotron",   "K8915",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, k8915,  0,       0, 	k8915,	k8915,	 k8915, 	  "Robotron",   "K8915",		GAME_NOT_WORKING | GAME_NO_SOUND)
