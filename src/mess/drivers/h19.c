@@ -16,11 +16,7 @@
         Either device will signal an interrupt to the CPU when a key
         is pressed/sent.
 
-        MAME's implentation of the 8250 seems incomplete, for example
-        there is no facility to change the clock speed.
-
-        For the moment, the "terminal" device is used for the keyboard,
-        and the interrupt is a periodic timer.
+        For the moment, the "terminal" device is used for the keyboard.
 
 ****************************************************************************/
 
@@ -29,6 +25,7 @@
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "machine/ins8250.h"
+#include "machine/terminal.h"
 
 
 #define H19_CLOCK (XTAL_12_288MHz / 6)
@@ -44,6 +41,7 @@ public:
 	UINT8 *videoram;
 	UINT8 *charrom;
 	running_device *beeper;
+	UINT8 term_data;
 };
 
 
@@ -53,22 +51,33 @@ static TIMER_CALLBACK( h19_beepoff )
 	beep_set_state(state->beeper, 0);
 }
 
+static READ8_HANDLER( h19_80_r )
+{
+// keyboard data
+	h19_state *state = space->machine->driver_data<h19_state>();
+	UINT8 ret = state->term_data;
+	state->term_data = 0;
+	return ret;
+}
+
+static READ8_HANDLER( h19_a0_r )
+{
+// keyboard status
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	return 0x7f; // says that a key is ready and no modifier keys are pressed
+}
+
 static WRITE8_HANDLER( h19_c0_w )
 {
 	h19_state *state = space->machine->driver_data<h19_state>();
-/* Beeper control - lengths need verifying
+/* Beeper control - a 96L02 contains 2 oneshots, one for bell and one for keyclick.
+- lengths need verifying
     offset 00-1F = keyclick
     offset 20-3F = terminal bell */
 
-	UINT16 length = 0;
-
-	if (offset & 0x20)
-		length = 200;
-	else
-		length = 4;
-
-	timer_set(space->machine, ATTOTIME_IN_MSEC(length), NULL, 0, h19_beepoff);
+	UINT8 length = (offset & 0x20) ? 200 : 4;
 	beep_set_state(state->beeper, 1);
+	timer_set(space->machine, ATTOTIME_IN_MSEC(length), NULL, 0, h19_beepoff);
 }
 
 static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -86,9 +95,9 @@ static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_r, ins8250_w )
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xc0, 0xff) AM_WRITE(h19_c0_w)
-	//AM_RANGE(0x80, 0x9F) keyboard control
-	//AM_RANGE(0xA0, 0xBF) keyboard control
+	AM_RANGE(0x80, 0x9F) AM_READ(h19_80_r)
+	AM_RANGE(0xA0, 0xBF) AM_READ(h19_a0_r)
+	AM_RANGE(0xC0, 0xFF) AM_WRITE(h19_c0_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,17 +128,17 @@ static INPUT_PORTS_START( h19 )
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
-	PORT_START("S402")
+	PORT_START("S402") // stored at 40C8
 	PORT_DIPNAME( 0x01, 0x00, "Cursor")
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
 	PORT_DIPNAME( 0x02, 0x00, "Keyclick")
 	PORT_DIPSETTING(    0x02, DEF_STR(No))
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
-	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")
+	PORT_DIPNAME( 0x04, 0x04, "Wrap at EOL")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
-	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")
+	PORT_DIPNAME( 0x08, 0x08, "Auto LF on CR")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
 	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")
@@ -144,6 +153,8 @@ static INPUT_PORTS_START( h19 )
 	PORT_DIPNAME( 0x80, 0x00, "Refresh")
 	PORT_DIPSETTING(    0x00, "50Hz")
 	PORT_DIPSETTING(    0x80, "60Hz")
+
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 
@@ -209,7 +220,7 @@ INS8250_INTERRUPT(h19_ace_irq)
 
 static const ins8250_interface h19_ace_interface =
 {
-	4800, // clock (baud * 16)
+	XTAL_12_288MHz / 4, // 3.072mhz clock which gets divided down for the various baud rates
 	h19_ace_irq, // interrupt
 	NULL, // transmit func
 	NULL, // handshake out
@@ -248,13 +259,24 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
+static WRITE8_DEVICE_HANDLER( h19_kbd_put )
+{
+	h19_state *state = device->machine->driver_data<h19_state>();
+	state->term_data = data;
+	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+}
+
+static GENERIC_TERMINAL_INTERFACE( h19_terminal_intf )
+{
+	DEVCB_HANDLER(h19_kbd_put)
+};
 
 static MACHINE_CONFIG_START( h19, h19_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
 	MDRV_CPU_PROGRAM_MAP(h19_mem)
 	MDRV_CPU_IO_MAP(h19_io)
-	MDRV_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // see notes above
+	//MDRV_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // for testing, causes a keyboard scan
 
 	MDRV_MACHINE_RESET(h19)
 
@@ -271,6 +293,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MDRV_INS8250_ADD( "ins8250", h19_ace_interface )
+	MDRV_GENERIC_TERMINAL_ADD("terminal", h19_terminal_intf) // keyboard only
 
 	MDRV_VIDEO_START( h19 )
 	MDRV_VIDEO_UPDATE( h19 )
