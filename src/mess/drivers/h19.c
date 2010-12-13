@@ -4,17 +4,35 @@
 
         12/05/2009 Skeleton driver.
 
+        The keyboard consists of a 9x10 matrix connected to a MM5740N
+        mask-programmed keyboard controller. The output of this passes
+        through a rom. The MM5740N may be custom-made, in which case it
+        will need to be procured and tested. There is a "default" array;
+        perhaps this is used. The presence of the rom would seem to
+        indicate that the default is being used. We won't know, of
+        course, until the device is emulated.
+
+        Keyboard input can also come from the serial port (a 8250).
+        Either device will signal an interrupt to the CPU when a key
+        is pressed/sent.
+
+        MAME's implentation of the 8250 seems incomplete, for example
+        there is no facility to change the clock speed.
+
+        For the moment, the "terminal" device is used for the keyboard,
+        and the interrupt is a periodic timer.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
+#include "machine/ins8250.h"
+
 
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define H19_BEEP_FRQ (H19_CLOCK / 1024)
-// next one needs to be measured
-#define H19_IRQ_PULSE (H19_BEEP_FRQ / 2)
 
 
 class h19_state : public driver_device
@@ -63,17 +81,69 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1E) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x61, 0x61) AM_MIRROR(0x1E) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x00, 0x1F) AM_READ_PORT("S401")
+	AM_RANGE(0x20, 0x3F) AM_READ_PORT("S402")
+	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_r, ins8250_w )
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc0, 0xff) AM_WRITE(h19_c0_w)
-	//AM_RANGE(0x00, 0x3F) powerup logic
-	//AM_RANGE(0x40, 0x5F) serial control
-	//AM_RANGE(0x80, 0x9F) keyboard data
+	//AM_RANGE(0x80, 0x9F) keyboard control
 	//AM_RANGE(0xA0, 0xBF) keyboard control
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( h19 )
+	PORT_START("S401")
+	PORT_DIPNAME( 0x0f, 0x03, "Baud Rate")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x10, "Odd")
+	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x40, "Stick")
+	PORT_DIPNAME( 0x80, 0x00, "Duplex")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
+
+	PORT_START("S402")
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")
+	PORT_DIPSETTING(    0x00, "Underline")
+	PORT_DIPSETTING(    0x01, "Block")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")
+	PORT_DIPSETTING(    0x02, DEF_STR(No))
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes))
+	PORT_DIPNAME( 0x20, 0x00, "Mode")
+	PORT_DIPSETTING(    0x00, "VT52")
+	PORT_DIPSETTING(    0x20, "ANSI")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x40, DEF_STR(Yes))
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")
+	PORT_DIPSETTING(    0x00, "50Hz")
+	PORT_DIPSETTING(    0x80, "60Hz")
 INPUT_PORTS_END
 
 
@@ -132,6 +202,20 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	}
 }
 
+INS8250_INTERRUPT(h19_ace_irq)
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+}
+
+static const ins8250_interface h19_ace_interface =
+{
+	4800, // clock (baud * 16)
+	h19_ace_irq, // interrupt
+	NULL, // transmit func
+	NULL, // handshake out
+	NULL // refresh func
+};
+
 static const mc6845_interface h19_crtc6845_interface =
 {
 	"screen",
@@ -170,7 +254,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MDRV_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
 	MDRV_CPU_PROGRAM_MAP(h19_mem)
 	MDRV_CPU_IO_MAP(h19_io)
-	MDRV_DEVICE_PERIODIC_INT(irq0_line_hold, H19_IRQ_PULSE)
+	MDRV_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // see notes above
 
 	MDRV_MACHINE_RESET(h19)
 
@@ -186,6 +270,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
+	MDRV_INS8250_ADD( "ins8250", h19_ace_interface )
 
 	MDRV_VIDEO_START( h19 )
 	MDRV_VIDEO_UPDATE( h19 )
@@ -223,4 +308,4 @@ ROM_END
 /* Driver (year is either 1978 or 1979) */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, h19,     0,       0,	h19,	h19,	 0, 	"Heath Inc", "Heathkit H-19", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1978, h19,     0,       0,	h19,	h19,	 0, 	"Heath Inc", "Heathkit H-19", GAME_NOT_WORKING )
