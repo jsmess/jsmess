@@ -259,7 +259,7 @@ void portfolio_state::scan_keyboard()
 //  TIMER_DEVICE_CALLBACK( keyboard_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK( keyboard_tick )
+static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
 	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
 
