@@ -639,6 +639,7 @@ const game_driver * const drivers[] =
 	DRIVER( poisk1 )
 	DRIVER( poisk2 )
 	DRIVER( mc1702 )
+	DRIVER( mc1502 )
 
 	/* AT */
 	DRIVER( ibm5170 )   /* 1984 IBM PC/AT 5170, original 6 MHz model    */

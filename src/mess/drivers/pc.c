@@ -3312,6 +3312,16 @@ ROM_START( mc1702 )
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
+
+
+ROM_START( mc1502 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD( "mc1502.rom", 0xfc000, 0x4000, CRC(a48295d5) SHA1(6f38977c22f9cc6c2bc6f6e53edc4048ca6b6721))
+	
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
+	// Here CGA rom with cyrillic support should be added
+ROM_END
 /***************************************************************************
 
   Game driver(s)
@@ -3356,4 +3366,5 @@ COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1
 COMP ( 1989,	mk88,       ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "MK-88" , GAME_NOT_WORKING)
 COMP ( 1990,	poisk1,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Poisk-1" , GAME_NOT_WORKING)
 COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,	pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
-COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "MC-1702" , GAME_NOT_WORKING)
+COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1702" , GAME_NOT_WORKING)
+COMP ( 19??,	mc1502,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1502" , GAME_NOT_WORKING)
