@@ -32,7 +32,7 @@
 	<view name="Heathkit H8">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="1" top="1" right="600" bottom="480" />
+			<bounds left="1" top="65" right="600" bottom="200" />
 		</bezel>
 		<bezel name="digit1" element="digit">
 			<bounds left="107" top="075" right="154" bottom="146" />
@@ -62,28 +62,28 @@
 			<bounds left="539" top="075" right="586" bottom="146" />
 		</bezel>
 		<bezel name="ion_led" element="red_led">
-			<bounds left="40" right="55" top="100" bottom="118" />
+			<bounds left="5" right="20" top="100" bottom="115" />
 		</bezel>
 		<bezel name="mon_led" element="red_led">
-			<bounds left="40" right="55" top="125" bottom="142" />
+			<bounds left="5" right="20" top="125" bottom="140" />
 		</bezel>
 		<bezel name="run_led" element="red_led">
-			<bounds left="40" right="55" top="150" bottom="166" />
+			<bounds left="5" right="20" top="150" bottom="165" />
 		</bezel>
 		<bezel name="pwr_led" element="red_led">
-			<bounds left="40" right="55" top="175" bottom="190" />
+			<bounds left="5" right="20" top="175" bottom="190" />
 		</bezel>
 		<bezel name="ion_txt" element="ION">
-			<bounds left="59" right="85" top="100" bottom="118" />
+			<bounds left="25" right="50" top="100" bottom="115" />
 		</bezel>
 		<bezel name="mon_txt" element="MON">
-			<bounds left="59" right="85" top="125" bottom="142" />
+			<bounds left="25" right="50" top="125" bottom="140" />
 		</bezel>
 		<bezel name="run_txt" element="RUN">
-			<bounds left="59" right="85" top="150" bottom="166" />
+			<bounds left="25" right="50" top="150" bottom="165" />
 		</bezel>
 		<bezel name="pwr_txt" element="PWR">
-			<bounds left="59" right="85" top="175" bottom="190" />
+			<bounds left="25" right="50" top="175" bottom="190" />
 		</bezel>
 		<bezel name="adr_txt" element="ADR">
 			<bounds left="100" right="455" top="175" bottom="190" />
