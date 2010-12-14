@@ -14,7 +14,7 @@
                 BAUDX4   5 |             | 36  DB1
                  DTR1L   6 |             | 35  COMDATA
                  CTS2L   7 |             | 34  MDSELDH
-                 DCSML   8 |             | 33  MDSELCKH
+                 DCSML   8 |             | 33  MDSELCKN
                   ROWL   9 |             | 32  VSYNCH
                  PCENL  10 |    ZX8302   | 31  XTAL2
                    Vdd  11 |     ULA     | 30  XTAL1
@@ -69,6 +69,7 @@ struct zx8302_interface
 {
 	int rtc_clock;				// the RTC clock (pin 30) of the chip
 
+	// serial
 	devcb_write_line	out_ipl1l_func;
 	devcb_write_line	out_baudx4_func;
 	devcb_write_line	out_comdata_func;
@@ -78,6 +79,16 @@ struct zx8302_interface
 	devcb_read_line		in_cts2_func;
 	devcb_write_line	out_netout_func;
 	devcb_read_line		in_netin_func;
+
+	// microdrive
+	devcb_write_line	out_mdselck_func;
+	devcb_write_line	out_mdseld_func;
+	devcb_write_line	out_mdrdw_func;
+	devcb_write_line	out_erase_func;
+	devcb_write_line	out_raw1_func;
+	devcb_read_line		in_raw1_func;
+	devcb_write_line	out_raw2_func;
+	devcb_read_line		in_raw2_func;
 };
 
 
@@ -154,6 +165,15 @@ private:
 	devcb_resolved_write_line	m_out_netout_func;
 	devcb_resolved_read_line	m_in_netin_func;
 
+	devcb_resolved_write_line	m_out_mdselck_func;
+	devcb_resolved_write_line	m_out_mdseld_func;
+	devcb_resolved_write_line	m_out_mdrdw_func;
+	devcb_resolved_write_line	m_out_erase_func;
+	devcb_resolved_write_line	m_out_raw1_func;
+	devcb_resolved_read_line	m_in_raw1_func;
+	devcb_resolved_write_line	m_out_raw2_func;
+	devcb_resolved_read_line	m_in_raw2_func;
+
 	// registers
 	UINT8 m_idr;					// IPC data register
 	UINT8 m_tcr;					// transfer control register
@@ -174,11 +194,6 @@ private:
 	int m_tx_bits;					// bits transmitted
 
 	// microdrive state
-	int m_mdrdw;					// read/write
-	int m_mdselck;					// select clock
-	int m_mdseld;					// select data
-	int m_erase;					// erase head
-	int m_mdv_motor;				// selected motor
 	UINT8 m_mdv_data[2];			// track data register
 	int m_track;					// current track
 

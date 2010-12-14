@@ -129,6 +129,14 @@ void zx8302_device_config::device_config_complete()
 		memset(&in_cts2_func, 0, sizeof(in_cts2_func));
 		memset(&out_netout_func, 0, sizeof(out_netout_func));
 		memset(&in_netin_func, 0, sizeof(in_netin_func));
+		memset(&out_mdselck_func, 0, sizeof(out_mdselck_func));
+		memset(&out_mdseld_func, 0, sizeof(out_mdseld_func));
+		memset(&out_mdrdw_func, 0, sizeof(out_mdrdw_func));
+		memset(&out_erase_func, 0, sizeof(out_erase_func));
+		memset(&out_raw1_func, 0, sizeof(out_raw1_func));
+		memset(&in_raw1_func, 0, sizeof(in_raw1_func));
+		memset(&out_raw2_func, 0, sizeof(out_raw2_func));
+		memset(&in_raw2_func, 0, sizeof(in_raw2_func));
 	}
 }
 
@@ -319,6 +327,14 @@ void zx8302_device::device_start()
 	devcb_resolve_read_line(&m_in_cts2_func, &m_config.in_cts2_func, this);
 	devcb_resolve_write_line(&m_out_netout_func, &m_config.out_netout_func, this);
 	devcb_resolve_read_line(&m_in_netin_func, &m_config.in_netin_func, this);
+	devcb_resolve_write_line(&m_out_mdselck_func, &m_config.out_mdselck_func, this);
+	devcb_resolve_write_line(&m_out_mdseld_func, &m_config.out_mdseld_func, this);
+	devcb_resolve_write_line(&m_out_mdrdw_func, &m_config.out_mdrdw_func, this);
+	devcb_resolve_write_line(&m_out_erase_func, &m_config.out_erase_func, this);
+	devcb_resolve_write_line(&m_out_raw1_func, &m_config.out_raw1_func, this);
+	devcb_resolve_read_line(&m_in_raw1_func, &m_config.in_raw1_func, this);
+	devcb_resolve_write_line(&m_out_raw2_func, &m_config.out_raw2_func, this);
+	devcb_resolve_read_line(&m_in_raw2_func, &m_config.in_raw2_func, this);
 
 	// allocate timers
 	m_txd_timer = device_timer_alloc(*this, TIMER_TXD);
@@ -344,11 +360,6 @@ void zx8302_device::device_start()
 	state_save_register_device_item(this, 0, m_ipc_busy);
 	state_save_register_device_item(this, 0, m_baudx4);
 	state_save_register_device_item(this, 0, m_tx_bits);
-	state_save_register_device_item(this, 0, m_mdrdw);
-	state_save_register_device_item(this, 0, m_mdselck);
-	state_save_register_device_item(this, 0, m_mdseld);
-	state_save_register_device_item(this, 0, m_erase);
-	state_save_register_device_item(this, 0, m_mdv_motor);
 	state_save_register_device_item_array(this, 0, m_mdv_data);
 	state_save_register_device_item(this, 0, m_track);
 }
@@ -376,10 +387,7 @@ void zx8302_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	case TIMER_GAP:
-		if (m_mdv_motor)
-		{
-			trigger_interrupt(INT_GAP);
-		}
+		trigger_interrupt(INT_GAP);
 		break;
 
 	case TIMER_IPC:
@@ -547,17 +555,13 @@ WRITE8_MEMBER( zx8302_device::mdv_control_w )
 
 	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
 
-	m_mdseld = BIT(data, 0);
-	m_mdselck = BIT(data, 1);
-	m_mdrdw = BIT(data, 2) ? 0 : 1;
-	m_erase = BIT(data, 3);
+	devcb_call_write_line(&m_out_mdseld_func, BIT(data, 0));
+	devcb_call_write_line(&m_out_mdselck_func, BIT(data, 1));
+	devcb_call_write_line(&m_out_mdrdw_func, BIT(data, 2));
+	devcb_call_write_line(&m_out_erase_func, BIT(data, 3));
 
-	// Microdrive selection shift register
-	if (m_mdselck)
+	if (BIT(data, 1))
 	{
-		m_mdv_motor >>= 1;
-		m_mdv_motor |= (m_mdseld << 7);
-
 		m_status &= ~STATUS_RX_BUFFER_FULL;
 	}
 }

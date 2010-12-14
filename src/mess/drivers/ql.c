@@ -10,10 +10,11 @@
 
     TODO:
 
+	- microdrive
+	- ZX8301 memory access slowdown
 	- use resnet.h to create palette
     - Tyche bios is broken
     - several disk interfaces (720K/1.44MB/3.2MB)
-    - discrete sound
     - Gold Card (68000 @ 16MHz, 2MB RAM)
     - Super Gold Card (68020 @ 24MHz, 4MB RAM)
     - QLToolkit II ROM
@@ -54,13 +55,27 @@
 #include "video/zx8301.h"
 #include "includes/ql.h"
 
-/* Intelligent Peripheral Controller (IPC) */
+
+
+
+//**************************************************************************
+//	INTELLIGENT PERIPHERAL CONTROLLER
+//**************************************************************************
+
+//-------------------------------------------------
+//  ipc_w - 
+//-------------------------------------------------
 
 WRITE8_MEMBER( ql_state::ipc_w )
 {
 	m_zx8302->comctl_w(0);
 	m_zx8302->comctl_w(1);
 }
+
+
+//-------------------------------------------------
+//  ipc_port1_w - 
+//-------------------------------------------------
 
 WRITE8_MEMBER( ql_state::ipc_port1_w )
 {
@@ -82,6 +97,11 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 	m_keylatch = data;
 }
 
+
+//-------------------------------------------------
+//  ipc_port2_w - 
+//-------------------------------------------------
+
 WRITE8_MEMBER( ql_state::ipc_port2_w )
 {
 	/*
@@ -92,49 +112,48 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
         1       Speaker output
         2       Interrupt output (IPL0-2)
         3       Interrupt output (IPL1)
-        4       Serial Clear-to-Send output (SER2 CTS)
-        5       Serial Data Terminal Ready output (SER1 DTR)
+        4       Serial Clear-to-Send output (SER1 CTS)
+        5       Serial Data Terminal Ready output (SER2 DTR)
         6       not connected
         7       ZX8302 serial link input/output (COMDATA)
 
     */
 
+	// speaker
+	speaker_level_w(m_speaker, BIT(data, 1));
+
+	// interrupts
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
 
 	if (ipl != m_ipl)
 	{
 		switch (ipl)
 		{
-		case 0:
-			cpu_set_input_line(m_maincpu, M68K_IRQ_7, ASSERT_LINE);
-			break;
-
-		case 1:
-			// CTRL-ALT-7 pressed
-			cpu_set_input_line(m_maincpu, M68K_IRQ_5, ASSERT_LINE);
-			break;
-
-		case 2:
-			cpu_set_input_line(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
-			break;
-
-		case 3:
-			cpu_set_input_line(m_maincpu, M68K_IRQ_7, CLEAR_LINE);
-			break;
+		case 0:	cpu_set_input_line(m_maincpu, M68K_IRQ_7, ASSERT_LINE);	break;
+		case 1:	cpu_set_input_line(m_maincpu, M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
+		case 2:	cpu_set_input_line(m_maincpu, M68K_IRQ_2, ASSERT_LINE);	break;
+		case 3:	cpu_set_input_line(m_maincpu, M68K_IRQ_7, CLEAR_LINE);	break;
 		}
 
 		m_ipl = ipl;
 	}
 
-	speaker_level_w(m_speaker, BIT(data, 1));
+	// clear to send
+	//rs232_cts_w(m_ser1, !BIT(data, 4));
 
-	m_ser2_cts = BIT(data, 4);
-	m_ser1_dtr = BIT(data, 5);
+	// data terminal ready
+	//rs232_dtr_w(m_ser2, !BIT(data, 5));
 
+	// COMDATA
 	m_comdata = BIT(data, 7);
 
 	m_zx8302->comdata_w(BIT(data, 7));
 }
+
+
+//-------------------------------------------------
+//  ipc_port2_r - 
+//-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_port2_r )
 {
@@ -153,17 +172,27 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
     */
 
-	int irq = (m_ser2_rxd | m_ser1_txd);
+//	int irq = (m_ser2_rxd | m_ser1_txd);
 
-	cpu_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
+//	cpu_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
 
-	return (m_comdata << 7) | irq;
+	return (m_comdata << 7);
 }
+
+
+//-------------------------------------------------
+//  ipc_t1_r - 
+//-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_t1_r )
 {
 	return m_baudx4;
 }
+
+
+//-------------------------------------------------
+//  ipc_bus_r - 
+//-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_bus_r )
 {
@@ -196,9 +225,17 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 	return data;
 }
 
-/* Memory Maps */
 
-static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8, ql_state )
+
+//**************************************************************************
+//	ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ql_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // 16K Cartridge ROM
 	AM_RANGE(0x010000, 0x017fff) AM_UNMAP // 32K Expansion I/O
@@ -216,7 +253,12 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8, ql_state )
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ipc_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ipc_io, ADDRESS_SPACE_IO, 8, ql_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
@@ -225,7 +267,15 @@ static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8, ql_state )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(ipc_bus_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-/* Input Ports */
+
+
+//**************************************************************************
+//	INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( ql )
 	PORT_START("ROW0")
@@ -329,6 +379,11 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
 INPUT_PORTS_END
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_es )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( ql_es )
 	PORT_INCLUDE(ql)
 
@@ -356,6 +411,11 @@ static INPUT_PORTS_START( ql_es )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('?')
 INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_de )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( ql_de )
 	PORT_INCLUDE(ql)
@@ -396,6 +456,11 @@ static INPUT_PORTS_START( ql_de )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_it )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( ql_it )
 	PORT_INCLUDE(ql)
@@ -441,52 +506,42 @@ static INPUT_PORTS_START( ql_it )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('.')
 INPUT_PORTS_END
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_fr )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( ql_fr )
 	PORT_INCLUDE(ql)
 INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_se )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( ql_se )
 	PORT_INCLUDE(ql)
 INPUT_PORTS_END
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( ql_dk )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( ql_dk )
 	PORT_INCLUDE(ql)
 INPUT_PORTS_END
 
-/* ZX8301 Interface */
 
-static ZX8301_INTERFACE( ql_zx8301_intf )
-{
-	M68008_TAG,
-	SCREEN_TAG,
-	DEVCB_DEVICE_LINE_MEMBER(ZX8302_TAG, zx8302_device, vsync_w)
-};
 
-/* ZX8302 Interface */
+//**************************************************************************
+//	VIDEO
+//**************************************************************************
 
-WRITE_LINE_MEMBER( ql_state::ql_baudx4_w )
-{
-	m_baudx4 = state;
-}
-
-WRITE_LINE_MEMBER( ql_state::ql_comdata_w )
-{
-	m_comdata = state;
-}
-
-static ZX8302_INTERFACE( ql_zx8302_intf )
-{
-	X2,
-	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+//-------------------------------------------------
+//  PALETTE_INIT( ql )
+//-------------------------------------------------
 
 static PALETTE_INIT( ql )
 {
@@ -500,6 +555,11 @@ static PALETTE_INIT( ql )
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff ); // white
 }
 
+
+//-------------------------------------------------
+//  VIDEO_UPDATE( ql )
+//-------------------------------------------------
+
 bool ql_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m_zx8301->update_screen(&bitmap, &cliprect);
@@ -507,46 +567,104 @@ bool ql_state::video_update(screen_device &screen, bitmap_t &bitmap, const recta
 	return 0;
 }
 
-/* Machine Drivers */
 
-void ql_state::machine_start()
+
+//**************************************************************************
+//	DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  ZX8301_INTERFACE( ql_zx8301_intf )
+//-------------------------------------------------
+
+static ZX8301_INTERFACE( ql_zx8301_intf )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	M68008_TAG,
+	SCREEN_TAG,
+	DEVCB_DEVICE_LINE_MEMBER(ZX8302_TAG, zx8302_device, vsync_w)
+};
 
-	// configure RAM 
-	switch (messram_get_size(m_ram))
-	{
-	case 128*1024:
-		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
-		break;
 
-	case 192*1024:
-		memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
-		break;
+//-------------------------------------------------
+//  ZX8302_INTERFACE( ql_zx8302_intf )
+//-------------------------------------------------
 
-	case 256*1024:
-		memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
-		break;
-
-	case 384*1024:
-		memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
-		break;
-
-	case 640*1024:
-		memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
-		break;
-	}
-
-	// register for state saving
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_ser1_txd);
-	state_save_register_global(machine, m_ser1_dtr);
-	state_save_register_global(machine, m_ser2_rxd);
-	state_save_register_global(machine, m_ser2_cts);
-	state_save_register_global(machine, m_ipl);
-	state_save_register_global(machine, m_comdata);
-	state_save_register_global(machine, m_baudx4);
+WRITE_LINE_MEMBER( ql_state::ql_baudx4_w )
+{
+	m_baudx4 = state;
 }
+
+WRITE_LINE_MEMBER( ql_state::ql_comdata_w )
+{
+	m_comdata = state;
+}
+
+WRITE_LINE_MEMBER( ql_state::zx8302_mdselck_w )
+{
+	microdrive_clk_w(m_mdv2, state);
+	microdrive_clk_w(m_mdv1, state);
+}
+
+WRITE_LINE_MEMBER( ql_state::zx8302_mdrdw_w )
+{
+	microdrive_read_write_w(m_mdv1, state);
+	microdrive_read_write_w(m_mdv2, state);
+}
+
+WRITE_LINE_MEMBER( ql_state::zx8302_erase_w )
+{
+	microdrive_erase_w(m_mdv1, state);
+	microdrive_erase_w(m_mdv2, state);
+}
+
+WRITE_LINE_MEMBER( ql_state::zx8302_raw1_w )
+{
+	microdrive_data1_w(m_mdv1, state);
+	microdrive_data1_w(m_mdv2, state);
+}
+
+READ_LINE_MEMBER( ql_state::zx8302_raw1_r )
+{
+	return microdrive_data1_r(m_mdv1) | microdrive_data1_r(m_mdv2);
+}
+
+WRITE_LINE_MEMBER( ql_state::zx8302_raw2_w )
+{
+	microdrive_data2_w(m_mdv1, state);
+	microdrive_data2_w(m_mdv2, state);
+}
+
+READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
+{
+	return microdrive_data2_r(m_mdv1) | microdrive_data2_r(m_mdv2);
+}
+
+static ZX8302_INTERFACE( ql_zx8302_intf )
+{
+	X2,
+	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
+	DEVCB_NULL, // TXD1
+	DEVCB_NULL, // TXD2
+	DEVCB_NULL, // DTR1
+	DEVCB_NULL, // CTS2
+	DEVCB_NULL, // NETOUT
+	DEVCB_NULL, // NETIN
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
+	DEVCB_DEVICE_LINE(MDV_1, microdrive_comms_in_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdrdw_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_erase_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_r),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_r)
+};
+
+
+//-------------------------------------------------
+//  floppy_config ql_floppy_config
+//-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( ql )
 	FLOPPY_OPTION(ql, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
@@ -593,23 +711,93 @@ static const floppy_config ql_floppy_config =
 	NULL
 };
 
+
+//-------------------------------------------------
+//  MICRODRIVE_CONFIG( mdv1_config )
+//-------------------------------------------------
+
+static MICRODRIVE_CONFIG( mdv1_config )
+{
+	DEVCB_DEVICE_LINE(MDV_2, microdrive_comms_in_w)
+};
+
+
+//-------------------------------------------------
+//  MICRODRIVE_CONFIG( mdv2_config )
+//-------------------------------------------------
+
+static MICRODRIVE_CONFIG( mdv2_config )
+{
+	DEVCB_NULL
+};
+
+
+
+//**************************************************************************
+//	MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( ql )
+//-------------------------------------------------
+
+void ql_state::machine_start()
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	// configure RAM 
+	switch (messram_get_size(m_ram))
+	{
+	case 128*1024:
+		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
+		break;
+
+	case 192*1024:
+		memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
+		break;
+
+	case 256*1024:
+		memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
+		break;
+
+	case 384*1024:
+		memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
+		break;
+
+	case 640*1024:
+		memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
+		break;
+	}
+
+	// register for state saving
+	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(machine, m_ipl);
+	state_save_register_global(machine, m_comdata);
+	state_save_register_global(machine, m_baudx4);
+}
+
+
+
+//**************************************************************************
+//	MACHINE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( ql )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_START( ql, ql_state )
 	// basic machine hardware
 	MDRV_CPU_ADD(M68008_TAG, M68008, X1/2)
-	MDRV_CPU_PROGRAM_MAP(ql_map)
+	MDRV_CPU_PROGRAM_MAP(ql_mem)
 
 	MDRV_CPU_ADD(I8749_TAG, I8749, X4)
-	MDRV_CPU_IO_MAP(ipc_io_map)
-
-	MDRV_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
-
-	MDRV_DEVICE_ADD(MDV1_TAG, MICRODRIVE, 0)
-	MDRV_DEVICE_ADD(MDV2_TAG, MICRODRIVE, 0)
+	MDRV_CPU_IO_MAP(ipc_io)
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50.08)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(960, 312)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
@@ -617,47 +805,80 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(ql)
 
-	MDRV_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
-
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	// devices
+	MDRV_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
+	MDRV_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ql_floppy_config)
 
-	/* internal ram */
+	MDRV_MICRODRIVE_ADD(MDV_1, mdv1_config)
+	MDRV_MICRODRIVE_ADD(MDV_2, mdv2_config)
+
+	// cartridge
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("ql_cart")
+
+	// software lists
+	MDRV_SOFTWARE_LIST_ADD("cart_list", "ql")
+
+	// internal ram
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
 MACHINE_CONFIG_END
 
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( ql_ntsc )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_DERIVED( ql_ntsc, ql )
+	// video hardware
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(960, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_CONFIG_END
 
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( opd )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_DERIVED( opd, ql )
-	/* internal ram */
+	// internal ram
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
 
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( megaopd )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_DERIVED( megaopd, ql )
-	/* internal ram */
+	// internal ram
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
-/* ROMs */
+
+
+//**************************************************************************
+//	ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( ql )
+//-------------------------------------------------
 
 ROM_START( ql )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
@@ -694,6 +915,11 @@ ROM_START( ql )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( ql_us )
+//-------------------------------------------------
+
 ROM_START( ql_us )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
     ROM_LOAD( "jsu.ic33", 0x0000, 0x8000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
@@ -706,6 +932,11 @@ ROM_START( ql_us )
 	ROM_REGION( 0x400, "plds", 0 )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ql_es )
+//-------------------------------------------------
 
 ROM_START( ql_es )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
@@ -720,6 +951,11 @@ ROM_START( ql_es )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( ql_fr )
+//-------------------------------------------------
+
 ROM_START( ql_fr )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
     ROM_LOAD( "mgf.ic33", 0x0000, 0x8000, NO_DUMP )
@@ -732,6 +968,11 @@ ROM_START( ql_fr )
 	ROM_REGION( 0x400, "plds", 0 )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ql_de )
+//-------------------------------------------------
 
 ROM_START( ql_de )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
@@ -752,6 +993,11 @@ ROM_START( ql_de )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( ql_it )
+//-------------------------------------------------
+
 ROM_START( ql_it )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
     ROM_LOAD( "mgi.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
@@ -764,6 +1010,11 @@ ROM_START( ql_it )
 	ROM_REGION( 0x400, "plds", 0 )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ql_se )
+//-------------------------------------------------
 
 ROM_START( ql_se )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
@@ -778,6 +1029,11 @@ ROM_START( ql_se )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( ql_gr )
+//-------------------------------------------------
+
 ROM_START( ql_gr )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
     ROM_LOAD( "efp.ic33", 0x0000, 0x8000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
@@ -790,6 +1046,11 @@ ROM_START( ql_gr )
 	ROM_REGION( 0x400, "plds", 0 )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ql_dk )
+//-------------------------------------------------
 
 ROM_START( ql_dk )
     ROM_REGION( 0x10000, M68008_TAG, 0 )
@@ -806,6 +1067,11 @@ ROM_START( ql_dk )
 	ROM_REGION( 0x400, "plds", 0 )
     ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( tonto )
+//-------------------------------------------------
 
 ROM_START( tonto )
     ROM_REGION( 0x400000, M68008_TAG, 0 )
@@ -828,6 +1094,11 @@ ROM_START( tonto )
 	ROM_LOAD( "rompack-5.rom", 0x020000, 0x008000, NO_DUMP )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( megaopd )
+//-------------------------------------------------
+
 ROM_START( megaopd )
     ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
@@ -849,9 +1120,13 @@ ROM_START( megaopd )
 	ROM_LOAD( "rompack-5.rom", 0x020000, 0x008000, NO_DUMP )
 ROM_END
 
-/* Computer Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS */
+
+//**************************************************************************
+//	SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS
 COMP( 1984, ql,     0,      0,      ql,         ql,     0,      "Sinclair Research Ltd",    "QL (UK)",      GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      "Sinclair Research Ltd",    "QL (USA)",     GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      "Sinclair Research Ltd",    "QL (Spain)",   GAME_SUPPORTS_SAVE )
