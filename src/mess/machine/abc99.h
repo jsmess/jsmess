@@ -19,8 +19,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ABC99_ADD(_tag) \
-    MDRV_DEVICE_ADD(_tag, ABC99, 0)
+#define MDRV_ABC99_ADD() \
+    MDRV_DEVICE_ADD(ABC99_TAG, ABC99, 0)
 
 
 
@@ -83,6 +83,10 @@ private:
 
 // device type definition
 extern const device_type ABC99;
+
+
+// keyboard matrix
+INPUT_PORTS_EXTERN( abc99 );
 
 
 
