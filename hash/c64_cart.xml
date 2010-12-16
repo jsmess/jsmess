@@ -217,9 +217,9 @@
     <publisher>&lt;unknown&gt;</publisher>
 
     <part name="cart" interface="c64_cart">
-      <dataarea name="rom" size="0x4000">
-        <rom name="shelp-$8.ba1" size="0x2000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
-        <rom name="shelp-$9.ba2" size="0x2000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x2000" />
+      <dataarea name="rom" size="0x2000">
+        <rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
+        <rom name="shelp-$9.ba2" size="0x1000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x1000" />
       </dataarea>
     </part>
   </software>
