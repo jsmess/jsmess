@@ -10,6 +10,7 @@
 
 	TODO:
 
+	- MCS-48 PC:01DC - Unimplemented opcode = 75 (ENT0 CLK, enable clock/3 output on T0)
 	- video
 	- keyboard
 	- mouse
@@ -17,6 +18,7 @@
 	- DMA
 	- DART
 	- CIO
+	- RTC
 	- hard disk (Xebec controller card w/ Z80A, 1K RAM, ROM "104521G", PROM "103911", Xebec 3198-0009, Xebec 3198-0045, 16MHz xtal, 20MHz xtal)
 	- monitor portrait/landscape mode
 
@@ -26,6 +28,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 #include "machine/abc99.h"
@@ -48,15 +51,34 @@
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x7efff) AM_RAM
-	AM_RANGE(0x7f100, 0x7f100) AM_DEVWRITE_LEGACY(SY6845EA_TAG, mc6845_address_w)
-	AM_RANGE(0x7f101, 0x7f101) AM_DEVREADWRITE_LEGACY(SY6845EA_TAG, mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x7f100, 0x7f100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
+	AM_RANGE(0x7f101, 0x7f101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
 //	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
 //	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
 //	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w)
+//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(E050_C16PC_TAG, e050c16pc_r, e050c16pc_w)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( xebec_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( xebec_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( xebec_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( xebec_io, ADDRESS_SPACE_IO, 8, abc1600_state )
 ADDRESS_MAP_END
 
 
@@ -80,17 +102,16 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  MC6845_UPDATE_ROW( abc1600_update_row )
+//  mc6845_interface crtc_intf
 //-------------------------------------------------
 
 static MC6845_UPDATE_ROW( abc1600_update_row )
 {
 }
 
-
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
+static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
+{
+}
 
 static const mc6845_interface crtc_intf =
 {
@@ -103,8 +124,19 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	NULL
+	crtc_update
 };
+
+
+//-------------------------------------------------
+//  VIDEO_UPDATE( abc1600 )
+//-------------------------------------------------
+
+void abc1600_state::video_start()
+{
+	// allocate video RAM
+	m_video_ram = auto_alloc_array(machine, UINT8, 128*1024);
+}
 
 
 //-------------------------------------------------
@@ -251,6 +283,10 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MDRV_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MDRV_CPU_PROGRAM_MAP(abc1600_mem)
 
+	MDRV_CPU_ADD(Z8400A_TAG, Z80, XTAL_16MHz/4)
+	MDRV_CPU_PROGRAM_MAP(xebec_mem)
+	MDRV_CPU_IO_MAP(xebec_io)
+
 	// video hardware
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -260,7 +296,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
     MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
-	MDRV_MC6845_ADD(SY6845EA_TAG, MC6845, XTAL_64MHz, crtc_intf)
+	MDRV_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz, crtc_intf)
 
 	// sound hardware
 
@@ -313,7 +349,7 @@ ROM_START( abc1600 )
 	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) )
 
 	ROM_REGION( 0x1000, Z8400A_TAG, 0 ) // Xebec hard disk controller card
-	ROM_LOAD( "104521g", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "104521g", 0x0800, 0x0800, BAD_DUMP CRC(1b004bdd) SHA1(ad8b14d9f2511826d7e81a11c23077fc02846fe7) ) // missing first half
 
 	ROM_REGION( 0x100, "103911", 0 ) // Xebec hard disk controller card
 	ROM_LOAD( "103911", 0x000, 0x100, NO_DUMP ) // DM74S288N
