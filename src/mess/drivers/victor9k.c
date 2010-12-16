@@ -15,7 +15,6 @@
 
     - floppy 8048
     - keyboard
-    - add HD46505S variant to mc6845.c
     - hires graphics
     - character attributes
     - brightness/contrast
@@ -911,7 +910,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_green)
 
-	MDRV_MC6845_ADD(HD46505S_TAG, H46505, 1000000, hd46505s_intf)
+	MDRV_MC6845_ADD(HD46505S_TAG, HD6845, 1000000, hd46505s_intf) // HD6845 == HD46505S
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
