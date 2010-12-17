@@ -8,12 +8,12 @@
 #define Z8410AB1_1_TAG		"7g"
 #define Z8410AB1_2_TAG		"8g"
 #define Z8470AB1_TAG		"17b"
+#define Z8530B1_TAG			"2a"
 #define Z8536B1_TAG			"15b"
 #define SAB1797_02P_TAG		"5a"
 #define FDC9229BT_TAG		"7a"
 #define E050_C16PC_TAG		"13b"
 #define SY6845E_TAG			"sy6845e"
-#define Z8400A_TAG			"z80"
 #define SCREEN_TAG			"screen"
 
 class abc1600_state : public driver_device

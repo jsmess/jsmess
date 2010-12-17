@@ -3,7 +3,7 @@
 	Luxor ABC 1600
 
 	Skeleton driver
-
+	
 */
 
 /*
@@ -19,7 +19,7 @@
 	- DART
 	- CIO
 	- RTC
-	- hard disk (Xebec controller card w/ Z80A, 1K RAM, ROM "104521G", PROM "103911", Xebec 3198-0009, Xebec 3198-0045, 16MHz xtal, 20MHz xtal)
+	- hard disk (Xebec S1410)
 	- monitor portrait/landscape mode
 
 */
@@ -28,10 +28,11 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
+#include "machine/8530scc.h"
 #include "machine/abc99.h"
+#include "machine/s1410.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
@@ -58,27 +59,10 @@ static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 //	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w)
+//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w)
 //	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(E050_C16PC_TAG, e050c16pc_r, e050c16pc_w)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( xebec_mem )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( xebec_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( xebec_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( xebec_io, ADDRESS_SPACE_IO, 8, abc1600_state )
 ADDRESS_MAP_END
 
 
@@ -283,10 +267,6 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MDRV_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MDRV_CPU_PROGRAM_MAP(abc1600_mem)
 
-	MDRV_CPU_ADD(Z8400A_TAG, Z80, XTAL_16MHz/4)
-	MDRV_CPU_PROGRAM_MAP(xebec_mem)
-	MDRV_CPU_IO_MAP(xebec_io)
-
 	// video hardware
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -305,9 +285,11 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MDRV_Z80DMA_ADD(Z8410AB1_1_TAG, 4000000, dma1_intf)
 	MDRV_Z80DMA_ADD(Z8410AB1_2_TAG, 4000000, dma2_intf)
 	MDRV_Z80DART_ADD(Z8470AB1_TAG, 4000000, dart_intf)
+	MDRV_SCC8530_ADD(Z8530B1_TAG, 4000000)
 	MDRV_WD179X_ADD(SAB1797_02P_TAG, fdc_intf)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_config)
 	MDRV_ABC99_ADD()
+	MDRV_S1410_ADD()
 
 	// internal ram
 	MDRV_RAM_ADD("messram")
@@ -347,12 +329,6 @@ ROM_START( abc1600 )
 	ROM_LOAD( "1023 6490352-01.11e", 0x410, 0x104, CRC(a2f350ac) SHA1(77e08654a197080fa2111bc3031cd2c7699bf82b) )
 	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) )
 	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) )
-
-	ROM_REGION( 0x1000, Z8400A_TAG, 0 ) // Xebec hard disk controller card
-	ROM_LOAD( "104521g", 0x0800, 0x0800, BAD_DUMP CRC(1b004bdd) SHA1(ad8b14d9f2511826d7e81a11c23077fc02846fe7) ) // missing first half
-
-	ROM_REGION( 0x100, "103911", 0 ) // Xebec hard disk controller card
-	ROM_LOAD( "103911", 0x000, 0x100, NO_DUMP ) // DM74S288N
 ROM_END
 
 
