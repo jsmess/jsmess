@@ -219,7 +219,7 @@ static const UINT8 tx0_palette[] =
 	pen_typewriter_bg, pen_red		/* red typing in typewriter */
 };
 
-static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
+static const UINT8 total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
 static GFXDECODE_START( tx0 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )

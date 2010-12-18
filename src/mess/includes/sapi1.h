@@ -16,6 +16,7 @@ public:
 	UINT8* sapi_video_ram;
 	UINT8 keyboard_mask;
 	UINT8 refresh_counter;
+	UINT8 zps3_25;
 };
 
 

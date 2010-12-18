@@ -32,15 +32,143 @@
 #define SGB_FRAMES_PER_SECOND	61.17
 
 
-/*----------- defined in audio/gb.c -----------*/
+#define MAX_ROMBANK 512
+#define MAX_RAMBANK 256
 
-DECLARE_LEGACY_SOUND_DEVICE(GAMEBOY, gameboy_sound);
 
-/* Custom Sound Interface */
-READ8_DEVICE_HANDLER( gb_sound_r );
-WRITE8_DEVICE_HANDLER( gb_sound_w );
-READ8_DEVICE_HANDLER( gb_wave_r );
-WRITE8_DEVICE_HANDLER( gb_wave_w );
+#define _NR_GB_VID_REGS		0x40
+
+struct layer_struct {
+	UINT8  enabled;
+	UINT8  *bg_tiles;
+	UINT8  *bg_map;
+	UINT8  xindex;
+	UINT8  xshift;
+	UINT8  xstart;
+	UINT8  xend;
+	/* GBC specific */
+	UINT8  *gbc_map;
+	INT16  bgline;
+};
+
+typedef struct {
+	int	window_lines_drawn;
+
+	UINT8	gb_vid_regs[_NR_GB_VID_REGS];
+	UINT8	bg_zbuf[160];
+
+	UINT16	cgb_bpal[32];	/* CGB current background palette table */
+	UINT16	cgb_spal[32];	/* CGB current sprite palette table */
+
+	UINT8	gb_bpal[4];		/* Background palette */
+	UINT8	gb_spal0[4];	/* Sprite 0 palette */
+	UINT8	gb_spal1[4];	/* Sprite 1 palette */
+
+	/* Things used to render current line */
+	int current_line;		/* Current line */
+	int cmp_line;			/* Compare line */
+	int sprCount;			/* Number of sprites on current line */
+	int sprite[10];			/* References to sprites to draw on current line */
+	int previous_line;		/* Previous line we've drawn in */
+	int start_x;			/* Pixel to start drawing from (inclusive) */
+	int end_x;				/* Pixel to end drawing (exclusive) */
+	int mode;				/* Keep track of internal STAT mode */
+	int state;				/* Current state of the video state machine */
+	int lcd_irq_line;
+	int triggering_line_irq;
+	int line_irq;
+	int triggering_mode_irq;
+	int mode_irq;
+	int delayed_line_irq;
+	int sprite_cycles;
+	int scrollx_adjust;
+	int oam_locked;
+	int vram_locked;
+	int pal_locked;
+	int hdma_enabled;
+	int hdma_possible;
+	struct layer_struct	layer[2];
+	emu_timer *lcd_timer;
+	int gbc_mode;
+
+	region_info *gb_vram;		/* Pointer to VRAM */
+	region_info *gb_oam;		/* Pointer to OAM memory */
+	UINT8	*gb_vram_ptr;
+	UINT8	*gb_chrgen;		/* Character generator */
+	UINT8	*gb_bgdtab;		/* Background character table */
+	UINT8	*gb_wndtab;		/* Window character table */
+	UINT8	gb_tile_no_mod;
+	UINT8	*gbc_chrgen;	/* CGB Character generator */
+	UINT8	*gbc_bgdtab;	/* CGB Background character table */
+	UINT8	*gbc_wndtab;	/* CGB Window character table */
+} gb_lcd_t;
+
+
+
+class gb_state : public driver_device
+{
+public:
+	gb_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 sgb_pal_data[4096];
+	UINT8 sgb_pal_map[20][18];
+	UINT16 sgb_pal[128];
+	UINT8 *sgb_tile_data;
+	UINT8 sgb_tile_map[2048];
+	UINT8 sgb_window_mask;
+	UINT8 sgb_hack;
+	//gb_state driver_data;
+	UINT8		gb_io[0x10];
+
+	/* Timer related */
+	UINT16		divcount;
+	UINT8		shift;
+	UINT16		shift_cycles;
+	UINT8		triggering_irq;
+	UINT8		reloading;
+
+	/* Serial I/O related */
+	UINT32		SIOCount;				/* Serial I/O counter */
+	emu_timer	*gb_serial_timer;
+
+	/* SGB variables */
+	UINT8		sgb_atf_data[4050];		/* (SGB) Attributes files */
+
+	/* Cartridge/mapper */
+	UINT16		MBCType;				/* MBC type: 0 for none */
+	UINT8		CartType;				/* Cartridge type (battery, ram, rtc, etc) */
+	UINT8		*ROMMap[MAX_ROMBANK];	/* Addresses of ROM banks */
+	UINT16		ROMBank;				/* Index of ROM bank currently used at 4000-7fff */
+	UINT16		ROMBank00;				/* Index of ROM bank currently used at 0000-3fff */
+	UINT8		ROMMask;				/* Mask for the ROM bank number */
+	UINT16		ROMBanks;				/* Total number of ROM banks */
+	UINT8		*RAMMap[MAX_RAMBANK];	/* Addresses of RAM banks */
+	UINT8		RAMBank;				/* Number of RAM bank currently used */
+	UINT8		RAMMask;				/* Mask for the RAM bank number */
+	UINT8		RAMBanks;				/* Total number of RAM banks */
+	UINT8		MBC1Mode;				/* MBC1 ROM/RAM mode */
+	UINT8		*MBC3RTCData;			/* MBC3 RTC data */
+	UINT8		MBC3RTCMap[5];			/* MBC3 RTC banks */
+	UINT8		MBC3RTCBank;			/* MBC3 RTC bank */
+	UINT8		*GBC_RAMMap[8];			/* (CGB) Addresses of internal RAM banks */
+	UINT8		GBC_RAMBank;			/* (CGB) Current CGB RAM bank */
+	UINT8		gbTama5Memory[32];
+	UINT8		gbTama5Byte;
+	UINT8		gbTama5Address;
+	UINT8		gbLastTama5Command;
+	UINT8		*gb_cart;
+	UINT8		*gb_cart_ram;
+	UINT8		*gb_dummy_rom_bank;
+	UINT8		*gb_dummy_ram_bank;
+
+	UINT8 mmm01_bank_offset;
+	UINT8 mmm01_reg1;
+	UINT8 mmm01_bank;
+	UINT8 mmm01_bank_mask;
+	gb_lcd_t lcd;
+	void (*update_scanline)( running_machine *machine );
+};
 
 
 /*----------- defined in machine/gb.c -----------*/
@@ -66,13 +194,6 @@ MACHINE_RESET( gbpocket );
 #define SGB_XOFFSET				48	/* GB screen starts at column 48        */
 #define SGB_YOFFSET				40	/* GB screen starts at row 40           */
 
-extern UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours            */
-extern UINT8 sgb_pal_map[20][18];	/* Palette tile map                     */
-extern UINT16 sgb_pal[128];			/* SGB palette remapping                */
-extern UINT8 *sgb_tile_data;		/* 256 tiles of 32 bytes each           */
-extern UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute) */
-extern UINT8 sgb_window_mask;		/* Current GB screen mask               */
-extern UINT8 sgb_hack;				/* Flag set if we're using a hack       */
 
 extern MACHINE_START( sgb );
 extern MACHINE_RESET( sgb );

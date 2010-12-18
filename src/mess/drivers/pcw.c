@@ -771,12 +771,11 @@ static READ8_HANDLER(mcu_printer_p2_r)
 static WRITE8_HANDLER(mcu_printer_p2_w)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-	static UINT8 prev;
 
 	//logerror("PRN: MCU writing %02x to P2\n",data);
 	state->printer_p2 = data & 0x70;
 
-	if((data & 0x40) == 0 && (prev & 0x40) != 0)
+	if((data & 0x40) == 0 && (state->printer_p2_prev & 0x40) != 0)
 		pcw_printer_fire_pins(space->machine,state->printer_pins);
 
 	// handle shift/store
@@ -841,7 +840,7 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 		state->printer_pins |= 0x0100;
 	else
 		state->printer_pins &= ~0x0100;
-	prev = data;
+	state->printer_p2_prev = data;
 	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",data & 0x40 ? " " : "6",data & 0x20 ? " " : "5",data & 0x10 ? " " : "4",state->printer_shift_output,state->printer_headpos);
 }
 

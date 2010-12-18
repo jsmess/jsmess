@@ -33,6 +33,7 @@ public:
 	int stars1y;
 	int stars2x;
 	int stars2y;
+	const struct CPS1config *cps1_game_config;
 	UINT8 empty_tile8x8[8*8];
 	UINT8 empty_tile[32*32/2];
 };

@@ -20,7 +20,6 @@
 #include "includes/sapi1.h"
 #include "devices/messram.h"
 
-static UINT8 sapizps3_25;
 
 /* switch out the rom shadow */
 static WRITE8_HANDLER( sapizps3_00_w )
@@ -31,12 +30,14 @@ static WRITE8_HANDLER( sapizps3_00_w )
 /* to stop execution in random ram */
 static READ8_HANDLER( sapizps3_25_r )
 {
-	return sapizps3_25;
+	sapi1_state *state = space->machine->driver_data<sapi1_state>();
+	return state->zps3_25;
 }
 
 static WRITE8_HANDLER( sapizps3_25_w )
 {
-	sapizps3_25 = data & 0xfc; //??
+	sapi1_state *state = space->machine->driver_data<sapi1_state>();
+	state->zps3_25 = data & 0xfc; //??
 }
 
 

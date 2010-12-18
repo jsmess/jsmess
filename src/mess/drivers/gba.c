@@ -20,10 +20,10 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "devices/cartslot.h"
-#include "includes/gba.h"
-#include "includes/gb.h"
 #include "sound/dac.h"
 #include "machine/intelfsh.h"
+#include "audio/gb.h"
+#include "includes/gba.h"
 
 #define VERBOSE_LEVEL	(0)
 

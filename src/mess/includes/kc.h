@@ -74,6 +74,7 @@ public:
 	int kc85_blink_state;
 	unsigned char *kc85_4_display_video_ram;
 	unsigned char *kc85_4_video_ram;
+	const struct kc85_module *modules[256>>2];
 };
 
 

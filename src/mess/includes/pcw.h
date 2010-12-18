@@ -57,6 +57,7 @@ public:
 	UINT8 printer_p2;  // MCU port P2 state
 	UINT8 paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	bitmap_t* prn_output;
+	UINT8 printer_p2_prev;
 };
 
 

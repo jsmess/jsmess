@@ -296,7 +296,6 @@ static const struct kc85_module kc85_disk_interface_device=
 	"Disk Interface"
 };
 
-static const struct kc85_module *modules[256>>2];
 /*
 
     port xx80
@@ -315,6 +314,7 @@ static const struct kc85_module *modules[256>>2];
 
  READ8_HANDLER(kc85_module_r)
 {
+	kc_state *state = space->machine->driver_data<kc_state>();
 	int port_upper;
 	int module_index;
 
@@ -330,9 +330,9 @@ static const struct kc85_module *modules[256>>2];
 
 	module_index = (port_upper>>2) & 0x03f;
 
-	if (modules[module_index])
+	if (state->modules[module_index])
 	{
-		return modules[module_index]->id;
+		return state->modules[module_index]->id;
 	}
 
 	return 0x0ff;
@@ -351,10 +351,10 @@ static void kc85_module_system_init(kc_state *state)
 	state->kc85_module_rom = NULL;
 	for (i=0; i<64; i++)
 	{
-		modules[i] = NULL;
+		state->modules[i] = NULL;
 	}
 
-	modules[30] = &kc85_disk_interface_device;
+	state->modules[30] = &kc85_disk_interface_device;
 }
 
 
