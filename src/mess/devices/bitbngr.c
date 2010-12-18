@@ -25,12 +25,12 @@ struct _bitbanger_token
 	int build_byte;
 	attotime idle_delay;
 	attotime current_baud;
-	UINT8 *input_buffer;
 	UINT32 input_buffer_size;
 	UINT32 input_buffer_cursor;
 	int mode;
 	int baud;
 	int tune;
+	UINT8 input_buffer[1000];
 };
 
 
@@ -298,37 +298,36 @@ bool bitbanger_dec_tune(running_device *device, bool test)
 /*-------------------------------------------------
     bitbanger_bytes_to_bits_81N
 -------------------------------------------------*/
-static void bitbanger_bytes_to_bits_81N(running_device *img, UINT8 **buffer, UINT32 *size)
+static void bitbanger_bytes_to_bits_81N(running_device *img)
 {
+   bitbanger_token *bi = get_token(img);
    UINT8 byte_buffer[100];
-   static UINT8 bit_buffer[1000];
    UINT32 byte_buffer_size, bit_buffer_size;
    int i, j;
    static const UINT8 bitmask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
    bit_buffer_size = 0;
-   byte_buffer_size = 100;
-   byte_buffer_size = native_input(img, &byte_buffer, byte_buffer_size);
+   byte_buffer_size = native_input(img, byte_buffer, sizeof(byte_buffer));
 
    /* Translate byte buffer into bit buffer using: 1 start bit, 8 data bits, 1 stop bit, no parity */
 
    for( i=0; i<byte_buffer_size; i++ )
    {
-      bit_buffer[bit_buffer_size++] = 0;
+      bi->input_buffer[bit_buffer_size++] = 0;
 
       for( j=0; j<8; j++ )
       {
          if( byte_buffer[i] & bitmask[j] )
-            bit_buffer[bit_buffer_size++] = 1;
+            bi->input_buffer[bit_buffer_size++] = 1;
          else
-            bit_buffer[bit_buffer_size++] = 0;
+            bi->input_buffer[bit_buffer_size++] = 0;
       }
 
-      bit_buffer[bit_buffer_size++] = 1;
+      bi->input_buffer[bit_buffer_size++] = 1;
    }
 
-   *buffer = bit_buffer;
-   *size = bit_buffer_size;
+   bi->input_buffer_size = bit_buffer_size;
+   bi->input_buffer_cursor = 0;
 }
 
 
@@ -347,21 +346,20 @@ static DEVICE_START(bitbanger)
 	bi->build_count = 0;
 	bi->bitbanger_output_timer = timer_alloc(device->machine, bitbanger_output_timer, (void *) device);
 
-   /* input config */
+	/* input config */
 	bi->bitbanger_input_timer = timer_alloc(device->machine, bitbanger_input_timer, (void *) device );
-   bi->idle_delay = ATTOTIME_IN_SEC(1);
-	bi->input_buffer = 0;
+	bi->idle_delay = ATTOTIME_IN_SEC(1);
 	bi->input_buffer_size = 0;
 	bi->input_buffer_cursor = 0;
 
 	bi->mode = config->default_mode;
 	bi->baud = config->default_baud;
 	bi->tune = config->default_tune;
-   bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+	bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
 
 	/* test callback */
 	if(!config->input_callback)
-	   fatalerror("Misconfigured bitbanger device: input_callback cannot be NULL\n");
+		fatalerror("Misconfigured bitbanger device: input_callback cannot be NULL\n");
 }
 
 
@@ -406,8 +404,7 @@ static TIMER_CALLBACK(bitbanger_input_timer)
    if(bi->input_buffer_cursor == bi->input_buffer_size)
    {
       /* get more data */
-      bitbanger_bytes_to_bits_81N(device, &(bi->input_buffer), &(bi->input_buffer_size));
-      bi->input_buffer_cursor = 0;
+      bitbanger_bytes_to_bits_81N(device);
 
       if(bi->input_buffer_size == 0)
       {
@@ -467,12 +464,12 @@ void bitbanger_output(running_device *device, int value)
 
 static DEVICE_IMAGE_LOAD( bitbanger )
 {
-   device_t *device = &image.device();
+	device_t *device = &image.device();
 	bitbanger_token *bi;
 	bi = get_token(device);
 
 	timer_enable(bi->bitbanger_input_timer, TRUE);
-   timer_adjust_periodic(bi->bitbanger_input_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(bi->bitbanger_input_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	/* we don't need to do anything special */
 	return IMAGE_INIT_PASS;
@@ -485,7 +482,7 @@ static DEVICE_IMAGE_LOAD( bitbanger )
 
 static DEVICE_IMAGE_UNLOAD( bitbanger )
 {
-   device_t *device = &image.device();
+	device_t *device = &image.device();
 	bitbanger_token *bi;
 	bi = get_token(device);
 

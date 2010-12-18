@@ -147,6 +147,9 @@ struct _m6847_vdg
 	/* saved palette; used with CoCo 3 */
 	UINT32 saved_palette[16];
 
+	UINT32 saved_artifacting, saved_c0, saved_c1;
+	UINT32 expanded_colors[128];
+
 	/* 2^7 modes, 256/16 character groups, background/foreground */
 	UINT8 colordata[128][256/16][2];
 
@@ -1356,8 +1359,6 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 
 	UINT32 artifacting, c0, c1;
 	UINT32 colors[16];
-	static UINT32 saved_artifacting, saved_c0, saved_c1;
-	static UINT32 expanded_colors[128];
 	const double *factors;
 	UINT8 val;
 	UINT32 new_line[256];
@@ -1381,11 +1382,11 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 	c0 = line[i];
 
 	/* do we need to update our artifact colors table? */
-	if ((artifacting != saved_artifacting) || (c0 != saved_c0) || (c1 != saved_c1))
+	if ((artifacting != m6847->saved_artifacting) || (c0 != m6847->saved_c0) || (c1 != m6847->saved_c1))
 	{
-		saved_artifacting = artifacting;
-		saved_c0 = colors[0] = c0;
-		saved_c1 = colors[15] = c1;
+		m6847->saved_artifacting = artifacting;
+		m6847->saved_c0 = colors[0] = c0;
+		m6847->saved_c1 = colors[15] = c1;
 
 		/* mix the other colors */
 		for (i = 1; i <= 14; i++)
@@ -1397,7 +1398,7 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 					|	(mix_color(factors[2], c0 >>  0, c1 >>  0) <<  0);
 		}
 		for (i = 0; i < 128; i++)
-			expanded_colors[i] = colors[artifactcorrection[i]];
+			m6847->expanded_colors[i] = colors[artifactcorrection[i]];
 	}
 
 	/* artifact the line */
@@ -1410,8 +1411,8 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 			|	((line[i + 2] == c1) ? 0x02 : 0x00)
 			|	((line[i + 3] == c1) ? 0x01 : 0x00);
 
-		new_line[i + 0] = expanded_colors[val * 2 + 0];
-		new_line[i + 1] = expanded_colors[val * 2 + 1];
+		new_line[i + 0] = m6847->expanded_colors[val * 2 + 0];
+		new_line[i + 1] = m6847->expanded_colors[val * 2 + 1];
 	}
 
 	/* and copy the results back */

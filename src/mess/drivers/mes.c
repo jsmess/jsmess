@@ -51,7 +51,8 @@ static VIDEO_START( mes )
     Also the screen dimensions are a guess. */
 static VIDEO_UPDATE( mes )
 {
-	mes_state *state = screen->machine->driver_data<mes_state>();	//static UINT8 framecnt=0;
+	mes_state *state = screen->machine->driver_data<mes_state>();
+	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;
 

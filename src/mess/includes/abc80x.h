@@ -112,6 +112,7 @@ public:
 	// serial state
 	int m_sio_rxcb;
 	int m_sio_txcb;
+	int keylatch;
 };
 
 class abc800m_state : public abc800_state

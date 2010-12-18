@@ -2,7 +2,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ctronics.h"
-#include "machine/kay_kbd.h"
 #include "devices/snapquik.h"
 #include "includes/kaypro.h"
 #include "devices/flopdrv.h"
@@ -283,13 +282,13 @@ READ8_DEVICE_HANDLER( kaypro_sio_r )
 	else
 	if (offset == 1)
 //      return z80sio_d_r(device, 1);
-		return kay_kbd_d_r();
+		return kay_kbd_d_r(device->machine);
 	else
 	if (offset == 2)
 		return z80sio_c_r(device, 0);
 	else
 //      return z80sio_c_r(device, 1);
-		return kay_kbd_c_r();
+		return kay_kbd_c_r(device->machine);
 }
 
 WRITE8_DEVICE_HANDLER( kaypro_sio_w )

@@ -329,7 +329,6 @@ static const TMS9928a_interface tms9928a_interface =
 	msx_vdp_interrupt
 };
 
-
 MACHINE_START( msx )
 {
 	TMS9928A_configure(&tms9928a_interface);
@@ -339,6 +338,7 @@ MACHINE_START( msx )
 MACHINE_START( msx2 )
 {
 	msx_state *state = machine->driver_data<msx_state>();
+	state->port_c_old = 0xff;
 	state->dsk_stat = 0x7f;
 }
 
@@ -783,28 +783,27 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_a_w )
 
 static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 {
-	static int old_val = 0xff;
-
+	msx_state *state = device->machine->driver_data<msx_state>();
 	/* caps lock */
-	if ( (old_val ^ data) & 0x40)
+	if ( (state->port_c_old ^ data) & 0x40)
 		set_led_status (device->machine,1, !(data & 0x40) );
 
 	/* key click */
-	if ( (old_val ^ data) & 0x80)
+	if ( (state->port_c_old ^ data) & 0x80)
 		dac_signed_data_w (device->machine->device("dac"), (data & 0x80 ? 0x7f : 0));
 
 	/* cassette motor on/off */
-	if ( (old_val ^ data) & 0x10)
+	if ( (state->port_c_old ^ data) & 0x10)
 		cassette_change_state(cassette_device_image(device->machine),
 						(data & 0x10) ? CASSETTE_MOTOR_DISABLED :
 										CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
-	if ( (old_val ^ data) & 0x20)
+	if ( (state->port_c_old ^ data) & 0x20)
 		cassette_output(cassette_device_image(device->machine), (data & 0x20) ? -1.0 : 1.0);
 
-	old_val = data;
+	state->port_c_old = data;
 }
 
 static READ8_DEVICE_HANDLER( msx_ppi_port_b_r )

@@ -60,9 +60,9 @@ static MACHINE_RESET( zexall )
 	UINT8 *rom = memory_region(machine, "romcode");
 	UINT8 *ram = state->main_ram;
 	int i;
-    /* fill main ram with zexall code */
-    for (i = 0; i < 0x228a; i++)
-	{ ram[i] = rom[i];}
+	/* fill main ram with zexall code */
+	for (i = 0; i < 0x228a; i++)
+		ram[i] = rom[i];
 	//fprintf(stderr,"MACHINE_RESET: copied romcode to maincpu\n");
 }
 

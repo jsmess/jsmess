@@ -26,6 +26,21 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 chunky_graphics;
+	UINT8 *chunky_buffer;
+	UINT8 keypad_column;
+	UINT8 keyboard_ascii;
+	emu_timer *timer;
+	int via_0_irq_line;
+	int via_1_irq_line;
+	int kbd_irq_line;
+	UINT8 keyrows[10];
+	int lastrow;
+	int mask;
+	int key;
+	int repeat;
+	int repeater;
+	tilemap_t *bg_tilemap;
 };
 
 
@@ -50,9 +65,6 @@ WRITE8_HANDLER ( microtan_sound_w );
 
 
 /*----------- defined in video/microtan.c -----------*/
-
-extern UINT8 microtan_chunky_graphics;
-extern UINT8 *microtan_chunky_buffer;
 
 extern WRITE8_HANDLER ( microtan_videoram_w );
 

@@ -46,6 +46,7 @@ public:
 	UINT8 superloadrunner_bank;
 	UINT8 korean90in1_bank;
 	UINT8 *top_page;
+	int port_c_old;
 };
 
 

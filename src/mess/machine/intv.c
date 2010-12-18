@@ -6,17 +6,14 @@
 #define INTELLIVOICE_MASK	0x02
 #define ECS_MASK			0x01
 
-UINT8 intv_gramdirty;
-UINT8 intv_gram[512];
-UINT8 intv_gramdirtybytes[512];
 
-UINT16 *intvkbd_dualport_ram;
 
 WRITE16_HANDLER ( intvkbd_dualport16_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	unsigned char *RAM;
 
-	COMBINE_DATA(&intvkbd_dualport_ram[offset]);
+	COMBINE_DATA(&state->intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
 	RAM	 = memory_region(space->machine, "keyboard");
@@ -25,29 +22,28 @@ WRITE16_HANDLER ( intvkbd_dualport16_w )
 
 READ8_HANDLER ( intvkbd_dualport8_lsb_r )
 {
-	return (UINT8) (intvkbd_dualport_ram[offset] >> 0);
+	intv_state *state = space->machine->driver_data<intv_state>();
+	return (UINT8) (state->intvkbd_dualport_ram[offset] >> 0);
 }
 
 WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	unsigned char *RAM;
 
-	intvkbd_dualport_ram[offset] &= ~0x00FF;
-	intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
+	state->intvkbd_dualport_ram[offset] &= ~0x00FF;
+	state->intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
 	RAM	 = memory_region(space->machine, "keyboard");
 	RAM[offset] = data;
 }
 
-static int intvkbd_keyboard_col;
-static int tape_int_pending;
-static int sr1_int_pending;
 
-int intvkbd_text_blanked;
 
 READ8_HANDLER ( intvkbd_dualport8_msb_r )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	unsigned char rv;
 
 	if (offset < 0x100)
@@ -79,14 +75,14 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
-				if (sr1_int_pending)
+				if (state->sr1_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
 				break;
 			case 0x007:
-				if (tape_int_pending)
+				if (state->tape_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
@@ -94,36 +90,36 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 				break;
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
-				if (intvkbd_keyboard_col == 0)
+				if (state->intvkbd_keyboard_col == 0)
 					rv = input_port_read(space->machine, "ROW0");
-				if (intvkbd_keyboard_col == 1)
+				if (state->intvkbd_keyboard_col == 1)
 					rv = input_port_read(space->machine, "ROW1");
-				if (intvkbd_keyboard_col == 2)
+				if (state->intvkbd_keyboard_col == 2)
 					rv = input_port_read(space->machine, "ROW2");
-				if (intvkbd_keyboard_col == 3)
+				if (state->intvkbd_keyboard_col == 3)
 					rv = input_port_read(space->machine, "ROW3");
-				if (intvkbd_keyboard_col == 4)
+				if (state->intvkbd_keyboard_col == 4)
 					rv = input_port_read(space->machine, "ROW4");
-				if (intvkbd_keyboard_col == 5)
+				if (state->intvkbd_keyboard_col == 5)
 					rv = input_port_read(space->machine, "ROW5");
-				if (intvkbd_keyboard_col == 6)
+				if (state->intvkbd_keyboard_col == 6)
 					rv = input_port_read(space->machine, "ROW6");
-				if (intvkbd_keyboard_col == 7)
+				if (state->intvkbd_keyboard_col == 7)
 					rv = input_port_read(space->machine, "ROW7");
-				if (intvkbd_keyboard_col == 8)
+				if (state->intvkbd_keyboard_col == 8)
 					rv = input_port_read(space->machine, "ROW8");
-				if (intvkbd_keyboard_col == 9)
+				if (state->intvkbd_keyboard_col == 9)
 					rv = input_port_read(space->machine, "ROW9");
 				break;
 			case 0x80:
 				rv = 0x00;
 				logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
-				tape_int_pending = 0;
+				state->tape_int_pending = 0;
 				break;
 			case 0xa0:
 				rv = 0x00;
 				logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
-				sr1_int_pending = 0;
+				state->sr1_int_pending = 0;
 				break;
 			case 0xc0:
 			case 0xc1:
@@ -145,19 +141,16 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 				rv = intvkbd_tms9927_r(space, offset-0xc0);
 				break;
 			default:
-				rv = (intvkbd_dualport_ram[offset]&0x0300)>>8;
+				rv = (state->intvkbd_dualport_ram[offset]&0x0300)>>8;
 				logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
 				break;
 		}
 		return rv;
 	}
 	else
-		return (intvkbd_dualport_ram[offset]&0x0300)>>8;
+		return (state->intvkbd_dualport_ram[offset]&0x0300)>>8;
 }
 
-static int tape_interrupts_enabled;
-static int tape_unknown_write[6];
-static int tape_motor_mode;
 static const char *const tape_motor_mode_desc[8] =
 {
 	"IDLE", "IDLE", "IDLE", "IDLE",
@@ -166,6 +159,7 @@ static const char *const tape_motor_mode_desc[8] =
 
 WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	unsigned int mask;
 
 	if (offset < 0x100)
@@ -173,39 +167,39 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 		switch (offset)
 		{
 			case 0x020:
-				tape_motor_mode &= 3;
+				state->tape_motor_mode &= 3;
 				if (data & 1)
-					tape_motor_mode |= 4;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[tape_motor_mode]);
+					state->tape_motor_mode |= 4;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->tape_motor_mode]);
 				break;
 			case 0x021:
-				tape_motor_mode &= 5;
+				state->tape_motor_mode &= 5;
 				if (data & 1)
-					tape_motor_mode |= 2;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[tape_motor_mode]);
+					state->tape_motor_mode |= 2;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->tape_motor_mode]);
 				break;
 			case 0x022:
-				tape_motor_mode &= 6;
+				state->tape_motor_mode &= 6;
 				if (data & 1)
-					tape_motor_mode |= 1;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[tape_motor_mode]);
+					state->tape_motor_mode |= 1;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->tape_motor_mode]);
 				break;
 			case 0x023:
 			case 0x024:
 			case 0x025:
 			case 0x026:
 			case 0x027:
-				tape_unknown_write[offset - 0x23] = (data & 1);
+				state->tape_unknown_write[offset - 0x23] = (data & 1);
 				break;
 			case 0x040:
-				tape_unknown_write[5] = (data & 1);
+				state->tape_unknown_write[5] = (data & 1);
 				break;
 			case 0x041:
 				if (data & 1)
 					logerror("TAPE: Tape Interrupts Enabled\n");
 				else
 					logerror("TAPE: Tape Interrupts Disabled\n");
-				tape_interrupts_enabled = (data & 1);
+				state->tape_interrupts_enabled = (data & 1);
 				break;
 			case 0x042:
 				if (data & 1)
@@ -215,33 +209,33 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 				break;
 			case 0x043:
 				if (data & 0x01)
-					intvkbd_text_blanked = 0;
+					state->intvkbd_text_blanked = 0;
 				else
-					intvkbd_text_blanked = 1;
+					state->intvkbd_text_blanked = 1;
 				break;
 			case 0x044:
-				intvkbd_keyboard_col &= 0x0e;
-				intvkbd_keyboard_col |= (data&0x01);
+				state->intvkbd_keyboard_col &= 0x0e;
+				state->intvkbd_keyboard_col |= (data&0x01);
 				break;
 			case 0x045:
-				intvkbd_keyboard_col &= 0x0d;
-				intvkbd_keyboard_col |= ((data&0x01)<<1);
+				state->intvkbd_keyboard_col &= 0x0d;
+				state->intvkbd_keyboard_col |= ((data&0x01)<<1);
 				break;
 			case 0x046:
-				intvkbd_keyboard_col &= 0x0b;
-				intvkbd_keyboard_col |= ((data&0x01)<<2);
+				state->intvkbd_keyboard_col &= 0x0b;
+				state->intvkbd_keyboard_col |= ((data&0x01)<<2);
 				break;
 			case 0x047:
-				intvkbd_keyboard_col &= 0x07;
-				intvkbd_keyboard_col |= ((data&0x01)<<3);
+				state->intvkbd_keyboard_col &= 0x07;
+				state->intvkbd_keyboard_col |= ((data&0x01)<<3);
 				break;
 			case 0x80:
 				logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
-				tape_int_pending = 0;
+				state->tape_int_pending = 0;
 				break;
 			case 0xa0:
 				logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
-				sr1_int_pending = 0;
+				state->sr1_int_pending = 0;
 				break;
 			case 0xc0:
 			case 0xc1:
@@ -269,53 +263,57 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 	}
 	else
 	{
-		mask = intvkbd_dualport_ram[offset] & 0x00ff;
-		intvkbd_dualport_ram[offset] = mask | ((data<<8)&0x0300);
+		mask = state->intvkbd_dualport_ram[offset] & 0x00ff;
+		state->intvkbd_dualport_ram[offset] = mask | ((data<<8)&0x0300);
 	}
 }
 
 READ16_HANDLER( intv_gram_r )
 {
-	//logerror("read: %d = GRAM(%d)\n",intv_gram[offset],offset);
-	return (int)intv_gram[offset];
+	intv_state *state = space->machine->driver_data<intv_state>();
+	//logerror("read: %d = GRAM(%d)\n",state->gram[offset],offset);
+	return (int)state->gram[offset];
 }
 
 WRITE16_HANDLER( intv_gram_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
     data &= 0xFF;
 
-	intv_gram[offset] = data;
-	intv_gramdirtybytes[offset] = 1;
-    intv_gramdirty = 1;
+	state->gram[offset] = data;
+	state->gramdirtybytes[offset] = 1;
+    state->gramdirty = 1;
 }
 
-static unsigned char intv_ram8[256];
 
 READ16_HANDLER( intv_ram8_r )
 {
-	//logerror("%x = ram8_r(%x)\n",intv_ram8[offset],offset);
-	return (int)intv_ram8[offset];
+	intv_state *state = space->machine->driver_data<intv_state>();
+	//logerror("%x = ram8_r(%x)\n",state->ram8[offset],offset);
+	return (int)state->ram8[offset];
 }
 
 WRITE16_HANDLER( intv_ram8_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	//logerror("ram8_w(%x) = %x\n",offset,data);
-	intv_ram8[offset] = data&0xff;
+	state->ram8[offset] = data&0xff;
 }
 
-UINT16 intv_ram16[0x160];
 
 READ16_HANDLER( intv_ram16_r )
 {
-	//logerror("%x = ram16_r(%x)\n",intv_ram16[offset],offset);
-	return (int)intv_ram16[offset];
+	intv_state *state = space->machine->driver_data<intv_state>();
+	//logerror("%x = ram16_r(%x)\n",state->ram16[offset],offset);
+	return (int)state->ram16[offset];
 }
 
 WRITE16_HANDLER( intv_ram16_w )
 {
+	intv_state *state = space->machine->driver_data<intv_state>();
 	//logerror("%g: WRITING TO GRAM offset = %d\n",timer_get_time(machine),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
-	intv_ram16[offset] = data&0xffff;
+	state->ram16[offset] = data&0xffff;
 }
 
 static int intv_load_rom_file(device_image_interface &image)
@@ -497,8 +495,9 @@ static TIMER_CALLBACK(intv_interrupt_complete)
 
 INTERRUPT_GEN( intv_interrupt )
 {
+	intv_state *state = device->machine->driver_data<intv_state>();
 	cputag_set_input_line(device->machine, "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
-	sr1_int_pending = 1;
+	state->sr1_int_pending = 1;
 	timer_set(device->machine, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(3791), NULL, 0, intv_interrupt_complete);
 	intv_stic_screenrefresh(device->machine);
 }

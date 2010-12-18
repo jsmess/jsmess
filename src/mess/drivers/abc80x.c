@@ -341,7 +341,6 @@ static INPUT_PORTS_START( fake_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static int keylatch;
 
 static const UINT8 abc800_keycodes[7*4][8] =
 {
@@ -384,6 +383,7 @@ static const UINT8 abc800_keycodes[7*4][8] =
 
 static void scan_keyboard(running_machine *machine)
 {
+	abc800_state *state = machine->driver_data<abc800_state>();
 	UINT8 keycode = 0;
 	UINT8 data;
 	int table = 0, row, col;
@@ -419,26 +419,26 @@ static void scan_keyboard(running_machine *machine)
 
 	if (keycode)
 	{
-		if (keycode != keylatch)
+		if (keycode != state->keylatch)
 		{
 			z80dart_device *m_dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(m_dart, 0);
 			m_dart->receive_data(1, keycode);
 
-			keylatch = keycode;
+			state->keylatch = keycode;
 		}
 	}
 	else
 	{
-		if (keylatch)
+		if (state->keylatch)
 		{
 			z80dart_device *m_dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(m_dart, 1);
 			m_dart->receive_data(1, 0);
 
-			keylatch = 0;
+			state->keylatch = 0;
 		}
 	}
 }
@@ -1237,9 +1237,9 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
+	abc800_state *drvstate = device->machine->driver_data<abc800_state>();
 	running_device *sio = device->machine->device(Z80SIO_TAG);
 
-	static int m_sio_rxcb, m_sio_txcb; // FIXME
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -1251,12 +1251,12 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 	}
 
 	// connected to SIO/2 RxCB through a thingy
-	//m_sio_rxcb = ?
-	z80dart_rxcb_w(sio, m_sio_rxcb);
+	//drvstate->m_sio_rxcb = ?
+	z80dart_rxcb_w(sio, drvstate->m_sio_rxcb);
 
 	// connected to SIO/2 TxCB through a JK divide by 2
-	m_sio_txcb = !m_sio_txcb;
-	z80dart_txcb_w(sio, m_sio_txcb);
+	drvstate->m_sio_txcb = !drvstate->m_sio_txcb;
+	z80dart_txcb_w(sio, drvstate->m_sio_txcb);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )

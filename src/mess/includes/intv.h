@@ -7,7 +7,7 @@
 #ifndef INTV_H_
 #define INTV_H_
 
-struct intv_sprite_type
+typedef struct
 {
 	int visible;
 	int xpos;
@@ -24,9 +24,8 @@ struct intv_sprite_type
 	int card;
 	int color;
 	int doubleyres;
-
 	int dirty;
-};
+} intv_sprite_type;
 
 class intv_state : public driver_device
 {
@@ -35,6 +34,35 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	intv_sprite_type sprite[8];
+	UINT8 sprite_buffers[8][16][128];
+	int color_stack_mode;
+	int collision_registers[8];
+	int color_stack_offset;
+	int color_stack[4];
+	int stic_handshake;
+	int border_color;
+	int col_delay;
+	int row_delay;
+	int left_edge_inhibit;
+	int top_edge_inhibit;
+	UINT8 gramdirty;
+	UINT8 gram[512];
+	UINT8 gramdirtybytes[512];
+	UINT16 ram16[0x160];
+	int intvkbd_text_blanked;
+	UINT16 *intvkbd_dualport_ram;
+	int intvkbd_keyboard_col;
+	int tape_int_pending;
+	int sr1_int_pending;
+	int tape_interrupts_enabled;
+	int tape_unknown_write[6];
+	int tape_motor_mode;
+	unsigned char ram8[256];
+	UINT8 tms9927_num_rows;
+	UINT8 tms9927_cursor_col;
+	UINT8 tms9927_cursor_row;
+	UINT8 tms9927_last_row;
 };
 
 
@@ -43,18 +71,6 @@ public:
 READ16_HANDLER( intv_stic_r );
 WRITE16_HANDLER( intv_stic_w );
 
-extern struct intv_sprite_type intv_sprite[];
-extern UINT8 intv_sprite_buffers[8][16][128];
-extern int intv_color_stack_mode;
-extern int intv_collision_registers[];
-extern int intv_color_stack_offset;
-extern int intv_color_stack[];
-extern int intv_stic_handshake;
-extern int intv_border_color;
-extern int intv_col_delay;
-extern int intv_row_delay;
-extern int intv_left_edge_inhibit;
-extern int intv_top_edge_inhibit;
 
 /*----------- defined in video/intv.c -----------*/
 
@@ -70,10 +86,6 @@ WRITE8_HANDLER ( intvkbd_tms9927_w );
 /*----------- defined in machine/intv.c -----------*/
 
 /*  for the console alone... */
-extern UINT8 intv_gramdirty;
-extern UINT8 intv_gram[];
-extern UINT8 intv_gramdirtybytes[];
-extern UINT16 intv_ram16[];
 
 DEVICE_START( intv_cart );
 DEVICE_IMAGE_LOAD( intv_cart );
@@ -92,11 +104,9 @@ READ8_HANDLER( intv_right_control_r );
 READ8_HANDLER( intv_left_control_r );
 
 /* for the console + keyboard component... */
-extern int intvkbd_text_blanked;
 
 DEVICE_IMAGE_LOAD( intvkbd_cart );
 
-extern UINT16 *intvkbd_dualport_ram;
 WRITE16_HANDLER ( intvkbd_dualport16_w );
 READ8_HANDLER ( intvkbd_dualport8_lsb_r );
 WRITE8_HANDLER ( intvkbd_dualport8_lsb_w );

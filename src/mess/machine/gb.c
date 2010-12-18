@@ -247,6 +247,8 @@ MACHINE_START( gb )
 	gb_state *state = machine->driver_data<gb_state>();
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
+	state->sgb_packets = -1;
+
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( state->gb_serial_timer, 0 );
@@ -919,11 +921,7 @@ static const char *const sgbcmds[26] =
 WRITE8_HANDLER ( sgb_io_w )
 {
 	gb_state *state = space->machine->driver_data<gb_state>();
-	static UINT8 sgb_bitcount = 0, sgb_bytecount = 0, sgb_start = 0, sgb_rest = 0;
-	static UINT8 sgb_controller_no = 0, sgb_controller_mode = 0;
-	static INT8 sgb_packets = -1;
-	static UINT8 sgb_data[112];
-	static UINT32 sgb_atf;
+	UINT8 *sgb_data = state->sgb_data;
 
 	switch( offset )
 	{
@@ -931,41 +929,41 @@ WRITE8_HANDLER ( sgb_io_w )
 			switch (data & 0x30)
 			{
 			case 0x00:				   /* start condition */
-				if (sgb_start)
+				if (state->sgb_start)
 					logerror("SGB: Start condition before end of transfer ??\n");
-				sgb_bitcount = 0;
-				sgb_start = 1;
-				sgb_rest = 0;
+				state->sgb_bitcount = 0;
+				state->sgb_start = 1;
+				state->sgb_rest = 0;
 				JOYPAD = 0x0F & ((input_port_read(space->machine, "INPUTS") >> 4) | input_port_read(space->machine, "INPUTS") | 0xF0);
 				break;
 			case 0x10:				   /* data true */
-				if (sgb_rest)
+				if (state->sgb_rest)
 				{
 					/* We should test for this case , but the code below won't
                        work with the current setup */
 #if 0
-					if (sgb_bytecount == 16)
+					if (state->sgb_bytecount == 16)
 					{
 						logerror("SGB: end of block is not zero!");
-						sgb_start = 0;
+						state->sgb_start = 0;
 					}
 #endif
-					sgb_data[sgb_bytecount] >>= 1;
-					sgb_data[sgb_bytecount] |= 0x80;
-					sgb_bitcount++;
-					if (sgb_bitcount == 8)
+					sgb_data[state->sgb_bytecount] >>= 1;
+					sgb_data[state->sgb_bytecount] |= 0x80;
+					state->sgb_bitcount++;
+					if (state->sgb_bitcount == 8)
 					{
-						sgb_bitcount = 0;
-						sgb_bytecount++;
+						state->sgb_bitcount = 0;
+						state->sgb_bytecount++;
 					}
-					sgb_rest = 0;
+					state->sgb_rest = 0;
 				}
 				JOYPAD = 0x1F & ((input_port_read(space->machine, "INPUTS") >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
-				if (sgb_rest)
+				if (state->sgb_rest)
 				{
-					if( sgb_bytecount == 16 && sgb_packets == -1 )
+					if( state->sgb_bytecount == 16 && state->sgb_packets == -1 )
 					{
 #ifdef MAME_DEBUG
 						logerror("SGB: %s (%02X) pkts: %d data: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
@@ -974,10 +972,10 @@ WRITE8_HANDLER ( sgb_io_w )
 								sgb_data[8], sgb_data[9], sgb_data[10], sgb_data[11],
 								sgb_data[12], sgb_data[13], sgb_data[14], sgb_data[15]);
 #endif
-						sgb_packets = sgb_data[0] & 0x07;
-						sgb_start = 0;
+						state->sgb_packets = sgb_data[0] & 0x07;
+						state->sgb_start = 0;
 					}
-					if (sgb_bytecount == (sgb_packets << 4) )
+					if (state->sgb_bytecount == (state->sgb_packets << 4) )
 					{
 						switch( sgb_data[0] >> 3 )
 						{
@@ -1246,17 +1244,17 @@ WRITE8_HANDLER ( sgb_io_w )
 									/* Attribute File */
 									if( sgb_data[9] & 0x40 )
 										state->sgb_window_mask = 0;
-									sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
+									state->sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
 									if( sgb_data[9] & 0x80 )
 									{
 										for( J = 0; J < 18; J++ )
 										{
 											for( I = 0; I < 5; I++ )
 											{
-												state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0xC0) >> 6;
-												state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0x30) >> 4;
-												state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0xC) >> 2;
-												state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0x3;
+												state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC0) >> 6;
+												state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x30) >> 4;
+												state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC) >> 2;
+												state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x3;
 											}
 										}
 									}
@@ -1291,9 +1289,9 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x11:	/* MLT_REQ - Multi controller request */
 								if (sgb_data[1] == 0x00)
-									sgb_controller_mode = 0;
+									state->sgb_controller_mode = 0;
 								else if (sgb_data[1] == 0x01)
-									sgb_controller_mode = 2;
+									state->sgb_controller_mode = 2;
 								break;
 							case 0x12:	/* JUMP */
 								/* Not Implemented */
@@ -1339,15 +1337,15 @@ WRITE8_HANDLER ( sgb_io_w )
 									/* Attribute File */
 									if( sgb_data[1] & 0x40 )
 										state->sgb_window_mask = 0;
-									sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
+									state->sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
 									for( J = 0; J < 18; J++ )
 									{
 										for( I = 0; I < 5; I++ )
 										{
-											state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0xC0) >> 6;
-											state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0x30) >> 4;
-											state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0xC) >> 2;
-											state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + sgb_atf + I] & 0x3;
+											state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC0) >> 6;
+											state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x30) >> 4;
+											state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC) >> 2;
+											state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x3;
 										}
 									}
 								}
@@ -1371,33 +1369,33 @@ WRITE8_HANDLER ( sgb_io_w )
 								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
 						}
 
-						sgb_start = 0;
-						sgb_bytecount = 0;
-						sgb_packets = -1;
+						state->sgb_start = 0;
+						state->sgb_bytecount = 0;
+						state->sgb_packets = -1;
 					}
-					if( sgb_start )
+					if( state->sgb_start )
 					{
-						sgb_data[sgb_bytecount] >>= 1;
-						sgb_bitcount++;
-						if (sgb_bitcount == 8)
+						sgb_data[state->sgb_bytecount] >>= 1;
+						state->sgb_bitcount++;
+						if (state->sgb_bitcount == 8)
 						{
-							sgb_bitcount = 0;
-							sgb_bytecount++;
+							state->sgb_bitcount = 0;
+							state->sgb_bytecount++;
 						}
 					}
-					sgb_rest = 0;
+					state->sgb_rest = 0;
 				}
 				JOYPAD = 0x2F & (input_port_read(space->machine, "INPUTS") | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
-				if (sgb_start)
-					sgb_rest = 1;
-				if (sgb_controller_mode)
+				if (state->sgb_start)
+					state->sgb_rest = 1;
+				if (state->sgb_controller_mode)
 				{
-					sgb_controller_no++;
-					if (sgb_controller_no == sgb_controller_mode)
-						sgb_controller_no = 0;
-					JOYPAD = 0x3F - sgb_controller_no;
+					state->sgb_controller_no++;
+					if (state->sgb_controller_no == state->sgb_controller_mode)
+						state->sgb_controller_no = 0;
+					JOYPAD = 0x3F - state->sgb_controller_no;
 				}
 				else
 					JOYPAD = 0x3F;

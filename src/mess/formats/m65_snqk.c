@@ -217,6 +217,7 @@ static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
+	microtan_state *state = machine->driver_data<microtan_state>();
     UINT8 *RAM = memory_region(machine, "maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
@@ -241,7 +242,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
         /* 64 bytes of chunky graphics info */
         for (i = 0; i < 32*16; i++)
         {
-            microtan_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+            state->chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
         }
         base += 64;
         microtan_set_cpu_regs(machine, snapshot_buff, base);
@@ -292,7 +293,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
         }
 
         microtan_sound_w(space, 0, snapshot_buff[base++]);
-        microtan_chunky_graphics = snapshot_buff[base++];
+        state->chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
@@ -310,7 +311,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 
         for (i = 0; i < 32*16; i++)
         {
-            microtan_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+            state->chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
         }
         base += 64;
 

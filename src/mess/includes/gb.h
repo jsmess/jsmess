@@ -134,6 +134,15 @@ public:
 
 	/* SGB variables */
 	UINT8		sgb_atf_data[4050];		/* (SGB) Attributes files */
+	INT8 sgb_packets;
+	UINT8 sgb_bitcount;
+	UINT8 sgb_bytecount;
+	UINT8 sgb_start;
+	UINT8 sgb_rest;
+	UINT8 sgb_controller_no;
+	UINT8 sgb_controller_mode;
+	UINT8 sgb_data[112];
+	UINT32 sgb_atf;
 
 	/* Cartridge/mapper */
 	UINT16		MBCType;				/* MBC type: 0 for none */

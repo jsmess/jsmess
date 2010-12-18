@@ -36,7 +36,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ctronics.h"
-#include "machine/kay_kbd.h"
 #include "sound/beep.h"
 #include "devices/snapquik.h"
 #include "devices/flopdrv.h"

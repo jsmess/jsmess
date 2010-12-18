@@ -19,8 +19,6 @@
 #include "devices/harddriv.h"
 #include "image.h"
 
-static struct hd_state hd;
-
 static TIMER_CALLBACK( req_delay )
 {
 	sasi_ctrl_t* sasi = (sasi_ctrl_t*)ptr;
@@ -52,7 +50,6 @@ DEVICE_START( x68k_hdc )
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
 	sasi->phase = SASI_PHASE_BUSFREE;
-	hd.current_block = 0;
 }
 
 DEVICE_IMAGE_CREATE( sasihd )

@@ -96,12 +96,6 @@ struct _sasi_ctrl_t
 	int req;  // REQ
 };
 
-struct hd_state
-{
-	int current_block;
-	int current_pos;
-};
-
 DEVICE_START( x68k_hdc );
 
 DEVICE_IMAGE_CREATE( sasihd );

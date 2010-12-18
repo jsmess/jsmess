@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )	/* GRAM,     8-bits wide */
 	AM_RANGE(0x4800, 0x6fff) AM_ROM		/* Cartridges? */
 	AM_RANGE(0x7000, 0x7fff) AM_ROM	AM_REGION("maincpu", 0x7000<<1)	/* Keyboard ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_BASE(&intvkbd_dualport_ram)	/* Dual-port RAM */
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_BASE_MEMBER(intv_state, intvkbd_dualport_ram)	/* Dual-port RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)

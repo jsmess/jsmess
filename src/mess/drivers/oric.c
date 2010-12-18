@@ -30,7 +30,6 @@
 #include "machine/6522via.h"
 #include "machine/6551.h"
 #include "machine/wd17xx.h"
-#include "includes/apple2.h"
 
 /*
     Explaination of memory regions:
@@ -381,7 +380,7 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-    FLOPPY_OPTIONS_NAME(apple2),
+	FLOPPY_OPTIONS_NAME(apple2),
 	NULL
 };
 

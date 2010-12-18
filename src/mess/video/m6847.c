@@ -183,6 +183,9 @@ struct _mc6847_state
 	UINT8 attrs[384];
 	m6847_pixel screendata[192][32];
 
+	UINT32 saved_artifacting, saved_c0, saved_c1;
+	UINT32 expanded_colors[128];
+
 	/* saved palette; used with CoCo 3 */
 	UINT32 saved_palette[16];
 
@@ -195,7 +198,7 @@ struct _mc6847_state
 
 
 
-static void apply_artifacts(running_machine *machine, UINT32 *line);
+static void apply_artifacts(running_device *device, UINT32 *line);
 
 
 static const UINT8 pal_round_fontdata8x12[] =
@@ -1787,7 +1790,7 @@ static void render_scanline(running_device *device, bitmap_t *bitmap, int scanli
 		if ((attrs & (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 			== (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 		{
-			apply_artifacts(device->machine, line + 32);
+			apply_artifacts(device, line + 32);
 		}
 	}
 	else
@@ -2060,7 +2063,7 @@ static UINT32 mix_color(double factor, UINT8 c0, UINT8 c1)
 
 
 
-static void apply_artifacts(running_machine *machine, UINT32 *line)
+static void apply_artifacts(running_device *device, UINT32 *line)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
      * artifacting implmentation.  The only reason that it didn't look as
@@ -2110,17 +2113,16 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 		15, 11,		15, 11,		15, 15,		15, 15
 	};
 
+	mc6847_state *mc6847 = get_safe_token(device);
 	UINT32 artifacting, c0, c1;
 	UINT32 colors[16];
-	static UINT32 saved_artifacting, saved_c0, saved_c1;
-	static UINT32 expanded_colors[128];
 	const double *factors;
 	UINT8 val;
 	UINT32 new_line[256];
 	int i;
 
 	/* are we artifacting? */
-	artifacting = input_port_read_safe(machine, "artifacting", 0x00) & 0x03;
+	artifacting = input_port_read_safe(device->machine, "artifacting", 0x00) & 0x03;
 	if (artifacting == 0x00)
 		return;
 	artifacting &= 0x01;
@@ -2137,11 +2139,11 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 	c0 = line[i];
 
 	/* do we need to update our artifact colors table? */
-	if ((artifacting != saved_artifacting) || (c0 != saved_c0) || (c1 != saved_c1))
+	if ((artifacting != mc6847->saved_artifacting) || (c0 != mc6847->saved_c0) || (c1 != mc6847->saved_c1))
 	{
-		saved_artifacting = artifacting;
-		saved_c0 = colors[0] = c0;
-		saved_c1 = colors[15] = c1;
+		mc6847->saved_artifacting = artifacting;
+		mc6847->saved_c0 = colors[0] = c0;
+		mc6847->saved_c1 = colors[15] = c1;
 
 		/* mix the other colors */
 		for (i = 1; i <= 14; i++)
@@ -2153,7 +2155,7 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 					|	(mix_color(factors[2], c0 >>  0, c1 >>  0) <<  0);
 		}
 		for (i = 0; i < 128; i++)
-			expanded_colors[i] = colors[artifactcorrection[i]];
+			mc6847->expanded_colors[i] = colors[artifactcorrection[i]];
 	}
 
 	/* artifact the line */
@@ -2166,8 +2168,8 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 			|	((line[i + 2] == c1) ? 0x02 : 0x00)
 			|	((line[i + 3] == c1) ? 0x01 : 0x00);
 
-		new_line[i + 0] = expanded_colors[val * 2 + 0];
-		new_line[i + 1] = expanded_colors[val * 2 + 1];
+		new_line[i + 0] = mc6847->expanded_colors[val * 2 + 0];
+		new_line[i + 1] = mc6847->expanded_colors[val * 2 + 1];
 	}
 
 	/* and copy the results back */
