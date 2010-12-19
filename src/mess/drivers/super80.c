@@ -1,5 +1,11 @@
 /*
-Super80.c written by Robbbert, 2005-2009. See the MESS sysinfo and wiki for usage documentation. Below for the most technical bits:
+
+Super80.c written by Robbbert, 2005-2010. 
+
+2010-12-19: Added V3.7 bios freshly dumped today.
+
+See the MESS sysinfo and wiki for usage
+documentation. Below for the most technical bits:
 
 = Architecture (super80):
 
@@ -100,7 +106,7 @@ then reset ready for the next wave state. The code for this is in the TIMER_CALL
 A kit was produced by ETI magazine, which plugged into the line from your cassette player earphone
 socket. The computer line was plugged into this box instead of the cassette player. The box was
 fitted with a speaker and a volume control. You could listen to the tones, to assist with head
-alignment, and with debugging. In RMESS, a config switch has been provided so that you can turn
+alignment, and with debugging. In MESS, a config switch has been provided so that you can turn
 this sound on or off as needed.
 
 = About the 1 MHz / 2 MHz switching:
@@ -129,7 +135,7 @@ To obtain accurate timing, the video update routine will toggle the HALT line on
 Although physically incorrect, it is the only way to accurately emulate the speed change function.
 The video update routine emulates the blank screen by filling it with spaces.
 
-For the benefit of those who like to experiment, config switches have been provided in RMESS to
+For the benefit of those who like to experiment, config switches have been provided in MESS to
 allow you to leave the screen on at all times, and to always run at 2 MHz if desired. These options
 cannot exist in real hardware.
 
@@ -791,9 +797,10 @@ ROM_END
 
 ROM_START( super80m )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("s80-8r0.u26",	  0xc000, 0x1000, CRC(48d410d8) SHA1(750d984abc013a3344628300288f6d1ba140a95f) )
-	ROM_LOAD("s80-8r0.u33",   0xd000, 0x1000, CRC(9765793e) SHA1(4951b127888c1f3153004cc9fb386099b408f52c) )
-	ROM_LOAD("s80-8r0.u42",   0xe000, 0x1000, CRC(5f65d94b) SHA1(fe26b54dec14e1c4911d996c9ebd084a38dcb691) )
+	ROM_SYSTEM_BIOS(0, "Bios8R0", "8R0")
+	ROMX_LOAD("s80-8r0.u26",  0xc000, 0x1000, CRC(48d410d8) SHA1(750d984abc013a3344628300288f6d1ba140a95f), ROM_BIOS(1) )
+	ROMX_LOAD("s80-8r0.u33",  0xd000, 0x1000, CRC(9765793e) SHA1(4951b127888c1f3153004cc9fb386099b408f52c), ROM_BIOS(1) )
+	ROMX_LOAD("s80-8r0.u42",  0xe000, 0x1000, CRC(5f65d94b) SHA1(fe26b54dec14e1c4911d996c9ebd084a38dcb691), ROM_BIOS(1) )
 #if 0
 	/* Temporary patch to fix crash when lprinting a tab */
 	ROM_FILL(0xcc44,1,0x46)
@@ -809,6 +816,11 @@ ROM_START( super80m )
 	ROM_FILL(0xcc4e,1,0x00)
 	ROM_FILL(0xcc4f,1,0x00)
 #endif
+	ROM_SYSTEM_BIOS(1, "BiosV37", "V3.7")
+	ROMX_LOAD("s80-v37.u26",  0xc000, 0x1000, CRC(46043035) SHA1(1765105df4e4af83d56cafb88e158ed462d4709e), ROM_BIOS(2) )
+	ROMX_LOAD("s80-v37.u33",  0xd000, 0x1000, CRC(afb52b15) SHA1(0a2c25834074ce44bf12ac8532b4add492bcf950), ROM_BIOS(2) )
+	ROMX_LOAD("s80-v37.u42",  0xe000, 0x1000, CRC(7344b27a) SHA1(f43fc47ddb5c12bffffa63488301cd5eb386cc9a), ROM_BIOS(2) )
+
 	ROM_REGION(0x1800, "gfx1", 0)
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )
 	ROM_LOAD("super80d.u27",  0x1000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
@@ -831,8 +843,8 @@ ROM_END
 ROM_START( super80v )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("s80-v37v.u26",  0xc000, 0x1000, CRC(01e0c0dd) SHA1(ef66af9c44c651c65a21d5bda939ffa100078c08) )
-	ROM_LOAD("s80-v37.u33",   0xd000, 0x1000, CRC(812ad777) SHA1(04f355bea3470a7d9ea23bb2811f6af7d81dc400) )
-	ROM_LOAD("s80-v37.u42",   0xe000, 0x1000, CRC(e02e736e) SHA1(57b0264c805da99234ab5e8e028fca456851a4f9) )
+	ROM_LOAD("s80-v37v.u33",  0xd000, 0x1000, CRC(812ad777) SHA1(04f355bea3470a7d9ea23bb2811f6af7d81dc400) )
+	ROM_LOAD("s80-v37v.u42",  0xe000, 0x1000, CRC(e02e736e) SHA1(57b0264c805da99234ab5e8e028fca456851a4f9) )
 	ROM_LOAD("s80hmce.ic24",  0xf000, 0x0800, CRC(a6488a1e) SHA1(7ba613d70a37a6b738dcd80c2bb9988ff1f011ef) )
 
 	ROM_REGION( 0x1000, "videoram", ROMREGION_ERASEFF )
