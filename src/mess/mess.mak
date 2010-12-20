@@ -348,6 +348,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nokia.a \
 	$(MESSOBJ)/novag.a \
 	$(MESSOBJ)/olivetti.a \
+	$(MESSOBJ)/omnibyte.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/osi.a \
@@ -1204,6 +1205,10 @@ $(MESSOBJ)/novag.a:				\
 $(MESSOBJ)/olivetti.a:			\
 	$(MESS_DRIVERS)/m20.o		\
 
+$(MESSOBJ)/omnibyte.a:			\
+	$(MESS_DRIVERS)/msbc1.o		\
+	$(MESS_DRIVERS)/ob68k1a.o	\
+
 $(MESSOBJ)/orion.a:				\
 	$(MESS_DRIVERS)/orion.o		\
 	$(MESS_MACHINE)/orion.o		\
@@ -1719,11 +1724,9 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\
 	$(MESS_DRIVERS)/multi8.o	\
-	$(MESS_DRIVERS)/msbc1.o		\
 	$(MESS_DRIVERS)/mycom.o		\
 	$(MESS_DRIVERS)/nanos.o		\
 	$(MESS_DRIVERS)/next.o		\
-	$(MESS_DRIVERS)/ob68k1a.o	\
 	$(MESS_DRIVERS)/p112.o		\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/pegasus.o	\

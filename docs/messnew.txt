@@ -23,6 +23,7 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Ausbaufaehiger Mikrocomputer mit dem U 880 [Curt Coder]
 - Heathkit ET3400 [Robbbert]
+- Omnibyte OB68K1A [Curt Coder]
 
 
 
