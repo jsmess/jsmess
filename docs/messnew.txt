@@ -1,9 +1,9 @@
-0.141
+﻿0.141
 
 New System Drivers Supported:
 -----------------------------
 - Homebrew Z80 Computer by Kun-Szabo Marton [Miodrag Milanovic]
-- Microbee TeleTerm [Robbbert]
+- Microbee TeleTerm (not fully working) [Robbbert]
 - Mephisto Vancouver 68000 12Mhz [Cowering]
 - Mephisto Vancouver 68020 12Mhz [Cowering]
 - Mephisto Almeria 68000 12Mhz [Cowering]
@@ -55,6 +55,8 @@ System Driver Changes:
 
 - [AMU880] Fixed keyboard. [Curt Coder]
 
+- [AVIGO] Fixed regressions. [Robbbert]
+
 - [C64] Added known good dumps software list for cartridges. Not hooked up
   to driver code yet. [Curt Coder]
 
@@ -90,6 +92,10 @@ System Driver Changes:
   one or both the lens screens (remember that you can enable lens views by 
   selecting the Segascope views from the Video Options menu). The option 
   is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
+
+- [SUPER80] Added a bios found in a scrapped machine. [Robbbert]
+
+- [SUPER80] Added printer support for the 'super80e' [Robbbert]
 
 - [TANDY200] Limited video RAM to 8 KB as per hardware. [Curt Coder]
 
@@ -135,6 +141,12 @@ Source Changes:
 
 - Enabled loading ROMs from software lists to ROM_CART_LOAD entries. [Curt Coder]
 
+- Preliminary work done on these systems. Results vary from little difference
+  to almost fully working: beehive, c10, cd2650, ccs2422, czk80, d6800,
+  dolphin, et3400, h8, h19, k8915, mccpm, mekd2, mes, pipbug, qtsbc,
+  sapizcps3, selz80, sol20, uts20, vta2000, zsbc3 [Robbbert]
+
+- Added configurable cursor to the generic terminal device. [Robbbert]
 
 
 0.140
