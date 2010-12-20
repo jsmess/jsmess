@@ -44,49 +44,62 @@ enum
 
 
 // baud rate
-static const int BAUD_19200				= 0x00;
-static const int BAUD_9600				= 0x01;
-static const int BAUD_4800				= 0x02;
-static const int BAUD_2400				= 0x03;
-static const int BAUD_1200				= 0x04;
-static const int BAUD_600				= 0x05;
-static const int BAUD_300				= 0x06;
-static const int BAUD_75				= 0x07;
-static const int BAUD_MASK				= 0x07;
-
+enum
+{
+	 BAUD_19200				= 0x00,
+	 BAUD_9600				= 0x01,
+	 BAUD_4800				= 0x02,
+	 BAUD_2400				= 0x03,
+	 BAUD_1200				= 0x04,
+	 BAUD_600				= 0x05,
+	 BAUD_300				= 0x06,
+	 BAUD_75				= 0x07,
+	 BAUD_MASK				= 0x07,
+};
 
 // transmit mode
-static const int MODE_SER1				= 0x00;
-static const int MODE_SER2				= 0x08;
-static const int MODE_MDV				= 0x10;
-static const int MODE_NET				= 0x18;
-static const int MODE_MASK				= 0x18;
-
+enum
+{
+	 MODE_SER1				= 0x00,
+	 MODE_SER2				= 0x08,
+	 MODE_MDV				= 0x10,
+	 MODE_NET				= 0x18,
+	 MODE_MASK				= 0x18,
+};
 
 // interrupts
-static const int INT_GAP				= 0x01;
-static const int INT_INTERFACE			= 0x02;
-static const int INT_TRANSMIT			= 0x04;
-static const int INT_FRAME				= 0x08;
-static const int INT_EXTERNAL			= 0x10;
-
+enum
+{
+	 INT_GAP				= 0x01,
+	 INT_INTERFACE			= 0x02,
+	 INT_TRANSMIT			= 0x04,
+	 INT_FRAME				= 0x08,
+	 INT_EXTERNAL			= 0x10,
+};
 
 // status register
-static const int STATUS_NETWORK_PORT	= 0x01;
-static const int STATUS_TX_BUFFER_FULL	= 0x02;
-static const int STATUS_RX_BUFFER_FULL	= 0x04;
-static const int STATUS_MICRODRIVE_GAP	= 0x08;
-
+enum
+{
+	 STATUS_NETWORK_PORT	= 0x01,
+	 STATUS_TX_BUFFER_FULL	= 0x02,
+	 STATUS_RX_BUFFER_FULL	= 0x04,
+	 STATUS_MICRODRIVE_GAP	= 0x08,
+};
 
 // transmit bits
-static const int TXD_START				= 0;
-static const int TXD_STOP				= 9;
-static const int TXD_STOP2				= 10;
+enum
+{
+	 TXD_START				= 0,
+	 TXD_STOP				= 9,
+	 TXD_STOP2				= 10,
+};
 
 
 // Monday 1st January 1979 00:00:00 UTC
-static const int RTC_BASE_ADJUST		= 283996800;
-
+enum
+{
+	 RTC_BASE_ADJUST		= 283996800,
+};
 
 
 //**************************************************************************

@@ -271,6 +271,13 @@ error:
  *  0       IFF1: 0=DI/1=EI
  *
  *******************************************************************/
+static void spectrum_border_update(running_machine *machine, int data)
+{
+    spectrum_EventList_Reset(machine);
+    spectrum_border_set_last_color(machine, data);
+    spectrum_border_force_redraw(machine);
+}
+
 void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsize)
 {
     int i, SP_OFFSET;
@@ -378,9 +385,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     /* Set border color */
     data = snapdata[SP_OFFSET + 34] & 0x07;
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -591,9 +596,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         /* Set border color */
         data = snapdata[SNA48_OFFSET + 26] & 0x07;
         state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-        spectrum_EventList_Reset();
-        spectrum_border_set_last_color(data);
-        spectrum_border_force_redraw();
+	spectrum_border_update(machine, data);
         logerror("Border color:%02X\n", data);
 
         //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
@@ -637,9 +640,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         /* Set border color */
         data = snapdata[SNA48_OFFSET + 26] & 0x07;
         state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-        spectrum_EventList_Reset();
-        spectrum_border_set_last_color(data);
-        spectrum_border_force_redraw();
+	spectrum_border_update(machine, data);
         logerror("Border color:%02X\n", data);
         data = state->port_7ffd_data & 0x07;
 
@@ -773,9 +774,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = snapdata[ACH_OFFSET + 156] & 0x07;
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -922,9 +921,7 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -1126,9 +1123,7 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     //if (snapsize == PLUSD48_SIZE)
@@ -1248,9 +1243,7 @@ void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -1369,9 +1362,7 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = snapdata[SIT_OFFSET + 27] & 0x07;
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -1515,9 +1506,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -1635,9 +1624,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = snapdata[SNP_OFFSET +  2] & 0x07;
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -1885,9 +1872,7 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = snapdata[SNX_OFFSET + 32] & 0x07;
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     spectrum_page_basicrom(machine);
@@ -2053,9 +2038,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     //logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
@@ -2241,9 +2224,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     /* Set border color */
     state->port_fe_data = (state->port_fe_data & 0xf8) | ((snapdata[12] & 0x0e) >> 1);
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color((snapdata[12] & 0x0e) >> 1);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, (snapdata[12] & 0x0e) >> 1);
 
     lo = snapdata[13] & 0x0ff;
     hi = snapdata[14] & 0x0ff;
@@ -2555,9 +2536,7 @@ void spectrum_setup_raw(running_machine *machine, UINT8 *quickdata, UINT32 quick
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
     state->port_fe_data = (state->port_fe_data & 0xf8) | data;
-    spectrum_EventList_Reset();
-    spectrum_border_set_last_color(data);
-    spectrum_border_force_redraw();
+    spectrum_border_update(machine, data);
     logerror("Border color:%02X\n", data);
 
     log_quickload("BYTES", start, len, 0, EXEC_NA);

@@ -50,15 +50,17 @@
 
 
 // attributes
-static const int ATTRIBUTE_REVID	= 0x80;
-static const int ATTRIBUTE_INT		= 0x40;
-static const int ATTRIBUTE_BLINK	= 0x20;
-static const int ATTRIBUTE_MS1		= 0x10;
-static const int ATTRIBUTE_MS0		= 0x08;
-static const int ATTRIBUTE_CHABL	= 0x04;
-static const int ATTRIBUTE_BKC		= 0x02;
-static const int ATTRIBUTE_BLC		= 0x01;
-
+enum
+{
+	ATTRIBUTE_REVID = 0x80,
+	ATTRIBUTE_INT   = 0x40,
+	ATTRIBUTE_BLINK = 0x20,
+	ATTRIBUTE_MS1   = 0x10,
+	ATTRIBUTE_MS0   = 0x08,
+	ATTRIBUTE_CHABL = 0x04,
+	ATTRIBUTE_BKC   = 0x02,
+	ATTRIBUTE_BLC   = 0x01
+};
 
 
 //**************************************************************************

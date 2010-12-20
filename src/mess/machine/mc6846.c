@@ -59,6 +59,8 @@ typedef struct
 	emu_timer *interval; /* interval programmable timer */
 	emu_timer *one_shot; /* 1-us x factor one-shot timer */
 
+	int old_cif;
+	int old_cto;
 } mc6846_t;
 
 
@@ -106,19 +108,18 @@ INLINE UINT16 mc6846_counter( running_device *device )
 INLINE void mc6846_update_irq( running_device *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
-	static int old_cif;
 	int cif = 0;
 	/* composite interrupt flag */
 	if ( ( (mc6846->csr & 1) && (mc6846->tcr & 0x40) ) ||
 	     ( (mc6846->csr & 2) && (mc6846->pcr & 1) ) ||
 	     ( (mc6846->csr & 4) && (mc6846->pcr & 8) && ! (mc6846->pcr & 0x20) ) )
 		cif = 1;
-	if ( old_cif != cif )
+	if ( mc6846->old_cif != cif )
 	{
 		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n",
 		       attotime_to_double(timer_get_time(device->machine)), cif,
 		       mc6846->csr & 1, (mc6846->csr >> 1 ) & 1, (mc6846->csr >> 2 ) & 1 ));
-		old_cif = cif;
+		mc6846->old_cif = cif;
 	}
 	if ( cif )
 	{
@@ -140,11 +141,10 @@ INLINE void mc6846_update_cto ( running_device *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	int cto = CTO;
-	static int old_cto;
-	if ( cto != old_cto )
+	if ( cto != mc6846->old_cto )
 	{
 		LOG (( "%f: mc6846 CTO set to %i\n", attotime_to_double(timer_get_time(device->machine)), cto ));
-		old_cto = cto;
+		mc6846->old_cto = cto;
 	}
 	if ( mc6846->iface->out_cto_func )
 		mc6846->iface->out_cto_func( device, 0, cto );

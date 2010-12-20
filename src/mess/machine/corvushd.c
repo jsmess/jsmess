@@ -112,6 +112,7 @@ typedef struct {
 	UINT16	last_cylinder;		// Last cylinder accessed - for calculating seek times
 	UINT32	delay;				// Delay in microseconds for callback
 	emu_timer	*timeout_timer;	// Four-second timer for timeouts
+	UINT8	invalid_command_flag;		// I hate this, but it saves a lot more tests
 
 	//
 	// Union below represents both an input and output buffer and interpretations of it
@@ -1651,7 +1652,6 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 WRITE8_HANDLER ( corvus_hdc_data_w ) {
 
 	corvus_hdc_t	*c = &corvus_hdc;
-	static UINT8	invalid_command_flag;		// I hate this, but it saves a lot more tests
 
 	//
 	// Received a byte -- check to see if we should really respond
@@ -1673,7 +1673,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	//
 	if(c->offset == 0)	{													// First byte of a packet
 		LOG(("corvus_hdc_data_w: Received a byte with c->offset == 0.  Processing as command: 0x%2.2x\n", data));
-		invalid_command_flag = parse_hdc_command(data);
+		c->invalid_command_flag = parse_hdc_command(data);
 		timer_reset(c->timeout_timer, (ATTOTIME_IN_SEC(4)));
 		timer_enable(c->timeout_timer, 1);								// Start our four-second timer
 	} else if(c->offset == 1 && c->awaiting_modifier) {						// Second byte of a packet
@@ -1693,7 +1693,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
 	if(c->offset == c->recv_bytes) {						// We've received enough data to process
-		corvus_process_command_packet(space->machine, invalid_command_flag);
+		corvus_process_command_packet(space->machine, c->invalid_command_flag);
 	} else {
 		//
 		// Reset the four-second timer since we received some data

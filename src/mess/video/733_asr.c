@@ -44,7 +44,7 @@ static const rectangle asr_scroll_clear_window =
 	asr_window_offset_y+asr_window_height-1					/* max_y */
 };
 
-static struct
+typedef struct
 {
 #if 0
 	UINT8 OutQueue[ASROutQueueSize];
@@ -57,7 +57,10 @@ static struct
 
 	UINT8 status;
 	UINT8 mode;
+	UINT8 last_key_pressed;
+	int last_modifier_state;
 
+	unsigned char repeat_timer;
 	int new_status_flag;
 
 	int x;
@@ -65,7 +68,8 @@ static struct
 	void (*int_callback)(running_machine *, int state);
 
 	bitmap_t *bitmap;
-} asr[MAX_ASR];
+} asr_t;
+static asr_t asr[MAX_ASR];
 
 enum
 {
@@ -176,6 +180,7 @@ int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(ru
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();
 
+	asr[unit].last_key_pressed = 0x80;
 	asr[unit].bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	bitmap_fill(asr[unit].bitmap, &visarea, 0);
@@ -617,10 +622,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 		special_debounce = -1
 	} modifier_state_t;
 
-	static unsigned char repeat_timer;
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
-	static UINT8 last_key_pressed = 0x80;
-	static modifier_state_t last_modifier_state;
 
 	UINT16 key_buf[6];
 	int i, j;
@@ -655,38 +657,38 @@ void asr733_keyboard(running_machine *machine, int unit)
 
 	if (! repeat_mode)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
-		repeat_timer = 0;
+		asr[unit].repeat_timer = 0;
 
-	if ( ! (last_key_pressed & 0x80) && (key_buf[last_key_pressed >> 4] & (1 << (last_key_pressed & 0xf))))
+	if ( ! (asr[unit].last_key_pressed & 0x80) && (key_buf[asr[unit].last_key_pressed >> 4] & (1 << (asr[unit].last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
-		if (modifier_state == last_modifier_state)
+		if (modifier_state == asr[unit].last_modifier_state)
 		{
 			/* handle REPEAT mode if applicable */
-			if ((repeat_mode) && (++repeat_timer == repeat_delay))
+			if ((repeat_mode) && (++asr[unit].repeat_timer == repeat_delay))
 			{
 				if (asr[unit].status & AS_rrq_mask)
 				{	/* keyboard buffer full */
-					repeat_timer--;
+					asr[unit].repeat_timer--;
 				}
 				else
 				{	/* repeat current key */
 					asr[unit].status |= AS_rrq_mask;
 					asr[unit].new_status_flag = 1;	/* right??? */
 					asr_field_interrupt(machine, unit);
-					repeat_timer = 0;
+					asr[unit].repeat_timer = 0;
 				}
 			}
 		}
 		else
 		{
-			repeat_timer = 0;
-			last_modifier_state = special_debounce;
+			asr[unit].repeat_timer = 0;
+			asr[unit].last_modifier_state = special_debounce;
 		}
 	}
 	else
 	{
-		last_key_pressed = 0x80;
+		asr[unit].last_key_pressed = 0x80;
 
 		if (asr[unit].status & AS_rrq_mask)
 		{	/* keyboard buffer full */
@@ -700,10 +702,10 @@ void asr733_keyboard(running_machine *machine, int unit)
 				{
 					if (key_buf[i] & (1 << j))
 					{
-						last_key_pressed = (i << 4) | j;
-						last_modifier_state = modifier_state;
+						asr[unit].last_key_pressed = (i << 4) | j;
+						asr[unit].last_modifier_state = modifier_state;
 
-						asr[unit].recv_buf = (int)key_translate[modifier_state][last_key_pressed];
+						asr[unit].recv_buf = (int)key_translate[modifier_state][asr[unit].last_key_pressed];
 						asr[unit].status |= AS_rrq_mask;
 						asr[unit].new_status_flag = 1;	/* right??? */
 						asr_field_interrupt(machine, unit);

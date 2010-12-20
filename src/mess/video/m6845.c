@@ -135,8 +135,16 @@ typedef struct m6845_state
 	int Display_Disable_Delay;
 
 	int	Vertical_Adjust_Done;
-//  int cycles_to_vsync_start;
-//  int cycles_to_vsync_end;
+
+#if 0
+	/* timer to set vsync */
+	emu_timer *vsync_set_timer;
+	/* timer to reset vsync */
+	emu_timer *vsync_clear_timer;
+
+	int cycles_to_vsync_start;
+	int cycles_to_vsync_end;
+#endif
 } m6845_state;
 
 
@@ -145,13 +153,8 @@ static m6845_state crtc;
 #if 0
 /* VSYNC functions */
 
-/* timer to set vsync */
-static void *m6845_vsync_set_timer = NULL;
-/* timer to reset vsync */
-static void *m6845_vsync_clear_timer = NULL;
-
-static void TIMER_CALLBACK( m6845_vsync_set_timer_callback );
-static void TIMER_CALLBACK( m6845_vsync_clear_timer_callback );
+static TIMER_CALLBACK( m6845_vsync_set_timer_callback );
+static TIMER_CALLBACK( m6845_vsync_clear_timer_callback );
 static void m6845_remove_vsync_set_timer(void);
 static void m6845_remove_vsync_clear_timer(void);
 static void m6845_set_new_vsync_set_time(int);
@@ -398,17 +401,17 @@ static void check_display_enabled(void)
 
 static void m6845_restart_frame(void)
 {
-					/* no restart frame */
-					/* End of All Vertical Character rows */
-					crtc.Scan_Line_Counter = 0;
-					crtc.Character_Row_Counter=0;
-					crtc.Vertical_Display_Enabled=True;
-					check_display_enabled();
+	/* no restart frame */
+	/* End of All Vertical Character rows */
+	crtc.Scan_Line_Counter = 0;
+	crtc.Character_Row_Counter=0;
+	crtc.Vertical_Display_Enabled=True;
+	check_display_enabled();
 
-									/* KT - As it stands it emulates the UM6845R well */
-					crtc.Memory_Address=(crtc.Memory_Address_of_this_Character_Row=crtc.screen_start_address);
-									/* HD6845S/MC6845 */
-					crtc.Memory_Address_of_next_Character_Row = crtc.Memory_Address;
+	/* KT - As it stands it emulates the UM6845R well */
+	crtc.Memory_Address=(crtc.Memory_Address_of_this_Character_Row=crtc.screen_start_address);
+	/* HD6845S/MC6845 */
+	crtc.Memory_Address_of_next_Character_Row = crtc.Memory_Address;
 }
 
 void m6845_frameclock(void)
@@ -727,7 +730,7 @@ int     m6845_cycles_to_vsync(void)
 	int cycles_into_frame;
 	int scans_per_character = R9_scan_lines_per_character+1;
 	int chars_per_line = R0_horizontal_total+1;
-    int cycles_to_vsync_start;
+	int cycles_to_vsync_start;
 
 	/* calculate current position into frame as char cycles */
 	/* scans into frames */
@@ -743,8 +746,8 @@ int     m6845_cycles_to_vsync(void)
 	cycles_to_vsync_start *= chars_per_line;
 
 
-    if (cycles_into_frame<cycles_to_vsync_start)
-    {
+	if (cycles_into_frame<cycles_to_vsync_start)
+	{
 		/* not gone past vertical sync yet! */
 		return cycles_to_vsync_start - cycles_into_frame;
 	}
@@ -800,20 +803,18 @@ static int m6845_vsync_length_in_cycles(void)
 /* remove "vsync set" timer */
 static void m6845_remove_vsync_set_timer(void)
 {
-	if (m6845_vsync_set_timer!=NULL)
+	if (crtc.vsync_set_timer!=NULL)
 	{
-		timer_remove(m6845_vsync_set_timer);	/* FIXME - timers should only be allocated once */
-		m6845_vsync_set_timer = NULL;
+		timer_adjust_oneshot(crtc.vsync_set_timer, attotime_never, 0);
 	}
 }
 
 /* remove "vsync clear" timer */
 static void m6845_remove_vsync_clear_timer(void)
 {
-	if (m6845_vsync_clear_timer!=NULL)
+	if (crtc.vsync_clear_timer != NULL)
 	{
-		timer_reset(m6845_vsync_clear_timer, attotime_never);	/* FIXME - timers should only be allocated once */
-		m6845_vsync_clear_timer = NULL;
+		timer_adjust_oneshot(crtc.vsync_clear_timer, attotime_never, 0);
 	}
 }
 
@@ -828,9 +829,10 @@ static void m6845_set_new_vsync_set_time(int cycles)
 
 	m6845_remove_vsync_set_timer();
 
+	//crtc.vsync_set_timer = timer_alloc(machine, m6845_vsync_set_timer_callback, NULL);
 	if (crtc_cycles_to_vsync_start!=-1)
 	{
-		m6845_vsync_set_timer = timer_set(machine, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_start), machine, 0, m6845_vsync_set_timer_callback);
+		timer_adjust_oneshot(crtc.vsync_set_timer, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_start), 0);
 	}
 }
 
@@ -844,9 +846,10 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 	/* get number of cycles to end of vsync */
 	crtc_cycles_to_vsync_end = cycles;
 
+	//crtc.vsync_clear_timer = timer_alloc(machine, m6845_vsync_clear_timer_callback, NULL);
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-		m6845_vsync_clear_timer = timer_set(machine, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), machine, 0, m6845_vsync_clear_timer_callback);
+		timer_adjust_oneshot(crtc.vsync_clear_timer, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), 0);
 	}
 }
 
@@ -869,7 +872,7 @@ static TIMER_CALLBACK( m6845_vsync_clear_timer_callback )
 	m6845_set_new_vsync_set_time(m6845_cycles_per_frame()-m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_reset(m6845_vsync_clear_timer, attotime_never);
+	timer_adjust_oneshot(crtc.vsync_clear_timer, attotime_never, 0);
 }
 
 /* called when vsync is set */
@@ -887,10 +890,10 @@ static TIMER_CALLBACK( m6845_vsync_set_timer_callback )
     is active, in this case, the new vsync end will be re-calculated */
 
 	/* setup time for vsync clear timer */
-    m6845_set_new_vsync_clear_time(m6845_vsync_length_in_cycles());
+	m6845_set_new_vsync_clear_time( m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_reset(m6845_vsync_set_timer, attotime_never);
+	timer_reset(crtc.vsync_set_timer, attotime_never);
 }
 static void m6845_recalc_cycles_to_vsync_end(void)
 {
@@ -947,8 +950,8 @@ void m6845_recalc(int offset,int num_cycles)
 
 	/* update row position */
 	crtc.Character_Row_Counter = num_scan_lines/scan_lines_per_char;
-    /* remainder is the scan line counter */
-    crtc.Scan_Line_Counter = num_scan_lines % scan_lines_per_char;
+	/* remainder is the scan line counter */
+	crtc.Scan_Line_Counter = num_scan_lines % scan_lines_per_char;
 }
 
 #endif

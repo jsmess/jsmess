@@ -23,9 +23,13 @@ Updated 3/1/10 : use real value for timing.
 static int cas_size;
 
 
-static const int  Header_cycles = 77; /* Valeur Th?orique 66 = 44100 * 1.5 / 1000  // mesur? sur jeu Formule1 = 1,75ms*/
-static const int  Zero_cycles =   27; /* Valeur Th?orique 17 = 44100 * 0.4 / 1000  // mesur? sur jeu Formule1 = 0,61ms*/
-static const int  Un_cycles =     50; /* Valeur Th?orique 40 = 44100 * 0.9 / 1000  // mesur? sur jeu Formule1 = 1,13ms*/
+enum
+{
+	Header_cycles = 77, /* Valeur Th?orique 66 = 44100 * 1.5 / 1000  // mesur? sur jeu Formule1 = 1,75ms*/
+	Zero_cycles =   27, /* Valeur Th?orique 17 = 44100 * 0.4 / 1000  // mesur? sur jeu Formule1 = 0,61ms*/
+	Un_cycles =     50, /* Valeur Th?orique 40 = 44100 * 0.9 / 1000  // mesur? sur jeu Formule1 = 1,13ms*/
+};
+
 /* Here I prefer use the value that I read on a real tape, and not the theorical value; note that these
    value work best on my HRX...    Yo_fr   (jj.stacino@aliceadsl.fr)  */
 

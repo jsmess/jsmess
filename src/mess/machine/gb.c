@@ -247,8 +247,6 @@ MACHINE_START( gb )
 	gb_state *state = machine->driver_data<gb_state>();
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
-	state->sgb_packets = -1;
-
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( state->gb_serial_timer, 0 );
@@ -287,6 +285,8 @@ MACHINE_RESET( gb )
 MACHINE_START( sgb )
 {
 	gb_state *state = machine->driver_data<gb_state>();
+
+	state->sgb_packets = -1;
 	state->sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);

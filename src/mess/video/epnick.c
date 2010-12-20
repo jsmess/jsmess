@@ -14,8 +14,8 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "epnick.h"
 #include "devices/messram.h"
+#include "includes/enterp.h"
 
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_RED8(x) \
@@ -56,7 +56,7 @@ typedef struct LPT_ENTRY
 	unsigned char COL[8];	/* COL0..COL7 */
 } LPT_ENTRY;
 
-typedef struct NICK_STATE
+typedef struct _NICK_STATE
 {
 	/* horizontal position */
 	unsigned char HorizontalClockCount;
@@ -78,6 +78,18 @@ typedef struct NICK_STATE
 	int dest_max_pos;
 
 	unsigned char Reg[16];
+
+	/* first clock visible on left hand side */
+	unsigned char FirstVisibleClock;
+	/* first clock visible on right hand side */
+	unsigned char LastVisibleClock;
+
+	/* given a bit pattern, this will get the pen index */
+	unsigned int PenIndexLookup_4Colour[256];
+	/* given a bit pattern, this will get the pen index */
+	unsigned int PenIndexLookup_16Colour[256];
+
+	UINT8 *videoram;
 } NICK_STATE;
 
 /* colour mode types */
@@ -127,13 +139,12 @@ typedef struct NICK_STATE
 
 /*************************************************************/
 /* MESS stuff */
-static NICK_STATE Nick;
 
 // MESS specific
 /* fetch a byte from "video ram" at Addr specified */
-static char Nick_FetchByte(running_machine *machine,unsigned long Addr)
+static char Nick_FetchByte(NICK_STATE *nick, unsigned long Addr)
 {
-   return messram_get_ptr(machine->device("messram"))[Addr & 0x0ffff];
+	return nick->videoram[Addr & 0x0ffff];
 }
 
 // MESS specific
@@ -164,11 +175,6 @@ PALETTE_INIT( epnick )
 	}
 }
 
-/* first clock visible on left hand side */
-static unsigned char Nick_FirstVisibleClock;
-/* first clock visible on right hand side */
-static unsigned char Nick_LastVisibleClock;
-
 /* No of highest resolution pixels per "clock" */
 #define NICK_PIXELS_PER_CLOCK	16
 
@@ -176,118 +182,111 @@ static unsigned char Nick_LastVisibleClock;
 #define NICK_TOTAL_CLOCKS_PER_LINE	64
 
 /* we align based on the clocks */
-static void Nick_CalcVisibleClocks(int Width)
+static void Nick_CalcVisibleClocks(NICK_STATE *nick, int Width)
 {
 	/* number of clocks we can see */
 	int NoOfVisibleClocks = Width/NICK_PIXELS_PER_CLOCK;
 
-	Nick_FirstVisibleClock =
+	nick->FirstVisibleClock =
 		(NICK_TOTAL_CLOCKS_PER_LINE - NoOfVisibleClocks)>>1;
 
-	Nick_LastVisibleClock = Nick_FirstVisibleClock + NoOfVisibleClocks;
+	nick->LastVisibleClock = nick->FirstVisibleClock + NoOfVisibleClocks;
 }
 
 
-/* given a bit pattern, this will get the pen index */
-static unsigned int	Nick_PenIndexLookup_4Colour[256];
-/* given a bit pattern, this will get the pen index */
-static unsigned int	Nick_PenIndexLookup_16Colour[256];
-
-static void	Nick_Init(void)
+static void Nick_Init(NICK_STATE *nick)
 {
 	int i;
-
-	memset(&Nick, 0, sizeof(NICK_STATE));
 
 	for (i=0; i<256; i++)
 	{
 		int PenIndex;
 
 		PenIndex = (
-                                (((i & 0x080)>>7)<<0) |
-                                (((i & 0x08)>>3)<<1)
-				);
+			(((i & 0x080)>>7)<<0) |
+			(((i & 0x08)>>3)<<1)
+		);
 
-                Nick_PenIndexLookup_4Colour[i] = PenIndex;
+		nick->PenIndexLookup_4Colour[i] = PenIndex;
 
 		PenIndex = (
-                                ((((i & 0x080)>>7))<<0) |
-                                ((((i & 0x08)>>3))<<1)  |
-                                ((((i & 0x020)>>5))<<2) |
-                                ((((i & 0x02)>>1))<<3)
-				);
+			((((i & 0x080)>>7))<<0) |
+			((((i & 0x08)>>3))<<1)  |
+			((((i & 0x020)>>5))<<2) |
+			((((i & 0x02)>>1))<<3)
+		);
 
-		Nick_PenIndexLookup_16Colour[i] = PenIndex;
+		nick->PenIndexLookup_16Colour[i] = PenIndex;
 	}
 
-	Nick_CalcVisibleClocks(ENTERPRISE_SCREEN_WIDTH);
+	Nick_CalcVisibleClocks(nick, ENTERPRISE_SCREEN_WIDTH);
 
-//  Nick.BORDER = 0;
-//  Nick.FIXBIAS = 0;
+	//nick->BORDER = 0;
+	//nick->FIXBIAS = 0;
 }
 
 /* write border colour */
-static void	Nick_WriteBorder(int Clocks)
+static void Nick_WriteBorder(NICK_STATE *nick, int Clocks)
 {
 	int i;
-	int ColIndex = Nick.BORDER;
+	int ColIndex = nick->BORDER;
 
 	for (i=0; i<(Clocks<<4); i++)
 	{
-		nick_write_pixel(&Nick, ColIndex);
+		nick_write_pixel(nick, ColIndex);
 	}
 }
 
 
-static void Nick_DoLeftMargin(LPT_ENTRY *pLPT)
+static void Nick_DoLeftMargin(NICK_STATE *nick)
 {
-		unsigned char LeftMargin;
+	unsigned char LeftMargin;
 
-		LeftMargin = NICK_GET_LEFT_MARGIN(pLPT->LM);
+	LeftMargin = NICK_GET_LEFT_MARGIN(nick->LPT.LM);
 
-		if (LeftMargin>Nick_FirstVisibleClock)
-		{
-			unsigned char LeftMarginVisible;
+	if (LeftMargin>nick->FirstVisibleClock)
+	{
+		unsigned char LeftMarginVisible;
 
-			/* some of the left margin is visible */
-			LeftMarginVisible = LeftMargin-Nick_FirstVisibleClock;
+		/* some of the left margin is visible */
+		LeftMarginVisible = LeftMargin-nick->FirstVisibleClock;
 
-			/* render the border */
-			Nick_WriteBorder(LeftMarginVisible);
-		}
+		/* render the border */
+		Nick_WriteBorder(nick, LeftMarginVisible);
+	}
 }
 
-static void Nick_DoRightMargin(LPT_ENTRY *pLPT)
+static void Nick_DoRightMargin(NICK_STATE *nick)
 {
-		unsigned char RightMargin;
+	unsigned char RightMargin;
 
-		RightMargin = NICK_GET_RIGHT_MARGIN(pLPT->RM);
+	RightMargin = NICK_GET_RIGHT_MARGIN(nick->LPT.RM);
 
-		if (RightMargin<Nick_LastVisibleClock)
-		{
-			unsigned char RightMarginVisible;
+	if (RightMargin<nick->LastVisibleClock)
+	{
+		unsigned char RightMarginVisible;
 
-			/* some of the right margin is visible */
-			RightMarginVisible = Nick_LastVisibleClock - RightMargin;
+		/* some of the right margin is visible */
+		RightMarginVisible = nick->LastVisibleClock - RightMargin;
 
-			/* render the border */
-			Nick_WriteBorder(RightMarginVisible);
-		}
+		/* render the border */
+		Nick_WriteBorder(nick, RightMarginVisible);
+	}
 }
 
-static int Nick_GetColourIndex(int PenIndex)
+static int Nick_GetColourIndex(NICK_STATE *nick, int PenIndex)
 {
 	if (PenIndex & 0x08)
 	{
-		return ((Nick.FIXBIAS & 0x01f)<<3) | (PenIndex & 0x07);
+		return ((nick->FIXBIAS & 0x01f)<<3) | (PenIndex & 0x07);
 	}
 	else
 	{
-		return Nick.LPT.COL[PenIndex];
+		return nick->LPT.COL[PenIndex];
 	}
 }
 
-static void Nick_WritePixels2Colour(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
+static void Nick_WritePixels2Colour(NICK_STATE *nick, unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
 {
 	int i;
 	int ColIndex[2];
@@ -296,20 +295,20 @@ static void Nick_WritePixels2Colour(unsigned char Pen0, unsigned char Pen1, unsi
 
 	Data = DataByte;
 
-	ColIndex[0] = Nick_GetColourIndex(Pen0);
-	ColIndex[1] = Nick_GetColourIndex(Pen1);
+	ColIndex[0] = Nick_GetColourIndex(nick, Pen0);
+	ColIndex[1] = Nick_GetColourIndex(nick, Pen1);
 
 	for (i=0; i<8; i++)
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		nick_write_pixel(&Nick, PenIndex);
+		nick_write_pixel(nick, PenIndex);
 
 		Data = Data<<1;
 	}
 }
 
-static void Nick_WritePixels2ColourLPIXEL(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
+static void Nick_WritePixels2ColourLPIXEL(NICK_STATE *nick, unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
 {
 	int i;
 	int ColIndex[2];
@@ -318,22 +317,22 @@ static void Nick_WritePixels2ColourLPIXEL(unsigned char Pen0, unsigned char Pen1
 
 	Data = DataByte;
 
-	ColIndex[0] = Nick_GetColourIndex(Pen0);
-	ColIndex[1] = Nick_GetColourIndex(Pen1);
+	ColIndex[0] = Nick_GetColourIndex(nick, Pen0);
+	ColIndex[1] = Nick_GetColourIndex(nick, Pen1);
 
 	for (i=0; i<8; i++)
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		nick_write_pixel(&Nick, PenIndex);
-		nick_write_pixel(&Nick, PenIndex);
+		nick_write_pixel(nick, PenIndex);
+		nick_write_pixel(nick, PenIndex);
 
 		Data = Data<<1;
 	}
 }
 
 
-static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
+static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned char CharIndex)
 {
 	int i;
 
@@ -341,7 +340,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 	int PenIndex;
 	/* Col index = EP colour value */
 	int PalIndex;
-	unsigned char	ColourMode = NICK_GET_COLOUR_MODE(Nick.LPT.MB);
+	unsigned char ColourMode = NICK_GET_COLOUR_MODE(nick->LPT.MB);
 	unsigned char Data = DataByte;
 
 	switch (ColourMode)
@@ -353,7 +352,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 			/* do before displaying byte */
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				if (Data & 0x080)
 				{
@@ -363,7 +362,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				Data &=~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				if (Data & 0x001)
 				{
@@ -373,7 +372,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				Data &=~0x01;
 			}
 
-			if (Nick.LPT.RM & NICK_RM_ALTIND1)
+			if (nick->LPT.RM & NICK_RM_ALTIND1)
 			{
 				if (CharIndex & 0x080)
 				{
@@ -381,17 +380,18 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				}
 			}
 
-//          if (Nick.LPT.RM & NICK_RM_ALTIND0)
-//          {
-//              if (Data & 0x040)
-//              {
-//                  PenOffset|=0x04;
-//              }
-//          }
+#if 0
+			if (nick->LPT.RM & NICK_RM_ALTIND0)
+			{
+				if (Data & 0x040)
+				{
+					PenOffset|=0x04;
+				}
+			}
+#endif
 
 
-
-			Nick_WritePixels2Colour(PenOffset,
+			Nick_WritePixels2Colour(nick, PenOffset,
 				(PenOffset|0x01), Data);
 		}
 		break;
@@ -401,12 +401,12 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 			//mame_printf_info("4 colour\r\n");
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -414,11 +414,11 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 
 			for (i=0; i<4; i++)
 			{
-				PenIndex = Nick_PenIndexLookup_4Colour[Data];
-				PalIndex = Nick.LPT.COL[PenIndex & 0x03];
+				PenIndex = nick->PenIndexLookup_4Colour[Data];
+				PalIndex = nick->LPT.COL[PenIndex & 0x03];
 
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -430,12 +430,12 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 			//mame_printf_info("16 colour\r\n");
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -443,14 +443,14 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 
 			for (i=0; i<2; i++)
 			{
-				PenIndex = Nick_PenIndexLookup_16Colour[Data];
+				PenIndex = nick->PenIndexLookup_16Colour[Data];
 
-				PalIndex = Nick_GetColourIndex(PenIndex);
+				PalIndex = Nick_GetColourIndex(nick, PenIndex);
 
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -460,12 +460,12 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 		case NICK_256_COLOUR_MODE:
 		{
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -473,14 +473,14 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 
 			PalIndex = Data;
 
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
 
 
 		}
@@ -488,7 +488,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 	}
 }
 
-static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharIndex)
+static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, unsigned char CharIndex)
 {
 	int i;
 
@@ -496,7 +496,7 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 	int PenIndex;
 	/* Col index = EP colour value */
 	int PalIndex;
-	unsigned char	ColourMode = NICK_GET_COLOUR_MODE(Nick.LPT.MB);
+	unsigned char ColourMode = NICK_GET_COLOUR_MODE(nick->LPT.MB);
 	unsigned char Data = DataByte;
 
 	switch (ColourMode)
@@ -508,7 +508,7 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 			/* do before displaying byte */
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				if (Data & 0x080)
 				{
@@ -518,7 +518,7 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				Data &=~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				if (Data & 0x001)
 				{
@@ -528,7 +528,7 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				Data &=~0x01;
 			}
 
-			if (Nick.LPT.RM & NICK_RM_ALTIND1)
+			if (nick->LPT.RM & NICK_RM_ALTIND1)
 			{
 				if (CharIndex & 0x080)
 				{
@@ -536,17 +536,18 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				}
 			}
 
-//          if (Nick.LPT.RM & NICK_RM_ALTIND0)
-//          {
-//              if (Data & 0x040)
-//              {
-//                  PenOffset|=0x04;
-//              }
-//          }
+#if 0
+			if (nick->LPT.RM & NICK_RM_ALTIND0)
+			{
+				if (Data & 0x040)
+				{
+					PenOffset|=0x04;
+				}
+			}
+#endif
 
 
-
-			Nick_WritePixels2ColourLPIXEL(PenOffset,(PenOffset|0x01), Data);
+			Nick_WritePixels2ColourLPIXEL(nick, PenOffset,(PenOffset|0x01), Data);
 		}
 		break;
 
@@ -555,12 +556,12 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 			//mame_printf_info("4 colour\r\n");
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -568,13 +569,13 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 
 			for (i=0; i<4; i++)
 			{
-				PenIndex = Nick_PenIndexLookup_4Colour[Data];
-				PalIndex = Nick.LPT.COL[PenIndex & 0x03];
+				PenIndex = nick->PenIndexLookup_4Colour[Data];
+				PalIndex = nick->LPT.COL[PenIndex & 0x03];
 
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -586,12 +587,12 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 			//mame_printf_info("16 colour\r\n");
 
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -599,18 +600,18 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 
 			for (i=0; i<2; i++)
 			{
-				PenIndex = Nick_PenIndexLookup_16Colour[Data];
+				PenIndex = nick->PenIndexLookup_16Colour[Data];
 
-				PalIndex = Nick_GetColourIndex(PenIndex);
+				PalIndex = Nick_GetColourIndex(nick, PenIndex);
 
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
-				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -620,12 +621,12 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 		case NICK_256_COLOUR_MODE:
 		{
 			/* left margin attributes */
-			if (Nick.LPT.LM & NICK_LM_MSBALT)
+			if (nick->LPT.LM & NICK_LM_MSBALT)
 			{
 				Data &= ~0x080;
 			}
 
-			if (Nick.LPT.LM & NICK_LM_LSBALT)
+			if (nick->LPT.LM & NICK_LM_LSBALT)
 			{
 				Data &= ~0x01;
 			}
@@ -633,23 +634,23 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 
 			PalIndex = Data;
 
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
 
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
-			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(nick, PalIndex);
 
 
 		}
@@ -658,110 +659,111 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 }
 
 
-static void Nick_DoPixel(running_machine *machine,int ClocksVisible)
+static void Nick_DoPixel(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 =  Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
 
-		Buf2 = Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
+		Buf2 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
 
-		Nick_WritePixels(Buf1,Buf1);
+		Nick_WritePixels(nick, Buf1, Buf1);
 
-		Nick_WritePixels(Buf2,Buf1);
+		Nick_WritePixels(nick, Buf2, Buf1);
 	}
 }
 
 
-static void Nick_DoLPixel(running_machine *machine,int ClocksVisible)
+static void Nick_DoLPixel(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 =  Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
 
-		Nick_WritePixelsLPIXEL(Buf1,Buf1);
+		Nick_WritePixelsLPIXEL(nick, Buf1, Buf1);
 	}
 }
 
-static void Nick_DoAttr(running_machine *machine,int ClocksVisible)
+static void Nick_DoAttr(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
 
-		Buf2 = Nick_FetchByte(machine,Nick.LD2);
-		Nick.LD2++;
+		Buf2 = Nick_FetchByte(nick, nick->LD2);
+		nick->LD2++;
 
 		{
 			unsigned char BackgroundColour = ((Buf1>>4) & 0x0f);
 			unsigned char ForegroundColour = (Buf1 & 0x0f);
 
-			Nick_WritePixels2ColourLPIXEL(BackgroundColour, ForegroundColour, Buf2);
+			Nick_WritePixels2ColourLPIXEL(nick, BackgroundColour, ForegroundColour, Buf2);
 		}
 	}
 }
 
-static void Nick_DoCh256(running_machine *machine,int ClocksVisible)
+static void Nick_DoCh256(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
-		Buf2 = Nick_FetchByte(machine,ADDR_CH256(Nick.LD2, Buf1));
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
+		Buf2 = Nick_FetchByte(nick, ADDR_CH256(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(Buf2,Buf1);
+		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
 	}
 }
 
-static void Nick_DoCh128(running_machine *machine,int ClocksVisible)
+static void Nick_DoCh128(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
-		Buf2 = Nick_FetchByte(machine,ADDR_CH128(Nick.LD2, Buf1));
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
+		Buf2 = Nick_FetchByte(nick, ADDR_CH128(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(Buf2,Buf1);
+		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
 	}
 }
 
-static void Nick_DoCh64(running_machine *machine,int ClocksVisible)
+static void Nick_DoCh64(NICK_STATE *nick, int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(machine,Nick.LD1);
-		Nick.LD1++;
-		Buf2 = Nick_FetchByte(machine,ADDR_CH64(Nick.LD2, Buf1));
+		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		nick->LD1++;
+		Buf2 = Nick_FetchByte(nick, ADDR_CH64(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(Buf2,Buf1);
+		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
 	}
 }
 
 
-static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
+static void Nick_DoDisplay(NICK_STATE *nick)
 {
+	LPT_ENTRY *pLPT = &nick->LPT;
 	unsigned char ClocksVisible;
 	unsigned char RightMargin, LeftMargin;
 
@@ -777,18 +779,18 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 		/* get display mode */
 		DisplayMode = NICK_GET_DISPLAY_MODE(pLPT->MB);
 
-		if ((Nick.ScanLineCount == 0))	// ||
+		if ((nick->ScanLineCount == 0))	// ||
 			//((pLPT->MB & NICK_MB_VRES)==0))
 		{
 			/* doing first line */
 			/* reload LD1, and LD2 (if necessary) regardless of display mode */
-			Nick.LD1 =	(pLPT->LD1L & 0x0ff) |
+			nick->LD1 =	(pLPT->LD1L & 0x0ff) |
 					((pLPT->LD1H & 0x0ff)<<8);
 
 			if ((DisplayMode != NICK_LPIXEL_MODE) && (DisplayMode != NICK_PIXEL_MODE))
 			{
 				/* lpixel and pixel modes don't use LD2 */
-				Nick.LD2 = (pLPT->LD2L & 0x0ff) |
+				nick->LD2 = (pLPT->LD2L & 0x0ff) |
 					((pLPT->LD2H & 0x0ff)<<8);
 			}
 		}
@@ -801,7 +803,7 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 				case NICK_ATTR_MODE:
 				{
 					/* reload LD1 */
-					Nick.LD1 = (pLPT->LD1L & 0x0ff) |
+					nick->LD1 = (pLPT->LD1L & 0x0ff) |
 					((pLPT->LD1H & 0x0ff)<<8);
 				}
 				break;
@@ -811,9 +813,9 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 				case NICK_CH64_MODE:
 				{
 					/* reload LD1 */
-					Nick.LD1 = (pLPT->LD1L & 0x0ff) |
+					nick->LD1 = (pLPT->LD1L & 0x0ff) |
 						((pLPT->LD1H & 0x0ff)<<8);
-					Nick.LD2++;
+					nick->LD2++;
 				}
 				break;
 
@@ -826,40 +828,40 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 		{
 			case NICK_PIXEL_MODE:
 			{
-                            Nick_DoPixel(machine,ClocksVisible);
+				Nick_DoPixel(nick,ClocksVisible);
 			}
 			break;
 
 			case NICK_ATTR_MODE:
 			{
 				//mame_printf_info("attr mode\r\n");
-                            Nick_DoAttr( machine,ClocksVisible);
+				Nick_DoAttr( nick,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH256_MODE:
 			{
 				//mame_printf_info("ch256 mode\r\n");
-				Nick_DoCh256(machine,ClocksVisible);
+				Nick_DoCh256(nick,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH128_MODE:
 			{
-				Nick_DoCh128(machine,ClocksVisible);
+				Nick_DoCh128(nick,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH64_MODE:
 			{
 				//mame_printf_info("ch64 mode\r\n");
-				Nick_DoCh64(machine,ClocksVisible);
+				Nick_DoCh64(nick,ClocksVisible);
 			}
 			break;
 
 			case NICK_LPIXEL_MODE:
 			{
-				Nick_DoLPixel(machine,ClocksVisible);
+				Nick_DoLPixel(nick,ClocksVisible);
 			}
 			break;
 
@@ -869,172 +871,173 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 	}
 }
 
-static void	Nick_UpdateLPT(void)
+static void Nick_UpdateLPT(NICK_STATE *nick)
 {
 	unsigned long CurLPT;
 
-	CurLPT = (Nick.LPL & 0x0ff) | ((Nick.LPH & 0x0f)<<8);
+	CurLPT = (nick->LPL & 0x0ff) | ((nick->LPH & 0x0f)<<8);
 	CurLPT++;
-	Nick.LPL = CurLPT & 0x0ff;
-	Nick.LPH = (Nick.LPH & 0x0f0) | ((CurLPT>>8) & 0x0f);
+	nick->LPL = CurLPT & 0x0ff;
+	nick->LPH = (nick->LPH & 0x0f0) | ((CurLPT>>8) & 0x0f);
 }
 
 
-static void	Nick_ReloadLPT(running_machine *machine)
+static void Nick_ReloadLPT(NICK_STATE *nick)
 {
 	unsigned long LPT_Addr;
 
 		/* get addr of LPT */
-		LPT_Addr = ((Nick.LPL & 0x0ff)<<4) | ((Nick.LPH & 0x0f)<<(8+4));
+		LPT_Addr = ((nick->LPL & 0x0ff)<<4) | ((nick->LPH & 0x0f)<<(8+4));
 
 		/* update internal LPT state */
-		Nick.LPT.SC = Nick_FetchByte(machine,LPT_Addr);
-		Nick.LPT.MB = Nick_FetchByte(machine,LPT_Addr+1);
-		Nick.LPT.LM = Nick_FetchByte(machine,LPT_Addr+2);
-		Nick.LPT.RM = Nick_FetchByte(machine,LPT_Addr+3);
-		Nick.LPT.LD1L = Nick_FetchByte(machine,LPT_Addr+4);
-		Nick.LPT.LD1H = Nick_FetchByte(machine,LPT_Addr+5);
-		Nick.LPT.LD2L = Nick_FetchByte(machine,LPT_Addr+6);
-		Nick.LPT.LD2H = Nick_FetchByte(machine,LPT_Addr+7);
-		Nick.LPT.COL[0] = Nick_FetchByte(machine,LPT_Addr+8);
-		Nick.LPT.COL[1] = Nick_FetchByte(machine,LPT_Addr+9);
-		Nick.LPT.COL[2] = Nick_FetchByte(machine,LPT_Addr+10);
-		Nick.LPT.COL[3] = Nick_FetchByte(machine,LPT_Addr+11);
-		Nick.LPT.COL[4] = Nick_FetchByte(machine,LPT_Addr+12);
-		Nick.LPT.COL[5] = Nick_FetchByte(machine,LPT_Addr+13);
-		Nick.LPT.COL[6] = Nick_FetchByte(machine,LPT_Addr+14);
-		Nick.LPT.COL[7] = Nick_FetchByte(machine,LPT_Addr+15);
+		nick->LPT.SC = Nick_FetchByte(nick,LPT_Addr);
+		nick->LPT.MB = Nick_FetchByte(nick,LPT_Addr+1);
+		nick->LPT.LM = Nick_FetchByte(nick,LPT_Addr+2);
+		nick->LPT.RM = Nick_FetchByte(nick,LPT_Addr+3);
+		nick->LPT.LD1L = Nick_FetchByte(nick,LPT_Addr+4);
+		nick->LPT.LD1H = Nick_FetchByte(nick,LPT_Addr+5);
+		nick->LPT.LD2L = Nick_FetchByte(nick,LPT_Addr+6);
+		nick->LPT.LD2H = Nick_FetchByte(nick,LPT_Addr+7);
+		nick->LPT.COL[0] = Nick_FetchByte(nick,LPT_Addr+8);
+		nick->LPT.COL[1] = Nick_FetchByte(nick,LPT_Addr+9);
+		nick->LPT.COL[2] = Nick_FetchByte(nick,LPT_Addr+10);
+		nick->LPT.COL[3] = Nick_FetchByte(nick,LPT_Addr+11);
+		nick->LPT.COL[4] = Nick_FetchByte(nick,LPT_Addr+12);
+		nick->LPT.COL[5] = Nick_FetchByte(nick,LPT_Addr+13);
+		nick->LPT.COL[6] = Nick_FetchByte(nick,LPT_Addr+14);
+		nick->LPT.COL[7] = Nick_FetchByte(nick,LPT_Addr+15);
 }
 
 /* call here to render a line of graphics */
-static void	Nick_DoLine(running_machine *machine)
+static void Nick_DoLine(NICK_STATE *nick)
 {
 	unsigned char ScanLineCount;
 
-	if ((Nick.LPT.MB & NICK_MB_LPT_RELOAD)!=0)
+	if ((nick->LPT.MB & NICK_MB_LPT_RELOAD)!=0)
 	{
 		/* reload LPT */
 
-		Nick.LPL = Nick.Reg[2];
-		Nick.LPH = Nick.Reg[3];
+		nick->LPL = nick->Reg[2];
+		nick->LPH = nick->Reg[3];
 
-		Nick_ReloadLPT(machine);
+		Nick_ReloadLPT(nick);
 	}
 
-		/* left border */
-		Nick_DoLeftMargin(&Nick.LPT);
+	/* left border */
+	Nick_DoLeftMargin(nick);
 
-		/* do visible part */
-		Nick_DoDisplay(machine,&Nick.LPT);
+	/* do visible part */
+	Nick_DoDisplay(nick);
 
-		/* right border */
-		Nick_DoRightMargin(&Nick.LPT);
+	/* right border */
+	Nick_DoRightMargin(nick);
 
 	// 0x0f7 is first!
 	/* scan line count for this LPT */
-	ScanLineCount = ((~Nick.LPT.SC)+1) & 0x0ff;
+	ScanLineCount = ((~nick->LPT.SC)+1) & 0x0ff;
 
-//  printf("ScanLineCount %02x\r\n",ScanLineCount);
+	//printf("ScanLineCount %02x\r\n",ScanLineCount);
 
 	/* update count of scanlines done so far */
-	Nick.ScanLineCount++;
+	nick->ScanLineCount++;
 
-	if (((unsigned char)Nick.ScanLineCount) ==
+	if (((unsigned char)nick->ScanLineCount) ==
 		((unsigned char)ScanLineCount))
 	{
 		/* done all scanlines of this Line Parameter Table, get next */
 
 
-		Nick.ScanLineCount = 0;
+		nick->ScanLineCount = 0;
 
-		Nick_UpdateLPT();
-		Nick_ReloadLPT(machine);
+		Nick_UpdateLPT(nick);
+		Nick_ReloadLPT(nick);
 
 
 	}
 }
 
 /* MESS specific */
-static int	Nick_vh_start(void)
-{
-  Nick_Init();
-  return 0;
-}
-
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( nick_reg_r )
 {
-  /* read from a nick register - return floating bus,
+	/* read from a nick register - return floating bus,
    because the registers are not readable! */
-  return 0x0ff;
+	return 0x0ff;
 }
 #endif
 
 WRITE8_HANDLER( epnick_reg_w )
 {
+	ep_state *state = space->machine->driver_data<ep_state>();
+	NICK_STATE *nick = state->nick;
 	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
 
-  /* write to a nick register */
-  Nick.Reg[offset & 0x0f] = data;
+	/* write to a nick register */
+	nick->Reg[offset & 0x0f] = data;
 
-  if ((offset == 0x03) || (offset == 0x02))
-  {
-    /* write LPH */
+	if ((offset == 0x03) || (offset == 0x02))
+	{
+		/* write LPH */
 
-    /* reload LPT base? */
-//    if (NICK_RELOAD_LPT(data))
-    {
-      /* reload LPT base pointer */
-      Nick.LPL = Nick.Reg[2];
-      Nick.LPH = Nick.Reg[3];
+		/* reload LPT base? */
+		//if (NICK_RELOAD_LPT(data))
+		{
+			/* reload LPT base pointer */
+			nick->LPL = nick->Reg[2];
+			nick->LPH = nick->Reg[3];
 
-	Nick_ReloadLPT(space->machine);
-    }
-  }
+			Nick_ReloadLPT(nick);
+		}
+	}
 
-  if (offset == 0x01)
-  {
-	Nick.BORDER = data;
-  }
+	if (offset == 0x01)
+	{
+		nick->BORDER = data;
+	}
 
-  if (offset == 0x00)
-  {
-	Nick.FIXBIAS = data;
-  }
+	if (offset == 0x00)
+	{
+		nick->FIXBIAS = data;
+	}
 }
 
-static void    Nick_DoScreen(running_machine *machine,bitmap_t *bm)
+static void Nick_DoScreen(NICK_STATE *nick, bitmap_t *bm)
 {
-  int line = 0;
+	int line = 0;
 
-  do
-  {
+	do
+	{
 
-    /* set write address for line */
-    Nick.dest = BITMAP_ADDR16(bm, line, 0);
-	Nick.dest_pos = 0;
-	Nick.dest_max_pos = bm->width;
+		/* set write address for line */
+		nick->dest = BITMAP_ADDR16(bm, line, 0);
+		nick->dest_pos = 0;
+		nick->dest_max_pos = bm->width;
 
-    /* write line */
-    Nick_DoLine(machine);
+		/* write line */
+		Nick_DoLine(nick);
 
-    /* next line */
-    line++;
-  }
-  while (((Nick.LPT.MB & 0x080)==0) && (line<ENTERPRISE_SCREEN_HEIGHT));
+		/* next line */
+		line++;
+	}
+	while (((nick->LPT.MB & 0x080)==0) && (line<ENTERPRISE_SCREEN_HEIGHT));
 
 }
 
 
 VIDEO_START( epnick )
 {
-	Nick_vh_start();
+	ep_state *state = machine->driver_data<ep_state>();
+	state->nick = auto_alloc_clear(machine, NICK_STATE);
+
+	state->nick->videoram = messram_get_ptr(machine->device("messram"));
+	Nick_Init(state->nick);
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
 
 VIDEO_UPDATE( epnick )
 {
-	Nick_DoScreen(screen->machine,screen->machine->generic.tmpbitmap);
+	ep_state *state = screen->machine->driver_data<ep_state>();
+	Nick_DoScreen(state->nick,screen->machine->generic.tmpbitmap);
 	return VIDEO_UPDATE_CALL(generic_bitmapped);
 }

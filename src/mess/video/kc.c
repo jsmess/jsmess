@@ -516,9 +516,9 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 
 #if 0
 	/* first item in list */
-	pItem = spectrum_EventList_GetFirstItem();
+	pItem = spectrum_EventList_GetFirstItem(machine);
 	/* number of items remaining */
-	NumItems = spectrum_EventList_NumEvents();
+	NumItems = spectrum_EventList_NumEvents(machine);
 
 	while (NumItems)
 	{
@@ -546,8 +546,8 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 
 	/* process remainder */
 	kc85_common_vh_process_lines(state, &video_update, cycles_remaining_in_frame);
-	//spectrum_EventList_Reset();
-	//spectrum_EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+	//spectrum_EventList_Reset(machine);
+	//spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 }
 
 

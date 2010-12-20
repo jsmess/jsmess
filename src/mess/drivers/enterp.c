@@ -18,24 +18,13 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "audio/dave.h"
-#include "video/epnick.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/messram.h"
+#include "includes/enterp.h"
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
-
-
-class ep_state : public driver_device
-{
-public:
-	ep_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
-	UINT8 keyboard_line;     /* index of keyboard line to read */
-};
 
 
 /***************************************************************************

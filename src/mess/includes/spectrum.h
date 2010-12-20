@@ -77,6 +77,7 @@ public:
 	int floppy;
 
 	/* video support */
+	int frame_invert_count;
 	int frame_number;    /* Used for handling FLASH 1 */
 	int flash_invert;
 	UINT8 retrace_cycles;
@@ -84,6 +85,17 @@ public:
 	UINT8 *screen_location;
 
 	int ROMSelection;
+
+	/* Last border colour output in the previous frame */
+	int CurrBorderColor;
+	int LastDisplayedBorderColor; /* Negative value indicates redraw */
+
+	EVENT_LIST_ITEM *pCurrentItem;
+	int NumEvents;
+	int TotalEvents;
+	char *pEventListBuffer;
+	int LastFrameStartTime;
+	int CyclesPerFrame;
 };
 
 
@@ -125,8 +137,8 @@ VIDEO_START( spectrum_128 );
 VIDEO_UPDATE( spectrum );
 VIDEO_EOF( spectrum );
 
-void spectrum_border_force_redraw (void);
-void spectrum_border_set_last_color (int NewColor);
+void spectrum_border_force_redraw (running_machine *machine);
+void spectrum_border_set_last_color (running_machine *machine, int NewColor);
 void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap, int full_refresh,
                 int TopBorderLines, int ScreenLines, int BottomBorderLines,
                 int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
@@ -134,15 +146,15 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap, int full_r
                 int HorizontalRetraceCycles, int VRetraceTime, int EventID);
 
 void spectrum_EventList_Initialise(running_machine *machine, int NumEntries);
-void spectrum_EventList_Reset(void);
-void spectrum_EventList_SetOffsetStartTime(int StartTime);
+void spectrum_EventList_Reset(running_machine *machine);
+void spectrum_EventList_SetOffsetStartTime(running_machine *machine, int StartTime);
 void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data,int Time);
-int spectrum_EventList_NumEvents(void);
-EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(void);
+int spectrum_EventList_NumEvents(running_machine *machine);
+EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine *machine);
 
 /*----------- defined in video/timex.c -----------*/
 
-VIDEO_EOF( ts2068 );
+VIDEO_START( ts2068 );
 VIDEO_UPDATE( ts2068 );
 
 VIDEO_UPDATE( tc2048 );

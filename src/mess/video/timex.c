@@ -23,30 +23,11 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
-VIDEO_EOF( ts2068 )
+VIDEO_START( ts2068 )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	EVENT_LIST_ITEM *pItem;
-	int NumItems;
-
-	state->frame_number++;
-	if (state->frame_number >= 30)
-	{
-		state->frame_number = 0;
-		state->flash_invert = !state->flash_invert;
-	}
-
-	/* Empty event buffer for undisplayed frames noting the last border
-       colour (in case colours are not changed in the next frame). */
-	NumItems = spectrum_EventList_NumEvents();
-	if (NumItems)
-	{
-		pItem = spectrum_EventList_GetFirstItem();
-		spectrum_border_set_last_color ( pItem[NumItems-1].Event_Data );
-		spectrum_EventList_Reset();
-		spectrum_EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
-		logerror ("Event log reset in callback fn.\n");
-	}
+	VIDEO_START_CALL( spectrum );
+	state->frame_invert_count = 30;
 }
 
 

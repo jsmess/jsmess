@@ -101,24 +101,20 @@ static const struct CPS1config cps1_config_table[]=
 };
 
 
-
-/* Public variables */
-
-
 /* Offset of each palette entry */
 #define cps1_palette_entries (32*6)  /* Number colour schemes in palette */
 
-static const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
-static const int cps1_obj_size    =0x0800;
-static const int cps1_other_size  =0x0800;
-static const int cps1_palette_align=0x0400;	/* minimum alignment is a single palette page (512 colors). Verified on pcb. */
-static const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette RAM */
+enum
+{
+	cps1_scroll_size =0x4000,	/* scroll1, scroll2, scroll3 */
+	cps1_obj_size    =0x0800,
+	cps1_other_size  =0x0800,
+	cps1_palette_align=0x0400,	/* minimum alignment is a single palette page (512 colors). Verified on pcb. */
+	cps1_palette_size=cps1_palette_entries*32, /* Size of palette RAM */
+	/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
+	cps1_stars_rom_size = 0x2000,
 
-
-/* Working variables */
-
-
-
+};
 
 
 /* CPS-A registers */
@@ -141,9 +137,6 @@ static const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette R
 #define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CPS1_VIDEOCONTROL       (0x22/2)    /* flip screen, rowscroll enable */
 
-
-/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
-static const int stars_rom_size = 0x2000;
 
 static void cps1_build_palette(running_machine *machine, const UINT16* const palette_base);
 
@@ -811,7 +804,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 
 	if (state->cps1_stars_enabled[0])
 	{
-		for (offs = 0;offs < stars_rom_size/2;offs++)
+		for (offs = 0;offs < cps1_stars_rom_size/2;offs++)
 		{
 			int col = stars_rom[8*offs+4];
 			if (col != 0x0f)
@@ -837,7 +830,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 
 	if (state->cps1_stars_enabled[1])
 	{
-		for (offs = 0;offs < stars_rom_size/2;offs++)
+		for (offs = 0;offs < cps1_stars_rom_size/2;offs++)
 		{
 			int col = stars_rom[8*offs];
 			if (col != 0x0f)
