@@ -148,7 +148,7 @@ static TIMER_CALLBACK( super80_halfspeed )
     Centronics printer is emulated; the serial side of things may be done later, as will the dipswitches.
 
     The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
-    All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
+    All the home-brew roms use this, except for super80e which uses BC-BE. */
 
 /**************************** I/O PORTS *****************************************************************/
 
