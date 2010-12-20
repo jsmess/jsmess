@@ -57,7 +57,7 @@ static TIMER_CALLBACK( kbd_update_callback )
 
 static INPUT_CHANGED( kbd_update )
 {
-	int	index = (int)param, i;
+	int	index = (int)(FPTR)param, i;
 	UINT32	oldvalue = oldval * field->mask, newvalue = newval * field->mask;
 	UINT32	delta = oldvalue ^ newvalue;
 
