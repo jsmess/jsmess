@@ -67,8 +67,8 @@ public:
 	DECLARE_READ8_MEMBER( enable_r );
 	DECLARE_WRITE8_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( dma_mux_w );
-	DECLARE_READ8_MEMBER( vpac_r );
-	DECLARE_WRITE8_MEMBER( vpac_w );
+	DECLARE_READ16_MEMBER( vpac_r );
+	DECLARE_WRITE16_MEMBER( vpac_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
 	DECLARE_READ8_MEMBER( keyboard_x0_r );
 	DECLARE_WRITE8_MEMBER( keyboard_y0_w );
