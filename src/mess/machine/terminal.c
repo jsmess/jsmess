@@ -4,6 +4,12 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+enum
+{
+	START = 0,
+	STOP = 9
+};
+
 #define TERMINAL_WIDTH 80
 #define TERMINAL_HEIGHT 24
 typedef struct _terminal_state terminal_state;
@@ -15,6 +21,10 @@ struct _terminal_state
 	UINT8 y_pos;
 	UINT8 last_code;
 	UINT8 scan_line;
+	int rx_state;
+	int tx_state;
+	UINT8 rx_shift;
+	UINT8 tx_shift;
 	devcb_resolved_write8 terminal_keyboard_func;
 };
 
@@ -205,6 +215,56 @@ static void terminal_clear(running_device *device) {
 	term->y_pos = 0;
 }
 
+READ_LINE_DEVICE_HANDLER( terminal_serial_r )
+{
+	terminal_state *term = get_safe_token(device);
+
+	UINT8 data = 1;
+
+	switch (term->tx_state)
+	{
+	case STOP:
+		data = 1;
+		break;
+
+	case START:
+		data = 0;
+		term->tx_state++;
+		break;
+
+	default:
+		data = BIT(term->tx_shift, 0);
+		term->tx_shift >>= 1;
+		term->tx_state++;
+		break;
+	}
+
+	return data;
+}
+
+WRITE_LINE_DEVICE_HANDLER( terminal_serial_w )
+{
+	terminal_state *term = get_safe_token(device);
+
+	switch (term->rx_state)
+	{
+	case START:
+		if (!state) term->rx_state++;
+		break;
+
+	case STOP:
+		terminal_write(device, 0, term->rx_shift);
+		term->rx_state = START;
+		break;
+
+	default:
+		term->rx_shift >>= 1;
+		term->rx_shift |= (state << 7);
+		term->rx_state++;
+		break;
+	}
+}
+
 WRITE8_DEVICE_HANDLER ( terminal_write )
 {
 	terminal_state *term = get_safe_token(device);
@@ -319,7 +379,7 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line)
+UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state)
 {
 	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6" };
 	int i;
@@ -403,6 +463,8 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 			}
 			if (last_code != key_code ) {
 				devcb_call_write8(callback, 0, key_code);
+				if (tx_shift) *tx_shift = key_code;
+				if (tx_state) *tx_state = START;
 			}
 			retVal = key_code;
 		} else {
@@ -418,7 +480,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 static TIMER_CALLBACK(keyboard_callback)
 {
 	terminal_state *term = get_safe_token((running_device *)ptr);
-	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line);
+	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line, &term->tx_shift, &term->tx_state);
 }
 
 /***************************************************************************
@@ -474,6 +536,8 @@ static DEVICE_RESET( terminal )
 	terminal_clear(device);
 	term->last_code = 0;
 	term->scan_line = 0;
+	term->rx_state = START;
+	term->tx_state = STOP;
 }
 
 /*-------------------------------------------------

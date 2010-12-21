@@ -19,6 +19,7 @@ New System Drivers Supported:
 - Elektronika MC-1502 (not working) [Miodrag Milanovic]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Ausbaufaehiger Mikrocomputer mit dem U 880 [Curt Coder]
@@ -44,6 +45,8 @@ Skeleton drivers:
 - SM1800 Terminal
 - Mikrolab KR580IK80
 
+
+
 System Driver Changes:
 ----------------------
 - [ABC80] Added graphics PROMs. [Ola Andersson]
@@ -57,6 +60,9 @@ System Driver Changes:
 - [AMU880] Fixed keyboard. [Curt Coder]
 
 - [AVIGO] Fixed regressions. [Robbbert]
+
+- [BULLET] Added PCB layout, devices, DMA, floppy, terminal.  
+  cpm22wmb.imd loads and pretty much works. [Curt Coder]
 
 - [C64] Added known good dumps software list for cartridges. Not hooked up
   to driver code yet. [Curt Coder]
@@ -79,7 +85,7 @@ System Driver Changes:
 
 - [PC8201] Added a software list for option ROMs. [Curt Coder]
 
-- [QL] Added software list for cartridges. [Curt Coder]
+- [QL] Added a software list for cartridges. [Curt Coder]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
   that control when the beam will reach the aim area, to run the function
@@ -148,6 +154,9 @@ Source Changes:
   sapizcps3, selz80, sol20, uts20, vta2000, zsbc3 [Robbbert]
 
 - Added configurable cursor to the generic terminal device. [Robbbert]
+
+- Added rudimentary 8N1 serial I/O to the generic terminal device. [Curt Coder]
+
 
 
 0.140
