@@ -88,17 +88,6 @@ WRITE8_MEMBER( ob68k1a_state::com8116_w )
 
 
 //-------------------------------------------------
-//  acia0_data_w - trampoline for terminal
-//-------------------------------------------------
-
-WRITE8_MEMBER( ob68k1a_state::acia0_data_w )
-{
-	acia6850_data_w(m_acia0, 0, data);
-	terminal_write(m_terminal, 0, data); // HACK for terminal
-}
-
-
-//-------------------------------------------------
 //  pia_r - trampoline for PIA odd/even access
 //-------------------------------------------------
 
@@ -132,7 +121,7 @@ static ADDRESS_MAP_START( ob68k1a_mem, ADDRESS_SPACE_PROGRAM, 16, ob68k1a_state 
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
 	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREAD8_LEGACY(MC6850_0_TAG, acia6850_data_r, 0x00ff) AM_WRITE8(acia0_data_w, 0x00ff)
+	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0x00ff)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE8(com8116_w, 0xff00)
 	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0x00ff)
 	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0x00ff)
@@ -227,8 +216,8 @@ static ACIA6850_INTERFACE( acia0_intf )
 {
 	9600*16, // HACK for terminal
 	9600*16, // HACK for terminal
-	DEVCB_LINE_VCC,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
 	DEVCB_LINE_GND, // HACK for terminal
 	DEVCB_NULL,
 	DEVCB_LINE_GND, // HACK for terminal
@@ -277,14 +266,9 @@ static COM8116_INTERFACE( dbrg_intf )
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( terminal_put )
-{
-	acia6850_receive_data(device, data);
-}
-
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DEVICE_HANDLER(MC6850_0_TAG, terminal_put)
+	DEVCB_NULL
 };
 
 

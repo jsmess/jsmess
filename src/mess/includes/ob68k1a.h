@@ -38,7 +38,6 @@ public:
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( com8116_w );
-	DECLARE_WRITE8_MEMBER( acia0_data_w );
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 };
