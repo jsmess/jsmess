@@ -867,6 +867,6 @@ ROM_END
 COMP( 1981, super80,  0,       0, super80,  super80,  super80,  "Dick Smith Electronics","Super-80 (V1.2)" , 0)
 COMP( 1981, super80d, super80, 0, super80d, super80d, super80,  "Dick Smith Electronics","Super-80 (V2.2)" , 0)
 COMP( 1981, super80e, super80, 0, super80e, super80d, super80,  "Dick Smith Electronics","Super-80 (El Graphix 4)" , GAME_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0, super80m, super80m, super80,  "Dick Smith Electronics","Super-80 (8R0)" , GAME_UNOFFICIAL)
+COMP( 1981, super80m, super80, 0, super80m, super80m, super80,  "Dick Smith Electronics","Super-80 (with colour)" , GAME_UNOFFICIAL)
 COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, "Dick Smith Electronics","Super-80 (with VDUEB)" , GAME_UNOFFICIAL)
 COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , GAME_UNOFFICIAL)
