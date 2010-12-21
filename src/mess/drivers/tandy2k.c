@@ -170,6 +170,30 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	pic8259_ir6_w(m_pic1, dme);
 }
 
+READ8_MEMBER( tandy2k_state::vpac_r )
+{
+	if (offset)
+	{
+		return m_vpac->read(space, offset / 2);
+	}
+	else
+	{
+		return 0xff;
+	}
+}
+
+WRITE8_MEMBER( tandy2k_state::vpac_w )
+{
+	if (offset)
+	{
+		m_vpac->write(space, offset / 2, data);
+	}
+	else
+	{
+		addr_ctrl_w(space, offset, data);
+	}
+}
+
 static READ8_DEVICE_HANDLER( fldtc_r )
 {
 	upd765_tc_w(device, 1);
@@ -330,7 +354,8 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
-	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff)// AM_WRITE8(addr_ctrl_w, 0xff00)
+//	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
+	AM_RANGE(0x00100, 0x0017f) AM_READWRITE8(vpac_r, vpac_w, 0xffff)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
 //  AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
