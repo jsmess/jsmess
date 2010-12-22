@@ -2,12 +2,473 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-Among undumped protos & special release
+Undumped
 
-  - Magical Drop - Bunka Housou version (1996) by Bandai (special version in collaboration with a radio program)
-  - Naughts &amp; Crosses
+  - Japan:
+
+  -- Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan) (Rev A)
+  -- Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Riyuu (Japan) (Rev A)
+  -- J.League Excite Stage '96 (Japan) (Sample)
+  -- Little Master - Nijiiro no Maseki (Japan) (Sample)
+  -- Magical Drop 2 - Bunka Housou Special Version (Japan) -- (1996) by Bandai (special version in collaboration with a radio program)
+  -- Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
+  -- Pro Yakyuu Nettou Puzzle Stadium (Japan) (Sample)
+  -- BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan) -- Initial release/Rev 0
+  -- Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
+  -- Super Mario Club Taikai You (Japan)
+  -- Super Mahjong Taikai (Japan) (Rev B)
+  -- Super Street Fighter II (Japan) (Sample)
+  -- Wild Trax (Japan) (Sample)
+  
+  - USA
+  
+  -- Naughts &amp; Crosses ??? (Is it USA?)
+  -- Fighter's History (USA) -- Initial release/Rev 0
+  -- Ignition Factor, The (USA) (Sample)
+  -- Star Fox (USA) (Rev A)
+  -- Super Mario World/Pilot Wings/F-Zero Competition Cartridge (USA)
+  
+  - Europe
+  
+  -- Biker Mice From Mars (Europe) (Sample)
+  -- Donkey Kong Country 2 - Diddy's Kong Quest (Europe) -- Initial release/Rev 0
+  
+  - Multi-region
+  
+  -- X-Terminator (Unlicensed)
+  -- X-Terminator 2 (Unlicensed)
 
 -->
+
+<!--
+The software list will be divided in four categories:
+1. Perfect dump: A matching dump from two different cartridges
+2. Verified dump: A dump from a known dumper
+3. Unconfirmed dump: A dump which is not confirmed
+4. Bad dumps: Known bad dumps, need redumps
+-->
+
+<!-- List of perfect dumps -->
+
+	<software name="ffant5j">
+		<!-- Serial: SHVC-F5 - Release Date: 1992-12-06 - Alt. Title: ファイナルファンタジーV -->
+		<description>Final Fantasy V (Jpn)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3B-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_serial" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-f5-0.u1" size="2097152" crc="c1bc267d" sha1="e937b54fff99838e2e853697e4f559359aa91fd6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ffant5ja" cloneof="ffant5j">
+		<!-- Serial: SHVC-F5 - Release Date: 1992-12-06 - Alt. Title: ファイナルファンタジーV -->
+		<description>Final Fantasy V (Jpn, Alt)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J3B-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 74LS139" />
+			<feature name="u5" value="U5 74LS00" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_serial" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-f5-0.p0.u1" size="1048576" crc="f6ccde10" sha1="a8a33c75cca3190de0b7f19aa1fcf089c8d1021a" offset="000000" />
+				<rom name="shvc-f5-0.p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffant6j" cloneof="ffant3">
+		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
+		<description>Final Fantasy VI (Jpn)</description>
+		<year>1994</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-01" /> <!-- also found with SHVC-BJ3M-10 pcb -->
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
+				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
+			</dataarea>
+ 		</part>
+ 	</software>
+
+	<software name="ffant6ja" cloneof="ffant3">
+		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
+		<description>Final Fantasy VI (Jpn, Alt)</description>
+		<year>1994</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-3J3M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 P2" />
+			<feature name="u4" value="U4 64K SRAM" />
+			<feature name="u5" value="U5 74LS139" />
+			<feature name="u6" value="U6 MAD-1" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_serial" value="920214" />
+			<dataarea name="rom" size="3145728 ">		
+				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
+				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="100000" />
+				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- End of perfect dumps -->
+
+
+<!-- List of verified dumps -->
+<!-- End of verified dumps -->
+
+
+<!-- List of unconfirmed dumps -->
+<!-- End of unconfirmed dumps -->
+
+
+<!-- List of bad dumps -->
+
+	<software name="3jigen">
+		<!-- Serial: SHVC-ABZJ-JPN - Release Date: 1995-04-28 -->
+		<description>3-jigen Kakutou Ballz (Jpn)</description>
+		<year>1995</year>
+		<publisher>Media Rings</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="3-jigen kakutou ballz (japan) [b].sfc" size="1048576" crc="f0810694" sha1="0caca71401b96b3ab42ec89e9bcf7af82b1bd3d4" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="batman">
+		<description>Batman (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>Software Creations</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="batman (usa) (proto) [b].sfc" size="524288" crc="9bae4220" sha1="db0191f23613e74b72fdc113b013501edbbe6311" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdragon" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Dragon Quest I (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bs dragon quest i (japan) [b].bs" size="1048576" crc="577f6d20" sha1="aed921ff60c7c01a80e7e8f2d24d6684465a941e" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeld2" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Zelda no Densetsu Map 2 - Dai-4-wa (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu map 2 - dai-4-wa (japan) [b].bs" size="1048576" crc="670b51ca" sha1="4a53e22e2b01f55245112da5bdd24aed7a9f7c10" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplft3up" cloneof="choplft3">
+		<description>Choplifter III - Rescue &amp; Survive (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Extreme Entertainment Group</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="choplifter iii - rescue &amp; survive (usa) (beta) [b].sfc" size="524288" crc="3280c18f" sha1="8501570bfb32fe86f6cc7756eae23c49defe9974" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdandnu" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>Dandan Belt Conveyor - Ukulele no Maki (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="dandan belt conveyor - ukulele no maki (japan) [b].bs" size="1048576" crc="10205b4b" sha1="da3c4c0bb0c36b7605a93fed9ff220e46d71f6d6" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macs">
+		<!-- Serial:  - Release Date:  -->
+		<description>M.A.C.S. Basic Rifle Marksmanship (USA)</description>
+		<year>1993</year>
+		<publisher>Sculptured Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="m.a.c.s. basic rifle marksmanship (usa) [b].sfc" size="524288" crc="b8491c98" sha1="81ca8f020755490fc98dbc283cea54cb91d3cbb6" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazingera" cloneof="mazinger">
+		<!-- Serial: SHVC-JZ - Release Date: 1993-06-25 - Alt. Title: マジンガーZ -->
+		<description>Mazinger Z (Jpn, Alt)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mazinger z (japan) (alt 1) [b].sfc" size="1048576" crc="202b3738" sha1="4e6ba15a1165d434e6d7da5f59b3560e705c51ef" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazinger">
+		<!-- Serial: SHVC-JZ - Release Date: 1993-06-25 - Alt. Title: マジンガーZ -->
+		<description>Mazinger Z (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mazinger z (japan) [b].sfc" size="1048576" crc="ca42e604" sha1="c35ae7ad817c71eb2cab783c2b6a215e6c0ec53c" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack">
+		<description>Mick &amp; Mack as the Global Gladiators (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mick &amp; mack as the global gladiators (usa) (proto) [b].sfc" size="2097152" crc="240442ea" sha1="920adcfce57ec5e882a39a95e616053a438ce91a" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popntwinjs" cloneof="popntwin">
+		<description>Pop'n TwinBee (Jpn, Sample)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pop'n twinbee (japan) (sample).sfc" size="1048576" crc="fdd56eb2" sha1="28a6524a4f48a4d48bdadee6e1fc1862dea0fe00" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhitomi">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sm choukyoushi hitomi (japan) (unl) [b].sfc" size="1048576" crc="d12d3529" sha1="886cd6721df35894d9933fe4d378383f2a18970b" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhitobh">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi - Bangai Hen (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi - bangai hen (japan) (unl) [b].sfc" size="524288" crc="e7a659e0" sha1="f457b876bf1dd0b3ba323ae990b6e56567d7e29b" offset="000000" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhitob2">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi - Bangai Hen 2 - Maki no Love Love Panic (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi - bangai hen 2 - maki no love love panic (japan) (unl) [b].sfc" size="524288" crc="0504f733" sha1="02c5900462d9e320136445968ad116a33da932ca" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhitotv">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi - Test Version (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi - test version (japan) (unl) [b].sfc" size="524288" crc="1cfc5feb" sha1="e0e6f367ae7596557161d294550f851cc8d326d4" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito2">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 2 (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sm choukyoushi hitomi vol. 2 (japan) (unl) [b].sfc" size="1048576" crc="4a55cfb8" sha1="1515018c597f6966c4c6fb566a8dd61ab58049d7" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito2t">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 2 - Trial Version (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi vol. 2 - trial version (japan) (unl) [b].sfc" size="524288" crc="29e1efbf" sha1="8814268822a211f46a5db15a78cc9353a8de5068" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito2r">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 2 Remix (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi vol. 2 remix (japan) (unl) [b].sfc" size="524288" crc="4b280dfa" sha1="7b5534582954a94dd8d1d66e0ba382288aa48430" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito3a" cloneof="smhito3">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="000000"  state="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito3">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (unl) [b].sfc" size="1048576" crc="1156cac6" sha1="37d404b0c213053d32b9d778a1c99f8477837b42" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhito3t">
+		<!-- Serial:  - Release Date:  -->
+		<description>SM Choukyoushi Hitomi Vol. 3 - Test Version (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sm choukyoushi hitomi vol. 3 - test version (japan) (unl) [b].sfc" size="524288" crc="b3be5f84" sha1="a0ad63ab4a262b728e0faa0e5749423cd6aa3d9c" offset="000000" state="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic4" cloneof="speedy">
+		<!-- Serial:  - Release Date:  -->
+		<description>Sonic the Hedgehog 4 (World)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sonic the hedgehog 4 (world) (unl) [b].sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidxmenup" cloneof="spidxmen">
+		<description>Spider-Man and the X-Men in Arcade's Revenge (USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="spider-man and the x-men in arcade's revenge (usa) (beta) [b].sfc" size="1048576" crc="6fd2cd8c" sha1="91d5da97339606c1350b69f07fb594564ced5ca2" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baselod3">
+		<!-- Serial:  - Release Date: 1995-02 -->
+		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. 1)</description>
+		<year>1995</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super bases loaded 3 - license to steal (usa) (rev 1) [b].sfc" size="2097152" crc="24a5a70f" sha1="62436a4e463592bd36edb499c8ee45f26ef8c74f" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprputtp" cloneof="suprputt">
+		<description>Super Putty (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="super putty (europe) (beta) [b].sfc" size="1048576" crc="2f2a86a0" sha1="ef5b47e82b7dfe7905538671d1d5f3b22f26db2d" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xterm2">
+		<!-- Serial:  - Release Date:  -->
+		<description>Super X-Terminator 2 Sasuke (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="super x-terminator 2 sasuke (japan) (unl) [b].sfc" size="32768" crc="5f75ce9e" sha1="1ab01f930fbf516d6b5f38af2a0ebf46cdaa09b3" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- End of bad dumps -->
+
+
+<!-- List of unclassified dumps -->
 
 <softwarelist name="snes" description="Nintendo SNES cartridges">
 	<software name="96zenko">
@@ -80,18 +541,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="3-ji no wide shou - 6 gatsugou (japan).bs" size="524288" crc="dbe754c6" sha1="8016d1d9db9af87d59edba7a4be39f46f7561253" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="3jigen">
-		<!-- Serial: SHVC-ABZJ-JPN - Release Date: 1995-04-28 -->
-		<description>3-jigen Kakutou Ballz (Jpn)</description>
-		<year>1995</year>
-		<publisher>Media Rings</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="3-jigen kakutou ballz (japan) [b].sfc" size="1048576" crc="f0810694" sha1="0caca71401b96b3ab42ec89e9bcf7af82b1bd3d4" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2007,17 +2456,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="batman">
-		<description>Batman (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>Software Creations</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="batman (usa) (proto) [b].sfc" size="524288" crc="9bae4220" sha1="db0191f23613e74b72fdc113b013501edbbe6311" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="batmanrj">
 		<description>Batman - Revenge of the Joker (USA, Prototype)</description>
 		<year>1992</year>
@@ -3627,19 +4065,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="bsdragon" supported="no">
-		<!-- Serial:  - Release Date:  -->
-		<description>BS Dragon Quest I (Jpn)</description>
-		<!-- BS -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bs dragon quest i (japan) [b].bs" size="1048576" crc="577f6d20" sha1="aed921ff60c7c01a80e7e8f2d24d6684465a941e" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bsfzero4" supported="no">
 		<!-- Serial:  - Release Date:  -->
 		<description>BS F-Zero Grand Prix - Ace League - Dai-4-shuu (Jpn)</description>
@@ -4180,19 +4605,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bs zelda no densetsu - kodai no sekiban - dai-4-wa (japan).bs" size="1048576" crc="8385bbf4" sha1="63c1110e32d4b3b2d6525919e10e50abcc7677a3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bszeld2" supported="no">
-		<!-- Serial:  - Release Date:  -->
-		<description>BS Zelda no Densetsu Map 2 - Dai-4-wa (Jpn)</description>
-		<!-- BS -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu map 2 - dai-4-wa (japan) [b].bs" size="1048576" crc="670b51ca" sha1="4a53e22e2b01f55245112da5bdd24aed7a9f7c10" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5070,17 +5482,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="choplifter iii - rescue &amp; survive (japan).sfc" size="524288" crc="ad26cc9e" sha1="1d5c4fa1b2638591f1f61d8ccc0855c0077bd8c0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="choplft3up" cloneof="choplft3">
-		<description>Choplifter III - Rescue &amp; Survive (USA, Prototype)</description>
-		<year>1994</year>
-		<publisher>Extreme Entertainment Group</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="choplifter iii - rescue &amp; survive (usa) (beta) [b].sfc" size="524288" crc="3280c18f" sha1="8501570bfb32fe86f6cc7756eae23c49defe9974" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6246,19 +6647,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="dandan belt conveyor - gyuunyuu no maki (japan).bs" size="1048576" crc="380c8c79" sha1="343e5607d62d7962a04c090cd003495fc344deee" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bsdandnu" supported="no">
-		<!-- Serial:  - Release Date:  -->
-		<description>Dandan Belt Conveyor - Ukulele no Maki (Jpn)</description>
-		<!-- BS -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="dandan belt conveyor - ukulele no maki (japan) [b].bs" size="1048576" crc="10205b4b" sha1="da3c4c0bb0c36b7605a93fed9ff220e46d71f6d6" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -9514,59 +9902,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="final fantasy usa - mystic quest (japan).sfc" size="524288" crc="1da17f0c" sha1="ffc05a65ef43fa5c56c9930af1af527509c1ae05" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffant5">
-		<!-- Serial: SHVC-F5 - Release Date: 1992-12-06 - Alt. Title: ファイナルファンタジーV -->
-		<description>Final Fantasy V (Jpn)</description>
-		<year>1992</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="final fantasy v (japan).sfc" size="2097152" crc="c1bc267d" sha1="e937b54fff99838e2e853697e4f559359aa91fd6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffant6" cloneof="ffant3">
-		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
-		<description>Final Fantasy VI (Jpn)</description>
-		<year>1994</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-BJ3M-01" /> <!-- also found with SHVC-BJ3M-10 pcb -->
-			<feature name="u3" value="64K SRAM" />
-			<feature name="u4" value="MAD-1" />
-			<feature name="u5" value="CIC" />
-			<feature name="cart_revision" value="N/A" />
-			<feature name="cart_model" value="SHVC-006" />
-			<dataarea name="rom" size="3145728">
-				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
-				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
-			</dataarea>
- 		</part>
- 	</software>
-
-	<software name="ffant6a" cloneof="ffant3">
-		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
-		<description>Final Fantasy VI (Jpn, Alt)</description>
-		<year>1994</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-3J3M-01" />
-			<feature name="u4" value="64K SRAM" />
-			<feature name="u5" value="74LS139" />
-			<feature name="u6" value="MAD-1" />
-			<feature name="u7" value="CIC" />
-			<feature name="cart_revision" value="N/A" />
-			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_serial" value="920214" />
-			<dataarea name="rom" size="3145728 ">		
-				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
-				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="100000" />
-				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17817,18 +18152,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="macs">
-		<!-- Serial:  - Release Date:  -->
-		<description>M.A.C.S. Basic Rifle Marksmanship (USA)</description>
-		<year>1993</year>
-		<publisher>Sculptured Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="m.a.c.s. basic rifle marksmanship (usa) [b].sfc" size="524288" crc="b8491c98" sha1="81ca8f020755490fc98dbc283cea54cb91d3cbb6" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="madden94">
 		<description>Madden NFL '94 (Euro)</description>
 		<year>1993</year>
@@ -18850,30 +19173,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="mazingera" cloneof="mazinger">
-		<!-- Serial: SHVC-JZ - Release Date: 1993-06-25 - Alt. Title: マジンガーZ -->
-		<description>Mazinger Z (Jpn, Alt)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mazinger z (japan) (alt 1) [b].sfc" size="1048576" crc="202b3738" sha1="4e6ba15a1165d434e6d7da5f59b3560e705c51ef" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mazinger">
-		<!-- Serial: SHVC-JZ - Release Date: 1993-06-25 - Alt. Title: マジンガーZ -->
-		<description>Mazinger Z (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mazinger z (japan) [b].sfc" size="1048576" crc="ca42e604" sha1="c35ae7ad817c71eb2cab783c2b6a215e6c0ec53c" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mecarobo">
 		<!-- Serial:  - Release Date: 1993-09 -->
 		<description>Mecarobot Golf (USA)</description>
@@ -19276,17 +19575,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1310720">
 				<rom name="michael jordan - chaos in the windy city (usa).sfc" size="1310720" crc="f57dba3b" sha1="08524189bd10051005c2a15bdaae999c3a90359d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mickmack">
-		<description>Mick &amp; Mack as the Global Gladiators (USA, Prototype)</description>
-		<year>1993</year>
-		<publisher>Virgin Games</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mick &amp; mack as the global gladiators (usa) (proto) [b].sfc" size="2097152" crc="240442ea" sha1="920adcfce57ec5e882a39a95e616053a438ce91a" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -23838,17 +24126,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="popntwinjs" cloneof="popntwin">
-		<description>Pop'n TwinBee (Jpn, Sample)</description>
-		<year>1993</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pop'n twinbee (japan) (sample).sfc" size="1048576" crc="fdd56eb2" sha1="28a6524a4f48a4d48bdadee6e1fc1862dea0fe00" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="popntwinj" cloneof="popntwin">
 		<!-- Serial: SHVC-PT - Release Date: 1993-03-26 - Alt. Title: ポップンツインビー - Notes: Also re-released through Nintendo Power -->
 		<description>Pop'n TwinBee (Jpn)</description>
@@ -28036,126 +28313,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="smhitomi">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi (japan) (unl) [b].sfc" size="1048576" crc="d12d3529" sha1="886cd6721df35894d9933fe4d378383f2a18970b" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhitobh">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi - Bangai Hen (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi - bangai hen (japan) (unl) [b].sfc" size="524288" crc="e7a659e0" sha1="f457b876bf1dd0b3ba323ae990b6e56567d7e29b" offset="000000" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhitob2">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi - Bangai Hen 2 - Maki no Love Love Panic (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi - bangai hen 2 - maki no love love panic (japan) (unl) [b].sfc" size="524288" crc="0504f733" sha1="02c5900462d9e320136445968ad116a33da932ca" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhitotv">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi - Test Version (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi - test version (japan) (unl) [b].sfc" size="524288" crc="1cfc5feb" sha1="e0e6f367ae7596557161d294550f851cc8d326d4" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito2">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 2 (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 2 (japan) (unl) [b].sfc" size="1048576" crc="4a55cfb8" sha1="1515018c597f6966c4c6fb566a8dd61ab58049d7" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito2t">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 2 - Trial Version (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 2 - trial version (japan) (unl) [b].sfc" size="524288" crc="29e1efbf" sha1="8814268822a211f46a5db15a78cc9353a8de5068" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito2r">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 2 Remix (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 2 remix (japan) (unl) [b].sfc" size="524288" crc="4b280dfa" sha1="7b5534582954a94dd8d1d66e0ba382288aa48430" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito3a" cloneof="smhito3">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="000000"  state="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito3">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (unl) [b].sfc" size="1048576" crc="1156cac6" sha1="37d404b0c213053d32b9d778a1c99f8477837b42" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smhito3t">
-		<!-- Serial:  - Release Date:  -->
-		<description>SM Choukyoushi Hitomi Vol. 3 - Test Version (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 3 - test version (japan) (unl) [b].sfc" size="524288" crc="b3be5f84" sha1="a0ad63ab4a262b728e0faa0e5749423cd6aa3d9c" offset="000000" state="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smartbal">
 		<!-- Serial:  - Release Date: 1992-03 -->
 		<description>Smart Ball (USA)</description>
@@ -28407,18 +28564,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="sonic blast man ii (usa).sfc" size="1572864" crc="24229a34" sha1="35f07d2fa80ce6f7d11c0cf2e41c768b3e94caf7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonic4" cloneof="speedy">
-		<!-- Serial:  - Release Date:  -->
-		<description>Sonic the Hedgehog 4 (World)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sonic the hedgehog 4 (world) (unl) [b].sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -29042,17 +29187,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="spider-man and the x-men in arcade's revenge (europe).sfc" size="1048576" crc="d679058d" sha1="6431b655516c1bfa3ae167a4bddb4c635eefeec4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spidxmenup" cloneof="spidxmen">
-		<description>Spider-Man and the X-Men in Arcade's Revenge (USA, Prototype)</description>
-		<year>1992</year>
-		<publisher>LJN</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="spider-man and the x-men in arcade's revenge (usa) (beta) [b].sfc" size="1048576" crc="6fd2cd8c" sha1="91d5da97339606c1350b69f07fb594564ced5ca2" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -30193,18 +30327,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="super bases loaded (usa).sfc" size="1048576" crc="6b971f1e" sha1="2b2523ad38d3597902d4600a7a7752319faee8a9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="baselod3">
-		<!-- Serial:  - Release Date: 1995-02 -->
-		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. 1)</description>
-		<year>1995</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super bases loaded 3 - license to steal (usa) (rev 1) [b].sfc" size="2097152" crc="24a5a70f" sha1="62436a4e463592bd36edb499c8ee45f26ef8c74f" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -33271,17 +33393,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="suprputtp" cloneof="suprputt">
-		<description>Super Putty (Euro, Prototype)</description>
-		<year>1993</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super putty (europe) (beta) [b].sfc" size="1048576" crc="2f2a86a0" sha1="ef5b47e82b7dfe7905538671d1d5f3b22f26db2d" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="suprputt">
 		<description>Super Putty (Euro)</description>
 		<year>1993</year>
@@ -34489,18 +34600,6 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="super wrestle angels (japan).sfc" size="1572864" crc="b697f8a0" sha1="1897062b952636ce0d2f9b714c7cd0b08cdc340b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xterm2">
-		<!-- Serial:  - Release Date:  -->
-		<description>Super X-Terminator 2 Sasuke (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="super x-terminator 2 sasuke (japan) (unl) [b].sfc" size="32768" crc="5f75ce9e" sha1="1ab01f930fbf516d6b5f38af2a0ebf46cdaa09b3" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
