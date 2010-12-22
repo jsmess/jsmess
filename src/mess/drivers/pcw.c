@@ -177,7 +177,7 @@ static TIMER_CALLBACK(pcw_timer_interrupt)
 
 	state->timer_irq_flag = 1;
 	pcw_update_irqs(machine);
-	timer_set(machine,ATTOTIME_IN_USEC(2),NULL,0,pcw_timer_pulse);
+	timer_set(machine,ATTOTIME_IN_USEC(100),NULL,0,pcw_timer_pulse);
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -383,7 +383,7 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	state->banks[offset] = data;
 
 	pcw_update_mem(space->machine, offset, data);
-	//popmessage("RAM Banks: %02x %02x %02x %02x",state->banks[0],state->banks[1],state->banks[2],state->banks[3]);
+//	popmessage("RAM Banks: %02x %02x %02x %02x",state->banks[0],state->banks[1],state->banks[2],state->banks[3]);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
@@ -664,7 +664,6 @@ static WRITE8_HANDLER(pcw_fdc_w)
 	}
 }
 
-/* TODO: Implement the printer for PCW8256, PCW8512,PCW9256*/
 static void pcw_printer_fire_pins(running_machine* machine, UINT16 pins)
 {
 	pcw_state *state = machine->driver_data<pcw_state>();
@@ -713,7 +712,7 @@ static  READ8_HANDLER(pcw_printer_data_r)
 // printer status
 // bit 7 - bail bar in
 // bit 6 - not currently executing a command
-// bit 5 - always 0 for dot matrix printer (PCW8256/8512), 1 if a daisywheel printer(PCW9512)
+// bit 5 - printer RAM is full
 // bit 4 - print head is not at left margin
 // bit 3 - sheet feeder is present
 // bit 2 - paper is present
@@ -753,7 +752,7 @@ static WRITE8_HANDLER(mcu_printer_p1_w)
 	pcw_state *state = space->machine->driver_data<pcw_state>();
 	state->printer_pins = (state->printer_pins & 0x0100) | data;
 	//popmessage("PRN: Print head position = %i",state->printer_headpos);
-	logerror("PRN: MCU writing %02x to P1 [%03x]\n",data,state->printer_pins);
+	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,state->printer_pins,~state->printer_pins & 0x1ff);
 }
 
 static READ8_HANDLER(mcu_printer_p2_r)
@@ -790,6 +789,7 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 	}
 	if((data & 0x08) != 0)  // strobe
 	{
+		logerror("Strobe active [%02x]\n",state->printer_shift);
 		state->printer_shift_output = state->printer_shift;
 		if((state->printer_p2 & 0x10) == 0)  // print head motor active
 		{
@@ -798,21 +798,25 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 			{
 				state->printer_headpos += 2;
 				state->head_motor_state++;
+				logerror("Printer head moved forward by 2 to %i\n",state->printer_headpos);
 			}
 			if(stepper_state == half_step_table[(state->head_motor_state + 1) & 0x03])
 			{
 				state->printer_headpos += 1;
 				state->head_motor_state++;
+				logerror("Printer head moved forward by 1 to %i\n",state->printer_headpos);
 			}
 			if(stepper_state == full_step_table[(state->head_motor_state - 1) & 0x03])
 			{
 				state->printer_headpos -= 2;
 				state->head_motor_state--;
+				logerror("Printer head moved back by 2 to %i\n",state->printer_headpos);
 			}
 			if(stepper_state == half_step_table[(state->head_motor_state - 1) & 0x03])
 			{
 				state->printer_headpos -= 1;
 				state->head_motor_state--;
+				logerror("Printer head moved back by 1 to %i\n",state->printer_headpos);
 			}
 			if(state->printer_headpos < 0)
 				state->printer_headpos = 0;
@@ -826,11 +830,15 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 			if(stepper_state == full_step_table[(state->linefeed_motor_state + 1) & 0x03])
 			{
 				state->paper_feed++;
+				if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
+					state->paper_feed = 0;
 				state->linefeed_motor_state++;
 			}
 			if(stepper_state == half_step_table[(state->linefeed_motor_state + 1) & 0x03])
 			{
 				state->paper_feed++;
+				if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
+					state->paper_feed = 0;
 				state->linefeed_motor_state++;
 			}
 			state->linefeed_motor_state &= 0x03;
@@ -1305,19 +1313,18 @@ static const floppy_config pcw_floppy_config =
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3400000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map)
 	MDRV_CPU_IO_MAP(pcw_io)
-//	MDRV_QUANTUM_TIME(HZ(50))
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
 	MDRV_CPU_IO_MAP(pcw_printer_io)
-	MDRV_QUANTUM_PERFECT_CPU("printer_mcu")
 
 	MDRV_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MDRV_CPU_IO_MAP(pcw_keyboard_io)
-	MDRV_QUANTUM_PERFECT_CPU("keyboard_mcu")
+
+//	MDRV_QUANTUM_TIME(HZ(50))
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_MACHINE_START(pcw)
 	MDRV_MACHINE_RESET(pcw)
@@ -1411,7 +1418,7 @@ ROM_END
 ROM_START(pcw9256)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot-matrix (does this model have different MCU code?)
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
@@ -1420,7 +1427,7 @@ ROM_END
 ROM_START(pcw9512)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)											\
-	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel (schematics say i8039?)
 	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
