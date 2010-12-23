@@ -131,6 +131,7 @@ CPUS += SCMP
 #CPUS += MN10200
 CPUS += COSMAC
 CPUS += UNSP
+CPUS += HCD62121
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1217,6 +1218,7 @@ $(MESSOBJ)/orion.a:				\
 $(MESSOBJ)/osborne.a:			\
 	$(MESS_DRIVERS)/osborne1.o	\
 	$(MESS_MACHINE)/osborne1.o	\
+	$(MESS_DRIVERS)/osbexec.o	\
 
 $(MESSOBJ)/osi.a:				\
 	$(MESS_DRIVERS)/osi.o		\
@@ -1758,6 +1760,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/vta2000.o	\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/z80dev.o	\
+	$(MESS_DRIVERS)/cfx9850.o	\
 	$(MESS_DRIVERS)/zexall.o	\
 
 

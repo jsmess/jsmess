@@ -681,6 +681,7 @@ const game_driver * const drivers[] =
 
 	/* Osborne */
 	DRIVER( osborne1 )  /* 1981 Osborne-1      */
+	DRIVER( osbexec )	/* 1982 Osborne Executive */
 
 	/* Research Machines */
 	DRIVER( nimbus )	/* RM Nimbus 186 */
