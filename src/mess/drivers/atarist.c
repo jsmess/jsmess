@@ -2533,8 +2533,6 @@ COMP( 1991, megaste_it,	ste,		0,		megaste,	st,			0,		"Atari",	"MEGA STE (Italy)"
 COMP( 1991, megaste_se,	ste,		0,		megaste,	st,			0,		"Atari",	"MEGA STE (Sweden)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1992, falcon,		0,			0,		falcon,		falcon,		0,		"Atari",	"Falcon030",			GAME_NOT_WORKING )
 COMP( 1992, falcon40,	falcon,		0,		falcon40,	falcon,		0,		"Atari",	"Falcon040 (prototype)",GAME_NOT_WORKING )
-/*
-COMP( 1989, stacy,    st,  0,      stacy,    stacy,    0,     "Atari", "Stacy", GAME_NOT_WORKING )
-COMP( 1991, stpad,    ste, 0,      stpad,    stpad,    0,     "Atari", "STPad (prototype)", GAME_NOT_WORKING )
-COMP( 1992, fx1,      0,        0,      falcon,   falcon,   0,     "Atari", "FX-1 (prototype)", GAME_NOT_WORKING )
-*/
+//COMP( 1989, stacy,    st,  0,      stacy,    stacy,    0,     "Atari", "Stacy", GAME_NOT_WORKING )
+//COMP( 1991, stpad,    ste, 0,      stpad,    stpad,    0,     "Atari", "STPad (prototype)", GAME_NOT_WORKING )
+//COMP( 1992, fx1,      0,        0,      falcon,   falcon,   0,     "Atari", "FX-1 (prototype)", GAME_NOT_WORKING )

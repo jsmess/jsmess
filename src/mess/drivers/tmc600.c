@@ -338,5 +338,5 @@ ROM_END
 
 /* System Drivers */
 //    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-COMP( 1982, tmc600s1, 0,	0,	     tmc600,   tmc600,   0, 	   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
+//COMP( 1982, tmc600s1, 0,	0,	     tmc600,   tmc600,   0, 	   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
 COMP( 1982, tmc600s2, 0,	0,	     tmc600,   tmc600,   0, 	   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -847,7 +847,7 @@ static MACHINE_CONFIG_DERIVED( ql_ntsc, ql )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_CONFIG_END
 
-
+/*
 //-------------------------------------------------
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
@@ -858,8 +858,9 @@ static MACHINE_CONFIG_DERIVED( opd, ql )
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
+*/
 
-
+/*
 //-------------------------------------------------
 //  MACHINE_CONFIG( megaopd )
 //-------------------------------------------------
@@ -869,7 +870,7 @@ static MACHINE_CONFIG_DERIVED( megaopd, ql )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
-
+*/
 
 
 //**************************************************************************
@@ -1136,5 +1137,5 @@ COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      "Sinclair Resear
 COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
 COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
 COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
-COMP( 1984, tonto,  0,		0,		opd,		ql,		0,		"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
-COMP( 1986, megaopd,tonto,	0,		megaopd,	ql,		0,		"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )
+//COMP( 1984, tonto,  0,		0,		opd,		ql,		0,		"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
+//COMP( 1986, megaopd,tonto,	0,		megaopd,	ql,		0,		"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )

@@ -762,6 +762,7 @@ static const cassette_config tmc1800_cassette_config =
 	NULL
 };
 
+
 static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	// basic system hardware
 	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
@@ -785,7 +786,7 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
-	/* internal ram */
+	// internal ram
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")

@@ -868,7 +868,9 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
-COMP( 1985, pc8001mk2sr,    0,		0,     pc88srl,  pc8001,  0,    "Nippon Electronic Company",  "PC-8001mkIISR", GAME_NOT_WORKING )
+
+// This entry was not in mamedriv.c.  It may be a duplicate of the pc8801mk2sr - left commented until fixed.
+// COMP( 1985, pc8001mk2sr,    0,		0,     pc88srl,  pc8001,  0,    "Nippon Electronic Company",  "PC-8001mkIISR", GAME_NOT_WORKING )
 
 COMP( 1981, pc8801,         0,		0,     pc88srl,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc8801mk2,      pc8801, 0,     pc88srl,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump

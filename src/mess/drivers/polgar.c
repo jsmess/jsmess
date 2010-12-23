@@ -460,4 +460,5 @@ led_status=0;
 //CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto, "Hegener & Glaser", "Mephisto Polgar Computer",         GAME_NOT_WORKING )
 CONS( 1986, polgar,     0,      0,      polgar,     polgar,   polgar,   "Hegener & Glaser", "Mephisto Polgar Schach Computer", 0 )
 CONS( 1986, milano,     polgar,      0,      milano,     polgar,   polgar,   "Hegener & Glaser", "Mephisto Milano Schach Computer", 0 )
+// milano to be added to supercon.c driver - no current messdriv.c entry
 // second design sold (same computer/program?)

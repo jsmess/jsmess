@@ -526,6 +526,8 @@ const game_driver * const drivers[] =
 	DRIVER( pet64 )	 /* Commodore PET 64     */
 	DRIVER( cbm4064 )   /* Commodore CBM 4064      */
 	DRIVER( edu64 )	 /* Commodore Educator 64   */
+//  DRIVER( clipper )  /* C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer */
+//  DRIVER( tesa6240 )  /*  modified SX64 with label printer */
 	DRIVER( sx64 )	  /* Commodore SX-64 Executive Machine (PAL)      */
 	DRIVER( vip64 )	 /* Commodore VIP64 (SX64, PAL, Swedish)     */
 //  DRIVER( dx64 )    /* Commodore DX-64 - Prototype      */
@@ -1256,14 +1258,14 @@ const game_driver * const drivers[] =
 	DRIVER( mpf1b )	   /* 1979 Multitech Micro Professor 1B */
 
 	/* Telercas Oy */
-//  DRIVER( tmc1800 )
+	DRIVER( tmc1800 )
 	DRIVER( tmc2000 )
 	DRIVER( tmc2000e )
 //  DRIVER( tmc600s1 )
 	DRIVER( tmc600s2 )
 
 	/* OSCOM Oy */
-//  DRIVER( osc1000b )
+	DRIVER( osc1000b )
 	DRIVER( nano )
 
 	/* MIT */
@@ -1272,7 +1274,6 @@ const game_driver * const drivers[] =
 
 	/* Luxor Datorer AB */
 	DRIVER( abc80 )
-//  DRIVER( abc80h )
 	DRIVER( abc802 )
 	DRIVER( abc800m )
 	DRIVER( abc800c )
@@ -1373,49 +1374,49 @@ const game_driver * const drivers[] =
 	DRIVER( impuls03 )
 
 	/* Homelab */
-	DRIVER (homelab2)
-	DRIVER (homelab3)
-	DRIVER (homelab4)
-	DRIVER (brailab4)
+	DRIVER ( homelab2 )
+	DRIVER ( homelab3 )
+	DRIVER ( homelab4 )
+	DRIVER ( brailab4 )
 
 	/* Irisha */
-	DRIVER (irisha)
+	DRIVER ( irisha )
 
 	/* PK-8020 */
-	DRIVER (korvet)
-	DRIVER (kontur)
-	DRIVER (neiva)
+	DRIVER ( korvet )
+	DRIVER ( kontur )
+	DRIVER ( neiva )
 
 	/* Vector-06c */
-	DRIVER (vector06)
+	DRIVER ( vector06 )
 
 	/* Robotron 1715 */
-	DRIVER (rt1715)
-	DRIVER (rt1715lc) /* (latin/cyrillic) */
-	DRIVER (rt1715w)
+	DRIVER ( rt1715 )
+	DRIVER ( rt1715lc ) /* (latin/cyrillic) */
+	DRIVER ( rt1715w )
 
 	/* Z1013 */
-	DRIVER (z1013)
-	DRIVER (z1013a2)
-	DRIVER (z1013k76)
-	DRIVER (z1013s60)
-	DRIVER (z1013k69)
+	DRIVER ( z1013 )
+	DRIVER ( z1013a2 )
+	DRIVER ( z1013k76 )
+	DRIVER ( z1013s60 )
+	DRIVER ( z1013k69 )
 
 	/* LLC */
-	DRIVER (llc1)
-	DRIVER (llc2)
+	DRIVER ( llc1 )
+	DRIVER ( llc2 )
 
 	/* PP-01 */
-	DRIVER (pp01)
+	DRIVER ( pp01 )
 
 	/* Ondra */
-	DRIVER (ondrat)
-	DRIVER (ondrav)
+	DRIVER ( ondrat )
+	DRIVER ( ondrav )
 
 	/* SAPI-1 */
-	DRIVER (sapi1)
-	DRIVER (sapizps2)
-	DRIVER (sapizps3)
+	DRIVER ( sapi1 )
+	DRIVER ( sapizps2 )
+	DRIVER ( sapizps3 )
 
   /* Spectrum clones */
 
@@ -1513,10 +1514,10 @@ const game_driver * const drivers[] =
 	DRIVER( trsm100 )
 	DRIVER( tandy102 )
 	DRIVER( tandy200 )
-    DRIVER( pc8201 )
+	DRIVER( pc8201 )
 	DRIVER( pc8201a )
 //  DRIVER( npc8300 )
-//  DRIVER( pc8401a )
+//  DRIVER( pc8401bd )
 	DRIVER( pc8500 )
 
 	/* Nakajima manufactured eletronic typewriters */
@@ -1745,6 +1746,7 @@ const game_driver * const drivers[] =
 	DRIVER( scv )
 	DRIVER( scv_pal )
 	DRIVER( vii ) // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
+	DRIVER( vsmile )
 	DRIVER( zsbc3 )
 	DRIVER( dms5000 )
 	DRIVER( dms86 )

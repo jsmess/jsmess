@@ -993,7 +993,7 @@ COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business M
 
 COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
 COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    "Commodore Business Machines", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-COMP(1983, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
+//COMP(1983, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
 
 COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64C (NTSC)", 0)
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (PAL)", 0)
