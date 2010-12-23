@@ -94,6 +94,11 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
+static STATE_POSTLOAD ( forte2 )
+{
+	TMS9928A_post_load(machine);
+}
+
 static MACHINE_START( forte2 )
 {
 	TMS9928A_configure(&tms9928a_interface);
@@ -102,6 +107,7 @@ static MACHINE_START( forte2 )
 
 	/* register for save states */
 	state_save_register_global(machine, forte2_input_mask);
+	state_save_register_postload(machine, forte2, NULL);
 }
 
 static MACHINE_RESET( forte2 )
@@ -130,7 +136,7 @@ static MACHINE_CONFIG_START( pesadelo, driver_device )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4458)) /* 70 lines */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

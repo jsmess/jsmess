@@ -2431,6 +2431,7 @@ static READ16_HANDLER( generic_cop_r )
 static WRITE16_HANDLER( generic_cop_w )
 {
 	static UINT32 temp32;
+	static UINT32 dma_src,dma_dst,dma_size,dma_trigger,dma_src_param;
 
 	switch (offset)
 	{
@@ -2464,10 +2465,15 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
 
-		/* Layer Clearing */
+		/* DMA / layer clearing */
+		case (0x076/2):
+			dma_src_param = data * 0x400;
+			break;
+
 		case (0x078/2): /* clear address */
 		{
 			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			dma_src = data << 6;
 			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
@@ -2476,7 +2482,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
-
+			dma_size = data << 5;
 			break;
 		}
 
@@ -2484,6 +2490,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			dma_dst = data << 6;
 			break;
 		}
 
@@ -2497,6 +2504,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				seibu_cop_log("invalid!, >0x1ff\n");
 				cop_clearfill_lasttrigger = 0;
 			}
+
+			dma_trigger = data; //dmach according to Olympic Soccer '92
 
 			break;
 		}
@@ -2564,9 +2573,74 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
+			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
+
+			if (dma_trigger & 0x80)
+			{
+				static UINT32 src,dst,size,i;
+
+				/* TODO: understand all the differences between triggers!
+                0x80 is used by Legionnaire (plain DMA)
+                0x81 is used by SD Gundam and Godzilla (unknown purpose)
+                0x86 is used by Seibu Cup Soccer (doesn't yet work)
+                0x87 is used by Denjin Makai (DMA with inverted word endianess)
+                */
+
+				//if(dma_trigger != 0x87)
+				//  printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
+
+				if(dma_trigger == 0x81)
+					return;
+
+				src = dma_src + dma_src_param;
+				dst = dma_dst;
+				size = (dma_size - dma_dst + 0x20)/2;
+
+				for(i = 0;i < size;i++)
+				{
+					space->write_word(dst, space->read_word(src));
+					src+=2;
+					dst+=2;
+				}
+
+				return;
+			}
+
+			/* Seibu Cup Soccer trigger this*/
+			if (dma_trigger == 0x0e)
+			{
+				static UINT32 src,dst,size,i;
+
+				src = dma_src;
+				dst = dma_dst;
+				size = ((dma_size - dma_dst) / 0x20) + 1;
+
+				for(i=0;i<size;i++)
+				{
+					space->write_dword(dst+0x00, space->read_dword(src+0x00));
+					space->write_dword(dst+0x04, space->read_dword(src+0x04));
+					space->write_dword(dst+0x08, space->read_dword(src+0x08));
+					space->write_dword(dst+0x0c, space->read_dword(src+0x0c));
+					space->write_dword(dst+0x10, space->read_dword(src+0x10));
+					space->write_dword(dst+0x14, space->read_dword(src+0x14));
+					space->write_dword(dst+0x18, space->read_dword(src+0x18));
+					space->write_dword(dst+0x1c, space->read_dword(src+0x1c));
+
+					//printf("%08x %08x\n",src,dst);
+
+					dst+=0x20;
+					src+=0x20;
+				}
+
+				return;
+			}
+
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+
 			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
 
 			/* do the fill  */
 			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
@@ -2581,6 +2655,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					space->write_word(i, 0x0000);
 				}
 			}
+
 			break;
 		}
 	}
@@ -2720,21 +2795,16 @@ READ16_HANDLER( cupsoc_mcu_r )
 		//case (0x1b4/2):
 		//  return cop_mcu_ram[offset];
 
-		/* returning 0xffff for some inputs for now, breaks coinage but
-           allows cupsoc to boot */
-		case (0x300/2): return input_port_read(space->machine, "DSW1");
-		case (0x304/2): return input_port_read(space->machine, "PLAYERS12");
-		case (0x308/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x30c/2): return input_port_read(space->machine, "SYSTEM");
-		case (0x314/2): return 0xffff;
-		case (0x31c/2): return input_port_read(space->machine, "DSW2");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2): return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
+		case (0x354/2): return 0xffff;
+		case (0x35c/2): return input_port_read(space->machine, "DSW2");
 
-		case (0x340/2): return 0xffff;
-		case (0x344/2): return 0xffff;
-		case (0x348/2):	return 0xffff;//seibu_main_word_r(space,2,0xffff);
-		case (0x34c/2): return 0xffff;//seibu_main_word_r(space,3,0xffff);
-		case (0x354/2): return 0xffff;//seibu_main_word_r(space,5,0xffff);
-		case (0x35c/2): return 0xffff;
+		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2): return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
 	}
 }
 
@@ -2754,6 +2824,7 @@ WRITE16_HANDLER( cupsoc_mcu_w )
         400-5ff -  Protection writes
         *********************************************************************/
 
+		#if 0
 		/* Trigger Macro Command */
 		case (0x100/2):
 		{
@@ -2807,6 +2878,7 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 			}
 			break;
 		}
+		#endif
 
 		/* Video Regs */
 		case (0x204/2):
@@ -2840,16 +2912,163 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 			}
 			break;
 		}
-		/*TODO: what's going on here,some scroll values aren't sent in these locations
-                but somewhere else?*/
-		case (0x22c/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x22e/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x230/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x232/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x234/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x236/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
-		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
+
+		case (0x21c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
+		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
+		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
+		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
+		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
+		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
+		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
+
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+	}
+}
+
+READ16_HANDLER( cupsocs_mcu_r )
+{
+	switch (offset)
+	{
+		default:
+			return generic_cop_r(space, offset, mem_mask);
+
+		//case (0x07e/2):
+		//case (0x1b0/2):
+		//case (0x1b4/2):
+		//  return cop_mcu_ram[offset];
+
+		case (0x300/2): return input_port_read(space->machine, "DSW1");
+		case (0x304/2): return input_port_read(space->machine, "PLAYERS12");
+		case (0x308/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x30c/2): return input_port_read(space->machine, "SYSTEM");
+		case (0x314/2): return 0xffff;
+		case (0x31c/2): return input_port_read(space->machine, "DSW2");
+
+		case (0x348/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x34c/2): return seibu_main_word_r(space,3,0xffff);
+		case (0x354/2): return seibu_main_word_r(space,5,0xffff);
+	}
+}
+
+WRITE16_HANDLER( cupsocs_mcu_w )
+{
+	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+
+	switch (offset)
+	{
+		default:
+			generic_cop_w(space, offset, data, mem_mask);
+			break;
+
+		/*********************************************************************
+        400-5ff -  Protection writes
+        *********************************************************************/
+
+		#if 0
+		/* Trigger Macro Command */
+		case (0x100/2):
+		{
+			switch(cop_mcu_ram[offset])
+			{
+				/*???*/
+				case 0x8100:
+				{
+					UINT32 src = cop_register[0];
+					space->write_word(src+0x36,0xffc0);
+					break;
+				}
+				case 0x8900:
+				{
+					UINT32 src = cop_register[0];
+					space->write_word(src+0x36,0xff80);
+					break;
+				}
+				/*Right*/
+				case 0x0205:
+				{
+					UINT32 src = cop_register[0];
+					INT16 y = space->read_word(src+0x4);
+					INT16 x = space->read_word(src+0x8);
+					INT16 y_rel = space->read_word(src+0x10);
+					INT16 x_rel = space->read_word(src+0x14);
+					space->write_word(src+0x4,(y+y_rel));
+					space->write_word(src+0x8,(x+x_rel));
+					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
+                                                   space->read_word(cop_reg[0]+0x4),
+                                                   space->read_word(cop_reg[0]+0x8),
+                                                   space->read_word(cop_reg[0]+0x10),
+                                                   space->read_word(cop_reg[0]+0x14));*/
+					break;
+				}
+				/*???*/
+				case 0x3bb0:
+				{
+					//UINT32 dst = cop_register[0];
+					//UINT32 dst = cop_register[1];
+					//space->write_word(dst,  mame_rand(space->machine)/*space->read_word(src)*/);
+					//space->write_word(dst+2,mame_rand(space->machine)/*space->read_word(src+2)*/);
+					//space->write_word(dst+4,mame_rand(space->machine)/*space->read_word(src+4)*/);
+					//space->write_word(dst+6,mame_rand(space->machine)/*space->read_word(src+6)*/);
+					//logerror("%04x\n",cop_register[0]);
+					break;
+				}
+				default:
+					//logerror("%04x\n",data);
+					break;
+			}
+			break;
+		}
+		#endif
+
+		/* Video Regs */
+		case (0x204/2):
+		{
+			//C.R.T. Controller
+			/*
+            data = setting
+            0x01e = 320x256         ---- ---x xxx-
+            0x0e1 = 320x256 REVERSE ---- xxx- ---x
+            0x016 = 320x240         ---- ---x -xx-
+            0x0e9 = 320x240 REVERSE ---- xxx- x--x
+            0x004 = 320x224         ---- ---- -x--
+            0x10b = 320x224 REVERSE ---x ---- x-xx
+            For now we use this by cases and not per bits.
+            */
+
+			switch(data)
+			{
+				case 0x0000:
+				case 0x001e: CRT_MODE(320,256,0); break;
+				case 0x00e1: CRT_MODE(320,256,1); break;
+				case 0x0016: CRT_MODE(320,240,0); break;
+				case 0x00e9: CRT_MODE(320,240,1); break;
+				case 0x0004: CRT_MODE(320,224,0); break;
+				case 0x010b: CRT_MODE(320,224,1); break;
+				default:
+				#ifdef MAME_DEBUG
+				popmessage("Warning: Undefined CRT Mode %04x",data);
+				#endif
+				CRT_MODE(320,256,0);
+			}
+			break;
+		}
+
+		case (0x25c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
+		case (0x260/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
+		case (0x262/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x264/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
+		case (0x266/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x268/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
+		case (0x26a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
+		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
+		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x340/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x344/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }

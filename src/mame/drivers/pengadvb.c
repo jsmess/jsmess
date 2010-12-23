@@ -235,6 +235,12 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
+static STATE_POSTLOAD ( pengadvb )
+{
+	TMS9928A_post_load(machine);
+	mem_map_banks(machine);
+}
+
 static MACHINE_START( pengadvb )
 {
 	TMS9928A_configure(&tms9928a_interface);
@@ -242,6 +248,7 @@ static MACHINE_START( pengadvb )
 	state_save_register_global_pointer(machine, main_mem, 0x4000);
 	state_save_register_global(machine, mem_map);
 	state_save_register_global_array(machine, mem_banks);
+	state_save_register_postload(machine, pengadvb, NULL);
 }
 
 static MACHINE_RESET( pengadvb )
@@ -276,7 +283,7 @@ static MACHINE_CONFIG_START( pengadvb, driver_device )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4458)) /* 70 lines */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

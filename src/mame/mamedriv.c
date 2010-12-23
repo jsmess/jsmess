@@ -465,6 +465,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( pastelg )	/* (c) 1985 */
 	DRIVER( 3ds )		/* (c) 1985 */
+	DRIVER( galds )		/* (c) 1985 */
 
 	DRIVER( crystalg )	/* (c) 1986 */
 	DRIVER( crystal2 )	/* (c) 1986 */
@@ -770,6 +771,7 @@ const game_driver * const drivers[] =
 	DRIVER( dspirita )	/* (c) 1987 (Atari license) */
 	DRIVER( blazer )	/* (c) 1987 (Japan) */
 	DRIVER( quester )	/* (c) 1987 (Japan) */
+	DRIVER( questers )	/* (c) 1987 (Japan) */
 	DRIVER( pacmania )	/* (c) 1987 */
 	DRIVER( pacmaniaj )	/* (c) 1987 (Japan) */
 	DRIVER( galaga88 )	/* (c) 1987 */
@@ -957,7 +959,7 @@ const game_driver * const drivers[] =
 	DRIVER( timecrs2b )	/* April 1998 */
 	DRIVER( timecrs2c )	/* April 1998 */
 	DRIVER( panicprk )	/* May 1998 */
-				/* Race On - September 1998 */
+	DRIVER( raceon )	/* Race On - September 1998 */
 	DRIVER( gunwars )	/* September 1998 */
 				/* Angler King - March 1999 */
 	DRIVER( 500gp )		/* March 1999 */
@@ -966,6 +968,7 @@ const game_driver * const drivers[] =
 				/* Guitar Jam - July 1999 */
 	DRIVER( crszone )	/* Crisis Zone - December 1999 */
 	DRIVER( crszonea )	/* Crisis Zone - December 1999 */
+	DRIVER( crszoneb )	/* Crisis Zone - December 1999 */
 
 	/* Namco System 246 */
 	DRIVER( sys246 )
@@ -1816,6 +1819,7 @@ const game_driver * const drivers[] =
 	DRIVER( onna34ro )	/* A52 (c) 1985 Taito Corporation (Japan) */
 	DRIVER( onna34roa )	/* A52 (c) 1985 Taito Corporation (Japan) */
 	DRIVER( victnine )	/* A16 (c) 1985 Taito Corporation (Japan) */
+	DRIVER( rumba )		/* A23 (c) 1985 Taito Corporation (Japan) */
 	DRIVER( gladiatr )	/* QB  (c) 1986 Taito America Corporation (US) */
 	DRIVER( ogonsiro )	/* QB  (c) 1986 Taito Corporation (Japan) */
 	DRIVER( greatgur )	/* QB  (c) 1986 Taito Corporation (Japan?) */
@@ -3603,6 +3607,7 @@ V-V                           TP-027
 	DRIVER( wcbowl16 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl140 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl15 )	/* (c) 1995 Incredible Technologies */
+	DRIVER( wcbowl14 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl13 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl12 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( sftm )		/* (c) 1995 Capcom/Incredible Technologies */
@@ -3677,6 +3682,7 @@ V-V                           TP-027
 	DRIVER( pigouta )	/* (c) 1990 Leland */
 	DRIVER( ataxx )		/* (c) 1990 Leland */
 	DRIVER( ataxxa )	/* (c) 1990 Leland */
+	DRIVER( ataxxe )	/* (c) 1990 Leland */
 	DRIVER( ataxxj )	/* (c) 1990 Leland */
 	DRIVER( wsf )		/* (c) 1990 Leland */
 	DRIVER( indyheat )	/* (c) 1991 Leland */
@@ -4689,7 +4695,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
-	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
+	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. D) */
+	DRIVER( drbyocwc )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
 	DRIVER( f355twn2 )	/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
@@ -5434,6 +5441,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pandoras )	/* GX328 (c) 1984 + Interlogic */
 	DRIVER( gyruss )	/* GX347 (c) 1983 */
 	DRIVER( gyrussce )	/* GX347 (c) 1983 + Centuri license */
+	DRIVER( gyrussb )	/* bootleg or actual Taito NZ license? */
 	DRIVER( venus )		/* bootleg */
 	DRIVER( trackfld )	/* GX361 (c) 1983 */
 	DRIVER( trackfldc )	/* GX361 (c) 1983 + Centuri license */
@@ -5571,6 +5579,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( suratka )	/* GX911 (c) 1990 (Asia) */
 	DRIVER( suratkj )	/* GX911 (c) 1990 (Japan) */
 	DRIVER( parodius )	/* GX955 (c) 1990 (World) */
+	DRIVER( parodiusa )	/* GX955 (c) 1990 (World) */
 	DRIVER( parodiusj )	/* GX955 (c) 1990 (Japan) */
 	DRIVER( rollerg )	/* GX999 (c) 1991 (US) */
 	DRIVER( rollergj )	/* GX999 (c) 1991 (Japan) */
@@ -7207,6 +7216,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gauntdl24 )	/* (c) 1999 Midway Games */
 	DRIVER( cartfury )	/* (c) 2000 Midway Games */
 
+	/* Midway Quicksilver */
+	DRIVER( hydrthnd )  /* (c) 1999 Midway Games */
+	DRIVER( offrthnd )  /* (c) 2000 Midway Games */
+
 	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
 	DRIVER( tmdo )		/* (c) 1996 Midway Games */
@@ -7378,6 +7391,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raiden2c )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raiden2d )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raiden2e )	/* (c) 1993 Seibu Kaihatsu */
+	DRIVER( raiden2f )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndx )	/* (c) 1994 Seibu Kaihatsu */
 	DRIVER( raidndxj )	/* (c) 1994 Seibu Kaihatsu */
 	DRIVER( raidndxu )	/* (c) 1994 Seibu Kaihatsu + Fabtek license */
@@ -7806,6 +7820,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( galpani2 )	/* (c) 1993 Kaneko */
 	DRIVER( galpani2g )	/* (c) 1993 Kaneko */
 	DRIVER( galpani2t )	/* (c) 1993 Kaneko */
+	DRIVER( galpani2i )	/* (c) 1993 Kaneko */
 	DRIVER( galpani2j )	/* (c) 1993 Kaneko */
 	DRIVER( gp2quiz )	/* (c) 1993 Kaneko */
 	DRIVER( gp2se )		/* (c) 1994 Kaneko */
@@ -8030,6 +8045,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( watrball )	/* (c) 1996 ABM */
 
 	/* Sun Electronics / SunSoft games */
+	DRIVER( dai3wksi )	/* 1979.09 Dai San Wakusei (The Third Planet) */
 	DRIVER( speakres )	/* [Sun Electronics] */
 	DRIVER( stratvox )	/* [1980 Sun Electronics] Taito */
 	DRIVER( stratvoxb )	/* bootleg */
@@ -8065,7 +8081,6 @@ Other Sun games
 1978.12 (GT)Block Challenger
 1979.04 Galaxy Force
 1979.07 Run Away
-1979.09 Dai San Wakusei (The Third Planet)
 1979.12 Warp 1
 1980.10 Cosmo Police (Cosmopolis?)
 */
@@ -8602,6 +8617,8 @@ Other Sun games
 	DRIVER( keta )
 	DRIVER( ketb )
 	DRIVER( ddp3 )
+	DRIVER( ddp3a )
+	DRIVER( ddp3b )
 	DRIVER( ddp3blk )
 	DRIVER( espgal )
 	DRIVER( orleg2 )		/* (c) 2007 */
@@ -9261,7 +9278,9 @@ Other Sun games
 	DRIVER( trvwz3v )	/* (c) 1985 Merit */
 	DRIVER( trvwz4 )	/* (c) 1985 Merit */
 	DRIVER( trvwz4a )	/* (c) 1985 Merit */
+	DRIVER( dtrvwz5 )	/* (c) 1987 Merit */
 	DRIVER( tictac )	/* (c) 1985 Merit */
+	DRIVER( tictacv )   /* (c) 1985 Merit */
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
 	DRIVER( phrcrazea )	/* (c) 1986 Merit */
 	DRIVER( phrcrazeb )	/* (c) 1986 Merit */
@@ -10130,8 +10149,6 @@ Other Sun games
 	DRIVER( moneymacv1 )/* (c) 200? Amcoe */
 	DRIVER( moneymacd2 )/* (c) 200? Amcoe */
 	DRIVER( moneymacv2 )/* (c) 200? Amcoe */
-	//DRIVER( atworld ) /* (c) 2007 Amcoe - Around The World (year listed on Amcoe web site) */
-	//DRIVER( atworldd1 )   /* (c) 2007 Amcoe (year listed on Amcoe web site) */
 
 
 	DRIVER( chsuper3 )	/* unknown */
@@ -10233,7 +10250,7 @@ Other Sun games
 	/* Fruit Cocktail */
 	//DRIVER( fcockt )  /* (c) 2003 */
 	//DRIVER( fcockt_2 )    /* (c) 2003 */
-	//DRIVER( fcockt_3 )    /* (c) 2003 */
+	DRIVER( fcockt_3 )    /* (c) 2003 */
 	//DRIVER( fcockt_4 )    /* (c) 2003 */
 	DRIVER( fcockt_5 )	/* (c) 2003 */
 	DRIVER( fcockt_6 )	/* (c) 2003 */
@@ -10246,7 +10263,7 @@ Other Sun games
 
 	/* Lucky Haunter */
 	//DRIVER( lhaunt )  /* (c) 2003 */
-	//DRIVER( lhaunt_2 )    /* (c) 2003 */
+	DRIVER( lhaunt_2 )	/* (c) 2003 */
 	//DRIVER( lhaunt_3 )    /* (c) 2003 */
 	DRIVER( lhaunt_4 )	/* (c) 2003 */
 	DRIVER( lhaunt_5 )	/* (c) 2003 */
@@ -10279,12 +10296,13 @@ Other Sun games
 	DRIVER( sweetl_2 )	/* (c) 2004 */
 
 	/* Resident */
-	//DRIVER( resdnt )  /* (c) 2004 */
+	DRIVER( resdnt )	/* (c) 2004 */
 	DRIVER( resdnt_2 )	/* (c) 2004 */
 	DRIVER( resdnt_3 )	/* (c) 2004 */
 
 	/* Island */
 	DRIVER( island )	/* (c) 2005 */
+	DRIVER( island_2 )	/* (c) 2005 */
 
 	/* Pirate */
 	//DRIVER( pirate )  /* (c) 2005 */
@@ -10308,6 +10326,10 @@ Other Sun games
 
 	/* Gnome */
 	DRIVER( gnome )		/* (c) 2007 */
+	DRIVER( gnome_2 )	/* (c) 2007 */
+
+	/* Sweet Life 2 */
+	DRIVER( sweetl2 )	/* (c) 2007 */
 
 	/* Igrosoft bootleg sets */
 
@@ -10402,6 +10424,8 @@ Other Sun games
 	DRIVER( gnomec )	/* bootleg */
 	DRIVER( gnomed )	/* bootleg */
 	DRIVER( gnomee )	/* bootleg */
+	DRIVER( gnome_2a )	/* bootleg */
+
 	/* Disney */
 	DRIVER( cdi )		/* Base unit */
 	DRIVER( quizard )	/* (c) Disney 1996 */

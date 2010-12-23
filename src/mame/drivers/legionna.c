@@ -17,29 +17,27 @@ different tiles available for use in the foreground layer.
 TODO
 ----
 
-Unemulated protection messes up both games.
-
-Sound System isn't working properly, hangs / denjinmk isn't happy with status without a hack
+Check work RAM boundaries, they are likely to be too generous right now
 
 
 Legionnaire
 -----------
 
-Foreground tiles screwy (screen after character selection screen).
-
 Need 16 px off top of vis area?
-
-The 0x104000 area appears to be extra paletteram?
 
 
 Denjin Makai
 ------------
 
-Palette Ram format correct,but color offset wrong?
-Probably protection related,game updates paletteram with rom data (or bad program rom?)..
+- Palette Ram format correct,but color offset wrong? Probably protection related,game updates paletteram with rom data (or bad program rom?)..
 
-Need a sound kludge to start.
+- Needs to patch a sound-related comm to make this to work, same as SD Gundam Psycho Salamander No Kyoui (68k never writes to port 6 for whatever reason).
 
+- There are a bunch of unemulated registers, one of them seems to be a brightness control of some sort. Needs a PCB side-by-side test.
+
+- backdrop color is ugly, especially noticeable in the port harbour stage (level 4). It should be dark blue or black but it's currently grey.
+
+- there are some ROM writes from time to time, could be a coding bug or something related to the protection.
 
 Godzilla
 --------
@@ -89,10 +87,9 @@ static ADDRESS_MAP_START( legionna_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM /* The 4000-4fff area contains PALETTE words and may be extra paletteram? */
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x106000, 0x106fff) AM_RAM /* is this used outside inits ?? */
-	AM_RANGE(0x107000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
+	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
 ADDRESS_MAP_END
 
@@ -144,11 +141,11 @@ static ADDRESS_MAP_START( denjinmk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11efff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x11e000, 0x11efff) AM_RAM
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -177,13 +174,32 @@ static ADDRESS_MAP_START( cupsoc_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM//AM_READWRITE(copdxbl_1_r,copdxbl_1_w) AM_BASE(&work_ram)/*shared with the COP MCU too!*/
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
+	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cupsocs_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsocs_mcu_r,cupsocs_mcu_w) AM_BASE(&cop_mcu_ram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
+	AM_RANGE(0x105000, 0x106fff) AM_RAM
+	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM
+	AM_RANGE(0x110000, 0x119fff) AM_RAM
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
@@ -196,13 +212,13 @@ static ADDRESS_MAP_START( cupsocbl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM//AM_READWRITE(copdxbl_1_r,copdxbl_1_w) AM_BASE(&work_ram)/*shared with the COP MCU too!*/
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
@@ -668,7 +684,9 @@ static INPUT_PORTS_START( grainbow )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( denjinmk )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	PORT_START("COIN")		/* coin inputs read through sound cpu, an impulse of 4 frame is too much for this game, especially for coin 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -686,50 +704,48 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) ) //it actually skips the story entirely, so just remain JP as default
+	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0600, "3c 5c" )
+	PORT_DIPSETTING(      0x0600, "3 Coins / 5 Credits" )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x6000, "3 Coins / 5 Credits" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x7000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xd000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xb000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0x1000, "1" )
-	PORT_DIPSETTING(      0x2000, "2" )
-	PORT_DIPSETTING(      0x3000, "3" )
-	PORT_DIPSETTING(      0x4000, "4" )
-	PORT_DIPSETTING(      0x5000, "5" )
-	PORT_DIPSETTING(      0x6000, "6" )
-	PORT_DIPSETTING(      0x7000, "7" )
-	PORT_DIPSETTING(      0x8000, "8" )
-	PORT_DIPSETTING(      0x9000, "9" )
-	PORT_DIPSETTING(      0xa000, "a" )
-	PORT_DIPSETTING(      0xb000, "b" )
-	PORT_DIPSETTING(      0xc000, "c" )
-	PORT_DIPSETTING(      0xd000, "d" )
-	PORT_DIPSETTING(      0xe000, "e" )
-	PORT_DIPSETTING(      0xf000, "f" )
 
 	PORT_START("PLAYERS12")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -779,54 +795,7 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) //unused according to the test mode
 INPUT_PORTS_END
 
 
@@ -997,6 +966,19 @@ static const gfx_layout legionna_tilelayout =
 	128*8
 };
 
+static const gfx_layout legionna_tilelayout2 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0*4, 1*4, 2*4, 3*4 },
+	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
+	  64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+	  8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	128*8
+};
+
 static const gfx_layout legionna_spritelayout =
 {
 	16,16,
@@ -1011,11 +993,11 @@ static const gfx_layout legionna_spritelayout =
 };
 
 static GFXDECODE_START( legionna )
-	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,   48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,      0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,     32*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,    0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout2,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
@@ -1028,13 +1010,59 @@ static GFXDECODE_START( heatbrl )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
+
+static const gfx_layout cupsocsb_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 4,0,12,8,20,16,28,24, 512+4, 512+0, 512+12, 512+8, 512+20, 512+16, 512+28, 512+24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	32*32
+};
+
+static const gfx_layout cupsocsb_8x8_tilelayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 8,12,0,4 },
+	{ 0,3,2,1,16,19,18,17 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+
+
+static const gfx_layout cupsocsb_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 8,12,0,4 },
+	{ 0,3,2,1,16,19,18,17,  512+0,512+3,512+2,512+1,512+16,512+19,512+18,512+17 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	32*32
+};
+
+
+static GFXDECODE_START( heatbrl_csb )
+	GFXDECODE_ENTRY( "gfx1", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "gfx2", 0, cupsocsb_spritelayout,      0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
+GFXDECODE_END
+
+
 static GFXDECODE_START( grainbow )
 	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,  32*16, 16 )	/* unused */
-	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,        32*16, 16 )	/* unused */
+	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,      0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,        32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,        16*16, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -1227,6 +1255,10 @@ static MACHINE_CONFIG_START( cupsoc, driver_device )
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cupsocs, cupsoc )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(cupsocs_mem)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cupsocbl, driver_device )
 
@@ -1253,7 +1285,7 @@ static MACHINE_CONFIG_START( cupsocbl, driver_device )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(heatbrl)
+	MDRV_GFXDECODE(heatbrl_csb)
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(cupsoc)
@@ -2023,42 +2055,35 @@ ROM_START( cupsocsb )
 	ROM_LOAD16_BYTE( "sc_05.bin", 0x00000, 0x80000, CRC(2f977dff) SHA1(4d8d6e7d06ce17bb7292072965911f8b1f1067e2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code */
-	/*First part is full of $FF,a bad dump?*/
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
-	ROM_RELOAD(               0x100000, 0x100000 )
-
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
-
-	ROM_REGION( 0x100000, "gfx4", 0 )	/* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
-
-	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-
-	/*bootleg GFX roms,for now load the original roms*/
-	ROM_REGION( 0x500000, "user2", 0 )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT ) /* bootleg sprite gfx */
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
-	ROM_LOAD( "sc_13.bin", 0x100000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
-	ROM_LOAD( "sc_12.bin", 0x110000, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	ROM_LOAD( "sc_08.bin", 0x200000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
-	ROM_LOAD( "sc_09.bin", 0x280000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
-	ROM_LOAD( "sc_14.bin", 0x300000, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
-	ROM_LOAD( "sc_15.bin", 0x380000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD( "sc_10.bin", 0x400000, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
-	ROM_LOAD( "sc_11.bin", 0x480000, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+	ROM_COPY( "gfx2", 0x00000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
+	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
+	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
+	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT )
+	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )	/* MBK tiles */
+	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )	/* not used */
+	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )	/* BK3 tiles */
+	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
@@ -2075,6 +2100,17 @@ ROM_START( cupsocsb )
 	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
+	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
 
 /* slight changes in the program roms compared to above set, all remaining roms were the same */
@@ -2087,38 +2123,32 @@ ROM_START( cupsocsb2 )
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
-	ROM_RELOAD(               0x100000, 0x100000 )
-
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
-
-	ROM_REGION( 0x100000, "gfx4", 0 )	/* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
-
-	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-
-	/*bootleg GFX roms,for now load the original roms*/
-	ROM_REGION( 0x500000, "user2", 0 )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT ) /* bootleg sprite gfx */
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
-	ROM_LOAD( "sc_13.bin", 0x100000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
-	ROM_LOAD( "sc_12.bin", 0x110000, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	ROM_LOAD( "sc_08.bin", 0x200000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
-	ROM_LOAD( "sc_09.bin", 0x280000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
-	ROM_LOAD( "sc_14.bin", 0x300000, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
-	ROM_LOAD( "sc_15.bin", 0x380000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD( "sc_10.bin", 0x400000, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
-	ROM_LOAD( "sc_11.bin", 0x480000, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+	ROM_COPY( "gfx2", 0x00000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
+	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
+	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
+	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT )
+	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )	/* MBK tiles */
+	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )	/* not used */
+	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )	/* BK3 tiles */
+	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
@@ -2135,9 +2165,20 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
+	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
 
-#define CUPSOC_DEBUG_MODE 1
+#define CUPSOC_DEBUG_MODE 0
 
 static DRIVER_INIT( cupsoc )
 {
@@ -2174,12 +2215,12 @@ GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,         ROT0, "TAD Corpor
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,         ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, 0,		   ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocs,  cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocs2, cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, olysoc92, cupsoc,   cupsoc,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

@@ -30,7 +30,8 @@
     Playfield control:
         Bit  0x0f00:    Playfield location in VRAM (in steps of 0x1000)
         Bit  0x0080:    0 = Playfield enable, 1 = disable
-        Bit  0x0002:    1 = Rowscroll enable, 0 = disable
+        Bit  0x0002:    1 = Rowselect enable, 0 = disable
+        Bit  0x0001:    1 = Rowscroll enable, 0 = disable
 
 *****************************************************************************/
 
@@ -53,6 +54,7 @@ static UINT16 *m107_spriteram;
 UINT16 *m107_vram_data;
 UINT16 m107_raster_irq_position;
 UINT8 m107_spritesystem;
+UINT8 m107_sprite_display;
 
 
 /*****************************************************************************/
@@ -97,12 +99,12 @@ WRITE16_HANDLER( m107_control_w )
 
 	COMBINE_DATA(&m107_control[offset]);
 
-	switch (offset)
+	switch (offset*2)
 	{
-		case 0x08: /* Playfield 1 (top layer) */
-		case 0x09: /* Playfield 2 */
-		case 0x0a: /* Playfield 3 */
-		case 0x0b: /* Playfield 4 (bottom layer) */
+		case 0x10: /* Playfield 1 (top layer) */
+		case 0x12: /* Playfield 2 */
+		case 0x14: /* Playfield 3 */
+		case 0x16: /* Playfield 4 (bottom layer) */
 			layer = &pf_layer[offset - 0x08];
 
 			/* update VRAM base (bits 8-11) */
@@ -114,9 +116,18 @@ WRITE16_HANDLER( m107_control_w )
 			/* mark everything dirty of the VRAM base changes */
 			if ((old ^ m107_control[offset]) & 0x0f00)
 				tilemap_mark_all_tiles_dirty(layer->tmap);
+
+			if(m107_control[offset] & 0xf07c)
+				printf("%04x %02x\n",m107_control[offset],offset*2);
+
 			break;
 
-		case 0x0f:
+		case 0x18:
+		case 0x1a:
+		case 0x1c:
+			break;
+
+		case 0x1e:
 			m107_raster_irq_position = m107_control[offset] - 128;
 			break;
 	}
@@ -152,17 +163,16 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *rom = memory_region(machine, "user1");
 
-	for (offs = 0x800-4;offs >= 0;offs -= 4)
+	for (offs = 0;offs < 0x800;offs += 4)
 	{
-		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr;
+		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr,pri_mask;
 
-		if (((m107_spriteram[offs+2]&0x80)==0x80) && pri==0) continue;
-		if (((m107_spriteram[offs+2]&0x80)==0x00) && pri==1) continue;
+		pri_mask = (!(m107_spriteram[offs+2]&0x80)) ? 2 : 0;
 
 		y=m107_spriteram[offs+0];
 		x=m107_spriteram[offs+3];
@@ -177,8 +187,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		y = 384 - 16 - y;
 
 		colour=m107_spriteram[offs+2]&0x7f;
-		fx=m107_spriteram[offs+2]&0x100;
-		fy=m107_spriteram[offs+2]&0x200;
+		fx=(m107_spriteram[offs+2]>>8)&0x1;
+		fy=(m107_spriteram[offs+2]>>8)&0x2;
 		y_multi=(m107_spriteram[offs+0]>>11)&0x3;
 
 		if (m107_spritesystem == 0)
@@ -190,11 +200,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (i=0; i<y_multi; i++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
-						x,y-i*16,0);
+						x,y-i*16,
+						machine->priority_bitmap,pri_mask,0);
+
+				/* wrap-around y */
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+						sprite + s_ptr,
+						colour,
+						fx,fy,
+						x,(y-i*16) - 0x200,
+						machine->priority_bitmap,pri_mask,0);
+
 				if (fy) s_ptr++; else s_ptr--;
 			}
 		}
@@ -206,22 +226,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				while (rom_offs < 0x40000)	/* safety check */
 				{
+					/*
+                    [1]
+                    x--- ---- end of block marker
+                    ---- --x- Flip Y
+                    ---- ---x Flip X
+                    [2]
+                    xxxx xxxx Y offs lo byte
+                    [3]
+                    ---- xxx- height (1/2/4/8)
+                    ---- ---x Y offs hi byte
+                    [4]
+                    xxxx xxxx sprite number lo byte
+                    [5]
+                    xxxx xxxx sprite number hi byte
+                    [6]
+                    xxxx xxxx X offs lo byte
+                    [7]
+                    ---- ---x X offs hi byte
+                    */
+
 					int xdisp = rom[rom_offs+6]+256*rom[rom_offs+7];
 					int ydisp = rom[rom_offs+2]+256*rom[rom_offs+3];
 					int ffx=fx^(rom[rom_offs+1]&1);
 					int ffy=fy^(rom[rom_offs+1]&2);
 					sprite=rom[rom_offs+4]+256*rom[rom_offs+5];
 					y_multi=1<<((rom[rom_offs+3]>>1)&0x3);
-					if (fx) xdisp = -xdisp;
+					if (fx) xdisp = -xdisp-16;
 					if (fy) ydisp = -ydisp - (16*y_multi-1);
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
-								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,0);
+								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,
+								machine->priority_bitmap,pri_mask,0);
+
+						/* wrap-around y */
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+								sprite+(ffy?i:-i),
+								colour,
+								ffx,ffy,
+								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,
+								machine->priority_bitmap,pri_mask,0);
 					}
 
 					if (rom[rom_offs+1]&0x80) break;	/* end of block */
@@ -240,57 +289,90 @@ static void m107_update_scroll_positions(void)
 	int laynum;
 	int i;
 
-	/*  Playfield 4 rowscroll data is 0xde800 - 0xdebff???
-        Playfield 3 rowscroll data is 0xdf800 - 0xdfbff
-        Playfield 2 rowscroll data is 0xdf400 - 0xdf7ff
-        Playfield 1 rowscroll data is 0xde800 - 0xdebff     ??
+	/*
+        rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
+        rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
+        Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
     */
 
     for (laynum = 0; laynum < 4; laynum++)
     {
     	pf_layer_info *layer = &pf_layer[laynum];
 
-		if (m107_control[0x08 + laynum] & 0x02)
+		int scrolly = m107_control[0 + 2 * laynum];
+		int scrollx = m107_control[1 + 2 * laynum];
+
+		if (m107_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
 		{
-			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * laynum) / 2;
+			const UINT16 *scrolldata = m107_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
 			tilemap_set_scroll_rows(layer->tmap, 512);
 			for (i = 0; i < 512; i++)
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[i] + m107_control[1 + 2 * laynum]);
+				tilemap_set_scrollx(layer->tmap, i, scrolldata[((i+0xff80)-(scrolly))&0x1ff] + scrollx);
+
 		}
 		else
 		{
 			tilemap_set_scroll_rows(layer->tmap, 1);
-			tilemap_set_scrollx(layer->tmap, 0, m107_control[1 + 2 * laynum]);
+			tilemap_set_scrollx(layer->tmap, 0, scrollx);
 		}
 
-		tilemap_set_scrolly(layer->tmap, 0, m107_control[0 + 2 * laynum]);
+		tilemap_set_scrolly(layer->tmap, 0,scrolly);
 	}
 }
 
 /*****************************************************************************/
 
+static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int laynum, int category,int opaque)
+{
+	int line;
+	rectangle clip;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.max_x;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
+
+	if (m107_control[0x08 + laynum] & 0x02)
+	{
+		for (line = cliprect->min_y; line <= cliprect->max_y;line++)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x200 * laynum) / 2;
+			clip.min_y = clip.max_y = line;
+
+			tilemap_set_scrollx(pf_layer[laynum].tmap,0,  m107_control[1 + 2 * laynum]);
+			tilemap_set_scrolly(pf_layer[laynum].tmap,0,  (m107_control[0 + 2 * laynum] + scrolldata[line]));
+
+			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category | opaque, category);
+		}
+	}
+	else
+		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category | opaque, category);
+}
+
+
 static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	bitmap_fill(machine->priority_bitmap, cliprect, 0);
+
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{
-		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 0, 0);
-		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 1, 0);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0,0);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1,0);
 	}
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 0, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 1, 0);
+	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((m107_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1,0);
 
-	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 0, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 0, 0);
-
-	draw_sprites(machine, bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 1, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 1, 0);
-
-	draw_sprites(machine, bitmap, cliprect, 1);
+	if(m107_sprite_display)
+		draw_sprites(machine, bitmap, cliprect);
 
 	/* This hardware probably has more priority values - but I haven't found
         any used yet */
@@ -301,7 +383,12 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 WRITE16_HANDLER( m107_spritebuffer_w )
 {
 	if (ACCESSING_BITS_0_7) {
+		/*
+        TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
+        */
 //      logerror("%04x: buffered spriteram\n",cpu_get_pc(space->cpu));
+		m107_sprite_display	= (!(data & 0x1000));
+
 		memcpy(m107_spriteram,space->machine->generic.spriteram.u16,0x1000);
 	}
 }

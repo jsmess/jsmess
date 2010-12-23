@@ -122,7 +122,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.140u2.  This incorporates all features of the
+- The core is based on MAME 0.140u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Added UTF-8 constants for Swedish/Finnish keyboard accented

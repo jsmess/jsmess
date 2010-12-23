@@ -97,7 +97,6 @@ static void i_pop_di(nec_state_t *nec_state);
 static void i_pusha(nec_state_t *nec_state);
 static void i_popa(nec_state_t *nec_state);
 static void i_chkind(nec_state_t *nec_state);
-static void i_brkn(nec_state_t *nec_state);
 static void i_repnc(nec_state_t *nec_state);
 static void i_repc(nec_state_t *nec_state);
 static void i_push_d16(nec_state_t *nec_state);
@@ -348,7 +347,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
 	i_pusha,		/* 0x60 */
 	i_popa,			/* 0x61 */
 	i_chkind,		/* 0x62 */
-	i_brkn,			/* 0x63 - V25S/V35S only */
+	i_invalid,		/* 0x63 */
 	i_repnc,		/* 0x64 */
 	i_repc,			/* 0x65 */
 	i_invalid,		/* 0x66 */
