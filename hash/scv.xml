@@ -131,7 +131,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="doraemon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
-				<rom name="doraemon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="8000" />
+				<rom name="doraemon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="0x8000" />
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
             <dataarea name="rom" size="40960">
                 <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
-                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="8000" />
+                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0x8000" />
             </dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
                        <dataarea name="rom" size="40960">
                                <rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
-                               <rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="8000" />
+                               <rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="0x8000" />
                        </dataarea>
 		</part>
 	</software>

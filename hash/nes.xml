@@ -36,7 +36,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="d3d248c9" sha1="64185edc4fd64b5f5e565b90b0ddc241592d899c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="9c124a53" sha1="beddf6a65a1a72410cfb1208e8b6b6e0cf5b2e74" offset="00000" />
@@ -54,7 +54,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.prg" size="16384" crc="b7e8deca" sha1="3108d4540449ea0a48daaa2644acf16a5de87f08" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="9c124a53" sha1="beddf6a65a1a72410cfb1208e8b6b6e0cf5b2e74" offset="00000" />
@@ -175,7 +175,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="49546b4d" sha1="e67eb7643d657fa796cb8786dc47f43d412fa37a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="425cc61f" sha1="c4ba502c4b2ca5d594b822c1134e997a553077d1" offset="00000" />
@@ -193,7 +193,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.prg" size="16384" crc="3ed8c6b5" sha1="682d8266da55812490ff598cff9b277194aad6f5" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="425cc61f" sha1="c4ba502c4b2ca5d594b822c1134e997a553077d1" offset="00000" />
@@ -311,9 +311,9 @@
 			<feature name="pcb" value="MLT-ACTION52" />
 			<dataarea name="prg" size="2097152">
 				<rom name="ati-02 action 52" size="524288" crc="64e40c10" sha1="b5a53f844accb40c9584dc9105985eb5d8c6f604" offset="000000" />
-				<rom name="ati-03 action 52" size="524288" crc="69fdc534" sha1="0d505ecb691ce688e764affb684fbef596a68d2b" offset="080000" />
-                <rom value="0xff" length="524288" offset="180000" loadflag="fill" />
-				<rom name="ati-04 action 52" size="524288" crc="7e43e9e1" sha1="ee262a09266956a9421aaa14a946bf69627fdf73" offset="180000" />
+				<rom name="ati-03 action 52" size="524288" crc="69fdc534" sha1="0d505ecb691ce688e764affb684fbef596a68d2b" offset="0x080000" />
+                <rom value="0xff" length="524288" offset="0x180000" loadflag="fill" />
+				<rom name="ati-04 action 52" size="524288" crc="7e43e9e1" sha1="ee262a09266956a9421aaa14a946bf69627fdf73" offset="0x180000" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="ati-01 action 52" size="524288" crc="596442ec" sha1="dc31dc0870e393fc46494b5e386ab08e769ac514" offset="000000" />
@@ -330,9 +330,9 @@
 			<feature name="pcb" value="MLT-ACTION52" />
 			<dataarea name="prg" size="2097152">
 				<rom name="action52 pgm-a" size="524288" crc="a51212fd" sha1="746b226ffc8aa717e2f95a8bbcbdb92188a96cd2" offset="000000" />
-				<rom name="action52 pgm-b" size="524288" crc="476d0b72" sha1="cf481deb81a03210e615f6bd942fe9560c102d39" offset="080000" />
-                <rom value="0xff" length="524288" offset="180000" loadflag="fill" />
-				<rom name="action52 pgm-c" size="524288" crc="2568dba6" sha1="da29c98c4048a9ad2ac0d5017d4368c931ebbf8e" offset="180000" />
+				<rom name="action52 pgm-b" size="524288" crc="476d0b72" sha1="cf481deb81a03210e615f6bd942fe9560c102d39" offset="0x080000" />
+                <rom value="0xff" length="524288" offset="0x180000" loadflag="fill" />
+				<rom name="action52 pgm-c" size="524288" crc="2568dba6" sha1="da29c98c4048a9ad2ac0d5017d4368c931ebbf8e" offset="0x180000" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="action52 chr-a" size="524288" crc="596442ec" sha1="dc31dc0870e393fc46494b5e386ab08e769ac514" offset="00000" />
@@ -813,7 +813,7 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="sunsoft-00" size="131072" crc="10935d10" sha1="7a3568028d9e1088f4efe8e2ec074b05048c4005" offset="00000" />
-				<rom name="sunsoft-01" size="131072" crc="0bc56f7a" sha1="b483839a93e4952a4c90906cad4142ed1c8763c2" offset="20000" />
+				<rom name="sunsoft-01" size="131072" crc="0bc56f7a" sha1="b483839a93e4952a4c90906cad4142ed1c8763c2" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
@@ -830,7 +830,7 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="335011-1022 abchl" size="131072" crc="1ec2140b" sha1="caa492b62ba15c9e114e1281d43b8590480dcae9" offset="00000" />
-				<rom name="335011-1032 abchh" size="131072" crc="38f01063" sha1="a73593e231e9ec6c7a3490f69dd580fb683b93fb" offset="20000" />
+				<rom name="335011-1032 abchh" size="131072" crc="38f01063" sha1="a73593e231e9ec6c7a3490f69dd580fb683b93fb" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
@@ -955,7 +955,7 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="0a.chr" size="131072" crc="765ee887" sha1="1e79fbf676d88d35716877d8164192cde24b5549" offset="00000" />
-				<rom name="0b.chr" size="131072" crc="8f31c807" sha1="ab8d067b94b0128ad2b00ec5a962171daf3a963f" offset="20000" />
+				<rom name="0b.chr" size="131072" crc="8f31c807" sha1="ab8d067b94b0128ad2b00ec5a962171daf3a963f" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1314,7 +1314,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="80401p" size="16384" crc="df189d34" sha1="3cad6d52c0c2f5b78091806c25a9909156acdb20" offset="00000" /> <!-- alt labels exist, e.g. 80403p, but it's the same revision -->
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="80401c" size="8192" crc="e03540cd" sha1="d3e2be4da1c450413197d127832dc4b180ecabf7" offset="00000" /> <!-- alt labels exist, e.g. 80403c, but it's the same revision -->
@@ -1332,7 +1332,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="804k01p" size="16384" crc="96900967" sha1="1cf703dcbfffff4b93b8d1c6e5f12f9f57367c9d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="804k01c" size="8192" crc="077fed33" sha1="361068ece125c675b640fd6bd41427a61eb87709" offset="00000" />
@@ -2110,7 +2110,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bf-0 prg" size="16384" crc="575ed2fe" sha1="63527ea590aa79a6b09896c35021de785fd40851" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-bf-0 chr" size="8192" crc="c642a1df" sha1="e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9" offset="00000" />
@@ -2128,7 +2128,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bf-0 prg" size="16384" crc="bd2e9025" sha1="6742fa2ea498e5b73dc2024ad3888a64e6b894e4" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-bf-0 chr" size="8192" crc="c642a1df" sha1="e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9" offset="00000" />
@@ -2146,7 +2146,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-bf-0 prg" size="16384" crc="5e137c5b" sha1="53583ef3c8a9eadd5cab927492ca12de8d4acdd1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-bf-0 chr" size="8192" crc="c642a1df" sha1="e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9" offset="00000" />
@@ -2444,7 +2444,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ba-0 prg" size="16384" crc="d18a3dde" sha1="91f7d3e4c9d18c1969ca1fffdc811b763508a0a2" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-ba-0 chr" size="8192" crc="c27eef20" sha1="d5bd643b3ba98846e520b4d3f38aae45a29cf250" offset="00000" />
@@ -2462,7 +2462,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ba-0 prg" size="16384" crc="39d1fa03" sha1="28d84cfefa81bbfd3d26e0f70f1b9f53383e54ad" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ba-0 chr" size="8192" crc="cde71b82" sha1="296ccef8a1fd9209f414ce0c788ab0dc95058242" offset="00000" />
@@ -2818,7 +2818,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot bc prg" size="16384" crc="912d82c5" sha1="fa99d71aecaebc407ff67ae64695f69924b0769d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot bc chr" size="8192" crc="6e32d231" sha1="dea287fc2604fbfb2df41134ce3cbd2b84a33cc6" offset="00000" />
@@ -3496,7 +3496,7 @@
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hfc-bi-0 prg" size="16384" crc="0c5c353a" sha1="3b35d81a7978ba71a2b269ef0726febf0f23407b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hfc-bi-0 chr" size="8192" crc="dc79323c" sha1="388c4162949cc6052557154b8b963c32b3171f7e" offset="00000" />
@@ -3585,7 +3585,7 @@
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="prg" size="32768">
 				<rom name="tfs-bk-0 prg" size="16384" crc="2a629f7d" sha1="bd0b7d6974ce1e3bc0a8afb55febd0c03332361c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="tfs-bk-0 chr" size="8192" crc="970a934e" sha1="2307a6daf73984ca4242a93858caabf9f86469ad" offset="00000" />
@@ -3882,7 +3882,7 @@
  			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hfc-bm-0 prg" size="16384" crc="9684657f" sha1="055db2dc8cec0448f3845da1626e108c7692cfc6" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hfc-bm-0 chr" size="8192" crc="a775822e" sha1="b0584f9f4172b9e111ae275d8de6644b76372b32" offset="00000" />
@@ -3900,7 +3900,7 @@
  			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bm-0 prg" size="16384" crc="a913a222" sha1="10478e542c2a0632472480b72935df21ea9ea1f1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-bm-0 chr" size="8192" crc="1db14e97" sha1="ed13e53286ec09393accdd19c7c796359fb97aee" offset="00000" />
@@ -4376,7 +4376,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="f9c22e00" sha1="e6657c657d762b51c7bba242510834a27c3435bf" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="db2fbccd" sha1="8d669ce6b63d76937741d96e93674e19102df7c2" offset="00000" />
@@ -4394,7 +4394,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-br-0 prg" size="16384" crc="2b2d47f1" sha1="a1e87309b0c8199679e3df167be7d962fce28242" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-br-0 chr" size="8192" crc="6268215d" sha1="4bdf4a47b37aa9a94562b8620dd52768ffb6940f" offset="00000" />
@@ -4982,7 +4982,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="4ba78222" sha1="93955507dd2f139a9290340c5d62bb5e1df7e964" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="59eac78d" sha1="a822167cce00c2ddd704a449b442c822911ed4c4" offset="00000" />
@@ -5068,7 +5068,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="74452e18" sha1="09996437fa78a9e5ac4cb3489cbee18cc0859593" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="dd53a3e0" sha1="21e46747ef49b659e14d04226ed55b8bee66a399" offset="00000" />
@@ -5343,7 +5343,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="namco mr prg" size="16384" crc="350bf21b" sha1="885ea7f7318fc244b89c9d1dda1e9e7e51280465" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namco mr chr" size="8192" crc="d1e5d796" sha1="542b1fee815ed15024fbeadf7910125ccaec86c7" offset="00000" />
@@ -5449,7 +5449,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="1497c75e" sha1="a4da33f3a1e04835284307281bea87acffb16241" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="f76c592a" sha1="c8bc574c43d26d5072869922573edaaab7a37050" offset="00000" />
@@ -5484,7 +5484,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="prg-jf-05" size="16384" crc="dda9f780" sha1="c8592217287850fc7a5cae79ac7079a777b34ea9" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="chr-jf-05" size="16384" crc="cd06f259" sha1="162a603a71f8950bd1999060e1fa53090350f465" offset="00000" />
@@ -5570,7 +5570,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-cl-0 prg" size="16384" crc="23a60a62" sha1="36003de2a208bf132f1ecbf7af7efd9095ef85c8" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-cl-0 chr" size="8192" crc="a63b8b98" sha1="8ddf97dcc8e28f2218c4a4c8b3d9d527fa0525fb" offset="00000" />
@@ -6548,7 +6548,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-sb-0 prg" size="16384" crc="7bc98e11" sha1="07d0af64b8f3092625a800dc4a4b9ce0f844aadf" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-sb-0 chr" size="8192" crc="3a034f6c" sha1="c722a00b9bb32dd990c2ea3a28b3ef07d614e173" offset="00000" />
@@ -6764,7 +6764,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="4df3f32e" sha1="c5cbe7976926ea093364e86992ebaa86e0e588e1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="3a9aa7a1" sha1="7af9c7ee2e1dff8f4260f11cdb2acec613313093" offset="00000" />
@@ -6781,7 +6781,7 @@
 			<feature name="pcb" value="HVC-SROM" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-dd-1 prg" size="16384" crc="b97afb85" sha1="05ec5ba36646ea62ecc877dac8aa6a7747d81c4d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-dd-0 chr" size="8192" crc="3a9aa7a1" sha1="7af9c7ee2e1dff8f4260f11cdb2acec613313093" offset="00000" />
@@ -6798,7 +6798,7 @@
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-dd-0 prg" size="16384" crc="60cb6ff6" sha1="00a7345604a551750a3bcbdc6b25e4b461ffc136" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-dd-0 chr" size="8192" crc="3a9aa7a1" sha1="7af9c7ee2e1dff8f4260f11cdb2acec613313093" offset="00000" />
@@ -6867,7 +6867,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot dd prg" size="16384" crc="82132616" sha1="da1f8c17c785672089e57397afbce9744e8aa8d1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot dd chr" size="8192" crc="2dabc198" sha1="79f1e65eea2a2841dc47916cb86fbf992b936bd5" offset="00000" />
@@ -7075,7 +7075,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="06d1a012" sha1="a6f92ae0a991c532e6377db2b3ab7f5c13d27675" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="a21d7c2e" sha1="97c16cd6b1f3656428b682a23e6e4248c1ca3607" offset="00000" />
@@ -7093,7 +7093,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-dk-1 prg" size="16384" crc="f56a5b10" sha1="2c4b1d653194df0996d54d9de9188b270d0337d9" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-dk-0 chr" size="8192" crc="a21d7c2e" sha1="97c16cd6b1f3656428b682a23e6e4248c1ca3607" offset="00000" />
@@ -7111,7 +7111,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-dt-0 prg" size="16384" crc="5ef4f30c" sha1="5b7ba89a601e47ea95ead2adfd99df2ed85be473" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-dt-0 chr" size="8192" crc="85d06c57" sha1="803adef82721452704607fbf70027ff792636325" offset="00000" />
@@ -7146,7 +7146,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-jr-1 prg" size="16384" crc="cf6c88b6" sha1="cefc276e7601d14c6a20e545f334281b7a9fe8db" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-jr-0 chr" size="8192" crc="852778ab" sha1="307f2245cce164491012f75897eb984af0c3f456" offset="00000" />
@@ -7164,7 +7164,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="27e4d335" sha1="4d06c438a03e41dd38785962411d0b1a099fe344" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="884379d1" sha1="02999f9afd06418fad703b21791506ce5ffa95e3" offset="00000" />
@@ -7182,7 +7182,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ca-0 prg" size="16384" crc="66f11648" sha1="4e243d05d60ee578a720f6fadd6c3ebde305605b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ca-0 chr" size="8192" crc="73329878" sha1="4c0c87f38af851bd605ccd980fb87ef49dfe98c8" offset="00000" />
@@ -7200,7 +7200,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ca-0 prg" size="16384" crc="927aba9d" sha1="f7581757d0950f79d4d49cf200cba650cb40f772" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-ca-0 chr" size="8192" crc="8975b3c2" sha1="0d3d182d4c200015630937b72bf9d11b504e5179" offset="00000" />
@@ -7218,7 +7218,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="021193b2" sha1="90b3a315b43e403ff9cd5d34d6b3d4521ef14fcf" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="ae41cfef" sha1="b443c8fd9440f60eb7cab5dfe0b9cd4f1feeefba" offset="00000" />
@@ -8312,7 +8312,7 @@
  			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-dh-0 prg" size="16384" crc="90ca616d" sha1="b742576317cd6a04caac25252d5593844c9a0bb6" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-dh-0 chr" size="8192" crc="4e049e03" sha1="ffad32a3bab2fb3826bc554b1b9838e837513576" offset="00000" />
@@ -8870,7 +8870,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-eb-0 prg" size="16384" crc="3a94fa0b" sha1="6239e91ccefdc017d233cbae388c6568a17ed04b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-eb-0 chr" size="8192" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" offset="00000" />
@@ -8888,9 +8888,9 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-eb-0 prg-a" size="8192" crc="03fca8e3" sha1="7d6b3fd791cb69f5de52a9388f7d770c16d809e9" offset="00000" />
-				<rom size="8192" offset="4000" loadflag="reload" />
-				<rom name="hvc-eb-0 prg-b" size="8192" crc="2895ee6b" sha1="79b86e5a8ef5dfcfa9ae25f27d9383d888cf5959" offset="02000" />
-				<rom size="8192" offset="6000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom name="hvc-eb-0 prg-b" size="8192" crc="2895ee6b" sha1="79b86e5a8ef5dfcfa9ae25f27d9383d888cf5959" offset="0x02000" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-eb-0 chr" size="8192" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" offset="00000" />
@@ -8908,7 +8908,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-eb-0 prg" size="16384" crc="0b5667e9" sha1="8c37839c645d54184df6273e481527d4cfa312d2" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-eb-0 chr" size="8192" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" offset="00000" />
@@ -8943,7 +8943,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="fc-ex-01.prg" size="16384" crc="c86a1f7d" sha1="3db9c8df8537cd400b4ec686fbefadeecaa21a48" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea> <!-- real label: fc-ex-01 -->
 			<dataarea name="chr" size="8192">
 				<rom name="fc-ex-01.chr" size="8192" crc="682b3fd8" sha1="60bf81664bb69bde29f613a276e1e6b472ba8faa" offset="00000" />
@@ -9150,7 +9150,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fr-0 prg" size="16384" crc="57970078" sha1="c212294be2a3b8f89ff440df821324fa0d522a55" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-fr-0 chr" size="8192" crc="e653dbcb" sha1="f9758fcc8e07890bd733af127defc86bb70f179e" offset="00000" />
@@ -9203,7 +9203,7 @@
 			<feature name="pcb" value="BANDAI-FCG-2" />
 			<dataarea name="prg" size="262144">
 				<rom name="fj-prg-1" size="131072" crc="81ca7e2e" sha1="5bdb6b6c89f6837dd17845d25938deac3a993319" offset="00000" />
-				<rom name="fj-prg-2" size="131072" crc="b8b100c1" sha1="143de724a48c162c9a333f6cb88e9d3a4f64cf17" offset="20000" />
+				<rom name="fj-prg-2" size="131072" crc="b8b100c1" sha1="143de724a48c162c9a333f6cb88e9d3a4f64cf17" offset="0x20000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="fj-chr" size="131072" crc="db36205e" sha1="d58611d317bc0cb3422353e86caf6612516362b8" offset="00000" />
@@ -9280,7 +9280,7 @@
  			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-1 a" size="16384" crc="12b97208" sha1="2fc97bdb035d308f0ecd7b58e44fa1571b99fe27" offset="00000" />
-				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="04000" />
+				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="0x04000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-fb1-0 c" size="8192" crc="11848b93" sha1="04311090fcb7c46d2df86a06575c81e09a0f77b8" offset="00000" />
@@ -9302,7 +9302,7 @@
  			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-2 a" size="16384" crc="1048e43d" sha1="d50b0352a358e73e29199b981456f33f6cc78131" offset="00000" />
-				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="04000" />
+				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="0x04000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-fb1-0 c" size="8192" crc="11848b93" sha1="04311090fcb7c46d2df86a06575c81e09a0f77b8" offset="00000" />
@@ -10105,7 +10105,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="e90d4a9f" sha1="6292673445b3f606dc9a798e453331e5ce80f840" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="0e060c68" sha1="41eb1829c746906082709c20057c27ebb354116b" offset="00000" />
@@ -10623,7 +10623,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="7f792d47" sha1="dba5be70af3709a91e07f7ffdb41d1beaaf4a887" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="5d0e5bda" sha1="9424c080daa78d9606c5d73598f1e79ae6f52c70" offset="00000" />
@@ -10641,7 +10641,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.prg" size="16384" crc="b9661f04" sha1="984b749a5624190a15475d3e879bb5b08baa2bf2" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="5d0e5bda" sha1="9424c080daa78d9606c5d73598f1e79ae6f52c70" offset="00000" />
@@ -10786,7 +10786,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="f59da73c" sha1="7e466de43d42dded55125ea95172fb0f97f86ecd" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="cf22cd4c" sha1="3e3c983f5e03c42404d6f02ee5d73ecbc1dd9c35" offset="00000" />
@@ -10876,7 +10876,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot gg prg" size="16384" crc="aa97d0a0" sha1="9e802879dc14baf5a50e0438798456eaf20abb3b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot gg chr" size="8192" crc="e2d5964e" sha1="62b2cd49a6a4c6f1e2b0742db3b7493e167e9a23" offset="00000" />
@@ -10928,9 +10928,9 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot gx prg" size="8192" crc="e48c1ebf" sha1="1976f2da2208405f0fcc2914ba09117980e01aa8" offset="00000" />
-				<rom size="8192" offset="2000" loadflag="reload" />
-				<rom size="8192" offset="4000" loadflag="reload" />
-				<rom size="8192" offset="6000" loadflag="reload" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot gx chr" size="8192" crc="873d3083" sha1="6a6cd9a2372ef07fbb473bcee81ef976153219f4" offset="00000" />
@@ -11819,7 +11819,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-gf-0 prg" size="16384" crc="9c7e6421" sha1="e67e9ff5ee81fbd1af8d7439b86a9ad98499b9dc" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-gf-0 chr" size="8192" crc="7dfa75a8" sha1="ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3" offset="00000" />
@@ -11837,7 +11837,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-gf-0 prg" size="16384" crc="f9622bfa" sha1="b4e341a91f614bb19c67cc0205b2443591567aea" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-gf-0 chr" size="8192" crc="ff6fc790" sha1="40177839b61f375f2ad03b203328683264845b5b" offset="00000" />
@@ -11855,7 +11855,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-gfm0 prg" size="16384" crc="10bbd4ba" sha1="b2011c444fd6190665d720209822b1f2b8cf5303" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-gf-0 chr" size="8192" crc="7dfa75a8" sha1="ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3" offset="00000" />
@@ -12008,7 +12008,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-go-0 prg" size="16384" crc="5603f579" sha1="f2b007e3b13a777f9f88ff58f87ead6ae8f26327" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-go-0 chr" size="8192" crc="97ea7144" sha1="47d354c654285275d0a9420cc6eb3564f0453eb0" offset="00000" />
@@ -13212,7 +13212,7 @@
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ha-0 prg" size="16384" crc="8963ae6e" sha1="bca489ed0fb58e1e99f36c427bc0d7d805b6c61a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-ha-0 chr" size="8192" crc="5df42fc4" sha1="4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8" offset="00000" />
@@ -13230,7 +13230,7 @@
 			<feature name="mmc1_type" value="MMC1" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-07-0 pr1" size="131072" crc="803519d0" sha1="28501a5e2eefd29060c266cd05f7bdaa29a43996" offset="00000" />
-				<rom name="hsp-07-0 pr2" size="131072" crc="51867a62" sha1="3e0287e44efad07bc8715bcc84d06b9180f1e401" offset="20000" />
+				<rom name="hsp-07-0 pr2" size="131072" crc="51867a62" sha1="3e0287e44efad07bc8715bcc84d06b9180f1e401" offset="0x20000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -13432,7 +13432,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="x3-001" size="16384" crc="f00355a0" sha1="dbf0cfc2a366c4f098e127d65c6eb2d23f513f2c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="x3-002" size="8192" crc="7afbb18c" sha1="c1d31b0ce383590bf8d04b33dc42f3997cc5ee34" offset="00000" />
@@ -13752,7 +13752,7 @@
 			<feature name="peripheral" value="hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="ff6621ce" sha1="33be02be4ba014b45394c18255f3885c13253690" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="a0ac7cfc" sha1="18825d6cc757a5e75aded9cedd531cd8e331e407" offset="00000" />
@@ -13771,7 +13771,7 @@
 			<feature name="peripheral" value="hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="806j0p" size="16384" crc="ac98cd70" sha1="191ede32665ddc042126e90e48805846f76fbe7b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="806j0c" size="8192" crc="51025f6b" sha1="87f653c8b22b5f131550fbb364021e48e6a5fe4e" offset="00000" />
@@ -13790,7 +13790,7 @@
 			<feature name="peripheral" value="hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.1.prg" size="16384" crc="ba5c8a54" sha1="f4fd4f13078c4aa758a5501d8270785c03018aba" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="51025f6b" sha1="87f653c8b22b5f131550fbb364021e48e6a5fe4e" offset="00000" />
@@ -13808,7 +13808,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="d548307f" sha1="e323ebaa2c0be5b9a31a21743ddfe7f3d1580672" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="fd98f4d3" sha1="43720585fe38b24e3bde1560a4ca9945489031a5" offset="00000" />
@@ -13826,7 +13826,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ic-0 prg" size="16384" crc="d548307f" sha1="e323ebaa2c0be5b9a31a21743ddfe7f3d1580672" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ic-0 chr" size="8192" crc="0d58a8b1" sha1="7ae5f457bb5996a5373c9cf46db3d296e27ec56a" offset="00000" />
@@ -14072,7 +14072,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="sunsoft rik prg" size="16384" crc="8cf1aae2" sha1="0d950ef783cb4b5c189d411901d6b99eb8fa1070" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="sunsoft rik chr" size="8192" crc="41c327d5" sha1="7a74db1c08a0b355c52bec9f9b24dbb07a37ab53" offset="00000" />
@@ -15049,7 +15049,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ju-0 prg" size="16384" crc="435e9971" sha1="68da18d14592d3eacfdfd0bc04c318c604495ccb" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="nes-ju-0 chr" size="16384" crc="c1e68dbf" sha1="83f04332f72a9bb0b0869744a6dceb8b6cc541e4" offset="00000" />
@@ -15607,7 +15607,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="sfc-kr-0 prg" size="16384" crc="2015226d" sha1="753c90a2d4c78c95489e4c5a8680fb86afdbea11" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="sfc-kr-0 chr" size="8192" crc="1552fbd4" sha1="6d880c41d293f715ef3c32c8a868bb1c87c324f5" offset="00000" />
@@ -16065,7 +16065,7 @@
 			<feature name="pcb" value="BANDAI-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="kin.0.prg" size="16384" crc="281160ae" sha1="3e123166c0368c4505b18905349b96ea79324732" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea> <!-- real label: kin -->
 			<dataarea name="chr" size="8192">
 				<rom name="kin.0.chr" size="8192" crc="fdc5c38e" sha1="d3e82ff241f2df7654674a3ab750aac988b1172a" offset="00000" />
@@ -16083,7 +16083,7 @@
 			<feature name="pcb" value="BANDAI-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="kin.1.prg" size="16384" crc="f5563f2e" sha1="26fbf1b5470defcb7fe3bdfce59a781ebb237be8" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea> <!-- real label: kin -->
 			<dataarea name="chr" size="8192">
 				<rom name="kin.1.chr" size="8192" crc="fdc5c38e" sha1="d3e82ff241f2df7654674a3ab750aac988b1172a" offset="00000" />
@@ -17428,7 +17428,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-lr-0 prg" size="16384" crc="85534474" sha1="9e2734ea9f9418da90cf45b2a2ebb3e8ca941f53" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-lr-0 chr" size="8192" crc="e8c6c127" sha1="76b342287d63b91a362f5645dc5894c2db2ce1a5" offset="00000" />
@@ -17446,7 +17446,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-lo-0 prg" size="16384" crc="ec3001c7" sha1="f7971585e0c46bc5bec0af438bebb25099395637" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-lo-0 chr" size="8192" crc="e8c6c127" sha1="76b342287d63b91a362f5645dc5894c2db2ce1a5" offset="00000" />
@@ -17583,7 +17583,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pnf-lb-0 prg" size="16384" crc="cd8233ef" sha1="d381cd303456f2533e5f47c0b8d8b2bc6bac6b9d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="pnf-lb-0 chr" size="8192" crc="13fdad72" sha1="75d85c4a253eafe9ce403416179e3997a83493ca" offset="00000" />
@@ -17601,7 +17601,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-lp-0 prg" size="16384" crc="9ba20dad" sha1="4eab6d0829030201729d03d480fab56544cc12db" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-lp-0 chr" size="8192" crc="a139062a" sha1="65b9a29d885f9aef19fbd22e001780523e34b3a6" offset="00000" />
@@ -17677,7 +17677,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ms-0 prg" size="16384" crc="092b5371" sha1="da7a78b34f14380d4ab2a6a0960acbdce98aba9f" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ms-0 chr" size="8192" crc="01623dfd" sha1="06b85574dcf8b35d99ad20b442176ddf7fca3309" offset="00000" />
@@ -18040,7 +18040,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-mj-1 prg" size="16384" crc="f86d8d8a" sha1="2904137a030ae2370a8cd3e068078a1d59a4f229" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-mj-0 chr" size="8192" crc="e1e96e97" sha1="1dd83c4f5971bde5d2ee33d1232312b1213184b2" offset="00000" />
@@ -18058,7 +18058,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.prg" size="16384" crc="f86d8d8a" sha1="2904137a030ae2370a8cd3e068078a1d59a4f229" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="2.chr" size="8192" crc="6bb45576" sha1="5974787496dfa27a4b7fe6023473fae930ea41dc" offset="00000" />
@@ -18355,7 +18355,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot mp prg" size="16384" crc="25482ceb" sha1="ca56ac119c3761127f1ae0f4da3d93ea29ddb09a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot mp chr" size="8192" crc="b060afc5" sha1="88d6d1a7a34891d666d4f7c75039506e3a8bfc2c" offset="00000" />
@@ -18475,7 +18475,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ma-0 prg" size="16384" crc="75f6a9f3" sha1="b6f88f7a2f9a49cc9182a244571730198f1edc4b" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-ma-0 chr" size="8192" crc="10f77435" sha1="a646c3443832ada84d31a3a8a4b34aebc17cecd5" offset="00000" />
@@ -18493,7 +18493,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-ma-0 prg" size="16384" crc="2aec46c2" sha1="f5d609720bc60bcb02f434d41149ae68e9f6b899" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-ma-0 chr" size="8192" crc="10f77435" sha1="a646c3443832ada84d31a3a8a4b34aebc17cecd5" offset="00000" />
@@ -19672,7 +19672,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ml-0 prg" size="16384" crc="0ab06c51" sha1="9e3c659f4d181821c809809e5fc2ba46a066d70a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ml-0 chr" size="8192" crc="3d3dae3f" sha1="f725bc47095fa0c2ae7bf1a84aebbb97af1b30e4" offset="00000" />
@@ -21147,7 +21147,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="prg" size="16384" crc="767a6a66" sha1="1f8b2c945438612968fb524f927decd85b535d79" offset="00000" /> <!-- alt label: p.プログラム -->
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="chr" size="16384" crc="35bea742" sha1="c077ff40c9e6fa98b6d10093c30b0e60a781de1e" offset="00000" /> <!-- alt label: c.キャラクター -->
@@ -21249,7 +21249,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="7a3fcc31" sha1="8eeca46d0b31c55990bd1e1c8cdc74ad47c44cd6" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="22ea1607" sha1="f349757cd2a5491d485550e10d2500003bb0c0e2" offset="00000" />
@@ -21266,7 +21266,7 @@
 			<feature name="pcb" value="JALECO-JF-03" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.1.prg" size="16384" crc="fde61002" sha1="092ee3b0880447b6cbc8be105296d0e8fe2b6f22" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="22ea1607" sha1="f349757cd2a5491d485550e10d2500003bb0c0e2" offset="00000" />
@@ -21343,7 +21343,7 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="if-11 c0" size="131072" crc="a47a33b3" sha1="6893d75685de72275d34c504517bcd0cc552b939" offset="00000" />
-				<rom name="if-11 c1" size="131072" crc="483b5b4c" sha1="a2a975e3f6dc3a7d23b4cbb7ac11238042908155" offset="20000" />
+				<rom name="if-11 c1" size="131072" crc="483b5b4c" sha1="a2a975e3f6dc3a7d23b4cbb7ac11238042908155" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21553,7 +21553,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-nm-0 prg" size="16384" crc="6c1390b4" sha1="1f232c34d3b9d537302dc747e2fb06e557462f4d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-nm-0 chr" size="8192" crc="ad96d84a" sha1="27d77037d9f6fc8f863983df831a44329cf539b7" offset="00000" />
@@ -21961,7 +21961,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot pm prg" size="16384" crc="bb1b591b" sha1="20f0fc7664983b5d4f166866302f1ad20efb727d" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="namcot pm chr" size="8192" crc="49abeee6" sha1="6255630a4d5634f1f03cbfb6266bf8c5f307205e" offset="00000" />
@@ -21979,7 +21979,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot pm prg.1" size="16384" crc="2bf9d836" sha1="160920895ec9ff4ed832cd16c9b2be5352feebae" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea> <!-- real label: namcot pm prg -->
 			<dataarea name="chr" size="8192">
 				<rom name="namcot pm chr" size="8192" crc="49abeee6" sha1="6255630a4d5634f1f03cbfb6266bf8c5f307205e" offset="00000" />
@@ -21997,7 +21997,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-p7-0 prg" size="16384" crc="347d7d34" sha1="aa1bba9a243c70eb4e9928b5efec9d4877579d08" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-p7-0 chr" size="8192" crc="ed9e2130" sha1="259b4d580d2fc11d5a61ad85f9fb717489986454" offset="00000" />
@@ -22015,7 +22015,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-pq-0 prg" size="16384" crc="e35321bc" sha1="5dd6d83b9827793f1da12923f2212e4d7502cf9a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-pq-0 chr" size="8192" crc="49abeee6" sha1="6255630a4d5634f1f03cbfb6266bf8c5f307205e" offset="00000" />
@@ -22033,7 +22033,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="335003-1011" size="16384" crc="7154acb5" sha1="799b199bdb43fe5f97a37bd37294802515a13dfa" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="335003-1012" size="8192" crc="49abeee6" sha1="6255630a4d5634f1f03cbfb6266bf8c5f307205e" offset="00000" />
@@ -22525,7 +22525,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-pn-0 prg" size="16384" crc="91d33e3c" sha1="607c5954e5c577ac78db3234987f8fe62f86f068" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-pn-0 chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" />
@@ -22543,9 +22543,9 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-pn-0 prg-a" size="8192" crc="0078d54a" sha1="4b729f56d3990a94c82b07187aaa1dcf438f012f" offset="00000" />
-				<rom size="8192" offset="4000" loadflag="reload" />
-				<rom name="hvc-pn-0 prg-b" size="8192" crc="24471979" sha1="e09b66af1ebddd55f254218aed338fac6a51bb7a" offset="02000" />
-				<rom size="8192" offset="6000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom name="hvc-pn-0 prg-b" size="8192" crc="24471979" sha1="e09b66af1ebddd55f254218aed338fac6a51bb7a" offset="0x02000" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-pn-0 chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" />
@@ -22563,7 +22563,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-pn-0 prg" size="16384" crc="b8571339" sha1="9fb84f4b9e3eaa1df88be37c679ce20204acef77" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-pn-0 chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" />
@@ -22770,7 +22770,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="e23e6fac" sha1="34793db9a062c76481bf97170eb086388108497a" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="d396dea8" sha1="b45432bdea7f0931c325e85c065b2aa1aef6428b" offset="00000" />
@@ -22788,7 +22788,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-pp-0 prg" size="16384" crc="f1ffd9f8" sha1="f350be84820e9ea0711400c6588cdba1018ab056" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-pp-0 chr" size="8192" crc="a5fd8d98" sha1="09d229404babb6c89b417ac541bab80fb06d2ba9" offset="00000" />
@@ -22806,7 +22806,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-pp-1 prg" size="16384" crc="0fa63a45" sha1="50c594a6d8dcbeee2d83bca8c54c42cf57093aba" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-pp-0 chr" size="8192" crc="a5fd8d98" sha1="09d229404babb6c89b417ac541bab80fb06d2ba9" offset="00000" />
@@ -22824,7 +22824,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-en-0 prg" size="16384" crc="2dbfa36a" sha1="0f4301d78d3dfa163239e7b7b7c4dff8a7e21bac" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-en-0 chr" size="8192" crc="fccc0f36" sha1="3566709c3c74960ce2ee1e60a85d026e70d7fd2c" offset="00000" />
@@ -23385,7 +23385,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pyr-prg b11e" size="16384" crc="be86ee6d" sha1="0c164a7b99028c17032e8021f3a9b5a590db7547" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="pyramid chr-256 7408-256k" size="8192" crc="8eef716a" sha1="3bb075d183253c1c882ad9a788401bd03ea9b69a" offset="00000" />
@@ -23875,7 +23875,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-rb-0 prg" size="16384" crc="c5b8efea" sha1="46ab8e48423f9275031c006cb7bb885618b3c2bf" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-rb-0 chr" size="8192" crc="e4d3b716" sha1="44290db0dc1eec4315473ae1f3f27659cd817149" offset="00000" />
@@ -23893,7 +23893,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-rb-1 prg" size="16384" crc="87b2a02c" sha1="f8e5db37b777a828ac54fe45c359a5b4f337b380" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-rb-0 chr" size="8192" crc="e4d3b716" sha1="44290db0dc1eec4315473ae1f3f27659cd817149" offset="00000" />
@@ -23911,7 +23911,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bu-0 prg" size="16384" crc="bb673749" sha1="42f1dd3676bc991e43360aaa9eb11b2d304113d4" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nes-bu-0 chr" size="8192" crc="f2ab5cd9" sha1="e1712be3bd4ba6091df02fd5343049407aa4ecaa" offset="00000" />
@@ -24234,7 +24234,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="f2a99db1" sha1="9a05e1f06913526241e1ad3353771127f8537ffe" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="889f0424" sha1="3774dc47e2427d5597717bf9bb99db44bbd5c240" offset="00000" />
@@ -24252,7 +24252,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-39-0 prg" size="16384" crc="f51c7d02" sha1="09970d1cc4a2bd82715cc4243e4f9fa4667c68c5" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="pal-39-0 chr" size="8192" crc="a148c520" sha1="df15751726f27902c3bcdf35cf63d8e85c42bbad" offset="00000" />
@@ -26991,7 +26991,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="x3-003" size="16384" crc="219ce59d" sha1="e3d4b3f536cd1a1f43edda6c10529c7e88719cc1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="x3-004" size="8192" crc="86e2067a" sha1="91548606de9d9b2ae2bedb0023866384d320843d" offset="00000" />
@@ -27537,7 +27537,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="50920b03" sha1="db05fc8e5156993918d1b6da6995ca1827ae28db" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="a1c6a8f4" sha1="ebeac55009a4be74f3e2f150d17f1f68ff581f14" offset="00000" />
@@ -27976,7 +27976,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-sf-0 prg" size="16384" crc="fd7dd2b0" sha1="e8335b0b24d8fe3c25e91d761c3477f270afdb72" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-sf-0 chr" size="8192" crc="b6128566" sha1="6ced5c98086e29e25fde990001ee14b925040d9e" offset="00000" />
@@ -28044,7 +28044,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="13556927" sha1="223c8f5eb47d123a1bdab846f45d644eb55faac8" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="3ff14826" sha1="f9adf07eda37fef812739c94f616f5ca7836430e" offset="00000" />
@@ -28545,7 +28545,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="f2ec0901" sha1="22bfac4a74cd2c149237cf8e69e24d25329d9da8" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="sun soft s-a" size="8192" crc="e1e3cf64" sha1="7e2fb3eeb92fd8ecf8e32e92ea85b6aa8a32c981" offset="00000" />
@@ -30638,7 +30638,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-te-0 prg" size="16384" crc="8b2e3e81" sha1="e54274c0b0d651458c5459d41872b1f99904d0fb" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-te-0 chr" size="8192" crc="3a34c45b" sha1="2cc26a01c38ead50503dccb3ee929ba7a2b6772c" offset="00000" />
@@ -30656,7 +30656,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-te-0 prg" size="16384" crc="108f732e" sha1="ec779c863b96124e9d07a96636bc287052b733e8" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-te-0 chr" size="8192" crc="3a34c45b" sha1="2cc26a01c38ead50503dccb3ee929ba7a2b6772c" offset="00000" />
@@ -32554,7 +32554,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-uc-0 prg" size="16384" crc="d31e4238" sha1="40b31eda5c83097100f203774e76efb389eb01d7" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-uc-0 chr" size="8192" crc="8777cef2" sha1="93d763e427bd590d56facb0750c73d4d900dd3ef" offset="00000" />
@@ -33137,7 +33137,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="e1a2e5b5" sha1="8b54e23a3cdb2dafd53e47f2e241cae4f3d7d037" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="10086caa" sha1="7f6b31812622d9eb47ad131aa56705008096d39a" offset="00000" />
@@ -33394,7 +33394,7 @@
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-wg-0 prg" size="16384" crc="0d3cf705" sha1="2c6a0d239bf0140830a96a343871ffb207b3095c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-wg-0 chr" size="8192" crc="a5e04856" sha1="9194d89a34f687742216889cbb3e717a9ae81c92" offset="00000" />
@@ -33413,7 +33413,7 @@
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-wg-1 prg" size="16384" crc="389960db" sha1="6b38f2c86ef27f653a2bdb9c682ac0bc981c7db6" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-wg-0 chr" size="8192" crc="a5e04856" sha1="9194d89a34f687742216889cbb3e717a9ae81c92" offset="00000" />
@@ -34081,7 +34081,7 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="802j2p" size="16384" crc="8f7719f3" sha1="d4830986894ba7d48bf7eb684efcffdce9aa3131" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="802j1c" size="8192" crc="fd4872fc" sha1="0a7e069cb52592b3bc447486cc032ebfa59175ef" offset="00000" />
@@ -34099,7 +34099,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="802j4p" size="16384" crc="e26a660d" sha1="28cd26ca1c7f60c1e2f27cd65331093b3451ef1e" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="802j1c" size="8192" crc="fd4872fc" sha1="0a7e069cb52592b3bc447486cc032ebfa59175ef" offset="00000" />
@@ -34465,7 +34465,7 @@
 			<feature name="pcb" value="IREM-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="if-01 p" size="16384" crc="e16bb5fe" sha1="eb95c633aa05d7a4b735ba75c5d0ed294c2b2e30" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea> <!-- Alt label: irem zr-128 -->
 			<dataarea name="chr" size="8192">
 				<rom name="if-01 c" size="8192" crc="45abd80e" sha1="d5da7acffa42556aa763c8dd352499cfc25dda68" offset="00000" />
@@ -34609,7 +34609,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="genie v1.5" size="16384" crc="02b26e69" sha1="8bb0d98c4515cba77a805bc8b06788dd6ed6263c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
@@ -34626,7 +34626,7 @@
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="genie v1.5a" size="16384" crc="02b26e69" sha1="8bb0d98c4515cba77a805bc8b06788dd6ed6263c" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
@@ -34646,7 +34646,7 @@
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="hvc kensa cassette controller test (japan).prg" size="16384" crc="d7c6121b" sha1="83f00c9a4ca9b226744b4a8d388e49580e092f0e" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -34679,7 +34679,7 @@
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="nintendo - ntf2 test cartridge (nes test) (usa) (rev 1).prg" size="16384" crc="770d5224" sha1="6edf7904876e382bf748e61a3a92ea0561012396" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -34744,7 +34744,7 @@
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="nintendo world class service - joystick test cartridge (usa).prg" size="16384" crc="9219765f" sha1="0897d69155ac45afa82e911d8567e8bf3160c940" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -34777,7 +34777,7 @@
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="nintendo world class service - power pad test cartridge (usa).prg" size="16384" crc="e8d34a54" sha1="c32b634e6409678feca80e21c5eb4ed55ce61e20" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -34812,9 +34812,9 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="demo boy 2 (unl).prg" size="8192" crc="61bc931a" sha1="5f642bc0c39420d8a006bd2492c397116d106a35" offset="00000" status="baddump" />
-				<rom size="8192" offset="2000" loadflag="reload" />
-				<rom size="8192" offset="4000" loadflag="reload" />
-				<rom size="8192" offset="6000" loadflag="reload" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -36686,7 +36686,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong jr. (japan).prg" size="16384" crc="1053136e" sha1="fe1514c5b5c9555cdb76718245ebe533b7262126" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hvc-jr-0 chr" size="8192" crc="852778ab" sha1="307f2245cce164491012f75897eb984af0c3f456" offset="00000" />
@@ -37537,9 +37537,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="galaxian (japan) (rev a).prg" size="8192" crc="acd87878" sha1="6f5205b4609a1dcad2f0af32160f5017f6155605" offset="00000" status="baddump" />
-				<rom size="8192" offset="2000" loadflag="reload" />
-				<rom size="8192" offset="4000" loadflag="reload" />
-				<rom size="8192" offset="6000" loadflag="reload" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -38520,7 +38520,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="joust (japan).prg" size="16384" crc="1dac6e97" sha1="b5afe483751cfed58e415f3f80c5ecb8855b7a79" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -38652,7 +38652,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="karateka (japan) (beta).prg" size="16384" crc="8e9210d1" sha1="5db0567428c2dabe6900bb22cf884f44fb7da7c3" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="sfc-kr-0 chr" size="8192" crc="1552fbd4" sha1="6d880c41d293f715ef3c32c8a868bb1c87c324f5" offset="00000" />
@@ -38964,7 +38964,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="lunar pool (europe).prg" size="16384" crc="dea0d843" sha1="56ed0c47d49b7a41d0ae58fcde39c574000f04c7" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -39471,7 +39471,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="millipede (japan).prg" size="16384" crc="ee993635" sha1="7a4e0ac88f45a09a2c64b415f7d32d139feaecc5" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -40138,7 +40138,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pac-man (europe).prg" size="16384" crc="6fa1193b" sha1="8fef2bdce0c0be2ece67b26587aa22097ba3c9cf" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -42915,7 +42915,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="m82 game selectable working product display (europe).prg" size="16384" crc="7d56840a" sha1="cbd2d14fa073273ba58367758f40d67fd8a9106d" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43021,7 +43021,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="othello (australia) (unl).prg" size="16384" crc="257736c8" sha1="ff341d3b1e87a8685c05594365858ab747795f0d" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43242,7 +43242,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="3ec312bf" sha1="261d13eaeeba7b9893b1f9427ddf431618bf41c1" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="841531e6" sha1="99024134493ed5143d0a437a099bff15d74a7af3" offset="00000" />
@@ -43262,7 +43262,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="sidewinder - xiang wei she (asia) (pal) (unl).prg" size="16384" crc="2d0e0a3d" sha1="248e11d7dba271a9fa047a357f9d532494969568" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43279,7 +43279,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="sidewinder (australia) (unl).prg" size="16384" crc="be1fdbd8" sha1="7c56e995f716b3fa91fc1da21fc6be5fd1fd7f29" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43297,7 +43297,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="sidewinder (joy van).prg" size="16384" crc="b99f3457" sha1="6d4670c9764ec8e6e152aeb665cb14fa2b225dc2" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43540,7 +43540,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="boku koku shuu kin - the world of card game (1990)(sachen)(tw)[p][!][tc-012].prg" size="16384" crc="cc3a2abb" sha1="83a17c6dab83b0a759964dd9dd5aa807b2207030" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -43575,7 +43575,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="boku koku shuu kin - the world of card game (199x)(-)(as)[p][tc-012].prg" size="16384" crc="00a9107a" sha1="db2ea05b5035135091eeadf5c75dcf6ee651ef1d" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -44173,7 +44173,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="penguin &amp; seal, the (asia, australia) (unl).prg" size="16384" crc="a90b980e" sha1="136f0ac17e874d7e38c9dff0b833a5c020d7a6b2" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -44209,7 +44209,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="lucky bingo 777 (asia) (pal) (unl).prg" size="16384" crc="8e53f4d8" sha1="8bc94dcbbf50d7c74f1dd6d19aab8e8f6a90df44" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -44381,7 +44381,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="1ff8dace" sha1="d23b489dc965585888fbcf610931181430dd5d33" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="8eef716a" sha1="3bb075d183253c1c882ad9a788401bd03ea9b69a" offset="00000" />
@@ -44758,7 +44758,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="dung dung no 1 (asia) (unl).prg" size="16384" crc="e732a4bc" sha1="af9cb94b091405bb432019bff2ab4c4179316030" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -44877,7 +44877,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
  			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="0d7ea169" sha1="f78f6589e4b209cc0e5a61c7dea45f73fdcadc5e" offset="00000" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="e838b839" sha1="09e2bc2fa043675d5300a065fbc0e29d321a6ba3" offset="00000" />
@@ -45149,7 +45149,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="bingo (mgc-003).prg" size="16384" crc="0bf8a13e" sha1="2f9daa73f3c997fdad14e1259a7dbb05e008015e" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -46588,7 +46588,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="puke jingling (china) (unl).prg" size="16384" crc="a99a2a5d" sha1="9a7e024bcc8dd811d87060903d5c9308370bd54f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47820,7 +47820,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="huabi (painter) split by maxzhou88.prg" size="16384" crc="c2b40597" sha1="cfcf7c35cbc388be6e1e249257376afb73f40347" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47837,7 +47837,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="prg" size="32768">
 				<rom name="jisuanqi (calculator) split by maxzhou88.prg" size="16384" crc="53a3f6f8" sha1="3b518f6c44cebac89399a2f59b3bcef34d2db484" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47874,7 +47874,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="anon gunman (unl).prg" size="16384" crc="705be1a1" sha1="9bab53000bf03c83d9a23086d0c57e9081499e1c" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47908,7 +47908,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="bestiarian (unl).prg" size="16384" crc="11b8026f" sha1="ce27262cd31b98c8e036b9dbefd13b386f41605a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47926,7 +47926,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="cow boy (unl).prg" size="16384" crc="9065da7b" sha1="abd10383491b7d04194a3265710a7d67d388edc4" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47944,7 +47944,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="debar bomb (unl).prg" size="16384" crc="726a0c26" sha1="3f9e1e8cd7dca99e9ba4204bcbc50b9cf2bc32cf" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47962,7 +47962,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="dinosaur'bale (unl).prg" size="16384" crc="df77b585" sha1="d51f3c92c0460a3a62127561b9ab4e1a95cc2d32" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47980,7 +47980,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="fast gunman (unl).prg" size="16384" crc="050844d4" sha1="8c98f69e763788742204388b26bb882f2fcab230" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -47998,7 +47998,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="forest guard (unl).prg" size="16384" crc="c6262bd5" sha1="6e910ef52e1ea01db1600482eb59ded56c52cbd3" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48016,7 +48016,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="gunfignt (unl).prg" size="16384" crc="5d4a880c" sha1="b961256a7a4e63c0c789f5894586cac8732f43bc" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48067,7 +48067,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pop (unl).prg" size="16384" crc="95e244ab" sha1="8d5a323711d9b95838e1f1ee630b7d438b3ec66a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48085,7 +48085,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="rnpid gunnery (unl).prg" size="16384" crc="9cdeecc1" sha1="780ab9611bb255d01f6a93e5078f10f64fae65ef" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48103,7 +48103,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="sharp shooter (unl).prg" size="16384" crc="94e7bad2" sha1="625f3105a42a7a23bd3e730414ec91f318d9cd5e" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48155,7 +48155,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="shooter (action 1-3) (unl).prg" size="16384" crc="5f25600b" sha1="23f123afa382502c41b702c28f9810aba5fe6b60" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48173,7 +48173,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="shooter (round 1-3) (unl).prg" size="16384" crc="48c2181c" sha1="a3cbe97fc3f263e0f2d686b54b6a801bea9dd843" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48191,7 +48191,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="snowfield shoot (unl).prg" size="16384" crc="0bda6724" sha1="2509583f5d3a4a9da42d5de587056327632543ef" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48209,7 +48209,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="space 2050 (unl).prg" size="16384" crc="a851c42e" sha1="a9ee224f852b5f86db08307bf8190fac9a46c2c9" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48724,7 +48724,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="brush roller (asia) (unl).prg" size="16384" crc="5523b15e" sha1="d9c20aad2775c7021b30c505f6581e4f29f1c14f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -49139,7 +49139,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="famikan (japan) (unl).prg" size="16384" crc="b3b5e13b" sha1="55cfdda77c8dc1b6341e8bcb8eaa0f07184b16bd" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -49156,7 +49156,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="fighter_f8000.prg" size="16384" crc="de27a826" sha1="6693612d42b4a33cc1147014b536e7c7f9e2d947" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -49594,7 +49594,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="magic jewelry (asia) (unl).prg" size="16384" crc="56a54eae" sha1="3f86e92737cf9932e7f4490b51a864b45f589549" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -49612,7 +49612,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="magic jewelry (unl) (hwang shinwei,rcm).prg" size="16384" crc="0ddc264a" sha1="1e956c36dedf1f55f8337f39f2bee84aaeb563c1" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -50247,7 +50247,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="65536">	<!-- CHECK THIS -->
 				<rom name="tin choi ma lei (ch) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
-				<rom name="tin choi ma lei (ch) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="08000" status="baddump" />
+				<rom name="tin choi ma lei (ch) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -51380,7 +51380,7 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="night arrow (199x)(-)(as)[p].prg" size="16384" crc="fa65f3ad" sha1="a14cc4740c39403a09c654c78a7d1908f1fe82eb" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -51527,7 +51527,7 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pyramid (1990)(sachen)(tw)[p][o][!][sa-009].prg" size="16384" crc="be86ee6d" sha1="0c164a7b99028c17032e8021f3a9b5a590db7547" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -52084,7 +52084,7 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="xiao ma li (ch).prg" size="16384" crc="87aed475" sha1="fd488ab2abdc30e2e6100d2e37c969235926694f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -52719,7 +52719,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="10 yard fight (1987)(fmg)(jp)[p].prg" size="16384" crc="abbf9d31" sha1="f13ff6a287279400b159645a45249d87746db346" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -52752,7 +52752,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="4 nin uchi mahjong (1987)(fmg)(jp)[p].prg" size="16384" crc="570b13d4" sha1="6fe2ced9d5bbf7a8d36fb102fe0e1024954a0ad7" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -52846,7 +52846,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="balloon fight (1987)(fmg)(jp)[p].prg" size="16384" crc="294f2608" sha1="7d6df0267638ad9cd7e8e3dd7966a531274c4d23" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="balloon fight (1987)(fmg)(jp)[p].chr" size="8192" crc="c642a1df" sha1="e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9" offset="00000" status="baddump" />
@@ -52896,7 +52896,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="baseball (1987)(fmg)(jp)[p].prg" size="16384" crc="ca172682" sha1="9729e6c848c45232b3349851dd29bed3495d71bb" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="baseball (1987)(fmg)(jp)[p].chr" size="8192" crc="c27eef20" sha1="d5bd643b3ba98846e520b4d3f38aae45a29cf250" offset="00000" status="baddump" />
@@ -52913,7 +52913,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
  			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="battle city (1987)(fmg)(jp)[p].prg" size="16384" crc="c2d4ac96" sha1="bf625cbc357cbeccbd0110f45500292910014e59" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="battle city (1987)(fmg)(jp)[p].chr" size="8192" crc="3b126f9f" sha1="4ec2e88bf75c31436dac90dd711e13272235189a" offset="00000" status="baddump" />
@@ -52934,7 +52934,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="binary land (1987)(fmg)(jp)[p].prg" size="16384" crc="0c5c353a" sha1="3b35d81a7978ba71a2b269ef0726febf0f23407b" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -52948,7 +52948,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
  			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bird week (1987)(fmg)(jp)[p][h][mapper 0].prg" size="16384" crc="55d745ff" sha1="a23169cb3bd8bcf2254165321ef81ec93d2c0095" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="bird week (1987)(fmg)(jp)[p][h][mapper 0].chr" size="8192" crc="208ca976" sha1="1789f78a898abdf8989426d8f54d274973c56dbe" offset="00000" status="baddump" />
@@ -52981,7 +52981,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
  			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bomberman (1987)(fmg)(jp)[p].prg" size="16384" crc="46f066b6" sha1="997016dec4d50b1261de035d9dfb7ad366dce943" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="bomberman (1987)(fmg)(jp)[p].chr" size="8192" crc="a775822e" sha1="b0584f9f4172b9e111ae275d8de6644b76372b32" offset="00000" status="baddump" />
@@ -53015,7 +53015,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="burger time (1987)(fmg)(jp)[p].prg" size="16384" crc="57a0f8c0" sha1="95b3a9d53f89a891d2d7cee4d6415898d3357eb9" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="burger time (1987)(fmg)(jp)[p].chr" size="8192" crc="aab6191d" sha1="2df9d75c8730aa95fffa08140d7b9957ddcb1504" offset="00000" status="baddump" />
@@ -53035,7 +53035,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="chack 'n pop (1987)(fmg)(jp)[p].prg" size="16384" crc="7c529f28" sha1="bef142d1294958142c90d6a79f0190acce0e6f0c" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53065,7 +53065,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="championship lode runner (1987)(fmg)(jp)[p].prg" size="16384" crc="9578ae77" sha1="4b7b7411d720337f1d9ca4617f238e329da0563f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="championship lode runner (1987)(fmg)(jp)[p].chr" size="8192" crc="dd53a3e0" sha1="21e46747ef49b659e14d04226ed55b8bee66a399" offset="00000" status="baddump" />
@@ -53082,7 +53082,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="choujikuu yousai - macross (1987)(fmg)(jp)[p].prg" size="16384" crc="a7aaf104" sha1="0635494582e00bc5c72a4ae55b40c48599dde0bb" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="choujikuu yousai - macross (1987)(fmg)(jp)[p].chr" size="8192" crc="d1e5d796" sha1="542b1fee815ed15024fbeadf7910125ccaec86c7" offset="00000" status="baddump" />
@@ -53099,7 +53099,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="circus charlie (1987)(fmg)(jp)[p].prg" size="16384" crc="26646b1e" sha1="f0cdb234976f645e1a3881372b2b90dec26e720b" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="circus charlie (1987)(fmg)(jp)[p].chr" size="8192" crc="f76c592a" sha1="c8bc574c43d26d5072869922573edaaab7a37050" offset="00000" status="baddump" />
@@ -53152,7 +53152,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="clu clu land (1987)(fmg)(jp)[p].prg" size="16384" crc="7c714e7d" sha1="9637409688ff8dbf37dd411660cbb787656b7a37" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53182,7 +53182,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="devil world (1987)(fmg)(jp)[p].prg" size="16384" crc="7b4714f0" sha1="089ea256f013f822beb235482c39eacd34c2759d" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="devil world (1987)(fmg)(jp)[p].chr" size="8192" crc="3a9aa7a1" sha1="7af9c7ee2e1dff8f4260f11cdb2acec613313093" offset="00000" status="baddump" />
@@ -53203,7 +53203,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="dig dug (1987)(fmg)(jp)[p].prg" size="16384" crc="c42b83a3" sha1="cd6f63c12bd2d5d8c7beab1f58b4660bde7bf964" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53233,7 +53233,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong rev prg1 (1987)(fmg)(jp)[p].prg" size="16384" crc="966c1433" sha1="516ba18ec836374fe9ee04b215b48823d6a6f0ee" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="donkey kong rev prg1 (1987)(fmg)(jp)[p].chr" size="8192" crc="a2bb12fb" sha1="cf7e248360ec9ff3b7c52ed4ef0fd42e78f5a64c" offset="00000" status="baddump" />
@@ -53250,7 +53250,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong jr. rev prg1 (1987)(fmg)(jp)[p].prg" size="16384" crc="ba17c936" sha1="e557c3b4874596d9baec766ce6f802b6d966c296" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="donkey kong jr. rev prg1 (1987)(fmg)(jp)[p].chr" size="8192" crc="852778ab" sha1="307f2245cce164491012f75897eb984af0c3f456" offset="00000" status="baddump" />
@@ -53270,7 +53270,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong 3 (1987)(fmg)(jp)[p].prg" size="16384" crc="14cbb22a" sha1="1467294bfd1e4ba942d431c02df7a86c95d01e33" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53284,7 +53284,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="door door (1987)(fmg)(jp)[p].prg" size="16384" crc="b473eb4a" sha1="8ba7f50122d53212ca1bbf0bcc920016d23c9682" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="door door (1987)(fmg)(jp)[p].chr" size="8192" crc="ae41cfef" sha1="b443c8fd9440f60eb7cab5dfe0b9cd4f1feeefba" offset="00000" status="baddump" />
@@ -53349,7 +53349,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="duck hunt (1987)(fmg)(jp)[p].prg" size="16384" crc="9e44c002" sha1="10075f771add649ddc1df07bf481e30e0c2dd37a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="duck hunt (1987)(fmg)(jp)[p].chr" size="8192" crc="4e049e03" sha1="ffad32a3bab2fb3826bc554b1b9838e837513576" offset="00000" status="baddump" />
@@ -53382,7 +53382,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="excitebike (1987)(fmg)(jp)[p].prg" size="16384" crc="3a01316b" sha1="63fc55e4bf8d22de3e0b49391bcc01e691d5c36d" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="excitebike (1987)(fmg)(jp)[p].chr" size="8192" crc="22be301c" sha1="31bfdac1e41fd6f4a64e0df7bafbe485854f1098" offset="00000" status="baddump" />
@@ -53418,7 +53418,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="exerion (1987)(fmg)(jp)[p].prg" size="16384" crc="71075fc6" sha1="04ee16953283ca6adf0a6e45895b62eed9a06481" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53432,7 +53432,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="f-1 race (1987)(fmg)(jp)[p].prg" size="16384" crc="8a7ebef5" sha1="6f5b7bd008570134e60c253f3adaee34e428172f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="f-1 race (1987)(fmg)(jp)[p].chr" size="8192" crc="b6d1434e" sha1="ffe35b7e74237b6d5341ecd7415a74de6a82e28f" offset="00000" status="baddump" />
@@ -53464,7 +53464,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="field combat (1987)(fmg)(jp)[p].prg" size="16384" crc="1b989d5e" sha1="567f4d7c237c7ac8043e8bce10b84a3f46409193" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="field combat (1987)(fmg)(jp)[p].chr" size="8192" crc="0e060c68" sha1="41eb1829c746906082709c20057c27ebb354116b" offset="00000" status="baddump" />
@@ -53500,7 +53500,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="formation z (1987)(fmg)(jp)[p].prg" size="16384" crc="082b96f7" sha1="8e1701df34482eea94773b2516649835f5fae5aa" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53517,7 +53517,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="galaga (1987)(fmg)(jp).prg" size="16384" crc="82651e23" sha1="afd2d2c20861e7a86c2c3b7752f57ab16a87af47" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -53596,7 +53596,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="golf (1987)(fmg)(j)[p].prg" size="16384" crc="550fd2f2" sha1="de0e6cbf89adcac9051fbc385c31d70fe76db448" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="golf (1987)(fmg)(j)[p].chr" size="8192" crc="d2d99442" sha1="160b366068b08d799263dfbc288f3fcc7654df73" offset="00000" status="baddump" />
@@ -53694,7 +53694,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hogan&apos;s alley (1987)(fmg)(jp)[p].prg" size="16384" crc="27c51ce8" sha1="13743a35b1617c6a191fc3939e81be0388d36cdb" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hogan&apos;s alley (1987)(fmg)(jp)[p].chr" size="8192" crc="5df42fc4" sha1="4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8" offset="00000" status="baddump" />
@@ -53775,7 +53775,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hyper olympic (1987)(fmg)(jp)[p].prg" size="16384" crc="2e8e0d31" sha1="93441d5a1f136f08910b6d8efe0c5539291ddbe8" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hyper olympic (1987)(fmg)(jp)[p].chr" size="8192" crc="23f8f1ae" sha1="2eeb207e55ad1e08e16eb18d2416e4074441d425" offset="00000" status="baddump" />
@@ -53792,7 +53792,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hyper sports (1987)(fmg)(jp)[p].prg" size="16384" crc="7ef481fa" sha1="b0ebafb14d6f8904accef6612fbcd101e7d745bf" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="hyper sports (1987)(fmg)(jp)[p].chr" size="8192" crc="15027308" sha1="8f37d038b9e01ea6516e7083a8d5f8f7a0a57906" offset="00000" status="baddump" />
@@ -53841,7 +53841,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="ikki (1987)(fmg)(jp)[p].prg" size="16384" crc="5a9c6d0b" sha1="1734886a662c22ad9d264e7d4cd5d5f1d6e7da76" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="ikki (1987)(fmg)(jp)[p].chr" size="8192" crc="41c327d5" sha1="7a74db1c08a0b355c52bec9f9b24dbb07a37ab53" offset="00000" status="baddump" />
@@ -53874,7 +53874,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="karateka (1987)(fmg)(jp)[p].prg" size="16384" crc="0d3e004e" sha1="4f1b5cd8ba677eb75a04ce0dc6e76ac19975743c" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="karateka (1987)(fmg)(jp)[p].chr" size="8192" crc="1552fbd4" sha1="6d880c41d293f715ef3c32c8a868bb1c87c324f5" offset="00000" status="baddump" />
@@ -53907,7 +53907,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="kinnikuman - muscle tag match (1987)(fmg)(jp)[p].prg" size="16384" crc="b576b48d" sha1="eb29d0a3f8adf3929df2bd0b411d79a80c8d1324" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="kinnikuman - muscle tag match (1987)(fmg)(jp)[p].chr" size="8192" crc="7d00b83e" sha1="c63d10f263a282b401240014e494a5a2afd43458" offset="00000" status="baddump" />
@@ -53971,7 +53971,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="lode runner (1987)(fmg)(jp)[p].prg" size="16384" crc="b464f8e8" sha1="f17037682e2d1a070aafebc0bf67caf3f26d1b50" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="lode runner (1987)(fmg)(jp)[p].chr" size="8192" crc="dd53a3e0" sha1="21e46747ef49b659e14d04226ed55b8bee66a399" offset="00000" status="baddump" />
@@ -54036,7 +54036,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="mahjong (1987)(fmg)(jp)[p].prg" size="16384" crc="fd3cba4c" sha1="eede29958ccf7bbcf2bc29203a6871f3324c5e83" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="mahjong (1987)(fmg)(jp)[p].chr" size="8192" crc="a237ed07" sha1="88e9e234d048f824628ce40a533a30ff2ae5349f" offset="00000" status="baddump" />
@@ -54069,7 +54069,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="mappy (1987)(fmg)(jp)[p].prg" size="16384" crc="de01660a" sha1="bf671880e5670010cec25c82821db1530caed0c5" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="mappy (1987)(fmg)(jp)[p].chr" size="8192" crc="6e15917c" sha1="e4addab56bd771af628204cb97fd11c9d700e188" offset="00000" status="baddump" />
@@ -54086,7 +54086,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="mario bros. (1987)(fmg)(jp)[p].prg" size="16384" crc="8b801893" sha1="c8e4946827005153b45c047d79ed0c1f5a707d2a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="mario bros. (1987)(fmg)(jp)[p].chr" size="8192" crc="10f77435" sha1="a646c3443832ada84d31a3a8a4b34aebc17cecd5" offset="00000" status="baddump" />
@@ -54215,7 +54215,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="ninja jajamaru kun (1987)(fmg)(jp)[p][h][mapper 3].prg" size="16384" crc="4d28bf35" sha1="7aa7578f5dd3870dfc33494c1cc185fa50ace970" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="ninja jajamaru kun (1987)(fmg)(jp)[p][h][mapper 3].chr" size="16384" crc="35bea742" sha1="c077ff40c9e6fa98b6d10093c30b0e60a781de1e" offset="00000" status="baddump" />
@@ -54232,7 +54232,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nuts &amp; milk (1987)(fmg)(jp)[p].prg" size="16384" crc="5023e1d5" sha1="4e5821f41dd7b7a31736567924f00e47c70944c8" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="nuts &amp; milk (1987)(fmg)(jp)[p].chr" size="8192" crc="ad96d84a" sha1="27d77037d9f6fc8f863983df831a44329cf539b7" offset="00000" status="baddump" />
@@ -54300,7 +54300,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pac-man (1987)(fmg)(jp)[p].prg" size="16384" crc="e748d737" sha1="d78c49997c510335c75c4eb49b99e6a39734b3ad" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -54330,7 +54330,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pinball (1987)(fmg)(jp)[p].prg" size="16384" crc="2e656e7e" sha1="409176f286ef8376b71f33bee881d0666303d69a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="pinball (1987)(fmg)(jp)[p].chr" size="8192" crc="303d89fe" sha1="d2e5565ed03ef68e29be76e456037feef14b1497" offset="00000" status="baddump" />
@@ -54347,7 +54347,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pooyan (1987)(fmg)(jp)[p].prg" size="16384" crc="36e6d055" sha1="f0e00c01a6da87e233ba911910692db5663ddc04" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="pooyan (1987)(fmg)(jp)[p].chr" size="8192" crc="3568bb6d" sha1="18391ae5e70139393006c04e15c43e2a96f18d43" offset="00000" status="baddump" />
@@ -54364,7 +54364,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="popeye rev prg0 (1987)(fmg)(jp)[p].prg" size="16384" crc="360baec1" sha1="c227cffe491b151eb7200dee5c9657465651378a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="popeye rev prg0 (1987)(fmg)(jp)[p].chr" size="8192" crc="a5fd8d98" sha1="09d229404babb6c89b417ac541bab80fb06d2ba9" offset="00000" status="baddump" />
@@ -54381,7 +54381,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="raid on bungeling bay (1987)(fmg)(jp)[p].prg" size="16384" crc="6c619892" sha1="123e00dfc4dc7c7a49c9e934ffabbf60987df482" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="raid on bungeling bay (1987)(fmg)(jp)[p].chr" size="8192" crc="3b0545e2" sha1="e022658049e85806fd9637aac7c1ab92eb8ca65c" offset="00000" status="baddump" />
@@ -54401,7 +54401,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="road fighter (1987)(fmg)(jp)[p].prg" size="16384" crc="6c259bbe" sha1="1d38b13abf405640d113c6656b39f9f76b39a0df" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -54466,7 +54466,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="sky destroyer (1987)(fmg)(jp)[p].prg" size="16384" crc="c0e76c9f" sha1="0669c58b127df6ab5f5215ff501a2c7e8733dec2" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -54531,7 +54531,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="space invaders (1987)(fmg)(jp)[p].prg" size="16384" crc="2229c40b" sha1="67d2a6d6d4d76ee35b2e8eed7fb3c8ffc4fca438" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -54593,7 +54593,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="star force (1987)(fmg)(jp)[p].prg" size="16384" crc="f087b4f6" sha1="40afeec71a833f6dd52fc9017fb5c2984b25027c" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="star force (1987)(fmg)(jp)[p].chr" size="8192" crc="b6128566" sha1="6ced5c98086e29e25fde990001ee14b925040d9e" offset="00000" status="baddump" />
@@ -54642,7 +54642,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="super arabian (1987)(fmg)(jp)[p].prg" size="16384" crc="e1589554" sha1="3b9dd02594383734a8290d0368e6afac6f050319" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="super arabian (1987)(fmg)(jp)[p].chr" size="8192" crc="e1e3cf64" sha1="7e2fb3eeb92fd8ecf8e32e92ea85b6aa8a32c981" offset="00000" status="baddump" />
@@ -54739,7 +54739,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="tennis (1987)(fmg)(jp)[p].prg" size="16384" crc="bd900cd9" sha1="f6b9b603da350106069c02742996168fd5d23175" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="tennis (1987)(fmg)(jp)[p].chr" size="8192" crc="2e15a1de" sha1="dd58fdab918314f73b106e60c125a1f6cb2f1f72" offset="00000" status="baddump" />
@@ -54852,7 +54852,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="urban champion (1987)(fmg)(jp)[p].prg" size="16384" crc="54702e8d" sha1="de12bd62999eff15ab090d647fd2b5d35d7ff6c4" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="urban champion (1987)(fmg)(jp)[p].chr" size="8192" crc="75ab5b65" sha1="62658668d0e5a8a4f2acdc51ba2063af96315d25" offset="00000" status="baddump" />
@@ -54885,7 +54885,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="warpman (1987)(fmg)(jp)[p].prg" size="16384" crc="0a4b26bf" sha1="b4fafc3cd2755fc059867e0a0322bb6ffb164190" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="warpman (1987)(fmg)(jp)[p].chr" size="8192" crc="144c0357" sha1="a4bf220ea71460d8370d7205866d984cea7c58fc" offset="00000" status="baddump" />
@@ -54902,7 +54902,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="wild gunman rev prg0 (1987)(fmg)(jp)[p].prg" size="16384" crc="e587d5fe" sha1="48bfd3216e46ec1819ca1ee522044d5973ad65de" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="wild gunman rev prg0 (1987)(fmg)(jp)[p].chr" size="8192" crc="d9142f8e" sha1="16285ce3e73cb3e89293a61320227fa287a08361" offset="00000" status="baddump" />
@@ -54951,7 +54951,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="yie ar kung-fu v1.4 (1987)(fmg)(jp)[p].prg" size="16384" crc="0c23fc17" sha1="0a9306ce0cbde654efd599de90ddcc63cc0b08e7" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="yie ar kung-fu v1.4 (1987)(fmg)(jp)[p].chr" size="8192" crc="cf967097" sha1="258f6fbcb693d11322bac0ee52ac711055cd729c" offset="00000" status="baddump" />
@@ -54968,7 +54968,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="zippy race (1987)(fmg)(jp)[p].prg" size="16384" crc="ce563725" sha1="b1e63fce23e8a9d8a325499e0422a272e271f8ad" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="zippy race (1987)(fmg)(jp)[p].chr" size="8192" crc="45abd80e" sha1="d5da7acffa42556aa763c8dd352499cfc25dda68" offset="00000" status="baddump" />
@@ -55951,7 +55951,7 @@ Games by A.Tchudov (from Ulyanovsk)
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="warehouse no. 18 (unl) (russian) [!].prg" size="16384" crc="4b8a0e51" sha1="42f723363370dc32b30b10ca59d0614cb41a8a05" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -56151,7 +56151,7 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="lines (r)[!].prg" size="16384" crc="27abc60f" sha1="477550350d15bf43f7024020cf534e40c9c8634b" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -56463,7 +56463,7 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="conqueror (e)(circus charlie hack)(dump by maxzhou88).prg" size="16384" crc="2ecdf639" sha1="caa1b4aa764b67154240b715e9c491100df00ac7" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58335,7 +58335,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="balloon fight (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="918a529b" sha1="d83a0bd607e769d74987683e1d3e08ff8b32e209" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58352,7 +58352,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="baseball (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="abb04ec3" sha1="62de85a6e92637f90a8618fb2caf1f20fbbaccf5" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58369,7 +58369,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="clu clu land (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="7df62b25" sha1="66bb8bf77a29bc4fbd5f21ea84ab8254bda4cac2" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58386,7 +58386,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong 3 (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="b211e89d" sha1="1ac3bc12ac3658dbe3b70b43211e3e4acdd11b27" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58403,7 +58403,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="dc4f8dfc" sha1="f983d07e530600a92d68029e85bcf4d564e4fba1" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58420,7 +58420,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="donkey kong jr. (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="d67cc685" sha1="4f750c58af9026f26cd8aad7e7405e69ecd77f6a" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58437,7 +58437,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="excitebike (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="9fd54db9" sha1="90f761a64d3290a51c2ebc2eb052f0ff90495c14" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58454,7 +58454,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="golf (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="46d52e0d" sha1="2bbc1d5460372ea1d41349333c860162672540aa" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58471,7 +58471,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="ice climber (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="d7637ba6" sha1="f7c6ba6f0f52603d60338e7bcc260071178b8db6" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58488,7 +58488,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="mario bros. (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="983f248c" sha1="f5852fe20302139ba6612f576655efdbf8a42d7f" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58505,7 +58505,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pinball (200x)(nintendo)(us)[h][ripped from gba e-reader].prg" size="16384" crc="6dff5b54" sha1="75e9c3ce1c454a78e3a97f87312232e8a20d1bdb" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58522,7 +58522,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="tennis (u) (gba e-reader).prg" size="16384" crc="a140e580" sha1="c332d8407e61b11cebff82fc13d55a4acb82fc18" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58539,7 +58539,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="urban champion (u) (gba e-reader).prg" size="16384" crc="127c3d9f" sha1="46c42132154c3308444b8886b0dce4c176f49d2e" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58556,7 +58556,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="bomberman (u) (famicom mini rip hack).prg" size="16384" crc="2bb76c37" sha1="f287ce1df60998b089cec8dc8abc2187435c96c7" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58717,7 +58717,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="baseball (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].prg" size="16384" crc="7c54ee72" sha1="65e776798511a9e31d20a2f84b1cba1970fced43" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58750,7 +58750,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="excitebike (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].prg" size="16384" crc="1fc03f23" sha1="36e991e5e801ad3fee9e3cf1dc9d5b787c42eb72" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58798,7 +58798,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="pinball (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].prg" size="16384" crc="07639bad" sha1="b846c85a1119e49de33d689d42126f590010d54b" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -58815,7 +58815,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="golf (200x)(nintendo)(eu)[h][ripped from animal crossing eu for gamecube].prg" size="16384" crc="10bbd4ba" sha1="b2011c444fd6190665d720209822b1f2b8cf5303" offset="00000" status="baddump" />
-				<rom size="16384" offset="4000" loadflag="reload" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>

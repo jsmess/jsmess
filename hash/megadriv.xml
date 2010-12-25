@@ -107,7 +107,7 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="f-22_intercept_f-202-4.u1" size="524288" crc="649771f8" sha1="6daeca39841f06549373f3a4fd746f3e1c95c328" offset="000000" /> 
-				<rom name="f-22_intercept_f-202-1.u2" size="131072" crc="d3d7cbb8" sha1="72e56f858bfe88c2529939304ba49eee3fe14353" offset="080001" loadflag="load16_byte" />
+				<rom name="f-22_intercept_f-202-1.u2" size="131072" crc="d3d7cbb8" sha1="72e56f858bfe88c2529939304ba49eee3fe14353" offset="0x080001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 <!--
@@ -270,7 +270,7 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="es133-1_rise_of_the_robots.u1" size="2097152" crc="ed583ef7" sha1="b9f43d5bf31819a1d76c1495e81cfa1d38bcde1c" offset="000000" />
-				<rom name="es133-2_rise_of_the_robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="200000" />
+				<rom name="es133-2_rise_of_the_robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="0x200000" />
 			</dataarea>
 		</part>
 <!--
@@ -310,7 +310,7 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zetsg_hi_7500-00033a.u1" size="1048576" crc="af362b8c" sha1="2e5c1e4809d763513fa5bb8dc72c97a873fc732b" offset="000000" />
-				<rom name="zetsg_lo_7500-00034a.u2" size="1048576" crc="b9c2d518" sha1="e5e7c36746233f441af5e03d0e2b63c6d916df24" offset="200000" />
+				<rom name="zetsg_lo_7500-00034a.u2" size="1048576" crc="b9c2d518" sha1="e5e7c36746233f441af5e03d0e2b63c6d916df24" offset="0x200000" />
 			</dataarea>
 		</part>
 <!--
@@ -493,7 +493,7 @@ Known undumped pirates
 			<feature name="pcb" value="171-5841" />
 			<dataarea name="rom" size="655360">
 				<rom name="mpr-12605a.ic1" size="131072" crc="d367c3cc" sha1="4c2c8fcf0219c6129650cf59a47d8edeb844e2df" offset="000000" />
-				<rom name="mpr-12606a.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="020000" />
+				<rom name="mpr-12606a.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="0x020000" />
 			</dataarea>
 		</part>
 	</software>
@@ -506,7 +506,7 @@ Known undumped pirates
 			<feature name="pcb" value="171-5841" />
 			<dataarea name="rom" size="655360">
 				<rom name="mpr-12605.ic1" size="131072" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="000000" />
-				<rom name="mpr-12606.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="020000" />
+				<rom name="mpr-12606.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="0x020000" />
 			</dataarea>
 		</part>
 	</software>
@@ -651,7 +651,7 @@ Known undumped pirates
 			<feature name="pcb" value="171-5921" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-12851a.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
-				<rom name="mpr-12852a.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="080000" />
+				<rom name="mpr-12852a.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="0x080000" />
 			</dataarea>
 		</part>
 	</software>
@@ -807,7 +807,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="12-in-1 (unl).bin" size="2097152" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="400000" loadflag="load16_word_swap" />
+				<rom name="12-in-1 (unl).bin" size="2097152" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -884,7 +884,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="4-in-1 (pirate).bin" size="2097152" crc="be72857b" sha1="2aceca16f13d6a7a6a1bff8543d31bded179df3b" offset="400000" loadflag="load16_word_swap" />
+				<rom name="4-in-1 (pirate).bin" size="2097152" crc="be72857b" sha1="2aceca16f13d6a7a6a1bff8543d31bded179df3b" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3979,7 +3979,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="chinese fighter iii (unl).bin" size="2097152" crc="e833bc6e" sha1="ecca9d2d21c8e27fc7584d53f557fdd8b4cbffa7" offset="400000" loadflag="load16_word_swap" />
+				<rom name="chinese fighter iii (unl).bin" size="2097152" crc="e833bc6e" sha1="ecca9d2d21c8e27fc7584d53f557fdd8b4cbffa7" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6281,7 +6281,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="earth defense (usa) (unl).bin" size="524288" crc="3519c422" sha1="9bf4cda850495d7811df578592289018862df575" offset="400000" loadflag="load16_word_swap" />
+				<rom name="earth defense (usa) (unl).bin" size="524288" crc="3519c422" sha1="9bf4cda850495d7811df578592289018862df575" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7777,7 +7777,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="funny world &amp; balloon boy (usa) (unl).bin" size="524288" crc="a82f05f0" sha1="17481c8327433bfce8f7bae493fc044194e400a4" offset="400000" loadflag="load16_word_swap" />
+				<rom name="funny world &amp; balloon boy (usa) (unl).bin" size="524288" crc="a82f05f0" sha1="17481c8327433bfce8f7bae493fc044194e400a4" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8163,7 +8163,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="golden 10-in-1 (bad dump).bin" size="1048576" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="400000" status="baddump" loadflag="load16_word_swap" />
+				<rom name="golden 10-in-1 (bad dump).bin" size="1048576" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="0x400000" status="baddump" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10479,7 +10479,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="shi zi wang 3 - the lion king 3 (Chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="400000" loadflag="load16_word_swap" />
+				<rom name="shi zi wang 3 - the lion king 3 (Chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -14760,7 +14760,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="pokemon stadium (unl).bin" size="2097152" crc="fe187c5d" sha1="f65af5d86aba33bd3f4f91a0cd7428778bcceedf" offset="400000" loadflag="load16_word_swap" />
+				<rom name="pokemon stadium (unl).bin" size="2097152" crc="fe187c5d" sha1="f65af5d86aba33bd3f4f91a0cd7428778bcceedf" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19088,7 +19088,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super 15-in-1 (pirate).bin" size="2097152" crc="6d17dfff" sha1="6b2a6de2622735f6d56c6c9c01f74daa90e355cb" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super 15-in-1 (pirate).bin" size="2097152" crc="6d17dfff" sha1="6b2a6de2622735f6d56c6c9c01f74daa90e355cb" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19099,7 +19099,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super 19-in-1 (pirate).bin" size="4194304" crc="0ad2b342" sha1="e1c041ba69da087c428dcda16850159f3caebd4b" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super 19-in-1 (pirate).bin" size="4194304" crc="0ad2b342" sha1="e1c041ba69da087c428dcda16850159f3caebd4b" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19176,7 +19176,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super donkey kong 99 (unl) (protected).bin" size="3145728" crc="43be4dd5" sha1="5d3c84bd18f821b20212941a6f7a1a272eb0d7e3" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super donkey kong 99 (unl) (protected).bin" size="3145728" crc="43be4dd5" sha1="5d3c84bd18f821b20212941a6f7a1a272eb0d7e3" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19200,7 +19200,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super king kong 99 (unl).bin" size="2097152" crc="413dfee2" sha1="6973598d77a755beafff31ce85595f9610f8afa5" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super king kong 99 (unl).bin" size="2097152" crc="413dfee2" sha1="6973598d77a755beafff31ce85595f9610f8afa5" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19467,7 +19467,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (euro).bin" size="5242880" crc="682c192f" sha1="56768a0524fa13fcd76474c8bb89b995bb471847" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (euro).bin" size="5242880" crc="682c192f" sha1="56768a0524fa13fcd76474c8bb89b995bb471847" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19478,7 +19478,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (jpn).bin" size="5242880" crc="d8eeb2bd" sha1="24c8634f59a481118f8350125fa6e00d33e04c95" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (jpn).bin" size="5242880" crc="d8eeb2bd" sha1="24c8634f59a481118f8350125fa6e00d33e04c95" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19489,7 +19489,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20206,7 +20206,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="the battle of red cliffs - romance of the three kingdoms (unl).bin" size="2097157" crc="44463492" sha1="244334583fde808a56059c0b0eef77742c18274d" offset="400000" loadflag="load16_word_swap" />
+				<rom name="the battle of red cliffs - romance of the three kingdoms (unl).bin" size="2097157" crc="44463492" sha1="244334583fde808a56059c0b0eef77742c18274d" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20647,7 +20647,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="400000" loadflag="load16_word_swap" />
+				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21758,7 +21758,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="whac-a-critter (usa) (unl).bin" size="524288" crc="1bdd02b8" sha1="4b45801b112a641fee936e41a31728ee7aa2f834" offset="400000" loadflag="load16_word_swap" />
+				<rom name="whac-a-critter (usa) (unl).bin" size="524288" crc="1bdd02b8" sha1="4b45801b112a641fee936e41a31728ee7aa2f834" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23986,8 +23986,8 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="000000" loadflag="load16_word_swap" loadflag="load16_word_swap" />
-				<rom size="4194304" offset="400000" loadflag="reload" />
-				<rom size="4194304" offset="800000" loadflag="reload" />
+				<rom size="4194304" offset="0x400000" loadflag="reload" />
+				<rom size="4194304" offset="0x800000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -23999,8 +23999,8 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="000000" loadflag="load16_word_swap" loadflag="load16_word_swap" />
-				<rom size="4194304" offset="400000" loadflag="reload" />
-				<rom size="4194304" offset="800000" loadflag="reload" />
+				<rom size="4194304" offset="0x400000" loadflag="reload" />
+				<rom size="4194304" offset="0x800000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>

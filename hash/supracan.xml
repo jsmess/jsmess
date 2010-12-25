@@ -71,7 +71,7 @@
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="16007.0" size="2097152" crc="56c1c3fb" sha1="249e2ad6d8d40ecd31eda5a1bd5e5d0f47174a27" offset="000000" />
-				<rom name="08007.1" size="1048576" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" offset="200000" />
+				<rom name="08007.1" size="1048576" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>

@@ -90,7 +90,7 @@ The software list will be divided in four categories:
 			<feature name="cart_serial" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-f5-0.p0.u1" size="1048576" crc="f6ccde10" sha1="a8a33c75cca3190de0b7f19aa1fcf089c8d1021a" offset="000000" />
-				<rom name="shvc-f5-0.p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="100000" />
+				<rom name="shvc-f5-0.p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
-				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
+				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
 			</dataarea>
  		</part>
  	</software>
@@ -137,8 +137,8 @@ The software list will be divided in four categories:
 			<feature name="cart_serial" value="920214" />
 			<dataarea name="rom" size="3145728 ">		
 				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
-				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="100000" />
-				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="200000" />
+				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
+				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>

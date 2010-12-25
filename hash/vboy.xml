@@ -22,7 +22,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="3-d tetris (usa).bin" size="1048576" crc="bb71b522" sha1="5177015a91442e56bd76af39447bca365e06c272" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="galactic pinball (japan, usa).bin" size="1048576" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="innsmouth no yakata (japan).bin" size="1048576" crc="efd0ac36" sha1="8bb91e681959207be068796d540120565c174d37" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="jack bros. (usa).bin" size="1048576" crc="a44de03c" sha1="0e086d7ef2bd8b97315196943fd0b71da07aa8f1" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="jack bros. no meiro de hiihoo! (japan).bin" size="1048576" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="mario clash (japan, usa).bin" size="1048576" crc="a47de78c" sha1="7556a778b60490bdb81774bcbaa7413fc84cb985" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -125,9 +125,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mario's tennis (japan, usa).bin" size="524288" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -152,9 +152,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="panic bomber (usa).bin" size="524288" crc="19bb2dfb" sha1="80216b2874cf162f301d571bb8aebc98d80b4f3e" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="red alarm (usa).bin" size="1048576" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="red alarm (japan).bin" size="1048576" crc="7e85c45d" sha1="f5057fa9bfd9d60b9dcfc004cfdd12aa8eb1cb4a" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="sd gundam - dimension war (japan).bin" size="1048576" crc="44788197" sha1="1a67f6bdb45db46e22b8aadea754a68ad379ae29" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -206,9 +206,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="space invaders - virtual collection (japan).bin" size="524288" crc="fa44402d" sha1="16ad904faafd24642dfd056d10a768e81f0d9bfa" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,9 +221,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="space squash (japan).bin" size="524288" crc="60895693" sha1="3f08cae2b6f9e386529949ff954220860db1af64" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -236,7 +236,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="teleroboxer (japan, usa).bin" size="1048576" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -249,9 +249,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tobidase! panibon (japan).bin" size="524288" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -264,7 +264,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="virtual bowling (japan).bin" size="1048576" crc="20688279" sha1="a5be7654037050f0a781e70efea0191f43d26f06" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -277,7 +277,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="virtual fishing (japan).bin" size="1048576" crc="526cc969" sha1="583b409b7215159219d08e789db46140062095f2" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -290,7 +290,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="vertical force (usa).bin" size="1048576" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -303,7 +303,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="vertical force (japan).bin" size="1048576" crc="9e9b8b92" sha1="c7204ba5cfe7d26394b5e22badc580c8ed8c0b37" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -328,7 +328,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="virtual lab (japan).bin" size="1048576" crc="8989fe0a" sha1="d96c9f8aac5b4ea012a8fe659bb68fb1159a9c6d" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -341,7 +341,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="virtual league baseball (usa).bin" size="1048576" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -354,7 +354,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">>
 				<rom name="virtual pro yakyuu '95 (japan).bin" size="1048576" crc="9ba8bb5e" sha1="ab8fa82b79512eefefccdccea6768078a374c4aa" offset="000000" />
-                <rom size="1048576" offset="100000" loadflag="reload" />
+                <rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -367,9 +367,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="v-tetris (japan).bin" size="524288" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" offset="000000" />
-                <rom size="524288" offset="080000" loadflag="reload" />
-                <rom size="524288" offset="100000" loadflag="reload" />
-                <rom size="524288" offset="180000" loadflag="reload" />
+                <rom size="524288" offset="0x080000" loadflag="reload" />
+                <rom size="524288" offset="0x100000" loadflag="reload" />
+                <rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
