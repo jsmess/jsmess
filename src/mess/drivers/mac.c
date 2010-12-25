@@ -1443,7 +1443,7 @@ COMP( 1990, maciisi,  0,	0,	maciisi,  maciici,  maciisi,	      "Apple Computer",
 COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,   macprtb,  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,	0,	macclas2, macadb,   macclassic2,      "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
 COMP( 1991, maclc2,   0,	0,	maclc2,   maciici,  maclc2,	          "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
-//COMP( 1993, maccclas, 0,        0,      maclc2,   macadb,   maclrcclassic,        "Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
+COMP( 1993, maccclas, 0,        0,      maclc2,   macadb,   maclrcclassic,        "Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,	0,	maclc3,   maciici,  maclc3,	          "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1994, pmac6100, 0,	0,	pwrmac,   macadb,   macpm6100,	      "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING | GAME_NO_SOUND )
 
