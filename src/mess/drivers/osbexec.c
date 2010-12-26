@@ -53,6 +53,14 @@ public:
 	osbexec_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	running_device	*maincpu;
+	running_device	*mb8877;
+	running_device	*messram;
+	running_device	*pia_0;
+	running_device	*pia_1;
+	running_device	*sio;
+	running_device	*speaker;
+
 	region_info	*fontram_region;
 	region_info *vram_region;
 	UINT8	*fontram;
@@ -62,11 +70,17 @@ public:
 	/* PIA 0 (UD12) */
 	UINT8	pia0_porta;
 	UINT8	pia0_portb;
+	int		pia0_irq_state;
 
+	/* PIA 1 (UD8) */
+	int		pia1_irq_state;
+
+	/* Vblank counter ("RTC") */
+	UINT8	rtc;
 
 	void set_banks(running_machine *machine)
 	{
-		UINT8 *messram_ptr = messram_get_ptr( machine->device("messram") );
+		UINT8 *messram_ptr = messram_get_ptr( messram );
 
 		if ( pia0_porta & 0x01 )
 			messram_ptr += 0x10000;
@@ -82,6 +96,13 @@ public:
 			memory_set_bankptr(machine, "c000", vram_region->base() );
 	}
 
+	void update_irq_state(running_machine *machine)
+	{
+		if ( pia0_irq_state || pia1_irq_state )
+			cpu_set_input_line( maincpu, 0, ASSERT_LINE );
+		else
+			cpu_set_input_line( maincpu, 0, CLEAR_LINE );
+	}
 };
 
 
@@ -95,6 +116,14 @@ static WRITE8_HANDLER( osbexec_0000_w )
 		if ( offset < 0x1000 )
 			state->fontram[ offset ] = data;
 	}
+}
+
+
+static READ8_HANDLER( osbexec_rtc_r )
+{
+	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+
+	return state->rtc;
 }
 
 
@@ -117,7 +146,7 @@ static ADDRESS_MAP_START( osbexec_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0C, 0x0F ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
 	/* 0x10 - 0x13 - 6821 PIA @UD8 */
 	/* 0x14 - 0x17 - kbd */
-	/* 0x18 - 0x1b - "RTC" */
+	AM_RANGE( 0x18, 0x1b ) AM_READ( osbexec_rtc_r )								/* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 ADDRESS_MAP_END
 
@@ -274,11 +303,20 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 {
 	osbexec_state *state = device->machine->driver_data<osbexec_state>();
-	running_device *speaker = device->machine->device("speaker");
 
 	state->pia0_portb = data;
 
-	speaker_level_w( speaker, ( data & 0x08 ) ? 0 : 1 );
+	speaker_level_w( state->speaker, ( data & 0x08 ) ? 0 : 1 );
+	wd17xx_dden_w( state->mb8877, ( data & 0x01 ) ? 1 : 0 );
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_irq )
+{
+	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+
+	st->pia0_irq_state = state;
+	st->update_irq_state( device->machine );
 }
 
 
@@ -294,9 +332,18 @@ static const pia6821_interface osbexec_pia0_config =
 	DEVCB_HANDLER( osbexec_pia0_b_w ),	/* out_b_func */		/* modem / speaker */
 	DEVCB_NULL,							/* out_ca2_func */		/* Keyboard strobe */
 	DEVCB_NULL,							/* out_cb2_func */		/* 60/50 */
-	DEVCB_NULL,							/* irq_a_func */		/* IRQ */
-	DEVCB_NULL							/* irq_b_func */		/* IRQ */
+	DEVCB_LINE( osbexec_pia0_irq ),		/* irq_a_func */		/* IRQ */
+	DEVCB_LINE( osbexec_pia0_irq )		/* irq_b_func */		/* IRQ */
 };
+
+
+static WRITE_LINE_DEVICE_HANDLER( osbexec_pia1_irq )
+{
+	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+
+	st->pia1_irq_state = state;
+	st->update_irq_state( device->machine );
+}
 
 
 static const pia6821_interface osbexec_pia1_config =
@@ -311,8 +358,8 @@ static const pia6821_interface osbexec_pia1_config =
 	DEVCB_NULL,							/* out_b_func */
 	DEVCB_NULL,							/* out_ca2_func */
 	DEVCB_NULL,							/* out_cb2_func */
-	DEVCB_NULL,							/* irq_a_func */
-	DEVCB_NULL							/* irq_b_func */
+	DEVCB_LINE( osbexec_pia1_irq ),		/* irq_a_func */
+	DEVCB_LINE( osbexec_pia1_irq )		/* irq_b_func */
 };
 
 
@@ -397,19 +444,19 @@ static const floppy_config osbexec_floppy_config =
 static TIMER_CALLBACK( osbexec_video_callback )
 {
 	osbexec_state *state = machine->driver_data<osbexec_state>();
-	running_device *pia_0 = machine->device("pia_0");
 	int y = machine->primary_screen->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
 	{
 		/* Clear CB1 on PIA @ UD12 */
-		pia6821_cb1_w( pia_0, 0 );
+		pia6821_cb1_w( state->pia_0, 0 );
 	}
 	else if ( y == 240 )
 	{
 		/* Set CB1 on PIA @ UD12 */
-		pia6821_cb1_w( pia_0, 1 );
+		pia6821_cb1_w( state->pia_0, 1 );
+		state->rtc++;
 	}
 	if ( y < 240 )
 	{
@@ -427,6 +474,14 @@ static TIMER_CALLBACK( osbexec_video_callback )
 			/* Check for underline */
 			if ( ( attr & 0x40 ) && char_line == 9 )
 				font_bits = 0xFF;
+
+			/* Check for blink */
+			if ( ( attr & 0x20 ) && ( state->rtc & 0x10 ) )
+				font_bits = 0;
+
+			/* Check for inverse video */
+			if ( attr & 0x10 )
+				font_bits ^= 0xFF;
 
 			for ( int b = 0; b < 8; b++ )
 			{
@@ -457,6 +512,20 @@ static DRIVER_INIT( osbexec )
 }
 
 
+static MACHINE_START( osbexec )
+{
+	osbexec_state *state = machine->driver_data<osbexec_state>();
+
+	state->maincpu = machine->device( "maincpu" );
+	state->mb8877  = machine->device( "mb8877" );
+	state->messram = machine->device( "messram" );
+	state->pia_0   = machine->device( "pia_0" );
+	state->pia_1   = machine->device( "pia_1" );
+	state->sio     = machine->device( "sio" );
+	state->speaker = machine->device( "speaker" );
+}
+
+
 static MACHINE_RESET( osbexec )
 {
 	osbexec_state *state = machine->driver_data<osbexec_state>();
@@ -466,14 +535,25 @@ static MACHINE_RESET( osbexec )
 	state->set_banks( machine );
 
 	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( 0, 0 ), 0 );
+
+	state->rtc = 0;
 }
+
+
+static const z80_daisy_config osbexec_daisy_config[] =
+{
+    { "sio" },
+	{ NULL }
+};
 
 
 static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
 	MDRV_CPU_PROGRAM_MAP( osbexec_mem)
 	MDRV_CPU_IO_MAP( osbexec_io)
+	MDRV_CPU_CONFIG( osbexec_daisy_config )
 
+	MDRV_MACHINE_START( osbexec )
 	MDRV_MACHINE_RESET( osbexec )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
