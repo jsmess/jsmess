@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "s3c2410.h"
+#include "machine/s3c2410.h"
 #include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -26,8 +26,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
 	}
 }
-
-#include "machine/s3c2410.h"
 
 #define DEVICE_S3C2410
 #include "machine/s3c24xx.c"
@@ -57,7 +55,7 @@ DEVICE_START( s3c2410 )
 	memory_install_readwrite32_device_handler( space, device, 0x4b000080, 0x4b0000a3, 0, 0, s3c24xx_dma_2_r, s3c24xx_dma_2_w);
 	memory_install_readwrite32_device_handler( space, device, 0x4b0000c0, 0x4b0000e3, 0, 0, s3c24xx_dma_3_r, s3c24xx_dma_3_w);
 	memory_install_readwrite32_device_handler( space, device, 0x4c000000, 0x4c000017, 0, 0, s3c24xx_clkpow_r, s3c24xx_clkpow_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4d000000, 0x4d000063, 0, 0, s3c24xx_lcd_r, s3c24xx_lcd_w);
+	memory_install_readwrite32_device_handler( space, device, 0x4d000000, 0x4d000063, 0, 0, s3c2410_lcd_r, s3c24xx_lcd_w);
 	memory_install_readwrite32_device_handler( space, device, 0x4d000400, 0x4d0007ff, 0, 0, s3c24xx_lcd_palette_r, s3c24xx_lcd_palette_w);
 	memory_install_readwrite32_device_handler( space, device, 0x4e000000, 0x4e000017, 0, 0, s3c24xx_nand_r, s3c24xx_nand_w);
 	memory_install_readwrite32_device_handler( space, device, 0x50000000, 0x5000002b, 0, 0, s3c24xx_uart_0_r, s3c24xx_uart_0_w);
@@ -108,6 +106,11 @@ void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)
 {
 	mecc[0] = mecc[1] = mecc[2] = mecc[3] = 0;
 	for (int i = 0; i < size; i++) nand_update_mecc( mecc, i, data[i]);
+}
+
+void s3c2410_request_eint( running_device *device, UINT32 number)
+{
+	s3c24xx_request_eint( device, number);
 }
 
 DEFINE_LEGACY_DEVICE(S3C2410, s3c2410);

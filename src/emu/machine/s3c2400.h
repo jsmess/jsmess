@@ -1,19 +1,19 @@
 /*******************************************************************************
 
-    Samsung S3C2400 private data
+    Samsung S3C2400
 
 *******************************************************************************/
 
 #ifndef __S3C2400_H__
 #define __S3C2400_H__
 
+#include "devlegcy.h"
+
 /*******************************************************************************
     MACROS / CONSTANTS
 *******************************************************************************/
 
 #define S3C2400_TAG "s3c2400"
-
-#define S3C2400 DEVICE_GET_INFO_NAME( s3c2400 )
 
 #define MDRV_S3C2400_ADD(_tag, _clock, _config) \
     MDRV_DEVICE_ADD(_tag, S3C2400, _clock) \
@@ -32,6 +32,8 @@ enum
 	S3C2400_GPIO_PORT_F,
 	S3C2400_GPIO_PORT_G
 };
+
+DECLARE_LEGACY_DEVICE(S3C2400, s3c2400);
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -583,6 +585,7 @@ typedef struct
 typedef struct
 {
 	s3c24xx_irq_regs_t regs;
+	int line_irq, line_fiq;
 } s3c24xx_irq_t;
 
 typedef struct

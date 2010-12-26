@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    Samsung S3C2410 private data
+    Samsung S3C2410
 
 *******************************************************************************/
 
@@ -36,7 +36,7 @@ enum
 
 DECLARE_LEGACY_DEVICE(S3C2410, s3c2410);
 
-READ32_DEVICE_HANDLER( s3c24xx_lcd_r );
+READ32_DEVICE_HANDLER( s3c2410_lcd_r );
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -102,6 +102,7 @@ VIDEO_UPDATE( s3c2410 );
 
 void s3c2410_uart_fifo_w( running_device *device, int uart, UINT8 data);
 void s3c2410_touch_screen( running_device *device, int state);
+void s3c2410_request_eint( running_device *device, UINT32 number);
 
 WRITE_LINE_DEVICE_HANDLER( s3c2410_pin_frnb_w );
 
@@ -711,6 +712,7 @@ typedef struct
 typedef struct
 {
 	s3c24xx_irq_regs_t regs;
+	int line_irq, line_fiq;
 } s3c24xx_irq_t;
 
 typedef struct
@@ -778,6 +780,7 @@ typedef struct
 {
 	s3c24xx_wdt_regs_t regs;
 	emu_timer *timer;
+	UINT32 freq, cnt;
 } s3c24xx_wdt_t;
 
 typedef struct
