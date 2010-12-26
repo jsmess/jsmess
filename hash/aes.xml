@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Based of MAME 0.140 Neo Geo driver -->
+<!-- Based on MAME Neo Geo driver.  Last update: 27/12/2010 -->
 
 <softwarelist name="aes" description="SNK Neo Geo AES cartridges">
 <!-- ID 001 -->
@@ -512,6 +512,35 @@
 			<dataarea name="sprites" size="2097152">
                 <rom name="023-c1.bin" size="1048576" crc="2999535a" sha1="0deabf771039987b559edc2444eea741bd7ba861" offset="0x000000" loadflag="load16_byte" />
                 <rom name="023-c2.bin" size="1048576" crc="876a99e6" sha1="8d1dcfc0927d7523f8be8203573192406ec654b4" offset="0x000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 025 -->
+	<software name="eightman">
+		<description>Eight Man</description>
+		<year>1991</year>
+		<publisher>SNK / Pallas</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="025-p1.bin" size="524288" crc="43344cb0" sha1="29dfd699f35b0a74e20fedd6c9174c289f0ef6e0" offset="0x000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="025-s1.bin" size="131072" crc="a402202b" sha1="75c44e1af459af155f5b892fd18706268dd5e602" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="025-m1.bin" size="131072" crc="9927034c" sha1="205665361c5b2ab4f01ec480dd3c9b69db858d09" offset="0x000000" />
+				<rom size="131072" offset="0x010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+                <rom name="025-v1.bin" size="1048576" crc="4558558a" sha1="a4b277703ed67225c652be0d618daeca65a27b88" offset="0x000000" />
+                <rom name="025-v2.bin" size="1048576" crc="c5e052e9" sha1="fa1119c90ce4c706a6aa0c17d7bc06aa3068d9b2" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+                <rom name="025-c1.bin" size="1048576" crc="555e16a4" sha1="1c96f3d2fd0991680fbf627a6cdd26ad2cd60319" offset="0x000000" loadflag="load16_byte" />
+                <rom name="025-c2.bin" size="1048576" crc="e1ee51c3" sha1="da8d074bb4e923ed7b8a154fd31b42f2d65b8e96" offset="0x000001" loadflag="load16_byte" />
+                <rom name="025-c3.bin" size="524288" crc="0923d5b0" sha1="ab72ba1e3ebf56dd356f9ad181f986b1360a1089" offset="0x200000" loadflag="load16_byte" />
+                <rom name="025-c4.bin" size="524288" crc="e3eca67b" sha1="88154cbc1a261c2f425430119ebc08a30adc9675" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
