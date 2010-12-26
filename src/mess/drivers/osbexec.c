@@ -61,6 +61,7 @@ public:
 
 	/* PIA 0 (UD12) */
 	UINT8	pia0_porta;
+	UINT8	pia0_portb;
 
 
 	void set_banks(running_machine *machine)
@@ -262,16 +263,35 @@ static WRITE8_DEVICE_HANDLER( osbexec_pia0_a_w )
 }
 
 
+static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
+{
+	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+
+	return state->pia0_portb;
+}
+
+
+static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
+{
+	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+	running_device *speaker = device->machine->device("speaker");
+
+	state->pia0_portb = data;
+
+	speaker_level_w( speaker, ( data & 0x08 ) ? 0 : 1 );
+}
+
+
 static const pia6821_interface osbexec_pia0_config =
 {
 	DEVCB_HANDLER( osbexec_pia0_a_r ),	/* in_a_func */			/* port A - banking */
-	DEVCB_NULL,							/* in_b_func */			/* modem / speaker */
+	DEVCB_HANDLER( osbexec_pia0_b_r),	/* in_b_func */			/* modem / speaker */
 	DEVCB_NULL,							/* in_ca1_func */		/* DMA IRQ */
 	DEVCB_NULL,							/* in_cb1_func */		/* Vblank (rtc irq) */
 	DEVCB_NULL,							/* in_ca2_func */
 	DEVCB_NULL,							/* in_cb2_func */
 	DEVCB_HANDLER( osbexec_pia0_a_w ),	/* out_a_func */		/* port A - banking */
-	DEVCB_NULL,							/* out_b_func */		/* modem / speaker */
+	DEVCB_HANDLER( osbexec_pia0_b_w ),	/* out_b_func */		/* modem / speaker */
 	DEVCB_NULL,							/* out_ca2_func */		/* Keyboard strobe */
 	DEVCB_NULL,							/* out_cb2_func */		/* 60/50 */
 	DEVCB_NULL,							/* irq_a_func */		/* IRQ */
