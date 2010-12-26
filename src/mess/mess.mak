@@ -396,6 +396,7 @@ DRVLIBS = \
 	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/tiger.a \
+	$(MESSOBJ)/tigertel.a \
 	$(MESSOBJ)/tiki.a \
 	$(MESSOBJ)/tomy.a \
 	$(MESSOBJ)/toshiba.a \
@@ -1601,6 +1602,11 @@ $(MESSOBJ)/tiger.a:				\
 	$(MESS_DRIVERS)/gamecom.o	\
 	$(MESS_MACHINE)/gamecom.o	\
 	$(MESS_VIDEO)/gamecom.o		\
+
+$(MESSOBJ)/tigertel.a:			\
+	$(MESS_DRIVERS)/gizmondo.o	\
+	$(MESS_MACHINE)/docg3.o		\
+	$(MESS_VIDEO)/gf4500.o		\
 
 $(MESSOBJ)/tiki.a:				\
 	$(MESS_DRIVERS)/tiki100.o	\

@@ -1288,6 +1288,9 @@ const game_driver * const drivers[] =
 	/* Tiger Electronics */
 	DRIVER( gamecom )   /* Tiger Game.com      */
 
+	/* Tiger Telematics */
+	DRIVER( gizmondo )
+
 	/* Thomson */
 	DRIVER( t9000 )	 /* 1980 Thomson T9000 (TO7 prototype)     */
 	DRIVER( to7 )	   /* 1982 Thomson TO7   */

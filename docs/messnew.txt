@@ -17,6 +17,7 @@ New System Drivers Supported:
 - Impuls-03 [Miodrag Milanovic]
 - Advanced Bridge Challenger (not working) [Kevtris, Lord Nightmare, Sandro Ronco]
 - Elektronika MC-1502 (not working) [Miodrag Milanovic]
+- Tiger Telematics Gizmondo (not working) [Tim Schuerewegen]
 
 
 
