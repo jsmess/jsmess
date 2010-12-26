@@ -39,6 +39,7 @@ Boot sequence:
 #include "sound/speaker.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
+#include "machine/z80dart.h"
 #include "machine/pit8253.h"
 #include "devices/messram.h"
 
@@ -109,10 +110,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( osbexec_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE( "pia_0", pia6821_r, pia6821_w )		/* 6821 PIA UD12 */
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE( "pia_0", pia6821_r, pia6821_w )		/* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
 	/* 0x08 - 0x0B - MB8877 @UB17 */
-	/* 0x0c - 0x0f - SIO @UD4 */
+	AM_RANGE( 0x0C, 0x0F ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
 	/* 0x10 - 0x13 - 6821 PIA @UD8 */
 	/* 0x14 - 0x17 - kbd */
 	/* 0x18 - 0x1b - "RTC" */
@@ -225,6 +226,20 @@ static PALETTE_INIT( osbexec )
   PA2 - BANK3ENA
   PA1 - BANK2ENA
   PA0 - BANK1ENA
+  CA1 - DMA IRQ
+  CA2 - KBD STB (i/o)
+
+  Port B:
+  PB7 - MODEM RI (input)
+  PB6 - MODEM DSR (input)
+  PB5 - TXC SEL
+  PB4 - RXC SEL
+  PB3 - speaker
+  PB2 - DSEL2
+  PB1 - DSEL1
+  PB0 - DDEN
+  CB1 - VBlank (input)
+  CB2 - 60/50 (?)
 */
 
 static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
@@ -278,6 +293,28 @@ static const pia6821_interface osbexec_pia1_config =
 	DEVCB_NULL,							/* out_cb2_func */
 	DEVCB_NULL,							/* irq_a_func */
 	DEVCB_NULL							/* irq_b_func */
+};
+
+
+static Z80DART_INTERFACE( osbexec_sio_config )
+{
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL	//DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
 
 
@@ -360,7 +397,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 		UINT16 *p = BITMAP_ADDR16( machine->generic.tmpbitmap, y, 0 );
 		UINT8 char_line = y % 10;
 
-		for ( int x = 0; x < 64; x++ )
+		for ( int x = 0; x < 80; x++ )
 		{
 			UINT8 ch = state->vram[ row_addr + x ];
 			UINT8 attr = state->vram[ 0x1000 + row_addr + x ];
@@ -421,7 +458,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 640, 0, 512, 260, 0, 240 )	/* May not be correct */
+	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 	MDRV_PALETTE_LENGTH( 3 )
@@ -436,7 +473,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MDRV_PIA6821_ADD( "pia_0", osbexec_pia0_config )
 	MDRV_PIA6821_ADD( "pia_1", osbexec_pia1_config )
 
-//	MDRV_Z80SIO0_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
+	MDRV_Z80SIO2_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
 
 	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
@@ -454,4 +491,4 @@ ROM_START( osbexec )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec,    osbexec,    "Osborne",  "Executive",    0 )
+COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec,    osbexec,    "Osborne",  "Executive",    GAME_NOT_WORKING )
