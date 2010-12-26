@@ -64,16 +64,16 @@ static DEVICE_NVRAM( diskonchip_g3 );
 INLINE diskonchip_g3_t *get_token( running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == DISKONCHIP_G3);
-	assert(device->token != NULL);
+	assert(device->type() == DISKONCHIP_G3);
+	assert(downcast<legacy_device_base *>(device)->token() != NULL);
 	return (diskonchip_g3_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const diskonchip_g3_config *get_config( running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == DISKONCHIP_G3);
-	assert(device->inline_config != NULL);
+	assert(device->type() == DISKONCHIP_G3);	
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	return (const diskonchip_g3_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
