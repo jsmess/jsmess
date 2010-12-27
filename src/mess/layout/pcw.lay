@@ -17,7 +17,7 @@
 			<bounds left="0" top="20" right="40" bottom="50" />
 		</screen>
 		<screen index="1">
-			<bounds left="10" top="0" right="30" bottom="20" />
+			<bounds left="0" top="0" right="40" bottom="20" />
 		</screen>
 	</view>
 </mamelayout>
