@@ -73,6 +73,8 @@ The software list will be divided in four categories:
 4. Bad dumps: Known bad dumps, need redumps
 -->
 
+<softwarelist name="snes" description="Nintendo SNES cartridges">
+
 <!-- List of perfect dumps -->
 	
 	<software name="ff4j" cloneof="ff2">
@@ -600,7 +602,6 @@ The software list will be divided in four categories:
 
 <!-- List of unclassified dumps -->
 
-<softwarelist name="snes" description="Nintendo SNES cartridges">
 	<software name="96zenko">
 		<!-- Serial:  - Release Date: 1996-03-22 -->
 		<description>'96 Zenkoku Koukou Soccer Senshuken (Jpn)</description>
