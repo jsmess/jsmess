@@ -704,7 +704,7 @@ static void modeE7_switch(running_machine *machine, UINT16 offset, UINT8 data)
 static void modeE7_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
-	memory_set_bankptr(machine,"bank9", state->extra_RAM + (4 + offset) * 256 );
+	memory_set_bankptr(machine,"bank9", state->extra_RAM->base() + (4 + offset) * 256 );
 }
 static void modeDC_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
@@ -1969,7 +1969,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_write8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
 		memory_install_read8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
 		memory_install_readwrite_bank(space, 0x1800, 0x18ff, 0, 0, "bank9");
-		memory_set_bankptr(machine, "bank9", state->extra_RAM + 4 * 256 );
+		memory_set_bankptr(machine, "bank9", state->extra_RAM->base() + 4 * 256 );
 		break;
 
 	case modeDC:
@@ -2043,7 +2043,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_write_bank(space, 0x1000, 0x10ff, 0, 0, "bank9");
 		memory_install_read_bank(space, 0x1100, 0x11ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->extra_RAM);
+		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}
 
 	if (state->banking_mode == modeCV)
@@ -2051,7 +2051,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_write_bank(space, 0x1400, 0x17ff, 0, 0, "bank9");
 		memory_install_read_bank(space, 0x1000, 0x13ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->extra_RAM);
+		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}
 
 	if (chip)
@@ -2059,7 +2059,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_write_bank(space, 0x1000, 0x107f, 0, 0, "bank9");
 		memory_install_read_bank(space, 0x1080, 0x10ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->extra_RAM);
+		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */

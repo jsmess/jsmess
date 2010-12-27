@@ -50,6 +50,9 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [A2600] Fixed a bug that could cause crashes on exits.  (bug #1948)
+  [Atari Ace]
+
 - [ABC80] Added graphics PROMs. [Ola Andersson]
 
 - [ABC80] Refactored video to work like real hardware. [Curt Coder]
