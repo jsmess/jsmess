@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+ <!--
+  Credits:
+  - Yakushi~Kabuto, JohnDie, Tori, Zidanax, Evan_G
+-->
+
 <!--
 Undumped
 
-  Japan:
+  Japan
 
   - 1992 Nintendo Challenge (Japan)
   - Dai-3-Ji Super Robot Taisen (Japan) (Rev C) C2941881
@@ -31,6 +36,7 @@ Undumped
   - Super Shougi (Rev A)
   - Tsukikomori (Japan) (v1.1) (NP) F37C6726
 
+  To be confirmed:
   - J.League Excite Stage '96 (Japan) (Sample)
   - Little Master - Nijiiro no Maseki (Japan) (Sample)
   - Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
@@ -81,6 +87,9 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-f4-1.u1" size="1048576" crc="caa15e97" sha1="eac14578b3465ffce874119005f9b244e8565a79" offset="000000" />
 			</dataarea>
@@ -99,6 +108,9 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-f4-0.u1" size="1048576" crc="21027c5d" sha1="7502ed13fe969b294aab9ea3600dd8341713cd03" offset="000000" />
 			</dataarea>
@@ -117,6 +129,9 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-fe-0.u1" size="1048576" crc="6cda700c" sha1="a2d04c5f3948ca930d2c0bc4e6f34d62f06a9fa5" offset="000000" />
 			</dataarea>
@@ -137,7 +152,7 @@ The software list will be divided in four categories:
 			<feature name="battery" value="CR2032" />
 			<feature name="cart_revision" value="N/A" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_serial" value="920214" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-f5-0.u1" size="2097152" crc="c1bc267d" sha1="e937b54fff99838e2e853697e4f559359aa91fd6" offset="000000" />
 			</dataarea>
@@ -160,7 +175,7 @@ The software list will be divided in four categories:
 			<feature name="battery" value="CR2032" />
 			<feature name="cart_revision" value="N/A" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_serial" value="920214" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-f5-0.p0.u1" size="1048576" crc="f6ccde10" sha1="a8a33c75cca3190de0b7f19aa1fcf089c8d1021a" offset="000000" />
 				<rom name="shvc-f5-0.p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="0x100000" />
@@ -207,11 +222,53 @@ The software list will be divided in four categories:
 			<feature name="battery" value="CR2032" />
 			<feature name="cart_revision" value="N/A" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_serial" value="920214" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728 ">		
 				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
 				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
 				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romsaga">
+		<!-- Serial:  - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
+		<description>Romancing SaGa (Jpn, Rev. 1)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 [note:74LS139]" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-rs-1.u1" size="1048576" crc="9684526d" sha1="6ab826e716869d4065307186a09925dde7cd488d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romsagaa" cloneof="romsaga">
+		<!-- Serial: SHVC-RS - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
+		<description>Romancing SaGa (Jpn)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 [note:74LS139]" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-rs-0.u1" size="1048576" crc="a6d82435" sha1="d00960176aa980dbd7bff4062e52b7450b9986dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26110,30 +26167,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="romance of the three kingdoms iv - wall of fire (usa).sfc" size="3145728" crc="82af5b69" sha1="9a42db6cde28a35419f0e2464090d6e96a47054a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="romsaga">
-		<!-- Serial:  - Release Date: 1992-01-28 -->
-		<description>Romancing SaGa (Jpn, Rev. 1)</description>
-		<year>1992</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="romancing saga (japan) (rev 1).sfc" size="1048576" crc="9684526d" sha1="6ab826e716869d4065307186a09925dde7cd488d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="romsagaa" cloneof="romsaga">
-		<!-- Serial: SHVC-RS - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
-		<description>Romancing SaGa (Jpn)</description>
-		<year>1992</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="romancing saga (japan).sfc" size="1048576" crc="a6d82435" sha1="d00960176aa980dbd7bff4062e52b7450b9986dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
