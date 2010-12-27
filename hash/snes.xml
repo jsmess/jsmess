@@ -6,17 +6,36 @@ Undumped
 
   - Japan:
 
+  -- 1992 Nintendo Challenge (Japan)
+  -- Dai-3-Ji Super Robot Taisen (Japan) (Rev C) C2941881
+  -- Doraemon - Nobita to Yousei no Kuni (Japan) (Rev A) 55E44983
+  -- Eiga Shoukai Soft - Mizu no Tabinin (Japan) unconfirmed
+  -- GAMARS Genuine Taiwan Mahjong 16 (Japan) (Unl)
+  -- GAMARS Taiwan Chess (Japan) (Unl)
   -- Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan) (Rev A)
   -- Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Riyuu (Japan) (Rev A)
+  -- Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame (Japan) (Rev A) 458C473B
+  -- Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame (Japan) (Rev B) AF984BC1
+  -- Magical Drop 2 - Bunka Housou Special Version (Japan)
+  -- Pro Action Replay - High Tech Option Series (Japan) (Unl)
+  -- Pro Mahjong Kiwame (Rev A)
+  -- Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
+  -- Satellaview BS-X (Japan) (Rev 0)
+  -- Shin Chou Kouki (Japan) (Rev A) 1A77CF3B
+  -- Shin Megami Tensai if... (Rev A) 77D02030
+  -- Shin Megami Tensei II (J) (Rev A) 84268A75
+  -- Shin Megami Tensei II (J) (Rev B) E38228A7
+  -- Shodai Nekketsu Kouha Kunio-kun (Japan) (Rev A) 5DF55465
+  -- Super Jinsei Game 2 (Rev B)
+  -- Super Mahjong Taikai (Japan) (Rev B)
+  -- Super Shougi (Rev A)
+  -- Tsukikomori (Japan) (v1.1) (NP) F37C6726
+
   -- J.League Excite Stage '96 (Japan) (Sample)
   -- Little Master - Nijiiro no Maseki (Japan) (Sample)
-  -- Magical Drop 2 - Bunka Housou Special Version (Japan) -- (1996) by Bandai (special version in collaboration with a radio program)
   -- Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
   -- Pro Yakyuu Nettou Puzzle Stadium (Japan) (Sample)
-  -- BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan) -- Initial release/Rev 0
-  -- Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
   -- Super Mario Club Taikai You (Japan)
-  -- Super Mahjong Taikai (Japan) (Rev B)
   -- Super Street Fighter II (Japan) (Sample)
   -- Wild Trax (Japan) (Sample)
   
@@ -49,8 +68,62 @@ The software list will be divided in four categories:
 -->
 
 <!-- List of perfect dumps -->
+	
+	<software name="ff4j" cloneof="ff2">
+		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
+		<description>Final Fantasy IV (Jpn, Rev. 1)</description>
+		<year>1991</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 [note:74LS139]" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-f4-1.u1" size="1048576" crc="caa15e97" sha1="eac14578b3465ffce874119005f9b244e8565a79" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="ffant5j">
+	<software name="ff4ja" cloneof="ff2">
+		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
+		<description>Final Fantasy IV (Jpn)</description>
+		<year>1991</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 [note:74LS139]" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-f4-0.u1" size="1048576" crc="21027c5d" sha1="7502ed13fe969b294aab9ea3600dd8341713cd03" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ff4je" cloneof="ff2">
+		<!-- Serial: SHVC-FE - Release Date: 1991-10-29 - Alt. Title: ファイナルファンタジーIV イージータイプ -->
+		<description>Final Fantasy IV - Easy Type (Jpn)</description>
+		<year>1991</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 [note:74LS139]" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-fe-0.u1" size="1048576" crc="6cda700c" sha1="a2d04c5f3948ca930d2c0bc4e6f34d62f06a9fa5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ff5j">
 		<!-- Serial: SHVC-F5 - Release Date: 1992-12-06 - Alt. Title: ファイナルファンタジーV -->
 		<description>Final Fantasy V (Jpn)</description>
 		<year>1992</year>
@@ -70,8 +143,8 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
-	
-	<software name="ffant5ja" cloneof="ffant5j">
+
+	<software name="ff5ja" cloneof="ff5j">
 		<!-- Serial: SHVC-F5 - Release Date: 1992-12-06 - Alt. Title: ファイナルファンタジーV -->
 		<description>Final Fantasy V (Jpn, Alt)</description>
 		<year>1992</year>
@@ -95,7 +168,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant6j" cloneof="ffant3">
+	<software name="ff6j" cloneof="ff3">
 		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
 		<description>Final Fantasy VI (Jpn)</description>
 		<year>1994</year>
@@ -117,7 +190,7 @@ The software list will be divided in four categories:
  		</part>
  	</software>
 
-	<software name="ffant6ja" cloneof="ffant3">
+	<software name="ff6ja" cloneof="ff3">
 		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
 		<description>Final Fantasy VI (Jpn, Alt)</description>
 		<year>1994</year>
@@ -9786,7 +9859,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffantmq" cloneof="mquest">
+	<software name="ffmq" cloneof="mquest">
 		<!-- Serial:  - Release Date: 1992-10 -->
 		<description>Final Fantasy - Mystic Quest (USA, Rev. 1)</description>
 		<year>1992</year>
@@ -9798,7 +9871,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffantmqa" cloneof="mquest">
+	<software name="ffmqa" cloneof="mquest">
 		<!-- Serial:  - Release Date: 1992-10 -->
 		<description>Final Fantasy - Mystic Quest (USA)</description>
 		<year>1992</year>
@@ -9810,7 +9883,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant2">
+	<software name="ff2">
 		<!-- Serial:  - Release Date: 1991-11 -->
 		<description>Final Fantasy II (USA, Rev. 1)</description>
 		<year>1991</year>
@@ -9822,7 +9895,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant2a" cloneof="ffant2">
+	<software name="ff2a" cloneof="ff2">
 		<!-- Serial:  - Release Date: 1991-11 -->
 		<description>Final Fantasy II (USA)</description>
 		<year>1991</year>
@@ -9834,7 +9907,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant3">
+	<software name="ff3">
 		<!-- Serial:  - Release Date: 1994-10 -->
 		<description>Final Fantasy III (USA, Rev. 1)</description>
 		<year>1994</year>
@@ -9846,7 +9919,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant3a" cloneof="ffant3">
+	<software name="ff3a" cloneof="ff3">
 		<!-- Serial:  - Release Date: 1994-10 -->
 		<description>Final Fantasy III (USA)</description>
 		<year>1994</year>
@@ -9858,43 +9931,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ffant4j" cloneof="ffant2">
-		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
-		<description>Final Fantasy IV (Jpn, Rev. 1)</description>
-		<year>1991</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="final fantasy iv (japan) (rev 1).sfc" size="1048576" crc="caa15e97" sha1="eac14578b3465ffce874119005f9b244e8565a79" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffant4ja" cloneof="ffant2">
-		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
-		<description>Final Fantasy IV (Jpn)</description>
-		<year>1991</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="final fantasy iv (japan).sfc" size="1048576" crc="21027c5d" sha1="7502ed13fe969b294aab9ea3600dd8341713cd03" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffant4je" cloneof="ffant2">
-		<!-- Serial: SHVC-FE - Release Date: 1991-10-29 - Alt. Title: ファイナルファンタジーIV イージータイプ -->
-		<description>Final Fantasy IV - Easy Type (Jpn)</description>
-		<year>1991</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="final fantasy iv - easy type (japan).sfc" size="1048576" crc="6cda700c" sha1="a2d04c5f3948ca930d2c0bc4e6f34d62f06a9fa5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffantmqj" cloneof="mquest">
+	<software name="ffmqj" cloneof="mquest">
 		<!-- Serial: SHVC-MQ - Release Date: 1993-09-10 - Alt. Title: ファイナル ファンタジーUSAミスティック クエスト -->
 		<description>Final Fantasy USA - Mystic Quest (Jpn)</description>
 		<year>1993</year>
