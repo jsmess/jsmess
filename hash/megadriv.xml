@@ -23985,7 +23985,7 @@ Known undumped pirates
 		<publisher>Radica Games / Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="12582912">
-				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="000000" loadflag="load16_word_swap" loadflag="load16_word_swap" />
+				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="000000" loadflag="load16_word_swap" />
 				<rom size="4194304" offset="0x400000" loadflag="reload" />
 				<rom size="4194304" offset="0x800000" loadflag="reload" />
 			</dataarea>
@@ -23998,7 +23998,7 @@ Known undumped pirates
 		<publisher>Radica Games / Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="12582912">
-				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="000000" loadflag="load16_word_swap" loadflag="load16_word_swap" />
+				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="000000" loadflag="load16_word_swap" />
 				<rom size="4194304" offset="0x400000" loadflag="reload" />
 				<rom size="4194304" offset="0x800000" loadflag="reload" />
 			</dataarea>
