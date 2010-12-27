@@ -71,6 +71,7 @@ public:
 	UINT8	pia0_porta;
 	UINT8	pia0_portb;
 	int		pia0_irq_state;
+	int		pia0_cb2;			/* 60/50 */
 
 	/* PIA 1 (UD8) */
 	int		pia1_irq_state;
@@ -119,6 +120,38 @@ static WRITE8_HANDLER( osbexec_0000_w )
 }
 
 
+static READ8_HANDLER( osbexec_kbd_r )
+{
+	UINT8 data = 0xFF;
+
+	if ( offset & 0x0100 )
+		data &= input_port_read( space->machine, "ROW0" );
+
+	if ( offset & 0x0200 )
+		data &= input_port_read( space->machine, "ROW1" );
+
+	if ( offset & 0x0400 )
+		data &= input_port_read( space->machine, "ROW2" );
+
+	if ( offset & 0x0800 )
+		data &= input_port_read( space->machine, "ROW3" );
+
+	if ( offset & 0x1000 )
+		data &= input_port_read( space->machine, "ROW4" );
+
+	if ( offset & 0x2000 )
+		data &= input_port_read( space->machine, "ROW5" );
+
+	if ( offset & 0x4000 )
+		data &= input_port_read( space->machine, "ROW6" );
+
+	if ( offset & 0x8000 )
+		data &= input_port_read( space->machine, "ROW7" );
+
+	return data;
+}
+
+
 static READ8_HANDLER( osbexec_rtc_r )
 {
 	osbexec_state *state = space->machine->driver_data<osbexec_state>();
@@ -139,14 +172,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( osbexec_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE( "pia_0", pia6821_r, pia6821_w )		/* 6821 PIA @ UD12 */
+	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_r, pia6821_w )				/* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
-	/* 0x08 - 0x0B - MB8877 @UB17 */
-	AM_RANGE( 0x0C, 0x0F ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
-	/* 0x10 - 0x13 - 6821 PIA @UD8 */
-	/* 0x14 - 0x17 - kbd */
-	AM_RANGE( 0x18, 0x1b ) AM_READ( osbexec_rtc_r )								/* "RTC" @ UE13/UF13 */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "mb8877", wd17xx_r, wd17xx_w )				/* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
+	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_r, pia6821_w )				/* 6821 PIA @ UD8 */
+	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ( osbexec_kbd_r )					/* KBD */
+	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ( osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 ADDRESS_MAP_END
 
@@ -311,6 +343,20 @@ static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 }
 
 
+static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_ca2_w )
+{
+	logerror("osbexec_pia0_ca2_w: state = %d\n", state);
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_cb2_w )
+{
+	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+
+	st->pia0_cb2 = state;
+}
+
+
 static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_irq )
 {
 	osbexec_state *st = device->machine->driver_data<osbexec_state>();
@@ -330,8 +376,8 @@ static const pia6821_interface osbexec_pia0_config =
 	DEVCB_NULL,							/* in_cb2_func */
 	DEVCB_HANDLER( osbexec_pia0_a_w ),	/* out_a_func */		/* port A - banking */
 	DEVCB_HANDLER( osbexec_pia0_b_w ),	/* out_b_func */		/* modem / speaker */
-	DEVCB_NULL,							/* out_ca2_func */		/* Keyboard strobe */
-	DEVCB_NULL,							/* out_cb2_func */		/* 60/50 */
+	DEVCB_LINE( osbexec_pia0_ca2_w ),	/* out_ca2_func */		/* Keyboard strobe */
+	DEVCB_LINE( osbexec_pia0_cb2_w ),	/* out_cb2_func */		/* 60/50 */
 	DEVCB_LINE( osbexec_pia0_irq ),		/* irq_a_func */		/* IRQ */
 	DEVCB_LINE( osbexec_pia0_irq )		/* irq_b_func */		/* IRQ */
 };
@@ -382,6 +428,15 @@ static Z80DART_INTERFACE( osbexec_sio_config )
 	DEVCB_NULL,
 
 	DEVCB_NULL	//DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+};
+
+
+static const wd17xx_interface osbexec_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE( "pia1", pia6821_cb1_w ),
+	DEVCB_NULL,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 
