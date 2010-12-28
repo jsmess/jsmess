@@ -50,7 +50,7 @@ static WRITE8_HANDLER( jupiter_expram_w );
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, videoram)
-	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, charram) AM_REGION("maincpu", 0x2c00)
+	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(jupiter_state, charram) AM_REGION("maincpu", 0xfc00)
 	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_RAM_WRITE( jupiter_expram_w ) AM_BASE_MEMBER(jupiter_state, expram) /* Expansion RAM */
 ADDRESS_MAP_END
@@ -219,7 +219,7 @@ static const gfx_layout jupiter_charlayout =
 
 
 static GFXDECODE_START( jupiter )
-	GFXDECODE_ENTRY( "maincpu", 0x2c00, jupiter_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0xfc00, jupiter_charlayout, 0, 1 )
 GFXDECODE_END
 
 
