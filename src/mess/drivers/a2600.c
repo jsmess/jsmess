@@ -1673,26 +1673,28 @@ static const struct tia_interface tia_interface_pal =
 	a2600_tia_vsync_callback_pal
 };
 
-static MACHINE_START( a2600 )
-{
-	a2600_state *state = machine->driver_data<a2600_state>();
-	screen_device *screen = machine->first_screen();
-	state->current_screen_height = screen->height();
-	state->extra_RAM =	machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
-	tia_init( machine, &tia_interface );
-	memset( state->riot_ram, 0x00, 0x80 );
-	state->current_reset_bank_counter = 0xFF;
-}
 
-static MACHINE_START( a2600p )
+static void common_init(running_machine *machine)
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
 	screen_device *screen = machine->first_screen();
 	state->current_screen_height = screen->height();
 	state->extra_RAM = machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
-	tia_init( machine, &tia_interface_pal );
 	memset( state->riot_ram, 0x00, 0x80 );
 	state->current_reset_bank_counter = 0xFF;
+	state->dpc.oscillator = timer_alloc(machine, modeDPC_timer_callback, NULL);
+}
+
+static MACHINE_START( a2600 )
+{
+	common_init(machine);
+	tia_init( machine, &tia_interface );
+}
+
+static MACHINE_START( a2600p )
+{
+	common_init(machine);
+	tia_init( machine, &tia_interface_pal );
 }
 
 static void set_category_value( running_machine *machine, const char* cat, const char *cat_selection )
@@ -2021,7 +2023,6 @@ static MACHINE_RESET( a2600 )
 				state->dpc.df[data_fetcher].music_mode = 0;
 			}
 		}
-		state->dpc.oscillator = timer_alloc(machine,  modeDPC_timer_callback , NULL);
 		timer_adjust_periodic(state->dpc.oscillator, ATTOTIME_IN_HZ(42000), 0, ATTOTIME_IN_HZ(42000));
 		break;
 
