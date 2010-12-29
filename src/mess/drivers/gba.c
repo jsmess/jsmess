@@ -2301,6 +2301,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	UINT8 *ROM = memory_region(image.device().machine, "cartridge");
 	int i;
 	UINT32 cart_size;
+	UINT8 game_code[4] = { 0 };
 	gba_state *state = image.device().machine->driver_data<gba_state>();
 
 	state->nvsize = 0;
@@ -2316,6 +2317,11 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	{
 		cart_size = image.get_software_region_length("rom");
 		memcpy(ROM, image.get_software_region("rom"), cart_size);
+	}
+
+	if (cart_size >= 0xAC + 4)
+	{
+		memcpy(game_code, ROM + 0xAC, 4);
 	}
 
 	for (i = 0; i < cart_size; i++)
@@ -2357,7 +2363,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 			break;
 		}
-		else if (!memcmp(&ROM[i], "FLASH", 5))
+		else if ((!memcmp(&ROM[i], "FLASH", 5)) && (memcmp(game_code, "BYHE", 4))) // "Backyard Hockey" false positive
 		{
 			state->nvptr = NULL;
 			state->nvsize = 0;
