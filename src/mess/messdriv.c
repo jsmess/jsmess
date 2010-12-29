@@ -1230,6 +1230,7 @@ const game_driver * const drivers[] =
 	DRIVER( hp48gx )	/* HP 48GX */
 	DRIVER( hp48gp )	/* HP 48G+ */
 	DRIVER( hp49g )
+	DRIVER( hp49gp )	/* HP 49G+ */
 	DRIVER( hp16500b )
 
 	/* SpectraVideo */
