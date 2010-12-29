@@ -40,6 +40,8 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 	}
 }
 
+#define GBA_ATTOTIME_NORMALIZE(a)	do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
+
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
 static void gba_machine_stop(running_machine &machine)
@@ -1652,7 +1654,9 @@ static WRITE32_HANDLER( gba_io_w )
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
-						timer_adjust_periodic(state->tmr_timer[offset], ATTOTIME_IN_HZ(final), offset, ATTOTIME_IN_HZ(final));
+						attotime time = ATTOTIME_IN_HZ(final);
+						GBA_ATTOTIME_NORMALIZE(time);
+						timer_adjust_periodic(state->tmr_timer[offset], time, offset, time);
 					}
 				}
 			}
