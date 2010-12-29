@@ -78,7 +78,13 @@ System Driver Changes:
 
 - [CHANNELF/LYNX/SPECIAL/SVISION/WSWAN] Tokenized audio state.  [Atari Ace]
 
-- [GBA] Added a workaround for the unreliable ATTOTIME_IN_HZ macro. This fixes the hang/crash problems with "Gunstar Super Heroes", "bit Generations" and maybe others too. [Tim Schuerewegen]
+- [GBA] Added a workaround for the unreliable ATTOTIME_IN_HZ macro. This
+  fixes the hang/crash problems with "Gunstar Super Heroes",
+  "bit Generations" and maybe others too. [Tim Schuerewegen]
+
+- [GBA] Fixed an issue with the ARM7 cycle count. This fixes the crash
+  problems with "Golden Sun", "All-Star Baseball 2003" and maybe others
+  too. [Tim Schuerewegen]
 
 - [GENESIS] Added support for several genesis PCB carts [El Barto]
   Updated softlist to use PCB's

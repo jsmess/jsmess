@@ -1567,9 +1567,6 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
         LOG(("%08x: Unaligned Mem Transfer @ %08x\n", R15, rbp));
 #endif
 
-    // We will specify the cycle count for each case, so remove the -3 that occurs at the end
-    ARM7_ICOUNT += 3;
-
     if (insn & INSN_BDT_L)
     {
         /* Loading */
@@ -1612,9 +1609,9 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                     SET_CPSR(GET_REGISTER(cpustate, SPSR));
                     SwitchMode(cpustate, GET_MODE);
                 }
+               // LDM PC - takes 1 extra cycle
+    	        ARM7_ICOUNT -= 1;
             }
-            // LDM PC - takes 1 extra cycle
-            ARM7_ICOUNT -= 1;
         }
         else
         {
@@ -1734,4 +1731,8 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
         // STM takes (n+1)S+2N+1I cycles (n = # of register transfers)
         ARM7_ICOUNT -= (result + 1) + 2 + 1;
     }
+
+    // We will specify the cycle count for each case, so remove the -3 that occurs at the end
+    ARM7_ICOUNT += 3;
+
 } /* HandleMemBlock */
