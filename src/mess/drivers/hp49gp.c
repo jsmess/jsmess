@@ -229,7 +229,7 @@ static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
 static INPUT_CHANGED( port_changed )
 {
 	hp49gp_state *hp49gp = field->port->machine->driver_data<hp49gp_state>();
-	s3c2410_request_eint( hp49gp->s3c2410, (int)param + 8);
+	s3c2410_request_eint( hp49gp->s3c2410, (FPTR)param + 8);
 }
 
 // ...
