@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
- <!--
+<!--
   Credits:
   - Yakushi~Kabuto, JohnDie, Tori, Zidanax, Evan_G
 -->
@@ -23,7 +23,6 @@ Undumped
   - Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame (Japan) (Rev B) AF984BC1
   - Magical Drop 2 - Bunka Housou Special Version (Japan)
   - Pro Action Replay - High Tech Option Series (Japan) (Unl)
-  - Pro Mahjong Kiwame (Rev A)
   - Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
   - Satellaview BS-X (Japan) (Rev 0)
   - Shin Chou Kouki (Japan) (Rev A) 1A77CF3B
@@ -41,7 +40,6 @@ Undumped
   - Little Master - Nijiiro no Maseki (Japan) (Sample)
   - Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
   - Pro Yakyuu Nettou Puzzle Stadium (Japan) (Sample)
-  - Super Mario Club Taikai You (Japan)
   - Super Street Fighter II (Japan) (Sample)
   - Wild Trax (Japan) (Sample)
   
@@ -58,7 +56,7 @@ Undumped
   - Biker Mice From Mars (Europe) (Sample)
   - Donkey Kong Country 2 - Diddy's Kong Quest (Europe) - Initial release/Rev 0
   
-  - Multi-region
+  Multi-region
   
   - X-Terminator (Unlicensed)
   - X-Terminator 2 (Unlicensed)
@@ -79,7 +77,7 @@ The software list will be divided in four categories:
 	
 	<software name="ff4j" cloneof="ff2">
 		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
-		<description>Final Fantasy IV (Jpn, Rev. 1)</description>
+		<description>Final Fantasy IV (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -234,8 +232,8 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="romsaga">
-		<!-- Serial:  - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
-		<description>Romancing SaGa (Jpn, Rev. 1)</description>
+		<!-- Serial: SHVC-RS - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
+		<description>Romancing SaGa (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -279,6 +277,25 @@ The software list will be divided in four categories:
 
 
 <!-- List of verified dumps -->
+
+	<software name="mjkiwame">
+		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
+		<description>Pro Mahjong Kiwame (Jpn, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Athena</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-zz-1.u1" size="524288" crc="59b6b116" sha1="9717e310aa3c83f8e2081e93f7a008764a5cbd55" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- End of verified dumps -->
 
 
@@ -24766,7 +24783,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="mjkiwame">
+	<software name="mjkiwamea" cloneof="mjkiwame">
 		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
 		<description>Pro Mahjong Kiwame (Jpn)</description>
 		<year>1993</year>
