@@ -188,7 +188,7 @@ public:
 	UINT32 flash_size;
 	UINT32 flash_mask;
 	intelfsh8_device *mFlashDev;
-	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits;
+	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits, eeprom_addr_bits;
 	UINT8 eep_data;
 
 	/* nvram-specific for MESS */

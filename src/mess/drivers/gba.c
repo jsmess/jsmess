@@ -2046,6 +2046,8 @@ static MACHINE_RESET( gba )
 	state->windowOn = 0;
 	state->fxOn = 0;
 
+	state->bios_protected = 0;
+
 	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 	timer_adjust_oneshot(state->hbl_timer, attotime_never, 0);
 	timer_adjust_oneshot(state->dma_timer[0], attotime_never, 0);
@@ -2189,6 +2191,10 @@ static READ32_HANDLER( eeprom_r )
 		case EEP_READ:
 			if ((state->eeprom_bits == 0) && (state->eeprom_count))
 			{
+				if (state->eeprom_addr >= sizeof( state->gba_eeprom))
+				{
+					fatalerror( "eeprom: invalid address (%x)", state->eeprom_addr);
+				}
 				state->eep_data = state->gba_eeprom[state->eeprom_addr];
 		       //       printf("EEPROM read @ %x = %x (%x)\n", state->eeprom_addr, state->eep_data, (state->eep_data & 0x80) ? 1 : 0);
 				state->eeprom_addr++;
@@ -2245,7 +2251,7 @@ static WRITE32_HANDLER( eeprom_w )
 				state->eeprom_command = EEP_WRITE;
 			}
 			state->eeprom_state = EEP_ADDR;
-			state->eeprom_count = 6;
+			state->eeprom_count = state->eeprom_addr_bits;
 			state->eeprom_addr = 0;
 			break;
 
@@ -2290,6 +2296,10 @@ static WRITE32_HANDLER( eeprom_w )
 			if (state->eeprom_bits == 0)
 			{
 				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->machine->device("maincpu")), state->eep_data, state->eeprom_addr );
+				if (state->eeprom_addr >= sizeof( state->gba_eeprom))
+				{
+					fatalerror( "eeprom: invalid address (%x)", state->eeprom_addr);
+				}
 				state->gba_eeprom[state->eeprom_addr] = state->eep_data;
 				state->eeprom_addr++;
 				state->eep_data = 0;
@@ -2342,6 +2352,17 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		{
 			state->nvptr = (UINT8 *)&state->gba_eeprom;
 			state->nvsize = 0x2000;
+
+			// "Bomberman Max 2" series use 14 bit addressing
+			if ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4)) ||
+				(!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4)))
+			{
+				state->eeprom_addr_bits = 14;
+			}
+			else
+			{
+				state->eeprom_addr_bits = 6;
+			}
 
 			if (cart_size <= (16 * 1024 * 1024))
 			{
