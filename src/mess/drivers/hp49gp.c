@@ -281,7 +281,9 @@ static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 	// I2S (data write)
 	{ NULL },
 	// NAND (command write, address write, data read, data write)
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, NULL, NULL },
+	// LCD (flags)
+	{ S3C24XX_INTERFACE_LCD_REVERSE }
 };
 
 static MACHINE_CONFIG_START( hp49gp, hp49gp_state )

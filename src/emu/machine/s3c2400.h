@@ -69,6 +69,12 @@ struct _s3c2400_interface_i2s
 	write16_device_func data_w;
 };
 
+typedef struct _s3c2400_interface_lcd s3c2400_interface_lcd;
+struct _s3c2400_interface_lcd
+{
+	int flags;
+};
+
 typedef struct _s3c2400_interface s3c2400_interface;
 struct _s3c2400_interface
 {
@@ -76,6 +82,7 @@ struct _s3c2400_interface
 	s3c2400_interface_i2c i2c;
 	s3c2400_interface_adc adc;
 	s3c2400_interface_i2s i2s;
+	s3c2400_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -92,6 +99,10 @@ void s3c2400_uart_fifo_w( running_device *device, int uart, UINT8 data);
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
+
+/* Interface */
+
+#define S3C24XX_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 

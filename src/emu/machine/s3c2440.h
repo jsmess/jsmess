@@ -78,6 +78,12 @@ struct _s3c2440_interface_nand
 	write8_device_func data_w;
 };
 
+typedef struct _s3c2440_interface_lcd s3c2440_interface_lcd;
+struct _s3c2440_interface_lcd
+{
+	int flags;
+};
+
 typedef struct _s3c2440_interface s3c2440_interface;
 struct _s3c2440_interface
 {
@@ -86,6 +92,7 @@ struct _s3c2440_interface
 	s3c2440_interface_adc adc;
 	s3c2440_interface_i2s i2s;
 	s3c2440_interface_nand nand;
+	s3c2440_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -107,6 +114,10 @@ WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w );
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
+
+/* Interface */
+
+#define S3C24XX_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 

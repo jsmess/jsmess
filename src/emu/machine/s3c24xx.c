@@ -351,7 +351,14 @@ static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 			vram += 2;
 		}
 	}
-	return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+	if (s3c24xx->iface->lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+	{
+		return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
+	}
+	else
+	{
+		return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+	}
 }
 
 static UINT32 s3c24xx_lcd_dma_read_bits( running_device *device, int count)
@@ -416,8 +423,16 @@ static void s3c24xx_lcd_render_stn_01( running_device *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 32; j++)
 		{
-			*scanline++ = s3c24xx_get_color_stn_01( device, (data >> 31) & 0x01);
-			data = data << 1;
+			if (s3c24xx->iface->lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+			{
+				*scanline++ = s3c24xx_get_color_stn_01( device, data & 0x01);
+				data = data >> 1;
+			}
+			else
+			{
+				*scanline++ = s3c24xx_get_color_stn_01( device, (data >> 31) & 0x01);
+				data = data << 1;
+			}
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 4))
 			{

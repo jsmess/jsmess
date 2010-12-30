@@ -177,7 +177,11 @@ static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 	// ADC (data read)
 	{ NULL },
 	// I2S (data write)
-	{ NULL }
+	{ NULL },
+	// NAND (command write, address write, data read, data write)
+	{ NULL, NULL, NULL, NULL },
+	// LCD (flags)
+	{ 0 }
 };
 
 static MACHINE_CONFIG_START( gizmondo, gizmondo_state )

@@ -81,6 +81,12 @@ struct _s3c2410_interface_nand
 	write8_device_func data_w;
 };
 
+typedef struct _s3c2410_interface_lcd s3c2410_interface_lcd;
+struct _s3c2410_interface_lcd
+{
+	int flags;
+};
+
 typedef struct _s3c2410_interface s3c2410_interface;
 struct _s3c2410_interface
 {
@@ -89,6 +95,7 @@ struct _s3c2410_interface
 	s3c2410_interface_adc adc;
 	s3c2410_interface_i2s i2s;
 	s3c2410_interface_nand nand;
+	s3c2410_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -111,6 +118,10 @@ void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc);
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
+
+/* Interface */
+
+#define S3C24XX_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 
