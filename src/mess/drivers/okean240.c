@@ -18,7 +18,7 @@ public:
 };
 
 
-static READ8_HANDLER( okean240_80_r ) { return mame_rand(space->machine); } // so we can start booting
+static READ8_HANDLER( okean240_rand_r ) { return mame_rand(space->machine); } // so we can start booting
 
 
 static ADDRESS_MAP_START(okean240_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( okean240_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240_80_r)
+	AM_RANGE(0x00, 0xff) AM_READ(okean240_rand_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -136,8 +136,12 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( okean240 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "monitor.bin", 0xe000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5))
-	ROM_LOAD( "cpm80.bin",   0xc000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204))
+	ROM_SYSTEM_BIOS(0, "Normal", "Normal")
+	ROMX_LOAD( "monitor.bin", 0xe000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5), ROM_BIOS(1))
+	ROMX_LOAD( "cpm80.bin",   0xc000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "Test", "Test")
+	ROMX_LOAD( "test.bin",    0xe000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
