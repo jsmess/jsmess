@@ -2353,9 +2353,10 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->nvptr = (UINT8 *)&state->gba_eeprom;
 			state->nvsize = 0x2000;
 
-			// "Bomberman Max 2" series use 14 bit addressing
+			// "Bomberman Max 2" and "Broken Sword" use 14 bit addressing
 			if ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4)) ||
-				(!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4)))
+				(!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4)) ||
+				(!memcmp(game_code, "ABJE", 4)) || (!memcmp(game_code, "ABJP", 4)))
 			{
 				state->eeprom_addr_bits = 14;
 			}

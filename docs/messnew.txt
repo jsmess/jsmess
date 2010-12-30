@@ -91,7 +91,7 @@ System Driver Changes:
   "Banjo Pilot". [Tim Schuerewegen]
 
 - [GBA] Added support for 14-bit EEPROM addressing. This fixes the lockups
-  in the "Bomberman Max 2" games. [Tim Schuerewegen]
+  in "Bomberman Max 2" and "Broken Sword". [Tim Schuerewegen]
 
 - [GBA] Fixed an ARM7 core bug. This fixes the freeze in "Big Mutha Truckers".
   [Tim Schuerewegen]
