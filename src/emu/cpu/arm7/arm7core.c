@@ -1108,8 +1108,13 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 	{
 	        // WRITE16(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(cpustate, rd));
 	        WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(cpustate, rd)); // manual says STR RD=PC, +12 of address
+
+// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
+#if 0
 	        if (rn != eR15)
+#endif
 	            R15 += 4;
+
 	        // STRH takes 2 cycles, so we add + 1
 	        ARM7_ICOUNT += 1;
 	}

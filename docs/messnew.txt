@@ -93,6 +93,9 @@ System Driver Changes:
 - [GBA] Added support for 14-bit EEPROM addressing. This fixes the lockups
   in the "Bomberman Max 2" games. [Tim Schuerewegen]
 
+- [GBA] Fixed an ARM7 core bug. This fixes the freeze in "Big Mutha Truckers".
+  [Tim Schuerewegen]
+
 - [GENESIS] Added support for several genesis PCB carts [El Barto]
   Updated softlist to use PCB's
   Added J-Cart player 3 and 4 support
