@@ -350,6 +350,9 @@ struct _wd1770_state
     /* complete command delay */
     int complete_command_delay;
 
+	/* Were we busy when we received a FORCE_INT command */
+	UINT8	was_busy;
+
 	/* Pointer to interface */
 	const wd17xx_interface *intf;
 };
@@ -1371,7 +1374,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 	result = w->status;
 
 	/* type 1 command or force int command? */
-	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
+	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV && ! w->was_busy))
 	{
 		result &= ~(STA_1_IPL | STA_1_TRACK0);
 
@@ -1470,8 +1473,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 		w->data_count = 0;
 		w->data_offset = 0;
+		w->was_busy = w->status & STA_2_BUSY;
 		w->status &= ~STA_2_BUSY;
-		w->status &= ~STA_2_LOST_DAT;
 
 		wd17xx_clear_drq(device);
 
@@ -1501,9 +1504,6 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 		/* terminate command */
 		wd17xx_complete_command(device, DELAY_ERROR);
-
-//      w->status_ipl = STA_1_IPL;
-/*      w->status_ipl = 0; */
 
 		w->busy_count = 0;
 		w->command_type = TYPE_IV;
