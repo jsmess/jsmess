@@ -1891,8 +1891,20 @@ static WRITE32_HANDLER(gba_oam_w)
 	state->gba_oam[offset] = COMBINE_DATA32_16(state->gba_oam[offset], data, mem_mask);
 }
 
+static READ32_HANDLER(gba_bios_r)
+{
+	running_machine *machine = space->machine;
+	gba_state *state = machine->driver_data<gba_state>();
+	UINT32 *rom = (UINT32 *)memory_region(space->machine, "maincpu");
+	if (state->bios_protected != 0)
+	{
+		offset = (state->bios_last_address + 8) / 4;
+	}
+	return rom[offset&0x3fff];
+}
+
 static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
@@ -2091,7 +2103,7 @@ static MACHINE_START( gba )
 }
 
 ROM_START( gba )
-	ROM_REGION( 0x8000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) )
 
 	/* cartridge region - 32 MBytes (128 Mbit) */
@@ -2471,15 +2483,16 @@ MACHINE_CONFIG_END
    and some games verify that as a protection check (notably Metroid Fusion) */
 DIRECT_UPDATE_HANDLER( gba_direct )
 {
+	gba_state *state = machine->driver_data<gba_state>();
 	if (address > 0x4000)
 	{
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "bios")+0x4000);
+		state->bios_protected = 1;
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "bios"));
+		state->bios_protected = 0;
+		state->bios_last_address = address;
 	}
-
 	return address;
 }
 

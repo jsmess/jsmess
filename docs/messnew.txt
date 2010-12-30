@@ -87,6 +87,9 @@ System Driver Changes:
   problems with "Golden Sun", "All-Star Baseball 2003" and maybe others
   too. [Tim Schuerewegen]
 
+- [GBA] Fixed protected BIOS reads. This fixes the black screen in
+  "Banjo Pilot". [Tim Schuerewegen]
+
 - [GENESIS] Added support for several genesis PCB carts [El Barto]
   Updated softlist to use PCB's
   Added J-Cart player 3 and 4 support
