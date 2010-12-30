@@ -96,6 +96,10 @@ System Driver Changes:
 - [GBA] Fixed an ARM7 core bug. This fixes the freeze in "Big Mutha Truckers".
   [Tim Schuerewegen]
 
+- [GBA] Fixed memory corruption due to a faulty DMA operation. This fixes the
+  problems with "The Ant Bully", "Buffy The Vampire Slayer", and maybe
+  others too. [Tim Schuerewegen]
+
 - [GENESIS] Added support for several genesis PCB carts [El Barto]
   Updated softlist to use PCB's
   Added J-Cart player 3 and 4 support

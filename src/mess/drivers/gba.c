@@ -824,10 +824,13 @@ static READ32_HANDLER( gba_io_r )
 		case 0x00dc/4:
 			{
 				// no idea why here, but it matches VBA better
+				// note: this suspicious piece of code crashes "Buffy The Vampire Slayer" (08008DB4) and "The Ant Bully", so disable it for now
+				#if 0
 				if (((offset-0xb0/4) % 3) == 2)
 				{
 					return state->dma_regs[offset-(0xb0/4)] & 0xff000000;
 				}
+				#endif
 
 				return state->dma_regs[offset-(0xb0/4)];
 			}
