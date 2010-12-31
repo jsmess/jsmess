@@ -3,7 +3,7 @@
 
 <!--
   Credits:
-  - Yakushi~Kabuto, JohnDie, Tori, Zidanax, Evan_G
+  - Yakushi~Kabuto, JohnDie, Tori, Zidanax, Badablek, Evan_G
 -->
 
 <!--
@@ -15,14 +15,15 @@ Undumped
   - Dai-3-Ji Super Robot Taisen (Japan) (Rev C) C2941881
   - Doraemon - Nobita to Yousei no Kuni (Japan) (Rev A) 55E44983
   - Eiga Shoukai Soft - Mizu no Tabinin (Japan) unconfirmed
-  - GAMARS Genuine Taiwan Mahjong 16 (Japan) (Unl)
-  - GAMARS Taiwan Chess (Japan) (Unl)
+  - GAMARS Genuine Taiwan Mahjong 16 (Japan) (Unlicensed)
+  - GAMARS Taiwan Chess (Japan) (Unlicensed)
   - Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan) (Rev A)
   - Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Riyuu (Japan) (Rev A)
   - Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame (Japan) (Rev A) 458C473B
   - Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame (Japan) (Rev B) AF984BC1
   - Magical Drop 2 - Bunka Housou Special Version (Japan)
-  - Pro Action Replay - High Tech Option Series (Japan) (Unl)
+  - Naughts &amp; Crosses (Japan) (Prototype)
+  - Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
   - Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
   - Satellaview BS-X (Japan) (Rev 0)
   - Shin Chou Kouki (Japan) (Rev A) 1A77CF3B
@@ -30,22 +31,19 @@ Undumped
   - Shin Megami Tensei II (J) (Rev A) 84268A75
   - Shin Megami Tensei II (J) (Rev B) E38228A7
   - Shodai Nekketsu Kouha Kunio-kun (Japan) (Rev A) 5DF55465
-  - Super Jinsei Game 2 (Rev B)
+  - Super Jinsei Game 2 (Rev A)
   - Super Mahjong Taikai (Japan) (Rev B)
-  - Super Shougi (Rev A)
   - Tsukikomori (Japan) (v1.1) (NP) F37C6726
 
   To be confirmed:
   - J.League Excite Stage '96 (Japan) (Sample)
   - Little Master - Nijiiro no Maseki (Japan) (Sample)
-  - Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
   - Pro Yakyuu Nettou Puzzle Stadium (Japan) (Sample)
   - Super Street Fighter II (Japan) (Sample)
   - Wild Trax (Japan) (Sample)
   
   USA
   
-  - Naughts &amp; Crosses ??? (Is it USA?)
   - Fighter's History (USA) - Initial release/Rev 0
   - Ignition Factor, The (USA) (Sample)
   - Star Fox (USA) (Rev A)
@@ -231,9 +229,27 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="mjkiwamea" cloneof="mjkiwame">
+		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
+		<description>Pro Mahjong Kiwame (Jpn)</description>
+		<year>1993</year>
+		<publisher>Athena</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-zz-0.u1" size="524288" crc="1210816b" sha1="7637e0a1fc86d3b815972e44c60acecfc1f8c1f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="romsaga">
 		<!-- Serial: SHVC-RS - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
-		<description>Romancing SaGa (Jpn, Rev. A)</description>
+		<description>Romancing Sa-Ga (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -254,7 +270,7 @@ The software list will be divided in four categories:
 
 	<software name="romsagaa" cloneof="romsaga">
 		<!-- Serial: SHVC-RS - Release Date: 1992-01-28 - Alt. Title: ロマンシング サ・ガ -->
-		<description>Romancing SaGa (Jpn)</description>
+		<description>Romancing Sa-Ga (Jpn)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -269,6 +285,73 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-rs-0.u1" size="1048576" crc="a6d82435" sha1="d00960176aa980dbd7bff4062e52b7450b9986dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romsaga2">
+		<!-- Serial: SHVC-2L - Release Date: 1993-12-10 - Alt. Title: ロマンシング サ・ガ2 -->
+		<description>Romancing Sa-Ga 2 (Jpn)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-01" /> <!-- also found with SHVC-1J3M-10 pcb -->
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-2l-0.u1" size="2097152" crc="54a585bc" sha1="0d3423a9d7e315a15ff8a3be588c65bd110e3d65" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romsaga2a" cloneof="romsaga2">
+		<!-- Serial: SHVC-2L - Release Date: 1993-12-10 - Alt. Title: ロマンシング サ・ガ2 -->
+		<description>Romancing Sa-Ga 2 (Jpn, Alt)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J3M-01" /> <!-- also found with SHVC-2J3M-10 pcb -->
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1/R" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-2l-0.p0.u1" size="1048576" crc="98453e17" sha1="01d54630d7caa1710cc4af7b68db262fe92b8305" offset="000000" />
+				<rom name="shvc-2l-0.p1.u2" size="1048576" crc="aad14245" sha1="9dde7ac6352ba1b57fc7241ac883aecb661b85ab" offset="100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sjinsei2a" cloneof="sjinsei2">
+		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 -->
+		<description>Super Jinsei Game 2 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A1M-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 16K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-al2j-0.p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="000000" />
+				<rom name="shvc-al2j-0.p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -292,6 +375,48 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-zz-1.u1" size="524288" crc="59b6b116" sha1="9717e310aa3c83f8e2081e93f7a008764a5cbd55" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sjinsei2">
+		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 -->
+		<description>Super Jinsei Game 2 (Jpn, Rev. B)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-al2j-2.u1" size="2097152" crc="a0e22580" sha1="eeec6a462bf067e4ce322af61c8add26197172c3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshogi">
+		<!-- Serial: SHVC-SD - Release Date: 1992-06-19 - Alt. Title: スーパー将棋 -->
+		<description>Super Shougi (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>I'Max</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-sd-1.u1" size="1048576" crc="3ba3c38b" sha1="b04dd59194287123382d99581988bd395a497035" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24783,18 +24908,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="mjkiwamea" cloneof="mjkiwame">
-		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
-		<description>Pro Mahjong Kiwame (Jpn)</description>
-		<year>1993</year>
-		<publisher>Athena</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="pro mahjong kiwame (japan).sfc" size="524288" crc="1210816b" sha1="7637e0a1fc86d3b815972e44c60acecfc1f8c1f2" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mjkiwam2">
 		<!-- Serial:  - Release Date: 1994-07-19 -->
 		<description>Pro Mahjong Kiwame II (Jpn, Rev. 1)</description>
@@ -26189,21 +26302,9 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="romsaga2">
-		<!-- Serial: SHVC-2L - Release Date: 1993-12-10 - Alt. Title: ロマンシング サ・ガ2 -->
-		<description>Romancing SaGa 2 (Jpn)</description>
-		<year>1993</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="romancing saga 2 (japan).sfc" size="2097152" crc="54a585bc" sha1="0d3423a9d7e315a15ff8a3be588c65bd110e3d65" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="romsaga3">
 		<!-- Serial:  - Release Date: 1995-11-11 -->
-		<description>Romancing SaGa 3 (Jpn, Rev. 1)</description>
+		<description>Romancing Sa-Ga 3 (Jpn, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26214,7 +26315,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="romsaga3s" cloneof="romsaga3">
-		<description>Romancing SaGa 3 (Jpn, Sample)</description>
+		<description>Romancing Sa-Ga 3 (Jpn, Sample)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26226,7 +26327,7 @@ The software list will be divided in four categories:
 
 	<software name="romsaga3a" cloneof="romsaga3">
 		<!-- Serial:  - Release Date: 1995-11-11 -->
-		<description>Romancing SaGa 3 (Jpn)</description>
+		<description>Romancing Sa-Ga 3 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32272,18 +32373,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="sjinsei2">
-		<!-- Serial:  - Release Date: 1995-09-08 -->
-		<description>Super Jinsei Game 2 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="super jinsei game 2 (japan).sfc" size="1310720" crc="7d924c99" sha1="85be3d5d3f3f001922ea37759d6d80422f9b06e1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sjinsei3">
 		<!-- Serial:  - Release Date: 1996-11-30 -->
 		<description>Super Jinsei Game 3 (Jpn)</description>
@@ -33766,7 +33855,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="sshogi">
+	<software name="sshogia" cloneof="sshogi">
 		<!-- Serial: SHVC-SD - Release Date: 1992-06-19 - Alt. Title: スーパー将棋 -->
 		<description>Super Shougi (Jpn)</description>
 		<year>1992</year>
