@@ -125,8 +125,11 @@
     2010-March-22 Curt Coder:
     - Implemented immediate and index pulse interrupts.
 
+	2010-Dec-31 Phill Harvey-Smith
+	- Copied multi-sector write code from r7263, for some reason this had been
+	  silently removed, but is required for the rmnimbus driver.
+
     TODO:
-        - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
          (e.g. unformatted disc)
 
@@ -1030,6 +1033,10 @@ static void wd17xx_complete_command(running_device *device, int delay)
 
 	/* set new timer */
 	timer_adjust_oneshot(w->timer_cmd, ATTOTIME_IN_USEC(usecs), 0);
+	
+	/* Kill onshot read/write sector timers */
+	timer_adjust_oneshot(w->timer_rs, attotime_never, 0);
+	timer_adjust_oneshot(w->timer_ws, attotime_never, 0);
 }
 
 
@@ -1832,7 +1839,27 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 
                         w->data_offset = 0;
 
-                        wd17xx_complete_command(device, DELAY_DATADONE);
+						/* Check we should handle the next sector for a multi record write */
+						if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & FDC_MULTI_REC ) ) 
+						{
+							w->sector++;
+							if (wd17xx_locate_sector(device))
+							{
+								w->data_count = w->sector_length;
+
+								w->status |= STA_2_BUSY;
+								w->busy_count = 0;
+
+								wd17xx_timed_data_request(device);
+							}
+						}
+						else
+						{
+							wd17xx_complete_command(device, DELAY_DATADONE);
+							if (VERBOSE)
+								logerror("wd17xx_data_w(): multi data write completed\n");
+						}
+//                       wd17xx_complete_command(device, DELAY_DATADONE);
                 }
                 else
                 {

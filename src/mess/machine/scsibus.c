@@ -13,7 +13,7 @@
 
 /* LOGLEVEL 0=no logging, 1=just commands and data, 2=everything ! */
 
-#define LOGLEVEL			0
+#define LOGLEVEL			1
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
@@ -73,7 +73,7 @@ static void scsibus_read_data(scsibus_t   *bus)
 {
     bus->data_last = (bus->bytes_left >= DATA_BUF_SIZE) ? DATA_BUF_SIZE : bus->bytes_left;
 
-    LOG(1,"SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
+    LOG(2,"SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
 
     if (bus->data_last > 0)
     {
@@ -539,7 +539,7 @@ static void scsi_change_phase(running_device *device, UINT8 newphase)
 {
     scsibus_t   *bus = get_token(device);
 
-    LOG(1,"scsi_change_phase() from=%s, to=%s\n",phasenames[bus->phase],phasenames[newphase]);
+    LOG(2,"scsi_change_phase() from=%s, to=%s\n",phasenames[bus->phase],phasenames[newphase]);
 
     bus->phase=newphase;
     bus->cmd_idx=0;

@@ -52,7 +52,7 @@ static const floppy_config nimbus_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSSD_35,
 	FLOPPY_OPTIONS_NAME(pc),
 	NULL
 };

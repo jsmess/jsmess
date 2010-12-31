@@ -43,16 +43,16 @@ static int sio_serial_receive( running_device *device, int channel );
 #define LATCH_INTS          1
 #define LOG_PORTS           0
 #define LOG_INTERRUPTS      0
-#define LOG_INTERRUPTS_EXT  1
+#define LOG_INTERRUPTS_EXT  0
 #define LOG_TIMER           0
 #define LOG_OPTIMIZATION    0
 #define LOG_DMA             0
 #define CPU_RESUME_TRIGGER	7123
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
-#define LOG_DISK_FDD        1
+#define LOG_DISK_FDD        0
 #define LOG_DISK_HDD        0
-#define LOG_DISK            1
+#define LOG_DISK            0
 #define LOG_PC8031          0
 #define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
@@ -647,7 +647,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	if ((LOG_DMA) && (diff & 0x6811))
 		logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
 			cpu_get_pc(machine->device(MAINCPU_TAG)), new_control);
-
+#if 0
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
 	{
@@ -671,6 +671,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 			d->finished = 0;
 		}
 	}
+#endif
 
 	if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 	if (DEBUG_SET(DMA_BREAK))
@@ -1239,7 +1240,7 @@ MACHINE_START( nimbus )
 		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
 		debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
 		debug_console_register_command(machine, "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
-
+		
 		/* set up the instruction hook */
 		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
@@ -2092,10 +2093,13 @@ static int sio_serial_receive( running_device *device, int channel )
 static void fdc_reset(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    state->nimbus_drives.reg400=0;
+    running_device *fdc = machine->device(FDC_TAG);
+	
+	state->nimbus_drives.reg400=0;
     state->nimbus_drives.reg410_in=0;
     state->nimbus_drives.reg410_out=0;
     state->nimbus_drives.int_ff=0;
+	wd17xx_set_pause_time(fdc,FDC_PAUSE);
 }
 
 static void set_disk_int(running_machine *machine, int state)

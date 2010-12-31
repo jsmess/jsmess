@@ -287,6 +287,7 @@ extern const z80sio_interface nimbus_sio_intf;
 /* Floppy/Fixed drive interface */
 
 #define FDC_TAG                 "wd2793"
+#define FDC_PAUSE				10000
 
 extern const wd17xx_interface nimbus_wd17xx_interface;
 
