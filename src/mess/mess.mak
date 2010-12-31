@@ -1184,11 +1184,8 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MAME_VIDEO)/n64.o		\
 	$(MAME_VIDEO)/rdpblend.o	\
 	$(MAME_VIDEO)/rdpfb.o		\
-	$(MAME_VIDEO)/rdpfetch.o	\
 	$(MAME_VIDEO)/rdptpipe.o	\
 	$(MAME_VIDEO)/rdpspn16.o	\
-	$(MAME_VIDEO)/rdptrect.o	\
-	$(MAME_VIDEO)/rdpfrect.o	\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
 	$(MESS_DRIVERS)/vboy.o		\
