@@ -5,28 +5,11 @@
 Screen is 80x24
 
 On boot at least bios seems to be enabled.
-Boot sequence:
-- set stack to and initialize Fxxx
-- write stuff to/initialize 2000-27FF
-- set PA to 80
-- initialize some more i/o
-- set PA to C0
-- test C000-CFFF
-- Set PA to 80
-- i/o things
-- Set PA to C0
-- Clear VRAM with 0x20
-- Write "PERFORMING SELF-TEST" to VRAM
-- Set PA to 80
-- (bp 0307)
-- Test 2000-27FF
-- Set SP to 27FF
-- Set PA to 80
-- Test 4000-FFFF
-- Set PA to 81
-- Test 4000-EFFF
-- (bp 2c6)
-- Test i/o
+
+Floppy breakpoints:
+- bp 0c50
+- bp 1449
+- bp 1465
 
 
 ***************************************************************************/
@@ -51,20 +34,29 @@ class osbexec_state : public driver_device
 {
 public:
 	osbexec_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+			maincpu( *this, "maincpu" ),
+			mb8877( *this, "mb8877" ),
+			messram( *this, "messram" ),
+			pia_0( *this, "pia_0" ),
+			pia_1( *this, "pia_1" ),
+			sio( *this, "sio" ),
+			speaker( *this, "speaker" )
+	{ }
 
-	running_device	*maincpu;
-	running_device	*mb8877;
-	running_device	*messram;
-	running_device	*pia_0;
-	running_device	*pia_1;
-	running_device	*sio;
-	running_device	*speaker;
+	required_device<cpu_device>	maincpu;
+	required_device<running_device>	mb8877;
+	required_device<running_device>	messram;
+	required_device<pia6821_device>	pia_0;
+	required_device<pia6821_device>	pia_1;
+	required_device<z80dart_device>	sio;
+	required_device<running_device>	speaker;
 
 	region_info	*fontram_region;
 	region_info *vram_region;
 	UINT8	*fontram;
 	UINT8	*vram;
+	UINT8	*ram_0000;
 	emu_timer *video_timer;
 
 	/* PIA 0 (UD12) */
@@ -81,14 +73,15 @@ public:
 
 	void set_banks(running_machine *machine)
 	{
-		UINT8 *messram_ptr = messram_get_ptr( messram );
+		ram_0000 = messram_get_ptr( messram );
 
 		if ( pia0_porta & 0x01 )
-			messram_ptr += 0x10000;
+			ram_0000 += 0x10000;
 
-		memory_set_bankptr( machine, "4000", messram_ptr + 0x4000 );
-		memory_set_bankptr( machine, "c000", messram_ptr + 0xc000 );
-		memory_set_bankptr( machine, "e000", messram_ptr + 0xe000 );
+		memory_set_bankptr( machine, "0000", ram_0000 + 0x0000 );
+		memory_set_bankptr( machine, "4000", ram_0000 + 0x4000 );
+		memory_set_bankptr( machine, "c000", ram_0000 + 0xc000 );
+		memory_set_bankptr( machine, "e000", ram_0000 + 0xe000 );
 
 		if ( pia0_porta & 0x80 )
 			memory_set_bankptr( machine, "0000", memory_region(machine, "maincpu") );
@@ -116,6 +109,10 @@ static WRITE8_HANDLER( osbexec_0000_w )
 	{
 		if ( offset < 0x1000 )
 			state->fontram[ offset ] = data;
+	}
+	else
+	{
+		state->ram_0000[ offset ] = data;
 	}
 }
 
@@ -339,6 +336,17 @@ static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 	state->pia0_portb = data;
 
 	speaker_level_w( state->speaker, ( data & 0x08 ) ? 0 : 1 );
+
+	switch ( data & 0x06 )
+	{
+	case 0x02:
+		wd17xx_set_drive( state->mb8877, 1 );
+		break;
+	case 0x04:
+		wd17xx_set_drive( state->mb8877, 0 );
+		break;
+	}
+
 	wd17xx_dden_w( state->mb8877, ( data & 0x01 ) ? 1 : 0 );
 }
 
@@ -567,20 +575,6 @@ static DRIVER_INIT( osbexec )
 }
 
 
-static MACHINE_START( osbexec )
-{
-	osbexec_state *state = machine->driver_data<osbexec_state>();
-
-	state->maincpu = machine->device( "maincpu" );
-	state->mb8877  = machine->device( "mb8877" );
-	state->messram = machine->device( "messram" );
-	state->pia_0   = machine->device( "pia_0" );
-	state->pia_1   = machine->device( "pia_1" );
-	state->sio     = machine->device( "sio" );
-	state->speaker = machine->device( "speaker" );
-}
-
-
 static MACHINE_RESET( osbexec )
 {
 	osbexec_state *state = machine->driver_data<osbexec_state>();
@@ -608,7 +602,6 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MDRV_CPU_IO_MAP( osbexec_io)
 	MDRV_CPU_CONFIG( osbexec_daisy_config )
 
-	MDRV_MACHINE_START( osbexec )
 	MDRV_MACHINE_RESET( osbexec )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
