@@ -2,7 +2,6 @@
 #define _VIDEO_RDPTEXPIPE_H_
 
 #include "emu.h"
-#include "video/rdpfetch.h"
 
 namespace N64
 {
