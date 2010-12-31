@@ -1418,9 +1418,16 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
             // Rd = 15 and S Flag IS set, Result is placed in R15, and current mode SPSR moved to CPSR
             if (rdn == eR15) {
 
-                // Update CPSR from SPSR
-                SET_CPSR(GET_REGISTER(cpustate, SPSR));
-                SwitchMode(cpustate, GET_MODE);
+				// When Rd is R15 and the S flag is set the result of the operation is placed in R15 and the SPSR corresponding to
+				// the current mode is moved to the CPSR. This allows state changes which automatically restore both PC and
+				// CPSR. --> This form of instruction should not be used in User mode. <--
+
+				if (GET_MODE != eARM7_MODE_USER)
+				{
+	                // Update CPSR from SPSR
+    	            SET_CPSR(GET_REGISTER(cpustate, SPSR));
+        	        SwitchMode(cpustate, GET_MODE);
+            	}
 
                 R15 = rd;
 

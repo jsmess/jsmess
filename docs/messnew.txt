@@ -93,8 +93,8 @@ System Driver Changes:
 - [GBA] Added support for 14-bit EEPROM addressing. This fixes the lockups
   in "Bomberman Max 2" and "Broken Sword". [Tim Schuerewegen]
 
-- [GBA] Fixed an ARM7 core bug. This fixes the freeze in "Big Mutha Truckers".
-  [Tim Schuerewegen]
+- [GBA] Fixed several ARM7 core bugs. This fixes the problems with
+  "Big Mutha Truckers" and "Colin McRae Rally" [Tim Schuerewegen]
 
 - [GBA] Fixed memory corruption due to a faulty DMA operation. This fixes the
   problems with "The Ant Bully", "Buffy The Vampire Slayer", and maybe
