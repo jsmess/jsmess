@@ -79,8 +79,8 @@ public:
 		if ( pia0_porta & 0x80 )
 		{
 			memory_set_bankptr( machine, "0000", machine->region("maincpu")->base());
-			/* When BIOS is enabled 2000-3FFF (or maybe 2000-2FFF) is taken from the first 64KB ) */
-			memory_set_bankptr( machine, "2000", messram_ptr + 0x2000 );
+			/* When BIOS is enabled 2000-3FFF is set to the "ROM RAM" */
+			memory_set_bankptr( machine, "2000", messram_ptr + 0x20000 );
 		}
 
 		if ( pia0_porta & 0x40 )
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("128K")	/* 128KB Main RAM */
+	MCFG_RAM_DEFAULT_SIZE("136K")	/* 128KB Main RAM + RAM in ROM bank (8) */
 MACHINE_CONFIG_END
 
 
