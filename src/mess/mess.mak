@@ -132,6 +132,7 @@ CPUS += SCMP
 CPUS += COSMAC
 CPUS += UNSP
 CPUS += HCD62121
+CPUS += PPS4
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
