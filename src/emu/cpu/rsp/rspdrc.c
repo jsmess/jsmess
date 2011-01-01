@@ -123,7 +123,7 @@ struct _rspimp_state
 	UINT32				vres[8];					/* used for temporary vector results */
 
 	/* register mappings */
-	drcuml_parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
+	drcuml_parameter	regmap[32];					/* parameter to register mappings for all 32 integer registers */
 
 	/* subroutines */
 	drcuml_codehandle *	entry;						/* entry point */
@@ -676,11 +676,41 @@ static CPU_INIT( rsp )
 	rsp->impstate->drcfe = drcfe_init(device, &feconfig, rsp);
 
 	/* compute the register parameters */
-	for (regnum = 0; regnum < 34; regnum++)
+	for (regnum = 0; regnum < 32; regnum++)
 	{
 		rsp->impstate->regmap[regnum].type = (regnum == 0) ? DRCUML_PTYPE_IMMEDIATE : DRCUML_PTYPE_MEMORY;
 		rsp->impstate->regmap[regnum].value = (regnum == 0) ? 0 : (FPTR)&rsp->r[regnum];
 	}
+
+	/*
+	drcbe_info beinfo;
+	drcuml_get_backend_info(rsp->impstate->drcuml, &beinfo);
+	if (beinfo.direct_iregs > 2)
+	{
+		rsp->impstate->regmap[30].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[30].value = DRCUML_REG_I2;
+	}
+	if (beinfo.direct_iregs > 3)
+	{
+		rsp->impstate->regmap[31].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[31].value = DRCUML_REG_I3;
+	}
+	if (beinfo.direct_iregs > 4)
+	{
+		rsp->impstate->regmap[2].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[2].value = DRCUML_REG_I4;
+	}
+	if (beinfo.direct_iregs > 5)
+	{
+		rsp->impstate->regmap[3].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[3].value = DRCUML_REG_I5;
+	}
+	if (beinfo.direct_iregs > 6)
+	{
+		rsp->impstate->regmap[4].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[4].value = DRCUML_REG_I6;
+	}
+	*/
 
 	/* mark the cache dirty so it is updated on next execute */
 	rsp->impstate->cache_dirty = TRUE;
@@ -713,48 +743,6 @@ INLINE UINT32 IREAD32(rsp_state *rsp, UINT32 address)
 	ret |= rsp->program->read_byte(address+2) << 8;
 	ret |= rsp->program->read_byte(address+3) << 0;
 	return ret;
-}
-
-static void dumpvecs(rsp_state *rsp)
-{
-	/*
-	char fuck[1024];
-	rsp_dasm_one(fuck, rsp->pc, IREAD32(rsp, rsp->pc));
-	printf("%08x: %s\n", rsp->pc, fuck);
-	printf("v0:  %08x %08x %08x %08x\n", rsp->v[ 0].l[0], rsp->v[ 0].l[1], rsp->v[ 0].l[2], rsp->v[ 0].l[3]);
-	printf("v1:  %08x %08x %08x %08x\n", rsp->v[ 1].l[0], rsp->v[ 1].l[1], rsp->v[ 1].l[2], rsp->v[ 1].l[3]);
-	printf("v2:  %08x %08x %08x %08x\n", rsp->v[ 2].l[0], rsp->v[ 2].l[1], rsp->v[ 2].l[2], rsp->v[ 2].l[3]);
-	printf("v3:  %08x %08x %08x %08x\n", rsp->v[ 3].l[0], rsp->v[ 3].l[1], rsp->v[ 3].l[2], rsp->v[ 3].l[3]);
-	printf("v4:  %08x %08x %08x %08x\n", rsp->v[ 4].l[0], rsp->v[ 4].l[1], rsp->v[ 4].l[2], rsp->v[ 4].l[3]);
-	printf("v5:  %08x %08x %08x %08x\n", rsp->v[ 5].l[0], rsp->v[ 5].l[1], rsp->v[ 5].l[2], rsp->v[ 5].l[3]);
-	printf("v6:  %08x %08x %08x %08x\n", rsp->v[ 6].l[0], rsp->v[ 6].l[1], rsp->v[ 6].l[2], rsp->v[ 6].l[3]);
-	printf("v7:  %08x %08x %08x %08x\n", rsp->v[ 7].l[0], rsp->v[ 7].l[1], rsp->v[ 7].l[2], rsp->v[ 7].l[3]);
-	printf("v8:  %08x %08x %08x %08x\n", rsp->v[ 8].l[0], rsp->v[ 8].l[1], rsp->v[ 8].l[2], rsp->v[ 8].l[3]);
-	printf("v9:  %08x %08x %08x %08x\n", rsp->v[ 9].l[0], rsp->v[ 9].l[1], rsp->v[ 9].l[2], rsp->v[ 9].l[3]);
-	printf("v10: %08x %08x %08x %08x\n", rsp->v[10].l[0], rsp->v[10].l[1], rsp->v[10].l[2], rsp->v[10].l[3]);
-	printf("v11: %08x %08x %08x %08x\n", rsp->v[11].l[0], rsp->v[11].l[1], rsp->v[11].l[2], rsp->v[11].l[3]);
-	printf("v12: %08x %08x %08x %08x\n", rsp->v[12].l[0], rsp->v[12].l[1], rsp->v[12].l[2], rsp->v[12].l[3]);
-	printf("v13: %08x %08x %08x %08x\n", rsp->v[13].l[0], rsp->v[13].l[1], rsp->v[13].l[2], rsp->v[13].l[3]);
-	printf("v14: %08x %08x %08x %08x\n", rsp->v[14].l[0], rsp->v[14].l[1], rsp->v[14].l[2], rsp->v[14].l[3]);
-	printf("v15: %08x %08x %08x %08x\n", rsp->v[15].l[0], rsp->v[15].l[1], rsp->v[15].l[2], rsp->v[15].l[3]);
-	printf("v16: %08x %08x %08x %08x\n", rsp->v[16].l[0], rsp->v[16].l[1], rsp->v[16].l[2], rsp->v[16].l[3]);
-	printf("v17: %08x %08x %08x %08x\n", rsp->v[17].l[0], rsp->v[17].l[1], rsp->v[17].l[2], rsp->v[17].l[3]);
-	printf("v18: %08x %08x %08x %08x\n", rsp->v[18].l[0], rsp->v[18].l[1], rsp->v[18].l[2], rsp->v[18].l[3]);
-	printf("v19: %08x %08x %08x %08x\n", rsp->v[19].l[0], rsp->v[19].l[1], rsp->v[19].l[2], rsp->v[19].l[3]);
-	printf("v20: %08x %08x %08x %08x\n", rsp->v[20].l[0], rsp->v[20].l[1], rsp->v[20].l[2], rsp->v[20].l[3]);
-	printf("v21: %08x %08x %08x %08x\n", rsp->v[21].l[0], rsp->v[21].l[1], rsp->v[21].l[2], rsp->v[21].l[3]);
-	printf("v22: %08x %08x %08x %08x\n", rsp->v[22].l[0], rsp->v[22].l[1], rsp->v[22].l[2], rsp->v[22].l[3]);
-	printf("v23: %08x %08x %08x %08x\n", rsp->v[23].l[0], rsp->v[23].l[1], rsp->v[23].l[2], rsp->v[23].l[3]);
-	printf("v24: %08x %08x %08x %08x\n", rsp->v[24].l[0], rsp->v[24].l[1], rsp->v[24].l[2], rsp->v[24].l[3]);
-	printf("v25: %08x %08x %08x %08x\n", rsp->v[25].l[0], rsp->v[25].l[1], rsp->v[25].l[2], rsp->v[25].l[3]);
-	printf("v26: %08x %08x %08x %08x\n", rsp->v[26].l[0], rsp->v[26].l[1], rsp->v[26].l[2], rsp->v[26].l[3]);
-	printf("v27: %08x %08x %08x %08x\n", rsp->v[27].l[0], rsp->v[27].l[1], rsp->v[27].l[2], rsp->v[27].l[3]);
-	printf("v28: %08x %08x %08x %08x\n", rsp->v[28].l[0], rsp->v[28].l[1], rsp->v[28].l[2], rsp->v[28].l[3]);
-	printf("v29: %08x %08x %08x %08x\n", rsp->v[29].l[0], rsp->v[29].l[1], rsp->v[29].l[2], rsp->v[29].l[3]);
-	printf("v30: %08x %08x %08x %08x\n", rsp->v[30].l[0], rsp->v[30].l[1], rsp->v[30].l[2], rsp->v[30].l[3]);
-	printf("v31: %08x %08x %08x %08x\n", rsp->v[31].l[0], rsp->v[31].l[1], rsp->v[31].l[2], rsp->v[31].l[3]);
-	printf("\n");
-	*/
 }
 
 static void cfunc_rsp_lbv(void *param)
@@ -810,8 +798,6 @@ static void cfunc_rsp_lsv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_llv(void *param)
@@ -942,8 +928,6 @@ static void cfunc_rsp_lrv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_lpv(void *param)
@@ -973,8 +957,6 @@ static void cfunc_rsp_lpv(void *param)
 	{
 		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_luv(void *param)
@@ -1004,8 +986,6 @@ static void cfunc_rsp_luv(void *param)
 	{
 		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_lhv(void *param)
@@ -1035,8 +1015,6 @@ static void cfunc_rsp_lhv(void *param)
 	{
 		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_lfv(void *param)
@@ -1073,8 +1051,6 @@ static void cfunc_rsp_lfv(void *param)
 		VREG_S(dest, i) = READ8(rsp, ea) << 7;
 		ea += 4;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_lwv(void *param)
@@ -1109,8 +1085,6 @@ static void cfunc_rsp_lwv(void *param)
 		VREG_B(dest, i & 0xf) = READ8(rsp, ea);
 		ea += 4;
 	}
-
-	dumpvecs(rsp);
 }
 
 static void cfunc_rsp_ltv(void *param)
@@ -1154,8 +1128,6 @@ static void cfunc_rsp_ltv(void *param)
 
 		ea += 2;
 	}
-
-	dumpvecs(rsp);
 }
 
 static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
@@ -2289,8 +2261,6 @@ INLINE void cfunc_rsp_vadd(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-
-	dumpvecs(rsp);
 }
 
 INLINE void cfunc_rsp_vsub(void *param)
@@ -2327,8 +2297,6 @@ INLINE void cfunc_rsp_vsub(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-
-	dumpvecs(rsp);
 }
 
 INLINE void cfunc_rsp_vabs(void *param)
