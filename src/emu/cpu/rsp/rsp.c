@@ -64,9 +64,9 @@ INLINE rsp_state *get_safe_token(device_t *device)
 #define VEC_EL_2(x,z)			(vector_elements[(x)][(z)])
 
 #define ACCUM(x)		rsp->accum[((x))].q
-#define ACCUM_H(x)		rsp->accum[((x))].w[3]
-#define ACCUM_M(x)		rsp->accum[((x))].w[2]
-#define ACCUM_L(x)		rsp->accum[((x))].w[1]
+#define ACCUM_H(x)		rsp->accum[((x))].w[0]
+#define ACCUM_M(x)		rsp->accum[((x))].w[1]
+#define ACCUM_L(x)		rsp->accum[((x))].w[2]
 
 #define CARRY_FLAG(x)			((rsp->flag[0] & (1 << ((x)))) ? 1 : 0)
 #define CLEAR_CARRY_FLAGS()		{ rsp->flag[0] &= ~0xff; }
@@ -1481,7 +1481,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				s1 = (INT32)(INT16)VREG_S(VS1REG, i);
 				s2 = (INT32)(INT16)VREG_S(VS2REG, sel);
 
-				rsp->accum[i].l[1] += s1*s2;
+				rsp->accum[i].l[0] += s1*s2;
 
 				res = SATURATE_ACCUM1(rsp, i, 0x8000, 0x7fff);
 
