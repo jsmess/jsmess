@@ -16,7 +16,7 @@
 
 #define PCW_SCREEN_WIDTH	(PCW_DISPLAY_WIDTH + (PCW_BORDER_WIDTH<<1))
 #define PCW_SCREEN_HEIGHT	(PCW_DISPLAY_HEIGHT  + (PCW_BORDER_HEIGHT<<1))
-#define PCW_PRINTER_WIDTH	(40*16)
+#define PCW_PRINTER_WIDTH	(80*16)
 #define PCW_PRINTER_HEIGHT	(20*16)
 
 
@@ -58,6 +58,8 @@ public:
 	UINT32 paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	bitmap_t* prn_output;
 	UINT8 printer_p2_prev;
+	emu_timer* prn_stepper;
+	emu_timer* prn_pins;
 };
 
 

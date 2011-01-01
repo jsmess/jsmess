@@ -104,6 +104,8 @@ System Driver Changes:
 
 - [PC8201] Added a software list for option ROMs. [Curt Coder]
 
+- [PCW] Added very preliminary printer emulation, output to a separate screen.  [Barry Rodewald]
+
 - [QL] Added a software list for cartridges. [Curt Coder]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 

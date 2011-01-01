@@ -740,6 +740,75 @@ static  READ8_HANDLER(pcw_printer_status_r)
  * T0: Paper sensor (?)
  * T1: Print head location (1 if not at left margin)
  */
+static TIMER_CALLBACK(pcw_stepper_callback)
+{
+	pcw_state *state = machine->driver_data<pcw_state>();
+
+	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",state->printer_p2 & 0x40 ? " " : "6",state->printer_p2 & 0x20 ? " " : "5",state->printer_p2 & 0x10 ? " " : "4",state->printer_shift_output,state->printer_headpos);
+	if((state->printer_p2 & 0x10) == 0)  // print head motor active
+	{
+		UINT8 stepper_state = (state->printer_shift_output >> 4) & 0x0f;
+		if(stepper_state == full_step_table[(state->head_motor_state + 1) & 0x03])
+		{
+			state->printer_headpos += 2;
+			state->head_motor_state++;
+			logerror("Printer head moved forward by 2 to %i\n",state->printer_headpos);
+		}
+		if(stepper_state == half_step_table[(state->head_motor_state + 1) & 0x03])
+		{
+			state->printer_headpos += 1;
+			state->head_motor_state++;
+			logerror("Printer head moved forward by 1 to %i\n",state->printer_headpos);
+		}
+		if(stepper_state == full_step_table[(state->head_motor_state - 1) & 0x03])
+		{
+			state->printer_headpos -= 2;
+			state->head_motor_state--;
+			logerror("Printer head moved back by 2 to %i\n",state->printer_headpos);
+		}
+		if(stepper_state == half_step_table[(state->head_motor_state - 1) & 0x03])
+		{
+			state->printer_headpos -= 1;
+			state->head_motor_state--;
+			logerror("Printer head moved back by 1 to %i\n",state->printer_headpos);
+		}
+		if(state->printer_headpos < 0)
+			state->printer_headpos = 0;
+		if(state->printer_headpos > PCW_PRINTER_WIDTH)
+			state->printer_headpos = PCW_PRINTER_WIDTH;
+		state->head_motor_state &= 0x03;
+		state->printer_p2 |= 0x10;
+	}
+	if((state->printer_p2 & 0x20) == 0)  // line feed motor active
+	{
+		UINT8 stepper_state = state->printer_shift_output & 0x0f;
+		if(stepper_state == full_step_table[(state->linefeed_motor_state + 1) & 0x03])
+		{
+			state->paper_feed++;
+			if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
+				state->paper_feed = 0;
+			state->linefeed_motor_state++;
+		}
+		if(stepper_state == half_step_table[(state->linefeed_motor_state + 1) & 0x03])
+		{
+			state->paper_feed++;
+			if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
+				state->paper_feed = 0;
+			state->linefeed_motor_state++;
+		}
+		state->linefeed_motor_state &= 0x03;
+		state->printer_p2 |= 0x20;
+	}
+}
+
+static TIMER_CALLBACK(pcw_pins_callback)
+{
+	pcw_state *state = machine->driver_data<pcw_state>();
+
+	pcw_printer_fire_pins(machine,state->printer_pins);
+	state->printer_p2 |= 0x40;
+}
+
 static READ8_HANDLER(mcu_printer_p1_r)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
@@ -774,9 +843,6 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 	//logerror("PRN: MCU writing %02x to P2\n",data);
 	state->printer_p2 = data & 0x70;
 
-	if((data & 0x40) == 0 && (state->printer_p2_prev & 0x40) != 0)
-		pcw_printer_fire_pins(space->machine,state->printer_pins);
-
 	// handle shift/store
 	state->printer_serial = data & 0x04;  // data
 	if((data & 0x02) != 0)  // clock
@@ -791,65 +857,17 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 	{
 		logerror("Strobe active [%02x]\n",state->printer_shift);
 		state->printer_shift_output = state->printer_shift;
-		if((state->printer_p2 & 0x10) == 0)  // print head motor active
-		{
-			UINT8 stepper_state = (state->printer_shift_output >> 4) & 0x0f;
-			if(stepper_state == full_step_table[(state->head_motor_state + 1) & 0x03])
-			{
-				state->printer_headpos += 2;
-				state->head_motor_state++;
-				logerror("Printer head moved forward by 2 to %i\n",state->printer_headpos);
-			}
-			if(stepper_state == half_step_table[(state->head_motor_state + 1) & 0x03])
-			{
-				state->printer_headpos += 1;
-				state->head_motor_state++;
-				logerror("Printer head moved forward by 1 to %i\n",state->printer_headpos);
-			}
-			if(stepper_state == full_step_table[(state->head_motor_state - 1) & 0x03])
-			{
-				state->printer_headpos -= 2;
-				state->head_motor_state--;
-				logerror("Printer head moved back by 2 to %i\n",state->printer_headpos);
-			}
-			if(stepper_state == half_step_table[(state->head_motor_state - 1) & 0x03])
-			{
-				state->printer_headpos -= 1;
-				state->head_motor_state--;
-				logerror("Printer head moved back by 1 to %i\n",state->printer_headpos);
-			}
-			if(state->printer_headpos < 0)
-				state->printer_headpos = 0;
-			if(state->printer_headpos > PCW_PRINTER_WIDTH)
-				state->printer_headpos = PCW_PRINTER_WIDTH;
-			state->head_motor_state &= 0x03;
-		}
-		if((state->printer_p2 & 0x20) == 0)  // line feed motor active
-		{
-			UINT8 stepper_state = state->printer_shift_output & 0x0f;
-			if(stepper_state == full_step_table[(state->linefeed_motor_state + 1) & 0x03])
-			{
-				state->paper_feed++;
-				if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
-					state->paper_feed = 0;
-				state->linefeed_motor_state++;
-			}
-			if(stepper_state == half_step_table[(state->linefeed_motor_state + 1) & 0x03])
-			{
-				state->paper_feed++;
-				if(state->paper_feed > PCW_PRINTER_HEIGHT*2)
-					state->paper_feed = 0;
-				state->linefeed_motor_state++;
-			}
-			state->linefeed_motor_state &= 0x03;
-		}
+		timer_adjust_oneshot(state->prn_stepper,PERIOD_OF_555_MONOSTABLE(22000,0.00000001),0);
 	}
+
+	if(data & 0x40)
+		timer_adjust_oneshot(state->prn_pins,PERIOD_OF_555_MONOSTABLE(22000,0.0000000068),0);
+
 	if(data & 0x01)
 		state->printer_pins |= 0x0100;
 	else
 		state->printer_pins &= ~0x0100;
 	state->printer_p2_prev = data;
-	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",data & 0x40 ? " " : "6",data & 0x20 ? " " : "5",data & 0x10 ? " " : "4",state->printer_shift_output,state->printer_headpos);
 }
 
 // Paper sensor
@@ -1103,6 +1121,9 @@ static DRIVER_INIT(pcw)
 	timer_pulse(machine, ATTOTIME_IN_HZ(300), NULL, 0, pcw_timer_interrupt);
 
 	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+
+	state->prn_stepper = timer_alloc(machine,pcw_stepper_callback,NULL);
+	state->prn_pins = timer_alloc(machine,pcw_pins_callback,NULL);
 }
 
 
@@ -1364,6 +1385,7 @@ static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
 	MDRV_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
 
 	MDRV_DEFAULT_LAYOUT( layout_pcw )
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
