@@ -1120,7 +1120,7 @@ static void start_audio_dma(running_machine *machine)
 
 	dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	dmadac[1] = machine->device<dmadac_sound_device>("dac2");
-    dmadac_transfer(&dmadac[0], 2, 2, 2, current->length/4, ram);
+    dmadac_transfer(&dmadac[0], 2, 1, 2, current->length/4, ram);
 
     ai_status |= 0x40000000;
 
