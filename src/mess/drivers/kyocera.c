@@ -1488,6 +1488,18 @@ ROM_START( pc8201a )
 	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START( npc8300 )
+	ROM_REGION( 0x10000, I8085_TAG, 0 )
+	ROM_LOAD( "831000-438_n83a_basic_1986_microsoft_8716_z01.bin", 0x0000, 0x8000, CRC(a3c15dcb) SHA1(f0322dfe3f2e951de043bf6d0973e6ffc2c87181))
+	
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
+
+	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
+ROM_END
+
+
 ROM_START( trsm100 )
 	/*
         Board Code  ROM type            ROM Code            Comment
@@ -1541,5 +1553,5 @@ COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		"Tandy Radio Shack",	"TRS-80 Mo
 COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		"Tandy Radio Shack",	"Tandy 102", 0 )
 COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", 0 )
 COMP( 1983, pc8201a,	pc8201,	0,		pc8201,		pc8201a,	0,		"Nippon Electronic Company",					"PC-8201A", 0 )
-//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      "Nippon Electronic Company",                  "PC-8300", 0 )
+COMP( 1987, npc8300,    pc8201, 0,      pc8201,     pc8201a,    0,      "Nippon Electronic Company",                  "PC-8300", GAME_NOT_WORKING )
 COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		"Tandy Radio Shack",	"Tandy 200", 0 )

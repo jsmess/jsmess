@@ -37,6 +37,7 @@ Skeleton drivers:
 - Osborne Executive [Wilbert Pol]
 - Micro Craft Dimension 68000
 - Okean-240
+- NEC PC-8300 [Incog]
 
 
 System Driver Changes:

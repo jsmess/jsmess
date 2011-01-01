@@ -1521,7 +1521,7 @@ const game_driver * const drivers[] =
 	DRIVER( tandy200 )
 	DRIVER( pc8201 )
 	DRIVER( pc8201a )
-//  DRIVER( npc8300 )
+    DRIVER( npc8300 )
 //  DRIVER( pc8401bd )
 	DRIVER( pc8500 )
 
