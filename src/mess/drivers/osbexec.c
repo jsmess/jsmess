@@ -2,16 +2,6 @@
 
     Osborne Executive driver file
 
-Screen is 80x24
-
-On boot at least bios seems to be enabled.
-
-Floppy breakpoints:
-- bp 0c50
-- bp 1449
-- bp 1465
-
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -73,18 +63,25 @@ public:
 
 	void set_banks(running_machine *machine)
 	{
-		ram_0000 = messram_get_ptr( messram );
+		UINT8 *messram_ptr = messram_get_ptr( messram );
+
+		ram_0000 = messram_ptr;
 
 		if ( pia0_porta & 0x01 )
 			ram_0000 += 0x10000;
 
 		memory_set_bankptr( machine, "0000", ram_0000 + 0x0000 );
+		memory_set_bankptr( machine, "2000", ram_0000 + 0x2000 );
 		memory_set_bankptr( machine, "4000", ram_0000 + 0x4000 );
 		memory_set_bankptr( machine, "c000", ram_0000 + 0xc000 );
 		memory_set_bankptr( machine, "e000", ram_0000 + 0xe000 );
 
 		if ( pia0_porta & 0x80 )
+		{
 			memory_set_bankptr( machine, "0000", memory_region(machine, "maincpu") );
+			/* When BIOS is enabled 2000-3FFF (or maybe 2000-2FFF) is taken from the first 64KB ) */
+			memory_set_bankptr( machine, "2000", messram_ptr + 0x2000 );
+		}
 
 		if ( pia0_porta & 0x40 )
 			memory_set_bankptr(machine, "c000", vram_region->base() );
@@ -159,10 +156,10 @@ static READ8_HANDLER( osbexec_rtc_r )
 
 static ADDRESS_MAP_START( osbexec_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE( osbexec_0000_w )	/* ROM and maybe also banked ram */
-	AM_RANGE( 0x2000, 0x3FFF ) AM_RAM											/* Banked? RAM */
-	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked ram */
+	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")								/* Banked RAM */
+	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked RAM */
 	AM_RANGE( 0xC000, 0xDFFF ) AM_RAMBANK("c000")								/* Video ram / Banked RAM */
-	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")								/* Banked ram */
+	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")								/* Banked RAM */
 	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM											/* 4KB of non-banked RAM for system stack etc */
 ADDRESS_MAP_END
 
